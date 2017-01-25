@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5-zone GSHP-GLHE.idf
+! 5-zone GSHP-Slinky.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Water to water ground source heat pump (parameter estimation model) with slinky ground loop heat exchanger
@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.6;
 
   Building,
     Building,                !- Name
@@ -3553,10 +3553,18 @@
     40,               !- Trench Length [m]
     15,               !- Number of Parallel Trenches
     2,                !- Trench Spacing [m]
-    15.5,             !- Kusuda-Achenbach Average Surface Temp [C]
-    3.2,              !- Kusuda-Achenbach Average Surface Temp Amplitude [C]
-    8,                !- Kusuda-Achenbach Phase Shift [C]
-    10;               !- Maximum length of simulation [years] 
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,    !- Type of Undisturbed Ground Temperature Model
+    KATemps,          !- Name of Undisturbed Ground Temperature Model
+    10;               !- Maximum length of simulation [years]
+    
+Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,         !- Name of object
+    1.8,             !- Pipe Thermal Conductivity [W/m-K]
+    920,             !- Pipe Density [kg/m3]
+    2200,            !- Pipe Specific Heat [J/kg-K]
+    15.5,            !- Annual average surface temperature [C]
+    3.2,             !- Annual amplitude of surface temperature [delta C]
+    8;               !- Phase shift of minimum surface temperature [days]
   
   Pump:ConstantSpeed,
     Cond Circ Pump,          !- Name

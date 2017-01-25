@@ -1,0 +1,1551 @@
+\section{Output:Table:SummaryReports}\label{outputtablesummaryreports}
+
+The Output:Table:SummaryReports object controls which predefined tabular reports are produced.~ The easiest option is to specify ``AllSummary'' which will produce all of the summary reports described in this section and does not include the Zone Component Load report. In addition, ``AllMonthly'' will produce all of the monthly reports described. If all predefined reports are needed. ``AllSummaryAndMonthly'' shows all of the summary and monthly predefined reports and does not include the Zone Component Load report. The ``AllSummaryAndSizingPeriod'' option and ``AllSummaryMonthlyAndSizingPeriod'' option are similar and add the Zone Component Load report. Including the Zone Component Load Summary report may increase the simulation run time.
+
+\subsection{Inputs}\label{inputs-064}
+
+\paragraph{Field: Report \textless{}\#\textgreater{} Name}\label{field-report-name}
+
+All of the fields in the Output:Table:SummaryReports are the same. A long list of predefined summary reports is available by entering one of the available key choices described below. Each one indicates the name of the predefined reports that should be output. The input AllSummary will cause all the reports described below to be created.~ The Report \textless{}\#\textgreater{} Name field can be repeated.
+
+\subsubsection{Predefined Annual Summary Reports}\label{predefined-annual-summary-reports}
+
+\paragraph{Annual Building Utility Performance Summary (sometimes called ABUPS)}\label{annual-building-utility-performance-summary-sometimes-called-abups}
+
+The Annual Building Utility Performance Summary report often called ABUPS -- (key: AnnualBuildingUtilityPerformanceSummary) produces a report that is an overall summary of the utility consumption of the building. It contains a number of subtables that are each described below.
+
+\begin{itemize}
+\item
+  Site and Source Energy -- Indicates the total site and source energy use. For electricity the net electricity from the utility is used for the electric contribution. The site to source conversion factors are based on those entered by the user. These are entered in the EnvironmentalImpactFactors object and FuelFactors objects.
+\item
+  Building Area -- Shows the total floorspace of the building and the conditioned floorspace.
+\item
+  End Uses -- This shows the total use of electricity, natural gas, other fuels, purchased cooling, purchased heating and water for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource does not affect this table -- the amount of electricity used for lights does not change if the electricity is from the utility or from an on-site generator. The Other Fuel column includes fuel oil\#1, fuel oil\#2, gasoline, coal, propane, diesel, otherfuel1 and otherfuel2. The district heating column also~ includes steam.
+\item
+  End Uses By Subcategory -- Shows a breakdown of the major end uses by user-defined category. If an end-use subcategory was not input for an object, it is automatically added to the General subcategory for that major end-use category.
+\item
+  Utility Use Per Floor Area -- These two sub-tables show the results from the end-uses table divided by the total floor area defined for the building and for the total conditioned floor area. Only three categories for end-uses are used for these sub-tables, lighting, HVAC and other. HVAC includes fans, pumps, heating, cooling, heat rejection, humidification, and domestic hot water heating. The Other Fuel column includes fuel oil\#1, fuel oil\#2, gasoline, coal, propane, diesel, otherfuel1 and otherfuel2. The district heating column also~ includes steam.
+\item
+  Electric Loads Satisfied -- Shows the different methods that electric loads are satisfied in the building. The values shown for on site power generation are: Fuel-Fired Power Generation, High Temperature Geothermal, Photovoltaic Power, and Wind Power. The flows to and from the electric utility are shown next and finally the total electricity used at the site is compared to the total generated on site plus the net amount from the electric utility. The percentages shown are based on the total electricity used by the end-uses. Note that High Temperature Geothermal and Wind Power are not yet implemented in EnergyPlus.
+\item
+  On-Site Thermal Sources -- Shows the on-site thermal sources of energy such as Water-Side Heat Recovery, Air to Air Heat Recovery for Cooling, Air to Air Heat Recovery for Heating, High-Temperature Geothermal, Solar Water Thermal, Solar Air Thermal. Note that High-Temperature Geothermal Solar Water Thermal, and Solar Air Thermal are not yet implemented in EnergyPlus.
+\item
+  Water Loads Summary -- Shows the different methods the water loads were satisfied. This table shows all zeros because water use is not yet implemented in EnergyPlus.
+\end{itemize}
+
+\paragraph{Input Verification and Results Summary (or IVRS)}\label{input-verification-and-results-summary-or-ivrs}
+
+The Input Verification and Results Summary report (key: InputVerificationandResultsSummary) produces a report with several tables including:
+
+\begin{itemize}
+\item
+  General which includes general information like the Program Version and Build, Weather, Latitude, Longitude, Elevation, Time Zone, North Axis Angle, and Hours Simulated.
+\item
+  Window-Wall Ratio table for envelope which includes the wall area, the window area and the ratio of the two. These are computed for all walls and for walls that are oriented generally north, south, east and west. All walls are categorized into one of these four cardinal directions. This is computed for walls that have a tilt of 60 to 120 degrees.
+\item
+  Skylight-Roof Ratio table for envelope which includes the roof area and the skylight area and the ratio of the two. This includes all surfaces with a tilt of less than 60 degrees.
+\item
+  Zone Summary includes internal load summary for each zone including area, if conditioned, volume, multipliers, above ground gross wall area, underground gross wall area, window area, design lighting, design people, design plug and process.
+\end{itemize}
+
+\paragraph{Source Energy End Use Components Summary}\label{source-energy-end-use-components-summary}
+
+The Source Energy End Use Components Summary report produces a report (key: SourceEnergyEndUseComponentsSummary) that includes three tables. These tables display source energy by fuel type that is calculated based on site to source energy factors specified by the user in the EnvironmentalImpactFactors and FuelFactors objects. The last two tables display the source energy in terms of area normalized metrics. Following is a description of each table:
+
+\begin{itemize}
+\item
+  Source Energy End Use Components -- This shows the total use of source electricity, source natural gas, source values of other fuels, source purchased cooling~~ and purchased heating for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource will affect this table -- the amount of electricity used for lights will change if the electricity is from the utility or from an on-site generator. The Other Fuel column includes FuelOil\#1, FuelOil\#2, Gasoline, Coal, Propane, Diesel, OtherFuel1 and OtherFuel2. The district heating column also~ includes steam.
+\item
+  Source Energy End Use Components normalized by Conditioned Floor Area -- This table shows the total end uses in source energy normalized by conditioned floor area.
+\item
+  Source Energy End Use Components normalized by Total Floor Area -- This table shows the total end uses in source energy normalized by total floor area.
+\end{itemize}
+
+\paragraph{Climatic Data Summary}\label{climatic-data-summary}
+
+The Climate Summary or Climatic Data Summary report (key: ClimaticDataSummary) produces a report that includes some of the details on each of the design days including: maximum dry-bulb, daily temperature range, humidity value, humidity type, wind speed, and wind direction.
+
+\paragraph{Envelope Summary}\label{envelope-summary}
+
+The Envelope Summary report (key: EnvelopeSummary) produces a report that includes the following tables:
+
+\begin{itemize}
+\item
+  Opaque which includes all opaque surfaces and includes the name of the construction, reflectance, U-Factor, gross area, azimuth, tilt, cardinal direction.
+\item
+  Fenestration which includes all non-opaque surfaces and includes the name of the construction, areas (glass, frame, divider, single opening, multiplied openings), U-Factor, SHGC (the solar heat gain coefficient based on summer conditions), visible transmittance, conductance (frame, divider), indication of shade control, the name of the parent surface, azimuth, tilt, cardinal direction.
+\end{itemize}
+
+\paragraph{Surface Shadowing Summary}\label{surface-shadowing-summary}
+
+The Surface Shadowing Summary report (key: SurfaceShadowingSummary) produces a report that includes two tables. Note that surfaces starting with ``Mir-`` are automatically generated by EnergyPlus and are the mirror images of user entered surfaces.
+
+\begin{itemize}
+\item
+  Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces and includes the name of the surface and a list of surfaces that may possibly cast shadows on that named surface. The list of possible shadow casters does not necessarily mean that they do cast shadows during the simulation, only that their relative position makes it possible that shadows from a surface in the list may fall on the named surface.
+\item
+  Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces, includes the name of the subsurface such as a window or a door and a corresponding list of surfaces that may be casting shadows on the windows and doors.
+\end{itemize}
+
+\paragraph{Shading Summary}\label{shading-summary}
+
+The Shading Summary report (key: ShadingSummary) produces a report that includes the following tables:
+
+\begin{itemize}
+\item
+  Sunlit Fraction which shows a list of windows and the fraction of the window that is sunlit for nine specific times of the year. The nine specific times include 9am, noon and 3pm on March 21, June 21, and December 21. These nine times were chosen to represent the range of sun angles. The simulation must include those times for the value to be included in the report.
+\item
+  Window control includes the names of all windows that have a window shading control (see WindowProperty:ShadingControl) and includes the name of the control, the type of shading, the shaded construction, the kind of control, and if glare control is used.
+\end{itemize}
+
+\paragraph{Lighting Summary}\label{lighting-summary}
+
+The Lighting Summary report (key: LightingSummary) produces a report that includes the following tables:
+
+\begin{itemize}
+\item
+  Interior Lighting which includes the name of the lights object, the zone that it is used in, the lighting power density, zone area, total power, end use subcategory, schedule name, average hours per week, return air fraction, and whether the zone is conditioned.
+\item
+  Daylighting which includes the names of the daylighting objects, the zone they are used in, the type of daylighting being used, the control type, the fraction of the lighting controlled, the total power of the lighting installed in the zone and the lighting power that is controlled by the daylighting object.
+\item
+  Exterior Lighting which includes the name of the ExteriorLights object, the total watts described by the object, if the ExteriorLights uses an astronomical clock or just a schedule, the name of the schedule used, and the average hours per week for the named schedule for the year. The effect of the astronomical clock does not get included in the averaged hours per week shown.
+\end{itemize}
+
+\paragraph{Equipment Summary}\label{equipment-summary}
+
+The Equipment Summary report (key: EquipmentSummary) produces a report that includes some details on the major HVAC equipment present. The report has seven parts.
+
+\begin{itemize}
+\item
+  Central Plant includes details on chillers, boilers, and cooling towers including the capacity and efficiency. For Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR, IPLV at AHRI standard test conditions is reported.
+\item
+  Cooling Coils includes the nominal total, sensible and latent capacities, the nominal sensible heat ratio, the nominal efficiency, nominal UA value, and nominal~ surface area for each cooling coil. These values are calculated by calling the cooling coil simulation routine with the rated inlet conditions: inlet air dry bulb temperature = 26.67C, inlet air wet bulb temperature = 19.44C, inlet chilled water temperature = 6.67C.
+\item
+  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = Coil:Cooling:DX:SingleSpeed with condenser type = AirCooled.
+\item
+  DX Heating Coils summarizes the High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) values at AHRI standard test. Currently, these values are only reported for coil type = Coil:Heating:DX:SingleSpeed.
+\item
+  Heating Coils includes the nominal capacity and efficiency for each heating coil. The capacity is calculated by calling the heating coil simulation routine at the rated inlet conditions: inlet air dry bulb temperature = 16.6C, inlet relative humidity = 50\%, inlet hot water temperature = 82.2C.
+\item
+  Fan includes the type of fan, the total efficiency, delta pressure, max flow rate, motor heat in air fraction, and end use.
+\item
+  Pumps includes the type of pump, control type, head pressure, electric power, and motor efficiency for each pump.
+\item
+  Service Water Heating includes the type of water heater, the storage volume, input, thermal efficiency, recovery efficiency, and energy factor.
+\end{itemize}
+
+\paragraph{HVAC Sizing Summary}\label{hvac-sizing-summary}
+
+The HVAC Sizing Summary report (key: HVACSizingSummary) produces a report that includes the following tables:
+
+\begin{itemize}
+\item
+  Zone Cooling which includes the following columns for each zone: the calculated design load, the user specified design load, the calculated design air flow, the user specified design air flow, the name of the sizing period, the time of the peak load during the sizing period, the temperature at the time of the peak load during the sizing period, and the humidity ratio at the time of the peak load during the sizing period used.
+\item
+  Zone Heating which includes the following columns for each zone: the calculated design load, the user specified design load, the calculated design air flow, the user specified design air flow, the name of the sizing period, the time of the peak load during the sizing period, the temperature at the time of the peak load during the sizing period, and the humidity ratio at the time of the peak load during the sizing period used.
+\item
+  System Design Air Flow Rates which includes the following columns for each air loop: the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, the user specified air flow rate for heating.
+\item
+  \emph{Note:} values listed as ``calculated'' are the unaltered result of the zone or system sizing calculations, using the design sizing period weather and schedules specified in the input. Values listed as ``user specified'' are either the calculated values modified by global or zone sizing factors or values specified with the \emph{flow/zone} or \emph{flow/system} design air flow method.
+\end{itemize}
+
+\paragraph{Component Sizing Summary}\label{component-sizing-summary}
+
+The Component Sizing Summary report (key: ComponentSizingSummary) produces a report that includes different tables depending on the kinds of HVAC components that exist in the input file. A table is shown for each type of HVAC component that is sized. The table lists the objects of that type of component that appear in the input file and one or more parameters related to that component.~ For example, the AirTerminal:SingleDuct:VAV:Reheat component creates a table showing the maximum air flow rate from the sizing calculations and the maximum reheat water flow rate. Another example is the Fan:VariableVolume object which shows a table with both the maximum and minimum flow rates for each fan based on the results from the sizing calculations.
+
+\paragraph{Outdoor Air Summary}\label{outdoor-air-summary}
+
+The Outdoor Air Summary report (key: OutdoorAirSummary) produces a report that includes the following tables:
+
+\begin{itemize}
+\item
+  Average Outside Air During Occupied Hours table shows for each zone the average and nominal number of occupants, the zone volume, the average air change rate based on mechanical ventilation, infiltration and simple ventilation during occupied hours.
+\item
+  Minimum Outside Air During Occupied Hours table shows for each zone the average and nominal number of occupants, the zone volume, the minimum air change rate based on mechanical ventilation, infiltration and simple ventilation during occupied hours.
+\end{itemize}
+
+\paragraph{System Summary}\label{system-summary}
+
+The System Summary Report (key: SystemSummary) produces a report that includes the following tables:
+
+\begin{itemize}
+\item
+  Economizer which includes the following columns for each Controller:OutdoorAir object: the high limit shutoff control, the minimum outdoor air flow, the maximum outdoor air flow, if the return air temperature has a control limit, if the return air has an enthalpy limit, the outdoor air temperature limit, and the outdoor air enthalpy limit.
+\item
+  Demand Controlled Ventilation table is for each Controller:MechanicalVentilation object and shows the name, the nominal outdoor air per person and the nominal outdoor air per zone area.
+\item
+  Time Not Comfortable Based on Simple ASHRAE 55-2004 table shows how many hours that the space is not comfortable for each zone under the criteria of assuming winter clothes, summer clothes or both summer and winter clothes.~ See the People object for more information about this thermal comfort calculation.
+\item
+  Time Setpoint is Not Met table shows how many hours the space is more than 0.2C from the setpoint during heating and during cooling.~ The last two columns indicate those hours that the setpoint is not met while the space is occupied.
+\end{itemize}
+
+\paragraph{Adaptive Comfort Summary}\label{adaptive-comfort-summary}
+
+The Adaptive Comfort Summary report (key: AdaptiveComfortSummary) produces a report tabulating the sum of occupied hours not meeting adaptive comfort acceptability limits for each relevant People object (People objects for which adaptive comfort calculations are requested). These acceptability limits include ASHRAE Std. 55 80\%, ASHRAE Std. 55 90\%, CEN-15251 Category I, CEN-15251 Category II, and CEN-15251 Category III.
+
+\paragraph{Sensible Heat Gain Summary}\label{sensible-heat-gain-summary}
+
+The Sensible Heat Gain Summary (key: SensibleHeatGainSummary) provides results for each zone and the overall building for some of the major heat gain components. The first four columns show the loads satisfied by sensible air heating and cooling as well as radiant heating and cooling surfaces in the zone. The heat gains from people, lighting, equipment, windows, interzone air flow, and infiltration are shown when adding heat to the zone and separately when removing heat from the zone (for applicable components). Finally the balance is shown as ``Opaque Surface Conduction and Other Heat Addition'' and ``Opaque Surface Conduction and Other Heat Removal'' which is a term indicating the affect of the walls, floors and ceilings/roof to the zone as well as the impact of the delay between heat gains/losses and loads on the HVAC equipment serving the zone.~ The following shows each output variable that is used for each column. For each timestep in the simulation, positive values are shown as additions and negative values are shown as removal for most variables.
+
+\begin{itemize}
+\tightlist
+\item
+  HVAC Input Sensible Air Heating
+\end{itemize}
+
+Zone Air Heat Balance System Air Transfer Rate
+
+Zone Air Heat Balance System Convective Heat Gain Rate
+
+\begin{itemize}
+\tightlist
+\item
+  HVAC Input Sensible Air Cooling
+\end{itemize}
+
+Zone Air Heat Balance System Air Transfer Rate
+
+Zone Air Heat Balance System Convective Heat Gain Rate
+
+\begin{itemize}
+\tightlist
+\item
+  HVAC Input Heated Surface Heating
+\end{itemize}
+
+Zone Radiant HVAC Heating Energy
+
+Zone Ventilated Slab Radiant Heating Energy
+
+\begin{itemize}
+\tightlist
+\item
+  HVAC Input Cooled Surface Cooling
+\end{itemize}
+
+Zone Radiant HVAC Cooling Energy
+
+Zone Ventilated Slab Radiant Cooling Energy
+
+\begin{itemize}
+\tightlist
+\item
+  People Sensible Heat Addition
+\end{itemize}
+
+Zone People Sensible Heating Energy
+
+\begin{itemize}
+\tightlist
+\item
+  Lights Sensible Heat Addition
+\end{itemize}
+
+Zone Lights Total Heating Energy
+
+\begin{itemize}
+\tightlist
+\item
+  Equipment Sensible Heat Addition \& Equipment Sensible Heat Removal
+\end{itemize}
+
+Zone Electric Equipment Radiant Heating Energy
+
+Zone Gas Equipment Radiant Heating Energy
+
+Zone Steam Equipment Radiant Heating Energy
+
+Zone Hot Water Equipment Radiant Heating Energy
+
+Zone Other Equipment Radiant Heating Energy
+
+Zone Electric Equipment Convective Heating Energy
+
+Zone Gas Equipment Convective Heating Energy
+
+Zone Steam Equipment Convective Heating Energy
+
+Zone Hot Water Equipment Convective Heating Energy
+
+Zone Other Equipment Convective Heating Energy
+
+\begin{itemize}
+\tightlist
+\item
+  Window Heat Addition \& Window Heat Removal
+\end{itemize}
+
+Zone Windows Total Heat Gain Energy
+
+\begin{itemize}
+\tightlist
+\item
+  Interzone Air Transfer Heat Addition \& Interzone Air Transfer Heat Removal
+\end{itemize}
+
+Zone Air Heat Balance Interzone Air Transfer Rate
+
+\begin{itemize}
+\tightlist
+\item
+  Infiltration Heat Addition \& Infiltration Heat Removal
+\end{itemize}
+
+Zone Air Heat Balance Outdoor Air Transfer Rate
+
+The Opaque Surface Conduction and Other Heat Addition and Opaque Surface Conduction and Other Heat Removal columns are also calculated on an timestep basis as the negative value of the other removal and gain columns so that the total for the timestep sums to zero. These columns are derived strictly from the other columns.
+
+\paragraph{Zone Component Load Summary}\label{zone-component-load-summary}
+
+The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The key used to obtain this report is ZoneComponentLoadSummary. Since including this report may increase the simulation time, new key options have been added that will display all reports but the Zone Component Load Summary those keys used are AllSummaryButZoneComponentLoad and AllSummaryAndMonthlyButZoneComponentLoad.
+
+The report has four parts:
+
+\begin{itemize}
+\tightlist
+\item
+  Estimated Cooling Peak Load Components
+\end{itemize}
+
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference.
+
+\begin{itemize}
+\tightlist
+\item
+  Cooling Peak Conditions
+\end{itemize}
+
+Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and relative humidity and humidity ratio for that time.
+
+\begin{itemize}
+\tightlist
+\item
+  Estimated Heating Peak Load Components
+\end{itemize}
+
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference.
+
+\begin{itemize}
+\tightlist
+\item
+  Heating Peak Conditions
+\end{itemize}
+
+Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and the relative humidity and humidity ratio for that time.
+
+\paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
+
+The Standard 62.1 Summary (key: Standard62.1Summary) produces a report that is consistent with many of the outputs needed when doing calculations consistent with ASHRAE Standard 62.1-2010. The report is generated when sizing calculations are specified. The abbreviations used in the report are consistent with the abbreviations used in Appendix A4 of the Standard. The following tables are part of the report:
+
+\begin{itemize}
+\item
+  System Ventilation Requirements for Cooling containing: Sum of Zone Primary Air Flow - Vpz-sum, System Population -- Ps, Sum of Zone Population - Pz-sum, Occupant Diversity -- D, Uncorrected Outdoor Air Intake Airflow -- Vou, System Primary Airflow -- Vps, Average Outdoor Air Fraction -- Xs, System Ventilation Efficiency -- Ev, Outdoor Air Intake Flow -- Vot, Percent Outdoor Air - \%OA.
+\item
+  System Ventilation Requirements for Heating containing: Sum of Zone Primary Air Flow - Vpz-sum, System Population -- Ps, Sum of Zone Population - Pz-sum, Occupant Diversity -- D, Uncorrected Outdoor Air Intake Airflow -- Vou, System Primary Airflow -- Vps, Average Outdoor Air Fraction -- Xs, System Ventilation Efficiency -- Ev, Outdoor Air Intake Flow -- Vot, Percent Outdoor Air - \%OA.
+\item
+  Zone Ventilation Parameters containing: AirLoop Name, People Outdoor Air Rate -- Rp, ~Zone Population -- Pz, Area Outdoor Air Rate -- Ra, Zone Floor Area -- Az, Breathing Zone Outdoor Airflow -- Vbz, Cooling Zone Air Distribution Effectiveness - Ez-clg, Cooling Zone Outdoor Airflow - Voz-clg, Heating Zone Air Distribution Effectiveness - Ez-htg, Heating Zone Outdoor Airflow - Voz-htg.
+\item
+  System Ventilation Parameters containing: People Outdoor Air Rate -- Rp, Sum of Zone Population - Pz-sum, Area Outdoor Air Rate -- Ra, Sum of Zone Floor Area - Az-sum, Breathing Zone Outdoor Airflow -- Vbz, Cooling Zone Outdoor Airflow - Voz-clg, Heating Zone Outdoor Airflow - Voz-htg.
+\item
+  Zone Ventilation Calculations for Cooling Design containing: AirLoop Name, Box Type, Zone Primary Airflow -- Vpz, Zone Discharge Airflow -- Vdz, Minimum Zone Primary Airflow - Vpz-min, Zone Outdoor Airflow Cooling - Voz-clg, Primary Outdoor Air Fraction -- Zpz, Primary Air Fraction -- Ep, Secondary Recirculation Fraction- Er, Supply Air Fraction- Fa, Mixed Air Fraction -- Fb, Outdoor Air Fraction -- Fc, Zone Ventilation Efficiency -- Evz.
+\item
+  System Ventilation Calculations for Cooling Design containing: Sum of Zone Primary Airflow - Vpz-sum, System Primary Airflow -- Vps, Sum of Zone Discharge Airflow - Vdz-sum, Minimum Zone Primary Airflow - Vpz-min, Zone Outdoor Airflow Cooling - Voz-clg, Zone Ventilation Efficiency - Evz-min.
+\item
+  Zone Ventilation Calculations for Heating Design containing: AirLoop Name, Box Type, Zone Primary Airflow -- Vpz, Zone Discharge Airflow -- Vdz, Minimum Zone Primary Airflow - Vpz-min, Zone Outdoor Airflow Cooling - Voz-clg, Primary Outdoor Air Fraction -- Zpz, Primary Air Fraction -- Ep, Secondary Recirculation Fraction- Er, Supply Air Fraction- Fa, Mixed Air Fraction -- Fb, Outdoor Air Fraction -- Fc, Zone Ventilation Efficiency -- Evz.
+\item
+  System Ventilation Calculations for Heating Design containing: Sum of Zone Primary Airflow - Vpz-sum, System Primary Airflow -- Vps, Sum of Zone Discharge Airflow - Vdz-sum, Minimum Zone Primary Airflow - Vpz-min, Zone Outdoor Airflow Cooling - Voz-clg, Zone Ventilation Efficiency - Evz-min.
+\end{itemize}
+
+\paragraph{Energy Meters Summary}\label{energy-meters-summary}
+
+The Energy Meters Summary (key: EnergyMeters) (which is a slight misnomer as some meters may not be strictly energy) provides the annual period (runperiod) results for each meter (reference the meter data dictionary file (.mdd) and/or the meter details file (.mtd). The results are broken out by fuel type (resource type) in this report.
+
+\paragraph{LEED Summary}\label{leed-summary}
+
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+
+\paragraph{Tariff Report}\label{TariffReport}
+
+The Tariff Report provides the results of the UtilityCost:Tariff object. The report consists of a summary table, categories, charges, ratchets, qualifies, native variables, other variables and computation. The key used to obtain this report is TariffReport.
+
+\paragraph{Economic Result Summary}\label{EconomicResultSummary}
+
+The Economic Result Summary provides a summary of the Tariff Reports. The report consists of annual costs and costs for each tariff considered and why it was or was not selected. The key used to obtain this report is EconomicResultSummary.
+
+\paragraph{Component Cost Economics Summary}\label{component-cost-economics-summary}
+
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
+
+\paragraph{Life Cycle Cost Report}\label{LifeCycleCostReport}
+
+The Life Cycle Cost Report provides the a summary of the information from the Life Cycle Cost calculations.  This report shows the costs and the timing of costs, often called “cash flows,” along with the present value in several different tables. The tabular results show the present value of all current and future costs. The key used to obtain this report is LifeCycleCostReport.
+
+
+\subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
+
+The predefined monthly report options are shown below. The key name of the predefined monthly report is all that is needed to have that report appear in the tabular output file. After each report name below are the output variables and aggregation types used. These cannot be modified when using the predefined reports but if changes are desired, a Output:Table:Monthly can be used instead. The StandardReports.idf file in the DataSets directory includes a Output:Table:Monthly that exactly corresponds to the predefined monthly reports shown below. They can be copied into an IDF file and extended if additional variables are desired. A listing of each available key for predefined monthly summary reports follows with a discrption of the variables included.
+
+\paragraph{ZoneCoolingSummaryMonthly}\label{zonecoolingsummarymonthly}
+
+\begin{itemize}
+\item
+  Zone Air System Sensible Cooling Energy (SumOrAverage)
+\item
+  Zone Air System Sensible Cooling Rate (Maximum)
+\item
+  Site Outdoor Air Drybulb Temperature (ValueWhenMaxMin)
+\item
+  Site Outdoor Air Wetbulb Temperature (ValueWhenMaxMin)
+\item
+  Zone Total Internal Latent Gain Energy (SumOrAverage)
+\item
+  Zone Total Internal Latent Gain Energy (Maximum)
+\item
+  Site Outdoor Air Drybulb Temperature (ValueWhenMaxMin)
+\item
+  Site Outdoor Air Wetbulb Temperature (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{ZoneHeatingSummaryMonthly}\label{zoneheatingsummarymonthly}
+
+\begin{itemize}
+\item
+  Zone Air System Sensible Heating Energy (SumOrAverage)
+\item
+  Zone Air System Sensible Heating Rate (Maximum)
+\item
+  Site Outdoor Air Drybulb Temperature (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{ZoneElectricSummaryMonthly}\label{zoneelectricsummarymonthly}
+
+\begin{itemize}
+\item
+  Zone Lights Electric Energy (SumOrAverage)
+\item
+  Zone Lights Electric Energy (Maximum)
+\item
+  Zone Electric Equipment Electric Energy (SumOrAverage)
+\item
+  Zone Electric Equipment Electric Energy (Maximum)
+\end{itemize}
+
+\paragraph{SpaceGainsMonthly}\label{spacegainsmonthly}
+
+\begin{itemize}
+\item
+  Zone People Total Heating Energy (SumOrAverage)
+\item
+  Zone Lights Total Heating Energy (SumOrAverage)
+\item
+  Zone Electric Equipment Total Heating Energy (SumOrAverage)
+\item
+  Zone Gas Equipment Total Heating Energy (SumOrAverage)
+\item
+  Zone Hot Water Equipment Total Heating Energy (SumOrAverage)
+\item
+  Zone Steam Equipment Total Heating Energy (SumOrAverage)
+\item
+  Zone Other Equipment Total Heating Energy (SumOrAverage)
+\item
+  Zone Infiltration Sensible Heat Gain Energy (SumOrAverage)
+\item
+  Zone Infiltration Sensible Heat Loss Energy (SumOrAverage)
+\end{itemize}
+
+\paragraph{PeakSpaceGainsMonthly}\label{peakspacegainsmonthly}
+
+\begin{itemize}
+\item
+  Zone People Total Heating Energy (Maximum)
+\item
+  Zone Lights Total Heating Energy (Maximum)
+\item
+  Zone Electric Equipment Total Heating Energy (Maximum)
+\item
+  Zone Gas Equipment Total Heating Energy (Maximum)
+\item
+  Zone Hot Water Equipment Total Heating Energy (Maximum)
+\item
+  Zone Steam Equipment Total Heating Energy (Maximum)
+\item
+  Zone Other Equipment Total Heating Energy (Maximum)
+\item
+  Zone Infiltration Sensible Heat Gain Energy (Maximum)
+\item
+  Zone Infiltration Sensible Heat Loss Energy (Maximum)
+\end{itemize}
+
+\paragraph{SpaceGainComponentsAtCoolingPeakMonthly}\label{spacegaincomponentsatcoolingpeakmonthly}
+
+\begin{itemize}
+\item
+  Zone Air System Sensible Cooling Rate (Maximum)
+\item
+  Zone People Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Lights Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Electric Equipment Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Gas Equipment Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Hot Water Equipment Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Steam Equipment Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Other Equipment Total Heating Energy (ValueWhenMaxMin)
+\item
+  Zone Infiltration Sensible Heat Gain Energy (ValueWhenMaxMin)
+\item
+  Zone Infiltration Sensible Heat Loss Energy (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{EnergyConsumptionElectricityNaturalGasMonthly}\label{energyconsumptionelectricitynaturalgasmonthly}
+
+\begin{itemize}
+\item
+  Electricity:Facility (SumOrAverage)
+\item
+  Electricity:Facility (Maximum)
+\item
+  Gas:Facility (SumOrAverage)
+\item
+  Gas:Facility (Maximum)
+\end{itemize}
+
+\paragraph{EnergyConsumptionElectricityGeneratedPropaneMonthly}\label{energyconsumptionelectricitygeneratedpropanemonthly}
+
+\begin{itemize}
+\item
+  ElectricityProduced:Facility (SumOrAverage)
+\item
+  ElectricityProduced:Facility (Maximum)
+\item
+  Propane:Facility (SumOrAverage)
+\item
+  Propane:Facility (Maximum)
+\end{itemize}
+
+\paragraph{EnergyConsumptionDieselFuel OilMonthly}\label{energyconsumptiondieselfuel-oilmonthly}
+
+\begin{itemize}
+\item
+  Diesel:Facility (SumOrAverage)
+\item
+  Diesel:Facility (Maximum)
+\item
+  FuelOil\#1:Facility (SumOrAverage)
+\item
+  FuelOil\#1:Facility (Maximum)
+\item
+  FuelOil\#2:Facility (SumOrAverage)
+\item
+  FuelOil\#2:Facility (Maximum)
+\end{itemize}
+
+\paragraph{EnergyConsumptionDisctrictHeatingCoolingMonthly}\label{energyconsumptiondisctrictheatingcoolingmonthly}
+
+\begin{itemize}
+\item
+  DistrictCooling:Facility (SumOrAverage)
+\item
+  DistrictCooling:Facility (Maximum)
+\item
+  DistrictHeating:Facility (SumOrAverage)
+\item
+  DistrictHeating:Facility (Maximum)
+\end{itemize}
+
+\paragraph{EnergyConsumptionCoalGasolineMonthly}\label{energyconsumptioncoalgasolinemonthly}
+
+\begin{itemize}
+\item
+  Coal:Facility (SumOrAverage)
+\item
+  Coal:Facility (Maximum)
+\item
+  Gasoline:Facility (SumOrAverage)
+\item
+  Gasoline:Facility (Maximum)
+\end{itemize}
+
+\paragraph{EnergyConsumptionOtherFuelsMonthly}\label{energyconsumptionotherfuelsmonthly}
+
+\begin{itemize}
+\item
+  OtherFuel1:Facility (SumOrAverage)
+\item
+  OtherFuel1:Facility (Maximum)
+\item
+  OtherFuel2:Facility (SumOrAverage)
+\item
+  OtherFuel2:Facility (Maximum)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionElectricityMonthly}\label{enduseenergyconsumptionelectricitymonthly}
+
+\begin{itemize}
+\item
+  InteriorLights:Electricity (SumOrAverage)
+\item
+  ExteriorLights:Electricity (SumOrAverage)
+\item
+  InteriorEquipment:Electricity (SumOrAverage)
+\item
+  ExteriorEquipment:Electricity (SumOrAverage)
+\item
+  Fans:Electricity (SumOrAverage)
+\item
+  Pumps:Electricity (SumOrAverage)
+\item
+  Heating:Electricity (SumOrAverage)
+\item
+  Cooling:Electricity (SumOrAverage)
+\item
+  HeatRejection:Electricity (SumOrAverage)
+\item
+  Humidifier:Electricity (SumOrAverage)
+\item
+  HeatRecovery:Electricity (SumOrAverage)
+\item
+  WaterSystems:Electricity (SumOrAverage)
+\item
+  Cogeneration:Electricity (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionNaturalGasMonthly}\label{enduseenergyconsumptionnaturalgasmonthly}
+
+\begin{itemize}
+\item
+  InteriorEquipment:Gas (SumOrAverage)
+\item
+  ExteriorEquipment:Gas (SumOrAverage)
+\item
+  Heating:Gas (SumOrAverage)
+\item
+  Cooling:Gas (SumOrAverage)
+\item
+  WaterSystems:Gas (SumOrAverage)
+\item
+  Cogeneration:Gas (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionDieselMonthly}\label{enduseenergyconsumptiondieselmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Diesel (SumOrAverage)
+\item
+  Cooling:Diesel (SumOrAverage)
+\item
+  Heating:Diesel (SumOrAverage)
+\item
+  WaterSystems:Diesel (SumOrAverage)
+\item
+  Cogeneration:Diesel (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionFuelOilMonthly}\label{enduseenergyconsumptionfueloilmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:FuelOil\#1 (SumOrAverage)
+\item
+  Cooling:FuelOil\#1 (SumOrAverage)
+\item
+  Heating:FuelOil\#1 (SumOrAverage)
+\item
+  WaterSystems:FuelOil\#1 (SumOrAverage)
+\item
+  Cogeneration:FuelOil\#1 (SumOrAverage)
+\item
+  ExteriorEquipment:FuelOil\#2 (SumOrAverage)
+\item
+  Cooling:FuelOil\#2 (SumOrAverage)
+\item
+  Heating:FuelOil\#2 (SumOrAverage)
+\item
+  WaterSystems:FuelOil\#2 (SumOrAverage)
+\item
+  Cogeneration:FuelOil\#2 (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionCoalMonthly}\label{enduseenergyconsumptioncoalmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Coal (SumOrAverage)
+\item
+  Heating:Coal (SumOrAverage)
+\item
+  WaterSystems:Coal (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionPropaneMonthly}\label{enduseenergyconsumptionpropanemonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Propane (SumOrAverage)
+\item
+  Cooling:Propane (SumOrAverage)
+\item
+  Heating:Propane (SumOrAverage)
+\item
+  WaterSystems:Propane (SumOrAverage)
+\item
+  Cogeneration:Propane (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionGasolineMonthly}\label{enduseenergyconsumptiongasolinemonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Gasoline (SumOrAverage)
+\item
+  Cooling:Gasoline (SumOrAverage)
+\item
+  Heating:Gasoline (SumOrAverage)
+\item
+  WaterSystems:Gasoline (SumOrAverage)
+\item
+  Cogeneration:Gasoline (SumOrAverage)
+\end{itemize}
+
+\paragraph{EndUseEnergyConsumptionOtherFuelsMonthly}\label{enduseenergyconsumptionotherfuelsmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:OtherFuel1 (SumOrAverage)
+\item
+  Cooling:OtherFuel1 (SumOrAverage)
+\item
+  Heating:OtherFuel1 (SumOrAverage)
+\item
+  WaterSystems:OtherFuel1 (SumOrAverage)
+\item
+  Cogeneration:OtherFuel1 (SumOrAverage)
+\item
+  ExteriorEquipment:OtherFuel1 (SumOrAverage)
+\item
+  Cooling:OtherFuel2 (SumOrAverage)
+\item
+  Heating:OtherFuel2 (SumOrAverage)
+\item
+  WaterSystems:OtherFuel2 (SumOrAverage)
+\item
+  Cogeneration:OtherFuel2 (SumOrAverage)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseElectricityPart1Monthly}\label{peakenergyenduseelectricitypart1monthly}
+
+\begin{itemize}
+\item
+  InteriorLights:Electricity (Maximum)
+\item
+  ExteriorLights:Electricity (Maximum)
+\item
+  InteriorEquipment:Electricity (Maximum)
+\item
+  ExteriorEquipment:Electricity (Maximum)
+\item
+  Fans:Electricity (Maximum)
+\item
+  Pumps:Electricity (Maximum)
+\item
+  Heating:Electricity (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseElectricityPart2Monthly}\label{peakenergyenduseelectricitypart2monthly}
+
+\begin{itemize}
+\item
+  Cooling:Electricity (Maximum)
+\item
+  HeatRejection:Electricity (Maximum)
+\item
+  Humidifier:Electricity (Maximum)
+\item
+  HeatRecovery:Electricity (Maximum)
+\item
+  WaterSystems:Electricity (Maximum)
+\item
+  Cogeneration:Electricity (Maximum)
+\end{itemize}
+
+\paragraph{ElectricComponentsOfPeakDemandMonthly}\label{electriccomponentsofpeakdemandmonthly}
+
+\begin{itemize}
+\item
+  Electricity:Facility (Maximum)
+\item
+  InteriorLights:Electricity (ValueWhenMaxMin)
+\item
+  InteriorEquipment:Electricity (ValueWhenMaxMin)
+\item
+  ExteriorLights:Electricity (ValueWhenMaxMin)
+\item
+  ExteriorEquipment:Electricity (ValueWhenMaxMin)
+\item
+  Fans:Electricity (ValueWhenMaxMin)
+\item
+  Pumps:Electricity (ValueWhenMaxMin)
+\item
+  Heating:Electricity (ValueWhenMaxMin)
+\item
+  Cooling:Electricity (ValueWhenMaxMin)
+\item
+  HeatRejection:Electricity (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseNaturalGasMonthly}\label{peakenergyendusenaturalgasmonthly}
+
+\begin{itemize}
+\item
+  InteriorEquipment:Gas (Maximum)
+\item
+  ExteriorEquipment:Gas (Maximum)
+\item
+  Heating:Gas (Maximum)
+\item
+  Cooling:Gas (Maximum)
+\item
+  WaterSystems:Gas (Maximum)
+\item
+  Cogeneration:Gas (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseDieselMonthly}\label{peakenergyendusedieselmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Diesel (Maximum)
+\item
+  Cooling:Diesel (Maximum)
+\item
+  Heating:Diesel (Maximum)
+\item
+  WaterSystems:Diesel (Maximum)
+\item
+  Cogeneration:Diesel (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseFuelOilMonthly}\label{peakenergyendusefueloilmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:FuelOil\#1 (Maximum)
+\item
+  Cooling:FuelOil\#1 (Maximum)
+\item
+  Heating:FuelOil\#1 (Maximum)
+\item
+  WaterSystems:FuelOil\#1 (Maximum)
+\item
+  Cogeneration:FuelOil\#1 (Maximum)
+\item
+  ExteriorEquipment:FuelOil\#2 (Maximum)
+\item
+  Cooling:FuelOil\#2 (Maximum)
+\item
+  Heating:FuelOil\#2 (Maximum)
+\item
+  WaterSystems:FuelOil\#2 (Maximum)
+\item
+  Cogeneration:FuelOil\#2 (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseCoalMonthly}\label{peakenergyendusecoalmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Coal (Maximum)
+\item
+  Heating:Coal (Maximum)
+\item
+  WaterSystems:Coal (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUsePropaneMonthly}\label{peakenergyendusepropanemonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Propane (Maximum)
+\item
+  Cooling:Propane (Maximum)
+\item
+  Heating:Propane (Maximum)
+\item
+  WaterSystems:Propane (Maximum)
+\item
+  Cogeneration:Propane (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseGasolineMonthly}\label{peakenergyendusegasolinemonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:Gasoline (Maximum)
+\item
+  Cooling:Gasoline (Maximum)
+\item
+  Heating:Gasoline (Maximum)
+\item
+  WaterSystems:Gasoline (Maximum)
+\item
+  Cogeneration:Gasoline (Maximum)
+\end{itemize}
+
+\paragraph{PeakEnergyEndUseOtherFuelsMonthly}\label{peakenergyenduseotherfuelsmonthly}
+
+\begin{itemize}
+\item
+  ExteriorEquipment:OtherFuel1 (Maximum)
+\item
+  Cooling:OtherFuel1 (Maximum)
+\item
+  Heating:OtherFuel1 (Maximum)
+\item
+  WaterSystems:OtherFuel1 (Maximum)
+\item
+  Cogeneration:OtherFuel1 (Maximum)
+\item
+  ExteriorEquipment:OtherFuel1 (Maximum)
+\item
+  Cooling:OtherFuel1 (Maximum)
+\item
+  Heating:OtherFuel1 (Maximum)
+\item
+  WaterSystems:OtherFuel1 (Maximum)
+\item
+  Cogeneration:OtherFuel1 (Maximum)
+\end{itemize}
+
+\paragraph{SetpointsNotMetWithTemperaturesMonthly}\label{setpointsnotmetwithtemperaturesmonthly}
+
+\begin{itemize}
+\item
+  Zone Heating Setpoint Not Met Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\item
+  Zone Heating Setpoint Not Met While Occupied Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\item
+  Zone Cooling Setpoint Not Met Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\item
+  Zone Cooling Setpoint Not Met While Occupied Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\end{itemize}
+
+\paragraph{ComfortReportSimple55Monthly}\label{comfortreportsimple55monthly}
+
+\begin{itemize}
+\item
+  Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\item
+  Zone Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\item
+  Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time (HoursNonZero)
+\item
+  Zone Mean Air Temperature (SumOrAverageDuringHoursShown)
+\end{itemize}
+
+\paragraph{UnglazedTranspiredSolarCollectorSummaryMonthly}\label{unglazedtranspiredsolarcollectorsummarymonthly}
+
+\begin{itemize}
+\item
+  Solar Collector System Efficiency (HoursNonZero)
+\item
+  Solar Collector System Efficiency (SumOrAverageDuringHoursShown)
+\item
+  Solar Collector Outside Face Suction Velocity (SumOrAverageDuringHoursShown)
+\item
+  Solar Collector Sensible Heating Rate (SumOrAverageDuringHoursShown)
+\end{itemize}
+
+\paragraph{OccupantComfortDataSummaryMonthly}\label{occupantcomfortdatasummarymonthly}
+
+\begin{itemize}
+\item
+  Zone People Occupant Count (HoursNonZero)
+\item
+  Zone Air Temperature (SumOrAverageDuringHoursShown)
+\item
+  Zone Air Relative Humidity (SumOrAverageDuringHoursShown)
+\item
+  Zone Thermal Comfort Fanger Model PMV (SumOrAverageDuringHoursShown)
+\item
+  Zone Thermal Comfort Fanger Model PPD (SumOrAverageDuringHoursShown)
+\end{itemize}
+
+\paragraph{ChillerReportMonthly}\label{chillerreportmonthly}
+
+\begin{itemize}
+\item
+  Chiller Electric Energy (SumOrAverage)
+\item
+  Chiller Electric Power (Maximum)
+\item
+  Chiller Electric Energy (HoursNonZero)
+\item
+  Chiller Evaporator Cooling Energy (SumOrAverage)
+\item
+  Chiller Condenser Heat Transfer Energy (SumOrAverage)
+\item
+  Chiller COP (SumOrAverage)
+\item
+  Chiller COP (Maximum)
+\end{itemize}
+
+\paragraph{TowerReportMonthly}\label{towerreportmonthly}
+
+\begin{itemize}
+\item
+  Tower Fan Electric Consumption (SumOrAverage)
+\item
+  Tower Fan Electric Consumption (HoursNonZero)
+\item
+  Cooling Tower Fan Electric Power (Maximum)
+\item
+  Cooling Tower Heat Transfer Rate (Maximum)
+\item
+  Cooling Tower Inlet Temperature (SumOrAverage)
+\item
+  Cooling Tower Outlet Temperature (SumOrAverage)
+\item
+  Cooling Tower Mass Flow Rate (SumOrAverage)
+\end{itemize}
+
+\paragraph{BoilerReportMonthly}\label{boilerreportmonthly}
+
+\begin{itemize}
+\item
+  Boiler Heating Energy (SumOrAverage)
+\item
+  Boiler Gas Consumption (SumOrAverage)
+\item
+  Boiler Heating Energy (HoursNonZero)
+\item
+  Boiler Heating Rate (Maximum)
+\item
+  Boiler Gas Consumption Rate (Maximum)
+\item
+  Boiler Inlet Temperature (SumOrAverage)
+\item
+  Boiler Outlet Temperature (SumOrAverage)
+\item
+  Boiler Mass Flow Rate (SumOrAverage)
+\item
+  Boiler Ancillary Electric Power (SumOrAverage)
+\end{itemize}
+
+\paragraph{DXReportMonthly}\label{dxreportmonthly}
+
+\begin{itemize}
+\item
+  Cooling Coil Total Cooling Energy (SumOrAverage)
+\item
+  Cooling Coil Electric Energy (SumOrAverage)
+\item
+  Cooling Coil Total Cooling Energy (HoursNonZero)
+\item
+  Cooling Coil Sensible Cooling Energy (SumOrAverage)
+\item
+  Cooling Coil Latent Cooling Energy (SumOrAverage)
+\item
+  Cooling Coil Crankcase Heater Electric Energy (SumOrAverage)
+\item
+  Cooling Coil Runtime Fraction (Maximum)
+\item
+  Cooling Coil Runtime Fraction (Minimum)
+\item
+  DX Coil Total Cooling Rate (Maximum)
+\item
+  Cooling Coil Sensible Cooling Rate (Maximum)
+\item
+  Cooling Coil Latent Cooling Rate (Maximum)
+\item
+  Cooling Coil Electric Power (Maximum)
+\item
+  Cooling Coil Crankcase Heater Electric Power (Maximum)
+\end{itemize}
+
+\paragraph{WindowReportMonthly}\label{windowreportmonthly}
+
+\begin{itemize}
+\item
+  Surface Window Transmitted Solar Radiation Rate (SumOrAverage)
+\item
+  Surface Window Transmitted Beam Solar Radiation Rate (SumOrAverage)
+\item
+  Surface Window Transmitted Diffuse Solar Radiation Rate (SumOrAverage)
+\item
+  Surface Window Heat Gain Rate (SumOrAverage)
+\item
+  Surface Window Heat Loss Rate (SumOrAverage)
+\item
+  Surface Window Inside Face Glazing Condensation Status (HoursNonZero)
+\item
+  Surface Shading Device Is On Time Fraction (HoursNonZero)
+\item
+  Surface Storm Window On Off Status (HoursNonZero)
+\end{itemize}
+
+\paragraph{WindowEnergyReportMonthly}\label{windowenergyreportmonthly}
+
+\begin{itemize}
+\item
+  Surface Window Transmitted Solar Radiation Energy (SumOrAverage)
+\item
+  Surface Window Transmitted Beam Solar Radiation Rate Energy (SumOrAverage)
+\item
+  Surface Window Transmitted Diffuse Solar Radiation Energy (SumOrAverage)
+\item
+  Surface Window Heat Gain Energy (SumOrAverage)
+\item
+  Surface Window Heat Loss Energy (SumOrAverage)
+\end{itemize}
+
+\paragraph{WindowZoneSummaryMonthly}\label{windowzonesummarymonthly}
+
+\begin{itemize}
+\item
+  Zone Windows Total Heat Gain Rate (SumOrAverage)
+\item
+  Zone Windows Total Heat Loss Rate (SumOrAverage)
+\item
+  Zone Windows Total Transmitted Solar Radiation Rate (SumOrAverage)
+\item
+  Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate (SumOrAverage)
+\item
+  Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate (SumOrAverage)
+\item
+  Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate (SumOrAverage)
+\item
+  Zone Interior Windows Total Transmitted Beam Solar Radiation Rate (SumOrAverage)
+\end{itemize}
+
+\paragraph{WindowEnergyZoneSummaryMonthly}\label{windowenergyzonesummarymonthly}
+
+\begin{itemize}
+\item
+  Zone Windows Total Heat Gain Energy (SumOrAverage)
+\item
+  Zone Windows Total Heat Loss Energy (SumOrAverage)
+\item
+  Zone Windows Total Transmitted Solar Radiation Energy (SumOrAverage)
+\item
+  Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy (SumOrAverage)
+\item
+  Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy (SumOrAverage)
+\item
+  Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy (SumOrAverage)
+\item
+  Zone Interior Windows Total Transmitted Beam Solar Radiation Energy (SumOrAverage)
+\end{itemize}
+
+\paragraph{AverageOutdoorConditionsMonthly}\label{averageoutdoorconditionsmonthly}
+
+\begin{itemize}
+\item
+  Site Outdoor Air Drybulb Temperature (SumOrAverage)
+\item
+  Site Outdoor Air Wetbulb Temperature (SumOrAverage)
+\item
+  Site Outdoor Air Dewpoint Temperature (SumOrAverage)
+\item
+  Wind Speed (SumOrAverage)
+\item
+  Site Sky Temperature (SumOrAverage)
+\item
+  Site Diffuse Solar Radiation Rate per Area (SumOrAverage)
+\item
+  Site Direct Solar Radiation Rate per Area (SumOrAverage)
+\item
+  Raining (SumOrAverage)
+\end{itemize}
+
+\paragraph{OutdoorConditionsMaximumDryBulbMonthly}\label{outdoorconditionsmaximumdrybulbmonthly}
+
+\begin{itemize}
+\item
+  Site Outdoor Air Drybulb Temperature (Maximum)
+\item
+  Site Outdoor Air Wetbulb Temperature (ValueWhenMaxMin)
+\item
+  Site Outdoor Air Dewpoint Temperature (ValueWhenMaxMin)
+\item
+  Wind Speed (ValueWhenMaxMin)
+\item
+  Site Sky Temperature (ValueWhenMaxMin)
+\item
+  Site Diffuse Solar Radiation Rate per Area (ValueWhenMaxMin)
+\item
+  Site Direct Solar Radiation Rate per Area (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{OutdoorConditionsMinimumDryBulbMonthly}\label{outdoorconditionsminimumdrybulbmonthly}
+
+\begin{itemize}
+\item
+  Site Outdoor Air Wetbulb Temperature (ValueWhenMaxMin)
+\item
+  Site Outdoor Air Dewpoint Temperature (ValueWhenMaxMin)
+\item
+  Wind Speed (ValueWhenMaxMin)
+\item
+  Site Sky Temperature (ValueWhenMaxMin)
+\item
+  Site Diffuse Solar Radiation Rate per Area (ValueWhenMaxMin)
+\item
+  Site Direct Solar Radiation Rate per Area (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{OutdoorConditionsMaximumWetBulbMonthly}\label{outdoorconditionsmaximumwetbulbmonthly}
+
+\begin{itemize}
+\item
+  Site Outdoor Air Wetbulb Temperature (Maximum)
+\item
+  Site Outdoor Air Drybulb Temperature (ValueWhenMaxMin)
+\item
+  Site Outdoor Air Dewpoint Temperature (ValueWhenMaxMin)
+\item
+  Wind Speed (ValueWhenMaxMin)
+\item
+  Site Sky Temperature (ValueWhenMaxMin)
+\item
+  Site Diffuse Solar Radiation Rate per Area (ValueWhenMaxMin)
+\item
+  Site Direct Solar Radiation Rate per Area (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{OutdoorConditionsMaximumDewPointMonthly}\label{outdoorconditionsmaximumdewpointmonthly}
+
+\begin{itemize}
+\item
+  Site Outdoor Air Dewpoint Temperature (Maximum)
+\item
+  Site Outdoor Air Drybulb Temperature (ValueWhenMaxMin)
+\item
+  Site Outdoor Air Wetbulb Temperature (ValueWhenMaxMin)
+\item
+  Wind Speed (ValueWhenMaxMin)
+\item
+  Site Sky Temperature (ValueWhenMaxMin)
+\item
+  Site Diffuse Solar Radiation Rate per Area (ValueWhenMaxMin)
+\item
+  Site Direct Solar Radiation Rate per Area (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{OutdoorGroundConditionsMonthly}\label{outdoorgroundconditionsmonthly}
+
+\begin{itemize}
+\item
+  Site Ground Temperature (SumOrAverage)
+\item
+  Site Surface Ground Temperature (SumOrAverage)
+\item
+  Site Deep Ground Temperature (SumOrAverage)
+\item
+  Site Mains Water Temperature (SumOrAverage)
+\item
+  Site Ground Reflected Solar Radiation Rate per Area (SumOrAverage)
+\item
+  Snow On Ground (SumOrAverage)
+\end{itemize}
+
+\paragraph{WindowACReportMonthly}\label{windowacreportmonthly}
+
+\begin{itemize}
+\item
+  Zone Window Air Conditioner Total Cooling Energy (SumOrAverage)
+\item
+  Zone Window Air Conditioner Electric Energy (SumOrAverage)
+\item
+  Zone Window Air Conditioner Total Cooling Energy (HoursNonZero)
+\item
+  Zone Window Air Conditioner Sensible Cooling Energy (SumOrAverage)
+\item
+  Zone Window Air Conditioner Latent Cooling Energy (SumOrAverage)
+\item
+  Zone Window Air Conditioner Total Cooling Rate (Maximum)
+\item
+  Zone Window Air Conditioner Sensible Cooling Rate (ValueWhenMaxMin)
+\item
+  Zone Window Air Conditioner Latent Cooling Rate (ValueWhenMaxMin)
+\item
+  Zone Window Air Conditioner Electric Power (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{WaterHeaterReportMonthly}\label{waterheaterreportmonthly}
+
+\begin{itemize}
+\item
+  Water Heater Total Demand Energy (SumOrAverage)
+\item
+  Water Heater Use Side Heat Transfer Energy (SumOrAverage)
+\item
+  Water Heater Burner Heating Energy (SumOrAverage)
+\item
+  Water Heater Gas Consumption (SumOrAverage)
+\item
+  Water Heater Total Demand Energy (HoursNonZero)
+\item
+  Water Heater Loss Demand Energy (SumOrAverage)
+\item
+  Water Heater Heat Loss Energy (SumOrAverage)
+\item
+  Water Heater Tank Temperature (SumOrAverage)
+\item
+  Water Heater Heat Recovery Supply Energy (SumOrAverage)
+\item
+  Water Heater Source Side Heat Transfer Energy (SumOrAverage)
+\end{itemize}
+
+\paragraph{GeneratorReportMonthly}\label{generatorreportmonthly}
+
+\begin{itemize}
+\item
+  Generator Produced Electric Energy (SumOrAverage)
+\item
+  Generator Diesel Energy (SumOrAverage)
+\item
+  Generator Gas Consumption (SumOrAverage)
+\item
+  Generator Produced Electric Energy (HoursNonZero)
+\item
+  Generator Total Heat Recovery (SumOrAverage)
+\item
+  Generator Jacket Heat Recovery Energy (SumOrAverage)
+\item
+  Generator Lube Heat Recovery Energy (SumOrAverage)
+\item
+  Generator Exhaust Heat Recovery Energy (SumOrAverage)
+\item
+  Generator Exhaust Air Temperature (SumOrAverage)
+\end{itemize}
+
+\paragraph{DaylightingReportMonthly}\label{daylightingreportmonthly}
+
+\begin{itemize}
+\item
+  Site Exterior Beam Normal Illuminance (HoursNonZero)
+\item
+  Daylighting Lighting Power Multiplier (SumOrAverageDuringHoursShown)
+\item
+  Daylighting Lighting Power Multiplier (MinimumDuringHoursShown)
+\item
+  Daylighting Reference Point 1 Illuminance (SumOrAverageDuringHoursShown)
+\item
+  Daylighting Reference Point 1 Glare Index (SumOrAverageDuringHoursShown)
+\item
+  Daylighting Reference Point 2 Illuminance (SumOrAverageDuringHoursShown)
+\item
+  Daylighting Reference Point 2 Glare Index (SumOrAverageDuringHoursShown)
+\item
+  Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time
+\item
+  Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time
+\item
+  Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time
+\item
+  Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time
+\end{itemize}
+
+\paragraph{CoilReportMonthly}\label{coilreportmonthly}
+
+\begin{itemize}
+\item
+  Heating Coil Heating Energy (SumOrAverage)
+\item
+  Heating Coil Heating Rate (Maximum)
+\item
+  Cooling Coil Total Cooling Energy (SumOrAverage)
+\item
+  Cooling Coil Sensible Cooling Energy (SumOrAverage)
+\item
+  Cooling Coil Total Cooling Rate (Maximum)
+\item
+  Cooling Coil Sensible Cooling Rate (ValueWhenMaxMin)
+\item
+  Cooling Coil Wetted Area Fraction (SumOrAverage)
+\end{itemize}
+
+\paragraph{PlantLoopDemandReportMonthly}\label{plantloopdemandreportmonthly}
+
+\begin{itemize}
+\item
+  Plant Supply Side Cooling Demand Rate (SumOrAverage)
+\item
+  Plant Supply Side Cooling Demand Rate (Maximum)
+\item
+  Plant Supply Side Heating Demand Rate (SumOrAverage)
+\item
+  Plant Supply Side Heating Demand Rate (Maximum)
+\end{itemize}
+
+\paragraph{FanReportMonthly}\label{fanreportmonthly}
+
+\begin{itemize}
+\item
+  Fan Electric Consumption (SumOrAverage)
+\item
+  Fan Rise in Air Temperature (SumOrAverage)
+\item
+  Fan Electric Power (Maximum)
+\item
+  Fan Rise in Air Temperature (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{PumpReportMonthly}\label{pumpreportmonthly}
+
+\begin{itemize}
+\item
+  Pump Electric Energy (SumOrAverage)
+\item
+  Pump Fluid Heat Gain Energy (SumOrAverage)
+\item
+  Pump Electric Power (Maximum)
+\item
+  Pump Shaft Power (ValueWhenMaxMin)
+\item
+  Pump Fluid Heat Gain Rate (ValueWhenMaxMin)
+\item
+  Pump Outlet Temperature (ValueWhenMaxMin)
+\item
+  Pump Mass Flow Rate (ValueWhenMaxMin)
+\end{itemize}
+
+\paragraph{CondLoopDemandReportMonthly}\label{condloopdemandreportmonthly}
+
+\begin{itemize}
+\item
+  Plant Supply Side Cooling Demand Rate (SumOrAverage)
+\item
+  Plant Supply Side Cooling Demand Rate (Maximum)
+\item
+  Plant Supply Side Inlet Temperature (ValueWhenMaxMin)
+\item
+  Plant Supply Side Outlet Temperature (ValueWhenMaxMin)
+\item
+  Plant Supply Side Heating Demand Rate (SumOrAverage)
+\item
+  Plant Supply Side Heating Demand Rate (Maximum)
+\end{itemize}
+
+\paragraph{ZoneTemperatureOscillationReportMonthly}\label{zonetemperatureoscillationreportmonthly}
+
+\begin{itemize}
+\item
+  Zone Oscillating Temperatures Time (HoursNonZero)
+\item
+  Zone People Occupant Count (SumOrAverageDuringHoursShown)
+\end{itemize}
+
+\paragraph{AirLoopSystemEnergyAndWaterUseMonthly}\label{airloopsystemenergyandwaterusemonthly}
+
+\begin{itemize}
+\item
+  Air System Hot Water Energy (SumOrAverage)
+\item
+  Air System Steam Energy (SumOrAverage)
+\item
+  Air System Chilled Water Energy (SumOrAverage)
+\item
+  Air System Electric Energy (SumOrAverage)
+\item
+  Air System Gas Energy (SumOrAverage)
+\item
+  Air System Water Volume (SumOrAverage)
+\end{itemize}
+
+\paragraph{AirLoopSystemComponentLoadsMonthly}\label{airloopsystemcomponentloadsmonthly}
+
+\begin{itemize}
+\item
+  Air System Fan Air Heating Energy (SumOrAverage)
+\item
+  Air System Cooling Coil Total Cooling Energy (SumOrAverage)
+\item
+  Air System Heating Coil Total Heating Energy (SumOrAverage)
+\item
+  Air System Heat Exchanger Total Heating Energy (SumOrAverage)
+\item
+  Air System Heat Exchanger Total Cooling Energy (SumOrAverage)
+\item
+  Air System Humidifier Total Heating Energy (SumOrAverage)
+\item
+  Air System Evaporative Cooler Total Cooling Energy (SumOrAverage)
+\item
+  Air System Desiccant Dehumidifier Total Cooling Energy (SumOrAverage)
+\end{itemize}
+
+\paragraph{AirLoopSystemComponentEnergyUseMonthly}\label{airloopsystemcomponentenergyusemonthly}
+
+\begin{itemize}
+\item
+  Air System Fan Electric Energy (SumOrAverage)
+\item
+  Air System Heating Coil Hot Water Energy (SumOrAverage)
+\item
+  Air System Cooling Coil Chilled Water Energy (SumOrAverage)
+\item
+  Air System DX Heating Coil Electric Energy (SumOrAverage)
+\item
+  Air System DX Cooling Coil Electric Energy (SumOrAverage)
+\item
+  Air System Heating Coil Electric Energy (SumOrAverage)
+\item
+  Air System Heating Coil Gas Energy (SumOrAverage)
+\item
+  Air System Heating Coil Steam Energy (SumOrAverage)
+\item
+  Air System Humidifier Electric Energy (SumOrAverage)
+\item
+  Air System Evaporative Cooler Electric Energy (SumOrAverage)
+\item
+  Air System Desiccant Dehumidifier Electric Energy (SumOrAverage)
+\end{itemize}
+
+\paragraph{MechanicalVentilationLoadsMonthly}\label{mechanicalventilationloadsmonthly}
+
+\begin{itemize}
+\item
+  Zone Mechanical Ventilation No Load Heat Removal Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Cooling Load Increase Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Cooling Load Decrease Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation No Load Heat Addition Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Heating Load Increase Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Heating Load Decrease Energy (SumOrAverage)
+\item
+  Zone Mechanical Ventilation Air Changes per Hour (SumOrAverage)
+\end{itemize}
+
+Sample IDF Input -- Output:Table:SummaryReports
+
+\begin{lstlisting}
+
+Output:Table:SummaryReports,
+          AllSummary,  !- Report 1 Name
+          AllMonthly;  !- Report 2 Name
+\end{lstlisting}

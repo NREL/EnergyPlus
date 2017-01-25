@@ -1,11 +1,69 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <HeatBalanceHAMTManager.hh>
@@ -103,28 +161,28 @@ namespace HeatBalanceHAMTManager {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_int firstcell;
-	FArray1D_int lastcell;
-	FArray1D_int Extcell;
-	FArray1D_int ExtRadcell;
-	FArray1D_int ExtConcell;
-	FArray1D_int ExtSkycell;
-	FArray1D_int ExtGrncell;
-	FArray1D_int Intcell;
-	FArray1D_int IntConcell;
+	Array1D_int firstcell;
+	Array1D_int lastcell;
+	Array1D_int Extcell;
+	Array1D_int ExtRadcell;
+	Array1D_int ExtConcell;
+	Array1D_int ExtSkycell;
+	Array1D_int ExtGrncell;
+	Array1D_int Intcell;
+	Array1D_int IntConcell;
 
-	FArray1D< Real64 > watertot;
-	FArray1D< Real64 > surfrh;
-	FArray1D< Real64 > surfextrh;
-	FArray1D< Real64 > surftemp;
-	FArray1D< Real64 > surfexttemp;
-	FArray1D< Real64 > surfvp;
+	Array1D< Real64 > watertot;
+	Array1D< Real64 > surfrh;
+	Array1D< Real64 > surfextrh;
+	Array1D< Real64 > surftemp;
+	Array1D< Real64 > surfexttemp;
+	Array1D< Real64 > surfvp;
 
-	FArray1D< Real64 > extvtc; // External Surface vapor transfer coefficient
-	FArray1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
-	FArray1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
-	FArray1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
-	FArray1D_bool MyEnvrnFlag; // Flag to reset surface properties.
+	Array1D< Real64 > extvtc; // External Surface vapor transfer coefficient
+	Array1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
+	Array1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
+	Array1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
+	Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
 
 	Real64 deltat( 0.0 ); // time step in seconds
 
@@ -136,7 +194,7 @@ namespace HeatBalanceHAMTManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
 
 	// Object Data
-	FArray1D< subcell > cells;
+	Array1D< subcell > cells;
 
 	// Functions
 
@@ -236,14 +294,14 @@ namespace HeatBalanceHAMTManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_string AlphaArray;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
+		Array1D_string AlphaArray;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
 
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
 
-		FArray1D< Real64 > NumArray;
+		Array1D< Real64 > NumArray;
 
 		Real64 dumrh;
 		Real64 dumdata;
@@ -342,7 +400,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject1, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject1 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -364,7 +422,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject2, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject2 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -443,7 +501,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject3, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject3 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -476,7 +534,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject4, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject4 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -507,7 +565,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject5, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject5 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -541,7 +599,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject6, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject6 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -575,7 +633,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			vtcsid = FindItemInList( AlphaArray( 1 ), Surface.Name(), TotSurfaces );
+			vtcsid = FindItemInList( AlphaArray( 1 ), Surface );
 			if ( vtcsid == 0 ) {
 				ShowSevereError( cHAMTObject7 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -765,8 +823,10 @@ namespace HeatBalanceHAMTManager {
 
 		// Make the cells and initialise
 		cells.allocate( TotCellsMax );
-		cells.adjs() = -1;
-		cells.adjsl() = -1;
+		for ( auto & e : cells ) {
+			e.adjs = -1;
+			e.adjsl = -1;
+		}
 
 		cid = 0;
 
@@ -1265,9 +1325,9 @@ namespace HeatBalanceHAMTManager {
 				cells( cid ).tempp1 = ( torsum + qvp + cells( cid ).Qadds + ( tcap * cells( cid ).temp / deltat ) ) / ( oorsum + ( tcap / deltat ) );
 			}
 
-			//Check for silly temperatures
-			tempmax = maxval( cells.tempp1() );
-			tempmin = minval( cells.tempp1() );
+			// Check for silly temperatures
+			tempmax = maxval( cells, &subcell::tempp1 );
+			tempmin = minval( cells, &subcell::tempp1 );
 			if ( tempmax > MaxSurfaceTempLimit ) {
 				if ( ! WarmupFlag ) {
 					if ( Surface( sid ).HighTempErrCount == 0 ) {
@@ -1474,8 +1534,8 @@ namespace HeatBalanceHAMTManager {
 	void
 	interp(
 		int const ndata,
-		FArray1A< Real64 > const xx,
-		FArray1A< Real64 > const yy,
+		Array1A< Real64 > const xx,
+		Array1A< Real64 > const yy,
 		Real64 const invalue,
 		Real64 & outvalue,
 		Optional< Real64 > outgrad
@@ -1655,7 +1715,7 @@ namespace HeatBalanceHAMTManager {
 
 	//                                 COPYRIGHT NOTICE
 
-	//     Portions Copyright ?University College London 2007.  All rights
+	//     Portions Copyright (c) University College London 2007.  All rights
 	//     reserved.
 
 	//     UCL LEGAL NOTICE
@@ -1672,32 +1732,6 @@ namespace HeatBalanceHAMTManager {
 	//     B. Assumes any liability with respect to the use of, or for any and
 	//        all damages resulting from the use of the program or any portion
 	//        thereof or any information disclosed therein.
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of
-	//     Illinois and The Regents of the University of California through
-	//     Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
-	//     reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and
-	//     copyrighted by other individuals, companies and institutions.  These
-	//     portions have been incorporated into the EnergyPlus software package
-	//     under license.  For a complete list of contributors, see "Notice"
-	//     located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting
-	//     on its behalf a paid-up, nonexclusive, irrevocable, worldwide license
-	//     in this data to reproduce, prepare derivative works, and perform
-	//     publicly and display publicly. Beginning five (5) years after
-	//     permission to assert copyright is granted, subject to two possible
-	//     five year renewals, the U.S. Government is granted for itself and
-	//     others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display
-	//     publicly, and to permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatBalanceHAMTManager
 

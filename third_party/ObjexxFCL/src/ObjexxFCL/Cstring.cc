@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -16,7 +16,8 @@
 
 // C++ Headers
 #include <cctype>
-#include <iostream>
+#include <istream>
+#include <ostream>
 
 namespace ObjexxFCL {
 
@@ -48,7 +49,7 @@ namespace ObjexxFCL {
 
 	// Has any Character of a std::string?
 	bool
-	Cstring::has_any_of( std::string const s ) const
+	Cstring::has_any_of( std::string const & s ) const
 	{
 		size_type const s_len( s.length() );
 		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
@@ -296,17 +297,7 @@ namespace ObjexxFCL {
 		return ( ( s.length() == 1 ) && ( to_lower( s.str_[ 0 ] ) == to_lower( c ) ) );
 	}
 
-	// Output to Stream
-	std::ostream &
-	operator <<( std::ostream & stream, Cstring const & s )
-	{
-		for ( Cstring::size_type i = 0; i < std::strlen( s.str_ ); ++i ) {
-			stream << s.str_[ i ];
-		}
-		return stream;
-	}
-
-	// Input from Stream
+	// Stream >> Cstring
 	std::istream &
 	operator >>( std::istream & stream, Cstring & s )
 	{
@@ -316,12 +307,17 @@ namespace ObjexxFCL {
 		return stream;
 	}
 
-// Static Data Member Definitions
+	// Stream << Cstring
+	std::ostream &
+	operator <<( std::ostream & stream, Cstring const & s )
+	{
+		for ( Cstring::size_type i = 0; i < std::strlen( s.str_ ); ++i ) {
+			stream << s.str_[ i ];
+		}
+		return stream;
+	}
 
-#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
-
-	Cstring::size_type const Cstring::npos;
-
-#endif
+	// Static Data Member Definitions
+	Cstring::size_type const Cstring::npos = static_cast< size_type >( -1 );
 
 } // ObjexxFCL

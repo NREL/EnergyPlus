@@ -1,9 +1,67 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -61,12 +119,12 @@ namespace SwimmingPool {
 	// to the plant via a water loop.
 
 	// REFERENCES:
-	// 1. ASHRAE (2011). 2011 ASHRAE Handbook – HVAC Applications. Atlanta: American Society of Heating,
+	// 1. ASHRAE (2011). 2011 ASHRAE Handbook - HVAC Applications. Atlanta: American Society of Heating,
 	//    Refrigerating and Air-Conditioning Engineers, Inc., p.5.6-5.9.
 	// 2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 	//    Saddle River, NJ: Pearson Education, Inc., p.246.
 	// 3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
-	// 4. Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated
+	// 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 	//    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 	// USE STATEMENTS:
 	// Use statements for data only modules
@@ -85,23 +143,39 @@ namespace SwimmingPool {
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
 	int NumSwimmingPools( 0 ); // Number of swimming pools
-	FArray1D_bool CheckEquipName;
-	FArray1D_int SurfaceToPoolIndex;
-	FArray1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular radiant surface
-	FArray1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	Array1D_bool CheckEquipName;
+	Array1D_int SurfaceToPoolIndex;
+	Array1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular radiant surface
+	Array1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
-	FArray1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
 	// Object Data
-	FArray1D< SwimmingPoolData > Pool;
+	Array1D< SwimmingPoolData > Pool;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumSwimmingPools = 0;
+		CheckEquipName.deallocate();
+		SurfaceToPoolIndex.deallocate();
+		QPoolSrcAvg.deallocate();
+		HeatTransCoefsAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQPoolSrc.deallocate();
+		LastHeatTransCoefs.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		Pool.deallocate();
+	}
 
 	void
 	SimSwimmingPool (
@@ -148,7 +222,7 @@ namespace SwimmingPool {
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetSwimmingPool( );
+			GetSwimmingPool();
 			GetInputFlag = false;
 		}
 
@@ -166,14 +240,14 @@ namespace SwimmingPool {
 
 		}
 
-		if ( NumSwimmingPools > 0 ) CalcHeatBalanceInsideSurf( );
+		if ( NumSwimmingPools > 0 ) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
-		ReportSwimmingPool( );
+		ReportSwimmingPool();
 
 	}
 
 	void
-	GetSwimmingPool( )
+	GetSwimmingPool()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -195,7 +269,6 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
-		using DataHeatBalance::Zone;
 		using DataHeatBalance::Construct;
 		using General::TrimSigDigits;
 		using InputProcessor::GetNumObjectsFound;
@@ -235,21 +308,21 @@ namespace SwimmingPool {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if something goes wrong
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
 		int IOStatus; // Used in GetObjectItem
 		int Item; // Item to be "gotten"
 		int MaxAlphas; // Maximum number of alphas for these input keywords
 		int MaxNumbers; // Maximum number of numbers for these input keywords
-		FArray1D< Real64 > Numbers; // Numeric items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int SurfNum; // Surface number
 
 		// FLOW:
@@ -290,7 +363,7 @@ namespace SwimmingPool {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Pool.Name(), Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Pool, Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -426,7 +499,6 @@ namespace SwimmingPool {
 				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "Hot Water Nodes" );
 			}
 			Pool( Item ).WaterVolFlowMax = Numbers( 6 );
-
 			Pool( Item ).MiscPowerFactor = Numbers( 7 );
 			if ( Pool( Item ).MiscPowerFactor < MinPowerFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a miscellaneous power factor less than zero." );
@@ -484,9 +556,10 @@ namespace SwimmingPool {
 		}
 
 		// Set up the output variables for swimming pools
+		// CurrentModuleObject = "SwimmingPool:Indoor"
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
-			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool( Item ).MakeUpWaterMassFlowRate, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterMass, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
+			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool(Item).MakeUpWaterVolFlowRate, "System", "Average", Pool(Item).Name);
+			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterVol, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
 			SetupOutputVariable( "Indoor Pool Makeup Water Temperature [C]", Pool( Item ).CurMakeupWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Water Temperature [C]", Pool( Item ).PoolWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Inlet Water Temperature [C]", Pool( Item ).WaterInletTemp, "System", "Average", Pool( Item ).Name );
@@ -560,8 +633,7 @@ namespace SwimmingPool {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // Flag for one-time initializations
 		static bool MyEnvrnFlagGeneral( true );
-		std::string Errout; // Message for errors
-		static FArray1D_bool MyPlantScanFlagPool;
+		static Array1D_bool MyPlantScanFlagPool;
 		bool errFlag;
 		Real64 mdot;
 		Real64 HeatGainPerPerson;
@@ -631,10 +703,9 @@ namespace SwimmingPool {
 			Density =GetDensityGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
 			Pool( PoolNum ).WaterMass = Surface( Pool( PoolNum ).SurfacePtr ).Area * Pool( PoolNum ).AvgDepth * Density;
 			Pool( PoolNum ).WaterMassFlowRateMax = Pool( PoolNum ).WaterVolFlowMax * Density;
-
 			if ( ! MyPlantScanFlagPool( PoolNum ) ) {
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
-					InitComponentNodes( 0.0, Pool( PoolNum ).WaterVolFlowMax, Pool( PoolNum ).WaterInletNode, Pool( PoolNum ).WaterOutletNode, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum );
+					InitComponentNodes( 0.0, Pool( PoolNum ).WaterMassFlowRateMax, Pool( PoolNum ).WaterInletNode, Pool( PoolNum ).WaterOutletNode, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum );
 				}
 			}
 		}
@@ -773,12 +844,12 @@ namespace SwimmingPool {
 
 
 		// REFERENCES:
-		//  1. ASHRAE (2011). 2011 ASHRAE Handbook – HVAC Applications. Atlanta: American Society of Heating,
+		//  1. ASHRAE (2011). 2011 ASHRAE Handbook - HVAC Applications. Atlanta: American Society of Heating,
 		//     Refrigerating and Air-Conditioning Engineers, Inc., p.5.6-5.9.
 		//  2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 		//     Saddle River, NJ: Pearson Education, Inc., p.246.
 		//  3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
-		//  4. Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated
+		//  4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 		//     Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
 		// Using/Aliasing
@@ -871,7 +942,6 @@ namespace SwimmingPool {
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
 		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
 		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
-
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
 		// to the air directly and added to the zone air heat balance
 		LWsum = ( QRadThermInAbs( SurfNum ) +  NetLWRadToSurf( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) );
@@ -885,8 +955,8 @@ namespace SwimmingPool {
 		// Get an estimate of the pool water specific heat
 		Cp = GetSpecificHeatGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
 
-		TH22 = TH( SurfNum, 2, 2 ); // inside surface temperature at the previous time step equals the old pool water temperature
-		TH11 = TH( SurfNum, 1, 1 ); // outside surface temperature at the current time step
+		TH22 = TH( 2, 2, SurfNum ); // inside surface temperature at the previous time step equals the old pool water temperature
+		TH11 = TH( 1, 1, SurfNum ); // outside surface temperature at the current time step
 		ConstrNum = Surface( SurfNum ).Construction;
 		TInSurf = Pool( PoolNum ).CurSetPtTemp;
 		Tmuw = Pool( PoolNum ).CurMakeupWaterTemp;
@@ -946,7 +1016,6 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
-		using DataHeatBalance::Zone;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataLoopNode::Node;
@@ -1165,7 +1234,7 @@ namespace SwimmingPool {
 	}
 
 	void
-	ReportSwimmingPool( )
+	ReportSwimmingPool()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1217,7 +1286,7 @@ namespace SwimmingPool {
 			SurfNum = Pool( PoolNum ).SurfacePtr;
 
 			// First transfer the surface inside temperature data to the current pool water temperature
-			Pool( PoolNum ).PoolWaterTemp = TH( SurfNum, 1, 2 );
+			Pool( PoolNum ).PoolWaterTemp = TH( 2, 1, SurfNum );
 
 			// Next calculate the amount of heating done by the plant loop
 			Cp = GetSpecificHeatGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
@@ -1240,32 +1309,27 @@ namespace SwimmingPool {
 			Pool( PoolNum ).MakeUpWaterMass = Pool( PoolNum ).MakeUpWaterMassFlowRate * TimeStepSys * SecInHour;
 			Pool( PoolNum ).EvapEnergyLoss = Pool( PoolNum ).EvapHeatLossRate * TimeStepSys * SecInHour;
 
+			Pool( PoolNum ).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(Pool( PoolNum ).MakeUpWaterMassFlowRate, Density);
+			Pool( PoolNum ).MakeUpWaterVol = MakeUpWaterVolFunct(Pool( PoolNum ).MakeUpWaterMass, Density);
 		}
 
 	}
 
-	//     NOTICE
+	Real64
+	MakeUpWaterVolFlowFunct( Real64 MakeUpWaterMassFlowRate, Real64 Density )
+	{
+		Real64 MakeUpWaterVolumeFlow;
+		MakeUpWaterVolumeFlow = MakeUpWaterMassFlowRate / Density;
+		return MakeUpWaterVolumeFlow;
+	}
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	Real64
+	MakeUpWaterVolFunct( Real64 MakeUpWaterMass, Real64 Density )
+	{
+		Real64 MakeUpWaterVolume;
+		MakeUpWaterVolume = MakeUpWaterMass / Density;
+		return MakeUpWaterVolume;
+	}
 
 } // SwimmingPool
 

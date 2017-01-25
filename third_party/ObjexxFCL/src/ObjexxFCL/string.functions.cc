@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -420,7 +420,7 @@ std::string &
 replace( std::string & s, std::string const & a, std::string const & b )
 {
 	std::string::size_type const la( a.length() ), lb( b.length() );
-	std::string::size_type pos( 0 );
+	std::string::size_type pos( 0u );
 	while ( ( pos = s.find( a, pos ) ) != std::string::npos ) {
 		s.replace( pos, la, b );
 		pos += lb;

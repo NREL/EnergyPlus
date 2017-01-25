@@ -1,0 +1,15 @@
+\section{Standard EnergyPlus Conditions}\label{standard-energyplus-conditions}
+
+\subsection{Standard Temperature and Pressure}\label{standard-temperature-and-pressure}
+
+Several objects specify inputs at ``standard temperature and pressure''. Standard Temperature~ is dry air at 20\(^{o}\) C drybulb. The program uses local barometric pressure to account for altitude using the equation for ``standard atmospheric'' pressure on p 6.1 of the ASHRAE 1997 HOF (SI edition) to initialize the air systems being simulated.
+
+\begin{equation}
+Stdpressure = 101325\cdot {\left( {1.0 - Z\cdot {{2.25577}^{ - 5}}} \right)^{5.2559}}
+\end{equation}
+
+where
+
+StdPressure = pressure \{Pa\}
+
+Z = altitude/elevation \{m\}

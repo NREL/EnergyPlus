@@ -1,0 +1,75 @@
+
+         EnergyPlus Problem/Suggestion Reporting Information
+         ===================================================
+
+How to report problems and/or suggestions:
+
+1. Fill out the attached Problem Report form.
+
+2. Send the problem report to the EnergyPlus Team using
+   one of the following methods:
+
+   * Submit a helpdesk ticket at:
+
+        EnergyPlus-Support@gard.com (please include input file if applicable)
+
+
+        http://energyplus.helpserve.com
+
+Tips for submitting helpdesk requests can be seen here:
+        http://energyplus.helpserve.com/staff/Troubleshooter/Step/ViewSteps/4
+
+Minimally, please include the following information and attach relevant input files
+required to reproduce the problem.
+
+---------------------------------------------------------------------------
+               EnergyPlus Problem Report Form
+
+Contact Name      :
+E-mail Address    :
+Program           :
+Program Version   :
+
+--------------------------- SYSTEM INFORMATION ----------------------------
+
+Operating System Version:
+Memory (RAM, especially important if program crashes or hangs):
+Processor Type (e.g. Intel, AMD, other):
+Platform (Windows, Linux, Mac):
+----------------------- PROBLEM INFORMATION -------------------------------
+
+Problem Description:
+
+
+
+
+Select one or more to indicate how severe the problem is:
+
+    [ ] Program crashes or hangs
+    [ ] Program halts with fatal error
+    [ ] Program gets incorrect results at run time
+    [ ] Appearance or usability issue
+    [ ] Suggestion or documentation error
+
+Select one to indicate if the problem is reproducible:
+
+    [ ] Always         [ ] Never
+    [ ] Sometimes      [ ] Did not try to reproduce it
+
+Steps to reproduce the problem:
+
+    (Attach all data files needed to reproduce the problem.
+	   Indicate the exact commands/steps used as applicable.)
+
+
+
+Have you found a workaround for this problem?   [ ] Yes  [ ] No
+If 'yes', please describe the workaround.
+
+
+
+---------------------------------------------------------------------------
+
+Additional Comments:
+
+

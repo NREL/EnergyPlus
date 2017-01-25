@@ -1,0 +1,11 @@
+6.0.0.023,7.0.0,
+8,8, These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Outdoor Air Unit Heating Rate,Outdoor Air Unit Total Heating Rate,
+Cooled Beam  Chilled Water Consumption,Cooled Beam Chilled Water Consumption,
+Ideal Loads Air Heating Energy,Ideal Loads Sensible Heating Energy,
+Ideal Loads Air Heating Rate,Ideal Loads Sensible Heating Rate,
+Ideal Loads Air Sensible Cooling Energy,Ideal Loads Sensible Cooling Energy,
+Ideal Loads Air Sensible Cooling Rate,Ideal Loads Sensible Cooling Rate,
+Ideal Loads Air Total Cooling Energy,Ideal Loads Total Cooling Energy,
+Ideal Loads Air Total Cooling Rate,Ideal Loads Total Cooling Rate,
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete,

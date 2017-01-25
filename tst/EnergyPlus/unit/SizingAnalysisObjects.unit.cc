@@ -1,14 +1,79 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::DataPlant Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace WeatherManager;
@@ -18,23 +83,22 @@ using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
 
-
-class SizingAnalysisObjectsTest : public :: testing::Test
+class SizingAnalysisObjectsTest : public testing::Test
 {
 
 public:
 
-	Real64 lowLogVal; 
+	Real64 lowLogVal;
 	Real64 midLogVal;
 	Real64 hiLogVal;
-	Real64 LogVal;  // actual variable pointed to 
+	Real64 LogVal;  // actual variable pointed to
 	int averagingWindow;
 	int logIndex;
 
 	SizingLoggerFramework sizingLoggerFrameObj;
 
 	// constructor for test fixture class
-	SizingAnalysisObjectsTest ( )
+	SizingAnalysisObjectsTest()
 	{
 		// fill in test log data values
 		lowLogVal = 50.0;
@@ -69,6 +133,7 @@ public:
 
 		TimeValue.allocate( 2 );
 		TimeValue( 1 ).TimeStep >>= TimeStepZone;
+		TimeValue( 2 ).TimeStep >>= DataHVACGlobals::TimeStepSys;
 
 		PlantSizData.allocate( 1 );
 
@@ -90,10 +155,14 @@ public:
 
 		SetPredefinedTables();
 
+		int write_stat;
+		// Open the Initialization Output File (lifted from SimulationManager.cc)
+		OutputFileInits = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 	}
 
 	//destructor
-	~SizingAnalysisObjectsTest( )
+	~SizingAnalysisObjectsTest()
 	{
 		TotNumLoops = 0;
 		PlantLoop( 1 ).LoopSide.deallocate();
@@ -101,18 +170,16 @@ public:
 		Environment.deallocate();
 		PlantSizData.deallocate();
 		TimeValue.deallocate();
-	}
 
+		// Close and delete eio output file
+		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	}
 
 };
 
-
-
-
-TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
+TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 {
-
-	int const ZoneIndex ( 1 );
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework" );
 
 	// first step
 	KindOfSim = 4;
@@ -121,7 +188,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
 	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
-	TimeValue( ZoneIndex ).CurMinute = 15;
+	DataGlobals::TimeStep = 1;
 
 	LogVal = lowLogVal;
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
@@ -130,7 +197,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 	//last step of first design day
 	HourOfDay = 24;
-	TimeValue( ZoneIndex ).CurMinute = 60;
+	DataGlobals::TimeStep = 4;
 	LogVal = hiLogVal;
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
 
@@ -138,7 +205,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 	//first step of second design day
 	HourOfDay = 1;
-	TimeValue( ZoneIndex ).CurMinute = 15;
+	DataGlobals::TimeStep = 1;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
 	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
@@ -146,11 +213,12 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
 
 	EXPECT_DOUBLE_EQ( midLogVal, sizingLoggerFrameObj.logObjs[ logIndex ].ztStepObj[ 96 ].logDataValue );
-
 }
 
-TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
+TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour" );
+
 // basic test of method FillZoneStep and zone time stamp constructor
 // setup a log for 4 timesteps per hour and fill the first 4 steps, then check that values are there
 	SizingLog TestLogObj( LogVal );
@@ -176,10 +244,9 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 3 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
-	int CurMin( 15 );
+	int timeStp( 1 );
 	Real64 timeStepDuration( 0.25 );
 	int numTimeStepsInHour ( 4 );
 	LogVal = lowLogVal;
@@ -188,53 +255,53 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp1 );
 
 // fill second step log with zone step data
 
-	CurMin = 30;
+	timeStp = 2;
 	LogVal = midLogVal;
 	ZoneTimestepObject tmpztStepStamp2( // call constructor
 		KindOfSim,
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp2 );
 
 // fill third step log with zone step data
-	CurMin = 45 ;
+	timeStp = 3 ;
 	LogVal = midLogVal;
 	ZoneTimestepObject tmpztStepStamp3( // call constructor
 		KindOfSim,
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp3 );
 
 // fill fourth step log with zone step data
-	CurMin = 60;
+	timeStp = 4;
 	LogVal = hiLogVal;
 	ZoneTimestepObject tmpztStepStamp4( // call constructor
 		KindOfSim,
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp4 );
 
 	// now check that the correct values were stored in the right spot
@@ -244,12 +311,12 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 
 	//store this in the logger framework
 	sizingLoggerFrameObj.logObjs.push_back( TestLogObj );
-
 }
-
 
 TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour" );
+
 // this test uses one timestep per hour and checks as for two design days
 
 	SizingLog TestLogObj( LogVal );
@@ -273,32 +340,30 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 3 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
-	int CurMin( 60 );
+	int timeStp( 1 );
 	Real64 timeStepDuration( 1.0 );
 	int numTimeStepsInHour ( 1 );
 
 	LogVal = lowLogVal;
-	for (int hr = 1; hr <= 24; hr++ ) {
+	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
-			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
+			KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,timeStepDuration,
 			numTimeStepsInHour
-		); 
+		);
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
 	}
 
 	Envrn = 4;
-	DDnum = 2;
 	LogVal = hiLogVal;
-	for (int hr = 1; hr <= 24; hr++ ) {
+	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
-			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
+			KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,timeStepDuration,
 			numTimeStepsInHour
-		); 
+		);
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
 	}
 
@@ -310,8 +375,9 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	sizingLoggerFrameObj.logObjs.push_back(TestLogObj );
 }
 
-TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
+TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest" );
 
 	std::string loopName;
 	int loopNum;
@@ -329,7 +395,7 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	timestepsInAvg = 1;
 	plantSizingIndex = 1;
 
-	PlantCoinicidentAnalysis TestAnalysisObj( 
+	PlantCoinicidentAnalysis TestAnalysisObj(
 		loopName,
 		loopNum,
 		nodeNum,
@@ -342,10 +408,9 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	// fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 4 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
-	int CurMin( 15 );
+	int timeStp( 1 );
 	Real64 timeStepDuration( 0.25 );
 	int numTimeStepsInHour ( 4 );
 
@@ -354,10 +419,10 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 		Envrn,
 		DayOfSim,
 		HourofDay,
-		CurMin,
+		timeStp,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	LogVal = 1.5; // kg/s
 	tmpztStepStamp1.runningAvgDataValue = 1.5;
 	sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep( tmpztStepStamp1 );
@@ -368,7 +433,7 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	TestAnalysisObj.NewFoundMaxDemandTimeStamp = tmpztStepStamp1;
 	TestAnalysisObj.peakDemandMassFlow = 1.5;
 	TestAnalysisObj.peakDemandReturnTemp = 10.0;
-	
+
 	EXPECT_DOUBLE_EQ( 0.002, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
 
 	TestAnalysisObj.ResolveDesignFlowRate( 1 );
@@ -376,8 +441,102 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	EXPECT_DOUBLE_EQ( 0.0015, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
 	EXPECT_DOUBLE_EQ( 1.5, PlantLoop( 1 ).MaxMassFlowRate ); //  m3/s
 	EXPECT_TRUE( TestAnalysisObj.anotherIterationDesired );
+}
 
 
+TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
+{
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour" );
+
+	// this test uses 4 zone timesteps per hour and 5 sub system time steps per zone timestep
+	// tests FillSysStep over two design days
+
+	SizingLog TestLogObj( LogVal );
+
+	TestLogObj.NumOfEnvironmentsInLogSet = 2;
+	TestLogObj.NumOfDesignDaysInLogSet = 2;
+	TestLogObj.NumberOfSizingPeriodsInLogSet = 0;
+
+	TestLogObj.NumOfStepsInLogSet = 24 * 2 * 4;
+	TestLogObj.ztStepCountByEnvrnMap[ 1 ]= 96;
+	TestLogObj.ztStepCountByEnvrnMap[ 2 ]= 96;
+
+	TestLogObj.envrnStartZtStepIndexMap[ 1 ] = 0;
+	TestLogObj.envrnStartZtStepIndexMap[ 2 ] = 96;
+
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 3 ] = 1;
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 4 ] = 2;
+
+	TestLogObj.ztStepObj.resize( TestLogObj.NumOfStepsInLogSet );
+
+	int KindOfSim( 4 );
+	int Envrn( 3 );
+	int DayOfSim( 1 );
+	int HourofDay( 0 );
+	DataHVACGlobals::TimeStepSys = 1.0 / ( 4.0  * 5.0 ); // fractional hours, duration
+	Real64 zoneTimeStepDuration( 0.25 );
+	int numTimeStepsInHour ( 4 );
+
+	LogVal = lowLogVal;
+	for ( int hr = 1; hr <= 24; ++hr ) {
+		HourofDay = hr;
+		for ( int timeStp = 1; timeStp <= 4; ++timeStp ) { // 15 minute zone timestep
+			for ( int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp ) { // 5 system substeps, so 3 minute system timestep
+				int const sysIndex ( 2 );
+				Real64 const minutesPerHour( 60.0 );
+				ZoneTimestepObject tmpztStepStamp( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+				SystemTimestepObject tmpSysStepStamp;
+				tmpSysStepStamp.CurMinuteEnd = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				if ( tmpSysStepStamp.CurMinuteEnd == 0.0 ) { tmpSysStepStamp.CurMinuteEnd = minutesPerHour; }
+				tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue( sysIndex ).TimeStep;
+				TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
+			}
+
+			ZoneTimestepObject tmpztStepStamp1( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+			TestLogObj.FillZoneStep( tmpztStepStamp1 );
+		}
+	}
+
+	Envrn = 4;
+	LogVal = hiLogVal;
+	for ( int hr = 1; hr <= 24; ++hr ) {
+		HourofDay = hr;
+		for ( int timeStp = 1; timeStp <= 4; ++timeStp ) { // 15 minute zone timestep
+			for ( int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp ) { // 5 system substeps, so 3 minute system timestep
+				int const sysIndex ( 2 );
+				Real64 const minutesPerHour( 60.0 );
+				ZoneTimestepObject tmpztStepStamp( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+				SystemTimestepObject tmpSysStepStamp;
+				tmpSysStepStamp.CurMinuteEnd = ( timeStp - 1 ) * ( minutesPerHour * zoneTimeStepDuration ) + ( subTimeStp ) * OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				if ( tmpSysStepStamp.CurMinuteEnd == 0.0 ) { tmpSysStepStamp.CurMinuteEnd = minutesPerHour; }
+				tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue( sysIndex ).TimeStep * minutesPerHour;
+				tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue( sysIndex ).TimeStep;
+				TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
+			}
+
+			ZoneTimestepObject tmpztStepStamp1( KindOfSim,Envrn,DayOfSim,HourofDay,timeStp,zoneTimeStepDuration,numTimeStepsInHour ); // call constructor
+			TestLogObj.FillZoneStep( tmpztStepStamp1 );
+		}
+	}
+
+	// check values at wrap of environment change over, lower value up until the end of the first and then higher value at the new day
+
+	// these should be from the FillZoneStep at this point
+	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].logDataValue );
+	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].logDataValue );
+
+	TestLogObj.AverageSysTimeSteps();
+	TestLogObj.ProcessRunningAverage();
+
+	// now these should be filled from the sub timesteps, and still have the same data.
+	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].logDataValue );
+	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].logDataValue );
+
+	//dig into data structure and check substeps have the correct value
+	EXPECT_DOUBLE_EQ( lowLogVal, TestLogObj.ztStepObj[ 95 ].subSteps[ 4 ].LogDataValue );
+	EXPECT_DOUBLE_EQ( hiLogVal, TestLogObj.ztStepObj[ 96 ].subSteps[ 0 ].LogDataValue );
 
 }
+
 

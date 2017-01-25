@@ -1,11 +1,68 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <DisplacementVentMgr.hh>
@@ -180,7 +237,7 @@ namespace DisplacementVentMgr {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -243,7 +300,6 @@ namespace DisplacementVentMgr {
 		// -
 
 		// Using/Aliasing
-		using DataRoomAirModel::AirModel;
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
@@ -291,8 +347,8 @@ namespace DisplacementVentMgr {
 				SurfNum = APos_Wall( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
@@ -341,8 +397,8 @@ namespace DisplacementVentMgr {
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
 				if ( Surface( SurfNum ).Tilt > 10.0 && Surface( SurfNum ).Tilt < 170.0 ) { // Window Wall
-					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 					ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 					ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
@@ -404,12 +460,46 @@ namespace DisplacementVentMgr {
 				SurfNum = APos_Door( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
-				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
+				if ( Surface( SurfNum ).Tilt > 10.0 && Surface( SurfNum ).Tilt < 170.0 ) { // Door Wall
+					Z1 = minval( Surface( SurfNum ).Vertex( { 1, Surface( SurfNum ).Sides } ), &Vector::z );
+					Z2 = maxval( Surface( SurfNum ).Vertex( { 1, Surface( SurfNum ).Sides } ), &Vector::z );
+					ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
+					ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
-				if ( ZInfSurf > LayH ) {
+					if ( ZInfSurf > LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HDoor( Ctd ) = DVHcIn( SurfNum );
+						HAT_MX += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
+						HA_MX += Surface( SurfNum ).Area * HDoor( Ctd );
+					}
+
+					if ( ZSupSurf < LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HDoor( Ctd ) = DVHcIn( SurfNum );
+						HAT_OC += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
+						HA_OC += Surface( SurfNum ).Area * HDoor( Ctd );
+					}
+
+					if ( ZInfSurf <= LayH && ZSupSurf >= LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HLU = DVHcIn( SurfNum );
+						TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HLD = DVHcIn( SurfNum );
+						TmedDV = ( ( ZSupSurf - LayH ) * ZTMX( ZoneNum ) + ( LayH - ZInfSurf ) * ZTOC( ZoneNum ) ) / ( ZSupSurf - ZInfSurf );
+						HDoor( Ctd ) = ( ( LayH - ZInfSurf ) * HLD + ( ZSupSurf - LayH ) * HLU ) / ( ZSupSurf - ZInfSurf );
+						HAT_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLU;
+						HA_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * HLU;
+						HAT_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLD;
+						HA_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * HLD;
+						TempEffBulkAir( SurfNum ) = TmedDV;
+					}
+				}
+
+				if ( Surface( SurfNum ).Tilt <= 10.0 ) { // Door Ceiling
 					TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
 					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
 					HDoor( Ctd ) = DVHcIn( SurfNum );
@@ -417,28 +507,12 @@ namespace DisplacementVentMgr {
 					HA_MX += Surface( SurfNum ).Area * HDoor( Ctd );
 				}
 
-				if ( ZSupSurf < LayH ) {
+				if ( Surface( SurfNum ).Tilt >= 170.0 ) { // Door Floor
 					TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
 					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
 					HDoor( Ctd ) = DVHcIn( SurfNum );
 					HAT_OC += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
 					HA_OC += Surface( SurfNum ).Area * HDoor( Ctd );
-				}
-
-				if ( ZInfSurf <= LayH && ZSupSurf >= LayH ) {
-					TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
-					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
-					HLU = DVHcIn( SurfNum );
-					TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
-					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
-					HLD = DVHcIn( SurfNum );
-					TmedDV = ( ( ZSupSurf - LayH ) * ZTMX( ZoneNum ) + ( LayH - ZInfSurf ) * ZTOC( ZoneNum ) ) / ( ZSupSurf - ZInfSurf );
-					HDoor( Ctd ) = ( ( LayH - ZInfSurf ) * HLD + ( ZSupSurf - LayH ) * HLU ) / ( ZSupSurf - ZInfSurf );
-					HAT_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLU;
-					HA_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * HLU;
-					HAT_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLD;
-					HA_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * HLD;
-					TempEffBulkAir( SurfNum ) = TmedDV;
 				}
 
 				DVHcIn( SurfNum ) = HDoor( Ctd );
@@ -614,9 +688,9 @@ namespace DisplacementVentMgr {
 		int FlagApertures;
 		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
 		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-		static FArray1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 
-		static FArray1D_int IntGainTypesMixedSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
+		static Array1D_int IntGainTypesMixedSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
 		Real64 RetAirGain;
 
 		// Exact solution or Euler method
@@ -725,36 +799,36 @@ namespace DisplacementVentMgr {
 		// have to be located above 1.8m.
 
 		if ( NumOfLinksMultiZone > 0 ) {
-			for ( Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Loop ) {
+			for ( Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Loop ) {
 				// direct AirflowNetwork surface
 
-				if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone == ZoneNum ) {
+				if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone == ZoneNum ) {
 
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW > 0 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW > 0 ) ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW2 > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW2 > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
 
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax < 1.8 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax < 1.8 ) ) {
 						FlagApertures = 0;
 						break;
 					}
 					// indirect AirflowNetwork surface; this is an interzone surface
 				} else {
 
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW2 > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW2 > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) ) {
 						FlagApertures = 0;
 						break;
 					}
@@ -1025,29 +1099,6 @@ namespace DisplacementVentMgr {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DisplacementVentMgr
 

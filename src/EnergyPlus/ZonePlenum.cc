@@ -1,10 +1,67 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <ZonePlenum.hh>
@@ -68,19 +125,37 @@ namespace ZonePlenum {
 	int NumZonePlenums( 0 ); // The Number of ZonePlenums found in the Input
 	int NumZoneReturnPlenums( 0 ); // The Number of ZoneReturnPlenums found in the Input
 	int NumZoneSupplyPlenums( 0 ); // The Number of ZoneSupplyPlenums found in the Input
-	FArray1D_bool CheckRetEquipName;
-	FArray1D_bool CheckSupEquipName;
+	Array1D_bool CheckRetEquipName;
+	Array1D_bool CheckSupEquipName;
 
+	namespace {
+		bool GetInputFlag( true ); // Flag set to make sure you get input once
+		bool InitAirZoneReturnPlenumEnvrnFlag( true );
+		bool InitAirZoneReturnPlenumOneTimeFlag( true );
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
 	// Object Data
-	FArray1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
-	FArray1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
+	Array1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
+	Array1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		InitAirZoneReturnPlenumEnvrnFlag = true;
+		InitAirZoneReturnPlenumOneTimeFlag = true;
+		NumZonePlenums = 0;
+		NumZoneReturnPlenums = 0;
+		NumZoneSupplyPlenums = 0;
+		ZoneRetPlenCond.deallocate();
+		ZoneSupPlenCond.deallocate();
+	}
 
 	void
 	SimAirZonePlenum(
@@ -133,22 +208,19 @@ namespace ZonePlenum {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
 
 		// FLOW:
 
 		// Obtains and Allocates ZonePlenum related parameters from input file
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( GetInputFlag ) { // First time subroutine has been entered
 			GetZonePlenumInput();
 			GetInputFlag = false;
 		}
 
-		{ auto const SELECT_CASE_var( iCompType );
-
-		if ( SELECT_CASE_var == ZoneReturnPlenum_Type ) { // 'AirLoopHVAC:ReturnPlenum'
+		if ( iCompType == ZoneReturnPlenum_Type ) { // 'AirLoopHVAC:ReturnPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
-				ZonePlenumNum = FindItemInList( CompName, ZoneRetPlenCond.ZonePlenumName(), NumZoneReturnPlenums );
+				ZonePlenumNum = FindItemInList( CompName, ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName );
 				if ( ZonePlenumNum == 0 ) {
 					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName );
 				}
@@ -174,10 +246,10 @@ namespace ZonePlenum {
 
 			ReportZoneReturnPlenum( ZonePlenumNum );
 
-		} else if ( SELECT_CASE_var == ZoneSupplyPlenum_Type ) { // 'AirLoopHVAC:SupplyPlenum'
+		} else if ( iCompType == ZoneSupplyPlenum_Type ) { // 'AirLoopHVAC:SupplyPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
-				ZonePlenumNum = FindItemInList( CompName, ZoneSupPlenCond.ZonePlenumName(), NumZoneSupplyPlenums );
+				ZonePlenumNum = FindItemInList( CompName, ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
 				if ( ZonePlenumNum == 0 ) {
 					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName );
 				}
@@ -208,7 +280,7 @@ namespace ZonePlenum {
 			ShowContinueError( "ZonePlenum: Unhandled plenum type found:" + TrimSigDigits( iCompType ) );
 			ShowFatalError( "Preceding conditions cause termination." );
 
-		}}
+		}
 
 	}
 
@@ -249,6 +321,7 @@ namespace ZonePlenum {
 		using NodeInputManager::EndUniqueNodeCheck;
 		using DataHeatBalance::Zone;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::EquipConfiguration;
 		using namespace DataIPShortCuts;
 		using PoweredInductionUnits::PIUInducesPlenumAir;
 
@@ -273,18 +346,18 @@ namespace ZonePlenum {
 		int NumNums;
 		int NumArgs;
 		int NumNodes;
-		FArray1D_int NodeNums;
+		Array1D_int NodeNums;
 		int MaxNums;
 		int MaxAlphas;
 		int NodeNum;
 		int IOStat;
-		FArray1D< Real64 > NumArray; // Numeric input items for object
+		Array1D< Real64 > NumArray; // Numeric input items for object
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -331,7 +404,7 @@ namespace ZonePlenum {
 			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ZoneRetPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -339,7 +412,7 @@ namespace ZonePlenum {
 			ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another return plenum
-			IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond.ZoneName(), ZonePlenumNum - 1 );
+			IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1 );
 			if ( IOStat != 0 ) {
 				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + '.' );
 				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
@@ -348,14 +421,14 @@ namespace ZonePlenum {
 			}
 			ZoneRetPlenCond( ZonePlenumNum ).ZoneName = AlphArray( 2 );
 			// put the X-Ref to the zone heat balance data structure
-			ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone.Name(), NumOfZones );
+			ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone );
 			if ( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
 			}
 			//  Check if this zone is used as a controlled zone
-			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
+			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
 			if ( ZoneEquipConfigLoop != 0 ) {
 				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject );
 				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
@@ -383,6 +456,8 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 				ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 				ZoneRetPlenCond( ZonePlenumNum ).InducedPressure.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
+				ZoneRetPlenCond( ZonePlenumNum ).InducedCO2.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
+				ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 				ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail = 0.0;
@@ -390,6 +465,8 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedPressure = 0.0;
+				ZoneRetPlenCond( ZonePlenumNum ).InducedCO2 = 0.0;
+				ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam = 0.0;
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) = NodeNums( NodeNum );
 					UniqueNodeError = false;
@@ -407,7 +484,7 @@ namespace ZonePlenum {
 
 			ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes = NumAlphas - 5;
 
-			ZoneRetPlenCond.InitFlag() = true;
+			for ( auto & e : ZoneRetPlenCond ) e.InitFlag = true;
 
 			ZoneRetPlenCond( ZonePlenumNum ).InletNode.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes );
 			ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes );
@@ -458,7 +535,7 @@ namespace ZonePlenum {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ZoneSupPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -466,7 +543,7 @@ namespace ZonePlenum {
 			ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another plenum
-			IOStat = FindItemInList( AlphArray( 2 ), ZoneSupPlenCond.ZoneName(), ZonePlenumNum - 1 );
+			IOStat = FindItemInList( AlphArray( 2 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1 );
 			if ( IOStat != 0 ) {
 				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + '.' );
 				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
@@ -474,7 +551,7 @@ namespace ZonePlenum {
 				ErrorsFound = true;
 			}
 			if ( NumZoneReturnPlenums > 0 ) { // Check if this zone is also used in another plenum
-				IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond.ZoneName(), NumZoneReturnPlenums );
+				IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName );
 				if ( IOStat != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
 					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone." );
@@ -484,15 +561,15 @@ namespace ZonePlenum {
 			}
 			ZoneSupPlenCond( ZonePlenumNum ).ZoneName = AlphArray( 2 );
 			// put the X-Ref to the zone heat balance data structure
-			ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone.Name(), NumOfZones );
+			ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone );
 			if ( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
 			}
 			//  Check if this zone is used as a controlled zone
-			if ( any( ZoneEquipConfig.IsControlled() ) ) {
-				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
+			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
+				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneEquipConfigLoop != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
 					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
@@ -521,7 +598,7 @@ namespace ZonePlenum {
 
 			ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes = NumAlphas - 4;
 
-			ZoneSupPlenCond.InitFlag() = true;
+			for ( auto & e : ZoneSupPlenCond ) e.InitFlag = true;
 
 			ZoneSupPlenCond( ZonePlenumNum ).OutletNode.allocate( ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes );
 			ZoneSupPlenCond( ZonePlenumNum ).OutletMassFlowRate.allocate( ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes );
@@ -602,6 +679,7 @@ namespace ZonePlenum {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataDefineEquip::AirDistUnit;
 		using DataDefineEquip::NumAirDistUnits;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -617,7 +695,7 @@ namespace ZonePlenum {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
-		static int InducedNode( 0 );
+		int InducedNode( 0 );
 		int InletNodeLoop;
 		int ZoneNodeNum;
 		int NodeNum;
@@ -628,12 +706,14 @@ namespace ZonePlenum {
 		int NumADUsToPlen; // number of ADUs that might leak to this plenum
 		int ADUsToPlenIndex; // index of an ADU that might leak to this plenum in the plenum ADU list
 
-		static bool MyEnvrnFlag( true );
-		static bool MyOneTimeFlag( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyEnvrnFlag( true ); // InitAirZoneReturnPlenumEnvrnFlag
+		// static bool MyOneTimeFlag( true ); // InitAirZoneReturnPlenumOneTimeFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitAirZoneReturnPlenumOneTimeFlag ) {
 
 			// For each zone with a return air plenum put the ZoneRetPlenCond number for the return air plenum
 			// in the ZoneEquipConfig array for the zone. This allows direct access of the zone's return air
@@ -677,12 +757,12 @@ namespace ZonePlenum {
 				}
 			}
 
-			MyOneTimeFlag = false;
+			InitAirZoneReturnPlenumOneTimeFlag = false;
 
 		}
 
 		// Do the Begin Environment initializations
-		if ( MyEnvrnFlag && BeginEnvrnFlag ) {
+		if ( InitAirZoneReturnPlenumEnvrnFlag && BeginEnvrnFlag ) {
 
 			for ( PlenumZoneNum = 1; PlenumZoneNum <= NumZoneReturnPlenums; ++PlenumZoneNum ) {
 
@@ -696,12 +776,12 @@ namespace ZonePlenum {
 
 			}
 
-			MyEnvrnFlag = false;
+			InitAirZoneReturnPlenumEnvrnFlag = false;
 
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag = true;
+			InitAirZoneReturnPlenumEnvrnFlag = true;
 		}
 
 		//Transfer the node data to ZoneRetPlenCond data structure
@@ -720,17 +800,28 @@ namespace ZonePlenum {
 
 		}
 
-		// Set the induced air flow rates
+		ZoneNodeNum = ZoneRetPlenCond( ZonePlenumNum ).ZoneNodeNum;
+		// Set the induced air flow rates and conditions
 		for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes; ++NodeNum ) {
 			InducedNode = ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum );
 			ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate( NodeNum ) = Node( InducedNode ).MassFlowRate;
 			ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail( NodeNum ) = Node( InducedNode ).MassFlowRateMaxAvail;
 			ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail( NodeNum ) = Node( InducedNode ).MassFlowRateMinAvail;
+
+			ZoneRetPlenCond( ZonePlenumNum ).InducedTemp( NodeNum ) = Node( ZoneNodeNum ).Temp;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( NodeNum ) = Node( ZoneNodeNum ).HumRat;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( NodeNum ) = Node( ZoneNodeNum ).Enthalpy;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( NodeNum ) = Node( ZoneNodeNum ).Press;
+			if ( Contaminant.CO2Simulation ) {
+				ZoneRetPlenCond( ZonePlenumNum ).InducedCO2( NodeNum ) = Node( ZoneNodeNum ).CO2;
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam( NodeNum ) = Node( ZoneNodeNum ).GenContam;
+			}
 		}
 
 		// Add stuff to calculate conduction inputs to the zone plenum
 		// Now load the zone conditions
-		ZoneNodeNum = ZoneRetPlenCond( ZonePlenumNum ).ZoneNodeNum;
 		ZoneRetPlenCond( ZonePlenumNum ).ZoneTemp = Node( ZoneNodeNum ).Temp;
 		ZoneRetPlenCond( ZonePlenumNum ).ZoneHumRat = Node( ZoneNodeNum ).HumRat;
 		ZoneRetPlenCond( ZonePlenumNum ).ZoneEnthalpy = Node( ZoneNodeNum ).Enthalpy;
@@ -919,11 +1010,11 @@ namespace ZonePlenum {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int InletNodeNum( 0 ); // inlet node number
-		static int IndNum( 0 ); // induced air index
-		static int ADUNum( 0 ); // air distribution unit number
-		static int ADUListIndex( 0 ); // air distribution unit index in zone return plenum data structure
-		static Real64 TotIndMassFlowRate( 0.0 ); // total induced air mass flow rate [kg/s]
+		int InletNodeNum( 0 ); // inlet node number
+		int IndNum( 0 ); // induced air index
+		int ADUNum( 0 ); // air distribution unit number
+		int ADUListIndex( 0 ); // air distribution unit index in zone return plenum data structure
+		Real64 TotIndMassFlowRate( 0.0 ); // total induced air mass flow rate [kg/s]
 
 		// Reset the totals to zero before they are summed.
 		ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate = 0.0;
@@ -1124,6 +1215,12 @@ namespace ZonePlenum {
 			Node( InducedNode ).HumRat = ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( IndNum );
 			Node( InducedNode ).Enthalpy = ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( IndNum );
 			Node( InducedNode ).Press = ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( IndNum );
+			if ( Contaminant.CO2Simulation ) {
+				Node( InducedNode ).CO2 = ZoneRetPlenCond( ZonePlenumNum ).InducedCO2( IndNum );
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				Node( InducedNode ).GenContam = ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam( IndNum );
+			}
 			Node( InducedNode ).Quality = Node( InletNode ).Quality;
 		}
 
@@ -1131,6 +1228,7 @@ namespace ZonePlenum {
 		Node( OutletNode ).Quality = Node( InletNode ).Quality;
 		Node( ZoneNode ).Quality = Node( InletNode ).Quality;
 
+		// Set the outlet node contaminant properties if needed. The zone contaminant conditions are calculated in ZoneContaminantPredictorCorrector
 		if ( Contaminant.CO2Simulation ) {
 			if ( ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate > 0.0 ) {
 				// CO2 balance to get outlet air CO2
@@ -1140,22 +1238,19 @@ namespace ZonePlenum {
 				}
 				Node( ZoneNode ).CO2 = Node( OutletNode ).CO2;
 			} else {
-				Node( OutletNode ).CO2 = Node( InletNode ).CO2;
-				Node( ZoneNode ).CO2 = Node( InletNode ).CO2;
+				Node( OutletNode ).CO2 = Node( ZoneNode ).CO2;
 			}
 		}
-
 		if ( Contaminant.GenericContamSimulation ) {
 			if ( ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate > 0.0 ) {
-				// Contaminant balance to get outlet air generic contaminant
+				// GenContam balance to get outlet air GenContam
 				Node( OutletNode ).GenContam = 0.0;
 				for ( InletNodeNum = 1; InletNodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes; ++InletNodeNum ) {
 					Node( OutletNode ).GenContam += Node( ZoneRetPlenCond( ZonePlenumNum ).InletNode( InletNodeNum ) ).GenContam * ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate( InletNodeNum ) / ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate;
 				}
 				Node( ZoneNode ).GenContam = Node( OutletNode ).GenContam;
 			} else {
-				Node( OutletNode ).GenContam = Node( InletNode ).GenContam;
-				Node( ZoneNode ).GenContam = Node( InletNode ).GenContam;
+				Node( OutletNode ).GenContam = Node( ZoneNode ).GenContam;
 			}
 		}
 
@@ -1259,7 +1354,7 @@ namespace ZonePlenum {
 	// *****************************************************************************
 
 	void
-	ReportZoneReturnPlenum( int const ZonePlenumNum ) // unused1208
+	ReportZoneReturnPlenum( int const EP_UNUSED( ZonePlenumNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1302,7 +1397,7 @@ namespace ZonePlenum {
 	}
 
 	void
-	ReportZoneSupplyPlenum( int const ZonePlenumNum ) // unused1208
+	ReportZoneSupplyPlenum( int const EP_UNUSED( ZonePlenumNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1346,29 +1441,6 @@ namespace ZonePlenum {
 
 	//        End of Reporting subroutines for the ZonePlenum Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ZonePlenum
 

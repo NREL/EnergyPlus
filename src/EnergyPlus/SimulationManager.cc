@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // FMI-Related Headers
 extern "C" {
 #include <FMI/main.h>
@@ -9,8 +67,8 @@ extern "C" {
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -51,6 +109,7 @@ extern "C" {
 #include <DualDuct.hh>
 #include <EconomicLifeCycleCost.hh>
 #include <EconomicTariff.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EMSManager.hh>
 #include <ExteriorEnergyUse.hh>
 #include <ExternalInterface.hh>
@@ -63,8 +122,8 @@ extern "C" {
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
+#include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -89,7 +148,6 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
-#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -127,7 +185,6 @@ namespace SimulationManager {
 	// and internal Evolutionary Engineering documentation.
 
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataSizing;
@@ -154,11 +211,28 @@ namespace SimulationManager {
 	bool RunPeriodsInInput( false );
 	bool RunControlInInput( false );
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of SimulationManager should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool PreP_Fatal( false );
+	}
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		RunPeriodsInInput = false;
+		RunControlInInput = false;
+		PreP_Fatal = false;
+	}
+
 
 	void
 	ManageSimulation()
@@ -198,6 +272,7 @@ namespace SimulationManager {
 		using OutputReportTabular::WriteTabularReports;
 		using OutputReportTabular::OpenOutputTabularFile;
 		using OutputReportTabular::CloseOutputTabularFile;
+		using OutputReportTabular::ResetTabularReports;
 		using DataErrorTracking::AskForConnectionsReport;
 		using DataErrorTracking::ExitDuringSimulations;
 		using OutputProcessor::SetupTimePointers;
@@ -220,7 +295,6 @@ namespace SimulationManager {
 		using BranchInputManager::ManageBranchInput;
 		using BranchInputManager::TestBranchIntegrity;
 		using BranchInputManager::InvalidBranchDefinitions;
-		using ManageElectricPower::VerifyCustomMetersElecPowerMgr;
 		using MixedAir::CheckControllerLists;
 		using EMSManager::CheckIfAnyEMS;
 		using EMSManager::ManageEMS;
@@ -230,15 +304,15 @@ namespace SimulationManager {
 		using PlantManager::CheckIfAnyPlant;
 		using CurveManager::InitCurveReporting;
 		using namespace DataTimings;
-		using DataSystemVariables::DeveloperFlag;
-		using DataSystemVariables::TimingFlag;
 		using DataSystemVariables::FullAnnualRun;
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
-		using namespace FaultsManager;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using FaultsManager::CheckAndReadFaults;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
+		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
+		using OutputProcessor::isFinalYear;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -307,13 +381,14 @@ namespace SimulationManager {
 		CheckIfAnySlabs();
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
-
-		CheckAndReadFaults();
+		createFacilityElectricPowerServiceObject();
 
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
 		ManageSizing();
+
+		CheckAndReadFaults();
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
@@ -355,7 +430,7 @@ namespace SimulationManager {
 			SetupPollutionMeterReporting();
 			UpdateMeterReporting();
 			CheckPollutionMeterReporting();
-			VerifyCustomMetersElecPowerMgr();
+			facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
 			SetupPollutionCalculations();
 			InitDemandManagers();
 
@@ -382,8 +457,8 @@ namespace SimulationManager {
 			}
 
 			CreateEnergyReportStructure();
-
-			ManageEMS( emsCallFromSetupSimulation ); // point to finish setup processing EMS, sensor ready now
+			bool anyEMSRan;
+			ManageEMS( emsCallFromSetupSimulation, anyEMSRan ); // point to finish setup processing EMS, sensor ready now
 
 			ProduceRDDMDD();
 
@@ -444,8 +519,12 @@ namespace SimulationManager {
 			DayOfSim = 0;
 			DayOfSimChr = "0";
 			NumOfWarmupDays = 0;
+			if ( NumOfDayInEnvrn <= 365 ){
+				isFinalYear = true;
+			}
 
-			ManageEMS( emsCallFromBeginNewEvironment ); // calling point
+			bool anyEMSRan;
+			ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
@@ -463,6 +542,7 @@ namespace SimulationManager {
 				BeginDayFlag = true;
 				EndDayFlag = false;
 
+
 				if ( WarmupFlag ) {
 					++NumOfWarmupDays;
 					cWarmupDay = TrimSigDigits( NumOfWarmupDays );
@@ -470,9 +550,15 @@ namespace SimulationManager {
 				} else if ( DayOfSim == 1 ) {
 					DisplayString( "Starting Simulation at " + CurMnDy + " for " + EnvironmentName );
 					gio::write( OutputFileInits, Format_700 ) << NumOfWarmupDays;
+					ResetAccumulationWhenWarmupComplete();
 				} else if ( DisplayPerfSimulationFlag ) {
 					DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 					DisplayPerfSimulationFlag = false;
+				}
+				// for simulations that last longer than a week, identify when the last year of the simulation is started
+				if ( ( DayOfSim > 365 ) && ( (NumOfDayInEnvrn - DayOfSim) == 364 ) && !WarmupFlag ){
+					DisplayString( "Starting last  year of environment at:  " + DayOfSimChr );
+					ResetTabularReports();
 				}
 
 				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
@@ -482,7 +568,7 @@ namespace SimulationManager {
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 						if ( AnySlabsInModel || AnyBasementsInModel ) {
-							InitAndSimGroundDomains();
+							SimulateGroundDomains( false );
 						}
 
 						BeginTimeStepFlag = true;
@@ -552,6 +638,8 @@ namespace SimulationManager {
 			}
 		}
 
+		PlantManager::CheckOngoingPlantWarnings();
+
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 		// Output detailed ZONE time series data
@@ -564,6 +652,8 @@ namespace SimulationManager {
 		SimCostEstimate();
 
 		ComputeTariff(); //     Compute the utility bills
+
+		EMSManager::checkForUnusedActuatorsAtEnd();
 
 		ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
@@ -638,7 +728,7 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
+		static Array1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -647,8 +737,8 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas( 6 );
-		FArray1D< Real64 > Number( 4 );
+		Array1D_string Alphas( 6 );
+		Array1D< Real64 > Number( 4 );
 		int NumAlpha;
 		int NumNumber;
 		int IOStat;
@@ -952,7 +1042,7 @@ namespace SimulationManager {
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
 			if ( Alphas( 4 ) == "NO" ) DoDesDaySim = false;
 			if ( Alphas( 5 ) == "NO" ) DoWeathSim = false;
-			if (NumAlpha > 5){
+			if (NumAlpha > 5) {
 				if ( Alphas( 6 ) == "YES") DoHVACSizingSimulation = true;
 			}
 		}
@@ -1006,7 +1096,7 @@ namespace SimulationManager {
 		}
 		if ( DoHVACSizingSimulation ) {
 			Alphas( 6 ) = "Yes";
-			if ( NumNumber >= 1 ){
+			if ( NumNumber >= 1 ) {
 				HVACSizingSimMaxIterations = Number( 1 );
 			}
 		} else {
@@ -1532,6 +1622,9 @@ namespace SimulationManager {
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
+		using PlantPipingSystemsManager::CheckIfAnySlabs;
+		using PlantPipingSystemsManager::CheckIfAnyBasements;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1625,6 +1718,10 @@ namespace SimulationManager {
 
 		} // ... End environment loop.
 
+		if ( AnySlabsInModel || AnyBasementsInModel ) {
+			SimulateGroundDomains( true );
+		}
+
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
 		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
 
@@ -1678,7 +1775,6 @@ namespace SimulationManager {
 		int NumNonParents;
 		int NumNonConnected;
 		std::string ChrOut;
-		FArray1D_bool NonConnectedNodes;
 		bool ParentComponentFound;
 
 		// Formats
@@ -1805,7 +1901,6 @@ namespace SimulationManager {
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
 		using namespace DataHVACGlobals;
-		using DataHeatBalance::Zone;
 		using namespace DataPlant;
 		using namespace DataZoneEquipment;
 		using OutAirNodeManager::OutsideAirNodeList;
@@ -2225,12 +2320,12 @@ namespace SimulationManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int Loop1;
-		FArray1D_string ChildCType;
-		FArray1D_string ChildCName;
-		FArray1D_string ChildInNodeName;
-		FArray1D_string ChildOutNodeName;
-		FArray1D_int ChildInNodeNum;
-		FArray1D_int ChildOutNodeNum;
+		Array1D_string ChildCType;
+		Array1D_string ChildCName;
+		Array1D_string ChildInNodeName;
+		Array1D_string ChildOutNodeName;
+		Array1D_int ChildInNodeNum;
+		Array1D_int ChildOutNodeNum;
 		int NumChildren;
 		bool ErrorsFound;
 
@@ -2312,15 +2407,15 @@ namespace SimulationManager {
 		int Loop;
 		int Loop1;
 		int NumVariables;
-		FArray1D_int VarIndexes;
-		FArray1D_int VarIDs;
-		FArray1D_int IndexTypes;
-		FArray1D_int VarTypes;
-		FArray1D_string UnitsStrings;
-		FArray1D_string VarNames;
-		FArray1D_int ResourceTypes;
-		FArray1D_string EndUses;
-		FArray1D_string Groups;
+		Array1D_int VarIndexes;
+		Array1D_int VarIDs;
+		Array1D_int IndexTypes;
+		Array1D_int VarTypes;
+		Array1D_string UnitsStrings;
+		Array1D_string VarNames;
+		Array1D_int ResourceTypes;
+		Array1D_string EndUses;
+		Array1D_string Groups;
 
 		gio::write( OutputFileDebug, fmtA ) << " CompSet,ComponentType,ComponentName,NumMeteredVariables";
 		gio::write( OutputFileDebug, fmtA ) << " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType";
@@ -2405,7 +2500,9 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
+		////////////////////////////////////////////////////////////////////////////////////
 
 		DoingInputProcessing = false;
 
@@ -2506,7 +2603,7 @@ namespace SimulationManager {
 		std::string ErrorMessage;
 
 		gio::close( CacheIPErrorFile );
-		gio::open( CacheIPErrorFile, "eplusout.iperr" );
+		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
 		iostatus = 0;
 		while ( iostatus == 0 ) {
 			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
@@ -2603,7 +2700,6 @@ namespace SimulationManager {
 		int TotRectIZWindows;
 		int TotRectIZDoors;
 		int TotRectIZGlazedDoors;
-		int iIDFsetThreadsInput;
 		int NumAlphas;
 		int NumNumbers;
 
@@ -2685,7 +2781,7 @@ namespace SimulationManager {
 		cCurrentModuleObject = "ProgramControl";
 		if ( GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
 			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			iIDFsetThreadsInput = int( rNumericArgs( 1 ) );
+			int iIDFsetThreadsInput = int( rNumericArgs( 1 ) );
 			if ( iIDFSetThreads > 1 ) {
 				ShowWarningError( "CheckThreading: " + cCurrentModuleObject + " is not available in this version." );
 				ShowContinueError( "...user requested [" + RoundSigDigits( iIDFsetThreadsInput ) + "] threads." );
@@ -2778,7 +2874,6 @@ Resimulate(
 	using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 	using DataHeatBalFanSys::iGetZoneSetPoints;
 	using DataHeatBalFanSys::iPredictStep;
-	using DataHeatBalFanSys::iCorrectStep;
 	using HVACManager::SimHVAC;
 	//using HVACManager::CalcAirFlowSimple;
 	using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
@@ -2805,8 +2900,8 @@ Resimulate(
 	if ( ResimHB ) {
 		// Surface simulation
 		InitSurfaceHeatBalance();
-		CalcHeatBalanceOutsideSurf();
-		CalcHeatBalanceInsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		// Air simulation
 		InitAirHeatBalance();
@@ -2829,25 +2924,6 @@ Resimulate(
 	}
 
 }
-
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef ExternalInterface_hh_INCLUDED
 #define ExternalInterface_hh_INCLUDED
 
@@ -21,7 +79,7 @@ extern "C" {
 #include <string>
 
 // Objexx Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 
 namespace EnergyPlus {
@@ -54,10 +112,10 @@ namespace ExternalInterface {
 	extern std::string const BlankString;
 
 	struct fmuInputVariableType {
-		
+
 		std::string Name; // Name of FMU input variable
 		int ValueReference; // = fmiValueReference specific to FMU variable
-		
+
 		// Default Constructor
 		fmuInputVariableType() :
 			Name( BlankString ),
@@ -210,42 +268,42 @@ namespace ExternalInterface {
 		fmiStatus fmistatus; // Status of fmi
 		int Index; // Index of FMU
 		// Variable Types structure for fmu input variables
-		FArray1D< fmuInputVariableType > fmuInputVariable;
+		Array1D< fmuInputVariableType > fmuInputVariable;
 		// Variable Types structure for checking duplicates fmu input variables
-		FArray1D< fmuInputVariableType > checkfmuInputVariable;
+		Array1D< fmuInputVariableType > checkfmuInputVariable;
 		// Variable Types structure for energyplus output variables
-		FArray1D< eplusOutputVariableType > eplusOutputVariable;
+		Array1D< eplusOutputVariableType > eplusOutputVariable;
 		// Variable Types structure for fmu output variables from type schedule
-		FArray1D< fmuOutputVariableScheduleType > fmuOutputVariableSchedule;
+		Array1D< fmuOutputVariableScheduleType > fmuOutputVariableSchedule;
 		// Variable Types structure for energyplus input variables from type schedule
-		FArray1D< eplusInputVariableScheduleType > eplusInputVariableSchedule;
+		Array1D< eplusInputVariableScheduleType > eplusInputVariableSchedule;
 		// Variable Types structure for fmu output variables from type variable
-		FArray1D< fmuOutputVariableVariableType > fmuOutputVariableVariable;
+		Array1D< fmuOutputVariableVariableType > fmuOutputVariableVariable;
 		// Variable Types structure for energyplus input variables from type variable
-		FArray1D< eplusInputVariableVariableType > eplusInputVariableVariable;
+		Array1D< eplusInputVariableVariableType > eplusInputVariableVariable;
 		// Variable Types structure for fmu output variables from type actuator
-		FArray1D< fmuOutputVariableActuatorType > fmuOutputVariableActuator;
+		Array1D< fmuOutputVariableActuatorType > fmuOutputVariableActuator;
 		// Variable Types structure for energyplus input variables from type actuator
-		FArray1D< eplusInputVariableActuatorType > eplusInputVariableActuator;
+		Array1D< eplusInputVariableActuatorType > eplusInputVariableActuator;
 
 		// Default Constructor
 		InstanceType() :
 			Name( BlankString ),
 			modelID( BlankString ),
-			modelGUID( BlankString ), 
-			WorkingFolder( BlankString ), 
-			WorkingFolder_wLib( BlankString ), 
-			fmiVersionNumber( BlankString ), 
-			NumInputVariablesInFMU( 0 ), 
-			NumInputVariablesInIDF( 0 ), 
-			NumOutputVariablesInFMU( 0 ), 
-			NumOutputVariablesInIDF( 0 ), 
-			NumOutputVariablesSchedule( 0 ), 
-			NumOutputVariablesVariable( 0 ), 
-			NumOutputVariablesActuator( 0 ), 
-			LenModelID( 0 ), 
-			LenModelGUID( 0 ), 
-			LenWorkingFolder( 0 ), 
+			modelGUID( BlankString ),
+			WorkingFolder( BlankString ),
+			WorkingFolder_wLib( BlankString ),
+			fmiVersionNumber( BlankString ),
+			NumInputVariablesInFMU( 0 ),
+			NumInputVariablesInIDF( 0 ),
+			NumOutputVariablesInFMU( 0 ),
+			NumOutputVariablesInIDF( 0 ),
+			NumOutputVariablesSchedule( 0 ),
+			NumOutputVariablesVariable( 0 ),
+			NumOutputVariablesActuator( 0 ),
+			LenModelID( 0 ),
+			LenModelGUID( 0 ),
+			LenWorkingFolder( 0 ),
 			LenWorkingFolder_wLib( 0 )
 		{
 			//fmiStatus, Index, and arrays not initialized in default constructor
@@ -265,7 +323,7 @@ namespace ExternalInterface {
 		int TotNumOutputVariablesSchedule; // Number of output variables from type schedule
 		int TotNumOutputVariablesVariable; // Number of output variables from type variable
 		int TotNumOutputVariablesActuator; // Number of output variables from type actuator
-		FArray1D< InstanceType > Instance; // Variable Types structure for energyplus input variables from type actuator
+		Array1D< InstanceType > Instance; // Variable Types structure for energyplus input variables from type actuator
 
 		// Default Constructor
 		FMUType() :
@@ -285,9 +343,9 @@ namespace ExternalInterface {
 
 	};
 
-	extern FArray1D< FMUType > FMU; // Variable Types structure
-	extern FArray1D< FMUType > FMUTemp; // Variable Types structure
-	extern FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	extern Array1D< FMUType > FMU; // Variable Types structure
+	extern Array1D< FMUType > FMUTemp; // Variable Types structure
+	extern Array1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
 	extern int NumExternalInterfaces; //Number of ExternalInterface objects
 	extern int NumExternalInterfacesBCVTB; //Number of BCVTB ExternalInterface objects
 	extern int NumExternalInterfacesFMUImport; //Number of FMU ExternalInterface objects
@@ -301,18 +359,18 @@ namespace ExternalInterface {
 	// which phase an error occured.
 	// (1=initialization, 2=time stepping)
 
-	extern FArray1D< int > keyVarIndexes; // Array index for specific key name
-	extern FArray1D< int > varTypes; // Types of variables in keyVarIndexes
-	extern FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
+	extern Array1D< int > keyVarIndexes; // Array index for specific key name
+	extern Array1D< int > varTypes; // Types of variables in keyVarIndexes
+	extern Array1D< int > varInd; // Index of ErlVariables for ExternalInterface
 	extern int socketFD; // socket file descriptor
 	extern bool ErrorsFound; // Set to true if errors are found
 	extern bool noMoreValues; //Flag, true if no more values
 	// will be sent by the server
 
-	extern FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
-	extern FArray1D< std::string > varNames; // Names of report variables used for data exchange
-	extern FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
-	extern FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
+	extern Array1D< std::string > varKeys; // Keys of report variables used for data exchange
+	extern Array1D< std::string > varNames; // Names of report variables used for data exchange
+	extern Array1D< int > inpVarTypes; // Names of report variables used for data exchange
+	extern Array1D< std::string > inpVarNames; // Names of report variables used for data exchange
 
 	extern bool configuredControlPoints; // True if control points have been configured
 	extern bool useEMS; // Will be set to true if ExternalInterface writes to EMS variables or actuators
@@ -323,60 +381,60 @@ namespace ExternalInterface {
 	ExternalInterfaceExchangeVariables();
 
 	void
-	CloseSocket( int const FlagToWriteToSocket ); 
+	CloseSocket( int const FlagToWriteToSocket );
 
 	void
 	InitExternalInterface();
-	
+
 	void
 	GetExternalInterfaceInput();
-	
+
 	void
 	CalcExternalInterface();
-	
+
 	void
 	ParseString(
 		std::string const & str,
-		FArray1S_string ele,
+		Array1S_string ele,
 		int const nEle
 	);
-	
+
 	void
 	GetReportVariableKey(
-		FArray1S_string const varKeys,
+		Array1S_string const varKeys,
 		int const numberOfKeys,
-		FArray1S_string const varNames,
-		FArray1S_int keyVarIndexes,
-		FArray1S_int varTypes
+		Array1S_string const varNames,
+		Array1S_int keyVarIndexes,
+		Array1S_int varTypes
 	);
-	
+
 	std::vector< char >
 	getCharArrayFromString( std::string const & originalString );
-	
+
 	std::string
 	getStringFromCharArray( std::vector< char > originalCharArray );
-	
+
 	void
 	StopExternalInterfaceIfError();
-	
+
 	void
 	ValidateRunControl();
-	
+
 	void
 	WarnIfExternalInterfaceObjectsAreUsed( std::string const & ObjectWord );
-	
+
 	void
 	CalcExternalInterfaceFMUImport();
-	
+
 	void
 	InitExternalInterfaceFMUImport();
-	
+
 	void
 	InstantiateInitializeFMUImport();
-	
+
 	void
-	TerminateResetFreeFMUImport();
-	
+	TerminateResetFreeFMUImport(int fmiEndSimulation);
+
 	void
 	GetSetVariablesAndDoStepFMUImport();
 
@@ -388,29 +446,6 @@ namespace ExternalInterface {
 
 	std::string
 	trim(std::string const& str);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ExternalInterface
 

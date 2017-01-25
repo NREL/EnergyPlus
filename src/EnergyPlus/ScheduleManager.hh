@@ -1,11 +1,71 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef ScheduleManager_hh_INCLUDED
 #define ScheduleManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/FArray2S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2A.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -21,10 +81,10 @@ namespace ScheduleManager {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const MaxDayTypes;
-	extern FArray1D_string const ValidDayTypes;
+	extern Array1D_string const ValidDayTypes;
 
 	extern int const NumScheduleTypeLimitUnitTypes;
-	extern FArray1D_string const ScheduleTypeLimitUnitTypes;
+	extern Array1D_string const ScheduleTypeLimitUnitTypes;
 
 	extern int const ScheduleInput_year;
 	extern int const ScheduleInput_compact;
@@ -71,23 +131,6 @@ namespace ScheduleManager {
 			UnitType( 0 )
 		{}
 
-		// Member Constructor
-		ScheduleTypeData(
-			std::string const & Name, // Schedule Type Name
-			bool const Limited, // True if this Schedule Type has limits
-			Real64 const Minimum, // Minimum for limited schedule
-			Real64 const Maximum, // Maximum for limited schedule
-			bool const IsReal, // True if this is a "real" schedule, false if integer
-			int const UnitType // reference ScheduleTypeLimit table
-		) :
-			Name( Name ),
-			Limited( Limited ),
-			Minimum( Minimum ),
-			Maximum( Maximum ),
-			IsReal( IsReal ),
-			UnitType( UnitType )
-		{}
-
 	};
 
 	struct DayScheduleData
@@ -97,7 +140,7 @@ namespace ScheduleManager {
 		int ScheduleTypePtr; // Index of Schedule Type
 		bool IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
 		bool Used; // Indicator for this schedule being "used".
-		FArray2D< Real64 > TSValue; // Value array by simulation timestep
+		Array2D< Real64 > TSValue; // Value array by simulation timestep
 		Real64 TSValMax; // maximum of all TSValue's
 		Real64 TSValMin; // minimum of all TSValue's
 
@@ -110,25 +153,6 @@ namespace ScheduleManager {
 			TSValMin( 0.0 )
 		{}
 
-		// Member Constructor
-		DayScheduleData(
-			std::string const & Name, // Day Schedule Name
-			int const ScheduleTypePtr, // Index of Schedule Type
-			bool const IntervalInterpolated, // Indicator for interval interpolation. If not "interpolated", False.  Else True
-			bool const Used, // Indicator for this schedule being "used".
-			FArray2< Real64 > const & TSValue, // Value array by simulation timestep
-			Real64 const TSValMax, // maximum of all TSValue's
-			Real64 const TSValMin // minimum of all TSValue's
-		) :
-			Name( Name ),
-			ScheduleTypePtr( ScheduleTypePtr ),
-			IntervalInterpolated( IntervalInterpolated ),
-			Used( Used ),
-			TSValue( TSValue ),
-			TSValMax( TSValMax ),
-			TSValMin( TSValMin )
-		{}
-
 	};
 
 	struct WeekScheduleData
@@ -136,23 +160,12 @@ namespace ScheduleManager {
 		// Members
 		std::string Name; // Week Schedule Name
 		bool Used; // Indicator for this schedule being "used".
-		FArray1D_int DaySchedulePointer; // Index of Day Schedule
+		Array1D_int DaySchedulePointer; // Index of Day Schedule
 
 		// Default Constructor
 		WeekScheduleData() :
 			Used( false ),
 			DaySchedulePointer( MaxDayTypes, 0 )
-		{}
-
-		// Member Constructor
-		WeekScheduleData(
-			std::string const & Name, // Week Schedule Name
-			bool const Used, // Indicator for this schedule being "used".
-			FArray1_int const & DaySchedulePointer // Index of Day Schedule
-		) :
-			Name( Name ),
-			Used( Used ),
-			DaySchedulePointer( MaxDayTypes, DaySchedulePointer )
 		{}
 
 	};
@@ -162,7 +175,7 @@ namespace ScheduleManager {
 		// Members
 		std::string Name; // Schedule Name
 		int ScheduleTypePtr; // Index of Schedule Type
-		FArray1D_int WeekSchedulePointer; // one created for each day of possible simulation
+		Array1D_int WeekSchedulePointer; // one created for each day of possible simulation
 		int SchType; // what kind of object has been input.
 		bool Used; // Indicator for this schedule being "used".
 		bool MaxMinSet; // Max/min values have been stored for this schedule
@@ -186,42 +199,20 @@ namespace ScheduleManager {
 			EMSValue( 0.0 )
 		{}
 
-		// Member Constructor
-		ScheduleData(
-			std::string const & Name, // Schedule Name
-			int const ScheduleTypePtr, // Index of Schedule Type
-			FArray1_int const & WeekSchedulePointer, // one created for each day of possible simulation
-			int const SchType, // what kind of object has been input.
-			bool const Used, // Indicator for this schedule being "used".
-			bool const MaxMinSet, // Max/min values have been stored for this schedule
-			Real64 const MaxValue, // Maximum value for this schedule
-			Real64 const MinValue, // Minimum value for this schedule
-			Real64 const CurrentValue, // For Reporting
-			bool const EMSActuatedOn, // indicates if EMS computed
-			Real64 const EMSValue
-		) :
-			Name( Name ),
-			ScheduleTypePtr( ScheduleTypePtr ),
-			WeekSchedulePointer( 366, WeekSchedulePointer ),
-			SchType( SchType ),
-			Used( Used ),
-			MaxMinSet( MaxMinSet ),
-			MaxValue( MaxValue ),
-			MinValue( MinValue ),
-			CurrentValue( CurrentValue ),
-			EMSActuatedOn( EMSActuatedOn ),
-			EMSValue( EMSValue )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
-	extern FArray1D< DayScheduleData > DaySchedule; // Day Schedule Storage
-	extern FArray1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
-	extern FArray1D< ScheduleData > Schedule; // Schedule Storage
+	extern Array1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
+	extern Array1D< DayScheduleData > DaySchedule; // Day Schedule Storage
+	extern Array1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
+	extern Array1D< ScheduleData > Schedule; // Schedule Storage
 
 	// Functions
+
+	// Clears the global data in ScheduleManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	ProcessScheduleInput();
@@ -254,7 +245,7 @@ namespace ScheduleManager {
 	void
 	GetScheduleValuesForDay(
 		int const ScheduleIndex,
-		FArray2S< Real64 > DayValues,
+		Array2S< Real64 > DayValues,
 		Optional_int_const JDay = _,
 		Optional_int_const CurDayofWeek = _
 	);
@@ -262,7 +253,7 @@ namespace ScheduleManager {
 	void
 	GetSingleDayScheduleValues(
 		int const DayScheduleIndex, // Index of the DaySchedule for values
-		FArray2S< Real64 > DayValues // Returned set of values
+		Array2S< Real64 > DayValues // Returned set of values
 	);
 
 	void
@@ -273,16 +264,17 @@ namespace ScheduleManager {
 
 	void
 	ProcessIntervalFields(
-		FArray1S_string const Untils,
-		FArray1S< Real64 > const Numbers,
+		Array1S_string const Untils,
+		Array1S< Real64 > const Numbers,
 		int const NumUntils,
 		int const NumNumbers,
-		FArray2A< Real64 > MinuteValue,
-		FArray2A_bool SetMinuteValue,
+		Array2A< Real64 > MinuteValue,
+		Array2A_bool SetMinuteValue,
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
-		std::string const & ErrContext // Context (used for errors)
-	);
+		std::string const & ErrContext, // Context (used for errors)
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		);
 
 	void
 	DecodeHHMMField(
@@ -291,14 +283,18 @@ namespace ScheduleManager {
 		int & RetMM, // Returned "minute"
 		bool & ErrorsFound, // True if errors found in this field
 		std::string const & DayScheduleName, // originating day schedule name
-		std::string const & FullFieldValue // Full Input field value
-	);
+		std::string const & FullFieldValue, // Full Input field value
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		);
+
+	bool
+	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep );
 
 	void
 	ProcessForDayTypes(
 		std::string const & ForDayField, // Field containing the "FOR:..."
-		FArray1A_bool TheseDays, // Array to contain returned "true" days
-		FArray1A_bool AlReady, // Array of days already done
+		Array1A_bool TheseDays, // Array to contain returned "true" days
+		Array1A_bool AlReady, // Array of days already done
 		bool & ErrorsFound // Will be true if error found.
 	);
 
@@ -391,29 +387,6 @@ namespace ScheduleManager {
 
 	int
 	GetNumberOfSchedules();
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ScheduleManager
 

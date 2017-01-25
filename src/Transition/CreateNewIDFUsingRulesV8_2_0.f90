@@ -364,7 +364,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(11)="No"
                 endif
                 ! the net effect here is the addition of 1 field
-                OutArgs(12:)=InArgs(11:)
+                OutArgs(12:15)=InArgs(11:14)
                 CurArgs = CurArgs + 1
       
               CASE('PLANTLOOP', 'CONDENSERLOOP')
@@ -380,7 +380,57 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 else
                   OutArgs(19)=InArgs(19) ! Redundant, but clear
                 endif
-              
+
+              CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 32, the chw loop load distribution type and make a decision:
+                if (SameString(InArgs(32), "SEQUENTIAL")) then
+                  OutArgs(32)="SequentialLoad"
+                elseif (SameString(InArgs(32), "UNIFORM")) then
+                  OutArgs(32)="UniformLoad"
+                else
+                  OutArgs(32)=InArgs(32) ! Redundant, but clear
+                endif
+                ! then check the value of 33, the cond loop load distribution type and make a decision:
+                if (SameString(InArgs(33), "SEQUENTIAL")) then
+                  OutArgs(33)="SequentialLoad"
+                elseif (SameString(InArgs(33), "UNIFORM")) then
+                  OutArgs(33)="UniformLoad"
+                else
+                  OutArgs(33)=InArgs(33) ! Redundant, but clear
+                endif
+
+              CASE('HVACTEMPLATE:PLANT:HOTWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 21, the load distribution type and make a decision:
+                if (SameString(InArgs(21), "SEQUENTIAL")) then
+                  OutArgs(21)="SequentialLoad"
+                elseif (SameString(InArgs(21), "UNIFORM")) then
+                  OutArgs(21)="UniformLoad"
+                else
+                  OutArgs(21)=InArgs(21) ! Redundant, but clear
+                endif
+
+              CASE('HVACTEMPLATE:PLANT:MIXEDWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 17, the load distribution type and make a decision:
+                if (SameString(InArgs(17), "SEQUENTIAL")) then
+                  OutArgs(17)="SequentialLoad"
+                elseif (SameString(InArgs(17), "UNIFORM")) then
+                  OutArgs(17)="UniformLoad"
+                else
+                  OutArgs(17)=InArgs(17) ! Redundant, but clear
+                endif
+
               CASE('SIZING:SYSTEM')
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -158,12 +216,12 @@ namespace HVACUnitaryBypassVAV {
 	Real64 PartLoadFrac( 0.0 ); // Compressor part-load fraction
 	Real64 SaveCompressorPLR( 0.0 ); // Holds DX compressor PLR from active DX coil
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< CBVAVData > CBVAV;
+	Array1D< CBVAVData > CBVAV;
 
 	// Functions
 
@@ -225,7 +283,7 @@ namespace HVACUnitaryBypassVAV {
 
 		// Find the correct changeover-bypass VAV unit
 		if ( CompIndex == 0 ) {
-			CBVAVNum = FindItemInList( CompName, CBVAV.Name(), NumCBVAV );
+			CBVAVNum = FindItemInList( CompName, CBVAV );
 			if ( CBVAVNum == 0 ) {
 				ShowFatalError( "SimUnitaryBypassVAV: Unit not found=" + CompName );
 			}
@@ -425,9 +483,7 @@ namespace HVACUnitaryBypassVAV {
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleIndex;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::FanType_ZoneExhaust;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -448,7 +504,6 @@ namespace HVACUnitaryBypassVAV {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
@@ -471,8 +526,8 @@ namespace HVACUnitaryBypassVAV {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBVAVIndex; // Loop index
 		int CBVAVNum; // Current CBVAV number
-		FArray1D_string Alphas( 19 ); // Alpha items for object
-		FArray1D< Real64 > Numbers( 11 ); // Numeric items for object
+		Array1D_string Alphas( 19 ); // Alpha items for object
+		Array1D< Real64 > Numbers( 11 ); // Numeric items for object
 		std::string CompSetFanInlet; // Used in SetUpCompSets call
 		std::string CompSetCoolInlet; // Used in SetUpCompSets call
 		std::string CompSetFanOutlet; // Used in SetUpCompSets call
@@ -494,7 +549,7 @@ namespace HVACUnitaryBypassVAV {
 		int AirLoopZoneNum; // Index to controlled zone
 		int BranchNum; // Index to branch containing this system
 		int CompNum; // Index to this system
-		FArray1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
+		Array1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
 		std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
 		std::string MixerInletNodeName; // Name of mixer inlet node
 		std::string SplitterOutletNodeName; // Name of splitter outlet node
@@ -503,14 +558,13 @@ namespace HVACUnitaryBypassVAV {
 		bool FoundTstatZone; // TRUE if thermostat found in controlled zone
 		bool OANodeErrFlag; // TRUE if DX Coil condenser node is not found
 		bool DXCoilErrFlag; // used in warning messages
-		FArray1D_string cAlphaFields( 19 ); // Alpha field names
-		FArray1D_string cNumericFields( 11 ); // Numeric field names
-		FArray1D_bool lAlphaBlanks( 19 ); // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks( 11 ); // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields( 19 ); // Alpha field names
+		Array1D_string cNumericFields( 11 ); // Numeric field names
+		Array1D_bool lAlphaBlanks( 19 ); // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks( 11 ); // Logical array, numeric field input BLANK = .TRUE.
 		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 		int HeatCoilInletNodeNum; // Heating coil air inlet node number
 		int HeatCoilOutletNodeNum; // Heating coil air outlet node number
-		int TempNodeNum; // HW coil water inlet node
 		int SteamIndex; // steam coil index
 		Real64 SteamDensity; // steam coil steam density
 
@@ -538,7 +592,7 @@ namespace HVACUnitaryBypassVAV {
 			CBVAVNum = CBVAVIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), CBVAV.Name(), CBVAVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), CBVAV, CBVAVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1197,7 +1251,6 @@ namespace HVACUnitaryBypassVAV {
 		using EMSManager::iHumidityRatioMaxSetPoint;
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
-		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1208,20 +1261,10 @@ namespace HVACUnitaryBypassVAV {
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitCBVAV" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InNode; // Inlet node number in CBVAV loop
@@ -1229,9 +1272,9 @@ namespace HVACUnitaryBypassVAV {
 		int MixerOutsideAirNode; // Outside air node number in CBVAV loop
 		Real64 RhoAir; // Air density at InNode
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // Used for sizing CBVAV inputs one time
-		static FArray1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // Used for sizing CBVAV inputs one time
+		static Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
 		Real64 QSensUnitOut; // Output of CBVAV system with coils off
 		Real64 OutsideAirMultiplier; // Outside air multiplier schedule (= 1.0 if no schedule)
 		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
@@ -1276,7 +1319,7 @@ namespace HVACUnitaryBypassVAV {
 					CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 
 					if ( CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
+						FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
 						CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound ) * FluidDensity;
 					}
 
@@ -1358,7 +1401,7 @@ namespace HVACUnitaryBypassVAV {
 							ErrorsFound = true;
 						}
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
+							FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
 							CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 						}
 					}
@@ -1864,7 +1907,6 @@ namespace HVACUnitaryBypassVAV {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 50 ); // Maximum number of iterations
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1895,7 +1937,7 @@ namespace HVACUnitaryBypassVAV {
 		bool const FirstHVACIteration, // Flag for 1st HVAC iteration
 		Real64 & PartLoadFrac, // Compressor part load fraction
 		Real64 & LoadMet, // Load met by unit (W)
-		Real64 & QZnReq, // Zone load (W)
+		Real64 & EP_UNUSED( QZnReq ), // Zone load (W)
 		Real64 & OnOffAirFlowRatio, // Ratio of compressor ON airflow to AVERAGE airflow over timestep
 		bool const HXUnitOn // flag to enable heat exchanger
 	)
@@ -1945,7 +1987,7 @@ namespace HVACUnitaryBypassVAV {
 		int OutletNode; // CBVAV air outlet node
 		int InletNode; // CBVAV air inlet node
 		Real64 MinHumRat; // Minimum humidity ratio for sensible capacity calculation (kg/kg)
-		FArray1D< Real64 > Par( 6 ); // RegulaFalsi parameters
+		Array1D< Real64 > Par( 6 ); // RegulaFalsi parameters
 		int SolFla; // Flag of RegulaFalsi solver
 		Real64 QHeater; // Load to be met by heater [W]
 		Real64 QHeaterActual; // actual heating load met [W]
@@ -2609,7 +2651,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2669,7 +2711,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HXAssistDXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2734,7 +2776,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2794,7 +2836,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3091,7 +3133,7 @@ namespace HVACUnitaryBypassVAV {
 		Real64 MinWaterFlow; // minimum water mass flow rate
 		Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		Array1D< Real64 > Par( 3 );
 		int SolFlag; // error flag
 
 		QCoilActual = 0.0;
@@ -3169,7 +3211,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 
@@ -3232,29 +3274,6 @@ namespace HVACUnitaryBypassVAV {
 		}
 		return Residuum;
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACUnitaryBypassVAV
 

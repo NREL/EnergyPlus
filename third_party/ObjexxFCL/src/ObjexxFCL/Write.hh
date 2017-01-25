@@ -5,19 +5,18 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
-#include <ObjexxFCL/FArray.all.hh>
-#include <ObjexxFCL/FArrayS.all.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/Array.all.hh>
+#include <ObjexxFCL/ArrayS.all.hh>
 #include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
@@ -25,10 +24,12 @@
 
 // C++ Headers
 #include <complex>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace ObjexxFCL {
 
@@ -38,11 +39,9 @@ class Write
 public: // Creation
 
 	// Default Constructor
-	inline
 	Write() :
 	 os_( nullptr ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( nullptr ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -52,32 +51,38 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	inline
-	Write( Write && w ) :
+	Write( Write && w ) NOEXCEPT :
 	 os_( w.os_ ),
 	 str_( w.str_ ),
-	 fst_( w.fst_ ),
-	 format_( w.format_ ),
+	 format_( w.format_ ? &w.format_->reset() : nullptr ),
 	 format_own_( w.format_own_ ),
 	 ter_( w.ter_ ),
 	 flags_( w.flags_ ? &w.flags_->clear_status() : nullptr ),
+#if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
+	 stream_( std::move( w.stream_ ) ),
+#endif
 	 pos_( 0 ),
 	 reverts_( 0 )
 	{
 		w.os_ = nullptr;
 		w.str_ = nullptr;
-		w.fst_ = nullptr;
 		w.format_ = nullptr;
 		w.format_own_ = false;
+		w.ter_ = LF;
+#if !defined(__GNUC__) || __GNUC__ >= 5
+		stream_.clear();
+		stream_.seekp( 0, std::ios::beg );
+		stream_.str( std::string() );
+#endif
+		w.pos_ = 0;
+		w.reverts_ = 0;
 	}
 
 	// Flags Constructor
-	inline
 	explicit
 	Write( IOFlags & flags ) :
 	 os_( nullptr ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( nullptr ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -87,11 +92,9 @@ public: // Creation
 	{}
 
 	// Stream + Format Constructor
-	inline
 	Write( std::ostream & stream, std::string const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( is_fstream( stream ) ? IOFlags::default_ter() : LF ),
@@ -101,11 +104,9 @@ public: // Creation
 	{}
 
 	// Stream + Format Constructor
-	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( is_fstream( stream ) ? IOFlags::default_ter() : LF ),
@@ -115,11 +116,9 @@ public: // Creation
 	{}
 
 	// Stream + Format Constructor
-	inline
 	Write( std::ostream & stream, gio::Fmt & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( is_fstream( stream ) ? IOFlags::default_ter() : LF ),
@@ -129,11 +128,9 @@ public: // Creation
 	{}
 
 	// Stream + Format + Flags Constructor
-	inline
 	Write( std::ostream & stream, std::string const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( is_fstream( stream ) ? flags.ter() : LF ),
@@ -145,11 +142,9 @@ public: // Creation
 	}
 
 	// Stream + Format + Flags Constructor
-	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( is_fstream( stream ) ? flags.ter() : LF ),
@@ -161,11 +156,9 @@ public: // Creation
 	}
 
 	// Stream + Format + Flags Constructor
-	inline
 	Write( std::ostream & stream, gio::Fmt & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( is_fstream( stream ) ? flags.ter() : LF ),
@@ -177,11 +170,9 @@ public: // Creation
 	}
 
 	// Stream + Format + Terminator Constructor
-	inline
 	Write( std::ostream & stream, std::string const & fmt, std::string const & ter ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( ter ),
@@ -191,11 +182,9 @@ public: // Creation
 	{}
 
 	// Stream + Format + Terminator Constructor
-	inline
 	Write( std::ostream & stream, gio::Fmt const & fmt, std::string const & ter ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( ter ),
@@ -205,11 +194,9 @@ public: // Creation
 	{}
 
 	// Stream + Format + Terminator Constructor
-	inline
 	Write( std::ostream & stream, gio::Fmt & fmt, std::string const & ter ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( ter ),
@@ -219,11 +206,9 @@ public: // Creation
 	{}
 
 	// File Stream + Format Constructor
-	inline
 	Write( std::fstream & stream, std::string const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( IOFlags::default_ter() ),
@@ -233,11 +218,9 @@ public: // Creation
 	{}
 
 	// File Stream + Format Constructor
-	inline
 	Write( std::fstream & stream, gio::Fmt const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( IOFlags::default_ter() ),
@@ -247,11 +230,9 @@ public: // Creation
 	{}
 
 	// File Stream + Format Constructor
-	inline
 	Write( std::fstream & stream, gio::Fmt & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( IOFlags::default_ter() ),
@@ -261,11 +242,9 @@ public: // Creation
 	{}
 
 	// File Stream + Format + Flags Constructor
-	inline
 	Write( std::fstream & stream, std::string const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( flags.ter() ),
@@ -277,11 +256,9 @@ public: // Creation
 	}
 
 	// File Stream + Format + Flags Constructor
-	inline
 	Write( std::fstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( flags.ter() ),
@@ -293,11 +270,9 @@ public: // Creation
 	}
 
 	// File Stream + Format + Flags Constructor
-	inline
 	Write( std::fstream & stream, gio::Fmt & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( flags.ter() ),
@@ -309,11 +284,9 @@ public: // Creation
 	}
 
 	// Output File Stream + Format Constructor
-	inline
 	Write( std::ofstream & stream, std::string const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( IOFlags::default_ter() ),
@@ -323,11 +296,9 @@ public: // Creation
 	{}
 
 	// Output File Stream + Format Constructor
-	inline
 	Write( std::ofstream & stream, gio::Fmt const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( IOFlags::default_ter() ),
@@ -337,11 +308,9 @@ public: // Creation
 	{}
 
 	// Output File Stream + Format Constructor
-	inline
 	Write( std::ofstream & stream, gio::Fmt & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( IOFlags::default_ter() ),
@@ -351,11 +320,9 @@ public: // Creation
 	{}
 
 	// Output File Stream + Format + Flags Constructor
-	inline
 	Write( std::ofstream & stream, std::string const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( flags.ter() ),
@@ -367,11 +334,9 @@ public: // Creation
 	}
 
 	// Output File Stream + Format + Flags Constructor
-	inline
 	Write( std::ofstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( flags.ter() ),
@@ -383,11 +348,9 @@ public: // Creation
 	}
 
 	// Output File Stream + Format + Flags Constructor
-	inline
 	Write( std::ofstream & stream, gio::Fmt & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( flags.ter() ),
@@ -399,11 +362,9 @@ public: // Creation
 	}
 
 	// String Stream + Format Constructor
-	inline
 	Write( std::stringstream & stream, std::string const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -413,11 +374,9 @@ public: // Creation
 	{}
 
 	// String Stream + Format Constructor
-	inline
 	Write( std::stringstream & stream, gio::Fmt const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -427,11 +386,9 @@ public: // Creation
 	{}
 
 	// String Stream + Format Constructor
-	inline
 	Write( std::stringstream & stream, gio::Fmt & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -441,11 +398,9 @@ public: // Creation
 	{}
 
 	// String Stream + Format + Flags Constructor
-	inline
 	Write( std::stringstream & stream, std::string const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -457,11 +412,9 @@ public: // Creation
 	}
 
 	// String Stream + Format + Flags Constructor
-	inline
 	Write( std::stringstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -473,11 +426,9 @@ public: // Creation
 	}
 
 	// String Stream + Format + Flags Constructor
-	inline
 	Write( std::stringstream & stream, gio::Fmt & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -489,11 +440,9 @@ public: // Creation
 	}
 
 	// Output String Stream + Format Constructor
-	inline
 	Write( std::ostringstream & stream, std::string const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -503,11 +452,9 @@ public: // Creation
 	{}
 
 	// Output String Stream + Format Constructor
-	inline
 	Write( std::ostringstream & stream, gio::Fmt const & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -517,11 +464,9 @@ public: // Creation
 	{}
 
 	// Output String Stream + Format Constructor
-	inline
 	Write( std::ostringstream & stream, gio::Fmt & fmt ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -531,11 +476,9 @@ public: // Creation
 	{}
 
 	// Output String Stream + Format + Flags Constructor
-	inline
 	Write( std::ostringstream & stream, std::string const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -547,11 +490,9 @@ public: // Creation
 	}
 
 	// Output String Stream + Format + Flags Constructor
-	inline
 	Write( std::ostringstream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -563,11 +504,9 @@ public: // Creation
 	}
 
 	// Output String Stream + Format + Flags Constructor
-	inline
 	Write( std::ostringstream & stream, gio::Fmt & fmt, IOFlags & flags ) :
 	 os_( &stream ),
 	 str_( nullptr ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -579,11 +518,9 @@ public: // Creation
 	}
 
 	// String + Format Constructor
-	inline
 	Write( std::string & str, std::string const & fmt ) :
 	 os_( nullptr ),
 	 str_( &str ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -593,11 +530,9 @@ public: // Creation
 	{}
 
 	// String + Format Constructor
-	inline
 	Write( std::string & str, gio::Fmt const & fmt ) :
 	 os_( nullptr ),
 	 str_( &str ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -607,11 +542,9 @@ public: // Creation
 	{}
 
 	// String + Format Constructor
-	inline
 	Write( std::string & str, gio::Fmt & fmt ) :
 	 os_( nullptr ),
 	 str_( &str ),
-	 fst_( nullptr ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -621,11 +554,9 @@ public: // Creation
 	{}
 
 	// String + Format + Flags Constructor
-	inline
 	Write( std::string & str, std::string const & fmt, IOFlags & flags ) :
 	 os_( nullptr ),
 	 str_( &str ),
-	 fst_( nullptr ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -635,11 +566,9 @@ public: // Creation
 	{}
 
 	// String + Format + Flags Constructor
-	inline
 	Write( std::string & str, gio::Fmt const & fmt, IOFlags & flags ) :
 	 os_( nullptr ),
 	 str_( &str ),
-	 fst_( nullptr ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
 	 ter_( LF ),
@@ -649,95 +578,9 @@ public: // Creation
 	{}
 
 	// String + Format + Flags Constructor
-	inline
 	Write( std::string & str, gio::Fmt & fmt, IOFlags & flags ) :
 	 os_( nullptr ),
 	 str_( &str ),
-	 fst_( nullptr ),
-	 format_( fmt.format_reset() ),
-	 format_own_( false ),
-	 ter_( LF ),
-	 flags_( &flags.clear_status() ),
-	 pos_( 0 ),
-	 reverts_( 0 )
-	{}
-
-	// Fstring + Format Constructor
-	inline
-	Write( Fstring & fst, std::string const & fmt ) :
-	 os_( nullptr ),
-	 str_( nullptr ),
-	 fst_( &fst ),
-	 format_( FormatFactory::create( fmt ) ),
-	 format_own_( true ),
-	 ter_( LF ),
-	 flags_( nullptr ),
-	 pos_( 0 ),
-	 reverts_( 0 )
-	{}
-
-	// Fstring + Format Constructor
-	inline
-	Write( Fstring & fst, gio::Fmt const & fmt ) :
-	 os_( nullptr ),
-	 str_( nullptr ),
-	 fst_( &fst ),
-	 format_( fmt.format_clone() ),
-	 format_own_( true ),
-	 ter_( LF ),
-	 flags_( nullptr ),
-	 pos_( 0 ),
-	 reverts_( 0 )
-	{}
-
-	// Fstring + Format Constructor
-	inline
-	Write( Fstring & fst, gio::Fmt & fmt ) :
-	 os_( nullptr ),
-	 str_( nullptr ),
-	 fst_( &fst ),
-	 format_( fmt.format_reset() ),
-	 format_own_( false ),
-	 ter_( LF ),
-	 flags_( nullptr ),
-	 pos_( 0 ),
-	 reverts_( 0 )
-	{}
-
-	// Fstring + Format + Flags Constructor
-	inline
-	Write( Fstring & fst, std::string const & fmt, IOFlags & flags ) :
-	 os_( nullptr ),
-	 str_( nullptr ),
-	 fst_( &fst ),
-	 format_( FormatFactory::create( fmt ) ),
-	 format_own_( true ),
-	 ter_( LF ),
-	 flags_( &flags.clear_status() ),
-	 pos_( 0 ),
-	 reverts_( 0 )
-	{}
-
-	// Fstring + Format + Flags Constructor
-	inline
-	Write( Fstring & fst, gio::Fmt const & fmt, IOFlags & flags ) :
-	 os_( nullptr ),
-	 str_( nullptr ),
-	 fst_( &fst ),
-	 format_( fmt.format_clone() ),
-	 format_own_( true ),
-	 ter_( LF ),
-	 flags_( &flags.clear_status() ),
-	 pos_( 0 ),
-	 reverts_( 0 )
-	{}
-
-	// Fstring + Format + Flags Constructor
-	inline
-	Write( Fstring & fst, gio::Fmt & fmt, IOFlags & flags ) :
-	 os_( nullptr ),
-	 str_( nullptr ),
-	 fst_( &fst ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
 	 ter_( LF ),
@@ -747,7 +590,6 @@ public: // Creation
 	{}
 
 	// Destructor
-	inline
 	~Write()
 	{
 		if ( format_ ) {
@@ -756,7 +598,7 @@ public: // Creation
 				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts() ) && active->output_no_arg( stream_, pos_, ter_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
-				if ( str_ || fst_ || format_->non_advancing() ) { // Non-advancing
+				if ( str_ || format_->non_advancing() ) { // Non-advancing
 					format_->output_pos( stream_, pos_ ); // Move to virtual position
 				} else { // Advancing
 					stream_ << ter_; // Add line terminator
@@ -769,8 +611,6 @@ public: // Creation
 			*os_ << stream_.str();
 		} else if ( str_ ) { // Transfer to the string
 			*str_ = stream_.str();
-		} else if ( fst_ ) { // Transfer to the Fstring
-			*fst_ = stream_.str();
 		}
 	}
 
@@ -788,7 +628,6 @@ private: // Assignment
 public: // Properties
 
 	// Stream
-	inline
 	std::ostream const &
 	stream() const
 	{
@@ -796,7 +635,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::ostream &
 	stream()
 	{
@@ -804,7 +642,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format const *
 	format() const
 	{
@@ -812,7 +649,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format *
 	format()
 	{
@@ -820,7 +656,6 @@ public: // Properties
 	}
 
 	// Line Terminator
-	inline
 	std::string const &
 	ter() const
 	{
@@ -828,7 +663,6 @@ public: // Properties
 	}
 
 	// Reversion Count Before Last next()
-	inline
 	Format::Size
 	reverts() const
 	{
@@ -838,7 +672,6 @@ public: // Properties
 public: // Operators
 
 	// Stream Manipulator Output
-	inline
 	Write &
 	operator <<( std::ostream & (*pf)( std::ostream & ) )
 	{
@@ -849,7 +682,6 @@ public: // Operators
 	}
 
 	// Stream Manipulator Output
-	inline
 	Write &
 	operator <<( std::basic_ios< char > & (*pf)( std::basic_ios< char > & ) )
 	{
@@ -859,9 +691,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output
+	// Stream << T
 	template< typename T >
-	inline
 	typename std::enable_if< ! std::is_base_of< BArray, T >::value, Write & >::type // Force array overload selection for array types
 	operator <<( T const & t )
 	{
@@ -885,9 +716,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: complex Overload
+	// Stream << complex
 	template< typename T >
-	inline
 	Write &
 	operator <<( std::complex< T > const & t )
 	{
@@ -906,14 +736,13 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray Overload
+	// Stream << Array
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray< T > const & t )
+	operator <<( Array< T > const & t )
 	{
 		if ( stream_ && format_ ) {
-			for ( typename FArray< T >::size_type i = 0; i < t.size(); ++i ) {
+			for ( typename Array< T >::size_type i = 0; i < t.size(); ++i ) {
 				*this << t[ i ];
 				if ( ! stream_ ) break;
 			}
@@ -922,11 +751,10 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray1S Overload
+	// Stream << Array1S
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray1S< T > const & t )
+	operator <<( Array1S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i = 1, e = t.u(); i <= e; ++i ) {
@@ -938,11 +766,10 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray2S Overload
+	// Stream << Array2S
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray2S< T > const & t )
+	operator <<( Array2S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -956,11 +783,10 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray3S Overload
+	// Stream << Array3S
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray3S< T > const & t )
+	operator <<( Array3S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -976,11 +802,10 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray44S Overload
+	// Stream << Array44S
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray4S< T > const & t )
+	operator <<( Array4S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -998,11 +823,10 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray5S Overload
+	// Stream << Array5S
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray5S< T > const & t )
+	operator <<( Array5S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -1022,11 +846,10 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray6S Overload
+	// Stream << Array6S
 	template< typename T >
-	inline
 	Write &
-	operator <<( FArray6S< T > const & t )
+	operator <<( Array6S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -1048,9 +871,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray1 Overload
+	// Stream << MArray1
 	template< class A, typename T >
-	inline
 	Write &
 	operator <<( MArray1< A, T > const & t )
 	{
@@ -1064,9 +886,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray2 Overload
+	// Stream << MArray2
 	template< class A, typename T >
-	inline
 	Write &
 	operator <<( MArray2< A, T > const & t )
 	{
@@ -1082,9 +903,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray3 Overload
+	// Stream << MArray3
 	template< class A, typename T >
-	inline
 	Write &
 	operator <<( MArray3< A, T > const & t )
 	{
@@ -1102,9 +922,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray44S Overload
+	// Stream << Array44S
 	template< class A, typename T >
-	inline
 	Write &
 	operator <<( MArray4< A, T > const & t )
 	{
@@ -1124,9 +943,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray5 Overload
+	// Stream << MArray5
 	template< class A, typename T >
-	inline
 	Write &
 	operator <<( MArray5< A, T > const & t )
 	{
@@ -1148,9 +966,8 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray6 Overload
+	// Stream << MArray6
 	template< class A, typename T >
-	inline
 	Write &
 	operator <<( MArray6< A, T > const & t )
 	{
@@ -1177,7 +994,6 @@ public: // Operators
 private: // Methods
 
 	// Status Flags Set
-	inline
 	void
 	set_status()
 	{
@@ -1188,7 +1004,6 @@ private: // Data
 
 	std::ostream * os_; // Output stream
 	std::string * str_; // Output string
-	Fstring * fst_; // Output Fstring
 	Format * format_; // Format expression
 	bool format_own_; // Own the Format?
 	std::string ter_; // Line terminator
@@ -1559,54 +1374,6 @@ write( std::string & str, gio::Fmt const & fmt, IOFlags & flags )
 inline
 Write
 write( std::string & str, gio::Fmt & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, std::string const & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, gio::Fmt const & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, gio::Fmt & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, std::string const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, gio::Fmt const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, gio::Fmt & fmt, IOFlags & flags )
 {
 	return Write( str, fmt, flags );
 }

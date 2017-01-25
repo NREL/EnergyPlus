@@ -1,8 +1,63 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 
 // EnergyPlus Headers
 #include <HVACDXHeatPumpSystem.hh>
@@ -75,7 +130,7 @@ namespace HVACDXHeatPumpSystem {
 	bool EconomizerFlag( false ); // holds air loop economizer status
 
 	// Make this type allocatable
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -85,12 +140,21 @@ namespace HVACDXHeatPumpSystem {
 	// Update routine to check convergence and update nodes
 
 	// Object Data
-	FArray1D< DXHeatPumpSystemStruct > DXHeatPumpSystem;
+	Array1D< DXHeatPumpSystemStruct > DXHeatPumpSystem;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumDXHeatPumpSystems = 0;
+		EconomizerFlag = false;
+		CheckEquipName.deallocate();
+		DXHeatPumpSystem.deallocate();
+	}
 
 	void
 	SimDXHeatPumpSystem(
@@ -148,7 +212,6 @@ namespace HVACDXHeatPumpSystem {
 		std::string CompName; // Name of CoilSystem:Heating:DX object
 		int DXSystemNum; // Index to CoilSystem:Heating:DX object
 		static bool GetInputFlag( true ); // Flag to get input only once
-		bool HXUnitOn; // Flag to control HX for HXAssisted Cooling Coil
 		Real64 AirMassFlow; // DX System air mass flow rate
 		int InletNodeNum; // DX System inlet node number
 		int OutletNodeNum; // DX System outlet node number
@@ -169,7 +232,7 @@ namespace HVACDXHeatPumpSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem.Name(), NumDXHeatPumpSystems );
+			DXSystemNum = FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );
 			}
@@ -258,7 +321,6 @@ namespace HVACDXHeatPumpSystem {
 		// Using/Aliasing
 		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -283,7 +345,6 @@ namespace HVACDXHeatPumpSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int DXSystemNum; // The DXHeatingSystem that you are currently loading input into
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
@@ -292,15 +353,13 @@ namespace HVACDXHeatPumpSystem {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		int DXHeatSysNum;
-		bool FanErrorsFound; // flag returned on fan operating mode check
-		bool DXErrorsFound; // flag returned on DX coil name check
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 
@@ -328,7 +387,7 @@ namespace HVACDXHeatPumpSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXHeatPumpSystem.Name(), DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXHeatPumpSystem, DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -446,7 +505,6 @@ namespace HVACDXHeatPumpSystem {
 		using DataAirLoop::AirLoopControlInfo;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-		using EMSManager::iHumidityRatioMaxSetPoint;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 
 		// Locals
@@ -462,7 +520,6 @@ namespace HVACDXHeatPumpSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int OutNode; // outlet node number
 		int ControlNode; // control node number
 		int DXSysIndex;
 		//  LOGICAL,SAVE        :: MyOneTimeFlag = .TRUE.
@@ -554,7 +611,6 @@ namespace HVACDXHeatPumpSystem {
 
 		// Using/Aliasing
 		using namespace ScheduleManager;
-		using DataEnvironment::OutBaroPress;
 		using DataHVACGlobals::TempControlTol;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
@@ -572,7 +628,6 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
-		Real64 const HumRatAcc( 1.e-6 ); // Accuracy of solver result
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		//  na
@@ -594,13 +649,9 @@ namespace HVACDXHeatPumpSystem {
 		Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 5 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 5 ); // Parameter array passed to solver
 		bool SensibleLoad; // True if there is a sensible cooling load on this system
-		bool LatentLoad; // True if there is a latent   cooling load on this system
 		int FanOpMode; // Supply air fan operating mode
-		Real64 TempMinPLR; // Used to find latent PLR when max iterations exceeded
-		Real64 TempMaxPLR; // Used to find latent PLR when max iterations exceeded
-		Real64 TempOutletTempDXCoil; // Used to find latent PLR when max iterations exceeded
 		//added variables to call variable speed DX coils
 		int SpeedNum; // speed number of variable speed DX cooling coil
 		Real64 QZnReq; // Zone load (W), input to variable-speed DX coil
@@ -887,7 +938,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -949,7 +1000,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	VSCoilCyclingResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1019,7 +1070,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	VSCoilSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:

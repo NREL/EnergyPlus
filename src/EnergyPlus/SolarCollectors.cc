@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -49,7 +107,6 @@ namespace SolarCollectors {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataSurfaces::Surface;
-	using DataSurfaces::TotSurfaces;
 	using DataSurfaces::SurfSunlitArea;
 	using DataSurfaces::SurfSunlitFrac;
 	using DataSurfaces::SurfaceClass_Detached_F;
@@ -78,22 +135,22 @@ namespace SolarCollectors {
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfParameters( 0 );
 	int NumOfCollectors( 0 );
 
-	FArray1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
-	FArray1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
-	FArray1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
-	FArray1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
+	Array1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
+	Array1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
+	Array1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
+	Array1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< ParametersData > Parameters;
-	FArray1D< CollectorData > Collector;
+	Array1D< ParametersData > Parameters;
+	Array1D< CollectorData > Collector;
 
 	// MODULE SUBROUTINES:
 
@@ -101,11 +158,11 @@ namespace SolarCollectors {
 
 	void
 	SimSolarCollector(
-		int const EquipTypeNum,
+		int const EP_UNUSED( EquipTypeNum ),
 		std::string const & CompName,
 		int & CompIndex,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( InitLoopEquip ),
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -142,7 +199,7 @@ namespace SolarCollectors {
 		}
 
 		if ( CompIndex == 0 ) {
-			CollectorNum = FindItemInList( CompName, Collector.Name(), NumOfCollectors );
+			CollectorNum = FindItemInList( CompName, Collector );
 			if ( CollectorNum == 0 ) {
 				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + CompName );
 			}
@@ -201,8 +258,6 @@ namespace SolarCollectors {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::DegToRadians;
-		using DataGlobals::InitConvTemp;
 		using namespace DataHeatBalance;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::FindItemInList;
@@ -219,9 +274,6 @@ namespace SolarCollectors {
 		using General::RoundSigDigits;
 		using DataSurfaces::Surface;
 		using DataSurfaces::OSCM;
-		using DataSurfaces::TotOSCM;
-		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::OtherSideCondModeledExt;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -255,12 +307,12 @@ namespace SolarCollectors {
 		int VentCavIndex; // vent cavity index
 		Real64 Perimeter; // perimeter of the absorber or collector
 
-		FArray1D< Real64 > Numbers; // Numeric data
-		FArray1D_string Alphas; // Alpha data
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D< Real64 > Numbers; // Numeric data
+		Array1D_string Alphas; // Alpha data
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// FLOW:
 		MaxNumbers = 0;
@@ -313,7 +365,7 @@ namespace SolarCollectors {
 				// Collector module parameters name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
+				VerifyName( cAlphaArgs( 1 ), Parameters, ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -334,7 +386,7 @@ namespace SolarCollectors {
 				}}
 
 				if ( rNumericArgs( 2 ) > 0.0 ) {
-					Parameters( ParametersNum ).TestMassFlowRate = rNumericArgs( 2 ) * RhoH2O( InitConvTemp );
+					Parameters( ParametersNum ).TestMassFlowRate = rNumericArgs( 2 ) * RhoH2O( DataGlobals::InitConvTemp );
 				} else {
 					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) + ":  flow rate must be greater than zero for " + cNumericFieldNames( 2 ) );
 					ErrorsFound = true;
@@ -393,7 +445,7 @@ namespace SolarCollectors {
 				// Collector name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), Collector, CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -402,7 +454,7 @@ namespace SolarCollectors {
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
 
 				// Get parameters object
-				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters.Name(), NumOfParameters );
+				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters );
 
 				if ( ParametersNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
@@ -412,7 +464,7 @@ namespace SolarCollectors {
 				}
 
 				// Get surface object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
@@ -491,7 +543,7 @@ namespace SolarCollectors {
 				// Collector module parameters name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
+				VerifyName( cAlphaArgs( 1 ), Parameters, ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -579,7 +631,7 @@ namespace SolarCollectors {
 				// Collector name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), Collector, CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -590,7 +642,7 @@ namespace SolarCollectors {
 				Collector( CollectorNum ).InitICS = true;
 
 				// Get parameters object
-				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters.Name(), NumOfParameters );
+				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters );
 
 				if ( ParametersNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
@@ -612,7 +664,7 @@ namespace SolarCollectors {
 					Collector( CollectorNum ).AreaRatio = Collector( CollectorNum ).SideArea / Collector( CollectorNum ).Area;
 				}
 				// Get surface object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
@@ -661,7 +713,7 @@ namespace SolarCollectors {
 				} else if ( SameString( cAlphaArgs( 4 ), "OtherSideConditionsModel" ) ) {
 					Collector( CollectorNum ).OSCMName = cAlphaArgs( 5 );
 					Collector( CollectorNum ).OSCM_ON = true;
-					Found = FindItemInList( Collector( CollectorNum ).OSCMName, OSCM.Name(), TotOSCM );
+					Found = FindItemInList( Collector( CollectorNum ).OSCMName, OSCM );
 					if ( Found == 0 ) {
 						ShowSevereError( cAlphaFieldNames( 5 ) + " not found=" + Collector( CollectorNum ).OSCMName + " in " + CurrentModuleObject + " =" + Collector( CollectorNum ).Name );
 						ErrorsFound = true;
@@ -734,12 +786,9 @@ namespace SolarCollectors {
 
 		// Using/Aliasing
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::DegToRadians;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
-		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::HourOfDay;
 		using DataLoopNode::Node;
 		using namespace DataPlant;
@@ -748,7 +797,6 @@ namespace SolarCollectors {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::TimeStepSys;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -761,12 +809,12 @@ namespace SolarCollectors {
 		Real64 const BigNumber( 9999.9 ); // Component desired mass flow rate
 
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag
 		Real64 rho;
 		//LOGICAL     :: errFlag
 		//  REAL(r64)                                :: Density                ! density of fluid
 		bool errFlag; // local error flag
-		static FArray1D_bool SetDiffRadFlag; // get diffuse radiation flag
+		static Array1D_bool SetDiffRadFlag; // get diffuse radiation flag
 
 		int SurfNum; // Surface object number for collector
 		int ParamNum; // Collector parameters object number
@@ -811,7 +859,7 @@ namespace SolarCollectors {
 		if ( BeginEnvrnFlag && Collector( CollectorNum ).Init ) {
 			// Clear node initial conditions
 			if ( Collector( CollectorNum ).VolFlowRateMax > 0 ) { //CR7425
-				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 
 				Collector( CollectorNum ).MassFlowRateMax = Collector( CollectorNum ).VolFlowRateMax * rho;
 			} else { //CR7425
@@ -1246,7 +1294,6 @@ namespace SolarCollectors {
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::HourOfDay;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
@@ -1382,7 +1429,7 @@ namespace SolarCollectors {
 
 	void
 	ICSCollectorAnalyticalSoluton(
-		int const ColleNum, // solar collector index
+		int const EP_UNUSED( ColleNum ), // solar collector index
 		Real64 const SecInTimeStep, // seconds in a time step
 		Real64 const a1, // coefficient of ODE for Tp
 		Real64 const a2, // coefficient of ODE for Tp
@@ -1422,7 +1469,6 @@ namespace SolarCollectors {
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::HourOfDay;
 
 		// Locals
@@ -1528,7 +1574,7 @@ namespace SolarCollectors {
 		Real64 ReflSys; // cover system solar reflectance
 		Real64 AbsCover1; // Inner cover solar absorbtance
 		Real64 AbsCover2; // Outer cover solar absorbtance
-		FArray1D< Real64 > CoversAbsBeam( 2 ); // Inner and Outer Cover absorptance
+		Array1D< Real64 > CoversAbsBeam( 2 ); // Inner and Outer Cover absorptance
 		// FLOW:
 
 		// set
@@ -1622,13 +1668,13 @@ namespace SolarCollectors {
 		Real64 RefrAngle; // angle of refraction
 		Real64 ParaRad; // parallel reflected component of unpolarized solar radiation
 		Real64 PerpRad; // Perpendicular reflected component of unpolarized solar radiation
-		FArray1D< Real64 > TransPara( 2 ); // cover transmittance parallel component
-		FArray1D< Real64 > TransPerp( 2 ); // cover transmittance perpendicular component
-		FArray1D< Real64 > ReflPara( 2 ); // cover reflectance parallel component
-		FArray1D< Real64 > ReflPerp( 2 ); // cover reflectance Perpendicular component
-		FArray1D< Real64 > AbsorPara( 2 ); // cover absorbtance parallel component
-		FArray1D< Real64 > AbsorPerp( 2 ); // cover absorbtance Perpendicular component
-		FArray1D< Real64 > TransAbsOnly( 2 ); // cover transmittance with absorptance only considered
+		Array1D< Real64 > TransPara( 2 ); // cover transmittance parallel component
+		Array1D< Real64 > TransPerp( 2 ); // cover transmittance perpendicular component
+		Array1D< Real64 > ReflPara( 2 ); // cover reflectance parallel component
+		Array1D< Real64 > ReflPerp( 2 ); // cover reflectance Perpendicular component
+		Array1D< Real64 > AbsorPara( 2 ); // cover absorbtance parallel component
+		Array1D< Real64 > AbsorPerp( 2 ); // cover absorbtance Perpendicular component
+		Array1D< Real64 > TransAbsOnly( 2 ); // cover transmittance with absorptance only considered
 		Real64 CoverRefrIndex; // refractive index of collector cover
 		Real64 TransSysDiff; // cover system solar transmittance from inner to outer cover
 		bool DiffRefFlag; // flag for calc. diffuse refl of cover from inside to outside
@@ -1732,8 +1778,6 @@ namespace SolarCollectors {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const gravity( 9.806 ); // gravitational constant [m/s^2]
-		Real64 const SmallNumber( 1.00e-20 ); // small number to avoid div by zero
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  CHARACTER(len=MaxNameLength):: String        ! Dummy string for converting numbers to strings
@@ -1927,11 +1971,11 @@ namespace SolarCollectors {
 		Real64 const gravity( 9.806 ); // gravitational constant [m/s^2]
 
 		int const NumOfPropDivisions( 11 );
-		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229 } ); // Viscosity, in kg/(m.s)
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703 } ); // Prandtl number (dimensionless)
-		static FArray1D< Real64 > const Density( NumOfPropDivisions, { 1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883 } ); // Density, in kg/m3
+		static Array1D< Real64 > const Temps( NumOfPropDivisions, { -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85 } ); // Temperature, in C
+		static Array1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229 } ); // Viscosity, in kg/(m.s)
+		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331 } ); // Conductivity, in W/mK
+		static Array1D< Real64 > const Pr( NumOfPropDivisions, { 0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703 } ); // Prandtl number (dimensionless)
+		static Array1D< Real64 > const Density( NumOfPropDivisions, { 1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883 } ); // Density, in kg/m3
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2229,7 +2273,6 @@ namespace SolarCollectors {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
 
@@ -2317,29 +2360,6 @@ namespace SolarCollectors {
 		TsColl = ExtVentedCavity( VentModNum ).Tbaffle;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SolarCollectors
 

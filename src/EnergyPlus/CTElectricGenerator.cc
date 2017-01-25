@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -49,46 +107,27 @@ namespace CTElectricGenerator {
 	// All CT Generator models are based on a polynomial fit of Generator
 	// performance data.
 
-	// REFERENCES: na
-
-	// OTHER NOTES:
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobalConstants::iGeneratorCombTurbine;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumCTGenerators( 0 ); // number of CT Generators specified in input
 	bool GetCTInput( true ); // then TRUE, calls subroutine to read input file.
 
-	FArray1D_bool CheckEquipName;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
+	Array1D_bool CheckEquipName;
 
 	// Object Data
-	FArray1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
-	FArray1D< ReportVars > CTGeneratorReport;
-
-	// MODULE SUBROUTINES:
-	// Beginning of CT Generator Module Driver Subroutines
-	//*************************************************************************
-
-	// Functions
+	Array1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
+	Array1D< ReportVars > CTGeneratorReport;
 
 	void
 	SimCTGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -137,7 +176,7 @@ namespace CTElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, CTGenerator.Name(), NumCTGenerators );
+			GenNum = FindItemInList( GeneratorName, CTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -161,17 +200,17 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTPlantHeatRecovery(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
-		int const CompTypeNum, // unused1208
+		int const EP_UNUSED( CompTypeNum ), // unused1208
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyLoad,
+		Real64 & EP_UNUSED( MyLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 
@@ -211,7 +250,7 @@ namespace CTElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, CTGenerator.Name(), NumCTGenerators );
+			CompNum = FindItemInList( CompName, CTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );
 				return;
@@ -266,8 +305,8 @@ namespace CTElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 12 ); // character string data
-		FArray1D< Real64 > NumArray( 12 ); // numeric data
+		Array1D_string AlphArray( 12 ); // character string data
+		Array1D< Real64 > NumArray( 12 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -294,7 +333,7 @@ namespace CTElectricGenerator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), CTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), CTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -512,7 +551,6 @@ namespace CTElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 
 		using DataEnvironment::OutDryBulbTemp;
@@ -737,7 +775,7 @@ namespace CTElectricGenerator {
 	InitCTGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
+		Real64 const EP_UNUSED( MyLoad ), // Generator demand
 		bool const FirstHVACIteration
 	)
 	{
@@ -782,9 +820,9 @@ namespace CTElectricGenerator {
 		int HeatRecOutletNode; // outlet node number in heat recovery loop
 		static bool MyOneTimeFlag( true ); // Initialization flag
 
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		Real64 mdot;
 		Real64 rho;
 		bool errFlag;
@@ -817,7 +855,7 @@ namespace CTElectricGenerator {
 			HeatRecOutletNode = CTGenerator( GeneratorNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			CTGenerator( GeneratorNum ).DesignHeatRecMassFlowRate = rho * CTGenerator( GeneratorNum ).DesignHeatRecVolFlowRate;
 
@@ -867,7 +905,7 @@ namespace CTElectricGenerator {
 
 	void
 	UpdateCTGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{
@@ -927,7 +965,7 @@ namespace CTElectricGenerator {
 
 	void
 	GetCTGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.6;
 
   Building,
     Building,                !- Name
@@ -3227,10 +3227,18 @@
     0.05,                    !- Pipe Inside Diameter {m}
     200.0,                   !- Pipe Length {m}
     Buried Pipe Soil,        !- Soil Material Name
-    13,                      !- Average Soil Surface Temperature {C}
-    1.5,                     !- Amplitude of Soil Surface Temperature {C}
-    30;                      !- Phase Constant of Soil Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                 !- Name of Undisturbed Ground Temperature Object
 
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,                 !- Name of object
+    0.36,                    !- Conductivity {W/m-K}
+    2000.0,                  !- Density {kg/m3}
+    1200.0,                  !- Specific Heat {J/kg-K}
+    13.0,                    !- Annual average surface temperature {C}
+    1.5,                     !- Annual amplitude of surface temperature {delta C}
+    30;                      !- Phase shift of minimum surface temperature {days} 
+    
   Branch,
     Condenser Supply Bypass Branch,  !- Name
     0,                       !- Maximum Flow Rate {m3/s}

@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -46,8 +104,8 @@ namespace WindowEquivalentLayer {
 	// ASHRAE 1311-RP, Final Report, February 11, 2009.
 	// Edwards, D.K. 1977.  Solar absorption by each element in an absorber-coverglass
 	//  array,Technical Note, Solar Energy, Vol. 19, pp. 401-402.
-	// Kotey, N. A., J. L. Wright, and M. R. Collins.  2008.  “Determining Longwave
-	//  RadiativeProperties of Flat Shading Materials,” 33rd Annual SESCI / 3rd CSBC
+	// Kotey, N. A., J. L. Wright, and M. R. Collins.  2008.  "Determining Longwave
+	//  RadiativeProperties of Flat Shading Materials," 33rd Annual SESCI / 3rd CSBC
 	//  Conference Proceedings, Fredericton, NB.
 	// Kotey, N.A., Wright, J.L., M. R. Collins. 2009a. "Determination of Angle-Dependent
 	//  SolarOptical Properties of Roller Blind Materials," drafted for submission to
@@ -108,8 +166,8 @@ namespace WindowEquivalentLayer {
 	int const hipTAU_BB0( 3 );
 	int const hipDIM( 3 ); // dimension of parameter array
 
-	FArray3D< Real64 > CFSDiffAbsTrans;
-	FArray1D_bool EQLDiffPropFlag;
+	Array3D< Real64 > CFSDiffAbsTrans;
+	Array1D_bool EQLDiffPropFlag;
 
 	// MODULE SUBROUTINES:
 	// Initialization routines for module
@@ -121,6 +179,13 @@ namespace WindowEquivalentLayer {
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		CFSDiffAbsTrans.deallocate();
+		EQLDiffPropFlag.deallocate();
+	}
 
 	void
 	InitEquivalentLayerWindowCalculations()
@@ -159,14 +224,13 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 		int ConstrNum; // Construction number
-		int EQLConNum; // Construction number for equivalent layer windows
 		int SurfNum; // surface number
 		// Flow
 
 		if ( TotWinEquivLayerConstructs < 1 ) return;
 		if ( ! allocated( CFS ) ) CFS.allocate( TotWinEquivLayerConstructs );
 		if ( ! allocated( EQLDiffPropFlag ) ) EQLDiffPropFlag.allocate( TotWinEquivLayerConstructs );
-		if ( ! allocated( CFSDiffAbsTrans ) ) CFSDiffAbsTrans.allocate( TotWinEquivLayerConstructs, CFSMAXNL + 1, 2 );
+		if ( ! allocated( CFSDiffAbsTrans ) ) CFSDiffAbsTrans.allocate( 2, CFSMAXNL + 1, TotWinEquivLayerConstructs );
 
 		EQLDiffPropFlag = true;
 		CFSDiffAbsTrans = 0.0;
@@ -231,8 +295,7 @@ namespace WindowEquivalentLayer {
 		int EQLNum; // equivalent layer window construction index
 		int NumGLayers; // number of gap layers
 		int NumSLayers; // number of glazing and shade layers (non-gas layers)
-		int DoWhat; // DoWhat =1, index for diffuse, and =2 index for beam
-		FArray2D< Real64 > SysAbs1( CFSMAXNL+1, 2 ); // layers absorptance and system transmittance
+		Array2D< Real64 > SysAbs1( 2, CFSMAXNL+1 ); // layers absorptance and system transmittance
 		// Flow
 
 		if ( ! allocated( CFSLayers ) ) CFSLayers.allocate( Construct( ConstrNum ).TotLayers );
@@ -341,14 +404,14 @@ namespace WindowEquivalentLayer {
 				CFS( EQLNum ).G( gLayer ).TAS = Material( MaterNum ).Thickness;
 				CFS( EQLNum ).G( gLayer ).FG.Name = Material( MaterNum ).GasName;
 				CFS( EQLNum ).G( gLayer ).FG.AK = Material( MaterNum ).GasCon( 1, 1 );
-				CFS( EQLNum ).G( gLayer ).FG.BK = Material( MaterNum ).GasCon( 1, 2 );
-				CFS( EQLNum ).G( gLayer ).FG.CK = Material( MaterNum ).GasCon( 1, 3 );
+				CFS( EQLNum ).G( gLayer ).FG.BK = Material( MaterNum ).GasCon( 2, 1 );
+				CFS( EQLNum ).G( gLayer ).FG.CK = Material( MaterNum ).GasCon( 3, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.ACP = Material( MaterNum ).GasCp( 1, 1 );
-				CFS( EQLNum ).G( gLayer ).FG.BCP = Material( MaterNum ).GasCp( 1, 2 );
-				CFS( EQLNum ).G( gLayer ).FG.CCP = Material( MaterNum ).GasCp( 1, 3 );
+				CFS( EQLNum ).G( gLayer ).FG.BCP = Material( MaterNum ).GasCp( 2, 1 );
+				CFS( EQLNum ).G( gLayer ).FG.CCP = Material( MaterNum ).GasCp( 3, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.AVISC = Material( MaterNum ).GasVis( 1, 1 );
-				CFS( EQLNum ).G( gLayer ).FG.BVISC = Material( MaterNum ).GasVis( 1, 2 );
-				CFS( EQLNum ).G( gLayer ).FG.CVISC = Material( MaterNum ).GasVis( 1, 3 );
+				CFS( EQLNum ).G( gLayer ).FG.BVISC = Material( MaterNum ).GasVis( 2, 1 );
+				CFS( EQLNum ).G( gLayer ).FG.CVISC = Material( MaterNum ).GasVis( 3, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.MHAT = Material( MaterNum ).GasWght( 1 );
 				// fills gas density and effective gap thickness
 				BuildGap( CFS( EQLNum ).G( gLayer ), CFS( EQLNum ).G( gLayer ).GTYPE, CFS( EQLNum ).G( gLayer ).TAS );
@@ -375,10 +438,10 @@ namespace WindowEquivalentLayer {
 
 		// Calculate layers diffuse absorptance and system diffuse transmittance
 		CalcEQLWindowOpticalProperty( CFS( EQLNum ), isDIFF, SysAbs1, 0.0, 0.0, 0.0 );
-		Construct( ConstrNum ).TransDiffFrontEQL = SysAbs1( CFS( EQLNum ).NL + 1, 1 );
-		CFSDiffAbsTrans( EQLNum, _, _ ) = SysAbs1;
-		Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = SysAbs1( {1,CFSMAXNL}, 1 );
-		Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = SysAbs1( {1,CFSMAXNL}, 2 );
+		Construct( ConstrNum ).TransDiffFrontEQL = SysAbs1( 1, CFS( EQLNum ).NL + 1 );
+		CFSDiffAbsTrans( _, _, EQLNum ) = SysAbs1;
+		Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = SysAbs1( 1, {1,CFSMAXNL} );
+		Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = SysAbs1( 2, {1,CFSMAXNL} );
 		// get construction front and back diffuse effective reflectance
 		Construct( ConstrNum ).ReflectSolDiffFront = CFS( EQLNum ).L( 1 ).SWP_EL.RHOSFDD;
 		Construct( ConstrNum ).ReflectSolDiffBack = CFS( EQLNum ).L( CFS( EQLNum ).NL ).SWP_EL.RHOSBDD;
@@ -546,34 +609,26 @@ namespace WindowEquivalentLayer {
 		Real64 TRMOUT;
 		Real64 TRMIN;
 		Real64 HCIN;
-		FArray1D< Real64 > QOCF( CFSMAXNL );
-		FArray1D< Real64 > JB( {0,CFSMAXNL} );
-		FArray1D< Real64 > JF( {1,CFSMAXNL+1} );
-		FArray1D< Real64 > T( CFSMAXNL );
-		FArray1D< Real64 > Q( {0,CFSMAXNL} );
-		FArray1D< Real64 > H( {0,CFSMAXNL+1} );
-		FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
-		Real64 QRSW;
-		Real64 QRLW;
-		Real64 QCONV;
+		Array1D< Real64 > QOCF( CFSMAXNL );
+		Array1D< Real64 > JB( {0,CFSMAXNL} );
+		Array1D< Real64 > JF( {1,CFSMAXNL+1} );
+		Array1D< Real64 > T( CFSMAXNL );
+		Array1D< Real64 > Q( {0,CFSMAXNL} );
+		Array1D< Real64 > H( {0,CFSMAXNL+1} );
+		Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		Real64 QOCFRoom;
-		Real64 QROOM;
 		Real64 UCG;
 		Real64 SHGC;
-		Real64 SHGCCheck;
 		Real64 IncA;
 		Real64 VProfA;
 		Real64 HProfA;
 		int NL;
 		int I;
-		int iL;
-		int iLC1;
-		bool DoShadeControlR;
 		bool CFSSHGC;
 		// Flow
 
 		// Object Data
-		FArray1D< CFSSWP > SWP_ON( CFSMAXNL );
+		Array1D< CFSSWP > SWP_ON( CFSMAXNL );
 
 		CFSSHGC = true;
 		NL = FS.NL;
@@ -596,11 +651,11 @@ namespace WindowEquivalentLayer {
 		for ( I = 1; I <= NL; ++I ) {
 			ASHWAT_OffNormalProperties( FS.L( I ), IncA, VProfA, HProfA, SWP_ON( I ) );
 		}
-		ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( {1,FS.NL+1}, 1 ), Abs1( {1,FS.NL+1}, 2 ) );
-		TransNormal = Abs1( NL + 1, 1 );
+		ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( 1, {1,FS.NL+1} ), Abs1( 2, {1,FS.NL+1} ) );
+		TransNormal = Abs1( 1, NL + 1 );
 
 		// Calculate SHGC using net radiation method (ASHWAT Model)
-		CFSSHGC = ASHWAT_Thermal( FS, TIN, TOUT, HCIN, HCOUT, TRMOUT, TRMIN, BeamSolarInc, BeamSolarInc * Abs1( {1,NL+1}, 1 ), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC, true );
+		CFSSHGC = ASHWAT_Thermal( FS, TIN, TOUT, HCIN, HCOUT, TRMOUT, TRMIN, BeamSolarInc, BeamSolarInc * Abs1( 1, {1,NL+1} ), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC, true );
 
 		if ( ! CFSSHGC ) {
 			ShowWarningMessage( RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name );
@@ -617,7 +672,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLWindowOpticalProperty(
 		CFSTY & FS, // fenestration system
 		int const DiffBeamFlag, // isDIFF: calc diffuse properties
-		FArray2A< Real64 > Abs1,
+		Array2A< Real64 > Abs1,
 		Real64 const IncA, // angle of incidence, radians
 		Real64 const VProfA, // inc solar vertical profile angle, radians
 		Real64 const HProfA // inc solar horizontal profile angle, radians
@@ -642,7 +697,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Argument array dimensioning
-		Abs1.dim( CFSMAXNL+1, 2 );
+		Abs1.dim( 2, CFSMAXNL+1 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -673,7 +728,7 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		// Object Data
-		FArray1D< CFSSWP > SWP_ON( CFSMAXNL );
+		Array1D< CFSSWP > SWP_ON( CFSMAXNL );
 
 		NL = FS.NL;
 		Abs1 = 0.0;
@@ -692,12 +747,12 @@ namespace WindowEquivalentLayer {
 			for ( I = 1; I <= NL; ++I ) {
 				ASHWAT_OffNormalProperties( FS.L( I ), IncA, VProfA, HProfA, SWP_ON( I ) );
 			}
-			ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( {1,FS.NL+1}, 1 ), Abs1( {1,FS.NL+1}, 2 ) );
+			ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( 1, {1,FS.NL+1} ), Abs1( 2, {1,FS.NL+1} ) );
 		} else {
 			// diffuse
-			FArray1D< CFSSWP > const SWP_EL( FS.L.ma( &CFSLAYER::SWP_EL ) ); //Autodesk:F2C++ Can't slice a member array so we create a temporary: Inefficient
-			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1( {1,FS.NL+1}, 1 ) );
-			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1( {1,FS.NL+1}, 2 ) );
+			Array1D< CFSSWP > const SWP_EL( FS.L.ma( &CFSLAYER::SWP_EL ) ); //Autodesk:F2C++ Can't slice a member array so we create a temporary: Inefficient
+			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1( 1, {1,FS.NL+1} ) );
+			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1( 2, {1,FS.NL+1} ) );
 			//CFSFenProp = LOK1 .AND. LOK2
 		}
 	}
@@ -737,10 +792,8 @@ namespace WindowEquivalentLayer {
 		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
 		using DataGlobals::StefanBoltzmann;
-		using DataEnvironment::SunIsUpValue;
 		using DataEnvironment::SkyTempKelvin;
 		using DataEnvironment::IsRain;
-		using DataEnvironment::SunIsUp;
 		using namespace DataHeatBalFanSys;
 
 		// Locals
@@ -757,26 +810,22 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NL; // Number of layers
-		Real64 TIN;
-		Real64 TMrtK;
+		Real64 TIN( 0 );
 		Real64 TRMIN;
-		Real64 Tout;
+		Real64 Tout( 0 );
 		Real64 TRMOUT;
 		Real64 UCG;
 		Real64 SHGC;
-		Real64 QRLW;
-		Real64 QIGLW;
 		Real64 QRLWX;
 		Real64 QCONV;
-		Real64 TSX;
-		FArray1D< Real64 > QOCF( CFSMAXNL );
+		Array1D< Real64 > QOCF( CFSMAXNL );
 		Real64 QOCFRoom;
-		FArray1D< Real64 > JB( {0,CFSMAXNL} );
-		FArray1D< Real64 > JF( {1,CFSMAXNL+1} );
-		FArray1D< Real64 > T( CFSMAXNL );
-		FArray1D< Real64 > Q( {0,CFSMAXNL} );
-		FArray1D< Real64 > H( {0,CFSMAXNL+1} );
-		FArray1D< Real64 > QAllSWwinAbs( {1,CFSMAXNL+1} );
+		Array1D< Real64 > JB( {0,CFSMAXNL} );
+		Array1D< Real64 > JF( {1,CFSMAXNL+1} );
+		Array1D< Real64 > T( CFSMAXNL );
+		Array1D< Real64 > Q( {0,CFSMAXNL} );
+		Array1D< Real64 > H( {0,CFSMAXNL+1} );
+		Array1D< Real64 > QAllSWwinAbs( {1,CFSMAXNL+1} );
 
 		bool ASHWAT_ThermalR; // net long wave radiation flux on the inside face of window
 		int EQLNum; // equivalent layer window index
@@ -791,21 +840,18 @@ namespace WindowEquivalentLayer {
 		Real64 NodeTemp;
 		Real64 CpAir;
 		Real64 RefAirTemp; // reference air temperatures
-		int tmpGasType;
 		int SurfNumAdj; // An interzone surface's number in the adjacent zone
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
 		Real64 LWAbsIn; // effective long wave absorptance/emissivity back side
 		Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
-		Real64 QLWAbsIn; // Inside surface long wave absorbed flux, W/m2
-		Real64 outir;
+		Real64 outir( 0 );
 		Real64 rmir;
 		Real64 Ebout;
 		Real64 QXConv; // extra convective gain from this surface
-		Real64 TaIn; // zone air temperature
+		Real64 TaIn( 0 ); // zone air temperature
 		Real64 tsky; // sky temperature
 		Real64 HcIn; // inside convection coeficient at this timestep, W/m2K
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
-		Real64 ConvHeatFlowForced; // Convective heat flow from forced airflow gap (W)
 		Real64 NetIRHeatGainWindow; // net radiation gain from the window surface to the zone (W)
 		Real64 ConvHeatGainWindow; // net convection heat gain from inside surface of window to zone air (W)
 		int InSideLayerType; // interior shade type
@@ -927,7 +973,7 @@ namespace WindowEquivalentLayer {
 		TRMIN = root_4( rmir / StefanBoltzmann ); // TODO check model equation.
 
 		NL = CFS( EQLNum ).NL;
-		QAllSWwinAbs( {1,NL + 1} ) = QRadSWwinAbs( SurfNum, {1,NL + 1} );
+		QAllSWwinAbs( {1,NL + 1} ) = QRadSWwinAbs( {1,NL + 1}, SurfNum );
 		//  Solve energy balance(s) for temperature at each node/layer and
 		//  heat flux, including components, between each pair of nodes/layers
 		ASHWAT_ThermalR = ASHWAT_Thermal( CFS( EQLNum ), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, 0.0, QAllSWwinAbs( {1,NL+1} ), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC );
@@ -955,6 +1001,7 @@ namespace WindowEquivalentLayer {
 		ConvHeatGainWindow = Surface( SurfNum ).Area * HcIn * ( SurfInsideTemp - TaIn );
 		// Window heat gain (or loss) is calculated here
 		WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+		WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 		SurfaceWindow( SurfNum ).ConvHeatFlowNatural = ConvHeatFlowNatural;
 		// store for component reporting
 		WinGainConvGlazShadGapToZoneRep( SurfNum ) = ConvHeatFlowNatural;
@@ -1083,9 +1130,9 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	HEMINT(
-		std::function< Real64( Real64 const THETA, int const OPT, FArray1A< Real64 > const ) > F, // property integrand function
+		std::function< Real64( Real64 const THETA, int const OPT, Array1A< Real64 > const ) > F, // property integrand function
 		int const F_Opt, // options passed to F() (hipRHO, hipTAU)
-		FArray1A< Real64 > const F_P // parameters passed to F()
+		Array1A< Real64 > const F_P // parameters passed to F()
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1123,7 +1170,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > T( KMAX, KMAX );
+		Array2D< Real64 > T( KMAX, KMAX );
 		Real64 FX;
 		Real64 X1;
 		Real64 X2;
@@ -1156,13 +1203,13 @@ namespace WindowEquivalentLayer {
 				}
 			}
 
-			T( 1, K ) = DX * SUM;
+			T( K, 1 ) = DX * SUM;
 			// trapezoid result - i.e., first column Romberg entry
 			// Now complete the row
 			if ( K > 1 ) {
 				for ( L = 2; L <= K; ++L ) {
 					Real64 const pow_4_L_1( std::pow( 4.0, L - 1 ) );
-					T( L, K ) = ( pow_4_L_1 * T( L - 1, K ) - T( L - 1, K - 1 ) ) / ( pow_4_L_1 - 1.0 );
+					T( K, L ) = ( pow_4_L_1 * T( K, L - 1 ) - T( K - 1, L - 1 ) ) / ( pow_4_L_1 - 1.0 );
 				}
 				//    check for convergence
 				//    do 8 panels minimum, else can miss F() features
@@ -1219,7 +1266,7 @@ namespace WindowEquivalentLayer {
 		// DERIVED TYPE DEFINITIONS
 		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		Real64 SumRefAndTran; // sum of the reflectance and transmittance
 		// Flow
 
@@ -1244,8 +1291,8 @@ namespace WindowEquivalentLayer {
 	Real64
 	RB_F(
 		Real64 const THETA, // incidence angle, radians
-		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters
+		int const EP_UNUSED( OPT ), // options (unused)
+		Array1A< Real64 > const P // parameters
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1401,7 +1448,7 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		//   TAU_BT0 = TAU_BB0 + TAU_BD0
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "IS_DIFF: " );
 
@@ -1437,7 +1484,7 @@ namespace WindowEquivalentLayer {
 	IS_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (1=reflectance, 2=transmittance)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1541,7 +1588,7 @@ namespace WindowEquivalentLayer {
 		Real64 TAU_BT; // beam-total transmittance
 		// Flow
 
-		Real64 const THETA(  min( 89.99 * DegToRadians, xTHETA ) ); // working incident angle, radians
+		Real64 const THETA( min( 89.99 * DegToRadians, xTHETA ) ); // working incident angle, radians
 		Real64 const COSTHETA( std::cos( THETA ) );
 
 		RHO_W = RHO_BT0 / max( 0.00001, 1.0 - TAU_BB0 );
@@ -1699,7 +1746,7 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TAU_BD0;
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		Real64 SumRefAndTran;
 		// flow
 
@@ -1727,7 +1774,7 @@ namespace WindowEquivalentLayer {
 	FM_F(
 		Real64 const THETA, // incidence angle, radians
 		int const Opt, // options (hipRHO, hipTAU)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -2001,8 +2048,8 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		FArray2D< Real64 > A( N, N+2 );
-		FArray1D< Real64 > XSOL( N );
+		Array2D< Real64 > A( N+2, N );
+		Array1D< Real64 > XSOL( N );
 		// Flow
 
 		if ( W / S < SMALL_ERROR ) {
@@ -2044,47 +2091,47 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = TAUF_DD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUF_DD * F87;
-		A( 2, 5 ) = -TAUF_DD * F86;
-		A( 2, 6 ) = 0.0;
-		A( 2, 7 ) = TAUF_DD * F85;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -TAUF_DD * F67;
-		A( 3, 5 ) = 0.0;
-		A( 3, 6 ) = -TAUF_DD * F68;
-		A( 3, 7 ) = TAUF_DD * F65;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
 		A( 4, 1 ) = 0.0;
-		A( 4, 2 ) = 0.0;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F76;
-		A( 4, 6 ) = -RHOFF_DD * F78;
-		A( 4, 7 ) = RHOFF_DD * F75;
-		A( 5, 1 ) = -TAUF_DD * F41;
-		A( 5, 2 ) = -TAUF_DD * F42;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F67;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = -RHOFF_DD * F68;
-		A( 5, 7 ) = RHOFF_DD * F65;
-		A( 6, 1 ) = -TAUF_DD * F21;
+		A( 5, 1 ) = 0.0;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = TAUF_DD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUF_DD * F87;
+		A( 5, 2 ) = -TAUF_DD * F86;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = -TAUF_DD * F24;
-		A( 6, 4 ) = -RHOFF_DD * F87;
-		A( 6, 5 ) = -RHOFF_DD * F86;
+		A( 7, 2 ) = TAUF_DD * F85;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = -TAUF_DD * F67;
+		A( 5, 3 ) = 0.0;
+		A( 6, 3 ) = -TAUF_DD * F68;
+		A( 7, 3 ) = TAUF_DD * F65;
+		A( 1, 4 ) = 0.0;
+		A( 2, 4 ) = 0.0;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F76;
+		A( 6, 4 ) = -RHOFF_DD * F78;
+		A( 7, 4 ) = RHOFF_DD * F75;
+		A( 1, 5 ) = -TAUF_DD * F41;
+		A( 2, 5 ) = -TAUF_DD * F42;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F67;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = -RHOFF_DD * F68;
+		A( 7, 5 ) = RHOFF_DD * F65;
+		A( 1, 6 ) = -TAUF_DD * F21;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = -TAUF_DD * F24;
+		A( 4, 6 ) = -RHOFF_DD * F87;
+		A( 5, 6 ) = -RHOFF_DD * F86;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = RHOFF_DD * F85;
+		A( 7, 6 ) = RHOFF_DD * F85;
 
 		SOLMATS( N, A, XSOL );
 
@@ -2240,14 +2287,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_I(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
 		Real64 const DE, // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -2399,8 +2446,8 @@ namespace WindowEquivalentLayer {
 		Real64 G5;
 		Real64 G8;
 		Real64 G11;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -2498,161 +2545,161 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F13;
-		A( 1, 4 ) = -RHOBF_DD * F14;
-		A( 1, 5 ) = -RHOBF_DD * F16;
-		A( 1, 6 ) = -RHOBF_DD * F17;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = 0.0;
-		A( 1, 9 ) = 0.0;
-		A( 1, 10 ) = 0.0;
-		A( 1, 11 ) = 0.0;
-		A( 1, 12 ) = 0.0;
-		A( 1, 13 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = 0.0;
-		A( 2, 5 ) = -RHOBF_DD * F26;
-		A( 2, 6 ) = -RHOBF_DD * F27;
-		A( 2, 7 ) = -TAUFF_DD * F149;
-		A( 2, 8 ) = -TAUFF_DD * F1410;
-		A( 2, 9 ) = -TAUFF_DD * F1411;
-		A( 2, 10 ) = 0.0;
-		A( 2, 11 ) = 0.0;
-		A( 2, 12 ) = 0.0;
-		A( 2, 13 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F31;
-		A( 3, 2 ) = 0.0;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -RHOBF_DD * F36;
-		A( 3, 6 ) = -RHOBF_DD * F37;
-		A( 3, 7 ) = -TAUFF_DD * F139;
-		A( 3, 8 ) = -TAUFF_DD * F1310;
-		A( 3, 9 ) = -TAUFF_DD * F1311;
-		A( 3, 10 ) = 0.0;
-		A( 3, 11 ) = 0.0;
-		A( 3, 12 ) = 0.0;
-		A( 3, 13 ) = Z3_BD;
-		A( 4, 1 ) = -RHOBF_DD * F41;
-		A( 4, 2 ) = 0.0;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOBF_DD * F46;
-		A( 4, 6 ) = -RHOBF_DD * F47;
-		A( 4, 7 ) = -TAUFF_DD * F129;
-		A( 4, 8 ) = -TAUFF_DD * F1210;
-		A( 4, 9 ) = -TAUFF_DD * F1211;
-		A( 4, 10 ) = 0.0;
-		A( 4, 11 ) = 0.0;
-		A( 4, 12 ) = 0.0;
-		A( 4, 13 ) = 0.0;
-		A( 5, 1 ) = -RHOBF_DD * F61;
-		A( 5, 2 ) = -RHOBF_DD * F62;
-		A( 5, 3 ) = -RHOBF_DD * F63;
-		A( 5, 4 ) = -RHOBF_DD * F64;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = 0.0;
-		A( 5, 9 ) = -TAUFF_DD * F1011;
-		A( 5, 10 ) = -TAUFF_DD * F1012;
-		A( 5, 11 ) = -TAUFF_DD * F1013;
-		A( 5, 12 ) = -TAUFF_DD * F1014;
-		A( 5, 13 ) = 0.0;
-		A( 6, 1 ) = -RHOBF_DD * F71;
-		A( 6, 2 ) = -RHOBF_DD * F72;
-		A( 6, 3 ) = -RHOBF_DD * F73;
-		A( 6, 4 ) = -RHOBF_DD * F74;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = 0.0;
-		A( 6, 9 ) = -TAUFF_DD * F911;
-		A( 6, 10 ) = -TAUFF_DD * F912;
-		A( 6, 11 ) = -TAUFF_DD * F913;
-		A( 6, 12 ) = -TAUFF_DD * F914;
-		A( 6, 13 ) = Z7_BD;
-		A( 7, 1 ) = -TAUBF_DD * F71;
-		A( 7, 2 ) = -TAUBF_DD * F72;
-		A( 7, 3 ) = -TAUBF_DD * F73;
-		A( 7, 4 ) = -TAUBF_DD * F74;
-		A( 7, 5 ) = 0.0;
-		A( 7, 6 ) = 0.0;
-		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = 0.0;
-		A( 7, 9 ) = -RHOFF_DD * F911;
-		A( 7, 10 ) = -RHOFF_DD * F912;
-		A( 7, 11 ) = -RHOFF_DD * F913;
-		A( 7, 12 ) = -RHOFF_DD * F914;
-		A( 7, 13 ) = Z9_BD;
-		A( 8, 1 ) = -TAUBF_DD * F61;
-		A( 8, 2 ) = -TAUBF_DD * F62;
-		A( 8, 3 ) = -TAUBF_DD * F63;
-		A( 8, 4 ) = -TAUBF_DD * F64;
-		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = 0.0;
-		A( 8, 7 ) = 0.0;
-		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = -RHOFF_DD * F1011;
-		A( 8, 10 ) = -RHOFF_DD * F1012;
-		A( 8, 11 ) = -RHOFF_DD * F1013;
-		A( 8, 12 ) = -RHOFF_DD * F1014;
-		A( 8, 13 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F13;
+		A( 4, 1 ) = -RHOBF_DD * F14;
+		A( 5, 1 ) = -RHOBF_DD * F16;
+		A( 6, 1 ) = -RHOBF_DD * F17;
+		A( 7, 1 ) = 0.0;
+		A( 8, 1 ) = 0.0;
 		A( 9, 1 ) = 0.0;
-		A( 9, 2 ) = 0.0;
-		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = 0.0;
-		A( 9, 5 ) = 0.0;
-		A( 9, 6 ) = 0.0;
-		A( 9, 7 ) = -RHOFF_DD * F119;
-		A( 9, 8 ) = -RHOFF_DD * F1110;
-		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = -RHOFF_DD * F1112;
-		A( 9, 11 ) = -RHOFF_DD * F1113;
-		A( 9, 12 ) = -RHOFF_DD * F1114;
-		A( 9, 13 ) = 0.0;
-		A( 10, 1 ) = -TAUBF_DD * F41;
+		A( 10, 1 ) = 0.0;
+		A( 11, 1 ) = 0.0;
+		A( 12, 1 ) = 0.0;
+		A( 13, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = 0.0;
+		A( 4, 2 ) = 0.0;
+		A( 5, 2 ) = -RHOBF_DD * F26;
+		A( 6, 2 ) = -RHOBF_DD * F27;
+		A( 7, 2 ) = -TAUFF_DD * F149;
+		A( 8, 2 ) = -TAUFF_DD * F1410;
+		A( 9, 2 ) = -TAUFF_DD * F1411;
 		A( 10, 2 ) = 0.0;
-		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = 0.0;
-		A( 10, 5 ) = -TAUBF_DD * F46;
-		A( 10, 6 ) = -TAUBF_DD * F47;
-		A( 10, 7 ) = -RHOFF_DD * F129;
-		A( 10, 8 ) = -RHOFF_DD * F1210;
-		A( 10, 9 ) = -RHOFF_DD * F1211;
-		A( 10, 10 ) = 1.0;
-		A( 10, 11 ) = 0.0;
-		A( 10, 12 ) = 0.0;
-		A( 10, 13 ) = 0.0;
-		A( 11, 1 ) = -TAUBF_DD * F31;
 		A( 11, 2 ) = 0.0;
-		A( 11, 3 ) = 0.0;
-		A( 11, 4 ) = 0.0;
-		A( 11, 5 ) = -TAUBF_DD * F36;
-		A( 11, 6 ) = -TAUBF_DD * F37;
-		A( 11, 7 ) = -RHOFF_DD * F139;
-		A( 11, 8 ) = -RHOFF_DD * F1310;
-		A( 11, 9 ) = -RHOFF_DD * F1311;
-		A( 11, 10 ) = 0.0;
-		A( 11, 11 ) = 1.0;
-		A( 11, 12 ) = 0.0;
-		A( 11, 13 ) = Z13_BD;
-		A( 12, 1 ) = -TAUBF_DD * F21;
 		A( 12, 2 ) = 0.0;
+		A( 13, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F31;
+		A( 2, 3 ) = 0.0;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -RHOBF_DD * F36;
+		A( 6, 3 ) = -RHOBF_DD * F37;
+		A( 7, 3 ) = -TAUFF_DD * F139;
+		A( 8, 3 ) = -TAUFF_DD * F1310;
+		A( 9, 3 ) = -TAUFF_DD * F1311;
+		A( 10, 3 ) = 0.0;
+		A( 11, 3 ) = 0.0;
 		A( 12, 3 ) = 0.0;
+		A( 13, 3 ) = Z3_BD;
+		A( 1, 4 ) = -RHOBF_DD * F41;
+		A( 2, 4 ) = 0.0;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOBF_DD * F46;
+		A( 6, 4 ) = -RHOBF_DD * F47;
+		A( 7, 4 ) = -TAUFF_DD * F129;
+		A( 8, 4 ) = -TAUFF_DD * F1210;
+		A( 9, 4 ) = -TAUFF_DD * F1211;
+		A( 10, 4 ) = 0.0;
+		A( 11, 4 ) = 0.0;
 		A( 12, 4 ) = 0.0;
-		A( 12, 5 ) = -TAUBF_DD * F26;
-		A( 12, 6 ) = -TAUBF_DD * F27;
-		A( 12, 7 ) = -RHOFF_DD * F149;
-		A( 12, 8 ) = -RHOFF_DD * F1410;
-		A( 12, 9 ) = -RHOFF_DD * F1411;
+		A( 13, 4 ) = 0.0;
+		A( 1, 5 ) = -RHOBF_DD * F61;
+		A( 2, 5 ) = -RHOBF_DD * F62;
+		A( 3, 5 ) = -RHOBF_DD * F63;
+		A( 4, 5 ) = -RHOBF_DD * F64;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = 0.0;
+		A( 8, 5 ) = 0.0;
+		A( 9, 5 ) = -TAUFF_DD * F1011;
+		A( 10, 5 ) = -TAUFF_DD * F1012;
+		A( 11, 5 ) = -TAUFF_DD * F1013;
+		A( 12, 5 ) = -TAUFF_DD * F1014;
+		A( 13, 5 ) = 0.0;
+		A( 1, 6 ) = -RHOBF_DD * F71;
+		A( 2, 6 ) = -RHOBF_DD * F72;
+		A( 3, 6 ) = -RHOBF_DD * F73;
+		A( 4, 6 ) = -RHOBF_DD * F74;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = 0.0;
+		A( 8, 6 ) = 0.0;
+		A( 9, 6 ) = -TAUFF_DD * F911;
+		A( 10, 6 ) = -TAUFF_DD * F912;
+		A( 11, 6 ) = -TAUFF_DD * F913;
+		A( 12, 6 ) = -TAUFF_DD * F914;
+		A( 13, 6 ) = Z7_BD;
+		A( 1, 7 ) = -TAUBF_DD * F71;
+		A( 2, 7 ) = -TAUBF_DD * F72;
+		A( 3, 7 ) = -TAUBF_DD * F73;
+		A( 4, 7 ) = -TAUBF_DD * F74;
+		A( 5, 7 ) = 0.0;
+		A( 6, 7 ) = 0.0;
+		A( 7, 7 ) = 1.0;
+		A( 8, 7 ) = 0.0;
+		A( 9, 7 ) = -RHOFF_DD * F911;
+		A( 10, 7 ) = -RHOFF_DD * F912;
+		A( 11, 7 ) = -RHOFF_DD * F913;
+		A( 12, 7 ) = -RHOFF_DD * F914;
+		A( 13, 7 ) = Z9_BD;
+		A( 1, 8 ) = -TAUBF_DD * F61;
+		A( 2, 8 ) = -TAUBF_DD * F62;
+		A( 3, 8 ) = -TAUBF_DD * F63;
+		A( 4, 8 ) = -TAUBF_DD * F64;
+		A( 5, 8 ) = 0.0;
+		A( 6, 8 ) = 0.0;
+		A( 7, 8 ) = 0.0;
+		A( 8, 8 ) = 1.0;
+		A( 9, 8 ) = -RHOFF_DD * F1011;
+		A( 10, 8 ) = -RHOFF_DD * F1012;
+		A( 11, 8 ) = -RHOFF_DD * F1013;
+		A( 12, 8 ) = -RHOFF_DD * F1014;
+		A( 13, 8 ) = 0.0;
+		A( 1, 9 ) = 0.0;
+		A( 2, 9 ) = 0.0;
+		A( 3, 9 ) = 0.0;
+		A( 4, 9 ) = 0.0;
+		A( 5, 9 ) = 0.0;
+		A( 6, 9 ) = 0.0;
+		A( 7, 9 ) = -RHOFF_DD * F119;
+		A( 8, 9 ) = -RHOFF_DD * F1110;
+		A( 9, 9 ) = 1.0;
+		A( 10, 9 ) = -RHOFF_DD * F1112;
+		A( 11, 9 ) = -RHOFF_DD * F1113;
+		A( 12, 9 ) = -RHOFF_DD * F1114;
+		A( 13, 9 ) = 0.0;
+		A( 1, 10 ) = -TAUBF_DD * F41;
+		A( 2, 10 ) = 0.0;
+		A( 3, 10 ) = 0.0;
+		A( 4, 10 ) = 0.0;
+		A( 5, 10 ) = -TAUBF_DD * F46;
+		A( 6, 10 ) = -TAUBF_DD * F47;
+		A( 7, 10 ) = -RHOFF_DD * F129;
+		A( 8, 10 ) = -RHOFF_DD * F1210;
+		A( 9, 10 ) = -RHOFF_DD * F1211;
+		A( 10, 10 ) = 1.0;
+		A( 11, 10 ) = 0.0;
 		A( 12, 10 ) = 0.0;
+		A( 13, 10 ) = 0.0;
+		A( 1, 11 ) = -TAUBF_DD * F31;
+		A( 2, 11 ) = 0.0;
+		A( 3, 11 ) = 0.0;
+		A( 4, 11 ) = 0.0;
+		A( 5, 11 ) = -TAUBF_DD * F36;
+		A( 6, 11 ) = -TAUBF_DD * F37;
+		A( 7, 11 ) = -RHOFF_DD * F139;
+		A( 8, 11 ) = -RHOFF_DD * F1310;
+		A( 9, 11 ) = -RHOFF_DD * F1311;
+		A( 10, 11 ) = 0.0;
+		A( 11, 11 ) = 1.0;
 		A( 12, 11 ) = 0.0;
+		A( 13, 11 ) = Z13_BD;
+		A( 1, 12 ) = -TAUBF_DD * F21;
+		A( 2, 12 ) = 0.0;
+		A( 3, 12 ) = 0.0;
+		A( 4, 12 ) = 0.0;
+		A( 5, 12 ) = -TAUBF_DD * F26;
+		A( 6, 12 ) = -TAUBF_DD * F27;
+		A( 7, 12 ) = -RHOFF_DD * F149;
+		A( 8, 12 ) = -RHOFF_DD * F1410;
+		A( 9, 12 ) = -RHOFF_DD * F1411;
+		A( 10, 12 ) = 0.0;
+		A( 11, 12 ) = 0.0;
 		A( 12, 12 ) = 1.0;
-		A( 12, 13 ) = Z14_BD;
+		A( 13, 12 ) = Z14_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -2683,14 +2730,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_II(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
 		Real64 const DE, // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -2820,8 +2867,8 @@ namespace WindowEquivalentLayer {
 		Real64 G4;
 		Real64 G7;
 		Real64 G10;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -2897,115 +2944,115 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F13;
-		A( 1, 4 ) = -RHOBF_DD * F15;
-		A( 1, 5 ) = -RHOBF_DD * F16;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = 0.0;
-		A( 1, 9 ) = 0.0;
-		A( 1, 10 ) = 0.0;
-		A( 1, 11 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = -RHOBF_DD * F25;
-		A( 2, 5 ) = -RHOBF_DD * F26;
-		A( 2, 6 ) = -TAUFF_DD * F128;
-		A( 2, 7 ) = -TAUFF_DD * F129;
-		A( 2, 8 ) = -TAUFF_DD * F1210;
-		A( 2, 9 ) = 0.0;
-		A( 2, 10 ) = 0.0;
-		A( 2, 11 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F31;
-		A( 3, 2 ) = 0.0;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -RHOBF_DD * F35;
-		A( 3, 5 ) = -RHOBF_DD * F36;
-		A( 3, 6 ) = -TAUFF_DD * F118;
-		A( 3, 7 ) = -TAUFF_DD * F119;
-		A( 3, 8 ) = -TAUFF_DD * F1110;
-		A( 3, 9 ) = 0.0;
-		A( 3, 10 ) = 0.0;
-		A( 3, 11 ) = Z3_BD;
-		A( 4, 1 ) = -RHOBF_DD * F51;
-		A( 4, 2 ) = -RHOBF_DD * F52;
-		A( 4, 3 ) = -RHOBF_DD * F53;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = 0.0;
-		A( 4, 6 ) = 0.0;
-		A( 4, 7 ) = 0.0;
-		A( 4, 8 ) = -TAUFF_DD * F910;
-		A( 4, 9 ) = -TAUFF_DD * F911;
-		A( 4, 10 ) = -TAUFF_DD * F912;
-		A( 4, 11 ) = 0.0;
-		A( 5, 1 ) = -RHOBF_DD * F61;
-		A( 5, 2 ) = -RHOBF_DD * F62;
-		A( 5, 3 ) = -RHOBF_DD * F63;
-		A( 5, 4 ) = 0.0;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = -TAUFF_DD * F810;
-		A( 5, 9 ) = -TAUFF_DD * F811;
-		A( 5, 10 ) = -TAUFF_DD * F812;
-		A( 5, 11 ) = Z6_BD;
-		A( 6, 1 ) = -TAUBF_DD * F61;
-		A( 6, 2 ) = -TAUBF_DD * F62;
-		A( 6, 3 ) = -TAUBF_DD * F63;
-		A( 6, 4 ) = 0.0;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = -RHOFF_DD * F810;
-		A( 6, 9 ) = -RHOFF_DD * F811;
-		A( 6, 10 ) = -RHOFF_DD * F812;
-		A( 6, 11 ) = Z8_BD;
-		A( 7, 1 ) = -TAUBF_DD * F51;
-		A( 7, 2 ) = -TAUBF_DD * F52;
-		A( 7, 3 ) = -TAUBF_DD * F53;
-		A( 7, 4 ) = 0.0;
-		A( 7, 5 ) = 0.0;
-		A( 7, 6 ) = 0.0;
-		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = -RHOFF_DD * F910;
-		A( 7, 9 ) = -RHOFF_DD * F911;
-		A( 7, 10 ) = -RHOFF_DD * F912;
-		A( 7, 11 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F13;
+		A( 4, 1 ) = -RHOBF_DD * F15;
+		A( 5, 1 ) = -RHOBF_DD * F16;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = 0.0;
 		A( 8, 1 ) = 0.0;
-		A( 8, 2 ) = 0.0;
-		A( 8, 3 ) = 0.0;
-		A( 8, 4 ) = 0.0;
-		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = -RHOFF_DD * F108;
-		A( 8, 7 ) = -RHOFF_DD * F109;
-		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = -RHOFF_DD * F1011;
-		A( 8, 10 ) = -RHOFF_DD * F1012;
-		A( 8, 11 ) = 0.0;
-		A( 9, 1 ) = -TAUBF_DD * F31;
+		A( 9, 1 ) = 0.0;
+		A( 10, 1 ) = 0.0;
+		A( 11, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = 0.0;
+		A( 4, 2 ) = -RHOBF_DD * F25;
+		A( 5, 2 ) = -RHOBF_DD * F26;
+		A( 6, 2 ) = -TAUFF_DD * F128;
+		A( 7, 2 ) = -TAUFF_DD * F129;
+		A( 8, 2 ) = -TAUFF_DD * F1210;
 		A( 9, 2 ) = 0.0;
-		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = -TAUBF_DD * F35;
-		A( 9, 5 ) = -TAUBF_DD * F36;
-		A( 9, 6 ) = -RHOFF_DD * F118;
-		A( 9, 7 ) = -RHOFF_DD * F119;
-		A( 9, 8 ) = -RHOFF_DD * F1110;
-		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = 0.0;
-		A( 9, 11 ) = Z11_BD;
-		A( 10, 1 ) = -TAUBF_DD * F21;
 		A( 10, 2 ) = 0.0;
+		A( 11, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F31;
+		A( 2, 3 ) = 0.0;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = -RHOBF_DD * F35;
+		A( 5, 3 ) = -RHOBF_DD * F36;
+		A( 6, 3 ) = -TAUFF_DD * F118;
+		A( 7, 3 ) = -TAUFF_DD * F119;
+		A( 8, 3 ) = -TAUFF_DD * F1110;
+		A( 9, 3 ) = 0.0;
 		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = -TAUBF_DD * F25;
-		A( 10, 5 ) = -TAUBF_DD * F26;
-		A( 10, 6 ) = -RHOFF_DD * F128;
-		A( 10, 7 ) = -RHOFF_DD * F129;
-		A( 10, 8 ) = -RHOFF_DD * F1210;
+		A( 11, 3 ) = Z3_BD;
+		A( 1, 4 ) = -RHOBF_DD * F51;
+		A( 2, 4 ) = -RHOBF_DD * F52;
+		A( 3, 4 ) = -RHOBF_DD * F53;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = 0.0;
+		A( 6, 4 ) = 0.0;
+		A( 7, 4 ) = 0.0;
+		A( 8, 4 ) = -TAUFF_DD * F910;
+		A( 9, 4 ) = -TAUFF_DD * F911;
+		A( 10, 4 ) = -TAUFF_DD * F912;
+		A( 11, 4 ) = 0.0;
+		A( 1, 5 ) = -RHOBF_DD * F61;
+		A( 2, 5 ) = -RHOBF_DD * F62;
+		A( 3, 5 ) = -RHOBF_DD * F63;
+		A( 4, 5 ) = 0.0;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = 0.0;
+		A( 8, 5 ) = -TAUFF_DD * F810;
+		A( 9, 5 ) = -TAUFF_DD * F811;
+		A( 10, 5 ) = -TAUFF_DD * F812;
+		A( 11, 5 ) = Z6_BD;
+		A( 1, 6 ) = -TAUBF_DD * F61;
+		A( 2, 6 ) = -TAUBF_DD * F62;
+		A( 3, 6 ) = -TAUBF_DD * F63;
+		A( 4, 6 ) = 0.0;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = 0.0;
+		A( 8, 6 ) = -RHOFF_DD * F810;
+		A( 9, 6 ) = -RHOFF_DD * F811;
+		A( 10, 6 ) = -RHOFF_DD * F812;
+		A( 11, 6 ) = Z8_BD;
+		A( 1, 7 ) = -TAUBF_DD * F51;
+		A( 2, 7 ) = -TAUBF_DD * F52;
+		A( 3, 7 ) = -TAUBF_DD * F53;
+		A( 4, 7 ) = 0.0;
+		A( 5, 7 ) = 0.0;
+		A( 6, 7 ) = 0.0;
+		A( 7, 7 ) = 1.0;
+		A( 8, 7 ) = -RHOFF_DD * F910;
+		A( 9, 7 ) = -RHOFF_DD * F911;
+		A( 10, 7 ) = -RHOFF_DD * F912;
+		A( 11, 7 ) = 0.0;
+		A( 1, 8 ) = 0.0;
+		A( 2, 8 ) = 0.0;
+		A( 3, 8 ) = 0.0;
+		A( 4, 8 ) = 0.0;
+		A( 5, 8 ) = 0.0;
+		A( 6, 8 ) = -RHOFF_DD * F108;
+		A( 7, 8 ) = -RHOFF_DD * F109;
+		A( 8, 8 ) = 1.0;
+		A( 9, 8 ) = -RHOFF_DD * F1011;
+		A( 10, 8 ) = -RHOFF_DD * F1012;
+		A( 11, 8 ) = 0.0;
+		A( 1, 9 ) = -TAUBF_DD * F31;
+		A( 2, 9 ) = 0.0;
+		A( 3, 9 ) = 0.0;
+		A( 4, 9 ) = -TAUBF_DD * F35;
+		A( 5, 9 ) = -TAUBF_DD * F36;
+		A( 6, 9 ) = -RHOFF_DD * F118;
+		A( 7, 9 ) = -RHOFF_DD * F119;
+		A( 8, 9 ) = -RHOFF_DD * F1110;
+		A( 9, 9 ) = 1.0;
 		A( 10, 9 ) = 0.0;
+		A( 11, 9 ) = Z11_BD;
+		A( 1, 10 ) = -TAUBF_DD * F21;
+		A( 2, 10 ) = 0.0;
+		A( 3, 10 ) = 0.0;
+		A( 4, 10 ) = -TAUBF_DD * F25;
+		A( 5, 10 ) = -TAUBF_DD * F26;
+		A( 6, 10 ) = -RHOFF_DD * F128;
+		A( 7, 10 ) = -RHOFF_DD * F129;
+		A( 8, 10 ) = -RHOFF_DD * F1210;
+		A( 9, 10 ) = 0.0;
 		A( 10, 10 ) = 1.0;
-		A( 10, 11 ) = Z12_BD;
+		A( 11, 10 ) = Z12_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3039,9 +3086,9 @@ namespace WindowEquivalentLayer {
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3171,8 +3218,8 @@ namespace WindowEquivalentLayer {
 		Real64 G7;
 		Real64 G10;
 
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3248,115 +3295,115 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F13;
-		A( 1, 4 ) = -RHOBF_DD * F15;
-		A( 1, 5 ) = -RHOBF_DD * F16;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = 0.0;
-		A( 1, 9 ) = 0.0;
-		A( 1, 10 ) = 0.0;
-		A( 1, 11 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = -RHOBF_DD * F25;
-		A( 2, 5 ) = -RHOBF_DD * F26;
-		A( 2, 6 ) = -TAUFF_DD * F128;
-		A( 2, 7 ) = -TAUFF_DD * F129;
-		A( 2, 8 ) = -TAUFF_DD * F1210;
-		A( 2, 9 ) = 0.0;
-		A( 2, 10 ) = 0.0;
-		A( 2, 11 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F31;
-		A( 3, 2 ) = 0.0;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -RHOBF_DD * F35;
-		A( 3, 5 ) = -RHOBF_DD * F36;
-		A( 3, 6 ) = -TAUFF_DD * F118;
-		A( 3, 7 ) = -TAUFF_DD * F119;
-		A( 3, 8 ) = -TAUFF_DD * F1110;
-		A( 3, 9 ) = 0.0;
-		A( 3, 10 ) = 0.0;
-		A( 3, 11 ) = Z3_BD;
-		A( 4, 1 ) = -RHOBF_DD * F51;
-		A( 4, 2 ) = -RHOBF_DD * F52;
-		A( 4, 3 ) = -RHOBF_DD * F53;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = 0.0;
-		A( 4, 6 ) = 0.0;
-		A( 4, 7 ) = 0.0;
-		A( 4, 8 ) = -TAUFF_DD * F910;
-		A( 4, 9 ) = -TAUFF_DD * F911;
-		A( 4, 10 ) = -TAUFF_DD * F912;
-		A( 4, 11 ) = 0.0;
-		A( 5, 1 ) = -RHOBF_DD * F61;
-		A( 5, 2 ) = -RHOBF_DD * F62;
-		A( 5, 3 ) = -RHOBF_DD * F63;
-		A( 5, 4 ) = 0.0;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = -TAUFF_DD * F810;
-		A( 5, 9 ) = -TAUFF_DD * F811;
-		A( 5, 10 ) = -TAUFF_DD * F812;
-		A( 5, 11 ) = Z6_BD;
-		A( 6, 1 ) = -TAUBF_DD * F61;
-		A( 6, 2 ) = -TAUBF_DD * F62;
-		A( 6, 3 ) = -TAUBF_DD * F63;
-		A( 6, 4 ) = 0.0;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = -RHOFF_DD * F810;
-		A( 6, 9 ) = -RHOFF_DD * F811;
-		A( 6, 10 ) = -RHOFF_DD * F812;
-		A( 6, 11 ) = Z8_BD;
-		A( 7, 1 ) = -TAUBF_DD * F51;
-		A( 7, 2 ) = -TAUBF_DD * F52;
-		A( 7, 3 ) = -TAUBF_DD * F53;
-		A( 7, 4 ) = 0.0;
-		A( 7, 5 ) = 0.0;
-		A( 7, 6 ) = 0.0;
-		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = -RHOFF_DD * F910;
-		A( 7, 9 ) = -RHOFF_DD * F911;
-		A( 7, 10 ) = -RHOFF_DD * F912;
-		A( 7, 11 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F13;
+		A( 4, 1 ) = -RHOBF_DD * F15;
+		A( 5, 1 ) = -RHOBF_DD * F16;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = 0.0;
 		A( 8, 1 ) = 0.0;
-		A( 8, 2 ) = 0.0;
-		A( 8, 3 ) = 0.0;
-		A( 8, 4 ) = 0.0;
-		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = -RHOFF_DD * F108;
-		A( 8, 7 ) = -RHOFF_DD * F109;
-		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = -RHOFF_DD * F1011;
-		A( 8, 10 ) = -RHOFF_DD * F1012;
-		A( 8, 11 ) = 0.0;
-		A( 9, 1 ) = -TAUBF_DD * F31;
+		A( 9, 1 ) = 0.0;
+		A( 10, 1 ) = 0.0;
+		A( 11, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = 0.0;
+		A( 4, 2 ) = -RHOBF_DD * F25;
+		A( 5, 2 ) = -RHOBF_DD * F26;
+		A( 6, 2 ) = -TAUFF_DD * F128;
+		A( 7, 2 ) = -TAUFF_DD * F129;
+		A( 8, 2 ) = -TAUFF_DD * F1210;
 		A( 9, 2 ) = 0.0;
-		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = -TAUBF_DD * F35;
-		A( 9, 5 ) = -TAUBF_DD * F36;
-		A( 9, 6 ) = -RHOFF_DD * F118;
-		A( 9, 7 ) = -RHOFF_DD * F119;
-		A( 9, 8 ) = -RHOFF_DD * F1110;
-		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = 0.0;
-		A( 9, 11 ) = Z11_BD;
-		A( 10, 1 ) = -TAUBF_DD * F21;
 		A( 10, 2 ) = 0.0;
+		A( 11, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F31;
+		A( 2, 3 ) = 0.0;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = -RHOBF_DD * F35;
+		A( 5, 3 ) = -RHOBF_DD * F36;
+		A( 6, 3 ) = -TAUFF_DD * F118;
+		A( 7, 3 ) = -TAUFF_DD * F119;
+		A( 8, 3 ) = -TAUFF_DD * F1110;
+		A( 9, 3 ) = 0.0;
 		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = -TAUBF_DD * F25;
-		A( 10, 5 ) = -TAUBF_DD * F26;
-		A( 10, 6 ) = -RHOFF_DD * F128;
-		A( 10, 7 ) = -RHOFF_DD * F129;
-		A( 10, 8 ) = -RHOFF_DD * F1210;
+		A( 11, 3 ) = Z3_BD;
+		A( 1, 4 ) = -RHOBF_DD * F51;
+		A( 2, 4 ) = -RHOBF_DD * F52;
+		A( 3, 4 ) = -RHOBF_DD * F53;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = 0.0;
+		A( 6, 4 ) = 0.0;
+		A( 7, 4 ) = 0.0;
+		A( 8, 4 ) = -TAUFF_DD * F910;
+		A( 9, 4 ) = -TAUFF_DD * F911;
+		A( 10, 4 ) = -TAUFF_DD * F912;
+		A( 11, 4 ) = 0.0;
+		A( 1, 5 ) = -RHOBF_DD * F61;
+		A( 2, 5 ) = -RHOBF_DD * F62;
+		A( 3, 5 ) = -RHOBF_DD * F63;
+		A( 4, 5 ) = 0.0;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = 0.0;
+		A( 8, 5 ) = -TAUFF_DD * F810;
+		A( 9, 5 ) = -TAUFF_DD * F811;
+		A( 10, 5 ) = -TAUFF_DD * F812;
+		A( 11, 5 ) = Z6_BD;
+		A( 1, 6 ) = -TAUBF_DD * F61;
+		A( 2, 6 ) = -TAUBF_DD * F62;
+		A( 3, 6 ) = -TAUBF_DD * F63;
+		A( 4, 6 ) = 0.0;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = 0.0;
+		A( 8, 6 ) = -RHOFF_DD * F810;
+		A( 9, 6 ) = -RHOFF_DD * F811;
+		A( 10, 6 ) = -RHOFF_DD * F812;
+		A( 11, 6 ) = Z8_BD;
+		A( 1, 7 ) = -TAUBF_DD * F51;
+		A( 2, 7 ) = -TAUBF_DD * F52;
+		A( 3, 7 ) = -TAUBF_DD * F53;
+		A( 4, 7 ) = 0.0;
+		A( 5, 7 ) = 0.0;
+		A( 6, 7 ) = 0.0;
+		A( 7, 7 ) = 1.0;
+		A( 8, 7 ) = -RHOFF_DD * F910;
+		A( 9, 7 ) = -RHOFF_DD * F911;
+		A( 10, 7 ) = -RHOFF_DD * F912;
+		A( 11, 7 ) = 0.0;
+		A( 1, 8 ) = 0.0;
+		A( 2, 8 ) = 0.0;
+		A( 3, 8 ) = 0.0;
+		A( 4, 8 ) = 0.0;
+		A( 5, 8 ) = 0.0;
+		A( 6, 8 ) = -RHOFF_DD * F108;
+		A( 7, 8 ) = -RHOFF_DD * F109;
+		A( 8, 8 ) = 1.0;
+		A( 9, 8 ) = -RHOFF_DD * F1011;
+		A( 10, 8 ) = -RHOFF_DD * F1012;
+		A( 11, 8 ) = 0.0;
+		A( 1, 9 ) = -TAUBF_DD * F31;
+		A( 2, 9 ) = 0.0;
+		A( 3, 9 ) = 0.0;
+		A( 4, 9 ) = -TAUBF_DD * F35;
+		A( 5, 9 ) = -TAUBF_DD * F36;
+		A( 6, 9 ) = -RHOFF_DD * F118;
+		A( 7, 9 ) = -RHOFF_DD * F119;
+		A( 8, 9 ) = -RHOFF_DD * F1110;
+		A( 9, 9 ) = 1.0;
 		A( 10, 9 ) = 0.0;
+		A( 11, 9 ) = Z11_BD;
+		A( 1, 10 ) = -TAUBF_DD * F21;
+		A( 2, 10 ) = 0.0;
+		A( 3, 10 ) = 0.0;
+		A( 4, 10 ) = -TAUBF_DD * F25;
+		A( 5, 10 ) = -TAUBF_DD * F26;
+		A( 6, 10 ) = -RHOFF_DD * F128;
+		A( 7, 10 ) = -RHOFF_DD * F129;
+		A( 8, 10 ) = -RHOFF_DD * F1210;
+		A( 9, 10 ) = 0.0;
 		A( 10, 10 ) = 1.0;
-		A( 10, 11 ) = Z12_BD;
+		A( 11, 10 ) = Z12_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3385,14 +3432,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_IV(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
-		Real64 const DE, // width of illumination on pleat bottom (same units as S)
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( DE ), // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3479,8 +3526,8 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3520,47 +3567,47 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUFF_DD * F86;
-		A( 2, 5 ) = -TAUFF_DD * F87;
-		A( 2, 6 ) = 0.0;
-		A( 2, 7 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -TAUFF_DD * F67;
-		A( 3, 6 ) = -TAUFF_DD * F68;
-		A( 3, 7 ) = Z4_BD;
-		A( 4, 1 ) = -TAUBF_DD * F41;
-		A( 4, 2 ) = -TAUBF_DD * F42;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F67;
-		A( 4, 6 ) = -RHOFF_DD * F68;
-		A( 4, 7 ) = Z6_BD;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
+		A( 4, 1 ) = 0.0;
 		A( 5, 1 ) = 0.0;
-		A( 5, 2 ) = 0.0;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F76;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = -RHOFF_DD * F78;
-		A( 5, 7 ) = 0.0;
-		A( 6, 1 ) = -TAUBF_DD * F21;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUFF_DD * F86;
+		A( 5, 2 ) = -TAUFF_DD * F87;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = -TAUBF_DD * F24;
-		A( 6, 4 ) = -RHOFF_DD * F86;
-		A( 6, 5 ) = -RHOFF_DD * F87;
+		A( 7, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -TAUFF_DD * F67;
+		A( 6, 3 ) = -TAUFF_DD * F68;
+		A( 7, 3 ) = Z4_BD;
+		A( 1, 4 ) = -TAUBF_DD * F41;
+		A( 2, 4 ) = -TAUBF_DD * F42;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F67;
+		A( 6, 4 ) = -RHOFF_DD * F68;
+		A( 7, 4 ) = Z6_BD;
+		A( 1, 5 ) = 0.0;
+		A( 2, 5 ) = 0.0;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = -RHOFF_DD * F78;
+		A( 7, 5 ) = 0.0;
+		A( 1, 6 ) = -TAUBF_DD * F21;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = -TAUBF_DD * F24;
+		A( 4, 6 ) = -RHOFF_DD * F86;
+		A( 5, 6 ) = -RHOFF_DD * F87;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = Z8_BD;
+		A( 7, 6 ) = Z8_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3590,9 +3637,9 @@ namespace WindowEquivalentLayer {
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3695,8 +3742,8 @@ namespace WindowEquivalentLayer {
 		Real64 G7;
 		Real64 G8;
 
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3750,61 +3797,61 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUFF_DD * F96;
-		A( 2, 5 ) = -TAUFF_DD * F97;
-		A( 2, 6 ) = -TAUFF_DD * F98;
-		A( 2, 7 ) = 0.0;
-		A( 2, 8 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -TAUFF_DD * F67;
-		A( 3, 6 ) = -TAUFF_DD * F68;
-		A( 3, 7 ) = -TAUFF_DD * F69;
-		A( 3, 8 ) = Z4_BD;
-		A( 4, 1 ) = -TAUBF_DD * F41;
-		A( 4, 2 ) = -TAUBF_DD * F42;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F67;
-		A( 4, 6 ) = -RHOFF_DD * F68;
-		A( 4, 7 ) = -RHOFF_DD * F69;
-		A( 4, 8 ) = Z6_BD;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
+		A( 4, 1 ) = 0.0;
 		A( 5, 1 ) = 0.0;
-		A( 5, 2 ) = 0.0;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F76;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = -RHOFF_DD * F79;
-		A( 5, 8 ) = Z7_BD;
 		A( 6, 1 ) = 0.0;
-		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = 0.0;
-		A( 6, 4 ) = -RHOFF_DD * F86;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = -RHOFF_DD * F89;
-		A( 6, 8 ) = 0.0;
-		A( 7, 1 ) = -TAUBF_DD * F21;
+		A( 7, 1 ) = 0.0;
+		A( 8, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUFF_DD * F96;
+		A( 5, 2 ) = -TAUFF_DD * F97;
+		A( 6, 2 ) = -TAUFF_DD * F98;
 		A( 7, 2 ) = 0.0;
-		A( 7, 3 ) = -TAUBF_DD * F24;
-		A( 7, 4 ) = -RHOFF_DD * F96;
-		A( 7, 5 ) = -RHOFF_DD * F97;
-		A( 7, 6 ) = -RHOFF_DD * F98;
+		A( 8, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -TAUFF_DD * F67;
+		A( 6, 3 ) = -TAUFF_DD * F68;
+		A( 7, 3 ) = -TAUFF_DD * F69;
+		A( 8, 3 ) = Z4_BD;
+		A( 1, 4 ) = -TAUBF_DD * F41;
+		A( 2, 4 ) = -TAUBF_DD * F42;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F67;
+		A( 6, 4 ) = -RHOFF_DD * F68;
+		A( 7, 4 ) = -RHOFF_DD * F69;
+		A( 8, 4 ) = Z6_BD;
+		A( 1, 5 ) = 0.0;
+		A( 2, 5 ) = 0.0;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = -RHOFF_DD * F79;
+		A( 8, 5 ) = Z7_BD;
+		A( 1, 6 ) = 0.0;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = 0.0;
+		A( 4, 6 ) = -RHOFF_DD * F86;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = -RHOFF_DD * F89;
+		A( 8, 6 ) = 0.0;
+		A( 1, 7 ) = -TAUBF_DD * F21;
+		A( 2, 7 ) = 0.0;
+		A( 3, 7 ) = -TAUBF_DD * F24;
+		A( 4, 7 ) = -RHOFF_DD * F96;
+		A( 5, 7 ) = -RHOFF_DD * F97;
+		A( 6, 7 ) = -RHOFF_DD * F98;
 		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = Z9_BD;
+		A( 8, 7 ) = Z9_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3831,20 +3878,20 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_VI(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
-		Real64 const DE, // width of illumination on pleat bottom (same units as S)
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( DE ), // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
-		Real64 const RHOFF_BT_PERP,
-		Real64 const TAUFF_BB_PERP,
-		Real64 const TAUFF_BD_PERP,
-		Real64 const RHOBF_BT_PERP,
-		Real64 const TAUBF_BB_PERP,
-		Real64 const TAUBF_BD_PERP,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
+		Real64 const EP_UNUSED( RHOFF_BT_PERP ),
+		Real64 const EP_UNUSED( TAUFF_BB_PERP ),
+		Real64 const EP_UNUSED( TAUFF_BD_PERP ),
+		Real64 const EP_UNUSED( RHOBF_BT_PERP ),
+		Real64 const EP_UNUSED( TAUBF_BB_PERP ),
+		Real64 const EP_UNUSED( TAUBF_BD_PERP ),
 		Real64 const RHOBF_DD, // fabric back diffuse-diffuse reflectance
 		Real64 const RHOFF_DD, // fabric front diffuse-diffuse reflectance
 		Real64 const TAUFF_DD, // fabric front diffuse-diffuse transmittance
@@ -3887,7 +3934,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 TAUBF_BT_PERP;
 		Real64 AK; // length of diagonal strings
 		Real64 CG;
 		Real64 Z1_BD; // diffuse source termps
@@ -3921,8 +3967,8 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		AK = std::sqrt( W * W + S * S );
@@ -3956,47 +4002,47 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUFF_DD * F86;
-		A( 2, 5 ) = -TAUFF_DD * F87;
-		A( 2, 6 ) = 0.0;
-		A( 2, 7 ) = 0.0;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -TAUFF_DD * F67;
-		A( 3, 6 ) = -TAUFF_DD * F68;
-		A( 3, 7 ) = 0.0;
-		A( 4, 1 ) = -TAUBF_DD * F41;
-		A( 4, 2 ) = -TAUBF_DD * F42;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F67;
-		A( 4, 6 ) = -RHOFF_DD * F68;
-		A( 4, 7 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
+		A( 4, 1 ) = 0.0;
 		A( 5, 1 ) = 0.0;
-		A( 5, 2 ) = 0.0;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F76;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = -RHOFF_DD * F78;
-		A( 5, 7 ) = Z7_BD;
-		A( 6, 1 ) = -TAUBF_DD * F21;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUFF_DD * F86;
+		A( 5, 2 ) = -TAUFF_DD * F87;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = -TAUBF_DD * F24;
-		A( 6, 4 ) = -RHOFF_DD * F86;
-		A( 6, 5 ) = -RHOFF_DD * F87;
+		A( 7, 2 ) = 0.0;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -TAUFF_DD * F67;
+		A( 6, 3 ) = -TAUFF_DD * F68;
+		A( 7, 3 ) = 0.0;
+		A( 1, 4 ) = -TAUBF_DD * F41;
+		A( 2, 4 ) = -TAUBF_DD * F42;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F67;
+		A( 6, 4 ) = -RHOFF_DD * F68;
+		A( 7, 4 ) = 0.0;
+		A( 1, 5 ) = 0.0;
+		A( 2, 5 ) = 0.0;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = -RHOFF_DD * F78;
+		A( 7, 5 ) = Z7_BD;
+		A( 1, 6 ) = -TAUBF_DD * F21;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = -TAUBF_DD * F24;
+		A( 4, 6 ) = -RHOFF_DD * F86;
+		A( 5, 6 ) = -RHOFF_DD * F87;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
+		A( 7, 6 ) = 0.0;
 
 		SOLMATS( N, A, XSOL );
 
@@ -4226,13 +4272,13 @@ namespace WindowEquivalentLayer {
 		Real64 XC;
 		Real64 XD;
 		Real64 XE;
-		Real64 XF;
+		Real64 XF( 0 );
 		Real64 YA;
 		Real64 YB;
 		Real64 YC;
 		Real64 YD;
 		Real64 YE;
-		Real64 YF;
+		Real64 YF( 0 );
 		int CORR;
 		// Flow
 
@@ -4626,8 +4672,8 @@ namespace WindowEquivalentLayer {
 		Real64 J4;
 		Real64 J5;
 		Real64 J6;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// flow
 
 		//  CHECK TO SEE WHICH SIDE OF SLAT IS SUNLIT
@@ -4690,25 +4736,25 @@ namespace WindowEquivalentLayer {
 			// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 			A( 1, 1 ) = 1.0 - TAU_SLAT * F43;
-			A( 1, 2 ) = -RHODFS_SLAT * F34;
-			A( 1, 3 ) = -TAU_SLAT * F45;
-			A( 1, 4 ) = -RHODFS_SLAT * F36;
-			A( 1, 5 ) = Z3;
-			A( 2, 1 ) = -RHOUFS_SLAT * F43;
+			A( 2, 1 ) = -RHODFS_SLAT * F34;
+			A( 3, 1 ) = -TAU_SLAT * F45;
+			A( 4, 1 ) = -RHODFS_SLAT * F36;
+			A( 5, 1 ) = Z3;
+			A( 1, 2 ) = -RHOUFS_SLAT * F43;
 			A( 2, 2 ) = 1.0 - TAU_SLAT * F34;
-			A( 2, 3 ) = -RHOUFS_SLAT * F45;
-			A( 2, 4 ) = -TAU_SLAT * F36;
-			A( 2, 5 ) = Z4;
-			A( 3, 1 ) = -TAU_SLAT * F63;
-			A( 3, 2 ) = -RHODFS_SLAT * F54;
+			A( 3, 2 ) = -RHOUFS_SLAT * F45;
+			A( 4, 2 ) = -TAU_SLAT * F36;
+			A( 5, 2 ) = Z4;
+			A( 1, 3 ) = -TAU_SLAT * F63;
+			A( 2, 3 ) = -RHODFS_SLAT * F54;
 			A( 3, 3 ) = 1.0 - TAU_SLAT * F65;
-			A( 3, 4 ) = -RHODFS_SLAT * F56;
-			A( 3, 5 ) = 0.0;
-			A( 4, 1 ) = -RHOUFS_SLAT * F63;
-			A( 4, 2 ) = -TAU_SLAT * F54;
-			A( 4, 3 ) = -RHOUFS_SLAT * F65;
+			A( 4, 3 ) = -RHODFS_SLAT * F56;
+			A( 5, 3 ) = 0.0;
+			A( 1, 4 ) = -RHOUFS_SLAT * F63;
+			A( 2, 4 ) = -TAU_SLAT * F54;
+			A( 3, 4 ) = -RHOUFS_SLAT * F65;
 			A( 4, 4 ) = 1.0 - TAU_SLAT * F56;
-			A( 4, 5 ) = 0.0;
+			A( 5, 4 ) = 0.0;
 
 			SOLMATS( N, A, XSOL );
 
@@ -4725,8 +4771,8 @@ namespace WindowEquivalentLayer {
 	void
 	SOLMATS(
 		int const N, // # of active rows in A
-		FArray2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
-		FArray1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
+		Array2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
+		Array1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -4783,13 +4829,13 @@ namespace WindowEquivalentLayer {
 		NP2 = N + 2;
 
 		for ( I = 1; I <= N; ++I ) {
-			A( I, NP2 ) = 0.0;
+			A( NP2, I ) = 0.0;
 			// DO 1 J=1,NP1    ! TODO ?
 		}
 
 		for ( I = 1; I <= N; ++I ) {
 			for ( J = 1; J <= NP1; ++J ) {
-				A( I, NP2 ) += A( I, J );
+				A( NP2, I ) += A( J, I );
 			}
 		}
 
@@ -4799,8 +4845,8 @@ namespace WindowEquivalentLayer {
 			NOS = L;
 
 			for ( I = LP; I <= N; ++I ) {
-				if ( std::abs( CMAX ) < std::abs( A( I, L ) ) ) {
-					CMAX = A( I, L );
+				if ( std::abs( CMAX ) < std::abs( A( L, I ) ) ) {
+					CMAX = A( L, I );
 					NOS = I;
 				}
 			}
@@ -4808,34 +4854,34 @@ namespace WindowEquivalentLayer {
 			// Swap rows
 			if ( NOS != L ) {
 				for ( J = 1; J <= NP2; ++J ) {
-					TEMP = A( L, J );
-					A( L, J ) = A( NOS, J );
-					A( NOS, J ) = TEMP;
+					TEMP = A( J, L );
+					A( J, L ) = A( J, NOS );
+					A( J, NOS ) = TEMP;
 				}
 			}
 
 			for ( I = LP; I <= N; ++I ) {
 				C = 0.0;
-				Y = -A( I, L ) / A( L, L );
+				Y = -A( L, I ) / A( L, L );
 				for ( J = L; J <= NP2; ++J ) {
-					A( I, J ) += Y * A( L, J );
+					A( J, I ) += Y * A( J, L );
 				}
 				for ( J = L; J <= NP1; ++J ) {
-					C += A( I, J );
+					C += A( J, I );
 				}
 			}
 		}
 
 		// back-substitute
-		XSOL( N ) = A( N, NP1 ) / A( N, N );
+		XSOL( N ) = A( NP1, N ) / A( N, N );
 		for ( I = 1; I <= NM1; ++I ) {
 			NI = N - I;
 			D = 0.0;
 			for ( J = 1; J <= I; ++J ) {
 				NJ = N + 1 - J;
-				D += A( NI, NJ ) * XSOL( NJ );
+				D += A( NJ, NI ) * XSOL( NJ );
 			}
-			XSOL( NI ) = ( A( NI, NP1 ) - D ) / A( NI, NI );
+			XSOL( NI ) = ( A( NP1, NI ) - D ) / A( NI, NI );
 		}
 	}
 
@@ -4849,15 +4895,15 @@ namespace WindowEquivalentLayer {
 		Real64 const TRMOUT,
 		Real64 const TRMIN, // indoor / outdoor mean radiant temp, K
 		Real64 const ISOL, // total incident solar, W/m2 (values used for SOURCE derivation)
-		FArray1S< Real64 > const SOURCE, // absorbed solar by layer, W/m2
+		Array1S< Real64 > const SOURCE, // absorbed solar by layer, W/m2
 		Real64 const TOL, // convergence tolerance, usually
-		FArray1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
+		Array1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
 		Real64 & QOCFRoom, // returned: open channel heat gain to room, W/m2
-		FArray1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
-		FArray1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-		FArray1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
-		FArray1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
-		FArray1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
+		Array1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
+		Array1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+		Array1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
+		Array1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
+		Array1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
 		Real64 & UCG, // returned: center-glass U-factor, W/m2-K
 		Real64 & SHGC, // returned: center-glass SHGC (Solar Heat Gain Coefficient)
 		Optional_bool_const HCInFlag // If true uses ISO Std 150099 routine for HCIn calc
@@ -4928,13 +4974,13 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ALPHA;
 		Real64 HCOCFout;
-		FArray2D< Real64 > A( 3*FS.NL+2, 3*FS.NL+4 );
-		FArray1D< Real64 > XSOL( 3*FS.NL+2 );
+		Array2D< Real64 > A( 3*FS.NL+4, 3*FS.NL+2 );
+		Array1D< Real64 > XSOL( 3*FS.NL+2 );
 		Real64 MAXERR;
-		FArray1D< Real64 > TNEW( FS.NL ); // latest estimate of layer temperatures, K
-		FArray1D< Real64 > EB( {0,FS.NL+1} ); // black emissive power by layer, W/m2
+		Array1D< Real64 > TNEW( FS.NL ); // latest estimate of layer temperatures, K
+		Array1D< Real64 > EB( {0,FS.NL+1} ); // black emissive power by layer, W/m2
 		//   EB( 0) = outdoor environment, EB( NL+1) = indoor environment
-		FArray1D< Real64 > HHAT( {0,FS.NL} ); // convective heat transfer coefficient (W/m2.K4)
+		Array1D< Real64 > HHAT( {0,FS.NL} ); // convective heat transfer coefficient (W/m2.K4)
 		//   based on EB, NOT temperature difference
 		Real64 RHOF_ROOM; // effective longwave room-side properties
 		Real64 TAU_ROOM;
@@ -4942,7 +4988,7 @@ namespace WindowEquivalentLayer {
 		Real64 RHOB_OUT; // effective longwave outdoor environment properties
 		Real64 TAU_OUT;
 		Real64 EPSB_OUT;
-		FArray1D< Real64 > QNET( FS.NL ); // checksum - net heat flux to a layer - should be zero - not needed
+		Array1D< Real64 > QNET( FS.NL ); // checksum - net heat flux to a layer - should be zero - not needed
 		int ADIM; // dimension of the A matrix
 		int CONVRG;
 		int NL;
@@ -4951,38 +4997,38 @@ namespace WindowEquivalentLayer {
 		int L;
 		int ITRY;
 		int hin_scheme; // flags different schemes for indoor convection coefficients
-		FArray1D_int ISDL( {0,FS.NL+1} ); // Flag to mark diathermanous layers, 0=opaque
+		Array1D_int ISDL( {0,FS.NL+1} ); // Flag to mark diathermanous layers, 0=opaque
 		int NDLIAR; // Number of Diathermanous Layers In A Row (i.e., consecutive)
 		int IB; // Counter begin and end limits
 		int IE;
 		int IDV; // Integer dummy variable, general utility
-		int IM_ON; // Turns on calculation of Indices of Merit if IM_ON=1
-		FArray1D< Real64 > QOCF_F( FS.NL ); // heat flux to outdoor-facing surface of layer i, from gap i-1,
+		int IM_ON( 1 ); // Turns on calculation of Indices of Merit if IM_ON=1
+		Array1D< Real64 > QOCF_F( FS.NL ); // heat flux to outdoor-facing surface of layer i, from gap i-1,
 		//   due to open channel flow, W/m2
-		FArray1D< Real64 > QOCF_B( FS.NL ); // heat flux to indoor-facing surface of layer i, from gap i,
+		Array1D< Real64 > QOCF_B( FS.NL ); // heat flux to indoor-facing surface of layer i, from gap i,
 		//   due to open channel flow, W/m2
 		Real64 Rvalue; // R-value in IP units [hr.ft2.F/BTU]
 		Real64 TAE_IN; // Indoor and outdoor effective ambient temperatures [K]
 		Real64 TAE_OUT;
-		FArray1D< Real64 > HR( {0,FS.NL} ); // Radiant heat transfer coefficient [W/m2K]
-		FArray1D< Real64 > HJR( FS.NL ); // radiative and convective jump heat transfer coefficients
-		FArray1D< Real64 > HJC( FS.NL );
+		Array1D< Real64 > HR( {0,FS.NL} ); // Radiant heat transfer coefficient [W/m2K]
+		Array1D< Real64 > HJR( FS.NL ); // radiative and convective jump heat transfer coefficients
+		Array1D< Real64 > HJC( FS.NL );
 		Real64 FHR_OUT; // hre/(hre+hce) fraction radiant h, outdoor or indoor, used for TAE
 		Real64 FHR_IN;
 		Real64 Q_IN; // net gain to the room [W/m2], including transmitted solar
-		FArray1D< Real64 > RHOF( {0,FS.NL+1} ); // longwave reflectance, front    !  these variables help simplify
-		FArray1D< Real64 > RHOB( {0,FS.NL+1} ); // longwave reflectance, back     !  the code because it is useful to
-		FArray1D< Real64 > EPSF( {0,FS.NL+1} ); // longwave emisivity,   front    !  increase the scope of the arrays
-		FArray1D< Real64 > EPSB( {0,FS.NL+1} ); // longwave emisivity,   back     !  to include indoor and outdoor
-		FArray1D< Real64 > TAU( {0,FS.NL+1} ); // longwave transmittance         !  nodes - more general
+		Array1D< Real64 > RHOF( {0,FS.NL+1} ); // longwave reflectance, front    !  these variables help simplify
+		Array1D< Real64 > RHOB( {0,FS.NL+1} ); // longwave reflectance, back     !  the code because it is useful to
+		Array1D< Real64 > EPSF( {0,FS.NL+1} ); // longwave emisivity,   front    !  increase the scope of the arrays
+		Array1D< Real64 > EPSB( {0,FS.NL+1} ); // longwave emisivity,   back     !  to include indoor and outdoor
+		Array1D< Real64 > TAU( {0,FS.NL+1} ); // longwave transmittance         !  nodes - more general
 		Real64 RTOT; // total resistance from TAE_OUT to TAE_IN [m2K/W]
-		FArray2D< Real64 > HC2D( 6, 6 ); // convective heat transfer coefficients between layers i and j
-		FArray2D< Real64 > HR2D( 6, 6 ); // radiant heat transfer coefficients between layers i and j
-		FArray1D< Real64 > HCIout( 6 ); // convective and radiant heat transfer coefficients between
-		FArray1D< Real64 > HRIout( 6 );
+		Array2D< Real64 > HC2D( 6, 6 ); // convective heat transfer coefficients between layers i and j
+		Array2D< Real64 > HR2D( 6, 6 ); // radiant heat transfer coefficients between layers i and j
+		Array1D< Real64 > HCIout( 6 ); // convective and radiant heat transfer coefficients between
+		Array1D< Real64 > HRIout( 6 );
 		// layer i and outdoor air or mean radiant temperature, resp.
-		FArray1D< Real64 > HCIin( 6 ); // convective and radiant heat transfer coefficients between
-		FArray1D< Real64 > HRIin( 6 );
+		Array1D< Real64 > HCIin( 6 ); // convective and radiant heat transfer coefficients between
+		Array1D< Real64 > HRIin( 6 );
 		// layer i and indoor air or mean radiant temperature, resp.
 		Real64 HCinout; // convective and radiant heat transfer coefficients between
 		Real64 HRinout;
@@ -5000,13 +5046,12 @@ namespace WindowEquivalentLayer {
 		Real64 TOUTdv;
 		Real64 TRMINdv; // for boundary conditions in calculating
 		Real64 TRMOUTdv;
-		FArray1D< Real64 > SOURCEdv( FS.NL+1 ); // indices of merit
+		Array1D< Real64 > SOURCEdv( FS.NL+1 ); // indices of merit
 		Real64 SUMERR; // error summation used to check validity of code/model
 		Real64 QGAIN; // total gain to conditioned space [[W/m2]
 		Real64 SaveHCNLm; // place to save HC(NL-1) - two resistance networks differ
 		Real64 SaveHCNL; // place to save HC(NL)   - two resistance networks differ
 		// in their definitions of these heat transfer coefficients
-		bool DoPrint; // set true to print debugging info
 		// Flow
 
 		ASHWAT_Thermal = false; // init to failure
@@ -5014,8 +5059,6 @@ namespace WindowEquivalentLayer {
 		if ( NL < 1 ) return ASHWAT_Thermal;
 
 		HCOCFout = HCOUT; // outdoor side
-
-		IM_ON = 1;
 
 		HHAT = 0.0;
 		HC = 0.0;
@@ -5200,64 +5243,64 @@ namespace WindowEquivalentLayer {
 			A = 0.0;
 
 			L = 1;
-			A( L, 1 ) = 1.0;
-			A( L, 2 ) = -1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
-			A( L, ADIM + 1 ) = EPSB_OUT * StefanBoltzmann * TRMOUT_4;
+			A( 1, L ) = 1.0;
+			A( 2, L ) = -1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
+			A( ADIM + 1, L ) = EPSB_OUT * StefanBoltzmann * TRMOUT_4;
 
 			for ( I = 1; I <= NL; ++I ) {
 				L = 3 * I - 1;
-				A( L, 3 * I - 2 ) = RHOF( I );
-				A( L, 3 * I - 1 ) = -1.0;
-				A( L, 3 * I ) = EPSF( I ); //  LWP( I)%EPSLF
-				A( L, 3 * I + 2 ) = TAU( I ); //  LWP( I)%TAUL
-				A( L, ADIM + 1 ) = 0.0;
+				A( 3 * I - 2, L ) = RHOF( I );
+				A( 3 * I - 1, L ) = -1.0;
+				A( 3 * I, L ) = EPSF( I ); //  LWP( I)%EPSLF
+				A( 3 * I + 2, L ) = TAU( I ); //  LWP( I)%TAUL
+				A( ADIM + 1, L ) = 0.0;
 
 				L = 3 * I;
 				if ( NL == 1 ) {
-					A( L, 1 ) = 1.0; // Single layer
-					A( L, 2 ) = -1.0;
-					A( L, 3 ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
-					A( L, 4 ) = -1.0;
-					A( L, 5 ) = 1.0;
-					A( L, ADIM + 1 ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + HHAT( 1 ) * EB( 2 ) + SOURCE( 1 ) + QOCF( 1 ) );
+					A( 1, L ) = 1.0; // Single layer
+					A( 2, L ) = -1.0;
+					A( 3, L ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
+					A( 4, L ) = -1.0;
+					A( 5, L ) = 1.0;
+					A( ADIM + 1, L ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + HHAT( 1 ) * EB( 2 ) + SOURCE( 1 ) + QOCF( 1 ) );
 				} else if ( I == 1 ) {
-					A( L, 1 ) = 1.0; //  Outdoor layer
-					A( L, 2 ) = -1.0;
-					A( L, 3 ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
-					A( L, 4 ) = -1.0;
-					A( L, 5 ) = 1.0;
-					A( L, 6 ) = HHAT( 1 );
-					A( L, ADIM + 1 ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + SOURCE( 1 ) + QOCF( 1 ) );
+					A( 1, L ) = 1.0; //  Outdoor layer
+					A( 2, L ) = -1.0;
+					A( 3, L ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
+					A( 4, L ) = -1.0;
+					A( 5, L ) = 1.0;
+					A( 6, L ) = HHAT( 1 );
+					A( ADIM + 1, L ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + SOURCE( 1 ) + QOCF( 1 ) );
 				} else if ( I == NL ) {
-					A( L, 3 * NL - 3 ) = HHAT( NL - 1 ); // Indoor layer
-					A( L, 3 * NL - 2 ) = 1.0;
-					A( L, 3 * NL - 1 ) = -1.0;
-					A( L, 3 * NL ) = -1.0 * ( HHAT( NL ) + HHAT( NL - 1 ) );
-					A( L, 3 * NL + 1 ) = -1.0;
-					A( L, 3 * NL + 2 ) = 1.0;
-					A( L, ADIM + 1 ) = -1.0 * ( HHAT( NL ) * EB( NL + 1 ) + SOURCE( NL ) + QOCF( NL ) );
+					A( 3 * NL - 3, L ) = HHAT( NL - 1 ); // Indoor layer
+					A( 3 * NL - 2, L ) = 1.0;
+					A( 3 * NL - 1, L ) = -1.0;
+					A( 3 * NL, L ) = -1.0 * ( HHAT( NL ) + HHAT( NL - 1 ) );
+					A( 3 * NL + 1, L ) = -1.0;
+					A( 3 * NL + 2, L ) = 1.0;
+					A( ADIM + 1, L ) = -1.0 * ( HHAT( NL ) * EB( NL + 1 ) + SOURCE( NL ) + QOCF( NL ) );
 				} else {
-					A( L, 3 * I - 3 ) = HHAT( I - 1 );
-					A( L, 3 * I - 2 ) = 1.0;
-					A( L, 3 * I - 1 ) = -1.0;
-					A( L, 3 * I ) = -1.0 * ( HHAT( I ) + HHAT( I - 1 ) );
-					A( L, 3 * I + 1 ) = -1.0;
-					A( L, 3 * I + 2 ) = 1.0;
-					A( L, 3 * I + 3 ) = HHAT( I );
-					A( L, ADIM + 1 ) = -1.0 * ( SOURCE( I ) + QOCF( I ) );
+					A( 3 * I - 3, L ) = HHAT( I - 1 );
+					A( 3 * I - 2, L ) = 1.0;
+					A( 3 * I - 1, L ) = -1.0;
+					A( 3 * I, L ) = -1.0 * ( HHAT( I ) + HHAT( I - 1 ) );
+					A( 3 * I + 1, L ) = -1.0;
+					A( 3 * I + 2, L ) = 1.0;
+					A( 3 * I + 3, L ) = HHAT( I );
+					A( ADIM + 1, L ) = -1.0 * ( SOURCE( I ) + QOCF( I ) );
 				}
 				L = 3 * I + 1;
-				A( L, 3 * I - 2 ) = TAU( I ); //   LWP( I)%TAUL
-				A( L, 3 * I ) = EPSB( I ); //   LWP( I)%EPSLB
-				A( L, 3 * I + 1 ) = -1.0;
-				A( L, 3 * I + 2 ) = RHOB( I );
-				A( L, ADIM + 1 ) = 0.0;
+				A( 3 * I - 2, L ) = TAU( I ); //   LWP( I)%TAUL
+				A( 3 * I, L ) = EPSB( I ); //   LWP( I)%EPSLB
+				A( 3 * I + 1, L ) = -1.0;
+				A( 3 * I + 2, L ) = RHOB( I );
+				A( ADIM + 1, L ) = 0.0;
 			}
 
 			L = 3 * NL + 2;
-			A( L, 3 * NL + 1 ) = -1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
-			A( L, 3 * NL + 2 ) = 1.0;
-			A( L, ADIM + 1 ) = EPSF_ROOM * StefanBoltzmann * TRMIN_4;
+			A( 3 * NL + 1, L ) = -1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
+			A( 3 * NL + 2, L ) = 1.0;
+			A( ADIM + 1, L ) = EPSF_ROOM * StefanBoltzmann * TRMIN_4;
 
 			//  SOLVE MATRIX
 
@@ -5471,8 +5514,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HC2D( I, I + 1 ) = HC( I );
-				HC2D( I + 1, I ) = HC2D( I, I + 1 );
+				HC2D( I + 1, I ) = HC( I );
+				HC2D( I, I + 1 ) = HC2D( I + 1, I );
 			}
 		}
 
@@ -5481,8 +5524,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HC2D( I - 1, I + 1 ) = HJC( I );
-				HC2D( I + 1, I - 1 ) = HC2D( I - 1, I + 1 );
+				HC2D( I + 1, I - 1 ) = HJC( I );
+				HC2D( I - 1, I + 1 ) = HC2D( I + 1, I - 1 );
 			}
 		}
 
@@ -5513,8 +5556,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HR2D( I, I + 1 ) = HR( I );
-				HR2D( I + 1, I ) = HR2D( I, I + 1 );
+				HR2D( I + 1, I ) = HR( I );
+				HR2D( I, I + 1 ) = HR2D( I + 1, I );
 			}
 		}
 
@@ -5523,8 +5566,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HR2D( I - 1, I + 1 ) = HJR( I );
-				HR2D( I + 1, I - 1 ) = HR2D( I - 1, I + 1 );
+				HR2D( I + 1, I - 1 ) = HJR( I );
+				HR2D( I - 1, I + 1 ) = HR2D( I + 1, I - 1 );
 			}
 		}
 
@@ -5569,12 +5612,12 @@ namespace WindowEquivalentLayer {
 			SOURCEdv = SOURCE;
 
 			for ( I = 1; I <= NL; ++I ) {
-				A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+				A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 				A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 				for ( J = 1; J <= NL; ++J ) {
 					if ( J != I ) {
-						A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-						A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+						A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+						A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 					}
 				}
 			}
@@ -5606,12 +5649,12 @@ namespace WindowEquivalentLayer {
 		SOURCEdv = 0.0;
 
 		for ( I = 1; I <= NL; ++I ) {
-			A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+			A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 			A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
-					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+					A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 				}
 			}
 
@@ -5652,12 +5695,12 @@ namespace WindowEquivalentLayer {
 			}
 
 			for ( I = 1; I <= NL; ++I ) {
-				A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+				A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 				A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 				for ( J = 1; J <= NL; ++J ) {
 					if ( J != I ) {
-						A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-						A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+						A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+						A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 					}
 				}
 			}
@@ -5694,12 +5737,12 @@ namespace WindowEquivalentLayer {
 		SOURCEdv = 0.0;
 
 		for ( I = 1; I <= NL; ++I ) {
-			A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+			A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 			A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
-					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+					A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 				}
 			}
 		}
@@ -5736,12 +5779,12 @@ namespace WindowEquivalentLayer {
 		SOURCEdv = 0.0;
 
 		for ( I = 1; I <= NL; ++I ) {
-			A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+			A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 			A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
-					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+					A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 				}
 			}
 		}
@@ -5846,21 +5889,14 @@ namespace WindowEquivalentLayer {
 		Real64 Epsdf;
 		Real64 Epsdb;
 		Real64 Epsm;
-		FArray2D< Real64 > A( 20, 22 );
-		FArray1D< Real64 > X( 20 );
+		Array2D< Real64 > A( 22, 20 );
+		Array1D< Real64 > X( 20 );
 		// real FSg_g, FSdf_g, FSdb_g, FSm_g
 		Real64 FSg_df;
-		Real64 FSdf_df;
-		Real64 FSdb_df;
 		Real64 FSm_df;
 		Real64 FSg_db;
-		Real64 FSdf_db;
-		Real64 FSdb_db;
 		Real64 FSm_db;
 		Real64 FSg_m;
-		Real64 FSdf_m;
-		Real64 FSdb_m;
-		Real64 FSm_m;
 
 		//  Calculate 4 emissivities/absorptivities
 
@@ -5878,7 +5914,7 @@ namespace WindowEquivalentLayer {
 		// step 1:  unit emission from (g) only
 
 		SETUP4x4_A( rhog, rhodf, rhodb, taud, rhom, A );
-		A( 1, 5 ) = 1.0; // unit source of radiation
+		A( 5, 1 ) = 1.0; // unit source of radiation
 		SOLMATS( 4, A, X );
 		FSg_df = X( 1 );
 		//  FSg_g   = X(2)
@@ -5908,7 +5944,7 @@ namespace WindowEquivalentLayer {
 		// step 4:  unit emission from (m) only
 
 		SETUP4x4_A( rhog, rhodf, rhodb, taud, rhom, A );
-		A( 4, 5 ) = 1.0; // unit source of radiation
+		A( 5, 4 ) = 1.0; // unit source of radiation
 		SOLMATS( 4, A, X );
 		FSm_df = X( 1 );
 		//  FSm_g   = X(2)
@@ -5936,7 +5972,7 @@ namespace WindowEquivalentLayer {
 		Real64 const rhodb,
 		Real64 const taud,
 		Real64 const rhom,
-		FArray2A< Real64 > A
+		Array2A< Real64 > A
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -5957,7 +5993,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Argument array dimensioning
-		A.dim( 20, 22 );
+		A.dim( 22, 20 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5978,14 +6014,14 @@ namespace WindowEquivalentLayer {
 
 		A = 0.0;
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -1.0 * rhog;
-		A( 2, 1 ) = -1.0 * rhodf;
+		A( 2, 1 ) = -1.0 * rhog;
+		A( 1, 2 ) = -1.0 * rhodf;
 		A( 2, 2 ) = 1.0;
-		A( 2, 4 ) = -1.0 * taud;
-		A( 3, 1 ) = -1.0 * taud;
+		A( 4, 2 ) = -1.0 * taud;
+		A( 1, 3 ) = -1.0 * taud;
 		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -1.0 * rhodb;
-		A( 4, 3 ) = -1.0 * rhom;
+		A( 4, 3 ) = -1.0 * rhodb;
+		A( 3, 4 ) = -1.0 * rhom;
 		A( 4, 4 ) = 1.0;
 
 	}
@@ -6000,10 +6036,10 @@ namespace WindowEquivalentLayer {
 		Real64 const CK,
 		Real64 const ACP, // gas specific heat coeffs, CP = ACP + BCP*TM + CCP*TM*TM
 		Real64 const BCP,
-		Real64 const CCP,
+		Real64 const EP_UNUSED( CCP ),
 		Real64 const AVISC, // gas viscosity coeffs, VISC = AVISC + BVISC*TM + CVISC*TM*TM
 		Real64 const BVISC,
-		Real64 const CVISC,
+		Real64 const EP_UNUSED( CVISC ),
 		Real64 const RHOGAS // gas density, kg/m3
 	)
 	{
@@ -6295,7 +6331,6 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 b;
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6387,7 +6422,6 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// a
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6514,7 +6548,6 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6689,20 +6722,16 @@ namespace WindowEquivalentLayer {
 		Real64 TRMOUT;
 		Real64 TIABS;
 		Real64 TRMIN;
-		FArray1D< Real64 > QOCF( FS.NL );
+		Array1D< Real64 > QOCF( FS.NL );
 		Real64 QOCFRoom;
-		FArray1D< Real64 > JB( {0,FS.NL} );
-		FArray1D< Real64 > JF( {1,FS.NL+1} );
-		FArray1D< Real64 > T( FS.NL );
-		FArray1D< Real64 > Q( {0,FS.NL} );
-		FArray1D< Real64 > H( {0,FS.NL+1} );
-		FArray1D< Real64 > SOURCE( FS.NL+1 );
+		Array1D< Real64 > JB( {0,FS.NL} );
+		Array1D< Real64 > JF( {1,FS.NL+1} );
+		Array1D< Real64 > T( FS.NL );
+		Array1D< Real64 > Q( {0,FS.NL} );
+		Array1D< Real64 > H( {0,FS.NL+1} );
+		Array1D< Real64 > SOURCE( FS.NL+1 );
 		Real64 ISOL;
-		Real64 UX;
 		Real64 SHGC;
-		Real64 QRLW;
-		Real64 QCONV;
-		Real64 QROOM;
 		// Flow
 
 		CFSUFactor = false;
@@ -6729,13 +6758,13 @@ namespace WindowEquivalentLayer {
 	void
 	ASHWAT_Solar(
 		int const NL, // # of layers
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		CFSSWP const & SWP_ROOM, // effective SW (solar) properties of room
 		Real64 const IBEAM, // incident beam insolation (W/m2 aperture)
 		Real64 const IDIFF, // incident diffuse insolation (W/m2 aperture)
 		Real64 const ILIGHTS, // incident diffuse insolation (W/m2 aperture)
-		FArray1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
-		Optional< FArray1S< Real64 > > SourceBD // returned: layer-by-layer flux of absorbed
+		Array1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
+		Optional< Array1S< Real64 > > SourceBD // returned: layer-by-layer flux of absorbed
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6780,23 +6809,23 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
-		FArray1D< Real64 > BPLUS( {0,NL} ); // beam solar fluxes flowing in outward and inward directions
-		FArray1D< Real64 > BMINUS( {0,NL} );
+		Array1D< Real64 > BPLUS( {0,NL} ); // beam solar fluxes flowing in outward and inward directions
+		Array1D< Real64 > BMINUS( {0,NL} );
 		//   correspond to Edwards QPLUS and QMINUS (except note
 		//   reverse layer numbering)
-		FArray1D< Real64 > CPLUS( {0,NL} ); // diffuse solar fluxes caused by BPLUS and BMINUS;
-		FArray1D< Real64 > CMINUS( {0,NL} );
+		Array1D< Real64 > CPLUS( {0,NL} ); // diffuse solar fluxes caused by BPLUS and BMINUS;
+		Array1D< Real64 > CMINUS( {0,NL} );
 		//   appear as sources in diffuse calculation
-		FArray1D< Real64 > DPLUS( {0,NL} ); // diffuse solar fluxes flowing in outward and inward
-		FArray1D< Real64 > DMINUS( {0,NL} );
+		Array1D< Real64 > DPLUS( {0,NL} ); // diffuse solar fluxes flowing in outward and inward
+		Array1D< Real64 > DMINUS( {0,NL} );
 		//   directions (W/m2)
-		FArray1D< Real64 > AP( 2*NL );
-		FArray1D< Real64 > AE( 2*NL );
-		FArray1D< Real64 > AW( 2*NL );
-		FArray1D< Real64 > BP( 2*NL );
-		FArray1D< Real64 > X( 2*NL );
+		Array1D< Real64 > AP( 2*NL );
+		Array1D< Real64 > AE( 2*NL );
+		Array1D< Real64 > AW( 2*NL );
+		Array1D< Real64 > BP( 2*NL );
+		Array1D< Real64 > X( 2*NL );
 		Real64 CHKSUM;
-		FArray1D< Real64 > BeamDiffuseAbs( NL+1 ); // beam-diffuse absorbed fraction of beam radiation (W/m2)
+		Array1D< Real64 > BeamDiffuseAbs( NL+1 ); // beam-diffuse absorbed fraction of beam radiation (W/m2)
 		int N_TDMA;
 		int I;
 		int LINE;
@@ -6901,11 +6930,11 @@ namespace WindowEquivalentLayer {
 	void
 	NETRAD(
 		int const NL, // # of layers, 1=outside .. NL=inside
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		Real64 const RHO_room, // effective solar reflectance of room (at inside)
 		Real64 const ISOL, // incident flux (W/m2)
-		FArray1< Real64 > & QPLUS, // returned: see Edwards paper
-		FArray1< Real64 > & QMINUS // returned: see Edwards paper
+		Array1< Real64 > & QPLUS, // returned: see Edwards paper
+		Array1< Real64 > & QMINUS // returned: see Edwards paper
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6943,8 +6972,8 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TED( NL+1 );
-		FArray1D< Real64 > RED( NL+1 );
+		Array1D< Real64 > TED( NL+1 );
+		Array1D< Real64 > RED( NL+1 );
 
 		//   Reflectance and Transmittance
 
@@ -6967,11 +6996,11 @@ namespace WindowEquivalentLayer {
 
 	void
 	TDMA_R(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	)
 	{
@@ -7005,8 +7034,8 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int J;
-		FArray1D< Real64 > ALPHA( N );
-		FArray1D< Real64 > BETA( N );
+		Array1D< Real64 > ALPHA( N );
+		Array1D< Real64 > BETA( N );
 		// Flow
 
 		ALPHA( N ) = AW( N ) / AP( N );
@@ -7025,11 +7054,11 @@ namespace WindowEquivalentLayer {
 
 	void
 	TDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	)
 	{
@@ -7063,8 +7092,8 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int J;
-		FArray1D< Real64 > ALPHA( N );
-		FArray1D< Real64 > BETA( N );
+		Array1D< Real64 > ALPHA( N );
+		Array1D< Real64 > BETA( N );
 		Real64 D;
 		// Flow
 
@@ -7090,11 +7119,11 @@ namespace WindowEquivalentLayer {
 
 	void
 	AUTOTDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int & N
 	)
 	{
@@ -7442,7 +7471,7 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 X1MRDiff( -1.0 );
 		static Real64 XTAUDiff( -1.0 );
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		// Flow
 
 		if ( XTAUDiff < 0.0 ) {
@@ -7458,7 +7487,7 @@ namespace WindowEquivalentLayer {
 	Specular_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters (none defined)
+		Array1A< Real64 > const P // parameters (none defined)
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -7960,8 +7989,6 @@ namespace WindowEquivalentLayer {
 		bool DODIFFUSE;
 		Real64 RHOBF_BT0;
 		Real64 RHOFF_BT0;
-		Real64 TAUBF_BT0;
-		Real64 TAUFF_BT0;
 		Real64 TAUX;
 		// Flow
 
@@ -8855,7 +8882,6 @@ namespace WindowEquivalentLayer {
 		// may be within L
 		static std::string const RoutineName( "FillDefaultsSWP: " );
 		bool OK;
-		bool ErrorsFound;
 		// Flow
 
 		// default back taus to front (often equal)
@@ -9180,7 +9206,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLOpticalProperty(
 		int const SurfNum,
 		int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-		FArray2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
+		Array2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
 	)
 	{
 
@@ -9207,7 +9233,7 @@ namespace WindowEquivalentLayer {
 		using DaylightingManager::ProfileAngle;
 
 		// Argument array dimensioning
-		CFSAbs.dim( CFSMAXNL+1, 2 );
+		CFSAbs.dim( 2, CFSMAXNL+1 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9225,13 +9251,10 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngHor; // Solar profile angle (radians) for horizontal blind
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
-		Real64 IncidAngle; // = ACOS(SOLCOS(3))
-		static FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		static Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index
-		int I; // index
-		int J; // index
 		// Flow
 
 		IncAng = 0.0; //Autodesk:Init Added to elim use uninitialized
@@ -9242,7 +9265,7 @@ namespace WindowEquivalentLayer {
 		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
 
 		if ( BeamDIffFlag != isDIFF ) {
-			if ( CosIncAng( SurfNum, HourOfDay, TimeStep ) <= 0.0 ) return;
+			if ( CosIncAng( TimeStep, HourOfDay, SurfNum ) <= 0.0 ) return;
 
 			for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 				if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
@@ -9254,10 +9277,10 @@ namespace WindowEquivalentLayer {
 				}
 			}
 			// Incident angle
-			IncAng = std::acos( CosIncAng( SurfNum, HourOfDay, TimeStep ) );
+			IncAng = std::acos( CosIncAng( TimeStep, HourOfDay, SurfNum ) );
 			CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
-			CFSAbs( {1,CFSMAXNL + 1}, 1 ) = Abs1( {1,CFSMAXNL + 1}, 1 );
-			CFSAbs( {1,CFSMAXNL + 1}, 2 ) = Abs1( {1,CFSMAXNL + 1}, 2 );
+			CFSAbs( 1, {1,CFSMAXNL + 1} ) = Abs1( 1, {1,CFSMAXNL + 1} );
+			CFSAbs( 2, {1,CFSMAXNL + 1} ) = Abs1( 2, {1,CFSMAXNL + 1} );
 		} else {
 			if ( EQLDiffPropFlag( EQLNum ) ) {
 				for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
@@ -9270,19 +9293,19 @@ namespace WindowEquivalentLayer {
 					}
 				}
 				CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
-				CFSAbs( {1,CFSMAXNL + 1}, _ ) = Abs1( {1,CFSMAXNL + 1}, _ );
-				CFSDiffAbsTrans( EQLNum, {1,CFSMAXNL + 1}, _ ) = Abs1( {1,CFSMAXNL + 1}, _ );
-				Construct( ConstrNum ).TransDiff = Abs1( CFS( EQLNum ).NL + 1, 1 );
-				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = Abs1( {1,CFSMAXNL}, 1 );
-				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = Abs1( {1,CFSMAXNL}, 2 );
+				CFSAbs( _, {1,CFSMAXNL + 1} ) = Abs1( _, {1,CFSMAXNL + 1} );
+				CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum ) = Abs1( _, {1,CFSMAXNL + 1} );
+				Construct( ConstrNum ).TransDiff = Abs1( 1, CFS( EQLNum ).NL + 1 );
+				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = Abs1( 1, {1,CFSMAXNL} );
+				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = Abs1( 2, {1,CFSMAXNL} );
 				Construct( ConstrNum ).ReflectSolDiffFront = CFS( EQLNum ).L( 1 ).SWP_EL.RHOSFDD;
 				Construct( ConstrNum ).ReflectSolDiffBack = CFS( EQLNum ).L( CFS( EQLNum ).NL ).SWP_EL.RHOSBDD;
 				if ( ! CFS( EQLNum ).ISControlled ) EQLDiffPropFlag( EQLNum ) = false;
 			} else {
-				CFSAbs( {1,CFSMAXNL + 1}, _ ) = CFSDiffAbsTrans( EQLNum, {1,CFSMAXNL + 1}, _ );
-				Construct( ConstrNum ).TransDiff = CFSDiffAbsTrans( EQLNum, CFS( EQLNum ).NL + 1, 1 );
-				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = CFSAbs( {1,CFSMAXNL}, 1 );
-				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( {1,CFSMAXNL}, 2 );
+				CFSAbs( _, {1,CFSMAXNL + 1} ) = CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum );
+				Construct( ConstrNum ).TransDiff = CFSDiffAbsTrans( 1, CFS( EQLNum ).NL + 1, EQLNum );
+				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = CFSAbs( 1, {1,CFSMAXNL} );
+				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( 2, {1,CFSMAXNL} );
 			}
 		}
 
@@ -9367,7 +9390,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 InsideLWEmiss; // LW inside emissivity
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9503,29 +9525,6 @@ namespace WindowEquivalentLayer {
 
 		return hcin;
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WindowEquivalentLayer
 

@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -20,6 +78,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <EMSManager.hh>
 
 namespace EnergyPlus {
 
@@ -73,28 +132,49 @@ namespace NodeInputManager {
 	// The following is a module level flag because there are several possible "entries" into
 	// this module that may need to get the Node Inputs.
 	bool GetNodeInputFlag( true ); // Flag to Get Node Input(s)
-	FArray1D_string TmpNodeID; // Used to "reallocate" name arrays
-	FArray1D_int NodeRef; // Number of times a Node is "referenced"
+	Array1D_string TmpNodeID; // Used to "reallocate" name arrays
+	Array1D_int NodeRef; // Number of times a Node is "referenced"
 	std::string CurCheckContextName; // Used in Uniqueness checks
-	FArray1D_string UniqueNodeNames; // used in uniqueness checks
+	Array1D_string UniqueNodeNames; // used in uniqueness checks
 	int NumCheckNodes( 0 ); // Num of Unique nodes in check
 	int MaxCheckNodes( 0 ); // Current "max" unique nodes in check
 	bool NodeVarsSetup( false ); // Setup indicator of node vars for reporting (also that all nodes have been entered)
-	FArray1D_bool NodeWetBulbRepReq;
+	Array1D_bool NodeWetBulbRepReq;
 
 	// Object Data
-	FArray1D< NodeListDef > NodeLists; // Node Lists
-
+	Array1D< NodeListDef > NodeLists; // Node Lists
+	namespace {
+		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
+	}
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
 
+	// Clears the global data in NodeInputManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		CalcMoreNodeInfoMyOneTimeFlag = true;
+		NumOfNodeLists = 0;
+		NumOfUniqueNodeNames = 0;
+		GetNodeInputFlag = true;
+		TmpNodeID.deallocate();
+		NodeRef.deallocate();
+		CurCheckContextName = std::string();
+		UniqueNodeNames.deallocate();
+		NumCheckNodes = 0;
+		MaxCheckNodes = 0;
+		NodeVarsSetup = false;
+		NodeLists.deallocate();
+	}
+
 	void
 	GetNodeNums(
 		std::string const & Name, // Name for which to obtain information
 		int & NumNodes, // Number of nodes accompanying this Name
-		FArray1S_int NodeNumbers, // Node Numbers accompanying this Name
+		Array1S_int NodeNumbers, // Node Numbers accompanying this Name
 		bool & ErrorsFound, // True when errors are found...
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
@@ -167,7 +247,7 @@ namespace NodeInputManager {
 		}
 
 		if ( not_blank( Name ) ) {
-			ThisOne = FindItemInList( Name, NodeLists.Name(), NumOfNodeLists );
+			ThisOne = FindItemInList( Name, NodeLists );
 			if ( ThisOne != 0 ) {
 				NumNodes = NodeLists( ThisOne ).NumOfNodesInList;
 				NodeNumbers( {1,NumNodes} ) = NodeLists( ThisOne ).NodeNumbers( {1,NumNodes} );
@@ -218,7 +298,7 @@ namespace NodeInputManager {
 	GetNodeList(
 		std::string const & Name, // Node List Name for which information is obtained
 		int & NumNodes, // Number of nodes accompanying this Name
-		FArray1S_int NodeNumbers, // NodeNumbers accompanying this Name
+		Array1S_int NodeNumbers, // NodeNumbers accompanying this Name
 		bool & errFlag, // Set to true when requested Node List not found
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
@@ -280,7 +360,7 @@ namespace NodeInputManager {
 
 		Try = 0;
 		if ( NumOfNodeLists > 0 ) {
-			Try = FindItemInList( Name, NodeLists( {1,NumOfNodeLists} ).Name(), NumOfNodeLists );
+			Try = FindItemInList( Name, NodeLists );
 		}
 
 		if ( Try != 0 ) {
@@ -369,6 +449,7 @@ namespace NodeInputManager {
 					if ( Node( NumNode ).FluidType == NodeType_Air || Node( NumNode ).FluidType == NodeType_Water ) { // setup volume flow rate report for actual/current density
 						SetupOutputVariable( "System Node Current Density Volume Flow Rate [m3/s]", MoreNodeInfo( NumNode ).VolFlowRateCrntRho, "System", "Average", NodeID( NumNode ) );
 						SetupOutputVariable( "System Node Current Density [kg/m3]", MoreNodeInfo( NumNode ).Density, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Specific Heat [J/kg-K]", MoreNodeInfo( NumNode ).SpecificHeat, "System", "Average", NodeID( NumNode ) );
 					}
 
 					SetupOutputVariable( "System Node Enthalpy [J/kg]", MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
@@ -491,8 +572,8 @@ namespace NodeInputManager {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool flagError; // true when error node list name should be output
-		FArray1D_string cAlphas;
-		FArray1D< Real64 > rNumbers;
+		Array1D_string cAlphas;
+		Array1D< Real64 > rNumbers;
 
 		ErrorsFound = false;
 		GetObjectDefMaxArgs( CurrentModuleObject, NCount, NumAlphas, NumNumbers );
@@ -500,9 +581,9 @@ namespace NodeInputManager {
 		rNumbers.allocate( NumNumbers );
 		NumOfNodeLists = GetNumObjectsFound( CurrentModuleObject );
 		NodeLists.allocate( NumOfNodeLists );
-		if ( NumOfNodeLists > 0 ) {
-			NodeLists( {1,NumOfNodeLists} ).Name() = "";
-			NodeLists( {1,NumOfNodeLists} ).NumOfNodesInList() = 0;
+		for ( int i = 1; i <= NumOfNodeLists; ++i ) {
+			NodeLists( i ).Name.clear();
+			NodeLists( i ).NumOfNodesInList = 0;
 		}
 
 		NCount = 0;
@@ -510,7 +591,7 @@ namespace NodeInputManager {
 			GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphas( 1 ), NodeLists.Name(), NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -744,7 +825,7 @@ namespace NodeInputManager {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NumNodes;
-		static FArray1D_int NodeNums;
+		static Array1D_int NodeNums;
 		int FluidType;
 		std::string ConnectionType;
 		static bool firstTime( true );
@@ -1022,9 +1103,6 @@ namespace NodeInputManager {
 		// Input is the existing node data plus environment variables. Output is
 		// stored in MoreNodeInfo.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutBaroPress;
@@ -1036,7 +1114,7 @@ namespace NodeInputManager {
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyTdpFnWPb;
-		using DataGlobals::InitConvTemp;
+		using Psychrometrics::PsyCpAirFnWTdb;
 		using OutputProcessor::ReqReportVariables;
 		using OutputProcessor::ReqRepVars;
 		using OutputProcessor::NumOfReqVariables;
@@ -1049,53 +1127,47 @@ namespace NodeInputManager {
 		using FluidProperties::NumOfGlycols;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMoreNodeInfo" );
 		static std::string const NodeReportingCalc( "NodeReportingCalc:" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
 		int iReq; // requested report variables loop index
-		static bool MyOneTimeFlag( true ); // one time flag
+
 		static Real64 RhoAirStdInit;
 		static Real64 RhoWaterStdInit;
-		static FArray1D_int NodeWetBulbSchedPtr;
-		static FArray1D_bool NodeRelHumidityRepReq;
-		static FArray1D_int NodeRelHumiditySchedPtr;
-		static FArray1D_bool NodeDewPointRepReq;
-		static FArray1D_int NodeDewPointSchedPtr;
+		static Array1D_int NodeWetBulbSchedPtr;
+		static Array1D_bool NodeRelHumidityRepReq;
+		static Array1D_int NodeRelHumiditySchedPtr;
+		static Array1D_bool NodeDewPointRepReq;
+		static Array1D_int NodeDewPointSchedPtr;
+		static Array1D_bool NodeSpecificHeatRepReq;
+		static Array1D_int NodeSpecificHeatSchedPtr;
 		static std::vector<std::string> nodeReportingStrings;
 		static std::vector<std::string> nodeFluidNames;
 		bool ReportWetBulb;
 		bool ReportRelHumidity;
 		bool ReportDewPoint;
+		bool ReportSpecificHeat;
 		Real64 SteamDensity;
 		Real64 EnthSteamInDry;
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
-		//  REAL(r64)     :: rRhoVapor
-		//  INTEGER,save :: Count=0
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
 
-		if ( MyOneTimeFlag ) {
+		if ( CalcMoreNodeInfoMyOneTimeFlag ) {
 			RhoAirStdInit = StdRhoAir;
-			RhoWaterStdInit = RhoH2O( InitConvTemp );
+			RhoWaterStdInit = RhoH2O( DataGlobals::InitConvTemp );
 			NodeWetBulbRepReq.allocate( NumOfNodes );
 			NodeWetBulbSchedPtr.allocate( NumOfNodes );
 			NodeRelHumidityRepReq.allocate( NumOfNodes );
 			NodeRelHumiditySchedPtr.allocate( NumOfNodes );
 			NodeDewPointRepReq.allocate( NumOfNodes );
 			NodeDewPointSchedPtr.allocate( NumOfNodes );
+			NodeSpecificHeatRepReq.allocate( NumOfNodes );
+			NodeSpecificHeatSchedPtr.allocate( NumOfNodes );
 			nodeReportingStrings.reserve( NumOfNodes );
 			nodeFluidNames.reserve( NumOfNodes );
 			NodeWetBulbRepReq = false;
@@ -1104,6 +1176,8 @@ namespace NodeInputManager {
 			NodeRelHumiditySchedPtr = 0;
 			NodeDewPointRepReq = false;
 			NodeDewPointSchedPtr = 0;
+			NodeSpecificHeatRepReq = false;
+			NodeSpecificHeatSchedPtr = 0;
 
 			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
 				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
@@ -1119,17 +1193,39 @@ namespace NodeInputManager {
 						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
 							NodeDewPointRepReq( iNode ) = true;
 							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Specific Heat" ) ) {
+							NodeSpecificHeatRepReq( iNode ) = true;
+							NodeSpecificHeatSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
 						}
 					}
 				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) {
+					NodeWetBulbRepReq( iNode ) = true;
+					NodeWetBulbSchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Relative Humidity" ) ) {
+					NodeRelHumidityRepReq( iNode ) = true;
+					NodeRelHumiditySchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Dewpoint Temperature" ) ) {
+					NodeDewPointRepReq( iNode ) = true;
+					NodeDewPointSchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Specific Heat" ) ) {
+					NodeSpecificHeatRepReq( iNode ) = true;
+					NodeSpecificHeatSchedPtr( iNode ) = 0;
+				}
+
+
 			}
-			MyOneTimeFlag = false;
+			CalcMoreNodeInfoMyOneTimeFlag = false;
 		}
 
 		for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
 			ReportWetBulb = false;
 			ReportRelHumidity = false;
 			ReportDewPoint = false;
+			ReportSpecificHeat = false;
 			if ( NodeWetBulbRepReq( iNode ) && NodeWetBulbSchedPtr( iNode ) > 0 ) {
 				ReportWetBulb = ( GetCurrentScheduleValue( NodeWetBulbSchedPtr( iNode ) ) > 0.0 );
 			} else if ( NodeWetBulbRepReq( iNode ) && NodeWetBulbSchedPtr( iNode ) == 0 ) {
@@ -1146,6 +1242,11 @@ namespace NodeInputManager {
 				ReportDewPoint = ( GetCurrentScheduleValue( NodeDewPointSchedPtr( iNode ) ) > 0.0 );
 			} else if ( NodeDewPointRepReq( iNode ) && NodeDewPointSchedPtr( iNode ) == 0 ) {
 				ReportDewPoint = true;
+			}
+			if ( NodeSpecificHeatRepReq( iNode ) && NodeSpecificHeatSchedPtr( iNode ) > 0 ) {
+				ReportSpecificHeat = ( GetCurrentScheduleValue( NodeSpecificHeatSchedPtr( iNode ) ) > 0.0 );
+			} else if ( NodeSpecificHeatRepReq( iNode ) && NodeSpecificHeatSchedPtr( iNode ) == 0 ) {
+				ReportSpecificHeat = true;
 			}
 			// calculate the volume flow rate
 			if ( Node( iNode ).FluidType == NodeType_Air ) {
@@ -1177,6 +1278,11 @@ namespace NodeInputManager {
 				} else {
 					MoreNodeInfo( iNode ).RelHumidity = 0.0;
 				}
+				if ( ReportSpecificHeat ) { //only call psych routine if needed.
+					MoreNodeInfo( iNode ).SpecificHeat = PsyCpAirFnWTdb( Node( iNode ).HumRat,  Node( iNode ).Temp );
+				} else {
+					MoreNodeInfo( iNode ).SpecificHeat = 0.0;
+				}
 			} else if ( Node( iNode ).FluidType == NodeType_Water ) {
 
 				if ( ! ( ( Node( iNode ).FluidIndex > 0 ) && ( Node( iNode ).FluidIndex <= NumOfGlycols ) ) ) {
@@ -1185,7 +1291,7 @@ namespace NodeInputManager {
 					Cp = CPCW( Node( iNode ).Temp );
 				} else {
 					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
-					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], DataGlobals::InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 					rho = GetDensityGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 				}
 
@@ -1193,6 +1299,7 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).VolFlowRateCrntRho = Node( iNode ).MassFlowRate / rho;
 				MoreNodeInfo( iNode ).Density = rho;
 				MoreNodeInfo( iNode ).ReportEnthalpy = Cp * Node( iNode ).Temp;
+				MoreNodeInfo( iNode ).SpecificHeat =  Cp; //always fill since cp already always being calculated anyway
 				MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				MoreNodeInfo( iNode ).RelHumidity = 100.0;
 			} else if ( Node( iNode ).FluidType == NodeType_Steam ) {
@@ -1214,6 +1321,7 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).ReportEnthalpy = 0.0;
 				MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				MoreNodeInfo( iNode ).RelHumidity = 0.0;
+				MoreNodeInfo( iNode ).SpecificHeat = 0.0;
 			} else {
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / RhoAirStdInit;
 				if ( Node( iNode ).HumRat > 0.0 ) {
@@ -1223,9 +1331,15 @@ namespace NodeInputManager {
 					} else {
 						MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					}
+					if ( ReportSpecificHeat ) {
+						MoreNodeInfo( iNode ).SpecificHeat = PsyCpAirFnWTdb( Node( iNode ).HumRat,  Node( iNode ).Temp );
+					} else {
+						MoreNodeInfo( iNode ).SpecificHeat = 0.0;
+					}
 				} else {
 					MoreNodeInfo( iNode ).ReportEnthalpy = CPCW( Node( iNode ).Temp ) * Node( iNode ).Temp;
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
+					MoreNodeInfo( iNode ).SpecificHeat = 0.0;
 				}
 			}
 		}
@@ -1329,29 +1443,6 @@ namespace NodeInputManager {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // NodeInputManager
 

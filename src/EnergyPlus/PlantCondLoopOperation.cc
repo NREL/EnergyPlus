@@ -1,11 +1,70 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -29,6 +88,7 @@
 #include <NodeInputManager.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SetPointManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -71,6 +131,11 @@ namespace PlantCondLoopOperation {
 	bool const TurnItemOn( true ); // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
 	bool const TurnItemOff( false ); // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
 
+	namespace{
+		bool GetPlantOpInput( true ); // operation Get Input flag
+		bool InitLoadDistributionOneTimeFlag( true );
+		bool LoadEquipListOneTimeFlag( true );
+	}
 	//MODULE VARIABLE DECLARATIONS:
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE  !SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -89,6 +154,12 @@ namespace PlantCondLoopOperation {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state(){
+		GetPlantOpInput = true;
+		InitLoadDistributionOneTimeFlag = true;
+		LoadEquipListOneTimeFlag = true;
+	}
 
 	void
 	ManagePlantLoadDistribution(
@@ -162,10 +233,6 @@ namespace PlantCondLoopOperation {
 		int NumEquipLists; // number of equipment lists
 		//Error control flags
 		bool foundlist; // equipment list found
-		bool UpperLimitTooLow; // error processing
-		Real64 HighestRange; // error processing
-		static int TooLowIndex( 0 ); // error processing
-		static int NotTooLowIndex( 0 ); // error processing
 		int NumCompsOnList;
 		int CompIndex;
 		int EquipBranchNum;
@@ -177,8 +244,8 @@ namespace PlantCondLoopOperation {
 			return;
 		}
 
-		//Return if there are no loop operation schemes available
-		if ( ! any( PlantLoop( LoopNum ).OpScheme.Available() ) ) return;
+		// Return if there are no loop operation schemes available
+		if ( ! std::any_of( PlantLoop( LoopNum ).OpScheme.begin(), PlantLoop( LoopNum ).OpScheme.end(), []( DataPlant::OperationData const & e ){ return e.Available; } ) ) return;
 
 		// set up references
 		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
@@ -358,7 +425,7 @@ namespace PlantCondLoopOperation {
 		std::string PlantOpSchemeName; // Name of the plant or condenser operating scheme
 		std::string CurrentModuleObject; // for ease in renaming
 		std::string PlantLoopObject; // for ease in renaming
-		FArray1D_string OpSchemeNames; // Used to verify unique op scheme names
+		Array1D_string OpSchemeNames; // Used to verify unique op scheme names
 		bool IsNotOK;
 		bool IsBlank;
 		bool ErrorsFound; // Passed in from OpSchemeInput
@@ -452,6 +519,8 @@ namespace PlantCondLoopOperation {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = HeatingRBOpSchemeType;
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT" ) { //* Temp Based Control
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CompSetPtBasedSchemeType;
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Simple TES Control
+							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CompSetPtBasedSchemeType; // set this to component based as it will be converted to this
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = EMSOpSchemeType;
 							AnyEMSPlantOpSchemesInModel = true;
@@ -564,6 +633,7 @@ namespace PlantCondLoopOperation {
 		int DBTDBO; // Number ofDry Bulb Temperature Range Based Operation Inputs
 		int WBTDBO; // Number ofWet Bulb Temperature Range Based Operation Inputs
 		int DPTDBO; // Number ofDewPoint Temperature Range Based Operation Inputs
+		int TESSPBO; // Number of Thermal Energy Storage Setpoint Based Operation Inputs
 		int NumSchemes; // Number of Condenser equipment lists
 		int NumUncontrolledSchemes; // Number of Condenser equipment lists
 		int NumUserDefOpSchemes; // number of user defined EMS op schemes
@@ -573,7 +643,7 @@ namespace PlantCondLoopOperation {
 		int NumSchemeLists;
 		int LoopNum;
 		std::string CurrentModuleObject; // for ease in renaming.
-		FArray1D_string TempVerifyNames;
+		Array1D_string TempVerifyNames;
 
 		ErrorsFound = false; //DSU CS
 
@@ -589,7 +659,8 @@ namespace PlantCondLoopOperation {
 		DBTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDryBulbDifference" );
 		WBTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorWetBulbDifference" );
 		DPTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDewpointDifference" );
-		NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes;
+		TESSPBO = GetNumObjectsFound( "PlantEquipmentOperation:ThermalEnergyStorage" );
+		NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
 		NumUncontrolledSchemes = GetNumObjectsFound( "PlantEquipmentOperation:Uncontrolled" );
 		if ( ( NumSchemes + NumUncontrolledSchemes ) <= 0 ) {
 			ShowFatalError( "No PlantEquipmentOperation:* objects specified. Stop simulation." );
@@ -637,6 +708,9 @@ namespace PlantCondLoopOperation {
 			} else if ( NumUserDefOpSchemes > 0 && Num <= ( CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUncontrolledSchemes + NumUserDefOpSchemes ) ) {
 				CurrentModuleObject = "PlantEquipmentOperation:UserDefined";
 				Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes;
+			} else if ( TESSPBO > 0 && Num <= ( CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUncontrolledSchemes + NumUserDefOpSchemes + TESSPBO ) ) {
+				CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
+				Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes - NumUserDefOpSchemes;
 			} else {
 				ShowFatalError( "Error in control scheme identification" );
 			}
@@ -681,7 +755,7 @@ namespace PlantCondLoopOperation {
 		//**********GET INPUT AND LOAD PLANT DATA STRUCTURE*********
 
 		//extend number of equipment lists to include one for each CSPBO
-		NumSchemeLists += CSPBO + NumUserDefOpSchemes;
+		NumSchemeLists += CSPBO + TESSPBO + NumUserDefOpSchemes;
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			for ( SchemeNum = 1; SchemeNum <= PlantLoop( LoopNum ).NumOpSchemes; ++SchemeNum ) {
 
@@ -735,11 +809,22 @@ namespace PlantCondLoopOperation {
 					CurrentModuleObject = "PlantEquipmentOperation:Uncontrolled";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, NumUncontrolledSchemes, LoopNum, SchemeNum, ErrorsFound );
 
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Temp Based Control
+					CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
+					FindCompSPInput( CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound );
+
 				} else { // invalid op scheme type for plant loop
 					// DSU?  Seems like the alpha args below is incorrect....
 					ShowSevereError( "Invalid operation scheme type = \"" + cAlphaArgs( Num * 3 - 1 ) + "\", entered in " + CurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}}
+
+				// At this point, switch the thermal energy storage controls to setpoint based controls as all of the
+				// internally generated setpoints and schedules have been generated and this can now be handled like
+				// the long form setpoint based control.
+				if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) {
+					PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf =  "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT";
+					}
 			}
 		}
 
@@ -803,12 +888,12 @@ namespace PlantCondLoopOperation {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//   certain object in the input file
 		int Num;
@@ -988,12 +1073,12 @@ namespace PlantCondLoopOperation {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//   certain object in the input file
 		int Num;
@@ -1106,7 +1191,7 @@ namespace PlantCondLoopOperation {
 		// DERIVED TYPE DEFINITIONS
 		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+
 		bool FoundIntendedList;
 		int Num;
 		int MachineNum;
@@ -1119,13 +1204,13 @@ namespace PlantCondLoopOperation {
 		bool IsNotOK;
 		std::string CurrentModuleObject;
 		static int TotNumLists( 0 );
-		static FArray1D_string EquipListsNameList;
-		static FArray1D_int EquipListsTypeList;
-		static FArray1D_int EquipListsIndexList;
+		static Array1D_string EquipListsNameList;
+		static Array1D_int EquipListsTypeList;
+		static Array1D_int EquipListsIndexList;
 		int iIndex;
 		bool firstblank;
 
-		if ( MyOneTimeFlag ) {
+		if ( LoadEquipListOneTimeFlag ) {
 			// assemble mapping between list names and indices one time
 			PELists = GetNumObjectsFound( "PlantEquipmentList" );
 			CELists = GetNumObjectsFound( "CondenserEquipmentList" );
@@ -1212,7 +1297,7 @@ namespace PlantCondLoopOperation {
 			if ( ErrorsFound ) {
 				ShowFatalError( "LoadEquipList/GetEquipmentLists: Failed due to preceding errors." );
 			}
-			MyOneTimeFlag = false;
+			LoadEquipListOneTimeFlag = false;
 		}
 
 		FoundIntendedList = false;
@@ -1259,6 +1344,7 @@ namespace PlantCondLoopOperation {
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   July 2010
 		//       MODIFIED       B. Griffith, check setpoint nodes have setpoint managers on EMS on them.
+		//                      Rick Strand, Aug 2014, added simple thermal energy storage controls
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1269,6 +1355,7 @@ namespace PlantCondLoopOperation {
 		// The format of the Energy+.idd (the EnergyPlus input data dictionary) for the
 		// following keywords is reflected exactly in this subroutine:
 		//    PlantEquipmentOperation:ComponentSetPoint
+		//    PlantEquipmentOperation:ThermalEnergyStorage
 
 		// REFERENCES:
 		// na
@@ -1285,6 +1372,8 @@ namespace PlantCondLoopOperation {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iTemperatureMinSetPoint;
 		using EMSManager::iTemperatureMaxSetPoint;
+		using ScheduleManager::GetScheduleIndex;
+		using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1310,6 +1399,15 @@ namespace PlantCondLoopOperation {
 		std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
 		bool SchemeNameFound; // Set to FALSE if a match of OpScheme object and OpScheme name is not found
 		bool NodeEMSSetPointMissing;
+		std::string OnPeakSchedName;
+		int OnPeakSchedPtr;
+		std::string ChargeSchedName;
+		int ChargeSchedPtr;
+		Real64 NonChargCHWTemp;
+		Real64 OffPeakCHWTemp;
+		int CompNumA;
+		int CompNumN;
+		int CompOpType; // 1=cooling, 2=dual(or other)
 
 		SchemeNameFound = true;
 
@@ -1334,18 +1432,44 @@ namespace PlantCondLoopOperation {
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).NumEquipLists = 1;
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList.allocate( 1 );
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps = ( NumAlphas - 1 ) / 5;
+
+				if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+					// Read all of the additional parameters for ice storage control scheme and error check various parameters
+					OnPeakSchedName = cAlphaArgs ( 2 );
+					OnPeakSchedPtr  = GetScheduleIndex( OnPeakSchedName );
+					if ( OnPeakSchedPtr == 0 ) {
+						ShowSevereError( "Could not find On Peak Schedule " + OnPeakSchedName + " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
+						ErrorsFound = true;
+					}
+					ChargeSchedName = cAlphaArgs ( 3 );
+					ChargeSchedPtr  = GetScheduleIndex( ChargeSchedName );
+					if ( ChargeSchedPtr == 0 ) {
+						ShowSevereError( "Could not find Charging Availability Schedule " + ChargeSchedName + " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
+						ErrorsFound = true;
+					}
+					NonChargCHWTemp = rNumericArgs ( 1 );
+					OffPeakCHWTemp  = rNumericArgs ( 2 );
+				}
+
 				if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps > 0 ) {
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp.allocate( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps );
 					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps; ++CompNum ) {
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).TypeOf = cAlphaArgs( CompNum * 5 - 3 );
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name = cAlphaArgs( CompNum * 5 - 2 );
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).DemandNodeName = cAlphaArgs( CompNum * 5 - 1 );
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).DemandNodeNum = GetOnlySingleNode( cAlphaArgs( CompNum * 5 - 1 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName = cAlphaArgs( CompNum * 5 );
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum = GetOnlySingleNode( cAlphaArgs( CompNum * 5 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
-						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointFlowRate = rNumericArgs( CompNum );
+						if ( CurrentModuleObject == "PlantEquipmentOperation:ComponentSetPoint" ) {
+							CompNumA = CompNum * 5;
+							CompNumN = CompNum;
+						} else if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+							CompNumA = CompNum * 5 + 2;
+							CompNumN = CompNum + 2;
+						}
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).TypeOf = cAlphaArgs( CompNumA - 3 );
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name = cAlphaArgs( CompNumA - 2 );
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).DemandNodeName = cAlphaArgs( CompNumA - 1 );
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).DemandNodeNum = GetOnlySingleNode( cAlphaArgs( CompNumA - 1 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName = cAlphaArgs( CompNumA );
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum = GetOnlySingleNode( cAlphaArgs( CompNumA ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointFlowRate = rNumericArgs( CompNumN );
 
-						if ( rNumericArgs( CompNum ) == AutoSize ) {
+						if ( rNumericArgs( CompNumN ) == AutoSize ) {
 							for ( Num = 1; Num <= SaveNumPlantComps; ++Num ) {
 								CompInNode = CompDesWaterFlow( Num ).SupNode;
 								CompFlowRate = CompDesWaterFlow( Num ).DesVolFlowRate;
@@ -1359,18 +1483,32 @@ namespace PlantCondLoopOperation {
 							ReportSizingOutput( CurrentModuleObject, PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, "Design Water Flow Rate [m3/s] Equipment # " + stripped( EquipNum ), CompFlowRate );
 						}
 
-						{ auto const controlType( cAlphaArgs( CompNum * 5 + 1 ) );
+						{ auto const controlType( cAlphaArgs( CompNumA + 1 ) );
 						if ( controlType == "COOLING" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = CoolingOp;
 						} else if ( controlType == "HEATING" ) {
+							if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+								ShowSevereError("Equipment Operation Mode cannot be HEATING for any equipment found in " + cAlphaArgs( 1 ) + " in thermal energy storage control" );
+								ErrorsFound = true;
+							}
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = HeatingOp;
 						} else if ( controlType == "DUAL" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = DualOp;
 						}}
 
-						if ( ( cAlphaArgs( 5 + 1 ) != "COOLING" ) && ( cAlphaArgs( 5 + 1 ) != "HEATING" ) && ( cAlphaArgs( 5 + 1 ) != "DUAL" ) ) {
+						if ( ( cAlphaArgs( CompNumA + 1 ) != "COOLING" ) && ( cAlphaArgs( CompNumA + 1 ) != "HEATING" ) && ( cAlphaArgs( CompNumA + 1 ) != "DUAL" ) ) {
 							ShowSevereError( "Equipment Operation Mode should be either HEATING or COOLING or DUAL mode, for " + CurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						}
+
+						if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+							// for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
+							// detailed input that is necessary to get thermal energy storage to work from the simpler input.
+							CompOpType = ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum ) - 1;
+							if ( ( CompOpType < 1 ) || ( CompOpType > 2 ) ) CompOpType = 2;
+							SetUpNewScheduledTESSetPtMgr( OnPeakSchedPtr, ChargeSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType, PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum );
+						}
+
+
 						//check that setpoint node has valid setpoint managers or EMS
 						{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 						if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -1530,7 +1668,6 @@ namespace PlantCondLoopOperation {
 		using InputProcessor::FindItemInList;
 
 		using DataRuntimeLanguage::EMSProgramCallManager;
-		using DataRuntimeLanguage::NumProgramCallManagers;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1591,7 +1728,7 @@ namespace PlantCondLoopOperation {
 						SetupEMSInternalVariable( "Component Remaining Current Demand Rate", PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + ':' + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name, "[W]", PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).EMSIntVarRemainingLoadValue );
 					}
 				}
-				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 				if ( StackMngrNum > 0 ) { // found it
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlSimProgramMngr = StackMngrNum;
 				} else {
@@ -1601,7 +1738,7 @@ namespace PlantCondLoopOperation {
 					ErrorsFound = true;
 				}
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1676,10 +1813,9 @@ namespace PlantCondLoopOperation {
 		int CompNum;
 		int Index;
 		int OpSchemePtr;
-		int SchemeNum;
 		int thisSchemeNum;
 		int SchemeType;
-		static bool MyOneTimeFlag( true );
+
 		bool FoundScheme;
 		bool FoundSchemeMatch;
 		//  LOGICAL, SAVE                     :: FirstHVACInitsDone = .FALSE.
@@ -1687,12 +1823,11 @@ namespace PlantCondLoopOperation {
 		int ThisTypeOfNum;
 		int CompOpNum;
 		int OldNumOpSchemes;
-		int OldNumEquipLists;
 		int NewNumEquipLists;
 		int NewNumOpSchemes;
 		int NumSearchResults;
 		bool GetInputOK; // successful Get Input
-		static bool GetPlantOpInput( true ); // successful Get Input
+
 		bool errFlag1;
 		bool errFlag2;
 		Real64 HighestRange;
@@ -1712,7 +1847,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		// ONE TIME INITS
-		if ( MyOneTimeFlag ) {
+		if ( InitLoadDistributionOneTimeFlag ) {
 			// Set up 'component' to 'op scheme' pointers in Plant data structure
 			// We're looking for matches between a component on a PlantLoop.OpScheme.List()
 			// and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
@@ -1879,7 +2014,7 @@ namespace PlantCondLoopOperation {
 				} // operation scheme
 			} // loop
 
-			MyOneTimeFlag = false;
+			InitLoadDistributionOneTimeFlag = false;
 		}
 
 		if ( AnyEMSPlantOpSchemesInModel ) { // Execute any Initialization EMS program calling managers for User-Defined operation.
@@ -1890,7 +2025,8 @@ namespace PlantCondLoopOperation {
 					if ( this_op_scheme.OpSchemeType == EMSOpSchemeType ) {
 						if ( BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag ) {
 							if ( this_op_scheme.ErlInitProgramMngr > 0 ) {
-								ManageEMS( emsCallFromUserDefinedComponentModel, this_op_scheme.ErlInitProgramMngr );
+								bool anyEMSRan;
+								ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr );
 							}
 							this_op_scheme.MyEnvrnFlag = false;
 						}
@@ -2732,7 +2868,6 @@ namespace PlantCondLoopOperation {
 		CompMinLoad = this_component.MinLoad;
 		CompMaxLoad = this_component.MaxLoad;
 		CompOptLoad = this_component.OptLoad;
-		DemandMdot = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointFlowRate;
 		DemandNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).DemandNodeNum;
 		SetPtNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointNodeNum;
 		TempIn = Node( DemandNode ).Temp;
@@ -2834,7 +2969,7 @@ namespace PlantCondLoopOperation {
 		int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
 		int const CurSchemePtr,
 		Real64 const LoopDemand,
-		Real64 & RemLoopDemand
+		Real64 & EP_UNUSED( RemLoopDemand )
 	)
 	{
 
@@ -2871,7 +3006,6 @@ namespace PlantCondLoopOperation {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompPtr;
-		int ListPtr;
 
 		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
 
@@ -2883,7 +3017,8 @@ namespace PlantCondLoopOperation {
 
 		// Call EMS program(s)
 		if ( PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ErlSimProgramMngr );
+			bool anyEMSRan;
+			ManageEMS( emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ErlSimProgramMngr );
 		}
 
 		// move actuated value to MyLoad
@@ -2943,23 +3078,21 @@ namespace PlantCondLoopOperation {
 		int ReferenceNodeNum;
 		Real64 NodeTemperature;
 
-		OperationScheme: { auto const SELECT_CASE_var( CurSchemeType );
-
-		if ( SELECT_CASE_var == DryBulbTDBOpSchemeType ) { // drybulb temp based controls
+		if ( CurSchemeType == DryBulbTDBOpSchemeType ) { // drybulb temp based controls
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDryBulbTemp;
-		} else if ( SELECT_CASE_var == WetBulbTDBOpSchemeType ) { // wetbulb temp based controls
+		} else if ( CurSchemeType == WetBulbTDBOpSchemeType ) { // wetbulb temp based controls
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutWetBulbTemp;
-		} else if ( SELECT_CASE_var == DewPointTDBOpSchemeType ) { // dewpoint temp based controls
+		} else if ( CurSchemeType == DewPointTDBOpSchemeType ) { // dewpoint temp based controls
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDewPointTemp;
 		} else {
 			assert( false );
-		}} // OperationScheme
+		} // OperationScheme
 
 		return FindRangeVariable;
 
@@ -3177,7 +3310,8 @@ namespace PlantCondLoopOperation {
 						UniqueIDName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Name;
 						ActuatorType = "On/Off Supervisory";
 						SetupEMSActuator( ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideOn, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideValue );
-					} else if ( LoopSideNum == DemandSide ) {
+					}
+					else if ( LoopSideNum == DemandSide ) {
 						ActuatorName = "Demand Side Branch";
 						UniqueIDName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Name;
 						ActuatorType = "On/Off Supervisory";
@@ -3389,29 +3523,6 @@ namespace PlantCondLoopOperation {
 
 	//*END PLANT EMS CONTROL ROUTINES!
 	//******************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantCondLoopOperation
 

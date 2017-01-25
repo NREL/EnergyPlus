@@ -3,13 +3,10 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 
-if(MSVC)
-#  add_definitions(/Za)
-endif()
-
 # Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+  configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
 endif()
 
 SET( SRC
@@ -18,6 +15,7 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -44,12 +42,11 @@ SET( SRC
   ChillerIndirectAbsorption.hh
   ChillerReformulatedEIR.cc
   ChillerReformulatedEIR.hh
-  #CommandLineInterface.cc
-  #CommandLineInterface.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
   ConductionTransferFunctionCalc.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh"
   ConvectionCoefficients.cc
   ConvectionCoefficients.hh
   CoolTower.cc
@@ -201,6 +198,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
+  ElectricPowerServiceManager.hh
+  ElectricPowerServiceManager.cc
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -238,6 +237,11 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
+  GroundTemperatureModeling/BaseGroundTemperatureModel.hh
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.cc
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
+  GroundTemperatureModeling/GroundTemperatureModelManager.cc
+  GroundTemperatureModeling/GroundTemperatureModelManager.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -248,6 +252,8 @@ SET( SRC
   HVACDXSystem.hh
   HVACDuct.cc
   HVACDuct.hh
+  HVACFourPipeBeam.cc
+  HVACFourPipeBeam.hh
   HVACHXAssistedCoolingCoil.cc
   HVACHXAssistedCoolingCoil.hh
   HVACInterfaceManager.cc
@@ -300,10 +306,18 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
-)
-
-SET( SRC_2
-  Timer.h
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -314,8 +328,6 @@ SET( SRC_2
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  ManageElectricPower.cc
-  ManageElectricPower.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
   MicroCHPElectricGenerator.cc
@@ -344,8 +356,12 @@ SET( SRC_2
   OutputReportPredefined.hh
   OutputReportTabular.cc
   OutputReportTabular.hh
+  OutputReportTabularAnnual.cc
+  OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
   PackagedTerminalHeatPump.cc
@@ -356,6 +372,7 @@ SET( SRC_2
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
+  PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
   Pipes.cc
@@ -364,6 +381,7 @@ SET( SRC_2
   PlantCentralGSHP.hh
   PlantChillers.cc
   PlantChillers.hh
+  PlantComponent.hh
   PlantComponentTemperatureSources.cc
   PlantComponentTemperatureSources.hh
   PlantCondLoopOperation.cc
@@ -372,6 +390,7 @@ SET( SRC_2
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
   PlantLoopSolver.cc
@@ -386,6 +405,7 @@ SET( SRC_2
   PlantUtilities.hh
   PlantValves.cc
   PlantValves.hh
+  Platform.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -406,6 +426,8 @@ SET( SRC_2
   ResultsSchema.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
+  RoomAirModelAirflowNetwork.cc
+  RoomAirModelAirflowNetwork.hh
   RoomAirModelManager.cc
   RoomAirModelManager.hh
   RoomAirModelUserTempPattern.cc
@@ -420,6 +442,7 @@ SET( SRC_2
   ScheduleManager.hh
   SetPointManager.cc
   SetPointManager.hh
+  Shape.hh
   SimAirServingZones.cc
   SimAirServingZones.hh
   SimulationManager.cc
@@ -450,6 +473,8 @@ SET( SRC_2
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
+  SurfaceOctree.cc
+  SurfaceOctree.hh
   SwimmingPool.cc
   SwimmingPool.hh
   SystemAvailabilityManager.cc
@@ -482,6 +507,7 @@ SET( SRC_2
   ThermalEN673Calc.hh
   ThermalISO15099Calc.cc
   ThermalISO15099Calc.hh
+  Timer.h
   TranspiredCollector.cc
   TranspiredCollector.hh
   UFADManager.cc
@@ -546,7 +572,8 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight cJSON)
+
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight jsoncpp cJSON)
 
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
@@ -555,38 +582,26 @@ if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
 
-add_library( energypluslib2 STATIC ${SRC_2} )
-target_link_libraries( energypluslib2 )
-if(UNIX AND NOT APPLE)
-  target_link_libraries( energypluslib2 dl )
-endif()
-
-
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
-target_link_libraries( energyplusapi energypluslib energypluslib2 )
-
+target_link_libraries( energyplusapi energypluslib )
 
 set_target_properties(
   energyplusapi
   PROPERTIES
   INSTALL_NAME_DIR "@executable_path"
 )
-install( TARGETS energyplusapi 
-  RUNTIME DESTINATION ./ 
-  LIBRARY DESTINATION ./ 
+install( TARGETS energyplusapi
+  RUNTIME DESTINATION ./
+  LIBRARY DESTINATION ./
 )
 
 if (MINGW)
-  target_link_libraries( energypluslib2 energypluslib )
-  target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
 elseif (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
-  target_link_libraries( energypluslib2 energypluslib )
-  target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-  target_link_libraries( energyplus energypluslib energypluslib2 )
+  target_link_libraries( energyplus energypluslib )
 else()
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
@@ -601,18 +616,18 @@ if( BUILD_TESTING )
   # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
   target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
-  add_test(NAME "integration.TestEnergyPlusCallbacks" 
-           COMMAND ${CMAKE_COMMAND} 
-           -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
-           -DBINARY_DIR=${CMAKE_BINARY_DIR} 
+  add_test(NAME "integration.TestEnergyPlusCallbacks"
+           COMMAND ${CMAKE_COMMAND}
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+           -DBINARY_DIR=${CMAKE_BINARY_DIR}
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
-           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
 endif()
 
 if(UNIX AND NOT APPLE)
   ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
-  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
+  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
 

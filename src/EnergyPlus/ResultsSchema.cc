@@ -7,9 +7,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -416,9 +416,9 @@ namespace EnergyPlus {
 
 		// class Table
 
-		Table::Table(FArray2D_string const & body,
-			FArray1D_string const & rowLabels,
-			FArray1D_string const & columnLabels,
+		Table::Table(Array2D_string const & body,
+			Array1D_string const & rowLabels,
+			Array1D_string const & columnLabels,
 			std::string const & tableName,
 			std::string footnoteText) 
 		{
@@ -499,9 +499,9 @@ namespace EnergyPlus {
 		ReportsCollection::ReportsCollection() {
 		}
 		
-		void ReportsCollection::addReportTable(FArray2D_string const & body,
-				FArray1D_string const & rowLabels,
-				FArray1D_string const & columnLabels,
+		void ReportsCollection::addReportTable(Array2D_string const & body,
+				Array1D_string const & rowLabels,
+				Array1D_string const & columnLabels,
 				std::string const & reportName, std::string const & reportForString,
 				std::string const & tableName,
 				std::string footnoteText)	
@@ -565,9 +565,9 @@ namespace EnergyPlus {
 			int numberOfOutputSchemaObjects = InputProcessor::GetNumObjectsFound("Output:JSON");
 			if (numberOfOutputSchemaObjects == 1) {
 				try {
-					FArray1D_string alphas(5);
+					Array1D_string alphas(5);
 					int numAlphas;
-					FArray1D< Real64 > numbers(2);
+					Array1D< Real64 > numbers(2);
 					int numNumbers;
 					int status;
 					InputProcessor::GetObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
@@ -597,7 +597,7 @@ namespace EnergyPlus {
 			return tsAndTabularEnabled;
 		}
 
-		void ResultsSchema::initializeRTSDataFrame(const int ReportFrequency, const FArray1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType) {
+		void ResultsSchema::initializeRTSDataFrame(const int ReportFrequency, const Array1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType) {
 			Reference< RealVariables > RVar;
 
 			for (int Loop = 1; Loop <= NumOfRVariable; ++Loop) {
@@ -670,7 +670,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		void ResultsSchema::initializeITSDataFrame(const int ReportFrequency, const FArray1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType) {
+		void ResultsSchema::initializeITSDataFrame(const int ReportFrequency, const Array1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType) {
 			Reference< IntegerVariables > IVar;
 
 			// loop over values to suck in var info
@@ -745,7 +745,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		void ResultsSchema::initializeMeters(const FArray1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency) {
+		void ResultsSchema::initializeMeters(const Array1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency) {
 			switch (ReportFrequency) {
 				case -1:
 					//nothing to do; meters are not reported at this frequency

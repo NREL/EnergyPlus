@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataErrorTracking_hh_INCLUDED
 #define DataErrorTracking_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,8 +75,8 @@ namespace DataErrorTracking {
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const SearchCounts;
-	extern FArray1D_string const MessageSearch;
-	extern FArray1D_string const Summaries;
+	extern Array1D_string const MessageSearch;
+	extern Array1D_string const Summaries;
 	// in below -- simple line end <CR>.  End of Whole message <CRE>
 	extern std::string const MoreDetails_1; // InterZone Surface Areas -- mismatch
 	extern std::string const MoreDetails_2; // Interzone surfaces - different zones
@@ -39,7 +97,7 @@ namespace DataErrorTracking {
 	extern std::string const MoreDetails_18; // Nominally unused constructions
 	extern std::string const MoreDetails_19; // InfraredTransparent constructions in non-interzone surfaces
 	extern std::string const MoreDetails_20; // No reporting elements requested
-	extern FArray1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
+	extern Array1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
 
 	extern int const MaxRecurringErrorMsgLength; // Maximum error message length for recurring error messages
 
@@ -49,7 +107,7 @@ namespace DataErrorTracking {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int MatchCounts;
+	extern Array1D_int MatchCounts;
 	extern bool AbortProcessing; // Flag used to if currently in "abort processing"
 	extern int NumRecurringErrors; // Number of stored recurring error messages
 	extern int TotalSevereErrors; // Counter
@@ -103,41 +161,10 @@ namespace DataErrorTracking {
 			ReportSum( false )
 		{}
 
-		// Member Constructor
-		RecurringErrorData(
-			std::string const & Message, // Message to be written to "error file" at end of simulation
-			int const Count, // Count of total times this recurring error message has been called
-			int const WarmupCount, // Count of times this recurring error message has been called during warmup
-			int const SizingCount, // Count of times this recurring error message has been called during sizing
-			Real64 const MaxValue, // Max of the values passed for this recurring error message
-			Real64 const MinValue, // Min of the values passed for this recurring error message
-			Real64 const SumValue, // Sum of the values passed for this recurring error message
-			std::string const & MaxUnits, // units for Max values
-			std::string const & MinUnits, // units for Min values
-			std::string const & SumUnits, // units for Sum values
-			bool const ReportMax, // Flag to report max value
-			bool const ReportMin, // Flag to report min value
-			bool const ReportSum // Flag to report sum value
-		) :
-			Message( Message ),
-			Count( Count ),
-			WarmupCount( WarmupCount ),
-			SizingCount( SizingCount ),
-			MaxValue( MaxValue ),
-			MinValue( MinValue ),
-			SumValue( SumValue ),
-			MaxUnits( MaxUnits ),
-			MinUnits( MinUnits ),
-			SumUnits( SumUnits ),
-			ReportMax( ReportMax ),
-			ReportMin( ReportMin ),
-			ReportSum( ReportSum )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< RecurringErrorData > RecurringErrors;
+	extern Array1D< RecurringErrorData > RecurringErrors;
 
 } // DataErrorTracking
 

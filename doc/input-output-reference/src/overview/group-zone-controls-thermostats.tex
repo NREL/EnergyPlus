@@ -1,0 +1,1103 @@
+\section{Group - Zone Controls - Thermostats and Humidistats}\label{group---zone-controls---thermostats-and-humidistats}
+
+Zone Control objects are used to control zone conditions to a specific setpoint. The six types of zone control are described in this section. They are, by name, ZoneControl:\textbf{\textless{}name\textgreater{}.}. These types are:
+
+\textbf{Thermostat} - The object provides the traditional approach to space control using air temperatures. Each controlled zone contains a thermostat object.
+
+\textbf{Humidistat} - The object is used to control a zone to a specified relative humidity.
+
+\textbf{Thermostat:ThermalComfort} - The object provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g.~Fanger) and a user-specified thermal comfort setpoint schedule.
+
+\textbf{Thermostat:OperativeTemperature} - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
+
+\textbf{Thermostat:TemperatureAndHumidity} - This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat s cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone s traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
+
+\textbf{Thermostat}:\textbf{StagedDualSetpoint} - This thermostat control works alone with ``Dual Setpoint'' type only. The object provides heating and cooling setpoints, throttling range and offsets, so that zone temperature setpoint used for system load calculation is adjusted by the setpoint and throttling range based on the zone temperature at the previous time step. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
+
+\subsection{ZoneControl:Thermostat}\label{zonecontrolthermostat}
+
+The thermostatic zone control object is used to control a zone to a specified temperature. ZoneControl:Thermostat references a control type schedule and one or more control type objects which in turn reference one or more setpoint schedules. The example at the end of this section illustrates a complete zone thermostat specification including the control type and setpoint schedules.
+
+The control type schedule and the list of control type/name pairs are directly related. The schedule defines the type of control that is to be used throughout the simulation. Valid Control Types are:
+
+0 - Uncontrolled (No specification or default)
+
+1 - Single Heating Setpoint
+
+2 - Single Cooling SetPoint
+
+3 - Single Heating/Cooling Setpoint
+
+4 - Dual Setpoint (Heating and Cooling) with deadband
+
+Thus, if the schedule referenced in the ZoneControl:Thermostat statement has a control type of 4 for a particular time period, this indicates that during that time period ``Dual Setpoint with deadband'' control is to be used. The specific ``Dual Setpoint (Heating and Cooling) with deadband'' control object to be used is specified in the list of control type/name pairs. Then the specific control type objects reference the thermostat setpoint temperature schedule to be used. Because only one control can be specified for each control type in a ZoneControl:Thermostat statement, there are only four pairs possible in a particular ZoneControl:Thermostat type/name list. This is because individual controls can be defined throughout the simulation, thus giving the user a full range of flexibility. Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the schedule profile.
+
+\subsubsection{Inputs}\label{inputs-054}
+
+\paragraph{Field: Name}\label{field-name-052}
+
+Unique identifying name for the thermostat.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-001}
+
+Name of the zone or set of zones that is being controlled. When the ZoneList option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
+
+\paragraph{Field: Control Type Schedule Name}\label{field-control-type-schedule-name}
+
+Schedule which defines what type of control is active during the simulation. Valid Control Types are:
+
+0 - Uncontrolled (No specification or default)
+
+1 - Single Heating Setpoint
+
+2 - Single Cooling SetPoint
+
+3 - Single Heating Cooling Setpoint
+
+4 - Dual Setpoint with Deadband (Heating and Cooling)
+
+Each non-zero control type which is used in this schedule must appear in the following fields which list the specific thermostat control objects to be used for this zone.
+
+\paragraph{Field Set (Control Object Type, Control Name)}\label{field-set-control-object-type-control-name}
+
+Up to four pairs of Control Object Type and Control Name may be listed to specify which control objects are used for this zone. This list is not order-dependent, and the position in this list has no impact on the control type schedule. In the control type schedule, a value of 1 always means ``Single Heating Setpoint'', even if that control type is not first in this list.
+
+\paragraph{Field: Control Object \textless{}x\textgreater{}Type}\label{field-control-object-xtype}
+
+This field specifies the control type to be used for this zone. Available control types are:
+
+ThermostatSetpoint:SingleHeating
+
+ThermostatSetpoint:SingleCooling
+
+ThermostatSetpoint:SingleHeatingOrCooling
+
+ThermostatSetpoint:DualSetpoint
+
+\paragraph{Field: Control \textless{}x\textgreater{} Name}\label{field-control-x-name}
+
+The corresponding control type name. The name is used in an object with the name of the control type and specifies the schedule.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+ZoneControl:Thermostat, Zone 3 Thermostat, NORTH ZONE,
+  Zone Control Type Sched,
+  DUAL SETPOINT WITH DEADBAND, VAV Setpoints;
+\end{lstlisting}
+
+An example of a global thermostat:
+
+\begin{lstlisting}
+
+ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+
+  ZoneControl:Thermostat,
+  AllControlledZones Thermostat,               !- Name
+  AllControlledZones,                               !- Zone Name
+  Zone Control Type Sched, !- Control Type Schedule Name
+  ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
+  CoolingSetPoint,                 !- Control 1 Name
+  ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
+  HeatingSetpoint,                 !- Control 2 Name
+  ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
+  DualSetPoint;                       !- Control 3 Name
+\end{lstlisting}
+
+A complete zone thermostat example showing this statement and all of the objects it must reference is:
+
+\begin{lstlisting}
+
+! Zone control object which links thermostats to a particular zone
+  ZoneControl:Thermostat, Zone 2 Thermostat, EAST ZONE,
+  Zone Control Type Sched,
+  ThermostatSetpoint:SingleCooling, Cooling Setpoint with SB,
+  ThermostatSetpoint:SingleHeating; Heating Setpoint with SB;
+
+  ! Control type objects     these may be used in more than one zone
+  ThermostatSetpoint:SingleCooling,
+  Cooling Setpoint with SB,
+  Cooling Setpoints;
+
+  ThermostatSetpoint:SingleHeating,
+  Heating Setpoint with SB,
+  Heating Setpoints;
+
+  ! Schedule type definitions
+  ScheduleTypeLimits,Temperature,-60:200,CONTINUOUS;
+  ScheduleTypeLimits,Control Type,0:4,DISCRETE;
+
+  ! Control type schedule definition
+  Schedule:Compact, Zone Control Type Sched, Control Type,
+  Through: 3/31,
+  For: AllDays,
+  Until: 24:00, 1,   !- Single Heating
+  Through: 9/30,
+  For: AllDays,
+  Until: 24:00, 2,   !- Single Cooling
+  Through: 12/31,
+  For: AllDays,
+  Until: 24:00, 1;   !- Single Heating
+
+  ! Heating setpoint schedule definition
+  Schedule:Compact, Heating Setpoints, Temperature,
+  Through: 12/31,
+  For: AllDays,
+  Until: 7:00, 15.,
+  Until: 17:00,20.,
+  Until: 24:00,15.;
+
+  ! Cooling setpoint schedule definition
+  Schedule:Compact, Cooling Setpoints, Temperature,
+  Through: 12/31,
+  For: AllDays,
+  Until: 7:00, 30.,
+  Until: 20:00,23.,
+  Until: 24:00,30.;
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-042}
+
+Outputs available from controlled zones. The ``key'' in the below is the Zone Name.
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}
+\item
+  Zone,Average,Zone Thermostat Control Type {[]}
+\item
+  Zone,Average,Zone Thermostat Heating Setpoint Temperature {[}C{]}
+\item
+  Zone,Average,Zone Thermostat Cooling Setpoint Temperature {[}C{]}
+\item
+  HVAC,Sum,Facility Any Zone Oscillating Temperatures Time {[}hr{]}
+\item
+  Zone,Sum,Zone Heating Setpoint Not Met Time {[}hr{]}
+\item
+  Zone,Sum,Zone Heating Setpoint Not Met While Occupied Time {[}hr{]}
+\item
+  Zone,Sum,Zone Cooling Setpoint Not Met Time {[}hr{]}
+\item
+  Zone,Sum,Zone Cooling Setpoint Not Met While Occupied Time {[}hr{]}
+\item
+  Zone,Sum,Facility Heating Setpoint Not Met Time {[}hr{]}
+\item
+  Zone,Sum,Facility Cooling Setpoint Not Met Time {[}hr{]}
+\item
+  Zone,Sum,Facility Heating Setpoint Not Met While Occupied Time {[}hr{]}
+\item
+  Zone,Sum,Facility Cooling Setpoint Not Met While Occupied Time {[}hr{]}
+\end{itemize}
+
+\paragraph{Zone Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-setpoint-heat-transfer-rate-w}
+
+This is the predicted sensible load in W required to meet the current zone thermostat setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active heating and/or cooling setpoints, determines if the zone requires heating or cooling or is in the deadband, and then passes this single load to the equipment. This value is not multiplied by zone or group multipliers.
+
+\paragraph{Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-heating-setpoint-heat-transfer-rate-w}
+
+This is the predicted sensible load in W required to meet the current zone thermostat heating setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is not multiplied by zone or group multipliers.
+
+\paragraph{Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-cooling-setpoint-heat-transfer-rate-w}
+
+This is the predicted sensible load in W required to meet the current zone thermostat cooling setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is not multiplied by zone or group multipliers.
+
+\paragraph{Zone Thermostat Control Type {[]}}\label{zone-thermostat-control-type}
+
+This is the current zone thermostat control type (0 through 4). This value is set at each zone timestep. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+\paragraph{Zone Thermostat Heating Setpoint Temperature {[}C{]}}\label{zone-thermostat-heating-setpoint-temperature-c}
+
+This is the current zone thermostat heating setpoint in degrees C. If there is no heating thermostat active, then the value will be 0. This value is set at each zone timestep. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+When the Thermostat:StagedDualSetpoint object is applied to the current zone, this output variable reports staged zone heating setpoint. When the staged number is not equal to zero, both staged heating and cooling setpoints are the same. When no cooling or heating is required, the staged heating setpoint is equal to the scheduled heating setpoint 0.5 * heating throttling range, and the staged cooling setpoint is equal to the scheduled cooling setpoint + 0.5 * cooling throttling range.
+
+\paragraph{Zone Thermostat Cooling Setpoint Temperature {[}C{]}}\label{zone-thermostat-cooling-setpoint-temperature-c}
+
+This is the current zone thermostat cooling setpoint in degrees C. If there is no cooling thermostat active, then the value will be 0. This value is set at each zone timestep. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+When the Thermostat:StagedDualSetpoint object is applied to the current zone, this output variable reports staged zone cooling setpoint. When the staged number is not equal to zero, both staged heating and cooling setpoints are the same. When no cooling or heating is required, the staged heating setpoint is equal to the scheduled heating setpoint 0.5 * heating throttling range, and the staged cooling setpoint is equal to the scheduled cooling setpoint + 0.5 * cooling throttling range.
+
+\paragraph{Zone Thermostat Stage Number {[]}}\label{zone-thermostat-stage-number}
+
+This is the current zone thermostat stage number when the ZoneControl:Thermostat:StagedDualSetpoint object is specified in this zone. When no heating or cooling is required, the stage number is set to 0. When heating is required, the stage number is positive. When cooling is required, the stage number is negative. The absolute number is sent to the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object to specify the speed number accordingly.
+
+\paragraph{Zone Heating Setpoint Not Met Time {[}hr{]}}\label{zone-heating-setpoint-not-met-time-hr}
+
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
+
+\paragraph{Zone Heating Setpoint Not Met While Occupied Time {[}hr{]}}\label{zone-heating-setpoint-not-met-while-occupied-time-hr}
+
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint and when people are present in the zone. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
+
+\paragraph{Zone Cooling Setpoint Not Met Time {[}hr{]}}\label{zone-cooling-setpoint-not-met-time-hr}
+
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
+
+\paragraph{Zone Cooling Setpoint Not Met While Occupied Time {[}hr{]}}\label{zone-cooling-setpoint-not-met-while-occupied-time-hr}
+
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint and when people are present in the zone. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
+
+\paragraph{Facility Heating Setpoint Not Met Time {[}hr{]}}\label{facility-heating-setpoint-not-met-time-hr}
+
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint in any one or more zones. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
+
+\paragraph{Facility Heating Setpoint Not Met While Occupied Time {[}hr{]}}\label{facility-heating-setpoint-not-met-while-occupied-time-hr}
+
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint and when people are present in any one or more zones. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
+
+\paragraph{Facility Cooling Setpoint Not Met Time {[}hr{]}}\label{facility-cooling-setpoint-not-met-time-hr}
+
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint in any one or more zones. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
+
+\paragraph{Facility Cooling Setpoint Not Met While Occupied Time {[}hr{]}}\label{facility-cooling-setpoint-not-met-while-occupied-time-hr}
+
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint and when people are present in any one or more zones. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
+
+\paragraph{Zone Oscillating Temperatures Time{[}hr{]}}\label{zone-oscillating-temperatures-timehr}
+
+Hours when the temperature in the zone is oscillating back and forth. Oscillation is defined as times when the three differences between zone temperatures during successive timesteps are greater in magnitude than 0.15 degrees C and the sign of the differences changes from positive to negative to positive or from negative to positive to negative.
+
+This may indicate a simulation with reduced reliability during the oscillation. Some oscillating hours should be expected in all simulations but excessive oscillations call into question the overall validity of the results. If excessive oscillations are occurring, try reducing the minimum system timestep (see ConvergenceLimits object) and the zone timestep (see the TimeStep object). Reducing these timestep lengths does increase the total computer time needed to complete the simulation. Having the zone timestep and the minimum system timestep the same length of time can also cause more oscillations. What amount of oscillations is considered excessive is difficult to quantify. One approach is comparing the number of oscillations to the case with 15 minute zone timesteps (4 per hour) and 1 minute minimum system timesteps. Often this variable is used as an indicator of the validity of the results when trying to decrease the time needed to perform the simulation.
+
+\paragraph{Facility Any Zone Oscillating Temperatures Time{[}hr{]}}\label{facility-any-zone-oscillating-temperatures-timehr}
+
+Hours when any zone in the building has oscillations. See Zone Oscillating Temperatures Time definition above.
+
+\subsection{Zone Thermostat Setpoints}\label{zone-thermostat-setpoints}
+
+The syntax for the current set of four zone thermostat setpoint objects is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control is a single or dual setpoint control). The schedule defines a temperature setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled zone no thermostat is specified or necessary.
+
+\subsection{ThermostatSetpoint:SingleHeating}\label{thermostatsetpointsingleheating}
+
+This would be for a heating only thermostat. The setpoint can be scheduled and varied throughout the simulation but only heating is allowed with this control type.
+
+\subsubsection{Inputs}\label{inputs-1-051}
+
+\paragraph{Field: Name}\label{field-name-1-049}
+
+Unique name for this control type.
+
+\paragraph{Field: Setpoint Temperature Schedule Name}\label{field-setpoint-temperature-schedule-name-002}
+
+The name of the associated schedule. Values in the schedule are temperatures \{C\}.
+
+\subsection{ThermostatSetpoint:SingleCooling}\label{thermostatsetpointsinglecooling}
+
+This would be for a cooling only thermostat. The setpoint can be scheduled and varied throughout the simulation but only cooling is allowed.
+
+\subsubsection{Inputs}\label{inputs-2-047}
+
+\paragraph{Field: Name}\label{field-name-2-044}
+
+Unique name for this control type.
+
+\paragraph{Field: Setpoint Temperature Schedule Name}\label{field-setpoint-temperature-schedule-name-1-000}
+
+The name of the associated schedule. Values in the schedule are temperatures \{C\}.
+
+\subsection{ThermostatSetpoint:SingleHeatingOrCooling}\label{thermostatsetpointsingleheatingorcooling}
+
+This would be for heating and cooling thermostat but only heating or cooling can be scheduled at any given time period. The setpoint can be scheduled and varied throughout the simulation for both heating and cooling.
+
+\subsubsection{Inputs}\label{inputs-3-042}
+
+\paragraph{Field: Name}\label{field-name-3-038}
+
+Unique name for this control type.
+
+\paragraph{Field: Setpoint Temperature Schedule Name}\label{field-setpoint-temperature-schedule-name-2}
+
+The name of the associated schedule. Values in the schedule are temperatures \{C\}.
+
+\subsection{ThermostatSetpoint:DualSetpoint}\label{thermostatsetpointdualsetpoint}
+
+This would be for heating and cooling thermostat where both a heating and cooling setpoint can be scheduled for any given time period. The setpoint can be scheduled and varied throughout the simulation for both heating and cooling.
+
+\subsubsection{Inputs}\label{inputs-4-039}
+
+\paragraph{Field: Name}\label{field-name-4-034}
+
+Unique name for this control type.
+
+\paragraph{Field: Heating Setpoint Temperature Schedule Name}\label{field-heating-setpoint-temperature-schedule-name-000}
+
+The heating temperature schedule. Values in the schedule are temperatures \{C\}.
+
+\paragraph{Field: Cooling Setpoint Temperature Schedule Name}\label{field-cooling-setpoint-temperature-schedule-name}
+
+The cooling temperature schedule. Values in the schedule are temperatures \{C\}.
+
+Examples of these statements in an IDF are:
+
+\begin{lstlisting}
+
+ThermostatSetpoint:SingleHeating, Heating Setpoint with SB, Heating Setpoints;
+  ThermostatSetpoint:SingleCooling, Cooling Setpoint with SB, Cooling Setpoints;
+  ThermostatSetpoint:SingleHeatingOrCooling, Heating Cooling Setpoint Sched, Heating Cooling Setpoints;
+  ThermostatSetpoint:DualSetpoint, VAV Setpoints, Heating Setpoints, Cooling Setpoints;
+\end{lstlisting}
+
+\subsection{ZoneControl:Thermostat:OperativeTemperature}\label{zonecontrolthermostatoperativetemperature}
+
+This object is used to modify the program s behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related set point objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
+
+This thermostatic operative temperature, \({T_{OP}}\) , is defined as:
+
+\begin{equation}
+{T_{OP}} = \gamma {T_{MRT}} + (1 - \gamma ){T_{drybulb}}
+\end{equation}
+
+where,
+
+\(\gamma\) is the radiative fraction,
+
+\({T_{MRT}}\) is the mean radiant temperature for the thermal zone, and
+
+\({T_{drybulb}}\) is the mean zone air temperature.
+
+The radiative fraction \(\gamma\) is selected by the user and can be scheduled to vary during the simulation. A typical value is 0.5. The maximum value needs to be less than 0.9 and the minimum is 0.0. A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply. Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
+
+% table 28
+\begin{longtable}[c]{@{}llll@{}}
+\caption{Radiative Fraction vs Air Velocity (Operative Temperature Control) \label{table:radiative-fraction-vs-air-velocity-operative}} \tabularnewline
+\toprule 
+Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Radiative Fraction vs Air Velocity (Operative Temperature Control)} \tabularnewline
+\toprule 
+Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
+\midrule
+\endhead
+\(\gamma\) & 0.5 & 0.4 & 0.3 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Reference: J. Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
+
+\subsubsection{Inputs}\label{inputs-5-034}
+
+\paragraph{Field: Thermostat Name}\label{field-thermostat-name-000}
+
+Name of ZoneControl:Thermostat object defined elsewhere in the input file whose operation is to be modified to effect control based on operative temperature. If the ZoneControl:Thermostat references a ZoneList (set of zones) then, this operative temperature thermostat will be applied to each of those zones. If only a single thermostat/zone is desired, then the name to be put here is \textless{}zone name\textgreater{} \textless{}Thermostat Name\textgreater{} where the Thermostat name is the thermostat that referenced the set of zones.
+
+\paragraph{Field: Radiative Fraction Input Mode}\label{field-radiative-fraction-input-mode}
+
+This field controls whether the input for radiative fraction is a constant value or if it is entered using a schedule. Enter \textbf{Constant} here to use a fixed radiative fraction defined in the following field. Enter \textbf{Scheduled} to vary the radiative fraction according to the schedule named in the second field below.
+
+\paragraph{Field: Fixed Radiative Fraction}\label{field-fixed-radiative-fraction}
+
+This is the fraction, \(\gamma\), of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to \textbf{Constant}.
+
+\paragraph{Field: Radiative Fraction Schedule Name}\label{field-radiative-fraction-schedule-name}
+
+This field contains the name of a schedule, defined elsewhere, that determines the value for radiative fraction \(\gamma\) during the simulation period. This schedule should have fractional values from 0.0 to 0.9. When the value of this schedule is 0.0, the controlling will be equivalent to control based only on zone air temperature. This field is used by the program if the Input Mode field is set to \textbf{Scheduled}.
+
+Note that by setting the values in this schedule separately for design days, the user can control how operative temperature control is applied during autosizing. (Operative temperature control tends to increase the equipment capacities calculated during sizing.)
+
+An example of this object follows.
+
+\begin{lstlisting}
+ZoneControl:Thermostat:OperativeTemperature,
+  Zone 1 Thermostat,    !- ZoneControl:Thermostat Name
+  Constant,             !- Radiative Fraction Input Mode
+  0.5,                  !- Fixed Radiative Fraction
+  ;                     !- Radiative Fraction Schedule
+\end{lstlisting}
+
+Global operative temperature applied to all zones for a global thermostat:
+
+\begin{lstlisting}
+ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+
+ZoneControl:Thermostat,
+  AllControlledZones Thermostat,        !- Name
+  AllControlledZones,                   !- Zone Name
+  Zone Control Type Sched,              !- Control Type Schedule Name
+  ThermostatSetpoint:SingleCooling,     !- Control 1 Object Type
+  CoolingSetPoint,                      !- Control 1 Name
+  ThermostatSetpoint:SingleHeating,     !- Control 2 Object Type
+  HeatingSetpoint,                      !- Control 2 Name
+  ThermostatSetpoint:DualSetpoint,      !- Control 3 Object Type
+  DualSetPoint;                         !- Control 3 Name
+
+
+ZoneControl:Thermostat:OperativeTemperature,
+  AllControlledZones Thermostat,        !- Thermostat Name
+  CONSTANT,                             !- Radiative Fraction Input Mode
+  0.4;                                  !- Fixed Radiative Fraction
+\end{lstlisting}
+
+Global operative temperature referencing a single zone from the list:
+
+\begin{lstlisting}
+ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+\end{lstlisting}
+
+\begin{lstlisting}
+ZoneControl:Thermostat,
+  AllControlledZones Thermostat,        !- Name
+  AllControlledZones,                   !- Zone Name
+  Zone Control Type Sched,              !- Control Type Schedule Name
+  ThermostatSetpoint:SingleCooling,     !- Control 1 Object Type
+  CoolingSetPoint,                      !- Control 1 Name
+  ThermostatSetpoint:SingleHeating,     !- Control 2 Object Type
+  HeatingSetpoint,                      !- Control 2 Name
+  ThermostatSetpoint:DualSetpoint,      !- Control 3 Object Type
+   DualSetPoint;                        !- Control 3 Name
+
+ZoneControl:Thermostat:OperativeTemperature,
+  SPACE3-1 AllControlledZones Thermostat, !- Thermostat Name
+  CONSTANT,                               !- Radiative Fraction Input Mode
+  0.4;                                    !- Fixed Radiative Fraction
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-1-032}
+
+\begin{itemize}
+\tightlist
+\item
+  Zone,Average,Zone Thermostat Operative Temperature {[}C{]}
+\end{itemize}
+
+\paragraph{Zone Thermostat Operative Temperature {[}C{]}}\label{zone-thermostat-operative-temperature-c}
+
+Operative temperature (OT) is a weighted mixture of Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), using the current value of Radiative Fraction (RF): OT = (1-RF)*MAT + RF*MAT. This output variable does not include the direct effect of high temperature radiant systems. See also Zone Operative Temperature.
+
+\subsection{ZoneControl:Thermostat:TemperatureAndHumidity}\label{zonecontrolthermostattemperatureandhumidity}
+
+This object is used to modify the behavior of ZoneControl:Thermostat objects (control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint only) based on zone air humidity conditions. Specifically, this TemperatureAndHumidity zone control resets the ZoneControl:Thermostat s cooling setpoint temperature downward when the zone air relative humidity exceeds the Dehumidifying Relative Humidity Setpoint defined in this object. The reduced cooling setpoint temperature typically results in longer cooling coil runtimes and additional dehumidification. The rate at which the cooling setpoint temperature is reduced is dictated by the user-specified Overcool Control Ratio. The maximum reduction in cooling setpoint temperature is defined by the user-entered OverCool Range (user choice of a constant value for the entire simulation or a schedule that can define how the overcool range varies over time). For details regarding the calculations, see the EnergyPlus Engineering Reference.
+
+Note: As described above, this ZoneControl:Thermostat:TemperatureAndHumidity control object modifies the cooling setpoint temperature of ZoneControl:Thermostat objects. The ZoneControl:Thermostat:TemperatureAndHumidity object works independently of the ZoneControl:Humidistat object; that is, it does not replace the need for, or coordinate its input fields with, ZoneControl:Humidistat objects that are required for other types of high humidity control (e.g., ZoneControl:Humidstat objects are required for ZoneHVAC:Dehumidifier:DX objects, AirLoopHVAC:Unitary* objects with CoolReheat or MultiMode dehumidification control types, etc.)
+
+\subsubsection{Inputs}\label{inputs-6-031}
+
+\paragraph{Field: Thermostat Name}\label{field-thermostat-name-1}
+
+Name of ZoneControl:Thermostat object defined elsewhere in the input file whose operation is to be modified to effect temperature control based on zone air humidity conditions. If the ZoneControl:Thermostat references a ZoneList (set of zones), then simply enter the name of the ZoneControl:Thermostat object and this TemperatureAndHumidity thermostat control will be applied to all zones in the ZoneList. If the ZoneControl:Thermostat references a ZoneList but it is desired that only a single zone within the ZoneList be controlled based on TemperatureAndHumidity control, then the name to be put here is \textless{}zone name\textgreater{} \textless{}Thermostat Name\textgreater{} where the Thermostat Name is the name of the ZoneControl:Thermostat object.
+
+\paragraph{Field: Dehumidifying Relative Humidity Setpoint Schedule Name}\label{field-dehumidifying-relative-humidity-setpoint-schedule-name}
+
+Name of a schedule that defines the dehumidifying relative humidity setpoint, expressed as a percentage (0-100), for each timestep of the simulation. This input field is required. This input field has absolutely no relationship or influence on the Dehumidifying Relative Humidity Setpoint Schedule Name optional input field in the ZoneControl:Humidistat object.
+
+\paragraph{Field:Dehumidification Control Type}\label{fielddehumidification-control-type}
+
+This input field defines what type of dehumidification control is active during the simulation. Valid control types are None and Overcool. The default is Overcool if this field is left blank. Overcool resets the thermostat s cooling setpoint temperature lower based on the zone air relative humidity level. None means no overcooling (i.e., traditional zone air temperature control based on the associated ZoneControl:Thermostat object {[}Thermostat Name input field above{]} will be in effect).
+
+\paragraph{Field: Overcool Range Input Method}\label{field-overcool-range-input-method}
+
+This field controls whether the input for the overcool (temperature) range is a constant value or if it is entered using a schedule. Enter \textbf{Constant} here to use a constant overcool range defined in the Overcool Constant Range input field below. Enter \textbf{Scheduled} to vary the overcool range according to the schedule named in the Overcool Range Schedule Name input field below. The default is \textbf{Constant} if this field is left blank.
+
+\paragraph{Field: Overcool Constant Range}\label{field-overcool-constant-range}
+
+This field specifies a fixed maximum overcool temperature range for cooling setpoint temperature reduction for zone overcool dehumidification in units of deltaC. This field is used if the Overcool Range Input Method is specified as \textbf{Constant}. The Overcool dehumidification control type only works with ZoneControl:Thermostat control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint . For ThermostatSetpoint:DualSetpoint , the model will use the \textbf{smaller} of the Overcool Constant Range input value or the difference between the cooling and heating setpoint temperatures specified in the ThermostatSetpoint:DualSetpoint object. The Overcool Constant Range must be greater than or equal to zero with a maximum value of 3 °C. A value of 0.0 indicates no zone air overcooling. The default value is 1.7 °C (3 °F) if this input field is left blank.
+
+\paragraph{Field: Overcool Range Schedule Name}\label{field-overcool-range-schedule-name}
+
+This field contains the name of a schedule, defined elsewhere, that determines the value for the overcool range during the simulation period. This schedule should contain values from 0.0 to \textless{} = 3.0 (deltaC). When the value of this schedule is 0.0, the zone air temperature control will be based only on zone air dry-bulb temperature (i.e., no zone overcooling). This field is used by the program if the Overcool Range Input Method field is set to \textbf{Scheduled}. Overcool dehumidification control type only works with ZoneControl:Thermostat control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint . For ThermostatSetpoint:DualSetpoint , the model will use the \textbf{smaller} of the Overcool Range values specified in this schedule or the difference between the cooling and heating setpoint temperatures specified in the ThermostatSetpoint:DualSetpoint object.
+
+Note that by setting the values in this schedule separately for design days, the user can control how Overcool Dehumidification Control is applied during autosizing. (Overcool dehumidification control tends to increase the cooling equipment capacities calculated during sizing.)
+
+\paragraph{Field:Overcool Control Ratio}\label{fieldovercool-control-ratio}
+
+The value of this input field is used to adjust the cooling setpoint temperature (established by the associated ZoneControl:Thermostat object) downward based on the difference between the zone air relative humidity level and the Dehumidifying Relative Humidity Setpoint. This input field is only used with Dehumidification Control Type = Overcool. Input values must be greater than or equal to 0.0 \%RH/K. The default value is 3.6 if this field is left blank.
+
+An example of this object follows.
+
+\begin{lstlisting}
+
+ZoneControl:Thermostat:TemperatureAndHumidity,
+  Zone Thermostat,                                 !- Thermostat Name
+  Seasonal Relative Humidity Sch,   !- Dehumidifying Relative Humidity Setpoint Schedule Name
+  Overcool,                                               !- Dehumidification Control Type
+  Constant,                                               !- Overcool Range Input Method
+  1.7,                                         !- Overcool Constant Range {deltaC}
+  ,                                               !- Overcool Range Schedule Name
+  3.0;                                         !- Overcool Control Ratio {percent/K}
+\end{lstlisting}
+
+\subsection{ZoneControl:Thermostat:StagedDualSetpoint}\label{zonecontrolthermostatstageddualsetpoint}
+
+The thermostatic zone control staged dual setpoint object is used to control a zone to a specified temperature based on multiple stages. The other types of ZoneControl:Thermostat objects reference a control type schedule and one or more control type objects which in turn reference one or more setpoint schedules. This control object does not require a control type schedule and associated one or more control type objects. Instead, the object is defined as a Dual Setpoint type only and has two fields to provide heating and cooling setpoints. The object also provides two fields to specify heating and cooling throttling temperature ranges, so that predicted zone loads may be varied within the throttling ranges for both heating and cooling. The number of stages for both heating and cooling varies from 1 to 4 for the time being to match the number of speeds used in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. The number of stages may be expanded later to accommodate other objects with the number of speeds higher than 4. The object requires inputs temperature offsets for both heating and cooling based on the number of stages. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. The staged number will be assigned to the speed number for the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed system type.
+
+It should be pointed out that If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
+
+\subsubsection{Inputs}\label{inputs-7-030}
+
+\paragraph{Field: Name}\label{field-name-5-028}
+
+Unique identifying name for the staged dual-setpoint thermostat.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-1-001}
+
+Name of the zone or set of zones that is being controlled. When the ZoneList option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
+
+\paragraph{Field: Number of Heating Stages}\label{field-number-of-heating-stages}
+
+This numerical field defines the number of heating stages, and must be less than or equal to the number of heating speeds defined in the associated heating coil, such as Coil:Heating:DX:MultiSpeed. The value for this input field defines the number of heating temperature offsets that must be defined for heating in the fields below. The minimum value for this field is one (1) and the maximum value is four (4).
+
+\paragraph{Field:Heating Temperature Setpoint Schedule Name}\label{fieldheating-temperature-setpoint-schedule-name}
+
+The name of the associated schedule to specify heating temperature setpoint. Values in the schedule are temperatures \{C\}.
+
+\paragraph{Field:Heating Throttling Temperature Range}\label{fieldheating-throttling-temperature-range}
+
+This numeric field defines the heating throttling temperature range in the units of deltaC. When the zone temperature at the previous time step is below the heating temperature setpoint, the zone heating setpoint will be set to the heating temperature setpoint + 0.5 * heating throttling temperature range. Otherwise, the zone heating setpoint will be set to the heating temperature setpoint - 0.5 * heating throttling temperature range. The zone heating setpoint is used in the predictor to calculate how much the heating system load is needed to maintain the zone at the heating setpoint.
+
+\paragraph{Field: Stage 1 Heating Temperature Offset}\label{field-stage-1-heating-temperature-offset}
+
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 1. The value entered here must be equal to or less than 0. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 1 offset value and greater than Stage 2 offset value, the heating stage number is 1. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 1 is specified.
+
+\paragraph{Field: Stage 2 Heating Temperature Offset}\label{field-stage-2-heating-temperature-offset}
+
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 2. The value entered here must be less than the value at the previous field: Stage 1 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 2 offset value and greater than Stage 3 offset value, the heating stage number is 2. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 2 is specified.
+
+\paragraph{Field: Stage 3 Heating Temperature Offset}\label{field-stage-3-heating-temperature-offset}
+
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 3. The value entered here must be less than the value at the previous field: Stage 3 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 3 offset value and greater than Stage 4 offset value, the heating stage number is 3. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 3 is specified.
+
+Note: If the stage number is not equal to the number of heating speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+
+\paragraph{Field: Stage 4 Heating Temperature Offset}\label{field-stage-4-heating-temperature-offset}
+
+This numeric field defines the heating temperature offset in the units of deltaC for Stage 4. The value entered here must be less than the value at the previous field: Stage 4 Heating Temperature Offset. The heating temperature offset fields are used to determine the heating stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference between the heating setpoint and the controlled zone temperature at previous time step is less than Stage 4 offset value, the heating stage number is 4. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 4 is specified.
+
+Note: If the stage number is not equal to the number of heating speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+
+\paragraph{Field: Number of Cooling Stages}\label{field-number-of-cooling-stages}
+
+This field defines the number of cooling stages, and must be less than or equal to the number of cooling speeds defined in the associated cooling coil, such as Coil:Cooling:DX:MultiSpeed. The value for this input field defines the number of cooling temperature offsets that must be defined for cooling in the fields below. The minimum value for this field is one (1) and the maximum value is four (4).
+
+\paragraph{Field:Cooling Temperature Setpoint Base Schedule Name}\label{fieldcooling-temperature-setpoint-base-schedule-name}
+
+The name of the associated schedule to specify cooling temperature base setpoint. Values in the schedule are temperatures \{C\}.
+
+\paragraph{Field:Cooling Throttling Temperature Range}\label{fieldcooling-throttling-temperature-range}
+
+This numeric field defines the cooling throttling temperature range in the units of deltaC. When the zone temperature at the previous time step is above the cooling temperature setpoint, the zone cooling setpoint will be set to the cooling temperature setpoint - 0.5 * cooling throttling temperature range. Otherwise, the zone cooling setpoint will be set to the cooling temperature setpoint + 0.5 * cooling throttling temperature range. The zone cooling setpoint is used in the predictor to calculate how much the cooling system load is needed to maintain the zone at the cooling setpoint.
+
+\paragraph{Field: Stage 1 Cooling Temperature Offset}\label{field-stage-1-cooling-temperature-offset}
+
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 1. The value entered here must be equal to or greater than 0. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 1 offset value and less than Stage 2 offset value, the cooling stage number is 1. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 1 is specified.
+
+\paragraph{Field: Stage 2 Cooling Temperature Offset}\label{field-stage-2-cooling-temperature-offset}
+
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 2. The value entered here must be greater than the value at the previous field: Stage 1 Cooling Temperature Offset. When the number of cooling stage is equal to 1, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 2 offset value and less than Stage 3 offset value, the cooling stage number is 2. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 2 is specified.
+
+\paragraph{Field: Stage 3 Cooling Temperature Offset}\label{field-stage-3-cooling-temperature-offset}
+
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 3. The value entered here must be greater than the value at the previous field: Stage 3 Cooling Temperature Offset. When the number of cooling stage is less than 3, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 3 offset value and less than Stage 4 offset value, the cooling stage number is 3. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 3 is specified.
+
+Note: If the stage number is not equal to the number of cooling speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+
+\paragraph{Field: Stage 4 Cooling Temperature Offset}\label{field-stage-4-cooling-temperature-offset}
+
+This numeric field defines the cooling temperature offset in the units of deltaC for Stage 4. The value entered here must be greater than the value at the previous field: Stage 4 Cooling Temperature Offset. When the number of cooling stage is less than 4, this filed is not used in the program. The cooling temperature offset fields are used to determine the cooling stage number for AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object. When the temperature difference of the cooling setpoint and the controlled zone temperature at previous time step is greater than Stage 4 offset value, the cooling stage number is 4. When the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object is called, Speed 4 is specified.
+
+Note: If the stage number is not equal to the number of cooling speed in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object, the minimum value is set to the speed number for the heat pump object.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+ZoneControl:Thermostat:StagedDualSetpoint,
+  ZoneThermostat,                   !- Name
+  AllZones,                               !- Zone or ZoneList Name
+  2,                                             !- Number of Heating Stages
+  Heating Setpoints,             !- Heating Temperature Setpoint Schedule Name
+  1.1,                                         !- Heating Throttling Temperature Range {deltaC}
+  0.0,                                         !- Stage 1 Heating Temperature Offset {deltaC}
+  -0.5,                                       !- Stage 2 Heating Temperature Offset {deltaC}
+  -1.0,                                       !- Stage 3 Heating Temperature Offset {deltaC}
+  -1.5,                                       !- Stage 4 Heating Temperature Offset {deltaC}
+  4,                                             !- Number of Cooling Stages
+  Cooling Setpoints,             !- Cooling Setpoint Temperature Schedule Name
+  1.1,                                         !- Cooling Throttling Temperature Range {deltaC}
+  0.0,                                         !- Stage 1 Cooling Temperature Offset {deltaC}
+  1.0,                                         !- Stage 2 Cooling Temperature Offset {deltaC}
+  2.0,                                         !- Stage 3 Cooling Temperature Offset {deltaC}
+  3.0;                                         !- Stage 4 Cooling Temperature Offset {deltaC}
+\end{lstlisting}
+
+\subsection{ZoneControl:Humidistat}\label{zonecontrolhumidistat}
+
+The humidistat zone control object is used to control a zone to a single relative humidity setpoint schedule, or to dual humidity setpoint schedules (humidifying/ dehumidifying setpoints with deadband). The single setpoint humidistat requires single setpoint input only, and the dual-setpoint humidistat requires inputs of both humidifying and dehumidifying setpoints. The schedules consist of relative humidities, expressed as a percentage (0-100), to be used during the simulation for that zone s moisture prediction calculation. Only one humidistat control statement can be specified for each zone. For a single setpoint humidistat, if the zone relative humidity is below the control relative humidity setpoint and the equipment specified can humidify then that equipment will try and meet the zone s humidification load. The opposite is true if the zone relative humidity is above the control relative humidity setpoint and the equipment can dehumidify. For a dual setpoint humidistat, if the zone relative humidity is below the \textbf{humidifying} relative humidity setpoint and the equipment specified can humidify then that equipment will try and meet the zone s humidification load. The opposite is true if the zone relative humidity is above the \textbf{dehumidifying} relative humidity setpoint and the equipment can dehumidify.
+
+If the ZoneControl:Humidistat is used by a furnace or unitary system (Ref. Furnace and Unitary Systems) no other objects are required. The signal from the humidistat is used directly by that component. If the Zone Control:Humidistat object is used to control a Humidifier or used in conjunction with a Controller:WaterCoil object with control variable \textbf{TemperatureAndHumidityRatio} or \textbf{HumidityRatio}, the following objects are required to determine a setpoint for those components for a single setpoint humidistat:
+
+\begin{itemize}
+\item
+  SetpointManager:SingleZone:Humidity:Minimum
+\item
+  SetpointManager:MultiZone:MinimumHumidity:Average
+\item
+  SetpointManager:MultiZone:MaximumHumidity:Average
+\item
+  SetpointManager:MultiZone:Humidity:Minimum
+\item
+  SetpointManager:MultiZone:Humidity:Maximum
+\item
+  SetpointManager:SingleZone:Humidity:Minimum
+\end{itemize}
+
+For a dual setpoint humidistat, both a maximum humidity setpoint manager object:
+
+\begin{itemize}
+\item
+  SetpointManager:SingleZone:Humidity:Maximum
+\item
+  SetpointManager:MultiZone:MaximumHumidity:Average
+\item
+  SetpointManager:MultiZone:Humidity:Maximum
+\end{itemize}
+
+and a minimum humidity setpoint manager object:
+
+\begin{itemize}
+\item
+  SetpointManager:SingleZone:Humidity:Minimum
+\item
+  SetpointManager:MultiZone:MinimumHumidity:Average
+\item
+  SetpointManager:MultiZone:Humidity:Minimum
+\end{itemize}
+
+are required to determine the setpoints for the corresponding humidification and dehumidification components.
+
+\subsubsection{Inputs}\label{inputs-8-028}
+
+\paragraph{Field: Name}\label{field-name-6-026}
+
+Unique identifying name for the humidistat.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-014}
+
+Name of the zone that is being controlled.
+
+\paragraph{Field: Humidifying Relative Humidity Setpoint Schedule Name}\label{field-humidifying-relative-humidity-setpoint-schedule-name}
+
+Name of a schedule that defines the humidifying relative humidity setpoint, expressed as a percentage (0-100), for each timestep of the simulation.
+
+\textbf{Note}: If only a single setpoint humidistat is desired, then input the single schedule name in the Humidifying Setpoint Schedule Name field (and leave the Dehumidifying Setpoint Schedule Name blank).
+
+\paragraph{Field: Dehumidifying Relative Humidity Setpoint Schedule Name}\label{field-dehumidifying-relative-humidity-setpoint-schedule-name-1}
+
+Name of a schedule that defines the dehumidifying relative humidity setpoint, expressed as a percentage (0-100), for each timestep of the simulation. This field is optional, only used if a dual setpoint humidistat is to be modeled.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+ZoneControl:Humidistat,
+  Zone 2 Humidistat,             !- Humidistat Name
+  EAST ZONE,                             !- Zone Name
+  Min Rel Hum Set Sch,       !- Humidifying Relative Humidity Setpoint SCHEDULE Name
+  Max Rel Hum Set Sch;       !- Dehumidifying Relative Humidity Setpoint SCHEDULE Name
+\end{lstlisting}
+
+An example schedule for the Zone Control:Humidistat
+
+\begin{lstlisting}
+
+ScheduleTypeLimits,Humidity,0:100,CONTINUOUS;
+
+
+  Schedule:Compact,
+  Min Rel Hum Set Sch,       !- Name
+  Humidity,                               !- ScheduleType
+  Through: 12/31,                   !- Complex Field \#1
+  For: AllDays,                       !- Complex Field \#2
+  Until: 24:00,                       !- Complex Field \#3
+  30.0;                                       !- Complex Field \#4
+  Schedule:Compact,,
+  Max Rel Hum Set Sch,       !- Name
+  Humidity,                               !- ScheduleType
+  Through: 12/31,                   !- Complex Field \#1
+  For: AllDays,                       !- Complex Field \#2
+  Until: 24:00,                       !- Complex Field \#3
+  55.0;                                       !- Complex Field \#4
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-2-027}
+
+Outputs available from the ZoneControl:Humidistat:
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\end{itemize}
+
+\paragraph{Zone Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-moisture-transfer-rate-kgwaters}
+
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone s relative humidity is between the defined humidifying and dehumidifying setpoints. This moisture load rate is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat setpoints, determines if the zone requires humidification or dehumidification, and then passes this single load to the equipment for the single setpoint humidistat case. This value is not multiplied by zone or group multipliers.
+
+\paragraph{Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-to-humidifying-setpoint-moisture-transfer-rate-kgwaters}
+
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{humidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires humidification or not, and then passes this load to the equipment for the case of a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is multiplied by zone or group multipliers.
+
+\paragraph{Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-to-dehumidifying-setpoint-moisture-transfer-rate-kgwaters}
+
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{dehumidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires dehumidification or not, and then passes this load to the equipment for a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is multiplied by zone or group multipliers.
+
+\subsection{ZoneControl:Thermostat:ThermalComfort}\label{zonecontrolthermostatthermalcomfort}
+
+The thermal comfort zone control provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g.~Fanger) and a user-specified thermal comfort setpoint schedule.
+
+This object references a control type schedule and one or more thermal comfort control type objects which in turn reference one or more setpoint schedules. The example at the end of this section illustrates a complete zone thermal comfort control specification including the control type and setpoint schedules. The control type schedule and the list of control type/name pairs are directly related. The schedule defines the type of control that is to be used during for each hour. Valid Control Types are
+
+0 - Uncontrolled (No thermal comfort control)
+
+1 - Single Thermal Comfort Heating Setpoint:Fanger
+
+2 - Single Thermal Comfort Cooling Setpoint:Fanger
+
+3 - Single Thermal Comfort Heating Cooling Setpoint:Fanger
+
+4 - Dual Thermal Comfort Setpoint with Deadband:Fanger
+
+Thus, if the schedule referenced in the ZoneControl:Thermostat:ThermalComfort statement has a value of 4 for a particular hour, this indicates that during that hour ``Dual Thermal Comfort Setpoint with Deadband:Fanger'' is to be used. The specific ``Dual Thermal Comfort Setpoint with Deadband:Fanger'' control object to be used is specified in the list of control type/name pairs. Then the specific control type objects reference the thermal comfort control setpoint schedule to be used. Because only one control can be specified for each control type in a ZoneControl:Thermostat:ThermalComfort statement, there are only four pairs possible in a particular ZoneControl:Thermostat:ThermalComfort type/name list. This is because individual controls can be defined hourly, thus giving the user a full range of flexibility. Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the hourly schedule profile.
+
+The ZoneControl:Thermostat:ThermalComfort object can be used alone, or with a ZoneControl:Thermostat object. When both control objects co-exist for a specific zone and the thermal comfort control type value in the thermal comfort control type schedule is non-zero the thermal comfort object will override the value from the zone thermostat object. If the thermal comfort control is specified as Uncontrolled (thermal comfort control type value of 0) for a particular period, then control will revert to thermostat control if specified. If the thermal comfort control is specified as Uncontrolled for a particular period and thermostat control is not specified in the input, then conditions will float.
+
+This object currently allows only Fanger comfort control (Ref. Thermal Comfort in Engineering Reference). It requires one or more people objects in a specific zone. It also requires inputs of Fields \emph{Activity Level Schedule Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name} and \emph{Air Velocity Schedule Name} in the people object(s). When thermal comfort control is used in a zone, the air velocity entered in the Air Velocity Schedule (Ref. People) should be greater than or equal to 0.1 and less than or equal to 0.5 m/s. A warning message will be issued if thermal comfort control is active and the air velocity is outside this range.
+
+This object reads input PMV values from a given PMV setpoint schedule to calculate a dry-bulb temperature setpoint based on the selected thermal comfort model. The dry-bulb temperature setpoint calculation uses zone air humidity ratio at the previous system timestep and surface temperatures at the previous zone timestep, along with other conditions at the current timestep (e.g., activity level, clothing level and air velocity from the PEOPLE object).
+
+\subsubsection{Inputs}\label{inputs-9-025}
+
+\paragraph{Field: Name}\label{field-name-7-024}
+
+Unique identifying name for this thermal comfort control object.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-2-000}
+
+Name of the zone or set of zones that is being controlled. When the ZoneList option is used then this thermostat definition is applied to each of the zones in the zone list effecting a global definition for thermostatic control in the zone.
+
+\paragraph{Field: Averaging Method}\label{field-averaging-method}
+
+This choice field specifies the method for calculating the thermal comfort dry-bulb temperature setpoint for a zone with multiple People objects defined. The available choices are: \textbf{SpecificObject}, \textbf{ObjectAverage}, and \textbf{PeopleAverage}. This field is only used when multiple people objects are defined for this zone. If this field is specified as \textbf{PeopleAverage} and the total number of people for all people objects is zero for a particular timestep, the PeopleAverage method cannot be applied and the program automatically uses the ObjectAverage method for this timestep. The default input is \textbf{PeopleAverage}.
+
+\paragraph{Field: Object Name for Specific Object Averaging Method}\label{field-object-name-for-specific-object-averaging-method}
+
+This choice field specifies the name of the specific People object to be used for calculating comfort control when multiple People objects are defined. Only used if the Averaging Method is specified as SpecificObject.
+
+\paragraph{Field: Minimum Dry-Bulb Temperature Setpoint}\label{field-minimum-dry-bulb-temperature-setpoint}
+
+This field specifies the minimum dry-bulb temperature setpoint allowed for this zone. If the dry-bulb temperature calculated by the thermal comfort setpoint model is below this value, then the temperature setpoint will be set to this value. The default value is 0 ˚C.
+
+\paragraph{Field: Maximum Dry-Bulb Temperature Setpoint}\label{field-maximum-dry-bulb-temperature-setpoint}
+
+This field specifies the maximum dry-bulb temperature setpoint allowed for this zone. If the dry-bulb temperature calculated by the thermal comfort setpoint model exceeds this value, then the temperature setpoint will be set to this value. The default value is 50 ˚C.
+
+Note the minimum and maximum temperature setpoint fields are provided to allow the user to bound the temperature control In a specific zone if necessary. These fields are used to provide boundaries for the dry-bulb temperature setpoint calculated at each system timestep when unrealistic inputs have been specified.
+
+\paragraph{Field: Thermal Comfort Control Type Schedule Name}\label{field-thermal-comfort-control-type-schedule-name}
+
+Schedule which defines what type of thermal comfort control is active during each simulation timestep.
+
+Valid Control Types are
+
+0 - No thermal comfort control
+
+1 - Single Thermal Comfort Heating Setpoint:Fanger
+
+2 - Single Thermal Comfort Cooling Setpoint:Fanger
+
+3 - Single Thermal Comfort Heating Cooling Setpoint:Fanger
+
+4 - Dual Thermal Comfort Setpoint with Deadband:Fanger
+
+Each non-zero control type used in this schedule must appear in the following fields which list the specific thermal comfort control objects to be used for this zone.
+
+\paragraph{Field Set (Thermal Comfort Control Object Type, Thermal Comfort Control Name)}\label{field-set-thermal-comfort-control-object-type-thermal-comfort-control-name}
+
+Up to four pairs of Thermal Comfort Control Type and Thermal Comfort Control Type Name fields may be listed to specify which thermal comfort control type objects are used for this zone. This list is not order-dependent, and the position in this list has no impact on the control type schedule. In the control type schedule, a value of 1 always means ``Single Thermal Comfort Heating Setpoint:Fanger'', even if that control type is not first in this list.
+
+\paragraph{Field: Thermal Comfort Control \textless{}x\textgreater{} Object Type}\label{field-thermal-comfort-control-x-object-type}
+
+This field specifies the first control type name to be used for this zone. Available control types are:
+
+ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating
+
+ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling
+
+ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling
+
+ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint
+
+\paragraph{Field: Thermal Comfort Control \textless{}x\textgreater{} Name}\label{field-thermal-comfort-control-x-name}
+
+The unique name for the corresponding thermal comfort control type.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+ZoneControl:Thermostat:ThermalComfort,
+  Zone 2 Comfort Control,                   !- Thermal Comfort Control Name
+  EAST ZONE,                                             !- Zone Name
+  SpecificObject,                                   !- Averaging Method for Zones with Multiple People Objects
+  EAST ZONE,                                             !- Object Name for Specific Object Averaging Method
+  12.8,                                                       !- Minimum dry-bulb temperature setpoint
+  40.0,                                                       !- Maximum dry-bulb temperature setpoint
+  Zone Comfort Control Type Sched, !- Thermal Comfort Control Type SCHEDULE Name
+  Dual Thermal Comfort Setpoint WITH DEADBAND:Fanger, !- Control Type #1
+  Dual Comfort Setpoint;                     !- Thermal Comfort Control Type Name #1
+\end{lstlisting}
+
+Global thermal comfort thermostat example:
+
+\begin{lstlisting}
+
+ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+
+
+  ZoneControl:Thermostat:ThermalComfort,
+  ControlledZones Comfort Control,   !- Name
+  AllControlledZones,                             !- Zone Name
+  PeopleAverage,                     !- Averaging Method
+  ,                                               !- Specific People Name
+  12.8,                                       !- Minimum Dry-Bulb Temperature Setpoint {C}
+  40.0,                                       !- Maximum Dry-Bulb Temperature Setpoint {C}
+  Zone Comfort Control Type Sched,   !- Thermal Comfort Control Type Schedule Name
+  ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,   !- Thermal Comfort Control 1 Object Type
+  Single Heating Comfort Setpoint,   !- Thermal Comfort Control 1 Name
+  ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling,   !- Thermal Comfort Control 2 Object Type
+  Single Cooling Comfort Setpoint,   !- Thermal Comfort Control 2 Name
+  ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling,   !- Thermal Comfort Control 3 Object Type
+  Single Heating Cooling Comfort Setpoint,   !- Thermal Comfort Control 3 Name
+  ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint,   !- Thermal Comfort Control 4 Object Type
+  Dual Comfort Setpoint;     !- Thermal Comfort Control 4 Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-3-024}
+
+Three outputs are available from the ZoneControl:Thermostat:ThermalComfort object. Two output variables used primarily for the ZoneControl:Thermost object are also described here to explain their meaning when using thermal comfort control.
+
+\textbf{ZoneControl:ThermalComfort}
+
+\begin{itemize}
+\item
+  Zone,Average,Zone Thermal Comfort Control Type {[]}
+\item
+  Zone,Average,Zone Thermal Comfort Control Fanger Low Setpoint PMV {[]}
+\item
+  Zone,Average,Zone Thermal Comfort Control Fanger High Setpoint PMV {[]}
+\end{itemize}
+
+\textbf{ZoneControl:Thermostat}
+
+\begin{itemize}
+\item
+  Zone,Average,Zone Thermostat Heating Setpoint Temperature {[}C{]}
+\item
+  Zone,Average,Zone Thermostat Cooling Setpoint Temperature {[}C{]}
+\end{itemize}
+
+\paragraph{Zone Thermal Comfort Control Type {[]}}\label{zone-thermal-comfort-control-type}
+
+This is the current zone thermal comfort control type (0 through 4). This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+\paragraph{Zone Thermal Comfort Control Fanger Low Setpoint PMV {[]}}\label{zone-thermal-comfort-control-fanger-low-setpoint-pmv}
+
+This is the current zone thermal comfort low Predicted Mean Vote value. Values range between -3 and +3. If there is no heating thermal comfort active, then the value reported will be -999. This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+\paragraph{Zone Thermal Comfort Control Fanger High Setpoint PMV {[]}}\label{zone-thermal-comfort-control-fanger-high-setpoint-pmv}
+
+This is the current zone thermal comfort high Predicted Mean Vote value. Values range between -3 and +3. If there is no cooling thermal comfort active, then the value reported will be 999. This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+\paragraph{Zone Thermostat Heating Setpoint Temperature {[}C{]}}\label{zone-thermostat-heating-setpoint-temperature-c-1}
+
+The Zone Control:Thermal Comfort object shares the same output variable and overwrites the thermal setpoints defined in object Zone Control:Thermostatic when both objects of Zone Control:Thermostatic and Zone Control:Thermal Comfort co-exist. It outputs the current zone thermal comfort heating setpoint in degrees C when thermal comfort control is active, otherwise this output variable will report the thermostat heating setpoint (Ref. Zone Control:Thermostatic Outputs). If there is no heating thermal comfort active and no thermostat heating setpoint is defined for this zone, this value will be 0. This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+\paragraph{Zone Thermostat Cooling Setpoint Temperature {[}C{]}}\label{zone-thermostat-cooling-setpoint-temperature-c-1}
+
+This output variable defined in object Zone Control:Thermostatic. The Thermal Comfort object shares the same output variable and overwrites the thermal setpoints defined in object Zone Control:Thermostatic when both objects of Zone Control:Thermostatic and Zone Control:Thermal Comfort co-exist. It outputs the current zone thermal comfort cooling setpoint in degrees C when thermal comfort control is active, otherwise this output variable will report the thermostat cooling setpoint (Ref. Zone Control:Thermostatic Outputs). If there is no cooling thermal comfort active and no thermostat cooling setpoint is defined for this zone, this value will be 0. This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
+
+\subsection{Thermal Comfort Setpoints}\label{thermal-comfort-setpoints}
+
+The syntax for the current set (4) of zone thermal comfort control types is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control type is a single or dual setpoint control). The schedule defines a Predicted Mean Vote (PMV) setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled thermal comfort zone, no Fanger thermal comfort object is specified or necessary. However, the \lstinline!Fanger thermal comfort output variables, Zone Thermal Comfort Fanger Model PMV and Zone Thermal Comfort Fanger Model PPD, are reported for thermal comfort uncontrolled conditions as well (e.i., free floating thermal comfort condition) just like a free floating temperature and humidity ratio.   These are indicative of the actual thermal comfort level in uncontrolled thermal comfort zone, and are outputs variables under!People objects\lstinline!.!
+
+\subsection{ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating}\label{thermostatsetpointthermalcomfortfangersingleheating}
+
+This would be used for heating only thermal comfort control. The PMV setpoint can be scheduled and varied throughout the simulation but only heating is allowed with this control type.
+
+\subsubsection{Inputs}\label{inputs-10-023}
+
+\paragraph{Field: Name}\label{field-name-8-024}
+
+Unique name for this control type.
+
+\paragraph{Field: Fanger Thermal Comfort Schedule Name}\label{field-fanger-thermal-comfort-schedule-name}
+
+The name of the associated schedule containing \lstinline!Zone Thermal Comfort Fanger Model PMV! values.
+
+\subsection{ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling}\label{thermostatsetpointthermalcomfortfangersinglecooling}
+
+This would be used for cooling only thermal comfort control. The PMV setpoint can be scheduled and varied throughout the simulation but only cooling is allowed with this control type.
+
+\subsubsection{Inputs}\label{inputs-11-022}
+
+\paragraph{Field: Name}\label{field-name-9-021}
+
+Unique name for this control type.
+
+\paragraph{Field: Fanger Thermal Comfort Schedule Name}\label{field-fanger-thermal-comfort-schedule-name-1}
+
+The name of the associated schedule, containing \lstinline!Zone Thermal Comfort Fanger Model PMV! values.
+
+\subsection{ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling}\label{thermostatsetpointthermalcomfortfangersingleheatingorcooling}
+
+This would be used for heating and cooling thermal comfort control but only heating or cooling can be scheduled at any given time period. The PMV setpoint can be scheduled and varied throughout the simulation for both heating and cooling.
+
+\subsubsection{Inputs}\label{inputs-12-020}
+
+\paragraph{Field: Name}\label{field-name-10-019}
+
+Unique name for this control type.
+
+\paragraph{Field: Fanger Thermal Comfort Schedule Name}\label{field-fanger-thermal-comfort-schedule-name-2}
+
+The name of the associated schedule containing \lstinline!Zone Thermal Comfort Fanger Model PMV! values.
+
+\subsection{ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint}\label{thermostatsetpointthermalcomfortfangerdualsetpoint}
+
+This would be used for heating and cooling thermal comfort control where both a heating and cooling PMV setpoint can be scheduled for any given time period. The PMV setpoint can be scheduled and varied throughout the simulation for both heating and cooling.
+
+\subsubsection{Inputs}\label{inputs-13-017}
+
+\paragraph{Field: Name}\label{field-name-11-016}
+
+Unique name for this control type.
+
+\paragraph{Field: Fanger Thermal Comfort Heating Schedule Name}\label{field-fanger-thermal-comfort-heating-schedule-name}
+
+The name of the associated schedule containing heating setpoint \lstinline!Zone Thermal Comfort Fanger Model PMV! values.
+
+\paragraph{Field: Fanger Thermal Comfort Cooling Schedule Name}\label{field-fanger-thermal-comfort-cooling-schedule-name}
+
+The name of the associated schedule containing cooling setpoint \lstinline!Zone Thermal Comfort Fanger Model PMV! values.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,
+  Heating Comfort Setpoint,!- Name
+  Heating PMV Setpoints;     !- Setpoint Temperature SCHEDULE Name
+
+
+  ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling,
+  Cooling Comfort Setpoint,!- Name
+  Cooling PMV Setpoints;     !- Setpoint Temperature SCHEDULE Name
+
+
+  ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling,
+  Heating Cooling Comfort Setpoint,!- Name
+  Heating Cooling PMV Setpoints;     !- Setpoint Temperature SCHEDULE Name
+
+
+  ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint,
+  Dual Comfort Setpoint,     !- Name
+  Heating PMV Setpoints,     !- Fanger Thermal Comfort Heating Setpoint PMV SCHEDULE Name
+  Cooling PMV Setpoints;     !- Fanger Thermal Comfort Cooling Setpoint PMV SCHEDULE Name
+\end{lstlisting}
+
+\subsection{ZoneControl:ContaminantController}\label{zonecontrolcontaminantcontroller}
+
+The ZoneControl:ContaminantController object is used for any of the following two purposes based on the system outdoor air method specified in the Controller:MechanicalVentilation.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  To control a zone to a specified indoor level of contaminants. When this zone is served by an AirLoopHVAC, the other zones served by the same AirLoopHVAC will have the same specified indoor level, if no objects in the other zones served by the same AirLoop are specified. Currently, the available contaminant controls are carbon dioxide and generic contaminant controls. The specified carbon dioxide setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure.The specified generic contaminant setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant.
+\item
+  To specify minimum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. Carbon Dioxide Control Availability Schedule Name determines the availability of ProportionalControl .
+\end{enumerate}
+
+For the first purpose above, when multiple zones are served by an AirLoop, those zones that do not have a contaminant controller object specified in the input data file are automatically assigned a carbon dioxide setpoint. Zone objects entered in the input data file are internally assigned an index number from 1 to n (first defined Zone object = 1, next Zone object defined in the input file = 2, etc.). For zones served by an AirLoop that do not have a contaminant controller specified, the zone s carbon dioxide setpoint will be the same as the zone with the next highest zone index number that has a contaminant controller specified. If a zone with a higher index number and contaminant controller specified does not exist, then the zone with the next lowest zone index number that has a contaminant controller specified will be used. For example, assume an AirLoop serves zones 1 through 5, but one ZoneControl:ContaminantController object is specified for zone 2, a second ZoneControl:ContaminantController object is specified for zone 4, and no ZoneControl:ContaminantController objects are specified for zones 1, 3 and 5. In this case, zone 1 will be assigned the carbon dioxide setpoint schedule that was specified for zone 2, and zones 3 and 5 will be assigned the carbon dioxide setpoint schedule that was specified for zone 4.
+
+\subsubsection{Inputs}\label{inputs-14-017}
+
+\paragraph{Field: Name}\label{field-name-12-013}
+
+Unique identifying name for the ZoneControl:ContaminantController.
+
+\paragraph{Field: Zone Name}\label{field-controlled-zone-name-000}
+
+Name of the zone that is being controlled.
+
+\paragraph{Field:Carbon Dioxide Control Availability Schedule Name}\label{fieldcarbon-dioxide-control-availability-schedule-name}
+
+This field contains the name of a schedule that determines whether or not the ZoneControl:ContaminantController is available. When the schedule value is zero, the ZoneControl:ContaminantController is bypassed (not available to operate). When the schedule value is greater than zero, the ZoneControl:ContaminantController is available and will be used to calculate the required outdoor airflow rate to reach the carbon dioxide setpoint. If this field is left blank, the schedule has a value of 1 for all time periods. Schedule values must be between 0 and 1.
+
+\paragraph{Field:Carbon Dioxide Setpoint Schedule Name}\label{fieldcarbon-dioxide-setpoint-schedule-name}
+
+This field contains the name of a schedule that contains the zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. The setpoint values in the schedule must be between 0 and 2000 ppm. . This field is used when the field System Outdoor Air Method = IndoorAirQualityProcedure in the Controller:MechanicalVentilation object.
+
+\paragraph{Field:Minimum Carbon Dioxide Concentration Schedule Name}\label{fieldminimum-carbon-dioxide-concentration-schedule-name}
+
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the Controller:MechanicalVentilation object.
+
+\paragraph{Field: Generic Contaminant Control Availability Schedule Name}\label{field-generic-contaminant-control-availability-schedule-name}
+
+This field contains the name of a schedule that determines whether or not the ZoneControl:ContaminantController is available. When the schedule value is zero, the generic contaminant control will not be performed. When the schedule value is greater than zero, the ZoneControl:ContaminantController is available and will be used to calculate the required outdoor airflow rate to reach the generic contaminant setpoint. If this field is left blank, the schedule has a value of 1 for all time periods. Schedule values must be between 0 and 1.
+
+\paragraph{Field: Generic Contaminant Setpoint Schedule Name}\label{field-generic-contaminant-setpoint-schedule-name}
+
+This field contains the name of a schedule that contains the zone generic contaminant concentration setpoint as a function of time. The units for generic contaminant setpoint are ppm. The setpoint values in the schedule must be\textgreater{} = 0.
+
+An IDF example is provided below:
+
+\begin{lstlisting}
+
+ZoneControl:ContaminantController,
+  CO2 Controller1,                 !- Name
+  EAST ZONE,                             !- Zone Name
+  CO2AvailSchedule,               !- Carbon Dioxide Control Availability Schedule Name
+  CO2SetpointSchedule,         !- Carbon Dioxide Setpoint Schedule Name
+  ,                                               !- Minimum Carbon Dioxide Concentration Schedule Name
+  GCAvailSchedule,                 !- Generic Contaminant Control Availability Schedule Name
+  GCSetpointSchedule;           !- Generic Contaminant Setpoint Schedule Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-4-020}
+
+The following output variables are available when the ZoneControl:ContaminantController object is specified.
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Zone Air CO2 Setpoint Concentration {[}ppm{]}
+\item
+  HVAC,Average,Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Zone Generic Air Contaminant Setpoint Concentration {[}ppm{]}
+\end{itemize}
+
+\paragraph{Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate {[}kg/s{]}}\label{zone-air-co2-predicted-load-to-setpoint-mass-flow-rate-kgs}
+
+This output is the average predicted outdoor airflow rate in kg/s required to meet the current zone carbon dioxide setpoint for the time step being reported. This value is calculated and reported from the Predict step in the Zone Contaminant Predictor-Corrector module. The calculated outdoor airflow rate will be specified in the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedureto provide enough outdoor ventilation air to keep the zone air carbon dioxide concentration level at or below the setpoint.
+
+\paragraph{Zone Air CO2 Setpoint Concentration {[}ppm{]}}\label{zone-air-co2-setpoint-concentration-ppm}
+
+This output variable is the average carbon dioxide setpoint value, in parts per million, for the time step being reported.
+
+\paragraph{Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate {[}kg/s{]}}\label{zone-generic-air-contaminant-predicted-load-to-setpoint-mass-flow-rate-kgs}
+
+This output is the average predicted outdoor airflow rate in kg/s required to meet the current zone generic contaminant setpoint for the time step being reported. This value is calculated and reported from the Predict step in the Zone Contaminant Predictor-Corrector module. The calculated outdoor airflow rate will be specified in the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant****to provide enough outdoor ventilation air to keep the zone air generic contaminant concentration level at or below the setpoint.
+
+\paragraph{Zone Generic Air Contaminant Setpoint Concentration {[}ppm{]}}\label{zone-generic-air-contaminant-setpoint-concentration-ppm}
+
+This output variable is the averagegeneric contaminant setpoint value, in parts per million, for the time step being reported.

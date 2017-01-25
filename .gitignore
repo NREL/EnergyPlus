@@ -10,14 +10,15 @@
 *.o
 *.o-*
 *.obj
+*.optrpt
 *.orig
 *.pdb
-*.rc
 *.res
 *.so
 *.so.*
 *~
 .directory
+.DS_Store
 
 # now that we have python, ignore some things
 *.pyc
@@ -34,3 +35,8 @@ Builds
 *.geany
 .project
 .cproject
+.idea
+.se
+
+# vim temp file:
+*.swp

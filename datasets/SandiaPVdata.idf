@@ -14,8 +14,7 @@
 !   2001
 !   mc-Si
 
-!  Version,
-!    8.3;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   PhotovoltaicPerformance:Sandia,
     12-PW100095W-Array,      !- Name

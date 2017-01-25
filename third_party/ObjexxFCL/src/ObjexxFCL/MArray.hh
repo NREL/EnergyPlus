@@ -5,23 +5,27 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/BArray.hh>
-#include <ObjexxFCL/StaticIndexRange.hh>
+#include <ObjexxFCL/fmt.hh>
+#include <ObjexxFCL/IndexRange.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
+#include <iomanip>
+#include <istream>
+#include <ostream>
 #include <type_traits>
 
 namespace ObjexxFCL {
@@ -33,11 +37,11 @@ class MArray : public BArray
 
 public: // Types
 
-	typedef  A  Array;
+	typedef  A  ArrayType;
 	typedef  typename A::value_type  Class;
 	typedef  T Class::*  MPtr;
 	typedef  TypeTraits< T >  Traits;
-	typedef  StaticIndexRange  IR;
+	typedef  IndexRange  IR;
 
 	// STL style
 	typedef  T  value_type;
@@ -60,7 +64,6 @@ public: // Types
 protected: // Creation
 
 	// Copy Constructor
-	inline
 	MArray( MArray const & a ) :
 	 BArray( a ),
 	 array_( a.array_ ),
@@ -68,7 +71,6 @@ protected: // Creation
 	{}
 
 	// Constructor
-	inline
 	MArray( A & a, T Class::* pmem ) :
 	 array_( a ),
 	 pmem_( pmem )
@@ -77,7 +79,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~MArray()
 	{}
@@ -85,22 +86,12 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	MArray &
 	operator =( MArray const & a ); // Disallow
 
 public: // Predicate
 
-	// Dimensions Initialized?
-	inline
-	bool
-	dimensions_initialized() const
-	{
-		return array_.dimensions_initialized();
-	}
-
 	// Allocated
-	inline
 	bool
 	allocated() const
 	{
@@ -108,7 +99,6 @@ public: // Predicate
 	}
 
 	// Active Array Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -116,7 +106,6 @@ public: // Predicate
 	}
 
 	// Active Array Size Bounded?
-	inline
 	bool
 	size_bounded() const
 	{
@@ -124,10 +113,9 @@ public: // Predicate
 	}
 
 	// Conformable?
-	template< class ArrayType >
-	inline
+	template< class Ar >
 	bool
-	conformable( ArrayType const & a ) const
+	conformable( Ar const & a ) const
 	{
 		return array_.conformable( a );
 	}
@@ -140,7 +128,6 @@ public: // Inspector
 	rank() const = 0;
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -148,7 +135,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	int
 	isize() const
 	{
@@ -156,7 +142,6 @@ public: // Inspector
 	}
 
 	// IndexRange of a Dimension
-	inline
 	IR
 	I( int const d ) const
 	{
@@ -164,7 +149,6 @@ public: // Inspector
 	}
 
 	// Lower Index of a Dimension
-	inline
 	int
 	l( int const d ) const
 	{
@@ -176,7 +160,6 @@ public: // Inspector
 	}
 
 	// Upper Index of a Dimension
-	inline
 	int
 	u( int const d ) const
 	{
@@ -184,7 +167,6 @@ public: // Inspector
 	}
 
 	// Size of a Dimension
-	inline
 	size_type
 	size( int const d ) const
 	{
@@ -192,7 +174,6 @@ public: // Inspector
 	}
 
 	// Size of a Dimension
-	inline
 	int
 	isize( int const d ) const
 	{
@@ -200,7 +181,6 @@ public: // Inspector
 	}
 
 	// Proxied Array
-	inline
 	A const &
 	array() const
 	{
@@ -208,7 +188,6 @@ public: // Inspector
 	}
 
 	// Proxied Array
-	inline
 	A &
 	array()
 	{
@@ -218,7 +197,6 @@ public: // Inspector
 protected: // Methods
 
 	// Array Index of an Index of Dimension
-	inline
 	int
 	j( int const d, int const i ) const
 	{
@@ -226,7 +204,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 1
-	inline
 	int
 	j1( int const i ) const
 	{
@@ -234,7 +211,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 2
-	inline
 	int
 	j2( int const i ) const
 	{
@@ -242,7 +218,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 3
-	inline
 	int
 	j3( int const i ) const
 	{
@@ -250,7 +225,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 4
-	inline
 	int
 	j4( int const i ) const
 	{
@@ -258,7 +232,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 5
-	inline
 	int
 	j5( int const i ) const
 	{
@@ -266,7 +239,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 6
-	inline
 	int
 	j6( int const i ) const
 	{
@@ -276,7 +248,6 @@ protected: // Methods
 protected: // Static Methods
 
 	// Is Last Index in [1,u] Range?
-	inline
 	static
 	bool
 	in_range( int const u, int const i )
@@ -286,7 +257,6 @@ protected: // Static Methods
 	}
 
 	// Are Last Two Indexes in [1,u] Range?
-	inline
 	static
 	bool
 	in_range( int const u, int const i, int const j )
@@ -304,19 +274,19 @@ protected: // Data
 }; // MArray
 
 // Conformable?
-template< class A, typename T, class ArrayType >
+template< class A, typename T, class Ar >
 inline
 bool
-conformable( MArray< A, T > const & a, ArrayType const & b )
+conformable( MArray< A, T > const & a, Ar const & b )
 {
 	return a.conformable( b );
 }
 
 // Conformable?
-template< class A, typename T, class ArrayType >
+template< class A, typename T, class Ar >
 inline
 bool
-conformable( ArrayType const & a, MArray< A, T > const & b )
+conformable( Ar const & a, MArray< A, T > const & b )
 {
 	return b.conformable( a );
 }

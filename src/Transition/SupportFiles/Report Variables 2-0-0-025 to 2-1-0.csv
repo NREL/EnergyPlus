@@ -1,0 +1,14 @@
+2.0.0.025,2.1.0.xxx,
+11,11, This number should be the number of following lines
+Domestic Hot Water Heating Rate,Water Use Equipment Heating Rate
+Domestic Hot Water Heating Energy,Water Use Equipment Heating Energy
+Domestic Hot Water Mass Flow Rate,Water Use Equipment Total Mass Flow Rate
+Domestic Hot Water Consumption Rate,Water Use Equipment Total Consumption Rate
+Domestic Hot Water Consumption,Water Use Equipment Total Consumption
+Diff Sol Amount from Ext Windows on Inside of Surface,<DELETE>
+Diff Sol Intensity from Ext Windows on Inside of Surface,<DELETE>
+Diff Sol Amount from Int Windows on Inside of Surface,<DELETE>
+Diff Sol Intensity from Int Windows on Inside of Surface,<DELETE>
+Diff Sol Amount from Ext Windows on Inside of Surface Energy,<DELETE>
+Diff Sol Amount from Int Windows on Inside of Surface Energy,<DELETE>
+old variable name,new variable name -- put variable names in quotes and leave off units -- <DELETE> to delete

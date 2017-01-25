@@ -1,17 +1,74 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <algorithm>
 #include <istream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/stream.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
 #include <CommandLineInterface.hh>
 #include <InputProcessor.hh>
 #include <DataIPShortCuts.hh>
@@ -54,7 +111,6 @@ namespace InputProcessor {
 	// USE STATEMENTS:
 	// Use statements for data only modules
 	// Using/Aliasing
-    
 	using namespace DataPrecisionGlobals;
 	using namespace DataStringGlobals;
 	using DataGlobals::MaxNameLength;
@@ -104,6 +160,18 @@ namespace InputProcessor {
 
 	// MODULE VARIABLE DECLARATIONS:
 
+	namespace {
+		// These were static variables within different functions. They were hoisted into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of InputProcessor should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		Array1D_string AlphaArgs;
+		Array1D< Real64 > NumberArgs;
+		Array1D_bool AlphaArgsBlank;
+		Array1D_bool NumberArgsBlank;
+	}
+
 	//Integer Variables for the Module
 	int NumObjectDefs( 0 ); // Count of number of object definitions found in the IDD
 	int NumSectionDefs( 0 ); // Count of number of section defintions found in the IDD
@@ -139,13 +207,13 @@ namespace InputProcessor {
 
 	//Character Variables for Module
 	std::string InputLine; // Each line can be up to MaxInputLineLength characters long
-	FArray1D_string ListOfSections;
-	FArray1D_string ListOfObjects;
-	FArray1D_int iListOfObjects;
-	FArray1D_int ObjectGotCount;
-	FArray1D_int ObjectStartRecord;
+	Array1D_string ListOfSections;
+	Array1D_string ListOfObjects;
+	Array1D_int iListOfObjects;
+	Array1D_int ObjectGotCount;
+	Array1D_int ObjectStartRecord;
 	std::string CurrentFieldName; // Current Field Name (IDD)
-	FArray1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
+	Array1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
 	std::string ReplacementName;
 
 	//Logical Variables for Module
@@ -161,22 +229,93 @@ namespace InputProcessor {
 	bool UniqueObject( false ); // Set to true when ReadInputLine has a unique object
 	bool ExtensibleObject( false ); // Set to true when ReadInputLine has an extensible object
 	int ExtensibleNumFields( 0 ); // set to number when ReadInputLine has an extensible object
-	FArray1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
+	Array1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
 	//Derived Types Variables
 
 	// Object Data
-	FArray1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
-	FArray1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
-	FArray1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
+	Array1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
+	Array1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
+	Array1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
 	LineDefinition LineItem; // Description of current record
-	FArray1D< LineDefinition > IDFRecords; // All the objects read from the IDF
-	FArray1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
+	Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
+	Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
+
+	// Clears the global data in InputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		ObjectDef.deallocate();
+		SectionDef.deallocate();
+		SectionsOnFile.deallocate();
+		ObjectStartRecord.deallocate();
+		ObjectGotCount.deallocate();
+		ObsoleteObjectsRepNames.deallocate();
+		ListOfSections.deallocate();
+		ListOfObjects.deallocate();
+		iListOfObjects.deallocate();
+		IDFRecordsGotten.deallocate();
+		IDFRecords.deallocate();
+		RepObjects.deallocate();
+		LineItem = LineDefinition();
+
+		NumObjectDefs = 0;
+		NumSectionDefs = 0;
+		MaxObjectDefs = 0;
+		MaxSectionDefs = 0;
+		NumLines = 0;
+		MaxIDFRecords = 0;
+		NumIDFRecords = 0;
+		MaxIDFSections = 0;
+		NumIDFSections = 0;
+		EchoInputFile = 0;
+		InputLineLength = 0;
+		MaxAlphaArgsFound = 0;
+		MaxNumericArgsFound = 0;
+		NumAlphaArgsFound = 0;
+		NumNumericArgsFound = 0;
+		MaxAlphaIDFArgsFound = 0;
+		MaxNumericIDFArgsFound = 0;
+		MaxAlphaIDFDefArgsFound = 0;
+		MaxNumericIDFDefArgsFound = 0;
+		NumOutOfRangeErrorsFound = 0;
+		NumBlankReqFieldFound = 0;
+		NumMiscErrorsFound = 0;
+		MinimumNumberOfFields = 0;
+		NumObsoleteObjects = 0;
+		TotalAuditErrors = 0;
+		NumSecretObjects = 0;
+		ProcessingIDD = false;
+
+		InputLine = std::string();
+		CurrentFieldName = std::string();
+		ReplacementName = std::string();
+
+		OverallErrorFlag = false;
+		EchoInputLine = true;
+		ReportRangeCheckErrors = true;
+		FieldSet = false;
+		RequiredField = false;
+		RetainCaseFlag = false;
+		ObsoleteObject = false;
+		RequiredObject = false;
+		UniqueObject = false;
+		ExtensibleObject = false;
+		ExtensibleNumFields = 0;
+
+		AlphaArgs.deallocate();
+		NumberArgs.deallocate();
+		AlphaArgsBlank.deallocate();
+		NumberArgsBlank.deallocate();
+
+		echo_stream = nullptr;
+	}
 
 	void
 	ProcessInput()
@@ -231,7 +370,6 @@ namespace InputProcessor {
 		int CountErr;
 		int Num1;
 		int Which;
-		int endcol;
 		int write_stat;
 		int read_stat;
 
@@ -280,7 +418,7 @@ namespace InputProcessor {
 		idd_stream.close();
 
 		ListOfObjects.allocate( NumObjectDefs );
-		ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
+		for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
 		if ( SortedIDD ) {
 			iListOfObjects.allocate( NumObjectDefs );
 			SetupAndSort( ListOfObjects, iListOfObjects );
@@ -325,7 +463,7 @@ namespace InputProcessor {
 		idf_stream.close();
 
 		ListOfSections.allocate( NumSectionDefs );
-		ListOfSections = SectionDef( {1,NumSectionDefs} ).Name();
+		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -406,8 +544,10 @@ namespace InputProcessor {
 		}
 
 		if ( OverallErrorFlag ) {
-			ShowSevereError( "IP: Possible incorrect IDD File" );
-			ShowContinueError( "IDD Version:\"" + IDDVerString + "\"" );
+			if (IDDVerString.find(MatchVersion) == std::string::npos) {
+				ShowSevereError("IP: Possible incorrect IDD File");
+				ShowContinueError(IDDVerString + " not the same as expected =\"" + MatchVersion + "\"");
+			}
 			for ( Loop = 1; Loop <= NumIDFRecords; ++Loop ) {
 				if ( SameString( IDFRecords( Loop ).Name, "Version" ) ) {
 					std::string::size_type const lenVer( len( MatchVersion ) );
@@ -416,7 +556,7 @@ namespace InputProcessor {
 					} else {
 						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ), MatchVersion ) );
 					}
-					if ( Which != 1 ) {
+					if ( Which != 0 ) {
 						ShowContinueError( "Version in IDF=\"" + IDFRecords( Loop ).Alphas( 1 ) + "\" not the same as expected=\"" + MatchVersion + "\"" );
 					}
 					break;
@@ -568,7 +708,7 @@ namespace InputProcessor {
 		errFlag = false;
 
 		if ( ! SqueezedSection.empty() ) {
-			if ( FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs ) > 0 ) {
+			if ( FindItemInList( SqueezedSection, SectionDef ) > 0 ) {
 				ShowSevereError( "IP: Already a Section called " + SqueezedSection + ". This definition ignored.", EchoInputFile );
 				// Error Condition
 				errFlag = true;
@@ -638,12 +778,11 @@ namespace InputProcessor {
 		bool errFlag; // Local Error condition flag, when true, object not added to Global list
 		char TargetChar; // Single character scanned to test for current field type (A or N)
 		bool BlankLine; // True when this line is "blank" (may have comment characters as first character on line)
-		static FArray1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha,
-		// False is numeric, saved in ObjectDef when done
-		static FArray1D_bool RequiredFields; // Array of argument required fields
-		static FArray1D_bool AlphRetainCase; // Array of argument for retain case
-		static FArray1D_string AlphFieldChecks; // Array with alpha field names
-		static FArray1D_string AlphFieldDefaults; // Array with alpha field defaults
+		static Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha, False is numeric, saved in ObjectDef when done
+		static Array1D_bool RequiredFields; // Array of argument required fields
+		static Array1D_bool AlphRetainCase; // Array of argument for retain case
+		static Array1D_string AlphFieldChecks; // Array with alpha field names
+		static Array1D_string AlphFieldDefaults; // Array with alpha field defaults
 		bool MinMax; // Set to true when MinMax field has been found by ReadInputLine
 		bool Default; // Set to true when Default field has been found by ReadInputLine
 		bool AutoSize; // Set to true when Autosizable field has been found by ReadInputLine
@@ -660,8 +799,8 @@ namespace InputProcessor {
 		static int PrevSizeNumAlpha( -1 );
 
 		// Object Data
-		static FArray1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
-		static FArray1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
+		static Array1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
+		static Array1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
 
 		if ( ! allocated( AlphaOrNumeric ) ) {
 			AlphaOrNumeric.allocate( {0,MaxANArgs} );
@@ -696,7 +835,7 @@ namespace InputProcessor {
 		WhichMinMax = 0;
 
 		if ( ! SqueezedObject.empty() ) {
-			if ( FindItemInList( SqueezedObject, ObjectDef.Name(), NumObjectDefs ) > 0 ) {
+			if ( FindItemInList( SqueezedObject, ObjectDef ) > 0 ) {
 				ShowSevereError( "IP: Already an Object called " + SqueezedObject + ". This definition ignored.", EchoInputFile );
 				// Error Condition
 				errFlag = true;
@@ -1231,7 +1370,7 @@ namespace InputProcessor {
 			ShowContinueError( "Will be processed as Section=" + SqueezedSection, EchoInputFile );
 		}
 		if ( ! has_prefix( SqueezedSection, "END" ) ) {
-			Found = FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs );
+			Found = FindItemInList( SqueezedSection, SectionDef );
 			if ( Found == 0 ) {
 				// Make sure this Section not an object name
 				if ( SortedIDD ) {
@@ -1338,7 +1477,7 @@ namespace InputProcessor {
 		std::string Message;
 		std::string cStartLine;
 		std::string cStartName;
-		static FArray1D_string LineBuf( dimLineBuf );
+		static Array1D_string LineBuf( dimLineBuf );
 		static int StartLine;
 		static int NumConxLines;
 		static int CurLines;
@@ -1372,7 +1511,7 @@ namespace InputProcessor {
 			}
 			if ( Found != 0 ) {
 				if ( ObjectDef( Found ).ObsPtr > 0 ) {
-					TFound = FindItemInList( SqueezedObject, RepObjects.OldName(), NumSecretObjects );
+					TFound = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
 					if ( TFound != 0 ) {
 						if ( RepObjects( TFound ).Transitioned ) {
 							if ( ! RepObjects( TFound ).Used ) ShowWarningError( "IP: Objects=\"" + stripped( ProposedObject ) + "\" are being transitioned to this object=\"" + RepObjects( TFound ).NewName + "\"" );
@@ -1403,7 +1542,7 @@ namespace InputProcessor {
 			TestingObject = false;
 			if ( Found == 0 ) {
 				// Check to see if it's a "secret" object
-				Found = FindItemInList( SqueezedObject, RepObjects.OldName(), NumSecretObjects );
+				Found = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
 				if ( Found == 0 ) {
 					ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Did not find \"" + stripped( ProposedObject ) + "\" in list of Objects", EchoInputFile );
 					// Will need to parse to next ;
@@ -1467,7 +1606,7 @@ namespace InputProcessor {
 					++NumMiscErrorsFound;
 				}
 				if ( ObjectDef( Found ).ObsPtr > 0 ) {
-					TFound = FindItemInList( SqueezedObject, RepObjects.OldName(), NumSecretObjects );
+					TFound = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
 					if ( TFound == 0 ) {
 						ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Obsolete object=" + stripped( ProposedObject ) + ", encountered.  Should be replaced with new object=" + ObsoleteObjectsRepNames( ObjectDef( Found ).ObsPtr ) );
 					} else if ( ! RepObjects( TFound ).Used && RepObjects( TFound ).Transitioned ) {
@@ -1953,7 +2092,7 @@ namespace InputProcessor {
 
 	void
 	GetListofSectionsinInput(
-		FArray1S_string SectionList,
+		Array1S_string SectionList,
 		int & NuminList
 	)
 	{
@@ -2000,7 +2139,7 @@ namespace InputProcessor {
 			ShowWarningError( "More in list than allowed in passed array - (GetListofSectionsinInput)" );
 		}
 		NuminList = MaxAllowedOut;
-		SectionList( {1,MaxAllowedOut} ) = SectionsOnFile( {1,MaxAllowedOut} ).Name();
+		for ( int i = 1; i <= MaxAllowedOut; ++i ) SectionList( i ) = SectionsOnFile( i ).Name;
 
 	}
 
@@ -2117,15 +2256,15 @@ namespace InputProcessor {
 	GetObjectItem(
 		std::string const & Object,
 		int const Number,
-		FArray1S_string Alphas,
+		Array1S_string Alphas,
 		int & NumAlphas,
-		FArray1S< Real64 > Numbers,
+		Array1S< Real64 > Numbers,
 		int & NumNumbers,
 		int & Status,
-		Optional< FArray1_bool > NumBlank,
-		Optional< FArray1_bool > AlphaBlank,
-		Optional< FArray1_string > AlphaFieldNames,
-		Optional< FArray1_string > NumericFieldNames
+		Optional< Array1_bool > NumBlank,
+		Optional< Array1_bool > AlphaBlank,
+		Optional< Array1_string > AlphaFieldNames,
+		Optional< Array1_string > NumericFieldNames
 	)
 	{
 
@@ -2166,10 +2305,12 @@ namespace InputProcessor {
 		int LoopIndex;
 		std::string ObjectWord;
 		std::string UCObject;
-		static FArray1D_string AlphaArgs;
-		static FArray1D< Real64 > NumberArgs;
-		static FArray1D_bool AlphaArgsBlank;
-		static FArray1D_bool NumberArgsBlank;
+		//////////// hoisted into namespace ////////////
+		// static Array1D_string AlphaArgs;
+		// static Array1D< Real64 > NumberArgs;
+		// static Array1D_bool AlphaArgsBlank;
+		// static Array1D_bool NumberArgsBlank;
+		////////////////////////////////////////////////
 		int MaxAlphas;
 		int MaxNumbers;
 		int Found;
@@ -2177,8 +2318,6 @@ namespace InputProcessor {
 		std::string cfld1;
 		std::string cfld2;
 		bool GoodItem;
-		int NAfld;
-		int NNfld;
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		NumAlphas = 0; //Autodesk:Uninit Force default initialization
@@ -2271,7 +2410,7 @@ namespace InputProcessor {
 						AlphaFieldNames()( {1,ObjectDef( Found ).NumAlpha} ) = ObjectDef( Found ).AlphFieldChks( {1,ObjectDef( Found ).NumAlpha} );
 					}
 					if ( present( NumericFieldNames ) ) {
-						NumericFieldNames()( {1,ObjectDef( Found ).NumNumeric} ) = ObjectDef( Found ).NumRangeChks( {1,ObjectDef( Found ).NumNumeric} ).FieldName();
+						for ( int i = 1, e = ObjectDef( Found ).NumNumeric; i <= e; ++i ) NumericFieldNames()( i ) = ObjectDef( Found ).NumRangeChks( i ).FieldName;
 					}
 					Status = 1;
 					break;
@@ -2494,10 +2633,10 @@ namespace InputProcessor {
 		std::string & ObjectWord,
 		int & NumAlpha,
 		int & NumNumeric,
-		Optional< FArray1S_string > AlphaArgs,
-		Optional< FArray1S< Real64 > > NumericArgs,
-		Optional< FArray1S_bool > AlphaBlanks,
-		Optional< FArray1S_bool > NumericBlanks
+		Optional< Array1S_string > AlphaArgs,
+		Optional< Array1S< Real64 > > NumericArgs,
+		Optional< Array1S_bool > AlphaBlanks,
+		Optional< Array1S_bool > NumericBlanks
 	)
 	{
 
@@ -3052,7 +3191,7 @@ namespace InputProcessor {
 		Count = NumParams - ObjectDef( ObjectNum ).ExtensibleNum + 1;
 		//  MaxArgsChanged=.FALSE.
 
-		FArray1D_bool AorN( ObjectDef( ObjectNum ).ExtensibleNum, false );
+		Array1D_bool AorN( ObjectDef( ObjectNum ).ExtensibleNum, false );
 		for ( int Loop = Count, Item = 1; Loop <= NumParams; ++Loop, ++Item ) {
 			bool const AON_Loop( ObjectDef( ObjectNum ).AlphaOrNumeric( Loop ) );
 			if ( AON_Loop ) {
@@ -3184,7 +3323,6 @@ namespace InputProcessor {
 		if ( StringLen == 0 ) return rProcessNumber;
 		int IoStatus( 0 );
 		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
-			Real64 Temp;
 			{ IOFlags flags; gio::read( PString, fmtLD, flags ) >> rProcessNumber; IoStatus = flags.ios(); }
 			ErrorFlag = false;
 		} else {
@@ -3342,7 +3480,61 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		FArray1S_string const ListOfItems,
+		Array1_string const & ListOfItems,
+		int const NumItems
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is not case insensitive and doesn't need
+		// for most inputs -- they are automatically turned to UPPERCASE.
+		// If you need case insensitivity use FindItem.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( String == ListOfItems( Count ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1S_string const ListOfItems,
 		int const NumItems
 	)
 	{
@@ -3396,7 +3588,7 @@ namespace InputProcessor {
 	int
 	FindItemInSortedList(
 		std::string const & String,
-		FArray1S_string const ListOfItems,
+		Array1S_string const ListOfItems,
 		int const NumItems
 	)
 	{
@@ -3462,7 +3654,62 @@ namespace InputProcessor {
 	int
 	FindItem(
 		std::string const & String,
-		FArray1S_string const ListOfItems,
+		Array1D_string const & ListOfItems,
+		int const NumItems
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   April 1999
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is case insensitive.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int FindItem = FindItemInList( String, ListOfItems, NumItems );
+		if ( FindItem != 0 ) return FindItem;
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	int
+	FindItem(
+		std::string const & String,
+		Array1S_string const ListOfItems,
 		int const NumItems
 	)
 	{
@@ -3571,7 +3818,74 @@ namespace InputProcessor {
 	void
 	VerifyName(
 		std::string const & NameToVerify,
-		FArray1S_string const NamesList,
+		Array1D_string const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   February 2000
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine verifys that a new name can be added to the
+		// list of names for this item (i.e., that there isn't one of that
+		// name already and that this name is not blank).
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames );
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+
+	}
+
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Array1S_string const NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
 		bool & IsBlank,
@@ -4008,7 +4322,7 @@ namespace InputProcessor {
 
 	void
 	GetListOfObjectsInIDD(
-		FArray1S_string ObjectNames, // List of Object Names (from IDD)
+		Array1S_string ObjectNames, // List of Object Names (from IDD)
 		int & Number // Number in List
 	)
 	{
@@ -4050,7 +4364,7 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		ObjectNames( {1,NumObjectDefs} ) = ObjectDef( {1,NumObjectDefs} ).Name();
+		for ( int i = 1; i <= NumObjectDefs; ++i ) ObjectNames( i ) = ObjectDef( i ).Name;
 		Number = NumObjectDefs;
 
 	}
@@ -4059,8 +4373,8 @@ namespace InputProcessor {
 	GetObjectDefInIDD(
 		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
-		FArray1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
-		FArray1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
+		Array1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
+		Array1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
 		int & MinNumFields // Minimum Number of Fields to be returned to Get routines
 	)
 	{
@@ -4302,8 +4616,8 @@ namespace InputProcessor {
 		int NumOrphObjNames;
 		bool potentialOrphanedSpecialObjects( false );
 
-		FArray1D_string OrphanObjectNames( NumIDFRecords );
-		FArray1D_string OrphanNames( NumIDFRecords );
+		Array1D_string OrphanObjectNames( NumIDFRecords );
+		Array1D_string OrphanNames( NumIDFRecords );
 		NumOrphObjNames = 0;
 
 		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
@@ -4996,6 +5310,7 @@ namespace InputProcessor {
 		static std::string const MeterCustomDecrement( "METER:CUSTOMDECREMENT" );
 		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
 		static std::string const OutputTableMonthly( "OUTPUT:TABLE:MONTHLY" );
+		static std::string const OutputTableAnnual( "OUTPUT:TABLE:ANNUAL" );
 		static std::string const OutputTableTimeBins( "OUTPUT:TABLE:TIMEBINS" );
 		static std::string const OutputTableSummaries( "OUTPUT:TABLE:SUMMARYREPORTS" );
 		static std::string const EMSSensor( "ENERGYMANAGEMENTSYSTEM:SENSOR" );
@@ -5102,6 +5417,15 @@ namespace InputProcessor {
 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
 			}
 			CurrentRecord = FindNextRecord( OutputTableMonthly, CurrentRecord );
+		}
+
+		CurrentRecord = FindFirstRecord( OutputTableAnnual );
+		while ( CurrentRecord != 0 ) {
+			for ( Loop = 5; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
+				if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
+				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
+			}
+			CurrentRecord = FindNextRecord( OutputTableAnnual, CurrentRecord );
 		}
 
 		CurrentRecord = FindFirstRecord( OutputTableSummaries ); // summary tables, not all add to variable structure
@@ -5760,7 +6084,7 @@ namespace InputProcessor {
 		std::string const & cStartName,
 		int const CurLine,
 		int const NumConxLines,
-		FArray1S_string const LineBuf,
+		Array1S_string const LineBuf,
 		int const CurQPtr
 	)
 	{
@@ -5940,30 +6264,6 @@ namespace InputProcessor {
 
 	}
 
-	//     NOTICE
-
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
 } // InputProcessor
 
 } // EnergyPlus
-

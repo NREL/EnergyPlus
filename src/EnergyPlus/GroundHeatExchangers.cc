@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -17,6 +75,7 @@
 #include <DisplayRoutines.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -30,7 +89,7 @@ namespace GroundHeatExchangers {
 	//       AUTHOR         Arun Murugappan, Dan Fisher
 	//       DATE WRITTEN   September 2000
 	//       MODIFIED       B. Griffith, Sept 2010,plant upgrades
-	//                      Matt Mitchell, February 2015. Added Slinky GHX. 
+	//                      Matt Mitchell, February 2015. Added Slinky GHX.
 	//                                                    Moved models to object-oriented design.
 	//       RE-ENGINEERED  na
 
@@ -69,21 +128,17 @@ namespace GroundHeatExchangers {
 	using DataGlobals::TimeStepZone;
 	using DataGlobals::DayOfSim;
 	using DataGlobals::Pi;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::SecInHour;
 	using DataHVACGlobals::TimeStepSys;
 	using DataHVACGlobals::SysTimeElapsed;
 	using namespace DataLoopNode;
 	using General::TrimSigDigits;
-
-	// Data
-	// DERIVED TYPE DEFINITIONS
+	using namespace GroundTemperatureManager;
 
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const hrsPerDay( 24.0 ); // Number of hours in a day
 	Real64 const hrsPerMonth( 730.0 ); // Number of hours in month
-	Real64 const DeltaTempLimit( 100.0 ); // temp limit for warnings
 	int const maxTSinHr( 60 ); // Max number of time step in a hour
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -93,177 +148,90 @@ namespace GroundHeatExchangers {
 	Real64 currentSimTime( 0.0 ); // Current simulation time in hours
 	int locHourOfDay( 0 );
 	int locDayOfSim( 0 );
+	namespace {
+		bool GetInput( true );
+		bool errorsFound( false );
+	}
 
-	FArray1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
+	Array1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
 	// to enable the calculation of the subhouly contribution..
 	// Recommended size, the product of Minimum subhourly history required and
 	// the maximum no of system time steps in an hour
 
-	FArray1D_bool checkEquipName;
+	Array1D_bool checkEquipName;
 
 	// Object Data
-	FArray1D< GLHEVert > verticalGLHE; 
-	FArray1D< GLHESlinky > slinkyGLHE; 
+	Array1D< GLHEVert > verticalGLHE;
+	Array1D< GLHESlinky > slinkyGLHE;
 
 	// MODULE SUBROUTINES:
 
 	//******************************************************************************
 
 	// Functions
-
 	void
-	SimGroundHeatExchangers(
-		int const typeNum,
-		std::string const & name,
-		int & compIndex,
-		bool const runFlag,
-		bool const firstIteration,
-		bool const initLoopEquip
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Dan Fisher
-		//       DATE WRITTEN:    August, 2000
-		//       MODIFIED         Arun Murugappan
-		//       RE-ENGINEERED    na
+	clear_state(){
+		numVerticalGLHEs = 0;
+		numSlinkyGLHEs = 0;
+		N = 1; // COUNTER OF TIME STEP
+		currentSimTime = 0.0 ; // Current simulation time in hours
+		locHourOfDay = 0;
+		locDayOfSim = 0;
+		GetInput = true;
+		errorsFound = false;
+		prevTimeSteps.deallocate();
+		checkEquipName.deallocate();
+		verticalGLHE.deallocate();
+		slinkyGLHE.deallocate();
+	}
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// mananges the simulation of the vertical closed-loop ground heat
-		// exchangers (GLHE) model
 
-		// METHODOLOGY EMPLOYED:
+	void GLHEBase::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {
+		this->initGLHESimVars();
+	}
 
-		// REFERENCES:
-		// Eskilson, P. 'Thermal Analysis of Heat Extraction Boreholes' Ph.D. Thesis:
-		//   Dept. of Mathematical Physics, University of Lund, Sweden, June 1987.
-		// Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
-		//   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
+	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
+		this->initGLHESimVars();
+		this->calcGroundHeatExchanger();
+		this->updateGHX();
+	}
 
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
-		int GLHENum;
-
-		//GET INPUT
+	PlantComponent * GLHEBase::factory( int const objectType, std::string objectName ) {
 		if ( GetInput ) {
 			GetGroundHeatExchangerInput();
 			GetInput = false;
 		}
-
-		if ( typeNum == DataPlant::TypeOf_GrndHtExchgVertical ) {
-
-			// Find the correct GLHE
-			if ( compIndex == 0 ) {
-				FArray1D< std::string > tmpNames( numVerticalGLHEs );
-				for ( int i = 1; i <= numVerticalGLHEs; i++ ) {
-					tmpNames( i ) = verticalGLHE( i ).Name;
-				}
-				GLHENum = FindItemInList( name, tmpNames, numVerticalGLHEs );
-				if ( GLHENum == 0 ) {
-					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
-				}
-				compIndex = GLHENum;
-			} else {
-				GLHENum = compIndex;
-				if ( GLHENum > numVerticalGLHEs || GLHENum < 1 ) {
-					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numVerticalGLHEs ) + ", Entered Unit name=" + name );
-				}
-				if ( checkEquipName( GLHENum ) ) {
-					if ( name != verticalGLHE( GLHENum ).Name ) {
-						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numVerticalGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + verticalGLHE( GLHENum ).Name );
-					}
-					checkEquipName( GLHENum ) = false;
+		if ( objectType == DataPlant::TypeOf_GrndHtExchgVertical ) {
+			for ( auto & ghx : verticalGLHE ) {
+				if ( ghx.Name == objectName ) {
+					return &ghx;
 				}
 			}
-
-			auto & thisGLHE( verticalGLHE( GLHENum ) );
-
-			if ( initLoopEquip ) {
-				thisGLHE.initGLHESimVars();
-				return;
-			}
-
-			// Initialize HX
-			thisGLHE.initGLHESimVars();
-
-			// Simulat HX
-			thisGLHE.calcGroundHeatExchanger();
-			
-			// Update HX Report Vars
-			thisGLHE.updateGHX();
-
-		} else if ( typeNum == DataPlant::TypeOf_GrndHtExchgSlinky ) {
-		
-			// Find the correct GLHE
-			if ( compIndex == 0 ) {
-				FArray1D< std::string > tmpNames( numSlinkyGLHEs );
-				for ( int i = 1; i <= numSlinkyGLHEs; i++ ) {
-					tmpNames( i ) = slinkyGLHE( i ).Name;
-				}
-				GLHENum = FindItemInList( name, tmpNames, numSlinkyGLHEs );
-				if ( GLHENum == 0 ) {
-					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
-				}
-				compIndex = GLHENum;
-			} else {
-				GLHENum = compIndex;
-				if ( GLHENum > numSlinkyGLHEs || GLHENum < 1 ) {
-					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numSlinkyGLHEs ) + ", Entered Unit name=" + name );
-				}
-				if ( checkEquipName( GLHENum ) ) {
-					if ( name != slinkyGLHE( GLHENum ).Name ) {
-						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numSlinkyGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + slinkyGLHE( GLHENum ).Name );
-					}
-					checkEquipName( GLHENum ) = false;
+		} else if ( objectType == DataPlant::TypeOf_GrndHtExchgSlinky ) {
+			for ( auto & ghx : slinkyGLHE ) {
+				if ( ghx.Name == objectName ) {
+					return &ghx;
 				}
 			}
-
-			auto & thisGLHE( slinkyGLHE( GLHENum ) );
-
-			if ( initLoopEquip ) {
-				thisGLHE.initGLHESimVars();
-				return;
-			}
-
-			// Initialize HX
-			thisGLHE.initGLHESimVars();
-
-			// Simulat HX
-			thisGLHE.calcGroundHeatExchanger();
-			
-			// Update HX Report Vars
-			thisGLHE.updateGHX();
 		}
+		// If we didn't find it, fatal
+		ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
 	}
 
 	//******************************************************************************
 
-	void 
+	void
 	GLHEVert::calcGFunctions()
 	{
 		// Nothing to see here. Move along.
-		// Just a stub out for future work. 
+		// Just a stub out for future work.
 	}
 
 	//******************************************************************************
 
-	void 
+	void
 	GLHESlinky::calcGFunctions()
 	{
 		// SUBROUTINE INFORMATION:
@@ -276,7 +244,7 @@ namespace GroundHeatExchangers {
 		// calculates g-functions for the slinky ground heat exchanger model
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 tLg_max( 0.0 ); 
+		Real64 tLg_max( 0.0 );
 		Real64 tLg_min( -2 );
 		Real64 tLg_grid( 0.25 );
 		Real64 ts( 3600 );
@@ -289,7 +257,7 @@ namespace GroundHeatExchangers {
 		int coil;
 		int trench;
 		Real64 fraction;
-		FArray2D< Real64 > valStored( {0, numTrenches}, {0, numCoils}, -1.0 );
+		Array2D< Real64 > valStored( {0, numTrenches}, {0, numCoils}, -1.0 );
 		Real64 gFunc;
 		Real64 gFuncin;
 		int m1;
@@ -299,7 +267,6 @@ namespace GroundHeatExchangers {
 		int mm1;
 		int nn1;
 		int i;
-		int j;
 		Real64 disRing;
 		int I0;
 		int J0;
@@ -310,7 +277,7 @@ namespace GroundHeatExchangers {
 		Y0.allocate( numTrenches );
 
 		// Calculate the number of g-functions required
-		tLg_max = std::log10( maxSimYears * convertYearsToSeconds / ts ); 
+		tLg_max = std::log10( maxSimYears * convertYearsToSeconds / ts );
 		NPairs = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
 
 		// Allocate and setup g-function arrays
@@ -321,23 +288,23 @@ namespace GroundHeatExchangers {
 		QnSubHr.allocate( ( SubAGG + 1 ) * maxTSinHr + 1 );
 		LastHourN.allocate( SubAGG + 1 );
 
-		for ( i = 1; i <= NPairs; i++ ) {
+		for ( i = 1; i <= NPairs; ++i ) {
 			GFNC( i ) = 0.0;
 			LNTTS( i ) = 0.0;
 		}
 
 		// Calculate the number of loops (per trench) and number of trenchs to be involved
-			// Due to the symmetry of a slinky GHX field, we need only calculate about 
-			// on quarter of the rings' tube wall temperature perturbation to get the 
+			// Due to the symmetry of a slinky GHX field, we need only calculate about
+			// on quarter of the rings' tube wall temperature perturbation to get the
 			// mean wall temperature perturbation of the entire slinky GHX field.
 		numLC = std::ceil( numCoils / 2.0 );
 		numRC = std::ceil( numTrenches / 2.0 );
 
 		// Calculate coordinates (X0, Y0, Z0) of a ring's center
-		for ( coil = 1; coil <= numCoils; coil++ ) {
+		for ( coil = 1; coil <= numCoils; ++coil ) {
 			X0( coil ) = coilPitch * ( coil - 1 );
 		}
-		for ( trench = 1; trench <= numTrenches; trench++ ) {
+		for ( trench = 1; trench <= numTrenches; ++trench ) {
 			Y0( trench ) = ( trench - 1 ) * trenchSpacing;
 		}
 		Z0 = coilDepth;
@@ -349,25 +316,21 @@ namespace GroundHeatExchangers {
 		} else {
 			fraction = 0.5;
 		}
-		
+
 		// Calculate the corresponding time of each temperature response factor
-		for ( NT = 1; NT <= NPairs; NT++ ) {
+		for ( NT = 1; NT <= NPairs; ++NT ) {
 			tLg = tLg_min + tLg_grid * ( NT - 1 );
 			t = std::pow( 10, tLg ) * ts;
 
 			// Set the average temperature resonse of the whole field to zero
 			gFunc = 0;
 
-			for ( i = 0; i <= numTrenches; i++ ) {
-				for ( j = 0; j <= numCoils; j++ ) {
-					valStored( i, j ) = -1.0;
-				}
-			}
+			valStored = -1.0;
 
-			for ( m1 = 1; m1 <= numRC; m1++ ) {
-				for ( n1 = 1; n1 <= numLC; n1++ ) {
-					for ( m = 1; m <= numTrenches; m++ ) {
-						for ( n = 1; n <= numCoils; n++ ) {
+			for ( m1 = 1; m1 <= numRC; ++m1 ) {
+				for ( n1 = 1; n1 <= numLC; ++n1 ) {
+					for ( m = 1; m <= numTrenches; ++m ) {
+						for ( n = 1; n <= numCoils; ++n ) {
 
 							// Zero out val after each iteration
 							doubleIntegralVal = 0.0;
@@ -391,7 +354,7 @@ namespace GroundHeatExchangers {
 							}
 
 							// if the ring(n1, m1) is the near-field ring of the ring(n,m)
-							if ( disRing <= (2.5 + coilDiameter) ) {
+							if ( disRing <= 2.5 + coilDiameter ) {
 								// if no calculated value has been stored
 								if ( valStored( mm1, nn1 ) < 0 ) {
 									doubleIntegralVal = doubleIntegral( m, n, m1, n1, t, I0, J0 );
@@ -400,7 +363,7 @@ namespace GroundHeatExchangers {
 								} else {
 									doubleIntegralVal = valStored( mm1, nn1 );
 								}
-							
+
 								// due to symmetry, the temperature response of ring(n1, m1) should be 0.25, 0.5, or 1 times its calculated value
 								if ( ! isEven( numTrenches ) && ! isEven( numCoils ) && m1 == numRC && n1 == numLC && numTrenches > 1.5 ) {
 									gFuncin = 0.25 * doubleIntegralVal;
@@ -422,7 +385,7 @@ namespace GroundHeatExchangers {
 								if ( valStored( mm1, nn1 ) < 0.0 ) {
 									midFieldVal = midFieldResponseFunction( m, n, m1, n1, t );
 									valStored( mm1, nn1 ) = midFieldVal;
-								//if a stored value is found for the comination of (m, n, m1, n1), then
+								// if a stored value is found for the comination of (m, n, m1, n1), then
 								} else {
 									midFieldVal = valStored( mm1, nn1 );
 								}
@@ -444,7 +407,7 @@ namespace GroundHeatExchangers {
 
 						} // n
 					} // m
-				} // n1			
+				} // n1
 			} // m1
 
 			GFNC( NT ) = ( gFunc * ( coilDiameter / 2.0 ) ) / ( 4 * Pi	* fraction * numTrenches * numCoils );
@@ -487,17 +450,17 @@ namespace GroundHeatExchangers {
 		sqrtAlphaT = std::sqrt( diffusivityGround * t );
 
 		if ( ! verticalConfig ) {
-			
+
 			sqrtDistDepth = std::sqrt( pow_2( distance1 ) + 4 * pow_2( coilDepth ) );
 			errFunc1 = std::erfc( 0.5 * distance1 / sqrtAlphaT );
 			errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
-		
+
 			return errFunc1 / distance1 - errFunc2 / sqrtDistDepth;
 
 		} else {
 
 			distance2 = distanceToFictRing( m, n, m1, n1, eta, theta );
-		
+
 			errFunc1 = std::erfc( 0.5 * distance1 / sqrtAlphaT );
 			errFunc2 = std::erfc( 0.5 * distance2 / sqrtAlphaT );
 
@@ -508,11 +471,11 @@ namespace GroundHeatExchangers {
 
 	Real64
 	GLHESlinky::midFieldResponseFunction(
-	int const m,
-	int const n,
-	int const m1,
-	int const n1,
-	Real64 const t
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const t
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -532,13 +495,13 @@ namespace GroundHeatExchangers {
 		Real64 distance;
 
 		sqrtAlphaT = std::sqrt( diffusivityGround * t );
-		
+
 		distance = distToCenter( m, n, m1, n1 );
 		sqrtDistDepth = std::sqrt( pow_2( distance ) + 4 * pow_2( coilDepth ) );
-		
+
 		errFunc1 = std::erfc( 0.5 * distance / sqrtAlphaT );
 		errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
-	
+
 		return 4 * pow_2( Pi ) * ( errFunc1 / distance - errFunc2 / sqrtDistDepth );
 	}
 
@@ -546,12 +509,12 @@ namespace GroundHeatExchangers {
 
 	Real64
 	GLHESlinky::distance(
-	int const m,
-	int const n,
-	int const m1,
-	int const n1,
-	Real64 const eta,
-	Real64 const theta	
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const eta,
+		Real64 const theta
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -587,19 +550,19 @@ namespace GroundHeatExchangers {
 		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		if ( ! verticalConfig ) {
-	
-			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( y - yIn ) ) 
+
+			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( y - yIn ) )
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( y - yOut ) );
 
 		} else {
-			
+
 			z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 );
 
 			zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
 			zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
 
-			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) ) 
-				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );			
+			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
+				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
 		}
 	}
 
@@ -612,7 +575,7 @@ namespace GroundHeatExchangers {
 		int const m1,
 		int const n1,
 		Real64 const eta,
-		Real64 const theta	
+		Real64 const theta
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -650,16 +613,16 @@ namespace GroundHeatExchangers {
 		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
 		zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
 
-		return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) ) 
-				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );			
+		return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
+				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
 
 	}
-	
+
 	//******************************************************************************
 
 	Real64
 	GLHESlinky::distToCenter(
-		int const m, 
+		int const m,
 		int const n,
 		int const m1,
 		int const n1
@@ -720,7 +683,7 @@ namespace GroundHeatExchangers {
 		//       RE-ENGINEERED    na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Integrates the temperature response at one point based on 
+		// Integrates the temperature response at one point based on
 		// input from other points
 
 		// METHODOLOGY EMPLOYED:
@@ -733,18 +696,18 @@ namespace GroundHeatExchangers {
 		Real64 theta2( 2 * Pi );
 		Real64 h;
 		int j;
-		FArray1D< Real64 > f( J0, 0.0 );
+		Array1D< Real64 > f( J0, 0.0 );
 
 		h = ( theta2 - theta1 ) / ( J0 - 1 );
 
 		// Calculate the function at various equally spaced x values
-		for ( j = 1; j <= J0; j++ ) {
-		
+		for ( j = 1; j <= J0; ++j ) {
+
 			theta = theta1 + ( j - 1 ) * h;
 
 			f( j ) = nearFieldResponseFunction( m, n, m1, n1, eta, theta, t );
 
-			if ( j == 1 || j == J0) {
+			if ( j == 1 || j == J0 ) {
 				f( j ) = f( j );
 			} else if ( isEven( j ) ) {
 				f( j ) = 4 * f( j );
@@ -754,7 +717,7 @@ namespace GroundHeatExchangers {
 
 			sumIntF += f( j );
 		}
-		
+
 		return ( h / 3 ) * sumIntF;
 	}
 	//******************************************************************************
@@ -777,12 +740,12 @@ namespace GroundHeatExchangers {
 		//       RE-ENGINEERED    na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Integrates the temperature response at one point based on 
+		// Integrates the temperature response at one point based on
 		// input from other points
 
 		// METHODOLOGY EMPLOYED:
 		// Simpson's 1/3 rule of integration
-	
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 sumIntF( 0.0 );
 		Real64 eta( 0.0 );
@@ -790,24 +753,24 @@ namespace GroundHeatExchangers {
 		Real64 eta2( 2 * Pi );
 		Real64 h;
 		int i;
-		FArray1D< Real64 > g( I0, 0.0 );
+		Array1D< Real64 > g( I0, 0.0 );
 
 		h = ( eta2 - eta1 ) / ( I0 - 1 );
 
 		// Calculates the value of the function at various equally spaced values
-		for ( i = 1; i <= I0; i++ ) {
-		
+		for ( i = 1; i <= I0; ++i ) {
+
 			eta = eta1 + ( i - 1 ) * h;
 			g( i ) = integral( m, n, m1, n1, t, eta, J0 );
 
 			if ( i == 1 || i == I0 ) {
 				g( i ) = g( i );
-			} else if ( isEven( i ) == true ) {
+			} else if ( isEven( i ) ) {
 				g( i ) = 4 * g( i );
 			} else {
 				g( i ) = 2 * g( i );
 			}
-			
+
 			sumIntF += g( i );
 		}
 
@@ -1014,7 +977,7 @@ namespace GroundHeatExchangers {
 				}
 				subHourlyLimit = N - LastHourN( IndexN ); //Check this when running simulation
 
-				SUBHRLY_LOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
+				for ( I = 1; I <= subHourlyLimit; ++I ) {
 					if ( I == subHourlyLimit ) {
 						if ( int( currentSimTime ) >= SubAGG ) {
 							gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
@@ -1025,33 +988,29 @@ namespace GroundHeatExchangers {
 							RQSubHr = gFuncVal / ( kGroundFactor );
 							sumQnSubHourly += QnSubHr( I ) * RQSubHr;
 						}
-						goto SUBHRLY_LOOP_exit;
+						break;
 					}
 					//prevTimeSteps(I+1) This is "I+1" because prevTimeSteps(1) = CurrentTimestep
 					gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 					RQSubHr = gFuncVal / ( kGroundFactor );
 					sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
-					SUBHRLY_LOOP_loop: ;
 				}
-				SUBHRLY_LOOP_exit: ;
 
 				// Calculate the Hourly Superposition
 
 				hourlyLimit = int( currentSimTime );
 				sumQnHourly = 0.0;
-				HOURLY_LOOP: for ( I = SubAGG + 1; I <= hourlyLimit; ++I ) {
+				for ( I = SubAGG + 1; I <= hourlyLimit; ++I ) {
 					if ( I == hourlyLimit ) {
 						gFuncVal = getGFunc( currentSimTime / ( timeSSFactor ) );
 						RQHour = gFuncVal / ( kGroundFactor );
 						sumQnHourly += QnHr( I ) * RQHour;
-						goto HOURLY_LOOP_exit;
+						break;
 					}
 					gFuncVal = getGFunc( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
 					RQHour = gFuncVal / ( kGroundFactor );
 					sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
-					HOURLY_LOOP_loop: ;
 				}
-				HOURLY_LOOP_exit: ;
 
 				// Find the total Sum of the Temperature difference due to all load blocks
 				sumTotal = sumQnSubHourly + sumQnHourly;
@@ -1085,62 +1044,53 @@ namespace GroundHeatExchangers {
 					currentMonth = numOfMonths;
 				}
 
-				//monthly superposition
-
+				// Monthly superposition
 				sumQnMonthly = 0.0;
-				SUMMONTHLY: for ( I = 1; I <= currentMonth; ++I ) {
+				for ( I = 1; I <= currentMonth; ++I ) {
 					if ( I == 1 ) {
 						gFuncVal = getGFunc( currentSimTime / ( timeSSFactor ) );
 						RQMonth = gFuncVal / ( kGroundFactor );
 						sumQnMonthly += QnMonthlyAgg( I ) * RQMonth;
-						goto SUMMONTHLY_loop;
+						continue;
 					}
 					gFuncVal = getGFunc( ( currentSimTime - ( I - 1 ) * hrsPerMonth ) / ( timeSSFactor ) );
 					RQMonth = gFuncVal / ( kGroundFactor );
 					sumQnMonthly += ( QnMonthlyAgg( I ) - QnMonthlyAgg( I - 1 ) ) * RQMonth;
-					SUMMONTHLY_loop: ;
 				}
-				SUMMONTHLY_exit: ;
 
 				// Hourly Superposition
-
 				hourlyLimit = int( currentSimTime - currentMonth * hrsPerMonth );
 				sumQnHourly = 0.0;
-				HOURLYLOOP: for ( I = 1 + SubAGG; I <= hourlyLimit; ++I ) {
+				for ( I = 1 + SubAGG; I <= hourlyLimit; ++I ) {
 					if ( I == hourlyLimit ) {
 						gFuncVal = getGFunc( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
 						RQHour = gFuncVal / ( kGroundFactor );
 						sumQnHourly += ( QnHr( I ) - QnMonthlyAgg( currentMonth ) ) * RQHour;
-						goto HOURLYLOOP_exit;
+						break;
 					}
 					gFuncVal = getGFunc( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
 					RQHour = gFuncVal / ( kGroundFactor );
 					sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
-					HOURLYLOOP_loop: ;
 				}
-				HOURLYLOOP_exit: ;
 
 				// Subhourly Superposition
-
 				subHourlyLimit = N - LastHourN( SubAGG + 1 );
 				sumQnSubHourly = 0.0;
-				SUBHRLOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
+				for ( I = 1; I <= subHourlyLimit; ++I ) {
 					if ( I == subHourlyLimit ) {
 						gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 						RQSubHr = gFuncVal / ( kGroundFactor );
 						sumQnSubHourly += ( QnSubHr( I ) - QnHr( SubAGG + 1 ) ) * RQSubHr;
-						goto SUBHRLOOP_exit;
+						break;
 					}
 					gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 					RQSubHr = gFuncVal / ( kGroundFactor );
 					sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
-					SUBHRLOOP_loop: ;
 				}
-				SUBHRLOOP_exit: ;
 
 				sumTotal = sumQnMonthly + sumQnHourly + sumQnSubHourly;
 
-				//Calulate the subhourly temperature due the Last Time steps Load
+				// Calulate the subhourly temperature due the Last Time steps Load
 
 				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
@@ -1161,7 +1111,7 @@ namespace GroundHeatExchangers {
 				}
 			} //  end of AGG OR NO AGG
 		} // end of N  = 1 branch
-		boreholeTemp = tempGround - sumTotal; 
+		boreholeTemp = tempGround - sumTotal;
 		//Load the QnSubHourly Array with a new value at end of every timestep
 
 		lastQnSubHr = tmpQnSubHourly;
@@ -1206,7 +1156,7 @@ namespace GroundHeatExchangers {
 		Node( outletNodeNum ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, outletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
 		GLHEdeltaTemp = std::abs( outletTemp - inletTemp );
-		
+
 		if ( GLHEdeltaTemp > deltaTempLimit && numErrorCalls < numVerticalGLHEs && ! WarmupFlag ) {
 			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 			designMassFlow = designFlow * fluidDensity;
@@ -1268,7 +1218,11 @@ namespace GroundHeatExchangers {
 			for ( J = 1; J <= ( N - LastHourN( 1 ) ); ++J ) {
 				SumQnHr += QnSubHr( J ) * std::abs( prevTimeSteps( J ) - prevTimeSteps( J + 1 ) );
 			}
-			SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
+			if ( prevTimeSteps( 1 ) != prevTimeSteps( J ) ){
+				SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
+			} else {
+				SumQnHr /= 0.05; // estimated small timestep
+			}
 			QnHr = eoshift( QnHr, -1, SumQnHr );
 			LastHourN = eoshift( LastHourN, -1, N );
 		}
@@ -1320,8 +1274,6 @@ namespace GroundHeatExchangers {
 		using General::RoundSigDigits;
 		using DataEnvironment::MaxNumberSimYears;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataEnvironment::PubGroundTempSurfFlag;
-		using DataEnvironment::PubGroundTempSurface;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1340,21 +1292,16 @@ namespace GroundHeatExchangers {
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array. "numNums" :)
 		int IOStat; // IO Status when calling get input subroutine
-		static bool errorsFound( false );
 		bool isNotOK; // Flag to verify name
 		bool isBlank; // Flag for blank name
 		int indexNum;
 		int pairNum;
 		bool allocated;
-		int const monthsInYear( 12 );
-		int monthIndex;
-		Real64 const LargeNumber( 10000.0 );
-		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
-		
+
 		// VERTICAL GLHE
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		
+
 		numVerticalGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Vertical" );
 		numSlinkyGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
 
@@ -1366,8 +1313,8 @@ namespace GroundHeatExchangers {
 			ShowContinueError( "Check inputs for GroundHeatExchanger:Vertical and GroundHeatExchanger:Slinky" );
 			ShowContinueError( "Also check plant/branch inputs for references to invalid/deleted objects" );
 			errorsFound = true;
-		} 
-		
+		}
+
 		if ( numVerticalGLHEs > 0 ) {
 
 			cCurrentModuleObject = "GroundHeatExchanger:Vertical";
@@ -1383,11 +1330,11 @@ namespace GroundHeatExchangers {
 				isBlank = false;
 
 				// Create temporary array of previous names to pass to VerifyName
-				FArray1D <std::string> tmpNames;
+				Array1D <std::string> tmpNames;
 				tmpNames.allocate( numVerticalGLHEs - 1 );
 
 				// Populate temporary array with previous entrys
-				for (int i = 1; i < numVerticalGLHEs - 1; i++) {
+				for (int i = 1; i < numVerticalGLHEs - 1; ++i ) {
 					tmpNames( i ) = verticalGLHE( i ).Name;
 				}
 
@@ -1455,7 +1402,19 @@ namespace GroundHeatExchangers {
 				}
 
 				// Get Gfunction data
-				verticalGLHE( GLHENum ).NPairs = rNumericArgs( 15 );
+				indexNum = 15;
+				verticalGLHE( GLHENum ).NPairs = rNumericArgs( indexNum );
+
+				// Get Gfunc error handling
+				if ( verticalGLHE( GLHENum ).NPairs < 1 ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
+					ShowContinueError( "..." + cNumericFieldNames( indexNum ) + " is less than 1." );
+					errorsFound = true;
+				} else if ( numNums != ( indexNum + ( verticalGLHE( GLHENum ).NPairs * 2 ) ) ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid number of input fields." );
+					errorsFound = true;
+				}
+
 				verticalGLHE( GLHENum ).SubAGG = 15;
 				verticalGLHE( GLHENum ).AGG = 192;
 
@@ -1497,7 +1456,7 @@ namespace GroundHeatExchangers {
 
 		}
 
-		// SLINKY GLHE		
+		// SLINKY GLHE
 
 		allocated = false;
 
@@ -1516,11 +1475,11 @@ namespace GroundHeatExchangers {
 				isBlank = false;
 
 				// Create temporary array of previous names to pass to VerifyName
-				FArray1D <std::string> tmpNames;
+				Array1D <std::string> tmpNames;
 				tmpNames.allocate( numSlinkyGLHEs - 1 );
 
 				// Populate temporary array with previous entrys
-				for (int i = 1; i < numSlinkyGLHEs - 1; i++) {
+				for (int i = 1; i < numSlinkyGLHEs - 1; ++i ) {
 					tmpNames( i ) = slinkyGLHE( i ).Name;
 				}
 
@@ -1570,24 +1529,21 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).trenchLength = rNumericArgs( 13 );
 				slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
 				slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
-				slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 19 );
+				slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 16 );
 
 				// Number of coils
 				slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
-				
+
 				// Total tube length
-				slinkyGLHE( GLHENum ).totalTubeLength = Pi * slinkyGLHE( GLHENum ).coilDiameter * slinkyGLHE( GLHENum ).trenchLength 
+				slinkyGLHE( GLHENum ).totalTubeLength = Pi * slinkyGLHE( GLHENum ).coilDiameter * slinkyGLHE( GLHENum ).trenchLength
 													* slinkyGLHE( GLHENum ). numTrenches / slinkyGLHE( GLHENum ). coilPitch;
 
 				// Get Gfunction data
 				slinkyGLHE( GLHENum ).SubAGG = 15;
 				slinkyGLHE( GLHENum ).AGG = 192;
 
-				// Farfield model parameters, validated min/max by IP
-				slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
-
 				// Average coil depth
-				if ( slinkyGLHE( GLHENum ).verticalConfig == true ) {
+				if ( slinkyGLHE( GLHENum ).verticalConfig ) {
 					// Vertical configuration
 					if ( slinkyGLHE( GLHENum ).trenchDepth - slinkyGLHE(GLHENum).coilDiameter < 0.0 ) {
 						// Error: part of the coil is above ground
@@ -1610,52 +1566,6 @@ namespace GroundHeatExchangers {
 				// Thermal diffusivity of the ground
 				slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
 
-				if ( !slinkyGLHE( GLHENum ).useGroundTempDataForKusuda ) {
-					slinkyGLHE( GLHENum ).averageGroundTemp = rNumericArgs( 16 );
-					slinkyGLHE( GLHENum ).averageGroundTempAmplitude = rNumericArgs( 17 );
-					slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = rNumericArgs( 18 );
-				} else {
-					// If ground temp data was not brought in manually in GETINPUT,
-					// then we must get it from the surface ground temperatures
-
-					if ( !PubGroundTempSurfFlag ) {
-						ShowSevereError( "Input problem for " + cCurrentModuleObject + '=' + slinkyGLHE( GLHENum ).Name );
-						ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-						ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-						ShowContinueError( " not directly entered into the input object." );
-						errorsFound = true;
-					}
-
-					// Calculate Average Ground Temperature for all 12 months of the year:
-					slinkyGLHE( GLHENum ).averageGroundTemp = 0.0;
-					for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-						slinkyGLHE( GLHENum ).averageGroundTemp += PubGroundTempSurface( monthIndex );
-					}
-
-					slinkyGLHE( GLHENum ).averageGroundTemp /= monthsInYear;
-
-					// Calculate Average Amplitude from Average:
-					slinkyGLHE( GLHENum ).averageGroundTempAmplitude = 0.0;
-					for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-						slinkyGLHE( GLHENum ).averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - slinkyGLHE( GLHENum ).averageGroundTemp );
-					}
-
-					slinkyGLHE( GLHENum ).averageGroundTempAmplitude /= monthsInYear;
-
-					// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-					slinkyGLHE( GLHENum ).monthOfMinSurfTemp = 0;
-					slinkyGLHE( GLHENum ).minSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-					for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-						if ( PubGroundTempSurface( monthIndex ) <= slinkyGLHE( GLHENum ).minSurfTemp ) {
-							slinkyGLHE( GLHENum ).monthOfMinSurfTemp = monthIndex;
-							slinkyGLHE( GLHENum ).minSurfTemp = PubGroundTempSurface( monthIndex );
-						}
-					}
-				
-					slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
-
-				}
-
 				if ( ! allocated ) {
 					prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
 					prevTimeSteps = 0.0;
@@ -1670,6 +1580,12 @@ namespace GroundHeatExchangers {
 					ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
 					ShowContinueError( "...Radius will be <=0." );
 					errorsFound = true;
+				}
+
+				// Initialize ground temperature model and get pointer reference
+				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
+				if ( slinkyGLHE ( GLHENum ).groundTempModel ) {
+					errorsFound = slinkyGLHE ( GLHENum ).groundTempModel->errorsFound;
 				}
 
 				//Check for Errors
@@ -1779,7 +1695,7 @@ namespace GroundHeatExchangers {
 			//   Convection Resistance
 			if ( reynoldsNum <= 2300 ) {
 				nusseltNum = laminarNusseltNo;
-			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) { 
+			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) {
 				smoothingFunction = 0.5 + 0.5 * std::tanh( ( reynoldsNum - A ) / B );
 				turbulentNusseltNo = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
 				nusseltNum = laminarNusseltNo * ( 1 - smoothingFunction ) + turbulentNusseltNo * smoothingFunction;
@@ -1824,11 +1740,11 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   February, 2015
-		//       MODIFIED       
-		//       RE-ENGINEERED 
+		//       MODIFIED
+		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
-		//    Calculates the resistance of the slinky HX from the fluid to the 
+		//    Calculates the resistance of the slinky HX from the fluid to the
 		//	  outer tube wall.
 
 		// Using/Aliasing
@@ -1856,11 +1772,6 @@ namespace GroundHeatExchangers {
 		Real64 hci;
 		Real64 Rcond;
 		Real64 Rconv;
-		Real64 Rgrout;
-		Real64 B0; // grout resistance curve fit coefficients
-		Real64 B1;
-		Real64 maxDistance;
-		Real64 distanceRatio;
 		Real64 smoothingFunction;
 		Real64 A( 3150 );
 		Real64 B( 350 );
@@ -1888,11 +1799,11 @@ namespace GroundHeatExchangers {
 			//   Convection Resistance
 			if ( reynoldsNum <= 2300 ) {
 				nusseltNum = laminarNusseltNo;
-			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) { 
+			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) {
 				smoothingFunction = 0.5 + 0.5 * std::tanh( ( reynoldsNum - A ) / B );
 				turbulentNusseltNo = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
 				nusseltNum = laminarNusseltNo * ( 1 - smoothingFunction ) + turbulentNusseltNo * smoothingFunction;
-			} else { 
+			} else {
 				nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
 			}
 			hci = nusseltNum * kFluid / pipeInnerDia;
@@ -1945,7 +1856,6 @@ namespace GroundHeatExchangers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 RATIO;
 		Real64 gFuncVal;
 
 		//Binary Search Algorithms Variables
@@ -1981,7 +1891,7 @@ namespace GroundHeatExchangers {
 		Found = false;
 		Low = 1;
 		High = NPairs;
-		LOOP: while ( Low <= High ) {
+		while ( Low <= High ) {
 			Mid = ( Low + High ) / 2;
 			if ( LNTTS( Mid ) < LnTTsVal ) {
 				Low = Mid + 1;
@@ -1990,12 +1900,10 @@ namespace GroundHeatExchangers {
 					High = Mid - 1;
 				} else {
 					Found = true;
-					goto LOOP_exit;
+					break;
 				}
 			}
-			LOOP_loop: ;
 		}
-		LOOP_exit: ;
 		//LnTTsVal is identical to one of the LnTTS array elements return gFuncVal
 		//the gFuncVal after applying the correction
 		if ( Found ) {
@@ -2131,7 +2039,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( myEnvrnFlag && BeginEnvrnFlag ) {
-			
+
 			myEnvrnFlag = false;
 
 			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, 20.0, PlantLoop( loopNum ).FluidIndex, RoutineName );
@@ -2166,7 +2074,7 @@ namespace GroundHeatExchangers {
 
 	void
 	GLHESlinky::initGLHESimVars()
-	{	
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
 		//       DATE WRITTEN:    August, 2000
@@ -2190,6 +2098,7 @@ namespace GroundHeatExchangers {
 		using DataPlant::TypeOf_GrndHtExchgSlinky;
 		using DataPlant::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2206,6 +2115,9 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 fluidDensity;
 		bool errFlag;
+		Real64 CurTime;
+
+		CurTime = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
 		// Init more variables
 		if ( myFlag ) {
@@ -2227,8 +2139,8 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
-			Node( outletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
+			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
+			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 
 			// zero out all history arrays
 
@@ -2242,7 +2154,7 @@ namespace GroundHeatExchangers {
 			prevHour = 1;
 		}
 
-		tempGround = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
+		tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
 
@@ -2250,75 +2162,10 @@ namespace GroundHeatExchangers {
 
 		// Reset local environment init flag
 		if ( ! BeginEnvrnFlag ) myEnvrnFlag = true;
-	
+
 	}
 
 	//******************************************************************************
-
-	Real64
-	GLHEBase::getKAGrndTemp(
-		Real64 const z, // Depth
-		Real64 const dayOfYear, // Day of year
-		Real64 const aveGroundTemp, // Average annual ground tempeature
-		Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
-		Real64 const phaseShiftInDays // Phase shift
-	)
-	{	
-		// AUTHOR         Matt Mitchell
-		// DATE WRITTEN   February 2015
-		// MODIFIED       na
-		// RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Returns a ground temperature
-
-		// METHODOLOGY EMPLOYED:
-		// Kusuda and Achenbach correlation is used
-
-		//Kusuda and Achenbach
-		// Using/Aliasing
-		using DataGlobals::SecsInDay;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Term1;
-		Real64 Term2;
-		Real64 SecsInYear;
-
-		SecsInYear = SecsInDay * 365.0;
-
-		Term1 = -z * std::sqrt( Pi / ( SecsInYear * diffusivityGround ) );
-		Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
-		
-		return aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
-	}
-
-	//******************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // GroundHeatExchangers
 

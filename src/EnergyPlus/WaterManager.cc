@@ -1,9 +1,67 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -225,9 +283,7 @@ namespace WaterManager {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using InputProcessor::VerifyName;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataHeatBalance::Zone;
-		using DataGlobals::NumOfZones;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleMinValue;
@@ -263,12 +319,12 @@ namespace WaterManager {
 		static int alphaOffset( 0 );
 		static int SurfNum( 0 );
 		static std::string objNameMsg;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		static Real64 tmpMax( 0.0 );
 		static Real64 tmpMin( 0.0 );
@@ -320,7 +376,7 @@ namespace WaterManager {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), WaterStorage.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterStorage, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -452,7 +508,7 @@ namespace WaterManager {
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
-						WaterStorage( Item ).ZoneID = FindItemInList( cAlphaArgs( 10 ), Zone.Name(), NumOfZones );
+						WaterStorage( Item ).ZoneID = FindItemInList( cAlphaArgs( 10 ), Zone );
 						if ( ( WaterStorage( Item ).ZoneID == 0 ) && ( WaterStorage( Item ).AmbientTempIndicator == AmbientTempZone ) ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -476,7 +532,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), RainCollector.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
+					VerifyName( cAlphaArgs( 1 ), RainCollector, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -484,7 +540,7 @@ namespace WaterManager {
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
 					RainCollector( Item ).StorageTankName = cAlphaArgs( 2 );
-					RainCollector( Item ).StorageTankID = FindItemInList( cAlphaArgs( 2 ), WaterStorage.Name(), NumWaterStorageTanks );
+					RainCollector( Item ).StorageTankID = FindItemInList( cAlphaArgs( 2 ), WaterStorage );
 					if ( RainCollector( Item ).StorageTankID == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -543,7 +599,7 @@ namespace WaterManager {
 					RainCollector( Item ).SurfID.allocate( RainCollector( Item ).NumCollectSurfs );
 					for ( SurfNum = 1; SurfNum <= RainCollector( Item ).NumCollectSurfs; ++SurfNum ) {
 						RainCollector( Item ).SurfName( SurfNum ) = cAlphaArgs( SurfNum + alphaOffset );
-						RainCollector( Item ).SurfID( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface.Name(), TotSurfaces );
+						RainCollector( Item ).SurfID( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface );
 						if ( RainCollector( Item ).SurfID( SurfNum ) == 0 ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( SurfNum + alphaOffset ) + '=' + cAlphaArgs( SurfNum + alphaOffset ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -578,7 +634,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), GroundwaterWell.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), GroundwaterWell, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -636,7 +692,7 @@ namespace WaterManager {
 
 					// setup tanks whose level is controlled by supply from another tank
 					if ( ( WaterStorage( Item ).ControlSupplyType == OtherTankFloatValve ) || ( WaterStorage( Item ).ControlSupplyType == TankMainsBackup ) ) {
-						WaterStorage( Item ).SupplyTankID = FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage.Name(), NumWaterStorageTanks );
+						WaterStorage( Item ).SupplyTankID = FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage );
 						if ( WaterStorage( Item ).SupplyTankID == 0 ) {
 							ShowSevereError( "Other tank called " + WaterStorage( Item ).SupplyTankName + " not found for " + cCurrentModuleObject + " Named " + WaterStorage( Item ).Name ); // TODO rename point
 							ErrorsFound = true;
@@ -646,7 +702,7 @@ namespace WaterManager {
 						InternalSetupTankSupplyComponent( WaterStorage( Item ).SupplyTankName, cCurrentModuleObject, WaterStorage( Item ).Name, ErrorsFound, Dummy, Dummy );
 					}
 					// setup overflow inputs
-					WaterStorage( Item ).OverflowTankID = FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage.Name(), NumWaterStorageTanks );
+					WaterStorage( Item ).OverflowTankID = FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage );
 					if ( WaterStorage( Item ).OverflowTankID == 0 ) {
 						// if blank, then okay it is discarded.  but if not blank then error
 						if ( is_blank( WaterStorage( Item ).OverflowTankName ) ) {
@@ -687,7 +743,7 @@ namespace WaterManager {
 				if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					ShowSevereError( "Schedule not found for " + cCurrentModuleObject + " object" );
 					ErrorsFound = true;
-				} else if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
+				} else if ( ( RainFall.RainSchedID != 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					if ( ! CheckScheduleValueMinMax( RainFall.RainSchedID, ">=", 0.0 ) ) {
 						ShowSevereError( "Schedule=" + cAlphaArgs( 2 ) + " for " + cCurrentModuleObject + " object has values < 0." );
 						ErrorsFound = true;
@@ -1254,11 +1310,11 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumSupply;
-		FArray1D_string oldSupplyCompNames;
-		FArray1D_string oldSupplyCompTypes;
+		Array1D_string oldSupplyCompNames;
+		Array1D_string oldSupplyCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
+		TankIndex = FindItemInList( TankName, WaterStorage );
 		if ( TankIndex == 0 ) {
 			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
@@ -1411,11 +1467,11 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumDemand;
-		FArray1D_string oldDemandCompNames;
-		FArray1D_string oldDemandCompTypes;
+		Array1D_string oldDemandCompNames;
+		Array1D_string oldDemandCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
+		TankIndex = FindItemInList( TankName, WaterStorage );
 		if ( TankIndex == 0 ) {
 			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
@@ -1656,7 +1712,6 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoingSizing;
@@ -1797,29 +1852,6 @@ namespace WaterManager {
 		// <this routine is typically needed only for those cases where you must transform the internal data to a reportable form>
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WaterManager
 

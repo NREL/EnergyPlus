@@ -369,14 +369,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('SITE:GROUNDDOMAIN')
                 ! Object rename
                 nodiff=.false.
+                ! objectname needs to be udpated before the GetNewObject call
                 ObjectName = 'Site:GroundDomain:Slab'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 
               CASE('GROUNDHEATEXCHANGER:VERTICAL')
                 ! Remove Max flow rate field
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:10) = InArgs(1:10)
+                OutArgs(1:3) = InArgs(1:3)
+                OutArgs(4) = InArgs(11) 
+                OutArgs(5:10) = InArgs(5:10)
                 OutArgs(11:CurArgs-1) = InArgs(12:CurArgs)
                 CurArgs = CurArgs - 1
 
@@ -421,6 +425,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! new fields F21-25 are shifted
                 OutArgs(21:25) = InArgs(14:18)
                 ! there are some additional new fields, but they are optional and intentionally blank
+                CurArgs = CurArgs + 7
                 
               CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
                 ! data center hvac changes
@@ -437,6 +442,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! shift the rest
                 OutArgs(8:13) = InArgs(5:10)
                 ! there are some additional new fields, but they are optional and intentionally blank
+                CurArgs = CurArgs + 3
                 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

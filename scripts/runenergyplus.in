@@ -28,7 +28,17 @@
 
 # Modified September 29, 2011, kyle.benne@nrel.gov
 #     Fixed support for ENERGYPLUS_WEATHER environment variable.
+
+# August 2015: Edwin: Marked as deprecated in favor of the command line interface
 #====================================================================
+
+echo "***** NOTE: This script is marked as deprecated as of August 2015."
+echo "*****       The functionality of this script is now in the command line interface."
+echo "*****       For information on the command line interface:"
+echo "*****        - See the documentation (https://energyplus.net/documentation)"
+echo "*****        - Call the application for usage: EnergyPlus --help"
+echo "*****        - Refer to the man page: man EnergyPlus"
+echo "*****       In a future version of EnergyPlus, this script will no longer be packaged."
 
 # function to set ENERGYPLUS_DIR relative to this script
 function SetEnergyPlusDir() {
@@ -106,7 +116,7 @@ esac
 
 HEADER="=============== EnergyPlus ================="
 # Name of executable
-PRG_N=EnergyPlus
+PRG_N=energyplus
 # Name of ExpandObjects executable
 PRG_X=ExpandObjects
 # Name of EPMacro executable

@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -101,11 +159,12 @@ namespace HeatingCoils {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumHeatingCoils( 0 ); // The Number of HeatingCoils found in the Input
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+	Array1D_bool MySizeFlag;
+	Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
 	bool CoilIsSuppHeater( false ); // Flag set to indicate the heating coil is a supplemental heater
-	FArray1D_bool CheckEquipName;
+	bool MyOneTimeFlag( true ); // one time initialization flag
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -123,8 +182,8 @@ namespace HeatingCoils {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< HeatingCoilEquipConditions > HeatingCoil;
-	FArray1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
+	Array1D< HeatingCoilEquipConditions > HeatingCoil;
+	Array1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -195,7 +254,7 @@ namespace HeatingCoils {
 		// Find the correct HeatingCoilNumber with the Coil Name
 		if ( present( CompIndex ) ) {
 			if ( CompIndex == 0 ) {
-				CoilNum = FindItemInList( CompName, HeatingCoil.Name(), NumHeatingCoils );
+				CoilNum = FindItemInList( CompName, HeatingCoil );
 				if ( CoilNum == 0 ) {
 					ShowFatalError( "SimulateHeatingCoilComponents: Coil not found=" + CompName );
 				}
@@ -329,12 +388,12 @@ namespace HeatingCoils {
 		std::string SourceTypeString; // character string used in error message for desuperheating coil
 		std::string SourceNameString; // character string used in error message for desuperheating coil
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -401,7 +460,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -436,6 +495,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 			// Setup Report variables for the Electric Coils
+			// CurrentModuleObject = "Coil:Heating:Electric"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
@@ -458,7 +518,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -503,6 +563,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 			// Setup Report variables for the Electric Coils
+			// CurrentModuleObject = "Coil:Heating:Electric:MultiStage"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
@@ -525,7 +586,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -568,6 +629,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).ParasiticGasCapacity = Numbers( 4 );
 
 			// Setup Report variables for the Gas Coils
+			// CurrentModuleObject = "Coil:Heating:Gas"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).GasUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
@@ -595,7 +657,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -651,6 +713,7 @@ namespace HeatingCoils {
 			//parasitic gas load associated with the gas heating coil (standing pilot light)
 
 			// Setup Report variables for the Gas Coils
+			// CurrentModuleObject = "Coil:Heating:Gas:MultiStage"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).GasUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
@@ -678,7 +741,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -787,6 +850,7 @@ namespace HeatingCoils {
 			}
 
 			// Setup Report variables for the Desuperheater Heating Coils
+			// CurrentModuleObject = "Coil:Heating:Desuperheater"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
@@ -899,10 +963,9 @@ namespace HeatingCoils {
 		int DXCoilNum; // Index to DX cooling coil
 		static int ValidSourceTypeCounter( 0 ); // Counter used to determine if desuperheater source name is valid
 		static bool HeatingCoilFatalError( false ); // used for error checking
-		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MySPTestFlag; // used for error checking
-		static FArray1D_bool ShowSingleWarning; // Used for single warning message for desuperheater coil
-		static FArray1D_bool MyEnvrnFlag; // one time environment flag
+		static Array1D_bool MySPTestFlag; // used for error checking
+		static Array1D_bool ShowSingleWarning; // Used for single warning message for desuperheater coil
+		static Array1D_bool MyEnvrnFlag; // one time environment flag
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
@@ -1074,8 +1137,6 @@ namespace HeatingCoils {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using namespace OutputReportPredefined;
@@ -1108,6 +1169,7 @@ namespace HeatingCoils {
 		int NumOfStages; // total number of stages of multi-stage heating coil
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int NumCoilsSized = 0; // counter used to deallocate temporary string array after all coils have been sized
+		Real64 TempSize; // sizing variable temp value
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
 			FieldNum = 1 + ( HeatingCoil( CoilNum ).NumOfStages * 2 );
@@ -1126,8 +1188,31 @@ namespace HeatingCoils {
 		CompName = HeatingCoil( CoilNum ).Name;
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
 		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
+
+		if ( TempCap == AutoSize ) {
+			if ( HeatingCoil( CoilNum ).DesiccantRegenerationCoil ) {
+				DataDesicRegCoil = true;
+				bPRINT = false;
+				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				DataDesInletAirTemp = TempSize;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				DataDesOutletAirTemp = TempSize;
+				if ( CurOASysNum > 0 ) {
+					OASysEqSizing( CurOASysNum ).AirFlow = true;
+					OASysEqSizing( CurOASysNum ).AirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+				}
+				DataDesicDehumNum = 0;
+				bPRINT = true;
+			}
+		}
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
+		DataDesicRegCoil = false; // reset global to false so other heating coils are not affected
+		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not 
+		DataDesOutletAirTemp = 0.0; // reset global data to zero so other heating coils are not affected
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage || HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
 			HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages ) = TempCap;
@@ -1589,7 +1674,7 @@ namespace HeatingCoils {
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
 		int const FanOpMode, // fan operating mode
-		Real64 const PartLoadRatio // part-load ratio of heating coil
+		Real64 const EP_UNUSED( PartLoadRatio ) // part-load ratio of heating coil
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1881,6 +1966,8 @@ namespace HeatingCoils {
 				EffHS = HeatingCoil( CoilNum ).MSEfficiency( StageNumHS );
 
 				PartLoadRat = min( 1.0, SpeedRatio );
+				HeatingCoil( CoilNum ).RTF = 1.0;
+
 				// Get full load output and power
 				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLS / MSHPMassFlowRateLow;
 				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHS / MSHPMassFlowRateHigh;
@@ -1924,6 +2011,7 @@ namespace HeatingCoils {
 				TotCap = HeatingCoil( CoilNum ).MSNominalCapacity( StageNumLS );
 
 				PartLoadRat = min( 1.0, CycRatio );
+				HeatingCoil( CoilNum ).RTF = PartLoadRat;
 
 				// Calculate full load outlet conditions
 				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
@@ -1951,8 +2039,6 @@ namespace HeatingCoils {
 
 				EffLS = HeatingCoil( CoilNum ).MSEfficiency( StageNumLS );
 
-				//    HeatingCoil(CoilNum)%HeatingCoilLoad = TotCap
-				//   This would require a CR to change
 				HeatingCoil( CoilNum ).HeatingCoilLoad = TotCap * PartLoadRat;
 
 				HeatingCoil( CoilNum ).GasUseLoad = HeatingCoil( CoilNum ).HeatingCoilLoad / EffLS;
@@ -1965,16 +2051,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).OutletAirHumRat = OutletAirHumRat;
 				HeatingCoil( CoilNum ).OutletAirEnthalpy = OutletAirEnthalpy;
 				HeatingCoil( CoilNum ).OutletAirMassFlowRate = HeatingCoil( CoilNum ).InletAirMassFlowRate;
-				// This seems unecessary (i.e., cycratio or speedratio is > 0) , and would require a CR to change
-				//  ELSE
-				//    ! Gas coil is off; just pass through conditions
-				//    HeatingCoil(CoilNum)%OutletAirEnthalpy = HeatingCoil(CoilNum)%InletAirEnthalpy
-				//    HeatingCoil(CoilNum)%OutletAirHumRat   = HeatingCoil(CoilNum)%InletAirHumRat
-				//    HeatingCoil(CoilNum)%OutletAirTemp     = HeatingCoil(CoilNum)%InletAirTemp
-				//    HeatingCoil(CoilNum)%OutletAirMassFlowRate = HeatingCoil(CoilNum)%InletAirMassFlowRate
-				//    HeatingCoil(CoilNum)%ElecUseLoad      = 0.0
-				//    HeatingCoil(CoilNum)%HeatingCoilLoad  = 0.0
-				//    ElecHeatingCoilPower                  = 0.0
+
 			}
 
 			// This requires a CR to correct (i.e., calculate outputs when coil is off)
@@ -2038,13 +2115,6 @@ namespace HeatingCoils {
 					OnOffFanPartLoadFraction = PLF;
 				}
 			}
-			// This requires a CR to correct (i.e., if PLFCurveIndex = 0 do this)
-			//   ELSE
-			//     IF(CycRatio > 0.0d0 .AND. StageNum < 2)THEN
-			//       HeatingCoil(CoilNum)%ElecUseLoad = HeatingCoil(CoilNum)%MSParasiticElecLoad(StageNum) * CycRatio
-			//       HeatingCoil(CoilNum)%GasUseLoad  = HeatingCoil(CoilNum)%MSNominalCapacity(StageNum) / EffLS * CycRatio
-			//       HeatingCoil(CoilNum)%ParasiticGasRate = HeatingCoil(CoilNum)%ParasiticGasCapacity * (1.0d0 - CycRatio)
-			//     END IF
 		}
 
 	}
@@ -2395,7 +2465,7 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		HeatingCoilIndex = FindItem( HeatingCoilName, HeatingCoil.Name(), NumHeatingCoils );
+		HeatingCoilIndex = FindItem( HeatingCoilName, HeatingCoil );
 		if ( HeatingCoilIndex == 0 ) {
 			ShowSevereError( "GetCoilIndex: Heating coil not found=" + HeatingCoilName );
 			ErrorsFound = true;
@@ -2456,7 +2526,7 @@ namespace HeatingCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItem( CompName, HeatingCoil.Name(), NumHeatingCoils );
+			CoilNum = FindItem( CompName, HeatingCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckHeatingCoilSchedule: Coil not found=\"" + CompName + "\"." );
 			}
@@ -2537,12 +2607,12 @@ namespace HeatingCoils {
 
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).NominalCapacity;
 			}
 		} else if ( FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas_MultiStage ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).MSNominalCapacity( HeatingCoil( WhichCoil ).NumOfStages );
 			}
@@ -2623,7 +2693,7 @@ namespace HeatingCoils {
 		AvailSchIndex = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = HeatingCoil( WhichCoil ).SchedPtr;
 			}
@@ -2697,7 +2767,7 @@ namespace HeatingCoils {
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -2772,7 +2842,7 @@ namespace HeatingCoils {
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -2942,7 +3012,7 @@ namespace HeatingCoils {
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -3017,7 +3087,7 @@ namespace HeatingCoils {
 		TypeNum = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				TypeNum = HeatingCoil( WhichCoil ).HCoilType_Num;
 			}
@@ -3090,7 +3160,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -3160,7 +3230,7 @@ namespace HeatingCoils {
 
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				IndexNum = HeatingCoil( WhichCoil ).PLFCurveIndex;
 			} else {
@@ -3227,7 +3297,7 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+		WhichCoil = FindItemInList( CoilName, HeatingCoil );
 		if ( WhichCoil != 0 ) {
 			NumberOfStages = HeatingCoil( WhichCoil ).NumOfStages;
 		} else {
@@ -3239,33 +3309,68 @@ namespace HeatingCoils {
 		return NumberOfStages;
 
 	}
+ 
+	// Clears the global data in HeatingCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state()
+	{
+
+		NumHeatingCoils = 0;
+		GetCoilsInputFlag = true;
+		CoilIsSuppHeater = false;
+		MyOneTimeFlag = true;
+
+		MySizeFlag.deallocate();
+		ValidSourceType.deallocate();
+		CheckEquipName.deallocate();
+		HeatingCoil.deallocate();
+		HeatingCoilNumericFields.deallocate();
+
+	}
+
+	void
+	SetHeatingCoilData(
+		int const CoilNum, // Number of electric or gas heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used 
+		) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function sets data to Heating Coil using the coil index and arguments passed
+
+		// Using/Aliasing
+		using General::TrimSigDigits;
+
+		if ( GetCoilsInputFlag ) { 
+			GetHeatingCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		if ( CoilNum <= 0 || CoilNum > NumHeatingCoils ) {
+			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumHeatingCoils ) );
+			ErrorsFound = true;
+			return;
+		}
+
+		if ( present( DesiccantRegenerationCoil ) ) {
+			HeatingCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+		}
+
+		if ( present( DesiccantDehumIndex ) ) {
+			HeatingCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
+		}
+
+	}
 
 	//        End of Utility subroutines for the HeatingCoil Module
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatingCoils
 

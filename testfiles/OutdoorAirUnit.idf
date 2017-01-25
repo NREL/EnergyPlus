@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.6;
 
   Building,
     Building,                !- Name
@@ -648,12 +648,12 @@
     Zone5DXOutAir,           !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
     SPACE5-1,                !- Zone Name
-    0.42,                    !- Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Outdoor Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Outdoor Air Schedule Name
     Zone5OAUFan1,            !- Supply Fan Name
     BlowThrough,             !- Supply Fan Placement
     Zone5OAUExhaustFan1,     !- Exhaust Fan Name
-    0.42,                    !- Exhaust Air Flow Rate {m3/s}
+    autosize,                !- Exhaust Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Exhaust Air Schedule Name
     TemperatureControl,      !- Unit Control Type
     OAUHitemp2,              !- High Air Control Temperature Schedule Name
@@ -669,7 +669,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Zone5OAUOANode,          !- Air Inlet Node Name
@@ -680,7 +680,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
@@ -720,7 +720,7 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
-    1.3,                     !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
     ,                        !- Fan Power Minimum Flow Fraction
     0.0,                     !- Fan Power Minimum Air Flow Rate {m3/s}
@@ -740,7 +740,7 @@
     CounterFlow,             !- Flow Arrangement Type
     Yes,                     !- Economizer Lockout
     1.0,                     !- Ratio of Supply to Secondary hA Values
-    0.4333,                  !- Nominal Supply Air Flow Rate {m3/s}
+    Autosize,                !- Nominal Supply Air Flow Rate {m3/s}
     5.0,                     !- Nominal Supply Air Inlet Temperature {C}
     15.0,                    !- Nominal Supply Air Outlet Temperature {C}
     0.4333,                  !- Nominal Secondary Air Flow Rate {m3/s}
@@ -755,7 +755,7 @@
     Desiccant Regen Coil,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     0.80,                    !- Gas Burner Efficiency
-    100000,                  !- Nominal Capacity {W}
+    autosize,                !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
     Regen Coil Out Node;     !- Air Outlet Node Name
 
@@ -848,6 +848,12 @@
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     Cooling,                 !- Loop Type
     15,                      !- Design Loop Exit Temperature {C}
+    5;                       !- Loop Design Temperature Difference {deltaC}
+
+  Sizing:Plant,
+    Hot Water Loop,      !- Plant or Condenser Loop Name
+    Heating,                 !- Loop Type
+    82,                      !- Design Loop Exit Temperature {C}
     5;                       !- Loop Design Temperature Difference {deltaC}
 
   Sizing:Zone,
@@ -1009,12 +1015,12 @@
     Zone5WaterOutAir,        !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
     SPACE5-1,                !- Zone Name
-    0.42,                    !- Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Outdoor Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Outdoor Air Schedule Name
     Zone5OAUFan2,            !- Supply Fan Name
     DrawThrough,             !- Supply Fan Placement
     Zone5OAUextFan1,         !- Exhaust Fan Name
-    0.42,                    !- Exhaust Air Flow Rate {m3/s}
+    autosize,                !- Exhaust Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Exhaust Air Schedule Name
     NeutralControl,          !- Unit Control Type
     ,                        !- High Air Control Temperature Schedule Name
@@ -1030,7 +1036,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.84,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Zone5DESHCoilOut2,       !- Air Inlet Node Name
@@ -1039,14 +1045,14 @@
   Coil:Heating:Water,
     Zone5OAUWaterHCoil,      !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    400.,                    !- U-Factor Times Area Value {W/K}
-    0.0005,                  !- Maximum Water Flow Rate {m3/s}
+    autosize,                !- U-Factor Times Area Value {W/K}
+    autosize,                !- Maximum Water Flow Rate {m3/s}
     Zone5OAUHWInletNode,     !- Water Inlet Node Name
     Zone5OAUHWOutletNode,    !- Water Outlet Node Name
     Zone5DESHCoilIn2,        !- Air Inlet Node Name
     Zone5DESHCoilOut2,       !- Air Outlet Node Name
     NominalCapacity,         !- Performance Input Method
-    30000,                   !- Rated Capacity {W}
+    autosize,                !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -1074,7 +1080,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Zone5OAUZoneOutletNode2, !- Air Inlet Node Name
@@ -1101,7 +1107,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     HXoutnode3,              !- Air Inlet Node Name
@@ -1110,13 +1116,13 @@
   Coil:Cooling:Water,
     Zone4OAUWCcoil,          !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    0.002,                   !- Design Water Flow Rate {m3/s}
-    0.84,                    !- Design Air Flow Rate {m3/s}
-    6.67,                    !- Design Inlet Water Temperature {C}
-    30,                      !- Design Inlet Air Temperature {C}
-    11,                      !- Design Outlet Air Temperature {C}
-    0.014,                   !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
+    autosize,                !- Design Water Flow Rate {m3/s}
+    autosize,                !- Design Air Flow Rate {m3/s}
+    autosize,                !- Design Inlet Water Temperature {C}
+    autosize,                !- Design Inlet Air Temperature {C}
+    autosize,                !- Design Outlet Air Temperature {C}
+    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
+    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     Zone4OAUChWInletNode,    !- Water Inlet Node Name
     Zone4OAUChWOutletNode,   !- Water Outlet Node Name
     Zone4OAUCCoilIn,         !- Air Inlet Node Name
@@ -1163,12 +1169,12 @@
     Zone4OutAir,             !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
     SPACE4-1,                !- Zone Name
-    0.42,                    !- Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Outdoor Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Outdoor Air Schedule Name
     Zone4OAUFan,             !- Supply Fan Name
     BlowThrough,             !- Supply Fan Placement
     Zone4OAUextFan,          !- Exhaust Fan Name
-    0.42,                    !- Exhaust Air Flow Rate {m3/s}
+    autosize,                !- Exhaust Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Exhaust Air Schedule Name
     NEUTRALCONTROL,          !- Unit Control Type
     ,                        !- High Air Control Temperature Schedule Name
@@ -1191,14 +1197,14 @@
   Coil:Heating:Water,
     Zone4OAUWaterHCoil,      !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    400.,                    !- U-Factor Times Area Value {W/K}
-    0.0005,                  !- Maximum Water Flow Rate {m3/s}
+    autosize,                !- U-Factor Times Area Value {W/K}
+    autosize,                !- Maximum Water Flow Rate {m3/s}
     Zone4OAUHWInletNode,     !- Water Inlet Node Name
     Zone4OAUHWOutletNode,    !- Water Outlet Node Name
     Zone4OAUHCoilIn,         !- Air Inlet Node Name
     Zone4OAUZoneInletNode,   !- Air Outlet Node Name
     NominalCapacity,         !- Performance Input Method
-    30000,                   !- Rated Capacity {W}
+    autosize,                !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -1227,7 +1233,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Zone4OAUOANode,          !- Air Inlet Node Name
@@ -1238,7 +1244,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     HXoutnode4,              !- Air Inlet Node Name
@@ -2044,7 +2050,7 @@
     Zone1OAUHeatingCoil,     !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
     0.99,                    !- Efficiency
-    30000,                   !- Nominal Capacity {W}
+    autosize,                !- Nominal Capacity {W}
     Zone1OAUHCoilin,         !- Air Inlet Node Name
     Z1OAFanIn;               !- Air Outlet Node Name
 
@@ -2063,7 +2069,7 @@
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Heat Ratio
     3.0,                     !- Gross Rated Cooling COP {W/W}
-    0.42,                    !- Rated Air Flow Rate {m3/s}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Zone1OAUCCoilin,         !- Air Inlet Node Name
     Zone1OAUHCoilin,         !- Air Outlet Node Name
@@ -2204,12 +2210,12 @@
     Zone1OutAir,             !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
     SPACE1-1,                !- Zone Name
-    0.42,                    !- Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Outdoor Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Outdoor Air Schedule Name
     Zone1OAUFan,             !- Supply Fan Name
     DrawThrough,             !- Supply Fan Placement
     Zone1OAUextFan,          !- Exhaust Fan Name
-    0.42,                    !- Exhaust Air Flow Rate {m3/s}
+    autosize,                !- Exhaust Air Flow Rate {m3/s}
     OAUnitOASched_01,        !- Exhaust Air Schedule Name
     TemperatureControl,      !- Unit Control Type
     OAUHiCtrlTemp,           !- High Air Control Temperature Schedule Name
@@ -2225,7 +2231,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     HXoutnode,               !- Air Inlet Node Name
@@ -3447,7 +3453,7 @@
     OAUnitOASched_01,        !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
+    autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Z1OAFanIn,               !- Air Inlet Node Name

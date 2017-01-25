@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,13 +15,14 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Inquire.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/Stream.hh>
 
 // C++ Headers
 #include <cassert>
-#include <iostream>
+#include <fstream>
+#include <istream>
+#include <ostream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef _WIN32
@@ -82,13 +83,6 @@ Inquire( std::string const & name, IOFlags & flags )
 
 // Inquire by Name
 void
-Inquire( Fstring const & name, IOFlags & flags )
-{
-	Inquire( std::string( name.trimmed() ), flags );
-}
-
-// Inquire by Name
-void
 Inquire( c_cstring const name, IOFlags & flags )
 {
 	Inquire( std::string( name ), flags );
@@ -102,11 +96,10 @@ Inquire( Stream const & stream, IOFlags & flags )
 	flags.name( stream.name() );
 	flags.exists( stream.is_open() ? true : std::ifstream( stream.name() ).good() );
 	flags.open( stream.is_open() );
-	flags.read( stream.read() );
-	flags.write( stream.write() );
-	flags.binary( stream.binary() );
-	flags.append( stream.append() );
-	flags.asis( stream.asis() );
+	flags.access( stream.access() );
+	flags.action( stream.action() );
+	flags.form( stream.form() );
+	flags.positioning( stream.positioning() );
 	if ( stream.is_open() ) {
 		flags.size( stream.size() );
 		flags.pos( stream.pos() );
@@ -124,8 +117,7 @@ Inquire( std::istream const & stream, IOFlags & flags )
 	flags.clear();
 	flags.exists( false );
 	flags.open( true );
-	flags.read( true );
-	flags.write( false );
+	flags.read_on();
 	flags.size( size( stream ) );
 	flags.pos( const_cast< std::istream & >( stream ).tellg() );
 }
@@ -137,8 +129,7 @@ Inquire( std::ostream const & stream, IOFlags & flags )
 	flags.clear();
 	flags.exists( false );
 	flags.open( true );
-	flags.read( false );
-	flags.write( true );
+	flags.write_on();
 	flags.size( size( stream ) );
 	flags.pos( const_cast< std::ostream & >( stream ).tellp() );
 }
@@ -150,8 +141,7 @@ Inquire( std::iostream const & stream, IOFlags & flags )
 	flags.clear();
 	flags.exists( false );
 	flags.open( true );
-	flags.read( true );
-	flags.write( true );
+	flags.readwrite_on();
 	flags.size( size( stream ) );
 	flags.pos( const_cast< std::iostream & >( stream ).tellg() );
 }
@@ -163,8 +153,7 @@ Inquire( std::ifstream const & stream, IOFlags & flags )
 	flags.clear();
 	flags.exists( stream.is_open() );
 	flags.open( stream.is_open() );
-	flags.read( true );
-	flags.write( false );
+	flags.read_on();
 	if ( stream.is_open() ) {
 		flags.size( size( stream ) );
 		flags.pos( const_cast< std::ifstream & >( stream ).tellg() );
@@ -178,8 +167,7 @@ Inquire( std::ofstream const & stream, IOFlags & flags )
 	flags.clear();
 	flags.exists( stream.is_open() );
 	flags.open( stream.is_open() );
-	flags.read( false );
-	flags.write( true );
+	flags.write_on();
 	if ( stream.is_open() ) {
 		flags.size( size( stream ) );
 		flags.pos( const_cast< std::ofstream & >( stream ).tellp() );
@@ -193,8 +181,7 @@ Inquire( std::fstream const & stream, IOFlags & flags )
 	flags.clear();
 	flags.exists( stream.is_open() );
 	flags.open( stream.is_open() );
-	flags.read( true );
-	flags.write( true );
+	flags.readwrite_on();
 	if ( stream.is_open() ) {
 		flags.size( size( stream ) );
 		flags.pos( const_cast< std::fstream & >( stream ).tellg() );

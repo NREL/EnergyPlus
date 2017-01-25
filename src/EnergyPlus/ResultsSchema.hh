@@ -4,8 +4,8 @@
 #include <unordered_map>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Reference.hh>
 
 // cJSON header
@@ -166,9 +166,9 @@ namespace EnergyPlus {
 			std::vector< std::string > RowHeaders;
 			std::vector< std::vector< std::string > > Data;
 
-			Table(FArray2D_string const & body,
-				FArray1D_string const & rowLabels,
-				FArray1D_string const & columnLabels,
+			Table(Array2D_string const & body,
+				Array1D_string const & rowLabels,
+				Array1D_string const & columnLabels,
 				std::string const & tableName,
 				std::string footnoteText = "");
 
@@ -190,9 +190,9 @@ namespace EnergyPlus {
 
 			ReportsCollection();
 
-			void addReportTable(FArray2D_string const & body,
-				FArray1D_string const & rowLabels,
-				FArray1D_string const & columnLabels,
+			void addReportTable(Array2D_string const & body,
+				Array1D_string const & rowLabels,
+				Array1D_string const & columnLabels,
 				std::string const & reportName, std::string const & reportForString, 
 				std::string const & tableName,
 				std::string footnoteText = "");
@@ -214,9 +214,9 @@ namespace EnergyPlus {
 			bool timeSeriesEnabled();
 			bool timeSeriesAndTabularEnabled();
 
-			void initializeRTSDataFrame(const int ReportFrequency, const FArray1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar);
-			void initializeITSDataFrame(const int ReportFrequency, const FArray1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar);
-			void initializeMeters(const FArray1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency);
+			void initializeRTSDataFrame(const int ReportFrequency, const Array1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar);
+			void initializeITSDataFrame(const int ReportFrequency, const Array1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar);
+			void initializeMeters(const Array1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency);
 
 			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
 			static DataFrame TSMeters, HRMeters, DYMeters, MNMeters, SMMeters;

@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -43,49 +101,31 @@ namespace ICEngineElectricGenerator {
 	// is available to meet an electric load demand, it calls SimICEngineGenerator
 	// which in turn calls the ICEngine Generator model.
 
-	// REFERENCES:
-	// N/A
-
-	// OTHER NOTES:
-	// N/A
-
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobalConstants::iGeneratorICEngine;
 	using General::RoundSigDigits;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	Real64 const ReferenceTemp( 25.0 ); // Reference temperature by which lower heating
 	// value is reported.  This should be subtracted
 	// off of when calculated exhaust energies.
 
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DECLARATIONS:
 	int NumICEngineGenerators( 0 ); // number of IC ENGINE Generators specified in input
 	bool GetICEInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
-	// SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
+	Array1D_bool CheckEquipName;
 
 	// Object Data
-	FArray1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
-	FArray1D< ReportVars > ICEngineGeneratorReport;
-
-	// MODULE SUBROUTINES:
-
-	// Beginning of IC ENGINE Generator Module Driver Subroutines
-	//*************************************************************************
-
-	// Functions
+	Array1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
+	Array1D< ReportVars > ICEngineGeneratorReport;
 
 	void
 	SimICEngineGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -132,7 +172,7 @@ namespace ICEngineElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, ICEngineGenerator.Name(), NumICEngineGenerators );
+			GenNum = FindItemInList( GeneratorName, ICEngineGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -156,7 +196,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	GetICEGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -205,13 +245,13 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
-		int const CompTypeNum,
+		int const EP_UNUSED( CompTypeNum ),
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyLoad,
+		Real64 & EP_UNUSED( MyLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -261,7 +301,7 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, ICEngineGenerator.Name(), NumICEngineGenerators );
+			CompNum = FindItemInList( CompName, ICEngineGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
 				return;
@@ -318,8 +358,8 @@ namespace ICEngineElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 10 ); // character string data
-		FArray1D< Real64 > NumArray( 11 ); // numeric data
+		Array1D_string AlphArray( 10 ); // character string data
+		Array1D< Real64 > NumArray( 11 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -346,7 +386,7 @@ namespace ICEngineElectricGenerator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ICEngineGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), ICEngineGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -536,7 +576,7 @@ namespace ICEngineElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
 		Real64 const MyLoad, // Generator demand
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -554,11 +594,9 @@ namespace ICEngineElectricGenerator {
 		// REFERENCES:na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataPlant::PlantLoop;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -597,13 +635,12 @@ namespace ICEngineElectricGenerator {
 		Real64 ExhaustEnergyRec; // exhaust gas heat recovered (J)
 		Real64 QExhaustTotal; // total engine exhaust heat (W)
 		Real64 ExhaustGasFlow; // exhaust gas mass flow rate (kg/s)
-		Real64 ExhaustStackTemp; // engine stack temp. (C)
+		Real64 ExhaustStackTemp( 0 ); // engine stack temp. (C)
 		Real64 DesignMinExitGasTemp; // design engine stact saturated steam temp. (C)
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
 		int HeatRecInNode; // Heat Recovery Fluid Inlet Node Num
 		Real64 HeatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 		Real64 HeatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
-		Real64 HeatRecCp; // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 		Real64 HRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
 		// and this assumption uses this ratio to accomplish this task.
 
@@ -615,7 +652,6 @@ namespace ICEngineElectricGenerator {
 		if ( ICEngineGenerator( GeneratorNum ).HeatRecActive ) {
 			HeatRecInNode = ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum;
 			HeatRecInTemp = Node( HeatRecInNode ).Temp;
-			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 			HeatRecMdot = Node( HeatRecInNode ).MassFlowRate;
 
 		} else {
@@ -795,7 +831,6 @@ namespace ICEngineElectricGenerator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatRecInNode;
-		int HeatRecOutNode;
 		Real64 MinHeatRecMdot;
 		Real64 HeatRecInTemp;
 		Real64 HeatRecOutTemp;
@@ -803,7 +838,6 @@ namespace ICEngineElectricGenerator {
 
 		//Load inputs to local structure
 		HeatRecInNode = ICEngineGenerator( Num ).HeatRecInletNodeNum;
-		HeatRecOutNode = ICEngineGenerator( Num ).HeatRecOutletNodeNum;
 
 		//Need to set the HeatRecRatio to 1.0 if it is not modified
 		HRecRatio = 1.0;
@@ -858,7 +892,7 @@ namespace ICEngineElectricGenerator {
 	InitICEngineGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
+		Real64 const EP_UNUSED( MyLoad ), // Generator demand
 		bool const FirstHVACIteration
 	)
 	{
@@ -903,9 +937,9 @@ namespace ICEngineElectricGenerator {
 		int HeatRecOutletNode; // outlet node number in heat recovery loop
 		static bool MyOneTimeFlag( true ); // Initialization flag
 
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		Real64 mdot;
 		Real64 rho;
 		bool errFlag;
@@ -937,7 +971,7 @@ namespace ICEngineElectricGenerator {
 			HeatRecOutletNode = ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			ICEngineGenerator( GeneratorNum ).DesignHeatRecMassFlowRate = rho * ICEngineGenerator( GeneratorNum ).DesignHeatRecVolFlowRate;
 			ICEngineGenerator( GeneratorNum ).HeatRecMdotDesign = ICEngineGenerator( GeneratorNum ).DesignHeatRecMassFlowRate;
@@ -988,7 +1022,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	UpdateICEngineGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{
@@ -1015,11 +1049,9 @@ namespace ICEngineElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int HeatRecInletNode;
 		int HeatRecOutletNode;
 
 		if ( ICEngineGenerator( Num ).HeatRecActive ) {
-			HeatRecInletNode = ICEngineGenerator( Num ).HeatRecInletNodeNum;
 			HeatRecOutletNode = ICEngineGenerator( Num ).HeatRecOutletNodeNum;
 			//      Node(HeatRecOutletNode)%MassFlowRate            = ICEngineGenerator(Num)%HeatRecMdotActual
 			Node( HeatRecOutletNode ).Temp = ICEngineGenerator( Num ).HeatRecOutletTemp;

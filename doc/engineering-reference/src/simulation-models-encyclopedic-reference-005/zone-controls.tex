@@ -1,0 +1,424 @@
+\section{Zone Controls }\label{zone-controls}
+
+\subsection{Thermostatic Zone Control}\label{thermostatic-zone-control}
+
+The input object ZoneControl:Thermostat provides a way for the zone to be controlled to a specified temperature.~ ZoneControl:Thermostat references a control type schedule and one or more control type objects which in turn reference one or more setpoint schedules.
+
+The control type schedule and the list of control type/name pairs are directly related.~ The schedule defines the type of control that is to be used during for each hour.~ Valid control types are
+
+0 - Uncontrolled (No specification or default)
+
+1 - Single Heating Setpoint
+
+2 - Single Cooling SetPoint
+
+3 - Single Heating/Cooling Setpoint
+
+4 - Dual Setpoint (Heating and Cooling) with deadband
+
+If the schedule referenced in the ZoneControl statement has a value of 4 for a particular hour, this indicates that during that hour ``dual setpoint with deadband control'' is to be used.~ The specific ``dual setpoint with deadband'' control object to be used is specified in the list of control type/name pairs.~ Then the specific control type objects reference the thermostat setpoint temperature schedule to be used.~ Because only one control can be specified for each control type in a ZoneControl statement, there are only four pairs possible in a particular ZoneControl type/name list.~ This is because individual controls can be defined hourly, thus giving the user a full range of flexibility.~ Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the hourly schedule profile.
+
+For more information see ZoneControl:Thermostat in the Input Output Reference and succeeding sections in this document.
+
+\subsection{Zone Thermostats}\label{zone-thermostats}
+
+The schema for the current set of four zone thermostats is given below.~ In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control is a single or dual setpoint control).~ The schedule defines a temperature setpoint for the control type.~ The schedule would be defined through the standard schedule syntax described earlier in this document.~ For an uncontrolled zone no thermostat is specified or necessary.~ See the Input Output Reference for more details.
+
+The control type schedule and the list of control type/name pairs are directly related.~ The schedule defines the type of control that is to be used during for each hour.~ Valid Control Types are
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Control Type Value & Control Type Name \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Control Type Value & Control Type Name \tabularnewline
+\midrule
+\endhead
+
+0 & Uncontrolled (No specification or default) \tabularnewline
+1 & Single Heating Setpoint (input object ThermostatSetpoint:SingleHeating) \tabularnewline
+2 & Single Cooling SetPoint (input object ThermostatSetpoint:SingleCooling) \tabularnewline
+3 & Single Heating/Cooling Setpoint (input object ThermostatSetpoint:SingleHeatingOrCooling) \tabularnewline
+4 & Dual Setpoint (Heating and Cooling) with deadband (input object ThermostatSetpoint:DualSetpoint) \tabularnewline
+\bottomrule
+\end{longtable}
+
+For the Uncontrolled case no heating or cooling requirement is calculated for the system to meet.
+
+CASE (0)
+
+~ ! Uncontrolled Zone
+
+~ LoadToHeatingSetPoint = 0.0
+
+~ LoadToCoolingSetPoint = 0.0
+
+~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = 0.0
+
+For the Single Heating Setpoint there would be a heating only thermostat.~ The setpoint can be scheduled and varied throughout the simulation but only heating is allowed with this control type.
+
+CASE (SingleHeatingSetPoint)
+
+~ ! Determine zone load based on
+
+~ ! Qload + Qsys = 0 and Qsys = mCp(Tsys-Tzone)
+
+~ ! System Load Sign Convention:
+
+~ !~~~~ - -\textgreater{} Cooling required to reach setpoint
+
+~ !~~~~ + -\textgreater{} Heating required to reach setpoint
+
+~ LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) *
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempZoneThermostatSetPoint(ZoneNum) --
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempIndZnLd(ZoneNum))
+
+~ IF ((ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired - 1.0) \textless{} 0.0) THEN
+
+~~ ~DeadBandOrSetback(ZoneNum) = .TRUE.
+
+~ ENDIF
+
+For the Single Cooling Setpoint there would be a cooling only thermostat.~ The setpoint can be scheduled and varied throughout the simulation but only cooling is allowed with this control type.
+
+CASE (SingleCoolingSetPoint)
+
+~ LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) *
+
+~~~~~~~~~~~~~~~~~~~~~~ ~~~~TempZoneThermostatSetPoint(ZoneNum) --
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempIndZnLd(ZoneNum))
+
+~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = LoadToCoolingSetPoint
+
+~ IF ((ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired + 1.0) \textgreater{} 0.0) THEN
+
+~~~ DeadBandOrSetback(ZoneNum) = .TRUE.
+
+~ ENDIF
+
+For the Single Heat Cool Setpoint there would be a cooling only thermostat there would be a heating and cooling thermostat.~ The setpoint can be scheduled and varied throughout the simulation for both heating and cooling. With this control type only 1 setpoint profile is needed or used.
+
+CASE (SingleHeatCoolSetPoint)
+
+~ LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) *
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ ~TempZoneThermostatSetPoint(ZoneNum) --
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempIndZnLd(ZoneNum))
+
+~ LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) *
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ ~TempZoneThermostatSetPoint(ZoneNum) --
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempIndZnLd(ZoneNum))
+
+! Possible combinations:
+
+! 1/~ LoadToHeatingSetPoint \textgreater{} 0 \& LoadToCoolingSetPoint \textgreater{} 0 --\textgreater{}~ Heating required
+
+! 2/~ LoadToHeatingSetPoint \textgreater{} 0 \& LoadToCoolingSetPoint \textless{} 0 --\textgreater{}~ Not Feasible
+
+! 3/~ LoadToHeatingSetPoint \textless{} 0 \& LoadToCoolingSetPoint \textless{} 0 --\textgreater{}~ Cooling Required
+
+! 4/~ LoadToHeatingSetPoint \textless{} 0 \& LoadToCoolingSetPoint \textgreater{} 0 --\textgreater{}~ Dead Band Operation
+
+~ IF (LoadToHeatingSetPoint \textgreater{} 0.0 .AND. LoadToCoolingSetPoint \textgreater{} 0.0) THEN
+
+~~~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = LoadToHeatingSetPoint
+
+~~~ ZoneSetPoint = ZoneThermostatSetPointLo(ZoneNum)
+
+~ ELSEIF (LoadToHeatingSetPoint \textless{} 0.0 .AND. LoadToCoolingSetPoint \textless{} 0.0) THEN
+
+~~~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = LoadToCoolingSetPoint
+
+~~~ ZoneSetPoint = ZoneThermostatSetPointHi(ZoneNum)
+
+~ ELSEIF (LoadToHeatingSetPoint \textless{} 0.0 .AND. LoadToCoolingSetPoint \textgreater{} 0.0) THEN
+
+~~~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = 0.0
+
+~~~ IF(Zone(ZoneNum)\%SystemZoneNodeNumber \textgreater{} 0) THEN
+
+~~~~~ ZoneSetPoint = Node(Zone(ZoneNum)\%SystemZoneNodeNumber)\%Temp
+
+~~~ ENDIF
+
+~~~ DeadBandOrSetback(ZoneNum) = .TRUE.
+
+~ ENDIF
+
+For Dual Setpoint with DeadBand there would be a heating and cooling thermostat.~ For this case both a heating and cooling setpoint can be scheduled for any given time period.~ The setpoint can be scheduled and varied throughout the simulation for both heating and cooling.
+
+CASE (DualSetPointWithDeadBand)
+
+~ LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) *
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ ~ZoneThermostatSetPointLo(ZoneNum) --
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempIndZnLd(ZoneNum))
+
+~ LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) *
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ ~ZoneThermostatSetPointHi(ZoneNum) --
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ TempIndZnLd(ZoneNum))
+
+! Possible combinations:
+
+! 1/~ LoadToHeatingSetPoint \textgreater{} 0 \& LoadToCoolingSetPoint \textgreater{} 0 --\textgreater{}~ Heating required
+
+! 2/~ LoadToHeatingSetPoint \textgreater{} 0 \& LoadToCoolingSetPoint \textless{} 0 --\textgreater{}~ Not Feasible
+
+! 3/~ LoadToHeatingSetPoint \textless{} 0 \& LoadToCoolingSetPoint \textless{} 0 --\textgreater{}~ Cooling Required
+
+! 4/~ LoadToHeatingSetPoint \textless{} 0 \& LoadToCoolingSetPoint \textgreater{} 0 --\textgreater{}~ Dead Band Operation
+
+~ IF (LoadToHeatingSetPoint \textgreater{} 0.0 .AND. LoadToCoolingSetPoint \textgreater{} 0.0) THEN
+
+~~~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = LoadToHeatingSetPoint
+
+~~~ ZoneSetPoint = ZoneThermostatSetPointLo(ZoneNum)
+
+~ ELSEIF (LoadToHeatingSetPoint \textless{} 0.0 .AND. LoadToCoolingSetPoint \textless{} 0.0) THEN
+
+~~~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = LoadToCoolingSetPoint
+
+~~~ ZoneSetPoint = ZoneThermostatSetPointHi(ZoneNum)
+
+~ ELSEIF (LoadToHeatingSetPoint \textless{} 0.0 .AND. LoadToCoolingSetPoint \textgreater{} 0.0) THEN
+
+~~~ ZoneSysEnergyDemand(ZoneNum)\%TotalOutputRequired = 0.0
+
+~~~ IF(Zone(ZoneNum)\%SystemZoneNodeNumber \textgreater{} 0) THEN
+
+~~~~~ ZoneSetPoint = Node(Zone(ZoneNum)\%SystemZoneNodeNumber)\%Temp
+
+~~~ ENDIF
+
+~~~ DeadBandOrSetback(ZoneNum) = .TRUE.
+
+~ ENDIF
+
+\subsection{Operative Temperature Control}\label{operative-temperature-control}
+
+The input object ZoneControl:Thermostat:OperativeTemperature provides a model where the behavior of the zone thermostats described above can be modified to accommodate operative temperature control. The ZoneControl:Thermostat:OperativeTemperature input object is used to modify the behavior of any of the thermostatic control types described above.~ When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just zone air temperatures).
+
+In EnergyPlus, operative temperature, \({T_{OP}}\) , is defined as ,
+
+\begin{equation}
+{T_{OP}} = \gamma {T_{MRT}} + (1 - \gamma ){T_{drybulb}}
+\end{equation}
+
+where,
+
+\(\gamma\) ~ is the radiative fraction,
+
+\({T_{MRT}}\) ~is the mean radiant temperature for the thermal zone, and
+
+\({T_{drybulb}}\) is the mean zone air temperature.
+
+The radiative fraction \(\gamma\) ~is selected by the user and can be scheduled to vary during the simulation.~ A typical value is 0.5.~ The maximum value needs to be less than 0.9 and the minimum is 0.0.~ A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply.~ Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
+
+% table 86
+\begin{longtable}[c]{@{}llll@{}}
+\caption{Operative Temperature - Radiative Fraction vs Air Velocity \label{table:operative-temperature-radiative-fraction-vs}} \tabularnewline
+\toprule 
+Air Velocity (m/s) & < 0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Operative Temperature - Radiative Fraction vs Air Velocity} \tabularnewline
+\toprule 
+Air Velocity (m/s) & < 0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
+\midrule
+\endhead
+
+\(\gamma\) & 0.5 & 0.4 & 0.3 \tabularnewline
+\bottomrule
+\end{longtable}
+
+The control is accomplished using the load to setpoint formulation that is fundamental to HVAC system control in EnergyPlus. Although real systems will not know the loads and operate on temperature-based control, EnergyPlus needs to be able to function at zone timesteps up to one hour and this is too long of a timeframe for true temperature-based zone control.~ Load-based control is an important method of determining the average HVAC system response to zone conditions over the time step.~ For operative temperature control, the same methods and routines are used for calculating loads to setpoints but the setpoints are shifted to emulate operative temperature control rather than air temperature control.
+
+The user-defined setpoint for \({T_{OP}}\) ~is an input in degrees Celsius. \({T_{MRT}}\) ~is continually modeled by the full zone heat balance method and includes all the interactions between thermal loads and HVAC systems.~ A new setpoint for the zone's \({T_{drybulb}}\) ~is obtained for each zone timestep by rearranging the definition of \({T_{OP}}\) ~to put \({T_{drybulb}}\) ~on the left hand side.
+
+\begin{equation}
+{T_{drybulb,setpo{\mathop{\rm int}} }} = \frac{{{T_{OP,setpo{\mathop{\rm int}} }} - \gamma {T_{MRT}}}}{{(1 - \gamma )}}
+\end{equation}
+
+This adjustment to the target zone air drybulb temperature is made every timestep for every zone immediately after the setpoints are obtained from the schedule.
+
+Reference: J. Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210.~ ASHRAE.~ Atlanta, GA.
+
+\subsection{Temperature And Humidity Control}\label{temperature-and-humidity-control}
+
+The input object ZoneControl:Thermostat:TemperatureAndHumidity is used to modify the behavior of ZoneControl:Thermostat objects (control types ThermostatSetpoint:SingleCooling and ThermostatSetpoint:DualSetpoint only) based on zone air humidity conditions. Specifically, this TemperatureAndHumidity zone control resets the ZoneControl:Thermostat's cooling setpoint temperature downward when the zone air relative humidity exceeds the Dehumidifying Relative Humidity Setpoint defined in this object. The reduced cooling setpoint temperature typically results in longer cooling coil runtimes and additional dehumidification. While additional dehumidification (lower absolute humidity level in the zone air) may be achieved, the resulting dry-bulb temperature and absolute humidity of the zone air will determine if the zone air \textbf{relative humidity} is reduced.
+
+The rate at which the cooling setpoint temperature is reduced is dictated by the user-specified Overcool Control Ratio. The maximum reduction in cooling setpoint temperature is defined by the user-entered Overcool Range, although the Overcool Range may be reduced from the user-defined value when this TemperatureAndHumidity control is used in tandem with a dual setpoint thermostat (see discussion below). Note that occupants are sensitive to overcooling and can experience discomfort if the overcool range is too large.
+
+This control is accomplished using the load to setpoint formulation that is fundamental to HVAC system control in EnergyPlus. Although real systems will not know the loads and operate on temperature-based control, EnergyPlus needs to be able to function at zone timesteps up to one hour and this is too long of a timeframe for true temperature-based zone control. Load-based control is an important method of determining the average HVAC system response to zone conditions over the time step. For TemperatureAndHumidity control, the same methods and routines are used for calculating loads to setpoints but the cooling setpoint is shifted to emulate TemperatureAndHumidity control, as described above.
+
+The overcool range limits the extent of the zone air temperature reduction below the cooling setpoint. When a dual setpoint thermostat is being modified by this TemperatureAndHumidity control, the maximum overcool range must be less than or equal to the temperature difference between the dual setpoint thermostat's cooling and heating setpoints:
+
+\begin{equation}
+  \Delta {T_{OvercoolRange,MAX}} = MIN\left( {\Delta {T_{OvercoolRange}},\,\Delta {T_{Setpoints}}} \right)
+\end{equation}
+
+where,
+
+\(\Delta {T_{OvercoolRange,MAX}}\) = maximum overcool range for the zone air (°C)
+
+\(\Delta {T_{OvercoolRange}}\) = overcool range for the zone air (°C).~ User input.
+
+\(\Delta {T_{Setpoints}}\) = temperature difference between the cooling and heating setpoints (°C)
+
+If a single cooling setpoint thermostat is being modified by this control, the maximum overcool range is equal to the user-defined overcool range.
+
+The extent that the zone air relative humidity exceeds the user-entered dehumidifying relative humidity setpoint is given by:
+
+\begin{equation}
+\Delta \phi  = MAX\left( {0.0,{\phi_{ZoneLagged}} - {\phi_{CSP}}} \right)
+\end{equation}
+
+The actual cooling setpoint reduction (overcooling) is calculated for the condition when the zone air relative humidity exceeds the dehumidifying setpoint (i.e., \(\Delta \phi\) \textgreater{}0), as described below:
+
+\begin{equation}
+  \begin{array}{l}
+    IF\,\,(\Delta \phi \, > \,0)\,\,THEN \\
+    ,\,\,\,\,\Delta {T_{Overcool,Actual}} = MIN\left( {\Delta {T_{OvercoolRange,MAX}},\,{{\Delta \phi } \mathord{\left/ {\vphantom {{\Delta \phi } {\Delta {\phi_{adjust}}}}} \right. } {\Delta {\phi_{adjust}}}}} \right) \\
+    ELSE \\
+    ,\,\,\,\,\Delta {T_{Overcool,Actual}} = 0 \\
+    ENDIF
+  \end{array}
+\end{equation}
+
+The cooling setpoint temperature is then adjustedas follows:
+
+\({T_{CSP,adj}} = \left( {{T_{CSP}} - \Delta {T_{Overcool,Actual}}} \right)\) where,
+
+\({T_{CSP,adj}}\) = adjusted cooling setpoint temperature (°C)
+
+\({T_{CSP}}\) = zone air cooling setpoint temperature for the current time step (°C).~ User input.
+
+\(\Delta {\phi_{adjust}}\) = user-defined overcool control ratio (\%/K)
+
+\(\Delta \phi\) = difference between the zone air relative humidity and the user-defined dehumidifying setpoint (\%)
+
+\({\phi_{ZoneLagged}}\) ~ = zone air relative humidity calculated at the last system time step (\%)
+
+\({\varphi_{CSP}}\) = dehumidifying relative humidity setpoint at the current time step (\%).~ User input.
+
+This adjusted cooling setpoint temperature is made every timestep for every zone immediately after the original thermostat setpoint is obtained from the user-defined setpoint schedule.
+
+\subsection{Humidistat}\label{humidistat}
+
+The input object ZoneControl:Humidistat provides a way for the zone to be controlled to a single relative humidity setpoint schedule, or dual humidity schedules (humidifying and dehumidifying with deadband). The schedules consist of relative humidities, expressed as a percentage (0-100), to be used for the zone moisture prediction calculation. Only one control statement can be specified for each zone.~ Individual relative humidity values can be defined for every time step, thus giving the user a full range of flexibility. For a single setpoint humidistat, if the control relative humidity is below the calculated load and the equipment specified can humidify then that equipment will try and meet the requirement.~ The opposite is true if the calculated value is above the setpoint and the equipment can dehumidify. For a dual setpoint humidistat, if the zone relative humidity is below the \textbf{humidifying} relative humidity setpoint and the equipment specified can humidify then that equipment will try and meet the zone's humidification load. The opposite is true if the zone relative humidity is above the \textbf{dehumidifying} relative humidity setpoint and the equipment can dehumidify.
+
+If the ZoneControl:Humidistat is used by a furnace or unitary system then no other objects are required. The signal from the humidistat is used directly by that component. If the Zone Control:Humidistat is used to control a Humidifier or used in conjunction with the Controller:Simple object with control variable ``TemperatureAndHumidityRatio'', then either the ``SetpointManager:SingleZone:Humidity:Minimum'', ``SetpointManager:MultiZone:Humidity:Minimum'',~~ ``SetpointManager:SingleZone:Humidity:Maximum'' or ``SetpointManager:MultiZone:Humidity:Maximum'' objects are required to determine a setpoint for those components to meet for the single setpoint humidistat. For a dual setpoint humidistat, a minimum humidity setpoint manager object~ (``SetpointManager:SingleZone:Humidity:Minimum'' or ``SetpointManager:MultiZone:Humidity:Minimum'') and a maximum humidity setpoint manager object (``SetpointManager:SingleZone:Humidity:Maximum'' or ``SetpointManager:MultiZone:Humidity:Maximum'') are required to determine the setpoints for the corresponding humidification and dehumidification components. Note that the ``SetpointManager:Scheduled'' object can also be used to directly set humidity ratio setpoints on the exit node of the humidifier component.
+
+For the single setpoint humidistat case, the model takes into account all of the moisture gains and/or losses from sources except the HVAC system contribution, and then calculates a moisture removal or addition rate based on the provided setpoint value, like the temperature predictor. The algorithm uses a 3rd Order derivative to predict zone moisture addition or removal to smooth the changes using the zone air capacitance. Positive values of moisture load mean that this amount of moisture must be added to the zone to reach the setpoint. Negative values represent the amount of moisture that must be removed by the system.
+
+\begin{equation}
+{\rm{MoistLoadHumidSetPoint = massflow}}\cdot {\rm{HumidityRatio = kg air/sec}}\cdot {\rm{kg }}{{\rm{H}}_{\rm{2}}}{\rm{O/kg air = kg }}{{\rm{H}}_{\rm{2}}}{\rm{O/sec}}
+\end{equation}
+
+This routine also calculates the zone required humidity ratio, Wsetpoint, which is required and takes into account the zone multiplier. At this time the Wsp is not stored in a derived type to make it available for SetpointManagers. It was setup to be analogous to the temperature thermostat.
+
+For the dual setpoint humidistat case, the model takes into account all of the moisture gains and/or losses from sources except the HVAC system contribution, and then calculates moisture addition and removal rates based on the provided humidifying and dehumidifying setpoint values, like the temperature predictor. The algorithm uses a Third Order Backward Difference , Analytical Solution, or Euler Method in subroutine CalcPredictedHumidityRatio to predict zone moisture addition and removal to smooth the changes using the zone air capacitance. The program calculates the humidifying (addition) and dehumidifying (removal) moisture loads based on the specified humidifying and dehumidifying setpoints, respectively. The calculated humidifying moisture load is passed to subroutine CalcSingZoneMinHumSetPoint and CalcMultiZoneMinHumSetPoint in the SetpointManager module to calculate the requested supply air humidity ratio at the setpoint node (Ref. SetpointManager:SingleZone:Humidity:Minimum and SetpointManager:MultiZone:Humidity:Minimum objects). The calculated dehumidifying moisture load is passed to subroutine CalcSingZoneMaxHumSetPoint and CalcMultiZoneMaxHumSetPoint in the SetpointManager module to calculate the requested supply air humidity ratio at the setpoint node (Ref. SetpointManager:SingleZone:Humidity:Maximum and SetpointManager:MultiZone:Humidity:Maximum objects). At the same time, the dehumidifying load is also passed directly to a furnace or unitary system if it is defined for the simulation, and that system will operate to meet this load based on its configuration and control settings.
+
+\subsection{Thermal Comfort Zone Control}\label{thermal-comfort-zone-control}
+
+The input object ZoneControl:Thermostat:ThermalComfort provides a way for the zone to be controlled to a specified temperature based on a selected thermal comfort model.~ ZoneControl:Thermostat:ThermalComfort references a thermal comfort control type schedule and one or more thermal comfort control type objects which in turn reference one or more setpoint schedules.
+
+The thermal comfort control type schedule and the list of thermal comfort control type/name pairs are directly related.~ The schedule defines the type of thermal comfort control that is to be used during for each simulation time step.~ Valid Control Types are
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Control Type & Control Type Name/Object \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Control Type & Control Type Name/Object \tabularnewline
+\midrule
+\endhead
+
+0 & No thermal comfort control \tabularnewline
+1 & ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating \tabularnewline
+2 & ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling \tabularnewline
+3 & ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling \tabularnewline
+4 & ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint \tabularnewline
+\bottomrule
+\end{longtable}
+
+If the schedule referenced in the ZoneControl statement has a value of 4 for a particular time step, this indicates that during that time step ``ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint'' control is to be used.~ The specific ``ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint'' control object to be used is specified in the list of thermal comfort control type/name pairs.~ Then the specific thermal comfort control type objects reference the thermal comfort PMV setpoint schedule to be used.~ Because only one thermal comfort control can be specified for each thermal comfort control type in a ZoneControl statement, there are only four pairs possible in a particular ZoneControl type/name list.~ This is because individual thermal comfort controls can be defined for specific times, thus giving the user a full range of flexibility.~ Since putting in the name of the thermal comfort control type directly in the schedule would be very cumbersome, the thermal comfort control types are assigned a number which is used in the schedule profile.
+
+For more information see ZoneControl:Thermostat:ThermalComfort in the InputOutput Reference and Zone Fanger Thermal Comfort in the Engineering Documentation.
+
+\subsubsection{Zone Control Based on Fanger Thermal Comfort}\label{zone-control-based-on-fanger-thermal-comfort}
+
+The syntax for the current set (4) of zone thermal comfort control types is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control type is a single or dual setpoint control). The schedule defines a PMV setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled thermal comfort zone, no Fanger thermal comfort object is specified or necessary. See the Input Output Reference for more details.
+
+The control type schedule and the list of control type/name pairs are directly related.~ The schedule defines the type of control that is to be used during for each hour.~ Valid Control Types are
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Control Type & Control Type Name/Object \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Control Type & Control Type Name/Object \tabularnewline
+\midrule
+\endhead
+
+0 & No thermal comfort control \tabularnewline
+1 & ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating \tabularnewline
+2 & ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling \tabularnewline
+3 & ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling \tabularnewline
+4 & ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint \tabularnewline
+\bottomrule
+\end{longtable}
+
+For the no thermal comfort control (uncontrolled) case, the control will revert to thermostat control if specified. If the thermal comfort control is specified as ``uncontrolled'' for a particular period and thermostat control is not specified in the input, then conditions will float.
+
+For the ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating case there would be a heating only thermal comfort setpoint temperature.~ The setpoint is calculated based on the selected thermal comfort model and varied throughout the simulation but only heating is allowed with this thermal comfort control type.
+
+~~~~~ CASE (Single Thermal Comfort Heating Setpoint:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = SingleHeatingSetpoint
+
+~~~~~ TempZoneThermostatSetPoint(ZoneNum) = Calculated Zone Setpoint from Fanger heating setpoint PMV
+
+For the ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling case there would be a cooling only thermal comfort setpoint temperature.~ The setpoint is calculated based on the selected thermal comfort model and varied throughout the simulation but only cooling is allowed with this thermal comfort control type.
+
+~~~~~ CASE (Single Thermal Comfort Cooling Setpoint:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = SingleCoolingSetPoint
+
+~~~~~ TempZoneThermostatSetPoint(ZoneNum) = Calculated Zone Setpoint from Fanger cooling setpoint PMV
+
+For the ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling there would be heating and cooling thermal comfort zone control objects.~ The setpoint is calculated based on the selected thermal comfort model and varied throughout the simulation for both heating and cooling. With this thermal comfort control type only 1 setpoint profile is needed or used.
+
+~~~~~ CASE (Single Thermal Comfort Heating Cooling Setpoint:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = SingleHeatCoolSetPoint
+
+~~~~~ TempZoneThermostatSetPoint(ZoneNum) = Calculated Zone Setpoint from Fanger heating and cooling
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ setpoint PMV
+
+For ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint there would be heating and cooling thermal comfort control objects.~ For this case both a heating and cooling setpoint can be calculated based on the selected thermal comfort model for any given time period.~ The thermal comfort setpoint temperature can be varied throughout the simulation for both heating and cooling.
+
+~~~~~ CASE (Dual Thermal Comfort Setpoint with Deadband:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = DualSetPointWithDeadBand
+
+~~~~~ ZoneThermostatSetPointLo(ZoneNum) = Calculated Zone Setpoint from Fanger heating setpoint PMV
+
+~~~~~ ZoneThermostatSetPointHi(ZoneNum) = Calculated Zone Setpoint from Fanger cooling setpoint PMV

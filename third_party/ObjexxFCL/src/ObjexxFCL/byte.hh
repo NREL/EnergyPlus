@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cstddef>
 #include <istream>
+#include <ostream>
 
 namespace ObjexxFCL {
 
@@ -27,55 +28,47 @@ class byte
 public: // Creation
 
 	// Default Constructor
-	inline
 	byte() :
 	 b_( static_cast< signed char >( 0 ) )
 	{}
 
 	// short Constructor
-	inline
 	explicit
 	byte( short int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// int Constructor
-	inline
 	explicit
 	byte( int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// long Constructor
-	inline
 	explicit
 	byte( long int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// long long Constructor
-	inline
 	explicit
 	byte( long long int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// char Constructor
-	inline
 	explicit
 	byte( signed char const c ) :
 	 b_( c )
 	{}
 
 	// Destructor
-	inline
 	~byte()
 	{}
 
 public: // Conversion
 
 	// short Conversion
-	inline
 	operator short int() const
 	{
 		return static_cast< short int >( b_ );
@@ -84,7 +77,6 @@ public: // Conversion
 public: // Assignment
 
 	// = short
-	inline
 	byte &
 	operator =( short int const i )
 	{
@@ -93,7 +85,6 @@ public: // Assignment
 	}
 
 	// += short
-	inline
 	byte &
 	operator +=( short int const i )
 	{
@@ -102,7 +93,6 @@ public: // Assignment
 	}
 
 	// -= short
-	inline
 	byte &
 	operator -=( short int const i )
 	{
@@ -111,7 +101,6 @@ public: // Assignment
 	}
 
 	// *= short
-	inline
 	byte &
 	operator *=( short int const i )
 	{
@@ -120,7 +109,6 @@ public: // Assignment
 	}
 
 	// /= short
-	inline
 	byte &
 	operator /=( short int const i )
 	{
@@ -132,7 +120,6 @@ public: // Assignment
 public: // Incrememt/Decrement
 
 	// ++byte
-	inline
 	byte &
 	operator ++()
 	{
@@ -141,7 +128,6 @@ public: // Incrememt/Decrement
 	}
 
 	// byte++
-	inline
 	byte const
 	operator ++( int )
 	{
@@ -151,7 +137,6 @@ public: // Incrememt/Decrement
 	}
 
 	// --byte
-	inline
 	byte &
 	operator --()
 	{
@@ -160,7 +145,6 @@ public: // Incrememt/Decrement
 	}
 
 	// byte--
-	inline
 	byte const
 	operator --( int )
 	{
@@ -172,7 +156,6 @@ public: // Incrememt/Decrement
 public: // Math
 
 	// +byte
-	inline
 	byte
 	operator +() const
 	{
@@ -180,7 +163,6 @@ public: // Math
 	}
 
 	// -byte
-	inline
 	byte
 	operator -() const
 	{
@@ -188,7 +170,6 @@ public: // Math
 	}
 
 	// byte + byte
-	inline
 	friend
 	byte
 	operator +( byte const & i, byte const & j )
@@ -197,7 +178,6 @@ public: // Math
 	}
 
 	// byte - byte
-	inline
 	friend
 	byte
 	operator -( byte const & i, byte const & j )
@@ -206,7 +186,6 @@ public: // Math
 	}
 
 	// byte * byte
-	inline
 	friend
 	byte
 	operator *( byte const & i, byte const & j )
@@ -215,7 +194,6 @@ public: // Math
 	}
 
 	// byte / byte
-	inline
 	friend
 	byte
 	operator /( byte const & i, byte const & j )
@@ -227,7 +205,6 @@ public: // Math
 public: // Bitwise Logical
 
 	// ~byte
-	inline
 	byte
 	operator ~() const
 	{
@@ -235,7 +212,6 @@ public: // Bitwise Logical
 	}
 
 	// byte >> std::size_t
-	inline
 	byte
 	operator >>( std::size_t const n ) const
 	{
@@ -243,7 +219,6 @@ public: // Bitwise Logical
 	}
 
 	// byte >> byte
-	inline
 	byte
 	operator >>( byte const n ) const
 	{
@@ -251,7 +226,6 @@ public: // Bitwise Logical
 	}
 
 	// byte << std::size_t
-	inline
 	byte
 	operator <<( std::size_t const n ) const
 	{
@@ -259,7 +233,6 @@ public: // Bitwise Logical
 	}
 
 	// byte << byte
-	inline
 	byte
 	operator <<( byte const n ) const
 	{
@@ -267,7 +240,6 @@ public: // Bitwise Logical
 	}
 
 	// &= byte
-	inline
 	byte &
 	operator &=( byte const & i )
 	{
@@ -276,7 +248,6 @@ public: // Bitwise Logical
 	}
 
 	// |= byte
-	inline
 	byte &
 	operator |=( byte const & i )
 	{
@@ -285,7 +256,6 @@ public: // Bitwise Logical
 	}
 
 	// ^= byte
-	inline
 	byte &
 	operator ^=( byte const & i )
 	{
@@ -294,7 +264,6 @@ public: // Bitwise Logical
 	}
 
 	// byte & byte
-	inline
 	friend
 	byte
 	operator &( byte const & i, byte const & j )
@@ -303,7 +272,6 @@ public: // Bitwise Logical
 	}
 
 	// byte | byte
-	inline
 	friend
 	byte
 	operator |( byte const & i, byte const & j )
@@ -312,7 +280,6 @@ public: // Bitwise Logical
 	}
 
 	// byte ^ byte
-	inline
 	friend
 	byte
 	operator ^( byte const & i, byte const & j )
@@ -323,7 +290,6 @@ public: // Bitwise Logical
 public: // Comparison
 
 	// byte == byte
-	inline
 	friend
 	bool
 	operator ==( byte const & i, byte const & j )
@@ -332,7 +298,6 @@ public: // Comparison
 	}
 
 	// byte != byte
-	inline
 	friend
 	bool
 	operator !=( byte const & i, byte const & j )
@@ -341,7 +306,6 @@ public: // Comparison
 	}
 
 	// byte < byte
-	inline
 	friend
 	bool
 	operator <( byte const & i, byte const & j )
@@ -350,7 +314,6 @@ public: // Comparison
 	}
 
 	// byte <= byte
-	inline
 	friend
 	bool
 	operator <=( byte const & i, byte const & j )
@@ -359,7 +322,6 @@ public: // Comparison
 	}
 
 	// byte > byte
-	inline
 	friend
 	bool
 	operator >( byte const & i, byte const & j )
@@ -368,7 +330,6 @@ public: // Comparison
 	}
 
 	// byte >= byte
-	inline
 	friend
 	bool
 	operator >=( byte const & i, byte const & j )
@@ -378,8 +339,7 @@ public: // Comparison
 
 public: // I/O
 
-	// Stream Input
-	inline
+	// Stream >> byte
 	friend
 	std::istream &
 	operator >>( std::istream & stream, byte & b )
@@ -388,6 +348,17 @@ public: // I/O
 			short int i;
 			stream >> i;
 			b.b_ = static_cast< signed char >( i );
+		}
+		return stream;
+	}
+
+	// Stream << byte
+	friend
+	std::ostream &
+	operator <<( std::ostream & stream, byte const & b )
+	{
+		if ( stream ) {
+			stream << static_cast< short int >( b.b_ );
 		}
 		return stream;
 	}
@@ -453,9 +424,13 @@ operator >( byte const & i, byte const & j );
 bool
 operator >=( byte const & i, byte const & j );
 
-// Stream Input
+// Stream >> byte
 std::istream &
 operator >>( std::istream & stream, byte & b );
+
+// Stream << byte
+std::ostream &
+operator <<( std::ostream & stream, byte const & b );
 
 } // ObjexxFCL
 

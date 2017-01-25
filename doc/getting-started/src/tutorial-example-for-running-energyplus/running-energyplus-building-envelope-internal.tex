@@ -1,0 +1,96 @@
+\section{Running EnergyPlus, Building Envelope, Internal Loads, Reports}\label{running-energyplus-building-envelope-internal-loads-reports}
+
+\subsection{Overview}\label{overview}
+
+\begin{itemize}
+\item
+  Rectangular single story building
+\item
+  Windows in east and west walls
+\item
+  Single zone with no interior partitions
+\item
+  Lightweight construction
+\end{itemize}
+
+\begin{figure}[hbtp] % fig 11
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image011.jpg}
+\caption{Schematic for Exercise 1 \protect \label{fig:schematic-for-exercise-1}}
+\end{figure}
+
+The details of the building construction and operation are shown in the following tables and description. For tutorial purposes, the building is located in Chicago Illinois, one of the weather files supplied with EnergyPlus. These details are listed in a fashion to make for easy entry into EnergyPlus.
+
+\subsection{Details of the exercise}\label{details-of-the-exercise}
+
+\subsubsection{Surface Constructions}\label{surface-constructions}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+Material (listed from outside to inside) & Conductivity (W/m-K) & Thickness (m) & U (W/m-K) & R (m-K/W) & Density (kg/m) & C (J/kg-K) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Material (listed from outside to inside) & Conductivity (W/m-K) & Thickness (m) & U (W/m-K) & R (m-K/W) & Density (kg/m) & C (J/kg-K) \tabularnewline
+\midrule
+\endhead
+
+Walls & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+WOOD SIDING\--1 & 0.140 & 0.009 & 15.556 & 0.064 & 530 & 900 \tabularnewline
+FIBERGLASS QUILT\--1 & 0.040 & 0.066 & 0.606 & 1.650 & 12 & 840 \tabularnewline
+PLASTER\-BOARD\--1 & 0.160 & 0.012 & 13.333 & 0.075 & 950 & 840 \tabularnewline
+Roof & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+ROOF DECK & 0.140 & 0.019 & 7.368 & 0.136 & 530 & 900 \tabularnewline
+FIBERGLASS QUILT-2 & 0.040 & 0.066 & 0.606 & 1.650 & 12 & 840 \tabularnewline
+PLASTER\-BOARD-2 & 0.160 & 0.010 & 1.60 & 0.625 & 950 & 840 \tabularnewline
+Floor & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+C5 CONCRETE & 1.73 & 0.1015 & 17.04 & 0.059 & 2243 & 837 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsubsection{Window Properties}\label{window-properties}
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Type * & Clear \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Type * & Clear \tabularnewline
+\midrule
+\endhead
+
+Number of panes & 2 \tabularnewline
+Pane thickness & 0.006 m \tabularnewline
+Air-gap thickness & 0.0032 m \tabularnewline
+Conductivity of glass & 0.9 W/m-K \tabularnewline
+\bottomrule
+\end{longtable}
+
+Refers to specific glass type included in the EnergyPlus datasets directory
+
+(\textbf{WindowGlassMaterials.idf})
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{4.5in}}
+\caption{Additional Model Details \label{table:additional-model-details}} \tabularnewline
+\toprule 
+Type & Details \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Additional Model Details} \tabularnewline
+\toprule 
+Type & Details \tabularnewline
+\midrule
+\endhead
+
+Internal Loads & Lights (1000 W), Office Lighting schedule, surface mount fluorescent \tabularnewline
+Space Conditioning & Heating setpoint 20C, cooling setpoint 24C, no setback \tabularnewline
+Location & Chicago, Illinois, USA; Summer and Winter design days \tabularnewline
+Simulation Period & Annual, Jan 1 - Dec 31 \tabularnewline
+Ground Temperatures & 18.2 C to 22.5 C (from Slab preprocessor, vary monthly) \tabularnewline
+\bottomrule
+\end{longtable}

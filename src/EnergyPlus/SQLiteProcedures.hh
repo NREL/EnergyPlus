@@ -1,9 +1,67 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef SQLiteProcedures_hh_INCLUDED
 #define SQLiteProcedures_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,6 +74,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <map>
 
 namespace EnergyPlus {
 
@@ -49,16 +108,17 @@ protected:
 	std::shared_ptr<sqlite3> m_db;
 };
 
-class SQLite : SQLiteProcedures {
+class SQLite : SQLiteProcedures
+{
 public:
 	// Friend SQLiteFixture which is the gtest fixture class for testing SQLite
 	// This allows for testing of private methods in SQLite
 	friend class SQLiteFixture;
 
-	void addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue );
+	void addScheduleData( int const number, std::string const & name, std::string const & type, double const minValue, double const maxValue );
 	void addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData );
 	void addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData );
-	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass );
+	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass );
 	void addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData );
 	void addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData );
 	void addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue );
@@ -140,7 +200,8 @@ public:
 		std::string const & PeakHrMin, // time stamp of the peak
 		Real64 const PeakTemp, // temperature at peak [C]
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
+		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	);
 
 	void addSQLiteSystemSizingRecord(
@@ -172,16 +233,16 @@ public:
 		int const dayOfMonth,
 		int const hourOfDay,
 		int const nX,
-		FArray1< Real64 > const & x,
+		Array1< Real64 > const & x,
 		int const nY,
-		FArray1< Real64 > const & y,
-		FArray2< Real64 > const & illuminance
+		Array1< Real64 > const & y,
+		Array2< Real64 > const & illuminance
 	);
 
 	void createSQLiteTabularDataRecords(
-		FArray2D_string const & body, // row,column
-		FArray1D_string const & rowLabels,
-		FArray1D_string const & columnLabels,
+		Array2D_string const & body, // row,column
+		Array1D_string const & rowLabels,
+		Array1D_string const & columnLabels,
 		std::string const & ReportName,
 		std::string const & ReportForString,
 		std::string const & TableName
@@ -260,6 +321,19 @@ private:
 
 	bool m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
+
+	int m_hourlyReportIndex = 0;
+	int m_hourlyDataIndex = 0;
+	int m_tabularDataIndex = 0;
+	int m_stringIndex = 1;
+	std::map < std::pair < std::string, int > , int > m_tabularStrings;
+	int m_errorIndex = 0;
+	int m_dataIndex = 0;
+	int m_extendedDataIndex = 0;
+	int m_zoneSizingIndex = 0;
+	int m_systemSizingIndex = 0;
+	int m_componentSizingIndex = 0;
+
 	sqlite3_stmt * m_reportDataInsertStmt;
 	sqlite3_stmt * m_reportExtendedDataInsertStmt;
 	sqlite3_stmt * m_reportDictionaryInsertStmt;
@@ -325,8 +399,8 @@ private:
 	class Schedule : SQLiteData
 	{
 		public:
-			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const scheduleName, 
-					std::string const scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
+			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const & scheduleName,
+					std::string const & scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
 				SQLiteData( errorStream, db ),
 				number( scheduleNumber ),
 				name( scheduleName ),
@@ -348,7 +422,7 @@ private:
 	class Surface : SQLiteData
 	{
 		public:
-			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass ) :
+			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) :
 				SQLiteData( errorStream, db ),
 				number( surfaceNumber ),
 				name( surfaceData.Name ),
@@ -385,7 +459,7 @@ private:
 			double const & azimuth;
 			double const & height;
 			double const & reveal;
-			int const & shape;
+			DataSurfaces::SurfaceShape const & shape;
 			int const & sides;
 			double const & tilt;
 			double const & width;
@@ -479,7 +553,7 @@ private:
 		private:
 			int const number;
 			std::string const & name;
-			FArray1D_int const & zones;
+			Array1D_int const & zones;
 	};
 
 	class ZoneGroup : SQLiteData
@@ -509,7 +583,7 @@ private:
 				SQLiteData( errorStream, db ),
 				number( materialNumber ),
 				name( materialData.Name ),
-				group( materialData.Group  ),
+				group( materialData.Group ),
 				roughness( materialData.Roughness ),
 				conductivity( materialData.Conductivity ),
 				density( materialData.Density ),
@@ -562,7 +636,7 @@ private:
 				typeIsWindow( constructionData.TypeIsWindow ),
 				uValue( constructionUValue )
 			{
-				for(int layerNum = 1; layerNum <= constructionData.TotLayers; ++layerNum) {
+				for (int layerNum = 1; layerNum <= constructionData.TotLayers; ++layerNum) {
 					constructionLayers.push_back(
 						std::unique_ptr<Construction::ConstructionLayer>(new ConstructionLayer(m_errorStream, m_db, number, layerNum, constructionData.LayerPoint(layerNum)))
 					);

@@ -1,18 +1,79 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
 
 	// Using/Aliasing
+	using namespace GroundTemperatureManager;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -27,8 +88,13 @@ namespace GroundHeatExchangers {
 
 	// Types
 
-	struct GLHEBase
+	struct GLHEBase : PlantComponent
 	{
+		// Destructor
+		virtual
+		~GLHEBase()
+		{}
+
 		// Members
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
@@ -50,18 +116,18 @@ namespace GroundHeatExchangers {
 		Real64 designFlow; // Design volumetric flow rate			[m3/s]
 		Real64 designMassFlow; // Design mass flow rate				[kg/s]
 		Real64 tempGround; // The far feild temperature of the ground   [°C]
-		FArray1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
-		FArray1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
-		FArray1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
+		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
+		Array1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
+		Array1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
 		// by the total active length of bore holes  [W/m]
 		int prevHour;
 		Real64 gReferenceRatio; // Reference ratio for developing g-functions [-]
 		int NPairs; // Number of pairs of Lntts and Gfunc
-		FArray1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
-		FArray1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
+		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
+		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
 		int AGG; // Minimum Hourly History required
 		int SubAGG; // Minimum subhourly History
-		FArray1D_int LastHourN; // Stores the Previous hour's N for past hours
+		Array1D_int LastHourN; // Stores the Previous hour's N for past hours
 		// until the minimum subhourly history
 		//loop topology variables
 		Real64 boreholeTemp; // [°C]
@@ -77,6 +143,7 @@ namespace GroundHeatExchangers {
 		Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
 		Real64 timeSS; // Steady state time
 		Real64 timeSSFactor; // Steady state time factor for calculation
+		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
 		// Default Constructor
 		GLHEBase() :
@@ -115,7 +182,6 @@ namespace GroundHeatExchangers {
 			HXResistance( 0.0 ),
 			timeSS( 0.0 ),
 			timeSSFactor( 0.0 )
-
 		{}
 
 		virtual void
@@ -145,19 +211,19 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
-		Real64
-		getKAGrndTemp(
-		Real64 const z,
-		Real64 const dayOfYear,
-		Real64 const aveGroundTemp,
-		Real64 const aveGroundTempAmplitude,
-		Real64 const phaseShift
-	);
+		void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
+
+		static PlantComponent * factory( int const objectType, std::string objectName );
 
 	};
 
 	struct GLHEVert:GLHEBase
 	{
+		// Destructor
+		~GLHEVert(){}
+
 		// Members
 		Real64 maxFlowRate; // design nominal capacity of Pump
 		int maxSimYears; // maximum length of simulation (years)
@@ -178,7 +244,6 @@ namespace GroundHeatExchangers {
 			kGrout( 0.0 ),
 			UtubeDist( 0.0 ),
 			runFlag( false )
-
 		{}
 
 		void
@@ -195,13 +260,17 @@ namespace GroundHeatExchangers {
 
 		Real64
 		getGFunc(
-		Real64 const time
+			Real64 const time
 		);
 
 	};
 
 	struct GLHESlinky:GLHEBase
 	{
+
+		// Destructor
+		~GLHESlinky(){}
+
 		// Members
 		bool verticalConfig;	// HX Configuration Flag
 		Real64 coilDiameter;	// Diameter of the slinky coils [m]
@@ -212,15 +281,11 @@ namespace GroundHeatExchangers {
 		int numTrenches;		// Number of parallel trenches [m]
 		Real64 trenchSpacing;	// Spacing between parallel trenches [m]
 		int numCoils;			// Number of coils
-		bool useGroundTempDataForKusuda; // Use Ground Temp Data Flag
-		Real64 averageGroundTemp;
-		Real64 averageGroundTempAmplitude;
-		Real64 phaseShiftOfMinGroundTempDays;
 		int monthOfMinSurfTemp;
 		Real64 maxSimYears;
 		Real64 minSurfTemp;
-		FArray1D< Real64 > X0;
-		FArray1D< Real64 > Y0;
+		Array1D< Real64 > X0;
+		Array1D< Real64 > Y0;
 		Real64 Z0;
 
 		// Default Constructor
@@ -234,10 +299,6 @@ namespace GroundHeatExchangers {
 			numTrenches( 0 ),
 			trenchSpacing( 0.0 ),
 			numCoils( 0 ),
-			useGroundTempDataForKusuda( false ),
-			averageGroundTemp( 0.0 ),
-			averageGroundTempAmplitude( 0.0 ),
-			phaseShiftOfMinGroundTempDays( 0.0 ),
 			monthOfMinSurfTemp( 0 ),
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )
@@ -262,77 +323,77 @@ namespace GroundHeatExchangers {
 
 		Real64
 		doubleIntegral(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const t,
-		int const I0,
-		int const J0
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const t,
+			int const I0,
+			int const J0
 		);
 
 		Real64
 		integral(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const t,
-		Real64 const eta,
-		Real64 const J0
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const t,
+			Real64 const eta,
+			Real64 const J0
 		);
 
 		bool
 		isEven(
-		int const val
+			int const val
 		);
 
 		Real64
 		distance(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const eta,
-		Real64 const theta
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const eta,
+			Real64 const theta
 		);
 
 		Real64
 		distanceToFictRing(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const eta,
-		Real64 const theta
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const eta,
+			Real64 const theta
 		);
 
 		Real64
 		distToCenter(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1
+			int const m,
+			int const n,
+			int const m1,
+			int const n1
 		);
 
 		Real64
 		nearFieldResponseFunction(
-		int const m, 
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const eta,
-		Real64 const theta,
-		Real64 const t
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const eta,
+			Real64 const theta,
+			Real64 const t
 		);
 
 		Real64
 		midFieldResponseFunction(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const t
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const t
 		);
 
 		Real64
@@ -343,44 +404,14 @@ namespace GroundHeatExchangers {
 	};
 
 	// Object Data
-	extern FArray1D< GLHEVert > verticalGLHE; // Vertical GLHEs
-	extern FArray1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
+	extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
 
 	void
-	SimGroundHeatExchangers(
-		int const GLHETypeNum,
-		std::string const & name,
-		int & compIndex,
-		bool const runFlag,
-		bool const firstIteration,
-		bool const initLoopEquip
-	);
+	clear_state();
 
 	void
 	GetGroundHeatExchangerInput();
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // GroundHeatExchangers
 

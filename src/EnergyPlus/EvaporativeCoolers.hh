@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef EvaporativeCoolers_hh_INCLUDED
 #define EvaporativeCoolers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -32,18 +90,18 @@ namespace EvaporativeCoolers {
 	// MODULE VARIABLE DECLARATIONS:
 	extern bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
 	extern int NumEvapCool; // The Number of Evap Coolers found in the Input
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 
 	extern int NumZoneEvapUnits;
-	extern FArray1D_bool CheckZoneEvapUnitName;
+	extern Array1D_bool CheckZoneEvapUnitName;
 	extern bool GetInputZoneEvapUnit;
 
 	// Indirect Evaporative Coolers Research Special Operating Modes
 	extern int const None; // the indirect evaporative cooler Research Special is scheduled off or turned off
 	extern int const DryModulated; // the evaporative cooler Research Special is modulated in Dry Mode
 	extern int const DryFull; // the evaporative cooler Research Special is run in full capacity in Dry Mode
-	extern int const DryWetModulated; // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode 
+	extern int const DryWetModulated; // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode
 	extern int const WetModulated; // the evaporative cooler Research Special is modulated in wet Mode
 	extern int const WetFull; // the evaporative cooler Research Special is run in full capacity in Wet Mode
 
@@ -73,7 +131,7 @@ namespace EvaporativeCoolers {
 		int InletNode;
 		int OutletNode;
 		int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
-		int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan 
+		int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
 		int TertiaryInletNode; // This node is used to run building exhaust into purge side.
 		Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
 		Real64 InletMassFlowRateMaxAvail;
@@ -130,7 +188,7 @@ namespace EvaporativeCoolers {
 		int DewPointBoundFlag; // report when indirect research special cooler is bound by dewpoint
 		Real64 MinOATDBEvapCooler; // Minimum outdoor air operating dry-bulb temperature for evaporative cooler
 		Real64 MaxOATDBEvapCooler; // Maximum outdoor air operating dry-bulb temperature for evaporative cooler
-		bool EvapCoolerOperationControlFlag; // turns the evap cooler on/off depending on the outdoor air temperature min and max limits 
+		bool EvapCoolerOperationControlFlag; // turns the evap cooler on/off depending on the outdoor air temperature min and max limits
 		Real64 MaxOATWBEvapCooler; // Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
 		Real64 DryCoilMaxEfficiency; // Cooler Drybulb Design Effectiveness
 		Real64 IndirectFanPower; // Secondary Fan Design Power
@@ -369,24 +427,18 @@ namespace EvaporativeCoolers {
 	struct ZoneEvapCoolerUnitFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		ZoneEvapCoolerUnitFieldData()
 		{}
 
-		// Member Constructor
-		ZoneEvapCoolerUnitFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data
-	extern FArray1D< EvapConditions > EvapCond;
-	extern FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
-	extern FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
+	extern Array1D< EvapConditions > EvapCond;
+	extern Array1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
+	extern Array1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
 
 
 	// Functions
@@ -450,13 +502,13 @@ namespace EvaporativeCoolers {
 		Real64 const EDBTSec,
 		Real64 const EWBTSec,
 		Real64 const EHumRatSec,
-		Real64 const QHXTotal, 
+		Real64 const QHXTotal,
 		Real64 & QHXLatent
 	);
 
 	void
 	CalcIndirectRDDEvapCoolerOutletTemp(
-		int const EvapCoolNum, 
+		int const EvapCoolNum,
 		int const DryOrWetOperatingMode,
 		Real64 const AirMassFlowSec,
 		Real64 const EDBTSec,
@@ -467,7 +519,7 @@ namespace EvaporativeCoolers {
 	Real64
 	CalcEvapCoolRDDSecFlowResidual(
 		Real64 const AirMassFlowSec,
-		FArray1< Real64 > const & Par //Par( 6 ) is desired temperature C
+		Array1< Real64 > const & Par //Par( 6 ) is desired temperature C
 	);
 
 	Real64
@@ -545,7 +597,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		FArray1< Real64 > const & Par // parameters
+		Array1< Real64 > const & Par // parameters
 	);
 
 	void
@@ -553,29 +605,6 @@ namespace EvaporativeCoolers {
 
 	//        End of Reporting subroutines for the EvaporativeCoolers Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // EvaporativeCoolers
 

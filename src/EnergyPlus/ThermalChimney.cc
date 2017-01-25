@@ -1,8 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -73,9 +130,9 @@ namespace ThermalChimney {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< ThermalChimneyData > ThermalChimneySys;
-	FArray1D< ThermChimZnReportVars > ZnRptThermChim;
-	FArray1D< ThermChimReportVars > ThermalChimneyReport;
+	Array1D< ThermalChimneyData > ThermalChimneySys;
+	Array1D< ThermChimZnReportVars > ZnRptThermChim;
+	Array1D< ThermChimReportVars > ThermalChimneyReport;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -215,7 +272,7 @@ namespace ThermalChimney {
 			// First Alpha is Thermal Chimney Name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys.Name(), Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys, Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) {
@@ -227,7 +284,7 @@ namespace ThermalChimney {
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name
-			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ThermalChimneySys( Loop ).RealZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
 				ShowContinueError( "invalid - not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -280,7 +337,7 @@ namespace ThermalChimney {
 			AllRatiosSummed = 0.0;
 			for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 				ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) = cAlphaArgs( TCZoneNum + 3 );
-				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone.Name(), NumOfZones );
+				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
 				ThermalChimneySys( Loop ).DistanceThermChimInlet( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 1 );
 				ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 2 );
 				if ( lNumericFieldBlanks( 3 * TCZoneNum + 2 ) ) ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = 1.0;
@@ -485,8 +542,8 @@ namespace ThermalChimney {
 		// REAL(r64)                    :: OutletAirTempThermalChim
 		Real64 OverallThermalChimLength;
 		Real64 ThermChimTolerance;
-		FArray1D< Real64 > TempTCMassAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Mass Flow Rate ()
-		FArray1D< Real64 > TempTCVolumeAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Volume Flow Rate ()
+		Array1D< Real64 > TempTCMassAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Mass Flow Rate ()
+		Array1D< Real64 > TempTCVolumeAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Volume Flow Rate ()
 		int IterationLoop;
 		Real64 Process1; // Temporary Variable Used in the Middle of the Calculation
 		Real64 Process2; // Temporary Variable Used in the Middle of the Calculation
@@ -500,9 +557,9 @@ namespace ThermalChimney {
 		Real64 DeltaL; // OverallThermalChimLength / NTC
 		int ThermChimLoop1;
 		int ThermChimLoop2;
-		FArray2D< Real64 > EquaCoef( NTC, NTC ); // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
-		FArray1D< Real64 > EquaConst( NTC ); // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
-		FArray1D< Real64 > ThermChimSubTemp( NTC ); // Air temperature of each thermal chimney air channel subregion
+		Array2D< Real64 > EquaCoef( NTC, NTC ); // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
+		Array1D< Real64 > EquaConst( NTC ); // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
+		Array1D< Real64 > ThermChimSubTemp( NTC ); // Air temperature of each thermal chimney air channel subregion
 
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
@@ -610,14 +667,14 @@ namespace ThermalChimney {
 
 				for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 					for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-						EquaCoef( ThermChimLoop1, ThermChimLoop2 ) = 0.0;
+						EquaCoef( ThermChimLoop2, ThermChimLoop1 ) = 0.0;
 					}
 				}
 
 				EquaCoef( 1, 1 ) = Process2;
 				EquaConst( 1 ) = Process3 - Process1 * RoomAirTemp;
 				for ( ThermChimLoop1 = 2; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
-					EquaCoef( ThermChimLoop1, ( ThermChimLoop1 - 1 ) ) = Process1;
+					EquaCoef( ( ThermChimLoop1 - 1 ), ThermChimLoop1 ) = Process1;
 					EquaCoef( ThermChimLoop1, ThermChimLoop1 ) = Process2;
 					EquaConst( ThermChimLoop1 ) = Process3;
 				}
@@ -640,14 +697,14 @@ namespace ThermalChimney {
 
 			for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 				for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-					EquaCoef( ThermChimLoop1, ThermChimLoop2 ) = 0.0;
+					EquaCoef( ThermChimLoop2, ThermChimLoop1 ) = 0.0;
 				}
 			}
 
 			EquaCoef( 1, 1 ) = Process2;
 			EquaConst( 1 ) = Process3 - Process1 * RoomAirTemp;
 			for ( ThermChimLoop1 = 2; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
-				EquaCoef( ThermChimLoop1, ( ThermChimLoop1 - 1 ) ) = Process1;
+				EquaCoef( ( ThermChimLoop1 - 1 ), ThermChimLoop1 ) = Process1;
 				EquaCoef( ThermChimLoop1, ThermChimLoop1 ) = Process2;
 				EquaConst( ThermChimLoop1 ) = Process3;
 			}
@@ -781,9 +838,9 @@ namespace ThermalChimney {
 
 	void
 	GaussElimination(
-		FArray2A< Real64 > EquaCoef,
-		FArray1A< Real64 > EquaConst,
-		FArray1A< Real64 > ThermChimSubTemp,
+		Array2A< Real64 > EquaCoef,
+		Array1A< Real64 > EquaConst,
+		Array1A< Real64 > ThermChimSubTemp,
 		int const NTC
 	)
 	{
@@ -820,7 +877,7 @@ namespace ThermalChimney {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D< Real64 > tempor( NTC );
+		Array1D< Real64 > tempor( NTC );
 		Real64 tempb;
 		Real64 TCvalue;
 		Real64 TCcoefficient;
@@ -835,24 +892,24 @@ namespace ThermalChimney {
 			TCvalue = std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop1 ) );
 			pivot = ThermChimLoop1;
 			for ( ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-				if ( std::abs( EquaCoef( ThermChimLoop2, ThermChimLoop1 ) ) > TCvalue ) {
-					TCvalue = std::abs( EquaCoef( ThermChimLoop2, ThermChimLoop1 ) );
+				if ( std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop2 ) ) > TCvalue ) {
+					TCvalue = std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop2 ) );
 					pivot = ThermChimLoop2;
 				}
 			}
 
 			if ( pivot != ThermChimLoop1 ) {
-				tempor( {ThermChimLoop1,NTC} ) = EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} );
+				tempor( {ThermChimLoop1,NTC} ) = EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 );
 				tempb = EquaConst( ThermChimLoop1 );
-				EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} ) = EquaCoef( pivot, {ThermChimLoop1,NTC} );
+				EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 ) = EquaCoef( {ThermChimLoop1,NTC}, pivot );
 				EquaConst( ThermChimLoop1 ) = EquaConst( pivot );
-				EquaCoef( pivot, {ThermChimLoop1,NTC} ) = tempor( {ThermChimLoop1,NTC} );
+				EquaCoef( {ThermChimLoop1,NTC}, pivot ) = tempor( {ThermChimLoop1,NTC} );
 				EquaConst( pivot ) = tempb;
 			}
 
 			for ( ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-				TCcoefficient = -EquaCoef( ThermChimLoop2, ThermChimLoop1 ) / EquaCoef( ThermChimLoop1, ThermChimLoop1 );
-				EquaCoef( ThermChimLoop2, {ThermChimLoop1,NTC} ) += TCcoefficient * EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} );
+				TCcoefficient = -EquaCoef( ThermChimLoop1, ThermChimLoop2 ) / EquaCoef( ThermChimLoop1, ThermChimLoop1 );
+				EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop2 ) += TCcoefficient * EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 );
 				EquaConst( ThermChimLoop2 ) += TCcoefficient * EquaConst( ThermChimLoop1 );
 			}
 
@@ -862,7 +919,7 @@ namespace ThermalChimney {
 		for ( ThermChimLoop2 = NTC - 1; ThermChimLoop2 >= 1; --ThermChimLoop2 ) {
 			ThermalChimSum = 0.0;
 			for ( ThermChimLoop3 = ThermChimLoop2 + 1; ThermChimLoop3 <= NTC; ++ThermChimLoop3 ) {
-				ThermalChimSum += EquaCoef( ThermChimLoop2, ThermChimLoop3 ) * ThermChimSubTemp( ThermChimLoop3 );
+				ThermalChimSum += EquaCoef( ThermChimLoop3, ThermChimLoop2 ) * ThermChimSubTemp( ThermChimLoop3 );
 			}
 			ThermChimSubTemp( ThermChimLoop2 ) = ( EquaConst( ThermChimLoop2 ) - ThermalChimSum ) / EquaCoef( ThermChimLoop2, ThermChimLoop2 );
 		}
@@ -872,28 +929,6 @@ namespace ThermalChimney {
 	//        End of Module Subroutines for ThermalChimney
 
 	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ThermalChimney
 

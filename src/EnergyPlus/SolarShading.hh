@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef SolarShading_hh_INCLUDED
 #define SolarShading_hh_INCLUDED
 
@@ -5,9 +63,9 @@
 #include <fstream>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -41,7 +99,7 @@ namespace SolarShading {
 	extern int const PartialOverlap;
 	extern int const TooManyVertices;
 	extern int const TooManyFigures;
-	extern FArray1D_string const cOverLapStatus;
+	extern Array1D_string const cOverLapStatus;
 
 	// DERIVED TYPE DEFINITIONS:
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -63,7 +121,7 @@ namespace SolarShading {
 	// 1=No overlap; 2=NS1 completely within NS2
 	// 3=NS2 completely within NS1; 4=Partial overlap
 
-	extern FArray1D< Real64 > CTHETA; // Cosine of angle of incidence of sun's rays on surface NS
+	extern Array1D< Real64 > CTHETA; // Cosine of angle of incidence of sun's rays on surface NS
 	extern int FBKSHC; // HC location of first back surface
 	extern int FGSSHC; // HC location of first general shadowing surface
 	extern int FINSHC; // HC location of first back surface overlap
@@ -80,43 +138,43 @@ namespace SolarShading {
 	extern int ShadowingDaysLeft; // Days left in current shadowing period
 	extern bool debugging;
 	extern std::ofstream shd_stream; // Shading file stream
-	extern FArray1D_int HCNS; // Surface number of back surface HC figures
-	extern FArray1D_int HCNV; // Number of vertices of each HC figure
-	extern FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCB; // 'B' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCC; // 'C' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
-	extern FArray2D< Int64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
-	extern FArray3D_int WindowRevealStatus;
-	extern FArray1D< Real64 > HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
+	extern Array1D_int HCNS; // Surface number of back surface HC figures
+	extern Array1D_int HCNV; // Number of vertices of each HC figure
+	extern Array2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
+	extern Array2D< Int64 > HCB; // 'B' homogeneous coordinates of sides
+	extern Array2D< Int64 > HCC; // 'C' homogeneous coordinates of sides
+	extern Array2D< Int64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
+	extern Array2D< Int64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
+	extern Array3D_int WindowRevealStatus;
+	extern Array1D< Real64 > HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
 	// - Positive, Shadow - Negative, Overlap between two shadows
 	// - positive, etc., so that sum of HC areas=base sunlit area
-	extern FArray1D< Real64 > HCT; // Transmittance of each HC figure
-	extern FArray1D< Real64 > ISABSF; // For simple interior solar distribution (in which all beam
+	extern Array1D< Real64 > HCT; // Transmittance of each HC figure
+	extern Array1D< Real64 > ISABSF; // For simple interior solar distribution (in which all beam
 	// radiation entering zone is assumed to strike the floor),
 	// fraction of beam radiation absorbed by each floor surface
-	extern FArray1D< Real64 > SAREA; // Sunlit area of heat transfer surface HTS
+	extern Array1D< Real64 > SAREA; // Sunlit area of heat transfer surface HTS
 	// Excludes multiplier for windows
 	// Shadowing combinations data structure...See ShadowingCombinations type
 	extern int NumTooManyFigures;
 	extern int NumTooManyVertices;
 	extern int NumBaseSubSurround;
-	extern FArray1D< Real64 > SUNCOS; // Direction cosines of solar position
+	extern Array1D< Real64 > SUNCOS; // Direction cosines of solar position
 	extern Real64 XShadowProjection; // X projection of a shadow (formerly called C)
 	extern Real64 YShadowProjection; // Y projection of a shadow (formerly called S)
-	extern FArray1D< Real64 > XTEMP; // Temporary 'X' values for HC vertices of the overlap
-	extern FArray1D< Real64 > XVC; // X-vertices of the clipped figure
-	extern FArray1D< Real64 > XVS; // X-vertices of the shadow
-	extern FArray1D< Real64 > YTEMP; // Temporary 'Y' values for HC vertices of the overlap
-	extern FArray1D< Real64 > YVC; // Y-vertices of the clipped figure
-	extern FArray1D< Real64 > YVS; // Y-vertices of the shadow
-	extern FArray1D< Real64 > ZVC; // Z-vertices of the clipped figure
+	extern Array1D< Real64 > XTEMP; // Temporary 'X' values for HC vertices of the overlap
+	extern Array1D< Real64 > XVC; // X-vertices of the clipped figure
+	extern Array1D< Real64 > XVS; // X-vertices of the shadow
+	extern Array1D< Real64 > YTEMP; // Temporary 'Y' values for HC vertices of the overlap
+	extern Array1D< Real64 > YVC; // Y-vertices of the clipped figure
+	extern Array1D< Real64 > YVS; // Y-vertices of the shadow
+	extern Array1D< Real64 > ZVC; // Z-vertices of the clipped figure
 	// Used in Sutherland Hodman poly clipping
-	extern FArray1D< Real64 > ATEMP; // Temporary 'A' values for HC vertices of the overlap
-	extern FArray1D< Real64 > BTEMP; // Temporary 'B' values for HC vertices of the overlap
-	extern FArray1D< Real64 > CTEMP; // Temporary 'C' values for HC vertices of the overlap
-	extern FArray1D< Real64 > XTEMP1; // Temporary 'X' values for HC vertices of the overlap
-	extern FArray1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
+	extern Array1D< Real64 > ATEMP; // Temporary 'A' values for HC vertices of the overlap
+	extern Array1D< Real64 > BTEMP; // Temporary 'B' values for HC vertices of the overlap
+	extern Array1D< Real64 > CTEMP; // Temporary 'C' values for HC vertices of the overlap
+	extern Array1D< Real64 > XTEMP1; // Temporary 'X' values for HC vertices of the overlap
+	extern Array1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
 	extern int maxNumberOfFigures;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
@@ -137,25 +195,16 @@ namespace SolarShading {
 			MiscIndex( 0 )
 		{}
 
-		// Member Constructor
-		SurfaceErrorTracking(
-			int const SurfIndex1, // Tracking for main error message
-			int const SurfIndex2, // Tracking for Overlapping Figure Name or Surface # 1
-			int const MiscIndex // Used for other pertinent information to be stored
-		) :
-			SurfIndex1( SurfIndex1 ),
-			SurfIndex2( SurfIndex2 ),
-			MiscIndex( MiscIndex )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< SurfaceErrorTracking > TrackTooManyFigures;
-	extern FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
-	extern FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
+	extern Array1D< SurfaceErrorTracking > TrackTooManyFigures;
+	extern Array1D< SurfaceErrorTracking > TrackTooManyVertices;
+	extern Array1D< SurfaceErrorTracking > TrackBaseSubSurround;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	InitSolarCalculations();
@@ -193,7 +242,7 @@ namespace SolarShading {
 	bool
 	polygon_contains_point(
 		int const nsides, // number of sides (vertices)
-		FArray1A< Vector > polygon_3d, // points of polygon
+		Array1A< Vector > polygon_3d, // points of polygon
 		Vector const & point_3d, // point to be tested
 		bool const ignorex,
 		bool const ignorey,
@@ -206,9 +255,9 @@ namespace SolarShading {
 	void
 	CLIP(
 		int const NVT,
-		FArray1< Real64 > & XVT,
-		FArray1< Real64 > & YVT,
-		FArray1< Real64 > & ZVT
+		Array1< Real64 > & XVT,
+		Array1< Real64 > & YVT,
+		Array1< Real64 > & ZVT
 	);
 
 	void
@@ -216,9 +265,9 @@ namespace SolarShading {
 		int const NS, // Surface number whose vertex coordinates are being transformed
 		int const NGRS, // Base surface number for surface NS
 		int & NVT, // Number of vertices for surface NS
-		FArray1< Real64 > & XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-		FArray1< Real64 > & YVT,
-		FArray1< Real64 > & ZVT
+		Array1< Real64 > & XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+		Array1< Real64 > & YVT,
+		Array1< Real64 > & ZVT
 	);
 
 	void
@@ -447,29 +496,6 @@ namespace SolarShading {
 
 	void
 	TimestepInitComplexFenestration();
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SolarShading
 

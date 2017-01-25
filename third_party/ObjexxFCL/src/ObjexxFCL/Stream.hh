@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -46,17 +46,15 @@ public: // Types
 protected: // Creation
 
 	// Name Constructor
-	inline
 	explicit
-	Stream( Name name = Name() ) :
+	Stream( Name const & name = Name() ) :
 	 name_( stripped_whitespace( name ) )
 	{
 		flags_.name( name_ );
 	}
 
 	// Name + Flags Constructor
-	inline
-	Stream( Name name, IOFlags flags ) :
+	Stream( Name const & name, IOFlags const & flags ) :
 	 name_( stripped_whitespace( name ) ),
 	 flags_( flags )
 	{
@@ -66,7 +64,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~Stream()
 	{}
@@ -74,7 +71,6 @@ public: // Creation
 public: // Properties
 
 	// Name
-	inline
 	Name const &
 	name() const
 	{
@@ -82,15 +78,20 @@ public: // Properties
 	}
 
 	// Flags
-	inline
 	IOFlags const &
 	flags() const
 	{
 		return flags_;
 	}
 
+	// Status
+	IOFlags::Status
+	status() const
+	{
+		return flags_.status();
+	}
+
 	// Old?
-	inline
 	bool
 	old() const
 	{
@@ -98,39 +99,79 @@ public: // Properties
 	}
 
 	// Scratch?
-	inline
 	bool
 	scratch() const
 	{
 		return flags_.scratch();
 	}
 
+	// Access
+	IOFlags::Access
+	access() const
+	{
+		return flags_.access();
+	}
+
+	// Action
+	IOFlags::Action
+	action() const
+	{
+		return flags_.action();
+	}
+
+	// Read?
+	virtual
+	bool
+	read() const = 0;
+
+	// Write?
+	virtual
+	bool
+	write() const = 0;
+
+	// Form
+	IOFlags::Form
+	form() const
+	{
+		return flags_.form();
+	}
+
 	// Binary?
-	inline
 	bool
 	binary() const
 	{
 		return flags_.binary();
 	}
 
-	// Append?
-	inline
-	bool
-	append() const
+	// Positioning
+	IOFlags::Positioning
+	positioning() const
 	{
-		return flags_.append();
+		return flags_.positioning();
 	}
 
 	// AsIs?
-	inline
 	bool
 	asis() const
 	{
 		return flags_.asis();
 	}
 
+	// AsIs Compatible?
+	bool
+	asis_compatible( IOFlags const & flags ) const
+	{
+		return flags_.asis_compatible( flags );
+	}
+
+	// Append?
+	bool
+	append() const
+	{
+		return flags_.append();
+	}
+
 	// Delete?
-	inline
 	bool
 	del() const
 	{
@@ -146,16 +187,6 @@ public: // Properties
 	virtual
 	std::ios &
 	stream() = 0;
-
-	// Read?
-	virtual
-	bool
-	read() const = 0;
-
-	// Write?
-	virtual
-	bool
-	write() const = 0;
 
 	// File Stream?
 	virtual
@@ -178,39 +209,27 @@ public: // Properties
 	pos() const = 0;
 
 	// Terminator
-	inline
 	std::string const &
 	ter() const
 	{
 		return flags_.ter();
 	}
 
-	// AsIs Compatible?
-	inline
-	bool
-	asis_compatible( IOFlags const & flags ) const
-	{
-		return flags_.asis_compatible( flags );
-	}
-
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::ios const &() const
 	{
 		return stream();
 	}
 
 	// Stream Conversion
-	inline
 	operator std::ios &()
 	{
 		return stream();
 	}
 
 	// Stream
-	inline
 	std::ios const &
 	operator ()() const
 	{
@@ -218,7 +237,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::ios &
 	operator ()()
 	{
@@ -228,7 +246,6 @@ public: // Operators
 public: // Methods
 
 	// Open
-	inline
 	virtual
 	bool
 	open()
@@ -237,7 +254,6 @@ public: // Methods
 	}
 
 	// Rewind
-	inline
 	virtual
 	bool
 	rewind( bool const = true )
@@ -246,14 +262,12 @@ public: // Methods
 	}
 
 	// Close
-	inline
 	virtual
 	void
 	close()
 	{}
 
 	// AsIs Update
-	inline
 	void
 	asis_update( IOFlags const & flags )
 	{
@@ -270,7 +284,6 @@ public: // Static Methods
 protected: // Properties
 
 	// Name Set
-	inline
 	Stream &
 	name( Name const & name )
 	{
@@ -280,7 +293,6 @@ protected: // Properties
 	}
 
 	// Flags
-	inline
 	IOFlags &
 	flags()
 	{
@@ -301,7 +313,6 @@ class IStream : public Stream
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	IStream( std::istream & stream, Name const & name = Name() ) :
 	 Stream( name ),
@@ -309,7 +320,6 @@ public: // Creation
 	{}
 
 	// Destructor
-	inline
 	virtual
 	~IStream()
 	{}
@@ -317,7 +327,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::istream const &
 	stream() const
 	{
@@ -325,7 +334,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::istream &
 	stream()
 	{
@@ -333,7 +341,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -341,7 +348,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -349,7 +355,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -357,7 +362,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -365,7 +369,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -380,7 +383,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -390,21 +392,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::istream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::istream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::istream const &
 	operator ()() const
 	{
@@ -412,7 +411,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::istream &
 	operator ()()
 	{
@@ -422,7 +420,6 @@ public: // Operators
 public: // Methods
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -444,7 +441,6 @@ class OStream : public Stream
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	OStream( std::ostream & stream, Name const & name = Name() ) :
 	 Stream( name ),
@@ -454,7 +450,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~OStream()
 	{}
@@ -462,7 +457,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::ostream const &
 	stream() const
 	{
@@ -470,7 +464,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::ostream &
 	stream()
 	{
@@ -478,7 +471,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -486,7 +478,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -494,7 +485,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -502,7 +492,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -510,7 +499,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -525,7 +513,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -535,21 +522,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::ostream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::ostream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::ostream const &
 	operator ()() const
 	{
@@ -557,7 +541,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::ostream &
 	operator ()()
 	{
@@ -567,7 +550,6 @@ public: // Operators
 public: // Methods
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -589,7 +571,6 @@ class IOStream : public Stream
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	IOStream( std::iostream & stream, Name const & name = Name() ) :
 	 Stream( name ),
@@ -599,7 +580,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~IOStream()
 	{}
@@ -607,7 +587,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::iostream const &
 	stream() const
 	{
@@ -615,7 +594,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::iostream &
 	stream()
 	{
@@ -623,7 +601,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -631,7 +608,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -639,7 +615,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -647,7 +622,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -655,7 +629,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -670,7 +643,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -680,21 +652,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::iostream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::iostream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::iostream const &
 	operator ()() const
 	{
@@ -702,7 +671,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::iostream &
 	operator ()()
 	{
@@ -712,7 +680,6 @@ public: // Operators
 public: // Methods
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -735,14 +702,12 @@ class IStringStream : public Stream
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	IStringStream( std::string const & s = std::string() ) :
 	 stream_( s )
 	{}
 
 	// Destructor
-	inline
 	virtual
 	~IStringStream()
 	{}
@@ -750,7 +715,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::istringstream const &
 	stream() const
 	{
@@ -758,7 +722,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::istringstream &
 	stream()
 	{
@@ -766,7 +729,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -774,7 +736,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -782,7 +743,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -790,7 +750,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -798,7 +757,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -806,7 +764,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -816,21 +773,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::istringstream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::istringstream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::istringstream const &
 	operator ()() const
 	{
@@ -838,7 +792,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::istringstream &
 	operator ()()
 	{
@@ -848,7 +801,6 @@ public: // Operators
 public: // Methods
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -870,7 +822,6 @@ class OStringStream : public Stream
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	OStringStream( std::string const & s = std::string() ) :
 	 stream_( s )
@@ -879,7 +830,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~OStringStream()
 	{}
@@ -887,7 +837,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::ostringstream const &
 	stream() const
 	{
@@ -895,7 +844,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::ostringstream &
 	stream()
 	{
@@ -903,7 +851,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -911,7 +858,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -919,7 +865,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -927,7 +872,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -935,7 +879,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -943,7 +886,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -953,21 +895,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::ostringstream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::ostringstream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::ostringstream const &
 	operator ()() const
 	{
@@ -975,7 +914,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::ostringstream &
 	operator ()()
 	{
@@ -985,7 +923,6 @@ public: // Operators
 public: // Methods
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -1007,7 +944,6 @@ class StringStream : public Stream
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	StringStream( Name const & name = Name() ) :
 	 Stream( name )
@@ -1016,7 +952,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~StringStream()
 	{}
@@ -1024,7 +959,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::stringstream const &
 	stream() const
 	{
@@ -1032,7 +966,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::stringstream &
 	stream()
 	{
@@ -1040,7 +973,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -1048,7 +980,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -1056,7 +987,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -1064,7 +994,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -1072,7 +1001,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -1080,7 +1008,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -1090,21 +1017,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::stringstream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::stringstream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::stringstream const &
 	operator ()() const
 	{
@@ -1112,7 +1036,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::stringstream &
 	operator ()()
 	{
@@ -1122,7 +1045,6 @@ public: // Operators
 public: // Methods
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -1145,7 +1067,6 @@ class IFileStream : public Stream
 public: // Creation
 
 	// Name Constructor
-	inline
 	explicit
 	IFileStream( Name const & name ) :
 	 Stream( name )
@@ -1155,7 +1076,6 @@ public: // Creation
 	}
 
 	// Name + Flags Constructor
-	inline
 	IFileStream( Name const & name, IOFlags const & flags ) :
 	 Stream( name, flags )
 	{
@@ -1165,7 +1085,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~IFileStream()
 	{
@@ -1175,7 +1094,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::ifstream const &
 	stream() const
 	{
@@ -1183,7 +1101,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::ifstream &
 	stream()
 	{
@@ -1191,7 +1108,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -1199,7 +1115,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -1207,7 +1122,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -1215,7 +1129,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -1223,7 +1136,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -1246,7 +1158,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -1254,7 +1165,6 @@ public: // Properties
 	}
 
 	// Open Mode
-	inline
 	std::ios_base::openmode
 	mode() const
 	{
@@ -1266,21 +1176,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::ifstream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::ifstream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::ifstream const &
 	operator ()() const
 	{
@@ -1288,7 +1195,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::ifstream &
 	operator ()()
 	{
@@ -1298,7 +1204,6 @@ public: // Operators
 public: // Methods
 
 	// Open
-	inline
 	bool
 	open()
 	{
@@ -1308,7 +1213,6 @@ public: // Methods
 	}
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const = true )
 	{
@@ -1318,7 +1222,6 @@ public: // Methods
 	}
 
 	// Close
-	inline
 	void
 	close()
 	{
@@ -1340,7 +1243,6 @@ class OFileStream : public Stream
 public: // Creation
 
 	// Name Constructor
-	inline
 	explicit
 	OFileStream( Name const & name ) :
 	 Stream( name )
@@ -1350,7 +1252,6 @@ public: // Creation
 	}
 
 	// Name + Flags Constructor
-	inline
 	OFileStream( Name const & name, IOFlags const & flags ) :
 	 Stream( name, flags )
 	{
@@ -1359,7 +1260,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~OFileStream()
 	{
@@ -1369,7 +1269,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::ofstream const &
 	stream() const
 	{
@@ -1377,7 +1276,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::ofstream &
 	stream()
 	{
@@ -1385,7 +1283,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -1393,7 +1290,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -1401,7 +1297,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -1409,7 +1304,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -1417,7 +1311,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -1440,7 +1333,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -1448,7 +1340,6 @@ public: // Properties
 	}
 
 	// Open Mode
-	inline
 	std::ios_base::openmode
 	mode() const
 	{
@@ -1464,21 +1355,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::ofstream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::ofstream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::ofstream const &
 	operator ()() const
 	{
@@ -1486,7 +1374,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::ofstream &
 	operator ()()
 	{
@@ -1496,7 +1383,6 @@ public: // Operators
 public: // Methods
 
 	// Open
-	inline
 	bool
 	open()
 	{
@@ -1506,7 +1392,6 @@ public: // Methods
 	}
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const truncate = true )
 	{
@@ -1521,7 +1406,6 @@ public: // Methods
 	}
 
 	// Close
-	inline
 	void
 	close()
 	{
@@ -1549,7 +1433,6 @@ class FileStream : public Stream
 public: // Creation
 
 	// Name Constructor
-	inline
 	explicit
 	FileStream( Name const & name ) :
 	 Stream( name )
@@ -1559,7 +1442,6 @@ public: // Creation
 	}
 
 	// Name + Flags Constructor
-	inline
 	FileStream( Name const & name, IOFlags const & flags ) :
 	 Stream( name, flags )
 	{
@@ -1568,7 +1450,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FileStream()
 	{
@@ -1578,7 +1459,6 @@ public: // Creation
 public: // Properties
 
 	// Stream
-	inline
 	std::fstream const &
 	stream() const
 	{
@@ -1586,7 +1466,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::fstream &
 	stream()
 	{
@@ -1594,7 +1473,6 @@ public: // Properties
 	}
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -1602,7 +1480,6 @@ public: // Properties
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -1610,7 +1487,6 @@ public: // Properties
 	}
 
 	// File Stream?
-	inline
 	bool
 	is_file() const
 	{
@@ -1618,7 +1494,6 @@ public: // Properties
 	}
 
 	// Open for I/O?
-	inline
 	bool
 	is_open() const
 	{
@@ -1626,7 +1501,6 @@ public: // Properties
 	}
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -1649,7 +1523,6 @@ public: // Properties
 	}
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -1657,7 +1530,6 @@ public: // Properties
 	}
 
 	// Open Mode
-	inline
 	std::ios_base::openmode
 	mode() const
 	{
@@ -1673,21 +1545,18 @@ public: // Properties
 public: // Operators
 
 	// Stream Conversion
-	inline
 	operator std::fstream const &() const
 	{
 		return stream_;
 	}
 
 	// Stream Conversion
-	inline
 	operator std::fstream &()
 	{
 		return stream_;
 	}
 
 	// Stream
-	inline
 	std::fstream const &
 	operator ()() const
 	{
@@ -1695,7 +1564,6 @@ public: // Operators
 	}
 
 	// Stream
-	inline
 	std::fstream &
 	operator ()()
 	{
@@ -1705,7 +1573,6 @@ public: // Operators
 public: // Methods
 
 	// Open
-	inline
 	bool
 	open()
 	{
@@ -1715,7 +1582,6 @@ public: // Methods
 	}
 
 	// Rewind
-	inline
 	bool
 	rewind( bool const truncate = true )
 	{
@@ -1731,7 +1597,6 @@ public: // Methods
 	}
 
 	// Close
-	inline
 	void
 	close()
 	{

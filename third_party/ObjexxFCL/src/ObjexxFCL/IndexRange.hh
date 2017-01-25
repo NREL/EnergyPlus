@@ -1,21 +1,20 @@
 #ifndef ObjexxFCL_IndexRange_hh_INCLUDED
 #define ObjexxFCL_IndexRange_hh_INCLUDED
 
-// IndexRange: Index Range Abstract Base Class
+// IndexRange: Index Range Class
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Index.hh>
-#include <ObjexxFCL/Star.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -28,10 +27,7 @@
 
 namespace ObjexxFCL {
 
-// Forward
-class Dimension;
-
-// IndexRange: Index Range Abstract Base Class
+// IndexRange: Index Range Class
 //
 // Note:
 //  Zero-size range is indicated by ( l - 1 == u ) and ( size == 0 )
@@ -39,11 +35,6 @@ class Dimension;
 //  Legal ranges have ( l - 2 <= u ) with l and u in their allowed ranges
 class IndexRange
 {
-
-private: // Friend
-
-	friend class StaticIndexRange;
-	friend class DynamicIndexRange;
 
 public: // Types
 
@@ -53,18 +44,16 @@ public: // Types
 	// C++ style
 	typedef  std::size_t  Size;
 
-protected: // Creation
+public: // Creation
 
 	// Default Constructor
-	inline
 	IndexRange() :
 	 l_( 1 ),
 	 u_( 0 ),
-	 size_( 0 )
+	 size_( 0u )
 	{}
 
 	// Copy Constructor
-	inline
 	IndexRange( IndexRange const & I ) :
 	 l_( I.l_ ),
 	 u_( I.u_ ),
@@ -72,52 +61,29 @@ protected: // Creation
 	{}
 
 	// Upper Index Constructor
-	inline
 	IndexRange( int const u ) :
 	 l_( 1 ),
 	 u_( clean_u( u ) ),
 	 size_( u_ )
-	{}
-
-	// Star Constructor
-	inline
-	IndexRange( Star const ) :
-	 l_( 1 ),
-	 u_( -1 ),
-	 size_( npos )
-	{}
+	{
+		assert( legal() );
+	}
 
 	// Index Range Constructor
-	inline
 	IndexRange( int const l, int const u ) :
 	 l_( l ),
 	 u_( clean_u( u ) ),
 	 size_( computed_size() )
-	{}
-
-	// Lower Index + Star Constructor
-	inline
-	IndexRange( int const l, Star const ) :
-	 l_( l ),
-	 u_( l_ - 2 ),
-	 size_( npos )
-	{}
-
-	// Star + Upper Index Constructor
-	inline
-	IndexRange( Star const, int const u ) :
-	 l_( u + 2 ),
-	 u_( u ),
-	 size_( npos )
-	{}
+	{
+		assert( legal() );
+	}
 
 	// Initializer List of Integer Constructor
 	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
-	inline
 	IndexRange( std::initializer_list< U > const lu ) :
 	 l_( 1 ),
 	 u_( 0 ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		size_type const n( lu.size() );
 		assert( n <= 2 );
@@ -137,14 +103,14 @@ protected: // Creation
 			break;
 		}
 		size_ = computed_size();
+		assert( legal() );
 	}
 
 	// Initializer List of Index Constructor
-	inline
 	IndexRange( std::initializer_list< Index > const lu ) :
 	 l_( 1 ),
 	 u_( 0 ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		size_type const n( lu.size() );
 		assert( n <= 2 );
@@ -164,10 +130,10 @@ protected: // Creation
 			break;
 		}
 		size_ = computed_size();
+		assert( legal() );
 	}
 
 	// Omit Constructor
-	inline
 	IndexRange( Omit const ) :
 	 l_( 1 ),
 	 u_( -1 ),
@@ -175,7 +141,6 @@ protected: // Creation
 	{}
 
 	// Lower Index + Omit Constructor
-	inline
 	IndexRange( int const l, Omit const ) :
 	 l_( l ),
 	 u_( l_ - 2 ),
@@ -183,70 +148,53 @@ protected: // Creation
 	{}
 
 	// Omit + Upper Index Constructor
-	inline
 	IndexRange( Omit const, int const u ) :
 	 l_( u + 2 ),
 	 u_( u ),
 	 size_( npos )
-	{}
+	{
+		assert( legal() );
+	}
 
 	// Omit + Omit Constructor
-	inline
 	IndexRange( Omit const, Omit const ) :
 	 l_( 1 ),
 	 u_( -1 ),
 	 size_( npos )
 	{}
 
-public: // Creation
-
 	// Destructor
-	inline
-	virtual
 	~IndexRange()
 	{}
 
-protected: // Assignment
-
-	// Copy Assignment
-	inline
-	void
-	operator =( IndexRange const & I )
-	{
-		l_ = I.l_;
-		u_ = I.u_;
-		size_ = I.size_;
-	}
-
 public: // Assignment
 
+	// Copy Assignment
+	IndexRange &
+	operator =( IndexRange const & I )
+	{
+		if ( this != &I ) {
+			l_ = I.l_;
+			u_ = I.u_;
+			size_ = I.size_;
+		}
+		assert( legal() );
+		return *this;
+	}
+
 	// Upper Index Assignment
-	inline
-	virtual
 	IndexRange &
 	operator =( int const u )
 	{
 		l_ = 1;
 		u_ = clean_u( u );
 		size_ = u_;
-		return *this;
-	}
-
-	// Unbounded Upper Index Assignment
-	inline
-	virtual
-	IndexRange &
-	operator =( Star const )
-	{
-		l_ = 1;
-		u_ = -1;
-		size_ = npos;
+		assert( legal() );
 		return *this;
 	}
 
 	// Initializer List of int Assignment
 	template< typename U, class = typename std::enable_if< std::is_assignable< int&, U >::value >::type >
-	inline
 	IndexRange &
 	operator =( std::initializer_list< U > const lu )
 	{
@@ -268,11 +216,11 @@ public: // Assignment
 			break;
 		}
 		size_ = computed_size();
+		assert( legal() );
 		return *this;
 	}
 
 	// Initializer List of Index Assignment
-	inline
 	IndexRange &
 	operator =( std::initializer_list< Index > const lu )
 	{
@@ -294,99 +242,62 @@ public: // Assignment
 			break;
 		}
 		size_ = computed_size();
+		assert( legal() );
+		return *this;
+	}
+
+	// IndexRange Assignment
+	IndexRange &
+	assign( IndexRange const & I )
+	{
+		l_ = I.l_;
+		u_ = I.u_;
+		size_ = I.size_;
+		assert( legal() );
 		return *this;
 	}
 
 	// Upper Index Assignment
-	inline
-	virtual
 	IndexRange &
 	assign( int const u )
 	{
 		l_ = 1;
 		u_ = clean_u( u );
 		size_ = u_;
-		return *this;
-	}
-
-	// Unbounded Upper Index Assignment
-	inline
-	virtual
-	IndexRange &
-	assign( Star const )
-	{
-		l_ = 1;
-		u_ = -1;
-		size_ = npos;
+		assert( legal() );
 		return *this;
 	}
 
 	// Index Range Assignment
-	inline
-	virtual
 	IndexRange &
 	assign( int const l, int const u )
 	{
 		l_ = l;
 		u_ = clean_u( u );
 		size_ = computed_size();
-		return *this;
-	}
-
-	// Index and Unbounded Upper Index Assignment
-	inline
-	virtual
-	IndexRange &
-	assign( int const l, Star const )
-	{
-		l_ = l;
-		u_ = l_ - 2;
-		size_ = npos;
+		assert( legal() );
 		return *this;
 	}
 
 public: // Subscript
 
-	// IndexRange( i ) const: Internal Index for i
-	inline
+	// IndexRange( i ): Internal Index for i
 	int
 	operator ()( int const i ) const
 	{
 		return l_ + ( i - 1 );
 	}
 
+	// IndexRange[ i ]: Internal Index for Zero-Based i
+	int
+	operator []( int const i ) const
+	{
+		return l_ + i;
+	}
+
 public: // Predicate
 
-	// Initialized?
-	inline
-	virtual
-	bool
-	initialized() const
-	{
-		return true;
-	}
-
-	// Lower Initialized?
-	inline
-	virtual
-	bool
-	l_initialized() const
-	{
-		return true;
-	}
-
-	// Upper Initialized?
-	inline
-	virtual
-	bool
-	u_initialized() const
-	{
-		return true;
-	}
-
 	// Legal?
-	inline
-	virtual
 	bool
 	legal() const
 	{
@@ -394,8 +305,6 @@ public: // Predicate
 	}
 
 	// Bounded?
-	inline
-	virtual
 	bool
 	bounded() const
 	{
@@ -403,8 +312,6 @@ public: // Predicate
 	}
 
 	// Unbounded?
-	inline
-	virtual
 	bool
 	unbounded() const
 	{
@@ -412,8 +319,6 @@ public: // Predicate
 	}
 
 	// Not Unbounded?
-	inline
-	virtual
 	bool
 	not_unbounded() const
 	{
@@ -421,8 +326,6 @@ public: // Predicate
 	}
 
 	// Empty?
-	inline
-	virtual
 	bool
 	empty() const
 	{
@@ -430,8 +333,6 @@ public: // Predicate
 	}
 
 	// Non-Empty?
-	inline
-	virtual
 	bool
 	non_empty() const
 	{
@@ -439,8 +340,6 @@ public: // Predicate
 	}
 
 	// Bounded with Positive Size?
-	inline
-	virtual
 	bool
 	positive() const
 	{
@@ -448,8 +347,6 @@ public: // Predicate
 	}
 
 	// Contains an Index?
-	inline
-	virtual
 	bool
 	contains( int const i ) const
 	{
@@ -457,8 +354,6 @@ public: // Predicate
 	}
 
 	// Contains Two Indexes?
-	inline
-	virtual
 	bool
 	contains( int const i, int const j ) const
 	{
@@ -466,45 +361,30 @@ public: // Predicate
 	}
 
 	// Contains Another IndexRange?
-	virtual
 	bool
 	contains( IndexRange const & I ) const;
 
 	// Intersects Another IndexRange?
-	virtual
 	bool
 	intersects( IndexRange const & I ) const;
 
 public: // Inspector
 
 	// Lower Index
-	inline
 	int
 	l() const
-	{
-		assert( l_initialized() );
-		return l_;
-	}
-
-	// Lower Index (1 if Uninitialized)
-	inline
-	int
-	lz() const
 	{
 		return l_;
 	}
 
 	// Upper Index
-	inline
 	int
 	u() const
 	{
-		assert( u_initialized() );
 		return u_;
 	}
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -512,7 +392,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	int
 	isize() const
 	{
@@ -521,16 +400,13 @@ public: // Inspector
 	}
 
 	// Offset of an Index
-	inline
 	int
 	offset( int const i ) const
 	{
-		assert( l_initialized() );
 		return ( i - l_ ); // Doesn't check/require that IndexRange includes i
 	}
 
 	// Last Index
-	inline
 	int
 	last() const
 	{
@@ -538,7 +414,6 @@ public: // Inspector
 	}
 
 	// Next Index
-	inline
 	int
 	next( int const i ) const
 	{
@@ -548,8 +423,6 @@ public: // Inspector
 public: // Modifier
 
 	// Lower Index Set
-	inline
-	virtual
 	IndexRange &
 	l( int const l )
 	{
@@ -565,8 +438,6 @@ public: // Modifier
 	}
 
 	// Upper Index Set
-	inline
-	virtual
 	IndexRange &
 	u( int const u )
 	{
@@ -575,20 +446,30 @@ public: // Modifier
 		return *this;
 	}
 
-	// Unbounded Upper Index Set
-	inline
-	virtual
+	// Grow Upper
 	IndexRange &
-	u( Star const )
+	grow( int const n = 1 )
 	{
-		u_ = l_ - 2;
-		size_ = npos;
+		assert( n >= 0 );
+		assert( u_ <= u_max - n );
+		assert( u_ >= l_ - 1 );
+		u_ += n;
+		size_ = computed_size();
+		return *this;
+	}
+
+	// Shrink Upper
+	IndexRange &
+	shrink( int const n = 1 )
+	{
+		assert( n >= 0 );
+		assert( u_ >= l_ - 1 );
+		u_ = clean_u( u_ - n );
+		size_ = computed_size();
 		return *this;
 	}
 
 	// Expand to Contain an Index
-	inline
-	virtual
 	IndexRange &
 	contain( int const i )
 	{
@@ -602,22 +483,19 @@ public: // Modifier
 				u_ = l_ - 2; // Reset u_ to maintain unbounded state
 			}
 		}
+		assert( legal() );
 		return *this;
 	}
 
 	// Expand to Contain Another IndexRange
-	virtual
 	IndexRange &
 	contain( IndexRange const & I );
 
 	// Intersect with Another IndexRange
-	virtual
 	IndexRange &
 	intersect( IndexRange const & I );
 
 	// Clear
-	inline
-	virtual
 	IndexRange &
 	clear()
 	{
@@ -627,64 +505,20 @@ public: // Modifier
 		return *this;
 	}
 
-protected: // Inspector
-
-	// Legal Static Range?
-	inline
-	bool
-	legal_static() const
-	{
-		return ( ( l_ >= l_min ) && ( u_ <= u_max ) && ( l_ - 2 <= u_ ) );
-	}
-
-	// Lower Dimension Clone
-	inline
-	virtual
-	Dimension *
-	l_dim_clone() const
-	{
-		return 0;
-	}
-
-	// Upper Dimension Clone
-	inline
-	virtual
-	Dimension *
-	u_dim_clone() const
-	{
-		return 0;
-	}
-
-protected: // Modifier
-
 	// Clean
-	inline
-	void
+	IndexRange &
 	clean()
 	{
-		if ( initialized() && ( l_ > u_ ) ) {
+		if ( l_ > u_ ) {
 			l_ = 1;
 			u_ = 0;
 			size_ = 0u;
 		}
-	}
-
-	// Clean Upper Index Value After Lower Index Set
-	inline
-	int
-	clean_u( int const u )
-	{
-		if ( initialized() && ( l_ > u ) ) {
-			l_ = 1; // Changes lower index: Side effect
-			return 0;
-		} else {
-			return u;
-		}
+		return *this;
 	}
 
 	// Swap
-	inline
-	void
+	IndexRange &
 	swap( IndexRange & I )
 	{
 		if ( this != &I ) {
@@ -692,25 +526,30 @@ protected: // Modifier
 			std::swap( u_, I.u_ );
 			std::swap( size_, I.size_ );
 		}
+		return *this;
 	}
 
-private: // Inspector
+private: // Methods
 
 	// Computed Size
-	inline
 	size_type
 	computed_size() const
 	{
 		return std::max( u_ - l_ + 1, -1 );
 	}
 
+	// Clean Upper Index Value After Lower Index Set
+	int
+	clean_u( int const u )
+	{
+		return std::max( u, l_ - 1 );
+	}
+
 public: // Data
 
-	static size_type const npos = static_cast< size_type >( -1 ); // Unbounded "size"
-
-	static int const l_min = -( static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ) - 1 ); // Min lower index
-
-	static int const u_max = static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ); // Max upper index
+	static size_type const npos; // Unbounded "size"
+	static int const l_min; // Min lower index
+	static int const u_max; // Max upper index
 
 private: // Data
 
@@ -727,7 +566,7 @@ inline
 bool
 operator ==( IndexRange const & I, IndexRange const & J )
 {
-	return ( I.initialized() && J.initialized() && ( I.l() == J.l() ) && ( I.u() == J.u() ) );
+	return ( ( I.l() == J.l() ) && ( I.u() == J.u() ) );
 }
 
 // IndexRange != IndexRange
@@ -770,11 +609,19 @@ operator >=( IndexRange const & I, IndexRange const & J )
 	return ( I.positive() && J.positive() && ( I.l() >= J.u() ) );
 }
 
-// Stream Input
+// Swap
+inline
+void
+swap( IndexRange & a, IndexRange & b )
+{
+	a.swap( b );
+}
+
+// Stream >> IndexRange
 std::istream &
 operator >>( std::istream & stream, IndexRange & I );
 
-// Stream Output
+// Stream << IndexRange
 std::ostream &
 operator <<( std::ostream & stream, IndexRange const & I );
 

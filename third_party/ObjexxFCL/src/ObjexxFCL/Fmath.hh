@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -816,7 +816,6 @@ dim( T const & x, T const & y )
 template< typename R, typename T, bool >
 struct NearestSelector
 {
-	inline
 	static
 	R
 	nearest( T const & x )
@@ -829,7 +828,6 @@ struct NearestSelector
 template< typename R, typename T >
 struct NearestSelector< R, T, true >
 {
-	inline
 	static
 	R
 	nearest( T const & x )
@@ -914,7 +912,6 @@ nint64( T const & x )
 template< typename T, bool >
 struct ModSelector
 {
-	inline
 	static
 	T
 	mod( T const & x, T const & y )
@@ -929,7 +926,6 @@ struct ModSelector
 template< typename T >
 struct ModSelector< T, true >
 {
-	inline
 	static
 	T
 	mod( T const & x, T const & y )
@@ -952,7 +948,7 @@ mod( T const & x, T const & y )
 // i(mod n) : float Arguments
 inline
 float
-mod( float const & i, float const & n )
+mod( float const i, float const n )
 {
 	assert( n != 0.0f );
 	return ( n == 0.0f ? 0.0f : std::fmod( i, n ) );
@@ -961,7 +957,7 @@ mod( float const & i, float const & n )
 // i(mod n) : double Arguments
 inline
 double
-mod( double const & i, double const & n )
+mod( double const i, double const n )
 {
 	assert( n != 0.0 );
 	return ( n == 0.0 ? 0.0 : std::fmod( i, n ) );
@@ -980,7 +976,6 @@ mod( long double const & i, long double const & n )
 template< typename T, bool >
 struct ModuloSelector
 {
-	inline
 	static
 	T
 	modulo( T const & x, T const & y )
@@ -993,7 +988,6 @@ struct ModuloSelector
 template< typename T >
 struct ModuloSelector< T, true >
 {
-	inline
 	static
 	T
 	modulo( T const & x, T const & y )

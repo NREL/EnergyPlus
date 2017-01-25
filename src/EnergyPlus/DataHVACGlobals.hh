@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataHVACGlobals_hh_INCLUDED
 #define DataHVACGlobals_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -58,6 +116,14 @@ namespace DataHVACGlobals {
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
 	extern int const MaxHeaterOutletTempSizing; // request sizing for heating coil maximum outlet temperature
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
+	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
+	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
+	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
+	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
+	extern int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing; // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -103,7 +169,7 @@ namespace DataHVACGlobals {
 	extern int const BypassWhenWithinEconomizerLimits; // heat recovery controlled by economizer limits
 	extern int const BypassWhenOAFlowGreaterThanMinimum; // heat recovery ON at minimum OA in economizer mode
 
-	extern FArray1D_string const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
+	extern Array1D_string const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
 
 	// parameters describing unitary systems
 	extern int const NumUnitarySystemTypes;
@@ -115,7 +181,7 @@ namespace DataHVACGlobals {
 	extern int const UnitarySys_HeatPump_AirToAir;
 	extern int const UnitarySys_HeatPump_WaterToAir;
 	extern int const UnitarySystem_AnyCoilType;
-	extern FArray1D_string const cFurnaceTypes;
+	extern Array1D_string const cFurnaceTypes;
 
 	// parameters describing coil types
 	extern int const NumAllCoilTypes;
@@ -125,7 +191,8 @@ namespace DataHVACGlobals {
 	extern int const CoilDX_CoolingTwoSpeed;
 	extern int const CoilDX_CoolingHXAssisted;
 	extern int const CoilDX_CoolingTwoStageWHumControl;
-	extern int const CoilDX_HeatPumpWaterHeater;
+	extern int const CoilDX_HeatPumpWaterHeaterPumped;
+	extern int const CoilDX_HeatPumpWaterHeaterWrapped;
 	extern int const CoilDX_MultiSpeedCooling;
 	extern int const CoilDX_MultiSpeedHeating;
 
@@ -148,12 +215,19 @@ namespace DataHVACGlobals {
 	extern int const CoilVRF_Cooling;
 	extern int const CoilVRF_Heating;
 
+	extern int const Coil_UserDefined;
 	extern int const CoilDX_PackagedThermalStorageCooling;
 
 	extern int const Coil_CoolingWaterToAirHPVSEquationFit;
 	extern int const Coil_HeatingWaterToAirHPVSEquationFit;
 	extern int const Coil_CoolingAirToAirVariableSpeed;
 	extern int const Coil_HeatingAirToAirVariableSpeed;
+	extern int const CoilDX_HeatPumpWaterHeaterVariableSpeed;
+	
+	extern int const CoilVRF_FluidTCtrl_Cooling;
+	extern int const CoilVRF_FluidTCtrl_Heating;
+
+	extern Array1D_string const cAllCoilTypes;
 
 	// Water to air HP coil types
 	extern int const WatertoAir_Simple;
@@ -165,8 +239,6 @@ namespace DataHVACGlobals {
 	extern int const WaterCycling; // water flow cycles with compressor
 	extern int const WaterConstant; // water flow is constant
 	extern int const WaterConstantOnDemand; // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
-
-	extern FArray1D_string const cAllCoilTypes;
 
 	// parameters describing coil performance types
 	extern int const CoilPerfDX_CoolBypassEmpirical;
@@ -185,11 +257,11 @@ namespace DataHVACGlobals {
 	extern Real64 const MaxCoolVolFlowPerRatedTotCap2; // m3/s per watt = 300 cfm/ton
 	extern Real64 const MinOperVolFlowPerRatedTotCap2; // m3/s per watt = 100 cfm/ton
 
-	extern FArray1D< Real64 > MaxRatedVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MinRatedVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MaxHeatVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MaxCoolVolFlowPerRatedTotCap;
-	extern FArray1D< Real64 > MinOperVolFlowPerRatedTotCap;
+	extern Array1D< Real64 > MaxRatedVolFlowPerRatedTotCap;
+	extern Array1D< Real64 > MinRatedVolFlowPerRatedTotCap;
+	extern Array1D< Real64 > MaxHeatVolFlowPerRatedTotCap;
+	extern Array1D< Real64 > MaxCoolVolFlowPerRatedTotCap;
+	extern Array1D< Real64 > MinOperVolFlowPerRatedTotCap;
 
 	// dx coil type (DXCT)
 	extern int const RegularDXCoil; // Regular DX coils or mixed air dx coils
@@ -203,7 +275,7 @@ namespace DataHVACGlobals {
 	extern int const HX_AIRTOAIR_GENERIC;
 	extern int const HX_DESICCANT_BALANCED;
 
-	extern FArray1D_string const cHXTypes;
+	extern Array1D_string const cHXTypes;
 
 	// Parameters describing air terminal mixers
 	extern int const NumATMixerTypes;
@@ -212,7 +284,7 @@ namespace DataHVACGlobals {
 	extern int const ATMixer_InletSide;
 	extern int const ATMixer_SupplySide;
 
-	extern FArray1D_string const cATMixerTypes;
+	extern Array1D_string const cATMixerTypes;
 	extern bool const ATMixerExists;
 
 	// Parameters describing variable refrigerant flow terminal unit types
@@ -220,14 +292,14 @@ namespace DataHVACGlobals {
 
 	extern int const VRFTUType_ConstVolume;
 
-	extern FArray1D_string const cVRFTUTypes;
+	extern Array1D_string const cVRFTUTypes;
 
 	// VRF Heating Performance Curve Temperature Type
 	extern int const NumVRFHeatingPerformanceOATTypes;
 	extern int const WetBulbIndicator;
 	extern int const DryBulbIndicator;
 
-	extern FArray1D_string const cVRFHeatingPerformanceOATTypes;
+	extern Array1D_string const cVRFHeatingPerformanceOATTypes;
 
 	// parameter concerning the amount of change in zone temperature is needed
 	// for oscillation of zone temperature to be detected.
@@ -241,7 +313,6 @@ namespace DataHVACGlobals {
 
 	extern bool FirstTimeStepSysFlag; // Set to true at the start of each sub-time step
 
-	extern Real64 SysUpdateTimeInc; // System Update Time Increment - the adaptive time step used by the HVAC simulation
 	extern Real64 TimeStepSys; // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
 	extern Real64 SysTimeElapsed; // elapsed system time in zone timestep (hours)
 	extern Real64 FracTimeStepZone; // System time step divided by the zone time step
@@ -284,12 +355,12 @@ namespace DataHVACGlobals {
 
 	// Hybrid ventilation control part
 	extern int NumHybridVentSysAvailMgrs; // Number of hybrid ventilation control
-	extern FArray1D_int HybridVentSysAvailAirLoopNum; // Airloop number in hybrid vent availability manager
-	extern FArray1D_int HybridVentSysAvailVentCtrl; // Ventilation control action in hybrid vent availability manager
-	extern FArray1D_int HybridVentSysAvailActualZoneNum; // Actual zone num in hybrid vent availability manager
-	extern FArray1D_int HybridVentSysAvailANCtrlStatus; // AN control status in hybrid vent availability manager
-	extern FArray1D_int HybridVentSysAvailMaster; // Master object name: Ventilation for simple; Zone name for AN
-	extern FArray1D< Real64 > HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
+	extern Array1D_int HybridVentSysAvailAirLoopNum; // Airloop number in hybrid vent availability manager
+	extern Array1D_int HybridVentSysAvailVentCtrl; // Ventilation control action in hybrid vent availability manager
+	extern Array1D_int HybridVentSysAvailActualZoneNum; // Actual zone num in hybrid vent availability manager
+	extern Array1D_int HybridVentSysAvailANCtrlStatus; // AN control status in hybrid vent availability manager
+	extern Array1D_int HybridVentSysAvailMaster; // Master object name: Ventilation for simple; Zone name for AN
+	extern Array1D< Real64 > HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
 	// For multispeed heat pump only
 	extern Real64 MSHPMassFlowRateLow; // Mass flow rate at low speed
 	extern Real64 MSHPMassFlowRateHigh; // Mass flow rate at high speed
@@ -306,6 +377,47 @@ namespace DataHVACGlobals {
 	extern bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	extern bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	extern bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
+
+	extern int const NumZoneHVACTerminalTypes;
+	extern Array1D_string const ccZoneHVACTerminalTypes;
+	extern Array1D_string const ZoneHVACTerminalTypes;
+	extern int const ZoneEquipTypeOf_VariableRefrigerantFlow;
+	extern int const ZoneEquipTypeOf_EnergyRecoveryVentilator;
+	extern int const ZoneEquipTypeOf_FourPipeFanCoil;
+	extern int const ZoneEquipTypeOf_OutdoorAirUnit;
+	extern int const ZoneEquipTypeOf_PackagedTerminalAirConditioner;
+	extern int const ZoneEquipTypeOf_PackagedTerminalHeatPump;
+	extern int const ZoneEquipTypeOf_UnitHeater;
+	extern int const ZoneEquipTypeOf_UnitVentilator;
+	extern int const ZoneEquipTypeOf_VentilatedSlab;
+	extern int const ZoneEquipTypeOf_WaterToAirHeatPump;
+	extern int const ZoneEquipTypeOf_WindowAirConditioner;
+	extern int const ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric;
+	extern int const ZoneEquipTypeOf_BaseboardRadiantConvectiveWater;
+	extern int const ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam;
+	extern int const ZoneEquipTypeOf_BaseboardConvectiveElectric;
+	extern int const ZoneEquipTypeOf_BaseboardConvectiveWater;
+	extern int const ZoneEquipTypeOf_HighTemperatureRadiant;
+	extern int const ZoneEquipTypeOf_DehumidifierDX;
+	extern int const ZoneEquipTypeOf_IdealLoadsAirSystem;
+	extern int const ZoneEquipTypeOf_RefrigerationChillerSet;
+	extern int const ZoneEquipTypeOf_FanZoneExhaust;
+	extern int const ZoneEquipTypeOf_WaterHeaterHeatPump;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled;
+	extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
+	extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam;
+	extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir;
+	extern int const ZoneEquipTypeOf_AirLoopHVACReturnAir;
 
 	// Types
 
@@ -331,27 +443,6 @@ namespace DataHVACGlobals {
 			OpType( 0 )
 		{}
 
-		// Member Constructor
-		ComponentSetPtData(
-			std::string const & EquipmentType,
-			std::string const & EquipmentName,
-			int const NodeNumIn,
-			int const NodeNumOut,
-			Real64 const EquipDemand,
-			Real64 const DesignFlowRate,
-			std::string const & HeatOrCool,
-			int const OpType
-		) :
-			EquipmentType( EquipmentType ),
-			EquipmentName( EquipmentName ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			EquipDemand( EquipDemand ),
-			DesignFlowRate( DesignFlowRate ),
-			HeatOrCool( HeatOrCool ),
-			OpType( OpType )
-		{}
-
 	};
 
 	struct DefineZoneCompAvailMgrs
@@ -362,9 +453,9 @@ namespace DataHVACGlobals {
 		int StartTime; // cycle on time (in SimTimeSteps)
 		int StopTime; // cycle off time (in SimTimeSteps)
 		std::string AvailManagerListName; // name of each availability manager
-		FArray1D_string AvailManagerName; // name of each availability manager
-		FArray1D_int AvailManagerType; // type of availability manager
-		FArray1D_int AvailManagerNum; // index for availability manager
+		Array1D_string AvailManagerName; // name of each availability manager
+		Array1D_int AvailManagerType; // type of availability manager
+		Array1D_int AvailManagerNum; // index for availability manager
 		int ZoneNum; // cycle off time (in SimTimeSteps)
 		bool Input; // starts off as true to initialize zone equipment availability manager data
 		int Count; // initialize twice to ensure zone equipment availability manager list name has been read in
@@ -377,34 +468,7 @@ namespace DataHVACGlobals {
 			StopTime( 0 ),
 			ZoneNum( 0 ),
 			Input( true ),
-			Count ( 0  )
-		{}
-
-		// Member Constructor
-		DefineZoneCompAvailMgrs(
-			int const NumAvailManagers, // number of availability managers for this system
-			int const AvailStatus, // system availability status
-			int const StartTime, // cycle on time (in SimTimeSteps)
-			int const StopTime, // cycle off time (in SimTimeSteps)
-			std::string const & AvailManagerListName, // name of each availability manager
-			FArray1_string const & AvailManagerName, // name of each availability manager
-			FArray1_int const & AvailManagerType, // type of availability manager
-			FArray1_int const & AvailManagerNum, // index for availability manager
-			int const ZoneNum, // cycle off time (in SimTimeSteps)
-			bool const Input,
-			int const Count
-		) :
-			NumAvailManagers( NumAvailManagers ),
-			AvailStatus( AvailStatus ),
-			StartTime( StartTime ),
-			StopTime( StopTime ),
-			AvailManagerListName( AvailManagerListName ),
-			AvailManagerName( AvailManagerName ),
-			AvailManagerType( AvailManagerType ),
-			AvailManagerNum( AvailManagerNum ),
-			ZoneNum( ZoneNum ),
-			Input( Input ),
-			Count ( Count )
+			Count ( 0 )
 		{}
 
 	};
@@ -412,7 +476,7 @@ namespace DataHVACGlobals {
 	struct ZoneCompTypeData
 	{
 		// Members
-		FArray1D< DefineZoneCompAvailMgrs > ZoneCompAvailMgrs;
+		Array1D< DefineZoneCompAvailMgrs > ZoneCompAvailMgrs;
 		int TotalNumComp; // total number of components of a zone equip type
 
 		// Default Constructor
@@ -420,45 +484,30 @@ namespace DataHVACGlobals {
 			TotalNumComp( 0 )
 		{}
 
-		// Member Constructor
-		ZoneCompTypeData(
-			FArray1< DefineZoneCompAvailMgrs > const & ZoneCompAvailMgrs,
-			int const TotalNumComp // total number of components of a zone equip type
-		) :
-			ZoneCompAvailMgrs( ZoneCompAvailMgrs ),
-			TotalNumComp( TotalNumComp )
-		{}
-
 	};
 
 	struct OptStartDataType
 	{
 		// Members
-		FArray1D_int ActualZoneNum;
-		FArray1D< Real64 > OccStartTime;
-		FArray1D_bool OptStartFlag;
+		Array1D_int ActualZoneNum;
+		Array1D< Real64 > OccStartTime;
+		Array1D_bool OptStartFlag;
 
 		// Default Constructor
 		OptStartDataType()
 		{}
 
-		// Member Constructor
-		OptStartDataType(
-			FArray1_int const & ActualZoneNum,
-			FArray1< Real64 > const & OccStartTime,
-			FArray1_bool const & OptStartFlag
-		) :
-			ActualZoneNum( ActualZoneNum ),
-			OccStartTime( OccStartTime ),
-			OptStartFlag( OptStartFlag )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ZoneCompTypeData > ZoneComp;
+	extern Array1D< ZoneCompTypeData > ZoneComp;
 	extern OptStartDataType OptStartData; // For optimum start
-	extern FArray1D< ComponentSetPtData > CompSetPtEquip;
+	extern Array1D< ComponentSetPtData > CompSetPtEquip;
+
+	// Clears the global data in DataHVACGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataHVACGlobals
 

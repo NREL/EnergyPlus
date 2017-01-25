@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -63,7 +121,6 @@ namespace HVACSingleDuctInduc {
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -88,7 +145,7 @@ namespace HVACSingleDuctInduc {
 
 	int NumIndUnits( 0 );
 	int NumFourPipes( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetIUInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
@@ -97,7 +154,7 @@ namespace HVACSingleDuctInduc {
 	// PRIVATE ReportIndUnit
 
 	// Object Data
-	FArray1D< IndUnitData > IndUnit;
+	Array1D< IndUnitData > IndUnit;
 
 	// Functions
 
@@ -155,7 +212,7 @@ namespace HVACSingleDuctInduc {
 
 		// Get the induction unit index
 		if ( CompIndex == 0 ) {
-			IUNum = FindItemInList( CompName, IndUnit.Name(), NumIndUnits );
+			IUNum = FindItemInList( CompName, IndUnit );
 			if ( IUNum == 0 ) {
 				ShowFatalError( "SimIndUnit: Induction Unit not found=" + CompName );
 			}
@@ -242,6 +299,7 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+		using MixerComponent::GetZoneMixerIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -262,12 +320,12 @@ namespace HVACSingleDuctInduc {
 		int IUIndex; // loop index
 		int IUNum; // current fan coil number
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
 		static int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -280,6 +338,7 @@ namespace HVACSingleDuctInduc {
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
 		int ADUNum;
+		bool errFlag;
 
 		// find the number of each type of induction unit
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
@@ -306,7 +365,7 @@ namespace HVACSingleDuctInduc {
 			IUNum = IUIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), IndUnit.Name(), IUNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), IndUnit, IUNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -332,12 +391,12 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).SecAirInNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent, cAlphaFields( 4 ) );
 			IndUnit( IUNum ).OutAirNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 5 ) );
 
-			IndUnit( IUNum ).HCoilType = Alphas( 8 ); // type (key) of heating coil
+			IndUnit( IUNum ).HCoilType = Alphas( 6 ); // type (key) of heating coil
 			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				IndUnit( IUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
 			}
 
-			IndUnit( IUNum ).HCoil = Alphas( 9 ); // name of heating coil object
+			IndUnit( IUNum ).HCoil = Alphas( 7 ); // name of heating coil object
 			IsNotOK = false;
 			IndUnit( IUNum ).HWControlNode = GetCoilWaterInletNode( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, IsNotOK );
 			if ( IsNotOK ) {
@@ -351,7 +410,7 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).MinVolHotWaterFlow = Numbers( 4 );
 			IndUnit( IUNum ).HotControlOffset = Numbers( 5 );
 
-			IndUnit( IUNum ).CCoilType = Alphas( 10 ); // type (key) of cooling coil
+			IndUnit( IUNum ).CCoilType = Alphas( 8 ); // type (key) of cooling coil
 
 			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) ) {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
@@ -359,7 +418,7 @@ namespace HVACSingleDuctInduc {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 			}
 
-			IndUnit( IUNum ).CCoil = Alphas( 11 ); // name of cooling coil object
+			IndUnit( IUNum ).CCoil = Alphas( 9 ); // name of cooling coil object
 			IsNotOK = false;
 			IndUnit( IUNum ).CWControlNode = GetCoilWaterInletNode( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, IsNotOK );
 			if ( IsNotOK ) {
@@ -372,7 +431,16 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).MaxVolColdWaterFlow = Numbers( 6 );
 			IndUnit( IUNum ).MinVolColdWaterFlow = Numbers( 7 );
 			IndUnit( IUNum ).ColdControlOffset = Numbers( 8 );
-			IndUnit( IUNum ).MixerName = Alphas( 12 );
+
+			// Get the Zone Mixer name and check that it is OK
+			errFlag = false;
+			IndUnit( IUNum ).MixerName = Alphas( 10 );
+			GetZoneMixerIndex( IndUnit( IUNum ).MixerName, IndUnit( IUNum ).Mixer_Num, errFlag, CurrentModuleObject );
+			if ( errFlag ) {
+				ShowContinueError( "...specified in " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
+				ErrorsFound = true;
+			}
+
 			// Add heating coil to component sets array
 			SetUpCompSets( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, Alphas( 4 ), "UNDEFINED" );
 			// Add cooling coil to component sets array
@@ -435,7 +503,6 @@ namespace HVACSingleDuctInduc {
 		Numbers.deallocate();
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
-
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );
 		}
@@ -462,9 +529,6 @@ namespace HVACSingleDuctInduc {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -479,17 +543,8 @@ namespace HVACSingleDuctInduc {
 		using PlantUtilities::InitComponentNodes;
 		using DataGlobals::AnyPlantInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitIndUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PriNode; // primary air inlet node number
@@ -500,9 +555,9 @@ namespace HVACSingleDuctInduc {
 		Real64 IndRat; // unit induction ratio
 		Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyPlantScanFlag;
 
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
@@ -583,7 +638,7 @@ namespace HVACSingleDuctInduc {
 			HotConNode = IndUnit( IUNum ).HWControlNode;
 			if ( HotConNode > 0 && ! MyPlantScanFlag( IUNum ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxHotWaterFlow = rho * IndUnit( IUNum ).MaxVolHotWaterFlow;
 				IndUnit( IUNum ).MinHotWaterFlow = rho * IndUnit( IUNum ).MinVolHotWaterFlow;
 				// get component outlet node from plant structure
@@ -593,7 +648,7 @@ namespace HVACSingleDuctInduc {
 
 			ColdConNode = IndUnit( IUNum ).CWControlNode;
 			if ( ColdConNode > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxColdWaterFlow = rho * IndUnit( IUNum ).MaxVolColdWaterFlow;
 				IndUnit( IUNum ).MinColdWaterFlow = rho * IndUnit( IUNum ).MinVolColdWaterFlow;
 
@@ -659,9 +714,6 @@ namespace HVACSingleDuctInduc {
 		// Accesses zone sizing array for air flow rates and zone and plant sizing arrays to
 		// calculate coil water flow rates.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
@@ -676,17 +728,8 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::MyPlantSizingIndex;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeIndUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -789,9 +832,9 @@ namespace HVACSingleDuctInduc {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
 								}
 								IndUnit( IUNum ).DesHeatingLoad = DesCoilLoad;
-								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 								MaxVolHotWaterFlowDes = max( MaxVolHotWaterFlowDes, 0.0 );
@@ -807,6 +850,8 @@ namespace HVACSingleDuctInduc {
 					if ( IsAutoSize ) {
 						IndUnit( IUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Maximum Hot Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else {
 						if ( IndUnit( IUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = IndUnit( IUNum ).MaxVolHotWaterFlow;
@@ -989,7 +1034,7 @@ namespace HVACSingleDuctInduc {
 		Real64 PriAirMassFlow; // primary air mass flow rate [kg/s]
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 InducRat; // Induction Ratio
-		FArray1D< Real64 > Par( 7 );
+		Array1D< Real64 > Par( 7 );
 		int SolFlag;
 		Real64 ErrTolerance;
 		int HWOutletNode;
@@ -1219,7 +1264,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUHeatingResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested zone load
+		Array1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1279,7 +1324,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUCoolingResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested zone load
+		Array1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1386,36 +1431,13 @@ namespace HVACSingleDuctInduc {
 
 		YesNo = false;
 		if ( NumIndUnits > 0 ) {
-			ItemNum = FindItemInList( CompName, IndUnit.MixerName(), NumIndUnits );
+			ItemNum = FindItemInList( CompName, IndUnit, &IndUnitData::MixerName );
 			if ( ItemNum > 0 ) YesNo = true;
 		}
 
 		return YesNo;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACSingleDuctInduc
 

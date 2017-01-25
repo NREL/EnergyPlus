@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -71,7 +71,7 @@ equali( std::string const & s, c_cstring const t )
 {
 #if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
 	std::string::size_type const s_len( s.length() );
-	std::string::size_type i( 0 );
+	std::string::size_type i( 0u );
 	char c( to_lower( t[ 0 ] ) );
 	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
 		c = to_lower( t[ ++i ] );
@@ -95,7 +95,7 @@ equali( c_cstring const t, std::string const & s )
 {
 #if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
 	std::string::size_type const s_len( s.length() );
-	std::string::size_type i( 0 );
+	std::string::size_type i( 0u );
 	char c( to_lower( t[ 0 ] ) );
 	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
 		c = to_lower( t[ ++i ] );
@@ -117,7 +117,7 @@ inline
 bool
 equali( c_cstring const s, c_cstring const t )
 {
-	std::string::size_type i( 0 );
+	std::string::size_type i( 0u );
 	char c( to_lower( s[ 0 ] ) );
 	while ( c == to_lower( t[ i ] ) ) {
 		if ( c == '\0' ) return true;
@@ -255,7 +255,85 @@ is_alpha( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! isalpha( c ) ) return false;
+			if ( std::isalpha( c ) == 0 ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Consonants?
+inline
+bool
+is_consonant( std::string const & s )
+{
+	static std::string const vowels( "aeiou" );
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::isalpha( c ) == 0 ) return false;
+			if ( vowels.find( std::tolower( c ) ) != std::string::npos ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Vowels?
+inline
+bool
+is_vowel( std::string const & s )
+{
+	static std::string const vowels( "aeiou" );
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( vowels.find( std::tolower( c ) ) == std::string::npos ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Lowercase Alphabetic?
+inline
+bool
+is_lower( std::string const & s )
+{
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::islower( c ) == 0 ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Uppercase Alphabetic?
+inline
+bool
+is_upper( std::string const & s )
+{
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::isupper( c ) == 0 ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Alphanumeric?
+inline
+bool
+is_alpha_numeric( std::string const & s )
+{
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::isalnum( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -270,7 +348,7 @@ is_digit( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! isdigit( c ) ) return false;
+			if ( std::isdigit( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -910,6 +988,30 @@ quoted( std::string & s )
 // Space-Free Head Copy of a string
 std::string
 head( std::string const & s );
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( std::string const & s, std::string const & t )
+{
+	return std::string( s ) += t;
+}
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( c_cstring const s, std::string const & t )
+{
+	return std::string( s ) += t;
+}
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( std::string const & s, c_cstring const t )
+{
+	return s + std::string( t );
+}
 
 // Conversion To std::string
 

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // CLI Headers
 #include <ezOptionParser.hpp>
 
@@ -38,43 +96,48 @@ using namespace ez;
 int
 ProcessArgs(int argc, const char * argv[])
 {
-	bool annSimulation;
-	bool ddSimulation;
+	typedef  std::string::size_type  size_type;
 
 	// Expand long-name options using "=" sign into two arguments
 	// and expand multiple short options into separate arguments
-	std::vector<std::string> arguments;
+	std::vector< std::string > arguments;
 
 	for ( int i = 0; i < argc; ++i ) {
 
 		std::string inputArg( argv[ i ] );
 
-		int doubleDashPosition = inputArg.find("--");
-		int equalsPosition = inputArg.find("=");
+		std::string const dash( "-" );
+		size_type const doubleDashPosition = inputArg.find("--");
+		size_type const equalsPosition = inputArg.find("=");
 
-		if (doubleDashPosition == 0 && equalsPosition != std::string::npos){
+		if ( doubleDashPosition == 0 && equalsPosition != std::string::npos ) { // --option=value
 			arguments.push_back(inputArg.substr(0,equalsPosition));
 			arguments.push_back(inputArg.substr(equalsPosition + 1,inputArg.size() - 1));
-		}
-		else if (inputArg.substr(0,1) == '-' && inputArg.substr(1,1) != '-' && inputArg.size() > 2){
-			for (int c = 1; c < inputArg.size(); ++c){
-				arguments.push_back("-" + inputArg.substr(c,1));
+		} else if ( ( inputArg.size() > 2 ) && ( inputArg[ 0 ] == '-' ) && ( inputArg[ 1 ] != '-' ) ) { // -abc style
+			for ( size_type c = 1; c < inputArg.size(); ++c ) {
+				arguments.push_back( dash + inputArg[ c ] );
 			}
-		}
-		else
+		} else { // ?
 			arguments.push_back(inputArg);
+		}
 	}
 
+//Fix This is problematic for a few reasons:
+//  Using ezOptionParser with a raw C-string interface is asking for trouble: Find something taking std::string if possible
+//  Passing out pointers returned by c_str() is bad form:
+//   They are pointers to internally-managed memory in std::string
+//   They are invalid as soon as the string goes out of scope or is modified
+//   In this case the strings may be in scope and unmodified until parse is done but this is red flag usage
 	// convert to vector of C strings for option parser
-	std::vector<const char *> cStrArgs;
+	std::vector< const char * > cStrArgs;
 	cStrArgs.reserve(arguments.size());
-	for (int i = 0; i < arguments.size(); ++i) {
+	for ( size_type i = 0; i < arguments.size(); ++i ) {
 		cStrArgs.push_back(arguments[i].c_str());
 	}
 
-	int argCount = cStrArgs.size();
+	size_type const argCount = cStrArgs.size();
 
-	bool legacyMode = (argCount == 1);
+	bool const legacyMode = (argCount == 1);
 
 	// Define options
 	ezOptionParser opt;
@@ -112,7 +175,7 @@ ProcessArgs(int argc, const char * argv[])
 	std::string errorFollowUp = "Type 'energyplus --help' for usage.";
 
 	// Parse arguments
-	opt.parse(argCount, &cStrArgs[0]);
+	opt.parse( argCount, &cStrArgs[0] );
 
 	// print arguments parsed (useful for debugging)
 	/*std::string pretty;
@@ -153,14 +216,13 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_SUCCESS);
 	}
 
-	if(opt.lastArgs.size() == 1){
-		for(int i=0; i < opt.lastArgs.size(); ++i) {
-			std::string arg(opt.lastArgs[i]->c_str());
+	if (opt.lastArgs.size() == 1) {
+		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
+			std::string const & arg( *opt.lastArgs[i] );
 			inputIdfFileName = arg;
 		}
 	}
-	if(opt.lastArgs.size() == 0)
-		inputIdfFileName = "in.idf";
+	if (opt.lastArgs.size() == 0) inputIdfFileName = "in.idf";
 
 	// Convert all paths to native paths
 	makeNativePath(inputIdfFileName);
@@ -169,23 +231,22 @@ ProcessArgs(int argc, const char * argv[])
 	makeNativePath(dirPathName);
 
 	std::vector<std::string> badOptions;
-	if(opt.lastArgs.size() > 1){
+	if (opt.lastArgs.size() > 1u) {
 		bool invalidOptionFound = false;
-		for(int i=0; i < opt.lastArgs.size(); ++i) {
-			std::string arg(opt.lastArgs[i]->c_str());
-			if (arg.substr(0,1) == "-"){
+		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
+			std::string const & arg( *opt.lastArgs[i] );
+			if (arg.substr(0,1) == "-") {
 				invalidOptionFound = true;
 				DisplayString("ERROR: Invalid option: " + arg);
 			}
 		}
-		if (invalidOptionFound){
+		if (invalidOptionFound) {
 			DisplayString(errorFollowUp);
 			exit(EXIT_FAILURE);
-		}
-		else {
+		} else {
 			DisplayString("ERROR: Multiple input files specified:");
-			for(int i=0; i < opt.lastArgs.size(); ++i) {
-				std::string arg(opt.lastArgs[i]->c_str());
+			for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
+				std::string const & arg( *opt.lastArgs[i] );
 				DisplayString("  Input file #" + std::to_string(i+1) +  ": " + arg);
 			}
 			DisplayString(errorFollowUp);
@@ -205,9 +266,9 @@ ProcessArgs(int argc, const char * argv[])
 
 	runEPMacro = opt.isSet("-m");
 
-	if (opt.isSet("-d") ){
+	if (opt.isSet("-d") ) {
 		// Add the trailing path character if necessary
-		if(dirPathName[dirPathName.size()-1]!=pathChar){
+		if (dirPathName[dirPathName.size()-1]!=pathChar) {
 			dirPathName+=pathChar;
 		}
 
@@ -217,14 +278,14 @@ ProcessArgs(int argc, const char * argv[])
 
 	// File naming scheme
 	std::string outputFilePrefix;
-	if(opt.isSet("-p")) {
+	if (opt.isSet("-p")) {
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
 		makeNativePath(prefixOutName);
 		outputFilePrefix = dirPathName + prefixOutName;
-	}
-	else
+	} else {
 		outputFilePrefix = dirPathName + "eplus";
+	}
 
 	std::string suffixType;
 	opt.get("-s")->getString(suffixType);
@@ -258,8 +319,7 @@ ProcessArgs(int argc, const char * argv[])
 		adsSuffix = "ADS";
 		screenSuffix = "screen";
 
-	}
-	else if (suffixType == "D" || suffixType == "d") {
+	} else if (suffixType == "D" || suffixType == "d") {
 
 		normalSuffix = "";
 		tableSuffix = "-table";
@@ -271,8 +331,7 @@ ProcessArgs(int argc, const char * argv[])
 		adsSuffix = "-ads";
 		screenSuffix = "-screen";
 
-	}
-	else if (suffixType == "C" || suffixType == "c") {
+	} else if (suffixType == "C" || suffixType == "c") {
 
 		normalSuffix = "";
 		tableSuffix = "Table";
@@ -284,8 +343,7 @@ ProcessArgs(int argc, const char * argv[])
 		adsSuffix = "Ads";
 		screenSuffix = "Screen";
 
-	}
-	else {
+	} else {
 		DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
@@ -327,7 +385,12 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-	outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	if (suffixType == "L" || suffixType == "l") {
+		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	}
+	else {
+		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
+	}
 	outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
 	outputDelightInFileName = "eplusout.delightin";
 	outputDelightOutFileName = "eplusout.delightout";
@@ -353,8 +416,8 @@ ProcessArgs(int argc, const char * argv[])
 
 
 	// Handle bad options
-	if(!opt.gotExpected(badOptions)) {
-		for(int i=0; i < badOptions.size(); ++i) {
+	if (!opt.gotExpected(badOptions)) {
+		for ( size_type i = 0; i < badOptions.size(); ++i ) {
 			DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i]);
 		}
 		DisplayString(errorFollowUp);
@@ -362,21 +425,21 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	// This is a place holder in case there are required options in the future
-	if(!opt.gotRequired(badOptions)) {
-		for(int i=0; i < badOptions.size(); ++i) {
+	if ( !opt.gotRequired(badOptions) ) {
+		for ( size_type i = 0; i < badOptions.size(); ++i ) {
 			DisplayString("ERROR: Missing required option " + badOptions[i]);
 		}
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
 
-	if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0){
-		for(int i=1; i < opt.firstArgs.size(); ++i) {
-			std::string arg(opt.firstArgs[i]->c_str());
+	if ( opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0 ) {
+		for ( size_type i = 1; i < opt.firstArgs.size(); ++i ) {
+			std::string const & arg( *opt.firstArgs[i] );
 			DisplayString("ERROR: Invalid option: " + arg);
 		}
-		for(int i=0; i < opt.unknownArgs.size(); ++i) {
-			std::string arg(opt.unknownArgs[i]->c_str());
+		for ( size_type i = 0; i < opt.unknownArgs.size(); ++i ) {
+			std::string const & arg( *opt.unknownArgs[i] );
 			DisplayString("ERROR: Invalid option: " + arg);
 		}
 		DisplayString(errorFollowUp);
@@ -403,7 +466,8 @@ ProcessArgs(int argc, const char * argv[])
 		LFN = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file "+EnergyPlusIniFileName+" for input (read)." );
+			DisplayString( "ERROR: Could not open file " + EnergyPlusIniFileName + " for input (read)." );
+			exit(EXIT_FAILURE);
 		}
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		// Relying on compiler to supply full path name here
@@ -448,14 +512,15 @@ ProcessArgs(int argc, const char * argv[])
 	OutputFileDebug = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, outputDbgFileName, flags ); iostatus = flags.ios(); }
 	if ( iostatus != 0 ) {
-		ShowFatalError( "EnergyPlus: Could not open output debug file: " + outputDbgFileName + "." );
+		DisplayString( "ERROR: Could not open output debug file: " + outputDbgFileName + "." );
+		exit(EXIT_FAILURE);
 	}
 
 	// Preprocessors (These will likely move to a new file)
-	if(runEPMacro){
+	if (runEPMacro) {
 		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
 		{ IOFlags flags; gio::inquire( epMacroPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
+		if (!FileExists) {
 			DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + "." );
 			exit(EXIT_FAILURE);
 		}
@@ -463,21 +528,19 @@ ProcessArgs(int argc, const char * argv[])
 		bool inputFileNamedIn =
 				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
 
-		if (!inputFileNamedIn)
-			linkFile(inputIdfFileName.c_str(), "in.imf");
+		if (!inputFileNamedIn) linkFile(inputIdfFileName.c_str(), "in.imf");
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
-		if (!inputFileNamedIn)
-			removeFile("in.imf");
+		if (!inputFileNamedIn) removeFile("in.imf");
 		moveFile("audit.out",outputEpmdetFileName);
 		moveFile("out.idf",outputEpmidfFileName);
-	    inputIdfFileName = outputEpmidfFileName;
+	   inputIdfFileName = outputEpmidfFileName;
 	}
 
-	if(runExpandObjects) {
+	if (runExpandObjects) {
 		std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
 		{ IOFlags flags; gio::inquire( expandObjectsPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
+		if (!FileExists) {
 			DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + "." );
 			exit(EXIT_FAILURE);
 		}
@@ -499,7 +562,7 @@ ProcessArgs(int argc, const char * argv[])
 			removeFile("Energy+.idd");
 		moveFile("expandedidf.err", outputExperrFileName);
 		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
-		if (FileExists){
+		if (FileExists) {
 			moveFile("expanded.idf", outputExpidfFileName);
 		    inputIdfFileName = outputExpidfFileName;
 		}
@@ -509,6 +572,12 @@ ProcessArgs(int argc, const char * argv[])
 	return 0;
 }
 
+//Fix This is Fortranic code that needs to be brought up to C++ style
+//     All the index and len and strip should be eliminated and replaced by string calls only where needed
+//     I/o with std::string should not be pulling in trailing blanks so stripping should not be needed, etc.
+//     Rewinding is a big performance hit and should be avoided if possible
+//     Case-insensitive comparison is much faster than converting strings to upper or lower case
+//     Each strip and case conversion is a heap hit and should be avoided if possible
 void
 ReadINIFile(
 	int const UnitNumber, // Unit number of the opened INI file
@@ -567,16 +636,16 @@ ReadINIFile(
 	bool NewHeading;
 
 	// Formats
-	static gio::Fmt const Format_700( "(A)" );
+	static gio::Fmt Format_700( "(A)" );
 
-	DataOut = "           ";
+	DataOut.clear();
 
 	// I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
 
 	Param = KindofParameter;
 	strip( Param );
 	ILEN = len( Param );
-	gio::rewind( UnitNumber );
+	gio::rewind( UnitNumber ); //Performance Ouch!
 	EndofFile = false;
 	Found = false;
 	NewHeading = false;
@@ -657,7 +726,5 @@ ReadINIFile(
 
 }
 
-} //CommandLineInterface namespace
-} //EnergyPlus namespace
-
-
+} // CommandLineInterface namespace
+} // EnergyPlus namespace

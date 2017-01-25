@@ -1,10 +1,67 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -70,11 +127,8 @@ namespace ChillerElectricEIR {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
-	using Psychrometrics::PsyCpAirFnWTdb;
-	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 	using FluidProperties::GetDensityGlycol;
@@ -103,6 +157,7 @@ namespace ChillerElectricEIR {
 	Real64 CondOutletTemp( 0.0 ); // Condenser outlet temperature [C]
 	Real64 CondOutletHumRat( 0.0 ); // Condenser outlet humidity ratio [kg/kg]
 	Real64 EvapOutletTemp( 0.0 ); // Evaporator outlet temperature [C]
+	Real64 EvapWaterConsumpRate( 0.0 ); // Evap condenser water consumption rate [m3/s]
 	Real64 Power( 0.0 ); // Rate of chiller electric energy use [W]
 	Real64 QEvaporator( 0.0 ); // Rate of heat transfer to the evaporator coil [W]
 	Real64 QCondenser( 0.0 ); // Rate of heat transfer to the condenser coil [W]
@@ -118,7 +173,7 @@ namespace ChillerElectricEIR {
 	Real64 ChillerFalseLoadRate( 0.0 ); // Chiller false load over and above the water-side load [W]
 	Real64 AvgCondSinkTemp( 0.0 ); // condenser temperature value for use in curves [C]
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	bool GetInputEIR( true ); // When TRUE, calls subroutine to read input file.
 
@@ -126,8 +181,8 @@ namespace ChillerElectricEIR {
 	//PUBLIC     SimEIRChillerHeatRecovery
 
 	// Object Data
-	FArray1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
-	FArray1D< ReportEIRVars > ElectricEIRChillerReport;
+	Array1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
+	Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -138,7 +193,7 @@ namespace ChillerElectricEIR {
 
 	void
 	SimElectricEIRChiller(
-		std::string const & EIRChillerType, // Type of chiller
+		std::string const & EP_UNUSED( EIRChillerType ), // Type of chiller
 		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
@@ -176,7 +231,6 @@ namespace ChillerElectricEIR {
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
-		using DataSizing::CurLoopNum;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -201,7 +255,7 @@ namespace ChillerElectricEIR {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			EIRChillNum = FindItemInList( EIRChillerName, ElectricEIRChiller.Name(), NumElectricEIRChillers );
+			EIRChillNum = FindItemInList( EIRChillerName, ElectricEIRChiller );
 			if ( EIRChillNum == 0 ) {
 				ShowFatalError( "SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName );
 			}
@@ -224,7 +278,7 @@ namespace ChillerElectricEIR {
 			TempCondInDesign = ElectricEIRChiller( EIRChillNum ).TempRefCondIn;
 
 			InitElectricEIRChiller( EIRChillNum, RunFlag, MyLoad );
-			
+
 			if ( LoopNum == ElectricEIRChiller( EIRChillNum ).CWLoopNum ) {
 				SizeElectricEIRChiller( EIRChillNum );
 				MinCap = ElectricEIRChiller( EIRChillNum ).RefCap * ElectricEIRChiller( EIRChillNum ).MinPartLoadRat;
@@ -309,7 +363,7 @@ namespace ChillerElectricEIR {
 		Real64 CurveVal; // Used to verify EIR-FT and CAP-FT curves equal 1 at reference conditions
 		static bool FoundNegValue( false ); // Used to evaluate PLFFPLR curve objects
 		static int CurveCheck( 0 ); // Used to evaluate PLFFPLR curve objects
-		FArray1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
+		Array1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 		bool errFlag; // Used to tell if a unique chiller name has been specified
 		std::string StringVar; // Used for EIRFPLR warning messages
@@ -343,7 +397,7 @@ namespace ChillerElectricEIR {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElectricEIRChiller.Name(), EIRChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElectricEIRChiller, EIRChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -489,14 +543,10 @@ namespace ChillerElectricEIR {
 			ElectricEIRChiller( EIRChillerNum ).TempRefEvapOut = rNumericArgs( 3 );
 			ElectricEIRChiller( EIRChillerNum ).TempRefCondIn = rNumericArgs( 4 );
 			ElectricEIRChiller( EIRChillerNum ).EvapVolFlowRate = rNumericArgs( 5 );
-			if ( ElectricEIRChiller( EIRChillerNum ).EvapVolFlowRate == AutoSize ){
+			if ( ElectricEIRChiller( EIRChillerNum ).EvapVolFlowRate == AutoSize ) {
 				ElectricEIRChiller( EIRChillerNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( ElectricEIRChiller( EIRChillerNum ).CondenserType == AirCooled || ElectricEIRChiller( EIRChillerNum ).CondenserType == EvapCooled ) { // Condenser flow rate not used for these cond types
-				ElectricEIRChiller( EIRChillerNum ).CondVolFlowRate = 0.0011;
-			} else {
-				ElectricEIRChiller( EIRChillerNum ).CondVolFlowRate = rNumericArgs( 6 );
-			}
+			ElectricEIRChiller( EIRChillerNum ).CondVolFlowRate = rNumericArgs( 6 );
 			if ( ElectricEIRChiller( EIRChillerNum ).CondVolFlowRate == AutoSize ) {
 				ElectricEIRChiller( EIRChillerNum ).CondVolFlowRateWasAutoSized = true;
 			}
@@ -752,6 +802,8 @@ namespace ChillerElectricEIR {
 					SetupOutputVariable( "Chiller Condenser Fan Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).CondenserFanEnergyConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
 				}
 				if ( ElectricEIRChiller( EIRChillerNum ).CondenserType == EvapCooled ) {
+					SetupOutputVariable( "Chiller Evaporative Condenser Water Volume [m3]", ElectricEIRChillerReport( EIRChillerNum ).EvapWaterConsump, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Chiller Evaporative Condenser Mains Supply Water Volume [m3]", ElectricEIRChillerReport( EIRChillerNum ).EvapWaterConsump, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "MainsWater", "Cooling", _, "System" );
 					if ( ElectricEIRChiller( EIRChillerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 						SetupOutputVariable( "Chiller Basin Heater Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).BasinHeaterPower, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 						SetupOutputVariable( "Chiller Basin Heater Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).BasinHeaterConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "Electric", "CHILLERS", _, "Plant" );
@@ -786,9 +838,6 @@ namespace ChillerElectricEIR {
 		// METHODOLOGY EMPLOYED:
 		//  Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -796,34 +845,20 @@ namespace ChillerElectricEIR {
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
-		using DataEnvironment::StdBaroPress;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitElectricEIRChiller" );
 		static bool MyOneTimeFlag( true ); // Flag used to execute code only once
-		static FArray1D_bool MyFlag; // TRUE in order to set component location
-		static FArray1D_bool MyEnvrnFlag; // TRUE when new environment is started
+		static Array1D_bool MyFlag; // TRUE in order to set component location
+		static Array1D_bool MyEnvrnFlag; // TRUE when new environment is started
 		int EvapInletNode; // Node number for evaporator water inlet node
 		int EvapOutletNode; // Node number for evaporator water outlet node
 		int CondInletNode; // Node number for condenser water inlet node
@@ -926,7 +961,7 @@ namespace ChillerElectricEIR {
 
 		if ( MyEnvrnFlag( EIRChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			ElectricEIRChiller( EIRChillNum ).EvapMassFlowRateMax = ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate * rho;
 
@@ -940,7 +975,7 @@ namespace ChillerElectricEIR {
 				Node( CondInletNode ).Temp = ElectricEIRChiller( EIRChillNum ).TempRefCondIn;
 			} else { // air or evap air condenser
 				// Initialize maximum available condenser flow rate
-				rho = PsyRhoAirFnPbTdbW( StdBaroPress, ElectricEIRChiller( EIRChillNum ).TempRefCondIn, 0.0, RoutineName );
+				rho = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, ElectricEIRChiller( EIRChillNum ).TempRefCondIn, 0.0, RoutineName );
 				ElectricEIRChiller( EIRChillNum ).CondMassFlowRateMax = rho * ElectricEIRChiller( EIRChillNum ).CondVolFlowRate;
 
 				Node( CondInletNode ).MassFlowRate = ElectricEIRChiller( EIRChillNum ).CondMassFlowRateMax;
@@ -957,7 +992,7 @@ namespace ChillerElectricEIR {
 			}
 
 			if ( ElectricEIRChiller( EIRChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				ElectricEIRChiller( EIRChillNum ).DesignHeatRecMassFlowRate = rho * ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, ElectricEIRChiller( EIRChillNum ).DesignHeatRecMassFlowRate, ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum, ElectricEIRChiller( EIRChillNum ).HeatRecOutletNodeNum, ElectricEIRChiller( EIRChillNum ).HRLoopNum, ElectricEIRChiller( EIRChillNum ).HRLoopSideNum, ElectricEIRChiller( EIRChillNum ).HRBranchNum, ElectricEIRChiller( EIRChillNum ).HRCompNum );
@@ -1068,9 +1103,6 @@ namespace ChillerElectricEIR {
 		//  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		//  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -1083,24 +1115,13 @@ namespace ChillerElectricEIR {
 		using namespace OutputReportPredefined;
 		using StandardRatings::CalcChillerIPLV;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeElectricEIRChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound;
 		std::string equipName;
 		Real64 rho;
 		Real64 Cp;
@@ -1108,10 +1129,16 @@ namespace ChillerElectricEIR {
 		Real64 tmpEvapVolFlowRate; // local evaporator design volume flow rate
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag; // TRUE in order to calculate IPLV
+		static Array1D_bool MyFlag; // TRUE in order to calculate IPLV
 		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow for reporting
 		Real64 RefCapUser; // Hardsized reference capacity for reporting
 		Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
+		std::string CompName; // component name
+		std::string	CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
+		Real64 TempSize; // autosized value of coil input field
+		int SizingMethod; // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 
 		if ( MyOneTimeFlag ) {
 			MyFlag.dimension( NumElectricEIRChillers, true );
@@ -1157,8 +1184,8 @@ namespace ChillerElectricEIR {
 					if ( ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 ) {
 						EvapVolFlowRateUser = ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
-								"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, 
+							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+								"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate,
 								"User-Specified Reference Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -1179,10 +1206,10 @@ namespace ChillerElectricEIR {
 				ShowSevereError( "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
-			} 
-			if ( ! ElectricEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+			}
+			if ( ! ElectricEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport
 					&& ( ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate > 0.0 ) ) {
-					ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
+					ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
 						"User-Specified Reference Chilled Water Flow Rate [m3/s]", ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate );
 			}
 		}
@@ -1191,9 +1218,9 @@ namespace ChillerElectricEIR {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate;
 				if ( ! ElectricEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = ElectricEIRChiller( EIRChillNum ).RefCap;
 			} else {
@@ -1203,18 +1230,18 @@ namespace ChillerElectricEIR {
 				if ( ElectricEIRChiller( EIRChillNum ).RefCapWasAutoSized ) {
 					ElectricEIRChiller( EIRChillNum ).RefCap = tmpNomCap;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
 							"Design Size Reference Capacity [W]", tmpNomCap );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
 							"Initial Design Size Reference Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
 					if ( ElectricEIRChiller( EIRChillNum ).RefCap > 0.0 && tmpNomCap > 0.0 ) {
 						RefCapUser = ElectricEIRChiller( EIRChillNum ).RefCap;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
+							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
 								"Design Size Reference Capacity [W]", tmpNomCap, "User-Specified Reference Capacity [W]", RefCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - RefCapUser ) / RefCapUser ) > AutoVsHardSizingThreshold ) {
@@ -1235,10 +1262,10 @@ namespace ChillerElectricEIR {
 				ShowSevereError( "Autosizing of Electric Chiller reference capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
-			} 
-			if ( ! ElectricEIRChiller( EIRChillNum ).RefCapWasAutoSized && PlantFinalSizesOkayToReport 
+			}
+			if ( ! ElectricEIRChiller( EIRChillNum ).RefCapWasAutoSized && PlantFinalSizesOkayToReport
 					&& ( ElectricEIRChiller( EIRChillNum ).RefCap > 0.0 )) { // Hard-sized with no sizing data
-						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
 							"User-Specified Reference Capacity [W]", ElectricEIRChiller( EIRChillNum ).RefCap );
 
 			}
@@ -1247,7 +1274,7 @@ namespace ChillerElectricEIR {
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 
-				rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElectricEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElectricEIRChiller( EIRChillNum ).RefCOP ) * ElectricEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
@@ -1261,25 +1288,25 @@ namespace ChillerElectricEIR {
 				if ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) {
 					ElectricEIRChiller( EIRChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
-							"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+							"Design Size Reference Condenser Fluid Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
-							"Initial Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+							"Initial Design Size Reference Condenser Fluid Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 				} else {
 					if ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 ) {
 						CondVolFlowRateUser = ElectricEIRChiller( EIRChillNum ).CondVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
-								"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, 
-								"User-Specified Reference Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
+							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+								"Design Size Reference Condenser Fluid Flow Rate [m3/s]", tmpCondVolFlowRate,
+								"User-Specified Reference Condenser Fluid Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + ElectricEIRChiller( EIRChillNum ).Name );
-									ShowContinueError( "User-Specified Reference Condenser Water Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Reference Condenser Water Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
+									ShowContinueError( "User-Specified Reference Condenser Fluid Flow Rate of " + RoundSigDigits( CondVolFlowRateUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Reference Condenser Fluid Flow Rate of " + RoundSigDigits( tmpCondVolFlowRate, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 								}
@@ -1290,17 +1317,39 @@ namespace ChillerElectricEIR {
 				}
 			}
 		} else {
-			if ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
-				ShowSevereError( "Autosizing of Electric EIR Chiller condenser flow rate requires a condenser" );
-				ShowContinueError( "loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Electric EIR Chiller object=" + ElectricEIRChiller( EIRChillNum ).Name );
-				ErrorsFound = true;
-			} 
-			if ( ! ElectricEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
-					&& ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 )) {
-					ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, 
-						"User-Specified Reference Condenser Water Flow Rate [m3/s]", ElectricEIRChiller( EIRChillNum ).CondVolFlowRate );
+			if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
+
+				if ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "Autosizing of Electric EIR Chiller condenser fluid flow rate requires a condenser" );
+					ShowContinueError( "loop Sizing:Plant object" );
+					ShowContinueError( "Occurs in Electric EIR Chiller object=" + ElectricEIRChiller( EIRChillNum ).Name );
+					ErrorsFound = true;
+				}
+				if ( ! ElectricEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport
+						&& ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 )) {
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+							"User-Specified Reference Condenser Fluid Flow Rate [m3/s]", ElectricEIRChiller( EIRChillNum ).CondVolFlowRate );
+				}
+
+			} else {
+
+				// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+				if ( PlantFinalSizesOkayToReport ) {
+					SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+					CompType = DataPlant::ccSimPlantEquipTypes( DataPlant::TypeOf_Chiller_ElectricEIR );
+					CompName = ElectricEIRChiller( EIRChillNum ).Name;
+					SizingString = "Reference Condenser Fluid Flow Rate  [m3/s]";
+					DataConstantUsedForSizing = ElectricEIRChiller( EIRChillNum ).RefCap;
+					DataFractionUsedForSizing = 0.000114;
+					TempSize = ElectricEIRChiller( EIRChillNum ).CondVolFlowRate;
+					ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
+					ElectricEIRChiller( EIRChillNum ).CondVolFlowRate = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
+				}
+
 			}
+
 		}
 
 		// save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
@@ -1331,7 +1380,7 @@ namespace ChillerElectricEIR {
 		int & EIRChillNum, // Chiller number
 		Real64 & MyLoad, // Operating load
 		bool const RunFlag, // TRUE when chiller operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{
@@ -1373,22 +1422,13 @@ namespace ChillerElectricEIR {
 		using DataEnvironment::CurMnDy;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
-		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcElectricEIRChillerModel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FRAC; // Chiller cycling ratio
@@ -1409,7 +1449,6 @@ namespace ChillerElectricEIR {
 		int EvapOutletNode; // Evaporator outlet node number
 		int CondInletNode; // Condenser inlet node number
 		int CondOutletNode; // Condenser outlet node number
-		//  LOGICAL,SAVE           :: PossibleSubcooling
 		Real64 TempLoad( 0.0 ); // Actual load to be met by chiller. This value is compared to MyLoad
 		// and reset when necessary since this chiller can cycle, the load passed
 		// should be the actual load. Instead the minimum PLR * RefCap is
@@ -1423,6 +1462,7 @@ namespace ChillerElectricEIR {
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
 		static std::string OutputChar; // character string for warning messages
 		Real64 Cp; // local fluid specific heat
+		Real64 RhoAir; // air density [kg/m3]
 
 		// Set module level inlet and outlet nodes and initialize other local variables
 		ChillerPartLoadRatio = 0.0;
@@ -1435,6 +1475,7 @@ namespace ChillerElectricEIR {
 		QEvaporator = 0.0;
 		QHeatRecovered = 0.0;
 		CondenserFanPower = 0.0;
+		EvapWaterConsumpRate = 0.0;
 		EvapInletNode = ElectricEIRChiller( EIRChillNum ).EvapInletNodeNum;
 		EvapOutletNode = ElectricEIRChiller( EIRChillNum ).EvapOutletNodeNum;
 		CondInletNode = ElectricEIRChiller( EIRChillNum ).CondInletNodeNum;
@@ -1549,7 +1590,13 @@ namespace ChillerElectricEIR {
 			SetComponentFlowRate( CondMassFlowRate, CondInletNode, CondOutletNode, ElectricEIRChiller( EIRChillNum ).CDLoopNum, ElectricEIRChiller( EIRChillNum ).CDLoopSideNum, ElectricEIRChiller( EIRChillNum ).CDBranchNum, ElectricEIRChiller( EIRChillNum ).CDCompNum );
 			PullCompInterconnectTrigger( ElectricEIRChiller( EIRChillNum ).CWLoopNum, ElectricEIRChiller( EIRChillNum ).CWLoopSideNum, ElectricEIRChiller( EIRChillNum ).CWBranchNum, ElectricEIRChiller( EIRChillNum ).CWCompNum, ElectricEIRChiller( EIRChillNum ).CondMassFlowIndex, ElectricEIRChiller( EIRChillNum ).CDLoopNum, ElectricEIRChiller( EIRChillNum ).CDLoopSideNum, CriteriaType_MassFlowRate, CondMassFlowRate );
 
-			if ( CondMassFlowRate < MassFlowTolerance ) return;
+			if ( CondMassFlowRate < MassFlowTolerance ) {
+				if ( EvapMassFlowRate < MassFlowTolerance ) {
+					// Use SetComponentFlowRate to decide actual flow
+					SetComponentFlowRate( EvapMassFlowRate, EvapInletNode, EvapOutletNode, ElectricEIRChiller( EIRChillNum ).CWLoopNum, ElectricEIRChiller( EIRChillNum ).CWLoopSideNum, ElectricEIRChiller( EIRChillNum ).CWBranchNum, ElectricEIRChiller( EIRChillNum ).CWCompNum );
+				}
+				return;
+			}
 
 		}
 
@@ -1868,10 +1915,16 @@ namespace ChillerElectricEIR {
 			if ( ElectricEIRChiller( EIRChillNum ).HeatRecActive ) EIRChillerHeatRecovery( EIRChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered );
 
 			if ( CondMassFlowRate > 0.0 ) {
-				Cp = PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
+				Cp = Psychrometrics::PsyCpAirFnWTdb( Node( CondInletNode ).HumRat, CondInletTemp );
 				CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / Cp;
 			} else {
 				CondOutletTemp = CondInletTemp;
+			}
+
+			if ( ElectricEIRChiller( EIRChillNum ).CondenserType == EvapCooled ) {
+				RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, CondInletTemp, Node( CondInletNode ).HumRat, RoutineName );
+				// CondMassFlowRate is already multiplied by PLR, convert to water use rate
+				EvapWaterConsumpRate = ( ( CondOutletHumRat - Node( CondInletNode ).HumRat ) * CondMassFlowRate ) / RhoAir;
 			}
 		}
 
@@ -1928,10 +1981,8 @@ namespace ChillerElectricEIR {
 		int HeatRecInNode; // Node number of heat recovery water inlet node
 		int HeatRecOutNode; // Node number of heat recovery water outlet node
 		Real64 QTotal; // Total condenser heat [W]
-		Real64 QCondTmp; // Total condenser heat based on average temperatures [W]
 		Real64 HeatRecInletTemp; // Heat reclaim inlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
-		Real64 FracHeatRec; // Fraction of condenser heat reclaimed
 		Real64 TAvgIn; // Average inlet temperature of heat reclaim inlet and condenser inlet [C]
 		Real64 TAvgOut; // Average outlet temperature [C]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
@@ -2024,6 +2075,7 @@ namespace ChillerElectricEIR {
 		//  na
 
 		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
@@ -2063,6 +2115,8 @@ namespace ChillerElectricEIR {
 			if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
 				Node( CondOutletNode ).HumRat = Node( CondInletNode ).HumRat;
 				Node( CondOutletNode ).Enthalpy = Node( CondInletNode ).Enthalpy;
+				Node( CondInletNode ).MassFlowRate = 0.0;
+				Node( CondOutletNode ).MassFlowRate = 0.0;
 			}
 
 			ElectricEIRChillerReport( Num ).ChillerPartLoadRatio = 0.0;
@@ -2087,6 +2141,7 @@ namespace ChillerElectricEIR {
 			if ( ElectricEIRChiller( Num ).CondenserType == EvapCooled ) {
 				ElectricEIRChillerReport( Num ).BasinHeaterPower = BasinHeaterPower;
 				ElectricEIRChillerReport( Num ).BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;
+				ElectricEIRChillerReport( Num ).EvapWaterConsump = 0.0;
 			}
 
 			if ( ElectricEIRChiller( Num ).HeatRecActive ) {
@@ -2102,11 +2157,24 @@ namespace ChillerElectricEIR {
 
 		} else { // Chiller is running, so pass calculated values
 			// Set node temperatures
-			Node( EvapOutletNode ).Temp = EvapOutletTemp;
-			Node( CondOutletNode ).Temp = CondOutletTemp;
-			if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
-				Node( CondOutletNode ).HumRat = CondOutletHumRat;
-				Node( CondOutletNode ).Enthalpy = PsyHFnTdbW( CondOutletTemp, CondOutletHumRat );
+			if ( CondMassFlowRate < MassFlowTolerance && EvapMassFlowRate < MassFlowTolerance ) {
+				Node( EvapOutletNode ).Temp = Node( EvapInletNode ).Temp;
+				Node( CondOutletNode ).Temp = Node( CondInletNode ).Temp;
+				if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
+					Node( CondOutletNode ).HumRat = Node( CondInletNode ).HumRat;
+					Node( CondOutletNode ).Enthalpy = Node( CondInletNode ).Enthalpy;
+					Node( CondInletNode ).MassFlowRate = 0.0;
+					Node( CondOutletNode ).MassFlowRate = 0.0;
+				}
+			} else {
+				Node( EvapOutletNode ).Temp = EvapOutletTemp;
+				Node( CondOutletNode ).Temp = CondOutletTemp;
+				if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
+					Node( CondOutletNode ).HumRat = CondOutletHumRat;
+					Node( CondOutletNode ).Enthalpy = PsyHFnTdbW( CondOutletTemp, CondOutletHumRat );
+					Node( CondInletNode ).MassFlowRate = CondMassFlowRate;
+					Node( CondOutletNode ).MassFlowRate = CondMassFlowRate;
+				}
 			}
 
 			// Set node flow rates;  for these load based models
@@ -2137,6 +2205,7 @@ namespace ChillerElectricEIR {
 			if ( ElectricEIRChiller( Num ).CondenserType == EvapCooled ) {
 				ElectricEIRChillerReport( Num ).BasinHeaterPower = BasinHeaterPower;
 				ElectricEIRChillerReport( Num ).BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;
+				ElectricEIRChillerReport( Num ).EvapWaterConsump = EvapWaterConsumpRate * ReportingConstant;
 			}
 
 			if ( ElectricEIRChiller( Num ).HeatRecActive ) {

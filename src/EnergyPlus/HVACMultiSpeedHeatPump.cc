@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -14,6 +72,7 @@
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
@@ -87,7 +146,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataEnvironment::StdRhoAir;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutDryBulbTemp;
-	using DataEnvironment::OutWetBulbTemp;
 	using DataEnvironment::OutHumRat;
 	using DataEnvironment::CurMnDy;
 	using DataEnvironment::EnvironmentName;
@@ -164,13 +222,13 @@ namespace HVACMultiSpeedHeatPump {
 	Real64 SupHeaterLoad( 0.0 ); // load to be met by supplemental heater [W]
 	Real64 SaveLoadResidual( 0.0 ); // Saved load residual used to check convergence
 	Real64 SaveCompressorPLR( 0.0 ); // holds compressor PLR from active DX coil
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< MSHeatPumpData > MSHeatPump;
-	FArray1D< MSHeatPumpReportData > MSHeatPumpReport;
+	Array1D< MSHeatPumpData > MSHeatPump;
+	Array1D< MSHeatPumpReportData > MSHeatPumpReport;
 
 	// Functions
 
@@ -228,7 +286,7 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		if ( CompIndex == 0 ) {
-			MSHeatPumpNum = FindItemInList( CompName, MSHeatPump.Name(), NumMSHeatPumps );
+			MSHeatPumpNum = FindItemInList( CompName, MSHeatPump );
 			if ( MSHeatPumpNum == 0 ) {
 				ShowFatalError( "MultiSpeed Heat Pump is not found=" + CompName );
 			}
@@ -522,10 +580,10 @@ namespace HVACMultiSpeedHeatPump {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using FluidProperties::GetSatDensityRefrig;
 		using ZoneTempPredictorCorrector::NumStageCtrZone;
 		using DataZoneControls::StageControlledZone;
+		using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
 
 		// Locals
 		// PARAMETERS
@@ -559,13 +617,12 @@ namespace HVACMultiSpeedHeatPump {
 		int SuppHeatCoilInletNode; // Supplemental heating coil inlet node number
 		int SuppHeatCoilOutletNode; // Supplemental heating coil outlet node number
 		bool LocalError; // Local error flag
-		int SpeedInput; // Status of number of speed input
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -617,7 +674,7 @@ namespace HVACMultiSpeedHeatPump {
 			GetObjectItem( CurrentModuleObject, MSHPNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), MSHeatPump.Name(), MSHPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), MSHeatPump, MSHPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -642,7 +699,7 @@ namespace HVACMultiSpeedHeatPump {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
 			//Get the Controlling Zone or Location of the engine driven heat pump Thermostat
-			MSHeatPump( MSHPNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone.Name(), NumOfZones );
+			MSHeatPump( MSHPNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone );
 			MSHeatPump( MSHPNum ).ControlZoneName = Alphas( 5 );
 			if ( MSHeatPump( MSHPNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\" " + cAlphaFields( 5 ) + " not found: " + MSHeatPump( MSHPNum ).ControlZoneName );
@@ -1207,18 +1264,22 @@ namespace HVACMultiSpeedHeatPump {
 			MSHeatPump( MSHPNum ).DesignHeatRecFlowRate = Numbers( 6 );
 			if ( MSHeatPump( MSHPNum ).DesignHeatRecFlowRate > 0.0 ) {
 				MSHeatPump( MSHPNum ).HeatRecActive = true;
-				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( InitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
-				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, "MSHP Heat receovery", Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( CWInitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
+				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecInletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 16 ) + '.' );
 					ErrorsFound = true;
 				}
-				MSHeatPump( MSHPNum ).HeatRecOutletNodeNum = GetOnlySingleNode( Alphas( 17 ), ErrorsFound, "MSHP Heat receovery", Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+				MSHeatPump( MSHPNum ).HeatRecOutletNodeNum = GetOnlySingleNode( Alphas( 17 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecOutletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 17 ) + '.' );
 					ErrorsFound = true;
 				}
 				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 16 ), Alphas( 17 ), "MSHP Heat receovery Nodes" );
+				SetMSHPDXCoilHeatRecoveryFlag( MSHeatPump( MSHPNum ).DXCoolCoilIndex );
+				if ( MSHeatPump( MSHPNum ).DXHeatCoilIndex > 0 ) {
+					SetMSHPDXCoilHeatRecoveryFlag( MSHeatPump( MSHPNum ).DXHeatCoilIndex );
+				}
 			} else {
 				MSHeatPump( MSHPNum ).HeatRecActive = false;
 				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = 0.0;
@@ -1511,13 +1572,10 @@ namespace HVACMultiSpeedHeatPump {
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataSizing::AutoSize;
-		using DataEnvironment::StdBaroPress;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
-		using DataBranchNodeConnections::NodeConnections;
-		using DataBranchNodeConnections::NumOfNodeConnections;
 		using InputProcessor::SameString;
 		using DataAirLoop::AirLoopControlInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -1551,16 +1609,14 @@ namespace HVACMultiSpeedHeatPump {
 		int InNode; // Inlet node number in MSHP loop
 		int OutNode; // Outlet node number in MSHP loop
 		int ZoneInNode; // Zone inlet node number in the controlled zone for MSHP
-		int HeatRecInNode; // Inlet node number of heat recovery
-		int HeatRecOutNode; // Outlet node number of heat recovery
 		Real64 RhoAir; // Air density at InNode
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // Used for sizing MSHP inputs one time
-		static FArray1D_bool MyCheckFlag; // Used to obtain the zone inlet node number in the controlled zone
-		static FArray1D_bool MyFlowFracFlag; // Used for calculatig flow fraction once
-		static FArray1D_bool MyPlantScantFlag; // used for finding on heat recovery plant loop
-		static FArray1D_bool MyStagedFlag; // used for finding on staged thermostat
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // Used for sizing MSHP inputs one time
+		static Array1D_bool MyCheckFlag; // Used to obtain the zone inlet node number in the controlled zone
+		static Array1D_bool MyFlowFracFlag; // Used for calculatig flow fraction once
+		static Array1D_bool MyPlantScantFlag; // used for finding on heat recovery plant loop
+		static Array1D_bool MyStagedFlag; // used for finding on staged thermostat
 
 		Real64 QSensUnitOut; // Output of MSHP system with coils off
 		Real64 PartLoadFrac; // Part-load ratio
@@ -1642,7 +1698,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 
 				if ( MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -1676,7 +1732,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 
 				if ( MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -1760,7 +1816,7 @@ namespace HVACMultiSpeedHeatPump {
 		NumAirLoopZones = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled + AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 		if ( allocated( AirToZoneNodeInfo ) && MyFlowFracFlag( MSHeatPumpNum ) ) {
 			FlowFracFlagReady = true;
-			ZonesLoop: for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex ) {
+			for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex ) {
 				// zone inlet nodes for cooling
 				if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled > 0 ) {
 					if ( AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex ) == -999 ) {
@@ -1775,9 +1831,7 @@ namespace HVACMultiSpeedHeatPump {
 						FlowFracFlagReady = false;
 					}
 				}
-				ZonesLoop_loop: ;
 			}
-			ZonesLoop_exit: ;
 		}
 		if ( allocated( AirToZoneNodeInfo ) && FlowFracFlagReady ) {
 			SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
@@ -1821,7 +1875,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( ( MSHeatPump( MSHeatPumpNum ).HeatRecActive ) && ( ! MyPlantScantFlag( MSHeatPumpNum ) ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60.0, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 				MSHeatPump( MSHeatPumpNum ).DesignHeatRecMassFlowRate = MSHeatPump( MSHeatPumpNum ).DesignHeatRecFlowRate * rho;
 
@@ -1834,7 +1888,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).CoilControlNode, MSHeatPump( MSHeatPumpNum ).CoilOutletNode, MSHeatPump( MSHeatPumpNum ).LoopNum, MSHeatPump( MSHeatPumpNum ).LoopSide, MSHeatPump( MSHeatPumpNum ).BranchNum, MSHeatPump( MSHeatPumpNum ).CompNum );
@@ -1860,7 +1914,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).SuppCoilControlNode, MSHeatPump( MSHeatPumpNum ).SuppCoilOutletNode, MSHeatPump( MSHeatPumpNum ).SuppLoopNum, MSHeatPump( MSHeatPumpNum ).SuppLoopSide, MSHeatPump( MSHeatPumpNum ).SuppBranchNum, MSHeatPump( MSHeatPumpNum ).SuppCompNum );
@@ -2109,14 +2163,15 @@ namespace HVACMultiSpeedHeatPump {
 
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
+		auto & e = MSHeatPump( MSHeatPumpNum ); {
+			e.TotHeatEnergyRate = 0.0;
+			e.SensHeatEnergyRate = 0.0;
+			e.LatHeatEnergyRate = 0.0;
+			e.TotCoolEnergyRate = 0.0;
+			e.SensCoolEnergyRate = 0.0;
+			e.LatCoolEnergyRate = 0.0;
+		}
 		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
-		MSHeatPump.TotHeatEnergyRate() = 0.0;
-		MSHeatPump.SensHeatEnergyRate() = 0.0;
-		MSHeatPump.LatHeatEnergyRate() = 0.0;
-		MSHeatPump.TotCoolEnergyRate() = 0.0;
-		MSHeatPump.SensCoolEnergyRate() = 0.0;
-		MSHeatPump.LatCoolEnergyRate() = 0.0;
-
 		//!!LKL Discrepancy with < 0
 		if ( GetCurrentScheduleValue( MSHeatPump( MSHeatPumpNum ).AvaiSchedPtr ) == 0.0 ) {
 			Node( OutNode ).Temp = Node( InNode ).Temp;
@@ -2230,9 +2285,6 @@ namespace HVACMultiSpeedHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int ControlledZoneNum( 0 ); // Index of Controllerd zone number
-		static int ThisCtrlZoneNum( 0 ); // Controllerd zone number
-		static Real64 ControlZoneVolFlow( 0.0 ); // Controlled zone volumetric flow
 		int NumOfSpeedCooling; // Number of speeds for cooling
 		int NumOfSpeedHeating; // Number of speeds for heating
 		int i; // Index to speed
@@ -2390,7 +2442,6 @@ namespace HVACMultiSpeedHeatPump {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::CurrentTime;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
 
@@ -2399,7 +2450,6 @@ namespace HVACMultiSpeedHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2414,7 +2464,7 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 NoCompOutput; // output when no active compressor [W]
 		Real64 ErrorToler; // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 9 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 9 ); // Parameters passed to RegulaFalsi
 		Real64 CpAir; // air specific heat
 		Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
 		Real64 QCoilActual; // coil load actually delivered returned to calling component
@@ -2724,6 +2774,8 @@ namespace HVACMultiSpeedHeatPump {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::DXCoilPartLoadRatio;
+		using DXCoils::DXCoil;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2749,14 +2801,27 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 SavePartloadRatio;
 		Real64 SaveSpeedRatio;
 		Real64 QCoilActual; // coil load actually delivered returned to calling component
-		Real64 MdotSupp; // suppleental coil hot water or steam flow rate
 		Real64 MinWaterFlow; // minimum water flow rate
 		Real64 ErrorToler; // supplemental heating coil convergence tollerance
 
 		// FLOW
 		OutletNode = MSHeatPump( MSHeatPumpNum ).AirOutletNodeNum;
 		InletNode = MSHeatPump( MSHeatPumpNum ).AirInletNodeNum;
-		OutsideDryBulbTemp = OutDryBulbTemp;
+		if ( MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0 ) {
+			if ( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).IsSecondaryDXCoilInZone ) {
+				OutsideDryBulbTemp = ZT( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).SecZonePtr );
+			} else {
+				OutsideDryBulbTemp = OutDryBulbTemp;
+			}
+		} else if ( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex > 0) {
+			if ( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).IsSecondaryDXCoilInZone ) {
+				OutsideDryBulbTemp = ZT( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).SecZonePtr );
+			} else {
+				OutsideDryBulbTemp = OutDryBulbTemp;
+			}
+		} else {
+			OutsideDryBulbTemp = OutDryBulbTemp;
+		}
 		FanOutletNode = MSHeatPump( MSHeatPumpNum ).FanOutletNode;
 		FanInletNode = MSHeatPump( MSHeatPumpNum ).FanInletNode;
 
@@ -2901,7 +2966,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2981,7 +3046,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3198,7 +3263,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
-		Real64 HeatRecInletEnth; // Heat reclaim water inlet enthalpy [J/kg]
 
 		// Begin routine
 		HeatRecInNode = MSHeatPump( MSHeatPumpNum ).HeatRecInletNodeNum;
@@ -3206,7 +3270,6 @@ namespace HVACMultiSpeedHeatPump {
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
-		HeatRecInletEnth = Node( HeatRecInNode ).Enthalpy;
 
 		// Set heat recovery mass flow rates
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
@@ -3218,9 +3281,13 @@ namespace HVACMultiSpeedHeatPump {
 			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
-			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) HeatRecOutletTemp = MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp;
+			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) {
+				HeatRecOutletTemp = max( HeatRecInletTemp, MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp );
+				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
+			}
 		} else {
 			HeatRecOutletTemp = HeatRecInletTemp;
+			QHeatRec = 0.0;
 		}
 
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );
@@ -3418,13 +3485,12 @@ namespace HVACMultiSpeedHeatPump {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 QCoilRequired; // heat addition required from an electric, gas, steam, or hot water coil
 		Real64 QCoilActual; // actual heating load met
 		Real64 mdot; // heating coil steam or hot water mass flow rate
 		Real64 MinWaterFlow; // coil minimum hot water mass flow rate, kg/s
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		Array1D< Real64 > Par( 3 );
 		int SolFlag;
 
 		static std::string HeatCoilName;
@@ -3558,7 +3624,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 
@@ -3621,29 +3687,6 @@ namespace HVACMultiSpeedHeatPump {
 		}
 		return Residuum;
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACMultiSpeedHeatPump
 

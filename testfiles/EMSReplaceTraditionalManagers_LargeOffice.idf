@@ -68,7 +68,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,8.3;
+  Version,8.6;
 
   Timestep,4;
 
@@ -8074,7 +8074,7 @@
 
   EnergyManagementSystem:Actuator,
     VAV_5_SAT_setpoint,      !- Name
-    VAV_1_CoolC-VAV_1_HeatCNode,  !- Actuated Component Unique Name
+    VAV_5 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
@@ -8841,7 +8841,7 @@
 
   EnergyManagementSystem:Actuator,
     VAV_2_SAT_setpoint,      !- Name
-    VAV_2_CoolC-VAV_2_HeatCNode,  !- Actuated Component Unique Name
+    VAV_2 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
@@ -9236,7 +9236,7 @@
 
   EnergyManagementSystem:Actuator,
     VAV_3_SAT_setpoint,      !- Name
-    VAV_3_CoolC-VAV_3_HeatCNode,  !- Actuated Component Unique Name
+    VAV_3 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 

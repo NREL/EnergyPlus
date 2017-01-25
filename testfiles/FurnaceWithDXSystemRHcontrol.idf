@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1481,9 +1481,7 @@
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
     Outdoor Air 1 Avail;     !- Availability Manager 1 Name
 
-!-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:SINGLEZONE:REHEAT ===========
-
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     Supply Air Temp Manager 1,  !- Name
     Temperature,             !- Control Variable
     14.0,                    !- Minimum Supply Air Temperature {C}

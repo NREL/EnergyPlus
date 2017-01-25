@@ -1,8 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -72,7 +129,7 @@ namespace HVACInterfaceManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
 	// Object Data
-	FArray1D< CommonPipeData > PlantCommonPipe;
+	Array1D< CommonPipeData > PlantCommonPipe;
 
 	// MODULE SUBROUTINES:
 
@@ -122,14 +179,14 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
+		static Array1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
 		// FLOW:
 
 		//Calculate the approximate energy difference across interface for comparison
 		DeltaEnergy = HVACCpApprox * ( ( Node( OutletNode ).MassFlowRate * Node( OutletNode ).Temp ) - ( Node( InletNode ).MassFlowRate * Node( InletNode ).Temp ) );
 
-		if( CalledFrom == CalledFromAirSystemDemandSide ) {
+		if ( CalledFrom == CalledFromAirSystemDemandSide ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
@@ -186,7 +243,7 @@ namespace HVACInterfaceManager {
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		} else if( CalledFrom == CalledFromAirSystemSupplySideDeck1 ) {
+		} else if ( CalledFrom == CalledFromAirSystemSupplySideDeck1 ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 2 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 2 ) = false;
@@ -243,7 +300,7 @@ namespace HVACInterfaceManager {
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		} else if( CalledFrom == CalledFromAirSystemSupplySideDeck2 ) {
+		} else if ( CalledFrom == CalledFromAirSystemSupplySideDeck2 ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 3 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 3 ) = false;
@@ -326,13 +383,11 @@ namespace HVACInterfaceManager {
 
 	// In-Place Right Shift by 1 of Array Elements
 	void
-	rshift1( FArray1< Real64 > & a )
+	rshift1( Array1< Real64 > & a )
 	{
 		assert( a.size_bounded() );
-		if ( a.dimensions_initialized() ) {
-			for ( int i = a.u(), e = a.l(); i > e; --i ) {
-				a( i ) = a( i - 1 );
-			}
+		for ( int i = a.u(), e = a.l(); i > e; --i ) {
+			a( i ) = a( i - 1 );
 		}
 	}
 
@@ -376,7 +431,6 @@ namespace HVACInterfaceManager {
 		using DataLoopNode::Node;
 		using namespace DataConvergParams;
 		using DataPlant::PlantLoop;
-		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
 		using FluidProperties::GetSpecificHeatGlycol;
 
@@ -393,14 +447,12 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 DeltaEnergy;
 		Real64 OldTankOutletTemp;
 		Real64 OldOtherLoopSideInletMdot;
 		Real64 TankOutletTemp;
 		Real64 Cp;
 		Real64 MixedOutletTemp;
 		int ThisLoopSideInletNode;
-		int ZoneInSysIndex;
 
 		// FLOW:
 
@@ -649,6 +701,20 @@ namespace HVACInterfaceManager {
 		//update last tank outlet temperature
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).TempInterfaceTankOutlet = TankFinalTemp;
 
+		//update heat trasport and heat storage rates
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT = ( TankInletTemp - TankFinalTemp ) * Cp * MassFlowRate;
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt = ( ThisTankMass * Cp * ( TankFinalTemp - LastTankOutletTemp ))/ TimeStepSeconds;
+		
+		//Determine excessive storage
+		if (PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT < PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt) {
+			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
+			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTime += TimeStepSys;
+		}
+		else {
+			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTimeReport = 0;
+		}
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_TotalTime += TimeStepSys;
+
 		// update report variable
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_TankTemp = TankAverageTemp;
 
@@ -870,7 +936,7 @@ namespace HVACInterfaceManager {
 		static int NodeNumPriIn( 0 );
 		static int NodeNumSecIn( 0 );
 		int CPFlowDir; // flow direction in single common pipe
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool OneTimeData( true );
 		Real64 CommonPipeTemp;
 
@@ -996,7 +1062,6 @@ namespace HVACInterfaceManager {
 		using DataPlant::DemandSide;
 		using DataPlant::TotNumLoops;
 		using DataPlant::DeltaTempTol;
-		using DataPlant::PlantReport;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataLoopNode::Node;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -1009,14 +1074,6 @@ namespace HVACInterfaceManager {
 		int const DemandLedSecondaryInletUpdate( 102 );
 		int const SupplyLedPrimaryInletUpdate( 103 );
 		int const SupplyLedSecondaryInletUpdate( 104 );
-		int const BothLedPrimaryInletUpdate( 105 );
-		int const BothLedSecondaryInletUpdate( 106 );
-
-		int const NeedsMoreFlow( 201 );
-		int const NeedsLessFlow( 202 );
-		int const NeedsSameFlow( 203 );
-
-		Real64 const MdotPerturbFactor( 0.02 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1025,7 +1082,7 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool OneTimeData( true );
 		int CurCallingCase; // local temporary
 		static Real64 MdotPri( 0.0 ); // flow rate on primary side kg/s
@@ -1339,29 +1396,6 @@ namespace HVACInterfaceManager {
 		CommonPipeSetupFinished = true;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACInterfaceManager
 

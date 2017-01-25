@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -40,8 +40,8 @@ TEST( GioTest, BasicLF )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
@@ -75,8 +75,8 @@ TEST( GioTest, BasicCRLF )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
@@ -110,8 +110,8 @@ TEST( GioTest, BasicEOF )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
@@ -148,8 +148,8 @@ TEST( GioTest, InquireByName )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );

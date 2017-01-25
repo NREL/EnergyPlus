@@ -1,8 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -51,48 +109,30 @@ namespace MicroturbineElectricGenerator {
 	//  MT Generator models are based on polynomial curve fits of generator
 	//  performance data.
 
-	// REFERENCES: na
-
-	// OTHER NOTES: na
-
-	// USE STATEMENTS:
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobalConstants::iGeneratorMicroturbine;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumMTGenerators( 0 ); // number of MT Generators specified in input
 	bool GetMTInput( true ); // then TRUE, calls subroutine to read input file.
 
-	FArray1D_bool CheckEquipName;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
+	Array1D_bool CheckEquipName;
 
 	// Object Data
-	FArray1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
-	FArray1D< ReportVars > MTGeneratorReport;
-
-	// MODULE SUBROUTINES:
-	// Beginning of MT Generator Module Driver Subroutine
-	//*************************************************************************
-
-	// Functions
+	Array1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
+	Array1D< ReportVars > MTGeneratorReport;
 
 	void
 	SimMTGenerator(
-		int const GeneratorType, // Type of generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // Type of generator !unused1208
 		std::string const & GeneratorName, // User-specified name of generator
 		int & GeneratorIndex, // Index to microturbine generator
 		bool const RunFlag, // Simulate generator when TRUE
@@ -144,7 +184,7 @@ namespace MicroturbineElectricGenerator {
 
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MTGenerator.Name(), NumMTGenerators );
+			GenNum = FindItemInList( GeneratorName, MTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -169,17 +209,17 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	SimMTPlantHeatRecovery(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
-		int const CompTypeNum, // unused1208
+		int const EP_UNUSED( CompTypeNum ), // unused1208
 		int & CompNum,
-		bool const RunFlag, // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
+		Real64 & EP_UNUSED( MyLoad ), // unused1208
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation !unused1208
 	)
 	{
 
@@ -223,7 +263,7 @@ namespace MicroturbineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MTGenerator.Name(), NumMTGenerators );
+			CompNum = FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
 				return;
@@ -308,9 +348,9 @@ namespace MicroturbineElectricGenerator {
 		static Real64 Var1Min( 0.0 ); // Minimum value for variable 1, value obtained from a curve object
 		static Real64 Var1Max( 0.0 ); // Maximum value for variable 1, value obtained from a curve object
 
-		FArray1D< Real64 > NumArray( 19 ); // Numeric data array
+		Array1D< Real64 > NumArray( 19 ); // Numeric data array
 
-		FArray1D_string AlphArray( 20 ); // Character string data array
+		Array1D_string AlphArray( 20 ); // Character string data array
 		std::string FuelType; // Type of fuel used for generator
 
 		// FLOW:
@@ -332,7 +372,7 @@ namespace MicroturbineElectricGenerator {
 			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), MTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1122,13 +1162,11 @@ namespace MicroturbineElectricGenerator {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Num; // Loop index over all generators
 		int HeatRecInletNode; // Inlet node number in heat recovery loop
 		int HeatRecOutletNode; // Outlet node number in heat recovery loop
-		static bool InitGeneratorOnce( true ); // Flag for 1 time initialization
-		static FArray1D_bool MyEnvrnFlag; // Flag for init once at start of environment
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		static bool MyOneTimeFlag( true ); // Initialization flag
 		Real64 rho; // local temporary fluid density
 		Real64 DesiredMassFlowRate;
@@ -1162,7 +1200,7 @@ namespace MicroturbineElectricGenerator {
 			HeatRecOutletNode = MTGenerator( GenNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			MTGenerator( GenNum ).DesignHeatRecMassFlowRate = rho * MTGenerator( GenNum ).RefHeatRecVolFlowRate;
 			MTGenerator( GenNum ).HeatRecMaxMassFlowRate = rho * MTGenerator( GenNum ).HeatRecMaxVolFlowRate;
@@ -1244,7 +1282,7 @@ namespace MicroturbineElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when generator is being asked to operate
 		Real64 const MyLoad, // Generator demand (W)
-		bool const FirstHVACIteration // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // unused1208
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1262,7 +1300,6 @@ namespace MicroturbineElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
@@ -1929,7 +1966,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	GetMTGeneratorResults(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -1978,7 +2015,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	GetMTGeneratorExhaustNode(
-		int const CompType,
+		int const EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & ExhaustOutletNodeNum
 	)
@@ -2024,7 +2061,7 @@ namespace MicroturbineElectricGenerator {
 
 		ExhaustOutletNodeNum = 0;
 
-		CompNum = FindItemInList( CompName, MTGenerator.Name(), NumMTGenerators );
+		CompNum = FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
 			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );

@@ -1,5 +1,63 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -151,6 +209,7 @@ namespace OutputReportPredefined {
 	int pdchOpUfactFilm;
 	int pdchOpUfactNoFilm;
 	int pdchOpGrArea;
+	int pdchOpNetArea;
 	int pdchOpAzimuth;
 	int pdchOpTilt;
 	int pdchOpDir;
@@ -257,6 +316,8 @@ namespace OutputReportPredefined {
 	int pdchZnClPkIndHum;
 	int pdchZnClPkOATemp;
 	int pdchZnClPkOAHum;
+	int pdchZnClPkOAMinFlow;
+	int pdchZnClPkDOASHeatGain;
 	int pdstZoneHtSize;
 	int pdchZnHtCalcDesLd;
 	int pdchZnHtUserDesLd;
@@ -270,6 +331,8 @@ namespace OutputReportPredefined {
 	int pdchZnHtPkIndHum;
 	int pdchZnHtPkOATemp;
 	int pdchZnHtPkOAHum;
+	int pdchZnHtPkOAMinFlow;
+	int pdchZnHtPkDOASHeatGain;
 	int pdstSystemSize;
 	int pdchSysSizCalcClAir;
 	int pdchSysSizUserClAir;
@@ -412,6 +475,8 @@ namespace OutputReportPredefined {
 	int pdstSHGSannual;
 	int pdchSHGSAnHvacHt;
 	int pdchSHGSAnHvacCl;
+	int pdchSHGSAnHvacATUHt;
+	int pdchSHGSAnHvacATUCl;
 	int pdchSHGSAnSurfHt;
 	int pdchSHGSAnSurfCl;
 	int pdchSHGSAnPeoplAdd;
@@ -431,6 +496,8 @@ namespace OutputReportPredefined {
 	int pdchSHGSClTimePeak;
 	int pdchSHGSClHvacHt;
 	int pdchSHGSClHvacCl;
+	int pdchSHGSClHvacATUHt;
+	int pdchSHGSClHvacATUCl;
 	int pdchSHGSClSurfHt;
 	int pdchSHGSClSurfCl;
 	int pdchSHGSClPeoplAdd;
@@ -450,6 +517,8 @@ namespace OutputReportPredefined {
 	int pdchSHGSHtTimePeak;
 	int pdchSHGSHtHvacHt;
 	int pdchSHGSHtHvacCl;
+	int pdchSHGSHtHvacATUHt;
+	int pdchSHGSHtHvacATUCl;
 	int pdchSHGSHtSurfHt;
 	int pdchSHGSHtSurfCl;
 	int pdchSHGSHtPeoplAdd;
@@ -651,14 +720,559 @@ namespace OutputReportPredefined {
 	Real64 TotalTimeNotSimpleASH55EitherForABUPS( 0.0 );
 
 	// Object Data
-	FArray1D< reportNameType > reportName;
-	FArray1D< SubTableType > subTable;
-	FArray1D< ColumnTagType > columnTag;
-	FArray1D< TableEntryType > tableEntry;
-	FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	FArray1D< ShadowRelateType > ShadowRelate;
+	Array1D< reportNameType > reportName;
+	Array1D< SubTableType > subTable;
+	Array1D< ColumnTagType > columnTag;
+	Array1D< TableEntryType > tableEntry;
+	Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
+	void
+	clear_state()
+	{
+		pdrClim = 0;
+		pdstDesDay = 0;
+		pdchDDmaxDB = 0;
+		pdchDDrange = 0;
+		pdchDDhumid = 0;
+		pdchDDhumTyp = 0;
+		pdchDDwindSp = 0;
+		pdchDDwindDr = 0;
+		pdstWthr = 0;
+		pdchWthrVal = 0;
+		pdrEquip = 0;
+		pdstMech = 0;
+		pdchMechType = 0;
+		pdchMechNomCap = 0;
+		pdchMechNomEff = 0;
+		pdchMechIPLVSI = 0;
+		pdchMechIPLVIP = 0;
+		pdstFan = 0;
+		pdchFanType = 0;
+		pdchFanTotEff = 0;
+		pdchFanDeltaP = 0;
+		pdchFanVolFlow = 0;
+		pdchFanMotorIn = 0;
+		pdchFanEndUse = 0;
+		pdchFanPwr = 0;
+		pdchFanPwrPerFlow = 0;
+		pdstPump = 0;
+		pdchPumpType = 0;
+		pdchPumpControl = 0;
+		pdchPumpHead = 0;
+		pdchPumpFlow = 0;
+		pdchPumpPower = 0;
+		pdchPumpPwrPerFlow = 0;
+		pdchMotEff = 0;
+		pdstCoolCoil = 0;
+		pdchCoolCoilType = 0;
+		pdchCoolCoilDesCap = 0;
+		pdchCoolCoilTotCap = 0;
+		pdchCoolCoilSensCap = 0;
+		pdchCoolCoilLatCap = 0;
+		pdchCoolCoilSHR = 0;
+		pdchCoolCoilNomEff = 0;
+		pdchCoolCoilUATotal = 0;
+		pdchCoolCoilArea = 0;
+		pdstDXCoolCoil = 0;
+		pdchDXCoolCoilType = 0; // DX cooling coil type
+		pdchDXCoolCoilNetCapSI = 0; // Standard Rated (Net) Cooling Capacity [W]
+		pdchDXCoolCoilCOP = 0; // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
+		pdchDXCoolCoilSEERIP = 0; // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+		pdchDXCoolCoilEERIP = 0; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
+		pdchDXCoolCoilIEERIP = 0; // IEER value in IP unit at AHRI std. 340/360 conditions
+		pdstDXCoolCoil2 = 0;
+		pdchDXCoolCoilNetCapSIA = 0; // Standard Rated (Net) Cooling Capacity [W], Test A
+		pdchDXCoolCoilElecPowerA = 0; // Standard Rated Electric Power [W], Test A
+		pdchDXCoolCoilNetCapSIB = 0; // Standard Rated (Net) Cooling Capacity [W], Test B
+		pdchDXCoolCoilElecPowerB = 0; // Standard Rated Electric Power [W], Test B
+		pdchDXCoolCoilNetCapSIC = 0; // Standard Rated (Net) Cooling Capacity [W], Test C
+		pdchDXCoolCoilElecPowerC = 0; // Standard Rated Electric Power [W], Test C
+		pdchDXCoolCoilNetCapSID = 0; // Standard Rated (Net) Cooling Capacity [W], Test D
+		pdchDXCoolCoilElecPowerD = 0; // Standard Rated Electric Power [W], Test D
+		pdstVAVDXCoolCoil = 0; // details for Packaged VAV rating under AHRI 340/360
+		pdchVAVDXCoolCoilType = 0;
+		pdchVAVDXFanName = 0;
+		pdchVAVDXCoolCoilNetCapSI = 0;
+		pdchVAVDXCoolCoilCOP = 0;
+		pdchVAVDXCoolCoilIEERIP = 0;
+		pdchVAVDXCoolCoilEERIP = 0;
+		pdchVAVDXCoolCoilMdotA = 0;
+		pdchVAVDXCoolCoilCOP_B = 0;
+		pdchVAVDXCoolCoilEER_B_IP = 0;
+		pdchVAVDXCoolCoilMdotB = 0;
+		pdchVAVDXCoolCoilCOP_C = 0;
+		pdchVAVDXCoolCoilEER_C_IP = 0;
+		pdchVAVDXCoolCoilMdotC = 0;
+		pdchVAVDXCoolCoilCOP_D = 0;
+		pdchVAVDXCoolCoilEER_D_IP = 0;
+		pdchVAVDXCoolCoilMdotD = 0;
+		pdstDXHeatCoil = 0;
+		pdchDXHeatCoilType = 0; // DX Heating coil type
+		pdchDXHeatCoilHighCap = 0;
+		pdchDXHeatCoilLowCap = 0;
+		pdchDXHeatCoilHSPFSI = 0; // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
+		pdchDXHeatCoilHSPFIP = 0; // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
+		pdchDXHeatCoilRegionNum = 0; // Region number for which HSPF is calculated
+		pdstHeatCoil = 0;
+		pdchHeatCoilType = 0;
+		pdchHeatCoilDesCap = 0;
+		pdchHeatCoilNomCap = 0;
+		pdchHeatCoilNomEff = 0;
+		pdstSWH = 0;
+		pdchSWHType = 0;
+		pdchSWHVol = 0;
+		pdchSWHHeatIn = 0;
+		pdchSWHThEff = 0;
+		pdchSWHRecEff = 0;
+		pdchSWHEnFac = 0;
+		pdrEnvelope = 0;
+		pdstOpaque = 0;
+		pdchOpCons = 0;
+		pdchOpRefl = 0;
+		pdchOpUfactFilm = 0;
+		pdchOpUfactNoFilm = 0;
+		pdchOpGrArea = 0;
+		pdchOpNetArea = 0;
+		pdchOpAzimuth = 0;
+		pdchOpTilt = 0;
+		pdchOpDir = 0;
+		pdstFen = 0;
+		pdchFenCons = 0;
+		pdchFenAreaOf1 = 0;
+		pdchFenGlassAreaOf1 = 0;
+		pdchFenFrameAreaOf1 = 0;
+		pdchFenDividerAreaOf1 = 0;
+		pdchFenArea = 0;
+		pdchFenUfact = 0;
+		pdchFenSHGC = 0;
+		pdchFenVisTr = 0;
+		pdchFenFrameConductance = 0;
+		pdchFenDividerConductance = 0;
+		pdchFenSwitchable = 0;
+		pdchFenParent = 0;
+		pdchFenAzimuth = 0;
+		pdchFenTilt = 0;
+		pdchFenDir = 0;
+		pdstDoor = 0;
+		pdchDrCons = 0;
+		pdchDrUfactFilm = 0;
+		pdchDrUfactNoFilm = 0;
+		pdchDrGrArea = 0;
+		pdchDrParent = 0;
+		pdstIntFen = 0;
+		pdchIntFenCons = 0;
+		pdchIntFenAreaOf1 = 0;
+		pdchIntFenArea = 0;
+		pdchIntFenUfact = 0;
+		pdchIntFenSHGC = 0;
+		pdchIntFenVisTr = 0;
+		pdchIntFenParent = 0;
+		pdrShading = 0;
+		pdstSunlitFrac = 0;
+		pdchSlfMar21_9 = 0;
+		pdchSlfMar21_12 = 0;
+		pdchSlfMar21_15 = 0;
+		pdchSlfJun21_9 = 0;
+		pdchSlfJun21_12 = 0;
+		pdchSlfJun21_15 = 0;
+		pdchSlfDec21_9 = 0;
+		pdchSlfDec21_12 = 0;
+		pdchSlfDec21_15 = 0;
+		pdstWindowControl = 0;
+		pdchWscName = 0;
+		pdchWscShading = 0;
+		pdchWscShadCons = 0;
+		pdchWscControl = 0;
+		pdchWscGlare = 0;
+		pdrLighting = 0;
+		pdstInLite = 0;
+		pdchInLtZone = 0;
+		pdchInLtDens = 0;
+		pdchInLtArea = 0;
+		pdchInLtPower = 0;
+		pdchInLtEndUse = 0;
+		pdchInLtSchd = 0;
+		pdchInLtAvgHrSchd = 0;
+		pdchInLtAvgHrOper = 0;
+		pdchInLtFullLoadHrs = 0;
+		pdchInLtRetAir = 0;
+		pdchInLtCond = 0;
+		pdchInLtConsump = 0;
+		pdstExtLite = 0;
+		pdchExLtPower = 0;
+		pdchExLtClock = 0;
+		pdchExLtSchd = 0;
+		pdchExLtAvgHrSchd = 0;
+		pdchExLtAvgHrOper = 0;
+		pdchExLtFullLoadHrs = 0;
+		pdchExLtConsump = 0;
+		pdstDaylight = 0;
+		pdchDyLtZone = 0;
+		pdchDyLtKind = 0;
+		pdchDyLtCtrl = 0;
+		pdchDyLtFrac = 0;
+		pdchDyLtWInst = 0;
+		pdchDyLtWCtrl = 0;
+		pdrSizing = 0;
+		pdstZoneClSize = 0;
+		pdchZnClCalcDesLd = 0;
+		pdchZnClUserDesLd = 0;
+		pdchZnClUserDesLdPerArea = 0;
+		pdchZnClCalcDesAirFlow = 0;
+		pdchZnClUserDesAirFlow = 0;
+		pdchZnClDesDay = 0;
+		pdchZnClPkTime = 0;
+		pdchZnClPkTstatTemp = 0;
+		pdchZnClPkIndTemp = 0;
+		pdchZnClPkIndHum = 0;
+		pdchZnClPkOATemp = 0;
+		pdchZnClPkOAHum = 0;
+		pdstZoneHtSize = 0;
+		pdchZnHtCalcDesLd = 0;
+		pdchZnHtUserDesLd = 0;
+		pdchZnHtUserDesLdPerArea = 0;
+		pdchZnHtCalcDesAirFlow = 0;
+		pdchZnHtUserDesAirFlow = 0;
+		pdchZnHtDesDay = 0;
+		pdchZnHtPkTime = 0;
+		pdchZnHtPkTstatTemp = 0;
+		pdchZnHtPkIndTemp = 0;
+		pdchZnHtPkIndHum = 0;
+		pdchZnHtPkOATemp = 0;
+		pdchZnHtPkOAHum = 0;
+		pdstSystemSize = 0;
+		pdchSysSizCalcClAir = 0;
+		pdchSysSizUserClAir = 0;
+		pdchSysSizCalcHtAir = 0;
+		pdchSysSizUserHtAir = 0;
+		pdstPlantSize = 0;
+		pdchPlantSizCalcVdot = 0;
+		pdchPlantSizMeasVdot = 0;
+		pdchPlantSizPrevVdot = 0;
+		pdchPlantSizCoincYesNo = 0;
+		pdchPlantSizDesDay = 0;
+		pdchPlantSizPkTimeHour = 0;
+		pdchPlantSizPkTimeDayOfSim = 0;
+		pdchPlantSizPkTimeMin = 0;
+		pdrSystem = 0;
+		pdstEconomizer = 0;
+		pdchEcoKind = 0;
+		pdchEcoMinOA = 0;
+		pdchEcoMaxOA = 0;
+		pdchEcoRetTemp = 0;
+		pdchEcoRetEnth = 0;
+		pdchEcoOATempLim = 0;
+		pdchEcoOAEnthLim = 0;
+		pdstDemCntlVent = 0;
+		pdchDCVventMechName = 0;
+		pdchDCVperPerson = 0;
+		pdchDCVperArea = 0;
+		pdchDCVZoneADEffCooling = 0;
+		pdchDCVZoneADEffHeating = 0;
+		pdchDCVZoneADEffSchName = 0;
+		pdstSimpleComfort = 0;
+		pdchSCwinterClothes = 0;
+		pdchSCsummerClothes = 0;
+		pdchSCeitherClothes = 0;
+		pdstUnmetLoads = 0;
+		pdchULnotMetHeat = 0;
+		pdchULnotMetCool = 0;
+		pdchULnotMetHeatOcc = 0;
+		pdchULnotMetCoolOcc = 0;
+		pdrOutsideAir = 0;
+		pdstOAavgOcc = 0;
+		pdchOaoAvgNumOcc1 = 0;
+		pdchOaoNomNumOcc1 = 0;
+		pdchOaoZoneVol1 = 0;
+		pdchOaoAvgMechVent = 0;
+		pdchOaoAvgInfil = 0;
+		pdchOaoAvgAFNInfil = 0;
+		pdchOaoAvgSimpVent = 0;
+		pdchOaoAvgTotVent = 0;
+		pdstOAminOcc = 0;
+		pdchOaoAvgNumOcc2 = 0;
+		pdchOaoNomNumOcc2 = 0;
+		pdchOaoZoneVol2 = 0;
+		pdchOaoMinMechVent = 0;
+		pdchOaoMinInfil = 0;
+		pdchOaoMinAFNInfil = 0;
+		pdchOaoMinSimpVent = 0;
+		pdchOaoMinTotVent = 0;
+		pdrObjCnt = 0;
+		pdstSurfCnt = 0;
+		pdchSurfCntTot = 0;
+		pdchSurfCntExt = 0;
+		pdstHVACcnt = 0;
+		pdchHVACcntVal = 0;
+		pdstFieldCnt = 0;
+		pdchFieldCntVal = 0;
+		pdrEnergyMeters = 0;
+		pdstEMelecvalues = 0;
+		pdchEMelecannual = 0;
+		pdchEMelecminvalue = 0;
+		pdchEMelecminvaluetime = 0;
+		pdchEMelecmaxvalue = 0;
+		pdchEMelecmaxvaluetime = 0;
+		pdstEMgasvalues = 0;
+		pdchEMgasannual = 0;
+		pdchEMgasminvalue = 0;
+		pdchEMgasminvaluetime = 0;
+		pdchEMgasmaxvalue = 0;
+		pdchEMgasmaxvaluetime = 0;
+		pdstEMcoolvalues = 0;
+		pdchEMcoolannual = 0;
+		pdchEMcoolminvalue = 0;
+		pdchEMcoolminvaluetime = 0;
+		pdchEMcoolmaxvalue = 0;
+		pdchEMcoolmaxvaluetime = 0;
+		pdstEMwatervalues = 0;
+		pdchEMwaterannual = 0;
+		pdchEMwaterminvalue = 0;
+		pdchEMwaterminvaluetime = 0;
+		pdchEMwatermaxvalue = 0;
+		pdchEMwatermaxvaluetime = 0;
+		pdstEMotherJvalues = 0;
+		pdchEMotherJannual = 0;
+		pdchEMotherJminvalue = 0;
+		pdchEMotherJminvaluetime = 0;
+		pdchEMotherJmaxvalue = 0;
+		pdchEMotherJmaxvaluetime = 0;
+		pdstEMotherKGvalues = 0;
+		pdchEMotherKGannual = 0;
+		pdchEMotherKGminvalue = 0;
+		pdchEMotherKGminvaluetime = 0;
+		pdchEMotherKGmaxvalue = 0;
+		pdchEMotherKGmaxvaluetime = 0;
+		pdstEMotherM3values = 0;
+		pdchEMotherM3annual = 0;
+		pdchEMotherM3minvalue = 0;
+		pdchEMotherM3minvaluetime = 0;
+		pdchEMotherM3maxvalue = 0;
+		pdchEMotherM3maxvaluetime = 0;
+		pdstEMotherLvalues = 0;
+		pdchEMotherLannual = 0;
+		pdchEMotherLminvalue = 0;
+		pdchEMotherLminvaluetime = 0;
+		pdchEMotherLmaxvalue = 0;
+		pdchEMotherLmaxvaluetime = 0;
+		pdrSensibleGain = 0;
+		pdstSHGSannual = 0;
+		pdchSHGSAnHvacHt = 0;
+		pdchSHGSAnHvacCl = 0;
+		pdchSHGSAnSurfHt = 0;
+		pdchSHGSAnSurfCl = 0;
+		pdchSHGSAnPeoplAdd = 0;
+		pdchSHGSAnLiteAdd = 0;
+		pdchSHGSAnEquipAdd = 0;
+		pdchSHGSAnWindAdd = 0;
+		pdchSHGSAnIzaAdd = 0;
+		pdchSHGSAnInfilAdd = 0;
+		pdchSHGSAnOtherAdd = 0;
+		pdchSHGSAnEquipRem = 0;
+		pdchSHGSAnWindRem = 0;
+		pdchSHGSAnIzaRem = 0;
+		pdchSHGSAnInfilRem = 0;
+		pdchSHGSAnOtherRem = 0;
+		pdstSHGSpkCl = 0;
+		pdchSHGSClTimePeak = 0;
+		pdchSHGSClHvacHt = 0;
+		pdchSHGSClHvacCl = 0;
+		pdchSHGSClSurfHt = 0;
+		pdchSHGSClSurfCl = 0;
+		pdchSHGSClPeoplAdd = 0;
+		pdchSHGSClLiteAdd = 0;
+		pdchSHGSClEquipAdd = 0;
+		pdchSHGSClWindAdd = 0;
+		pdchSHGSClIzaAdd = 0;
+		pdchSHGSClInfilAdd = 0;
+		pdchSHGSClOtherAdd = 0;
+		pdchSHGSClEquipRem = 0;
+		pdchSHGSClWindRem = 0;
+		pdchSHGSClIzaRem = 0;
+		pdchSHGSClInfilRem = 0;
+		pdchSHGSClOtherRem = 0;
+		pdstSHGSpkHt = 0;
+		pdchSHGSHtTimePeak = 0;
+		pdchSHGSHtHvacHt = 0;
+		pdchSHGSHtHvacCl = 0;
+		pdchSHGSHtSurfHt = 0;
+		pdchSHGSHtSurfCl = 0;
+		pdchSHGSHtPeoplAdd = 0;
+		pdchSHGSHtLiteAdd = 0;
+		pdchSHGSHtEquipAdd = 0;
+		pdchSHGSHtWindAdd = 0;
+		pdchSHGSHtIzaAdd = 0;
+		pdchSHGSHtInfilAdd = 0;
+		pdchSHGSHtOtherAdd = 0;
+		pdchSHGSHtEquipRem = 0;
+		pdchSHGSHtWindRem = 0;
+		pdchSHGSHtIzaRem = 0;
+		pdchSHGSHtInfilRem = 0;
+		pdchSHGSHtOtherRem = 0;
+		pdrStd62 = 0;
+		pdstS62sysVentReqCool = 0;
+		pdchS62svrClSumVpz = 0;
+		pdchS62svrClPs = 0;
+		pdchS62svrClSumPz = 0;
+		pdchS62svrClD = 0;
+		pdchS62svrClVou = 0;
+		pdchS62svrClVps = 0;
+		pdchS62svrClXs = 0;
+		pdchS62svrClEv = 0;
+		pdchS62svrClVot = 0;
+		pdchS62svrClPercOA = 0;
+		pdstS62sysVentReqHeat = 0;
+		pdchS62svrHtSumVpz = 0;
+		pdchS62svrHtPs = 0;
+		pdchS62svrHtSumPz = 0;
+		pdchS62svrHtD = 0;
+		pdchS62svrHtVou = 0;
+		pdchS62svrHtVps = 0;
+		pdchS62svrHtXs = 0;
+		pdchS62svrHtEv = 0;
+		pdchS62svrHtVot = 0;
+		pdchS62svrHtPercOA = 0;
+		pdstS62znVentPar = 0;
+		pdchS62zvpAlN = 0;
+		pdchS62zvpRp = 0;
+		pdchS62zvpPz = 0;
+		pdchS62zvpRa = 0;
+		pdchS62zvpAz = 0;
+		pdchS62zvpVbz = 0;
+		pdchS62zvpClEz = 0;
+		pdchS62zvpClVoz = 0;
+		pdchS62zvpHtEz = 0;
+		pdchS62zvpHtVoz = 0;
+		pdstS62sysVentPar = 0;
+		pdchS62svpRp = 0;
+		pdchS62svpPz = 0;
+		pdchS62svpRa = 0;
+		pdchS62svpAz = 0;
+		pdchS62svpVbz = 0;
+		pdchS62svpClVoz = 0;
+		pdchS62svpHtVoz = 0;
+		pdstS62znCoolDes = 0;
+		pdchS62zcdAlN = 0;
+		pdchS62zcdBox = 0;
+		pdchS62zcdVpz = 0;
+		pdchS62zcdVps = 0;
+		pdchS62zcdVsec = 0;
+		pdchS62zcdVdz = 0;
+		pdchS62zcdVpzmin = 0;
+		pdchS62zcdVozclg = 0;
+		pdchS62zcdZpz = 0;
+		pdchS62zcdEp = 0;
+		pdchS62zcdEr = 0;
+		pdchS62zcdFa = 0;
+		pdchS62zcdFb = 0;
+		pdchS62zcdFc = 0;
+		pdchS62zcdEvz = 0;
+		pdstS62sysCoolDes = 0;
+		pdchS62scdVpz = 0;
+		pdchS62scdVps = 0;
+		pdchS62scdVsec = 0;
+		pdchS62scdVdz = 0;
+		pdchS62scdVpzmin = 0;
+		pdchS62scdVozclg = 0;
+		pdchS62scdEvz = 0;
+		pdstS62znHeatDes = 0;
+		pdchS62zhdAlN = 0;
+		pdchS62zhdBox = 0;
+		pdchS62zhdVpz = 0;
+		pdchS62zhdVps = 0;
+		pdchS62zhdVsec = 0;
+		pdchS62zhdVdz = 0;
+		pdchS62zhdVpzmin = 0;
+		pdchS62zhdVozhtg = 0;
+		pdchS62zhdZpz = 0;
+		pdchS62zhdEp = 0;
+		pdchS62zhdEr = 0;
+		pdchS62zhdFa = 0;
+		pdchS62zhdFb = 0;
+		pdchS62zhdFc = 0;
+		pdchS62zhdEvz = 0;
+		pdstS62sysHeatDes = 0;
+		pdchS62shdVpz = 0;
+		pdchS62shdVps = 0;
+		pdchS62shdVsec = 0;
+		pdchS62shdVdz = 0;
+		pdchS62shdVpzmin = 0;
+		pdchS62shdVozhtg = 0;
+		pdchS62shdEvz = 0;
+		pdrLeed = 0;
+		pdstLeedGenInfo = 0;
+		pdchLeedGenData = 0;
+		pdstLeedSpaceUsageType = 0;
+		pdchLeedSutName = 0;
+		pdchLeedSutSpArea = 0;
+		pdchLeedSutOcArea = 0;
+		pdchLeedSutUnArea = 0;
+		pdchLeedSutHrsWeek = 0;
+		pdstLeedAdvsMsg = 0;
+		pdchLeedAmData = 0;
+		pdstLeedEneTypSum = 0;
+		pdchLeedEtsType = 0;
+		pdchLeedEtsRtNm = 0;
+		pdchLeedEtsVirt = 0;
+		pdchLeedEtsEneUnt = 0;
+		pdchLeedEtsDemUnt = 0;
+		pdstLeedPerf = 0;
+		pdchLeedPerfRot = 0;
+		pdchLeedPerfElEneUse = 0;
+		pdchLeedPerfElDem = 0;
+		pdchLeedPerfGasEneUse = 0;
+		pdchLeedPerfGasDem = 0;
+		pdchLeedPerfOthEneUse = 0;
+		pdchLeedPerfOthDem = 0;
+		pdstLeedEneUseSum = 0;
+		pdchLeedEusUnt = 0;
+		pdchLeedEusProc = 0;
+		pdchLeedEusTotal = 0;
+		pdstLeedEneCostSum = 0;
+		pdchLeedEcUnt = 0;
+		pdchLeedEcsProc = 0;
+		pdchLeedEcsTotal = 0;
+		LEEDelecCostTotal = 0.0;
+		LEEDgasCostTotal = 0.0;
+		LEEDothrCostTotal = 0.0;
+		pdstLeedRenewSum = 0;
+		pdchLeedRenRatCap = 0;
+		pdchLeedRenAnGen = 0;
+		pdstLeedEneUseIntEl = 0;
+		pdchLeedEuiElec = 0;
+		pdstLeedEneUseIntNatG = 0;
+		pdchLeedEuiNatG = 0;
+		pdstLeedEneUseIntOthr = 0;
+		pdchLeedEuiOthr = 0;
+		pdstLeedEneUsePerc = 0;
+		pdchLeedEupPerc = 0;
+		sizeReportName = 0;
+		numReportName = 0;
+		sizeSubTable = 0;
+		numSubTable = 0;
+		sizeColumnTag = 0;
+		numColumnTag = 0;
+		sizeTableEntry = 0;
+		numTableEntry = 0;
+		sizeCompSizeTableEntry = 0; //Autodesk Was used uninitialized in output to .audit files
+		numCompSizeTableEntry = 0; //Autodesk Was used uninitialized in WriteComponentSizing
+		sizeShadowRelate = 0;
+		numShadowRelate = 0;
+		TotalNotMetHeatingOccupiedForABUPS = 0.0;
+		TotalNotMetCoolingOccupiedForABUPS = 0.0;
+		TotalNotMetOccupiedForABUPS = 0.0;
+		TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+		reportName.deallocate();
+		subTable.deallocate();
+		columnTag.deallocate();
+		tableEntry.deallocate();
+		CompSizeTableEntry.deallocate();
+		ShadowRelate.deallocate();
+	}
+
+
 
 	void
 	SetPredefinedTables()
@@ -727,6 +1341,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = newPreDefColumn( pdstOpaque, "U-Factor with Film [W/m2-K]" );
 		pdchOpUfactNoFilm = newPreDefColumn( pdstOpaque, "U-Factor no Film [W/m2-K]" );
 		pdchOpGrArea = newPreDefColumn( pdstOpaque, "Gross Area [m2]" );
+		pdchOpNetArea = newPreDefColumn( pdstOpaque, "Net Area [m2]" );
 		pdchOpAzimuth = newPreDefColumn( pdstOpaque, "Azimuth [deg]" );
 		pdchOpTilt = newPreDefColumn( pdstOpaque, "Tilt [deg]" );
 		pdchOpDir = newPreDefColumn( pdstOpaque, "Cardinal Direction" );
@@ -956,7 +1571,7 @@ namespace OutputReportPredefined {
 
 		pdrSizing = newPreDefReport( "HVACSizingSummary", "Size", "HVAC Sizing Summary" );
 
-		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Cooling" );
+		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Sensible Cooling" );
 
 		pdchZnClCalcDesLd = newPreDefColumn( pdstZoneClSize, "Calculated Design Load [W]" );
 		pdchZnClUserDesLd = newPreDefColumn( pdstZoneClSize, "User Design Load [W]" );
@@ -964,14 +1579,15 @@ namespace OutputReportPredefined {
 		pdchZnClCalcDesAirFlow = newPreDefColumn( pdstZoneClSize, "Calculated Design Air Flow [m3/s]" );
 		pdchZnClUserDesAirFlow = newPreDefColumn( pdstZoneClSize, "User Design Air Flow [m3/s]" );
 		pdchZnClDesDay = newPreDefColumn( pdstZoneClSize, "Design Day Name" );
-		pdchZnClPkTime = newPreDefColumn( pdstZoneClSize, "Date/Time Of Peak" );
+		pdchZnClPkTime = newPreDefColumn( pdstZoneClSize, "Date/Time Of Peak {TIMESTAMP}" );
 		pdchZnClPkTstatTemp = newPreDefColumn( pdstZoneClSize, "Thermostat Setpoint Temperature at Peak Load [C]" );
 		pdchZnClPkIndTemp = newPreDefColumn( pdstZoneClSize, "Indoor Temperature at Peak Load [C]" );
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
-
-		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Heating" );
+		pdchZnClPkOAMinFlow = newPreDefColumn( pdstZoneClSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
+		pdchZnClPkDOASHeatGain = newPreDefColumn( pdstZoneClSize, "Heat Gain Rate from DOAS [W]" );		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
+		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Sensible Heating" );
 
 		pdchZnHtCalcDesLd = newPreDefColumn( pdstZoneHtSize, "Calculated Design Load [W]" );
 		pdchZnHtUserDesLd = newPreDefColumn( pdstZoneHtSize, "User Design Load [W]" );
@@ -979,13 +1595,14 @@ namespace OutputReportPredefined {
 		pdchZnHtCalcDesAirFlow = newPreDefColumn( pdstZoneHtSize, "Calculated Design Air Flow [m3/s]" );
 		pdchZnHtUserDesAirFlow = newPreDefColumn( pdstZoneHtSize, "User Design Air Flow [m3/s]" );
 		pdchZnHtDesDay = newPreDefColumn( pdstZoneHtSize, "Design Day Name" );
-		pdchZnHtPkTime = newPreDefColumn( pdstZoneHtSize, "Date/Time Of Peak" );
+		pdchZnHtPkTime = newPreDefColumn( pdstZoneHtSize, "Date/Time Of Peak {TIMESTAMP}" );
 		pdchZnHtPkTstatTemp = newPreDefColumn( pdstZoneHtSize, "Thermostat Setpoint Temperature at Peak Load [C]" );
 		pdchZnHtPkIndTemp = newPreDefColumn( pdstZoneHtSize, "Indoor Temperature at Peak Load [C]" );
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
-
+		pdchZnHtPkOAMinFlow = newPreDefColumn( pdstZoneHtSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
+		pdchZnHtPkDOASHeatGain = newPreDefColumn( pdstZoneHtSize, "Heat Gain Rate from DOAS [W]" );		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 
 		pdchSysSizCalcClAir = newPreDefColumn( pdstSystemSize, "Calculated cooling [m3/s]" );
@@ -993,16 +1610,16 @@ namespace OutputReportPredefined {
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
 
-		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments");
+		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
 //		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
 		pdchPlantSizPrevVdot = newPreDefColumn( pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]" );
 		pdchPlantSizMeasVdot = newPreDefColumn( pdstPlantSize, "Algorithm Volume Flow Rate [m3/s]" );
 		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );
 		pdchPlantSizCoincYesNo = newPreDefColumn( pdstPlantSize, "Coincident Size Adjusted" );
 		pdchPlantSizDesDay = newPreDefColumn( pdstPlantSize, "Peak Sizing Period Name" );
-		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period" );
-		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day" );
-		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute" );
+		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period {TIMESTAMP}[day]" );
+		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day {TIMESTAMP}[hr]" );
+		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute {TIMESTAMP}[min]" );
 
 		// System Summary Report
 
@@ -1093,73 +1710,75 @@ namespace OutputReportPredefined {
 		pdstEMelecvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Electricity" );
 		pdchEMelecannual = newPreDefColumn( pdstEMelecvalues, "Electricity Annual Value [GJ]" );
 		pdchEMelecminvalue = newPreDefColumn( pdstEMelecvalues, "Electricity Minimum Value [W]" );
-		pdchEMelecminvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Minimum" );
+		pdchEMelecminvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMelecmaxvalue = newPreDefColumn( pdstEMelecvalues, "Electricity Maximum Value [W]" );
-		pdchEMelecmaxvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Maximum" );
+		pdchEMelecmaxvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Gas Sub Table
 		pdstEMgasvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Gas" );
 		pdchEMgasannual = newPreDefColumn( pdstEMgasvalues, "Gas Annual Value [GJ]" );
 		pdchEMgasminvalue = newPreDefColumn( pdstEMgasvalues, "Gas Minimum Value [W]" );
-		pdchEMgasminvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Minimum" );
+		pdchEMgasminvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMgasmaxvalue = newPreDefColumn( pdstEMgasvalues, "Gas Maximum Value [W]" );
-		pdchEMgasmaxvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Maximum" );
+		pdchEMgasmaxvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Cool SubTable
 		pdstEMcoolvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Cooling" );
 		pdchEMcoolannual = newPreDefColumn( pdstEMcoolvalues, "Cooling Annual Value [GJ]" );
 		pdchEMcoolminvalue = newPreDefColumn( pdstEMcoolvalues, "Cooling Minimum Value [W]" );
-		pdchEMcoolminvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Minimum" );
+		pdchEMcoolminvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMcoolmaxvalue = newPreDefColumn( pdstEMcoolvalues, "Cooling Maximum Value [W]" );
-		pdchEMcoolmaxvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Maximum" );
+		pdchEMcoolmaxvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Water SubTable
 		pdstEMwatervalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Water" );
 		pdchEMwaterannual = newPreDefColumn( pdstEMwatervalues, "Annual Value [m3]" );
 		pdchEMwaterminvalue = newPreDefColumn( pdstEMwatervalues, "Minimum Value [m3/s]" );
-		pdchEMwaterminvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Minimum" );
+		pdchEMwaterminvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMwatermaxvalue = newPreDefColumn( pdstEMwatervalues, "Maximum Value [m3/s]" );
-		pdchEMwatermaxvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Maximum" );
+		pdchEMwatermaxvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other KG SubTable
 		pdstEMotherKGvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other by Weight/Mass" );
 		pdchEMotherKGannual = newPreDefColumn( pdstEMotherKGvalues, "Annual Value [kg]" );
 		pdchEMotherKGminvalue = newPreDefColumn( pdstEMotherKGvalues, "Minimum Value [kg/s]" );
-		pdchEMotherKGminvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Minimum" );
+		pdchEMotherKGminvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherKGmaxvalue = newPreDefColumn( pdstEMotherKGvalues, "Maximum Value [kg/s]" );
-		pdchEMotherKGmaxvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Maximum" );
+		pdchEMotherKGmaxvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other M3 SubTable
 		pdstEMotherM3values = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other Volumetric" );
 		pdchEMotherM3annual = newPreDefColumn( pdstEMotherM3values, "Annual Value [m3]" );
 		pdchEMotherM3minvalue = newPreDefColumn( pdstEMotherM3values, "Minimum Value [m3/s]" );
-		pdchEMotherM3minvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Minimum" );
+		pdchEMotherM3minvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherM3maxvalue = newPreDefColumn( pdstEMotherM3values, "Maximum Value [m3/s]" );
-		pdchEMotherM3maxvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Maximum" );
+		pdchEMotherM3maxvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other M3 SubTable
 		pdstEMotherLvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other Liquid/Gas" );
 		pdchEMotherLannual = newPreDefColumn( pdstEMotherLvalues, "Annual Value [L]" );
 		pdchEMotherLminvalue = newPreDefColumn( pdstEMotherLvalues, "Minimum Value [L]" );
-		pdchEMotherLminvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Minimum" );
+		pdchEMotherLminvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherLmaxvalue = newPreDefColumn( pdstEMotherLvalues, "Maximum Value [L]" );
-		pdchEMotherLmaxvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Maximum" );
+		pdchEMotherLmaxvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other J SubTable
 		pdstEMotherJvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other" );
 		pdchEMotherJannual = newPreDefColumn( pdstEMotherJvalues, "Annual Value [GJ]" );
 		pdchEMotherJminvalue = newPreDefColumn( pdstEMotherJvalues, "Minimum Value [W]" );
-		pdchEMotherJminvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Minimum" );
+		pdchEMotherJminvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherJmaxvalue = newPreDefColumn( pdstEMotherJvalues, "Maximum Value [W]" );
-		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum" );
+		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
-		// Sensible Heat Gas Component Report
+		// Sensible Heat Gain Component Report
 		pdrSensibleGain = newPreDefReport( "SensibleHeatGainSummary", "SHGS", "Sensible Heat Gain Summary" );
 
 		pdstSHGSannual = newPreDefSubTable( pdrSensibleGain, "Annual Building Sensible Heat Gain Components" );
 
-		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Heating [GJ]" );
-		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacATUHt = newPreDefColumn( pdstSHGSannual, "HVAC Terminal Unit Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacATUCl = newPreDefColumn( pdstSHGSannual, "HVAC Terminal Unit Sensible Air Cooling [GJ]" );
 		pdchSHGSAnSurfHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Heated Surface Heating [GJ]" );
 		pdchSHGSAnSurfCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Cooled Surface Cooling [GJ]" );
 		pdchSHGSAnPeoplAdd = newPreDefColumn( pdstSHGSannual, "People Sensible Heat Addition [GJ]" );
@@ -1177,9 +1796,11 @@ namespace OutputReportPredefined {
 
 		pdstSHGSpkCl = newPreDefSubTable( pdrSensibleGain, "Peak Cooling Sensible Heat Gain Components" );
 
-		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak" );
-		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Heating [W]" );
-		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Cooling [W]" );
+		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak {TIMESTAMP}" );
+		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
+		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
+		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Heating [W]" );
+		pdchSHGSClHvacATUCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Cooling [W]" );
 		pdchSHGSClSurfHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSClSurfCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSClPeoplAdd = newPreDefColumn( pdstSHGSpkCl, "People Sensible Heat Addition [W]" );
@@ -1197,9 +1818,11 @@ namespace OutputReportPredefined {
 
 		pdstSHGSpkHt = newPreDefSubTable( pdrSensibleGain, "Peak Heating Sensible Heat Gain Components" );
 
-		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak" );
-		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Heating [W]" );
-		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Cooling [W]" );
+		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak {TIMESTAMP}" );
+		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
+		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
+		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Heating [W]" );
+		pdchSHGSHtHvacATUCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Cooling [W]" );
 		pdchSHGSHtSurfHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSHtSurfCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSHtPeoplAdd = newPreDefColumn( pdstSHGSpkHt, "People Sensible Heat Addition [W]" );
@@ -1619,6 +2242,22 @@ namespace OutputReportPredefined {
 		tableEntry( numTableEntry ).indexColumn = columnIndex;
 	}
 
+	std::string
+	RetrievePreDefTableEntry(
+		int const columnIndex,
+		std::string const & objName
+		)
+	{
+		for ( int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry ) {
+			if ( tableEntry( iTableEntry ).indexColumn == columnIndex && tableEntry( iTableEntry ).objectName == objName ){
+				return trimmed( left_justified(tableEntry( iTableEntry ).charEntry) );
+				break;
+			}
+		}
+		return "NOT FOUND";
+	}
+
+
 	void
 	incrementTableEntry()
 	{
@@ -1990,29 +2629,6 @@ namespace OutputReportPredefined {
 		newPreDefColumn = numColumnTag;
 		return newPreDefColumn;
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportPredefined
 

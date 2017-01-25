@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef OutputReportTabular_hh_INCLUDED
 #define OutputReportTabular_hh_INCLUDED
 
@@ -6,11 +64,11 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array2S.hh>
+#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -87,7 +145,7 @@ namespace OutputReportTabular {
 	extern int sizeMonthlyFieldSetInput;
 	extern int MonthlyTablesCount;
 	extern int MonthlyColumnsCount;
-	extern FArray1D_bool IsMonthGathered; // shown as true for any month used
+	extern Array1D_bool IsMonthGathered; // shown as true for any month used
 
 	extern int TOCEntriesCount;
 	extern int TOCEntriesSize;
@@ -107,9 +165,9 @@ namespace OutputReportTabular {
 	extern std::ofstream fix_stream; // Fixed table stream
 	extern std::ofstream htm_stream; // HTML table stream
 	extern std::ofstream xml_stream; // XML table stream
-	extern FArray1D< std::ofstream * > TabularOutputFile; // Table stream array
-	extern FArray1D_string del; // the delimiter to use
-	extern FArray1D_int TableStyle; // see list of parameters
+	extern Array1D< std::ofstream * > TabularOutputFile; // Table stream array
+	extern Array1D_string del; // the delimiter to use
+	extern Array1D_int TableStyle; // see list of parameters
 
 	extern Real64 timeInYear;
 
@@ -124,36 +182,39 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
+	extern bool displayLifeCycleCostReport;
+	extern bool displayTariffReport;
+	extern bool displayEconomicResultSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
 	// arrays that hold the meter numbers that are initialized at get input
-	extern FArray1D_int meterNumTotalsBEPS;
-	extern FArray1D_int meterNumTotalsSource;
-	extern FArray1D_bool fuelfactorsused;
-	extern FArray1D_bool ffUsed;
-	extern FArray1D< Real64 > SourceFactors;
-	extern FArray1D_bool ffSchedUsed;
-	extern FArray1D_int ffSchedIndex;
-	extern FArray2D_int meterNumEndUseBEPS;
-	extern FArray3D_int meterNumEndUseSubBEPS;
+	extern Array1D_int meterNumTotalsBEPS;
+	extern Array1D_int meterNumTotalsSource;
+	extern Array1D_bool fuelfactorsused;
+	extern Array1D_bool ffUsed;
+	extern Array1D< Real64 > SourceFactors;
+	extern Array1D_bool ffSchedUsed;
+	extern Array1D_int ffSchedIndex;
+	extern Array2D_int meterNumEndUseBEPS;
+	extern Array3D_int meterNumEndUseSubBEPS;
 	// arrays that hold the names of the resource and end uses
-	extern FArray1D_string resourceTypeNames;
-	extern FArray1D_string sourceTypeNames;
-	extern FArray1D_string endUseNames;
+	extern Array1D_string resourceTypeNames;
+	extern Array1D_string sourceTypeNames;
+	extern Array1D_string endUseNames;
 	// arrays that hold the actual values for the year
-	extern FArray1D< Real64 > gatherTotalsBEPS;
-	extern FArray1D< Real64 > gatherTotalsBySourceBEPS;
-	extern FArray1D< Real64 > gatherTotalsSource;
-	extern FArray1D< Real64 > gatherTotalsBySource;
-	extern FArray2D< Real64 > gatherEndUseBEPS;
-	extern FArray2D< Real64 > gatherEndUseBySourceBEPS;
-	extern FArray3D< Real64 > gatherEndUseSubBEPS;
+	extern Array1D< Real64 > gatherTotalsBEPS;
+	extern Array1D< Real64 > gatherTotalsBySourceBEPS;
+	extern Array1D< Real64 > gatherTotalsSource;
+	extern Array1D< Real64 > gatherTotalsBySource;
+	extern Array2D< Real64 > gatherEndUseBEPS;
+	extern Array2D< Real64 > gatherEndUseBySourceBEPS;
+	extern Array3D< Real64 > gatherEndUseSubBEPS;
 	// arrays the hold the demand values
-	extern FArray1D< Real64 > gatherDemandTotal;
-	extern FArray2D< Real64 > gatherDemandEndUse;
-	extern FArray3D< Real64 > gatherDemandEndUseSub;
-	extern FArray1D_int gatherDemandTimeStamp;
+	extern Array1D< Real64 > gatherDemandTotal;
+	extern Array2D< Real64 > gatherDemandEndUse;
+	extern Array3D< Real64 > gatherDemandEndUseSub;
+	extern Array1D_int gatherDemandTimeStamp;
 	// to keep track of hours for the BEPS report gathering
 	extern Real64 gatherElapsedTimeBEPS;
 	// for normalization of results
@@ -177,6 +238,10 @@ namespace OutputReportTabular {
 	extern Real64 gatherElecPurchased;
 	extern int meterNumElecSurplusSold;
 	extern Real64 gatherElecSurplusSold;
+	extern int meterNumElecStorage;
+	extern Real64 gatherElecStorage;
+	extern int meterNumPowerConversion;
+	extern Real64 gatherPowerConversion;
 	// for on site thermal source components on BEPS report
 	extern int meterNumWaterHeatRecovery;
 	extern Real64 gatherWaterHeatRecovery;
@@ -216,7 +281,7 @@ namespace OutputReportTabular {
 	extern Real64 sourceFactorOtherFuel1;
 	extern Real64 sourceFactorOtherFuel2;
 
-	extern FArray1D_int td;
+	extern Array1D_int td;
 	//(1)   Current year
 	//(2)   Current month
 	//(3)   Current day
@@ -227,67 +292,67 @@ namespace OutputReportTabular {
 	//(8)   Milliseconds (0-999)
 
 	// Design day name storage
-	extern FArray1D_string DesignDayName;
+	extern Array1D_string DesignDayName;
 	extern int DesignDayCount;
 
 	//arrays related to pulse and load component reporting
-	extern FArray2D< Real64 > radiantPulseUsed;
-	extern FArray2D_int radiantPulseTimestep;
-	extern FArray2D< Real64 > radiantPulseReceived;
-	extern FArray3D< Real64 > loadConvectedNormal;
-	extern FArray3D< Real64 > loadConvectedWithPulse;
-	extern FArray3D< Real64 > netSurfRadSeq;
-	extern FArray2D< Real64 > decayCurveCool;
-	extern FArray2D< Real64 > decayCurveHeat;
-	extern FArray3D< Real64 > ITABSFseq; // used for determining the radiant fraction on each surface
-	extern FArray3D< Real64 > TMULTseq; // used for determining the radiant fraction on each surface
+	extern Array2D< Real64 > radiantPulseUsed;
+	extern Array2D_int radiantPulseTimestep;
+	extern Array2D< Real64 > radiantPulseReceived;
+	extern Array3D< Real64 > loadConvectedNormal;
+	extern Array3D< Real64 > loadConvectedWithPulse;
+	extern Array3D< Real64 > netSurfRadSeq;
+	extern Array2D< Real64 > decayCurveCool;
+	extern Array2D< Real64 > decayCurveHeat;
+	extern Array3D< Real64 > ITABSFseq; // used for determining the radiant fraction on each surface
+	extern Array3D< Real64 > TMULTseq; // used for determining the radiant fraction on each surface
 
-	extern FArray3D< Real64 > peopleInstantSeq;
-	extern FArray3D< Real64 > peopleLatentSeq;
-	extern FArray3D< Real64 > peopleRadSeq;
-	extern FArray3D< Real64 > peopleDelaySeq;
+	extern Array3D< Real64 > peopleInstantSeq;
+	extern Array3D< Real64 > peopleLatentSeq;
+	extern Array3D< Real64 > peopleRadSeq;
+	extern Array3D< Real64 > peopleDelaySeq;
 
-	extern FArray3D< Real64 > lightInstantSeq;
-	extern FArray3D< Real64 > lightRetAirSeq;
-	extern FArray3D< Real64 > lightLWRadSeq; // long wave thermal radiation
-	extern FArray3D< Real64 > lightSWRadSeq; // short wave visible radiation
-	extern FArray3D< Real64 > lightDelaySeq;
+	extern Array3D< Real64 > lightInstantSeq;
+	extern Array3D< Real64 > lightRetAirSeq;
+	extern Array3D< Real64 > lightLWRadSeq; // long wave thermal radiation
+	extern Array3D< Real64 > lightSWRadSeq; // short wave visible radiation
+	extern Array3D< Real64 > lightDelaySeq;
 
-	extern FArray3D< Real64 > equipInstantSeq;
-	extern FArray3D< Real64 > equipLatentSeq;
-	extern FArray3D< Real64 > equipRadSeq;
-	extern FArray3D< Real64 > equipDelaySeq;
+	extern Array3D< Real64 > equipInstantSeq;
+	extern Array3D< Real64 > equipLatentSeq;
+	extern Array3D< Real64 > equipRadSeq;
+	extern Array3D< Real64 > equipDelaySeq;
 
-	extern FArray3D< Real64 > refrigInstantSeq;
-	extern FArray3D< Real64 > refrigRetAirSeq;
-	extern FArray3D< Real64 > refrigLatentSeq;
+	extern Array3D< Real64 > refrigInstantSeq;
+	extern Array3D< Real64 > refrigRetAirSeq;
+	extern Array3D< Real64 > refrigLatentSeq;
 
-	extern FArray3D< Real64 > waterUseInstantSeq;
-	extern FArray3D< Real64 > waterUseLatentSeq;
+	extern Array3D< Real64 > waterUseInstantSeq;
+	extern Array3D< Real64 > waterUseLatentSeq;
 
-	extern FArray3D< Real64 > hvacLossInstantSeq;
-	extern FArray3D< Real64 > hvacLossRadSeq;
-	extern FArray3D< Real64 > hvacLossDelaySeq;
+	extern Array3D< Real64 > hvacLossInstantSeq;
+	extern Array3D< Real64 > hvacLossRadSeq;
+	extern Array3D< Real64 > hvacLossDelaySeq;
 
-	extern FArray3D< Real64 > powerGenInstantSeq;
-	extern FArray3D< Real64 > powerGenRadSeq;
-	extern FArray3D< Real64 > powerGenDelaySeq;
+	extern Array3D< Real64 > powerGenInstantSeq;
+	extern Array3D< Real64 > powerGenRadSeq;
+	extern Array3D< Real64 > powerGenDelaySeq;
 
-	extern FArray3D< Real64 > infilInstantSeq;
-	extern FArray3D< Real64 > infilLatentSeq;
+	extern Array3D< Real64 > infilInstantSeq;
+	extern Array3D< Real64 > infilLatentSeq;
 
-	extern FArray3D< Real64 > zoneVentInstantSeq;
-	extern FArray3D< Real64 > zoneVentLatentSeq;
+	extern Array3D< Real64 > zoneVentInstantSeq;
+	extern Array3D< Real64 > zoneVentLatentSeq;
 
-	extern FArray3D< Real64 > interZoneMixInstantSeq;
-	extern FArray3D< Real64 > interZoneMixLatentSeq;
+	extern Array3D< Real64 > interZoneMixInstantSeq;
+	extern Array3D< Real64 > interZoneMixLatentSeq;
 
-	extern FArray3D< Real64 > feneCondInstantSeq;
+	extern Array3D< Real64 > feneCondInstantSeq;
 	//REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
-	extern FArray3D< Real64 > feneSolarRadSeq;
-	extern FArray3D< Real64 > feneSolarDelaySeq;
+	extern Array3D< Real64 > feneSolarRadSeq;
+	extern Array3D< Real64 > feneSolarDelaySeq;
 
-	extern FArray3D< Real64 > surfDelaySeq;
+	extern Array3D< Real64 > surfDelaySeq;
 
 	extern int maxUniqueKeyCount;
 
@@ -334,58 +399,18 @@ namespace OutputReportTabular {
 			scheduleIndex( 0 )
 		{}
 
-		// Member Constructor
-		OutputTableBinnedType(
-			std::string const & keyValue, // the key value (usually an asterisk to indicate all variables
-			std::string const & varOrMeter, // the name of the variable or meter
-			Real64 const intervalStart, // The lowest value for the intervals being binned into.
-			Real64 const intervalSize, // The size of the bins starting with Interval start.
-			int const intervalCount, // The number of bins used. The number of hours below the start of
-			int const resIndex, // result index - pointer to BinResults array
-			int const numTables,
-			int const typeOfVar, // 0=not found, 1=integer, 2=real, 3=meter
-			int const avgSum, // Variable  is Averaged=1 or Summed=2
-			int const stepType, // Variable time step is Zone=1 or HVAC=2
-			std::string const & units, // the units string, may be blank
-			std::string const & ScheduleName, // the name of the schedule
-			int const scheduleIndex // index to the schedule specified - if no schedule use zero
-		) :
-			keyValue( keyValue ),
-			varOrMeter( varOrMeter ),
-			intervalStart( intervalStart ),
-			intervalSize( intervalSize ),
-			intervalCount( intervalCount ),
-			resIndex( resIndex ),
-			numTables( numTables ),
-			typeOfVar( typeOfVar ),
-			avgSum( avgSum ),
-			stepType( stepType ),
-			units( units ),
-			ScheduleName( ScheduleName ),
-			scheduleIndex( scheduleIndex )
-		{}
-
 	};
 
 	struct BinResultsType
 	{
 		// Members
-		FArray1D< Real64 > mnth; // monthly bins
-		FArray1D< Real64 > hrly; // hourly bins
+		Array1D< Real64 > mnth; // monthly bins
+		Array1D< Real64 > hrly; // hourly bins
 
 		// Default Constructor
 		BinResultsType() :
 			mnth( 12, 0.0 ),
 			hrly( 24, 0.0 )
-		{}
-
-		// Member Constructor
-		BinResultsType(
-			FArray1< Real64 > const & mnth, // monthly bins
-			FArray1< Real64 > const & hrly // hourly bins
-		) :
-			mnth( 12, mnth ),
-			hrly( 24, hrly )
 		{}
 
 	};
@@ -399,15 +424,6 @@ namespace OutputReportTabular {
 		// Default Constructor
 		BinObjVarIDType() :
 			varMeterNum( 0 )
-		{}
-
-		// Member Constructor
-		BinObjVarIDType(
-			std::string const & namesOfObj, // name of the object
-			int const varMeterNum // variable or meter number
-		) :
-			namesOfObj( namesOfObj ),
-			varMeterNum( varMeterNum )
 		{}
 
 	};
@@ -430,21 +446,6 @@ namespace OutputReportTabular {
 			maximum( 0.0 )
 		{}
 
-		// Member Constructor
-		BinStatisticsType(
-			Real64 const sum, // sum of the variable
-			Real64 const sum2, // sum of the variable squared
-			int const n, // number of items in sum
-			Real64 const minimum, // minimum value
-			Real64 const maximum // maximum value
-		) :
-			sum( sum ),
-			sum2( sum2 ),
-			n( n ),
-			minimum( minimum ),
-			maximum( maximum )
-		{}
-
 	};
 
 	struct NamedMonthlyType
@@ -456,15 +457,6 @@ namespace OutputReportTabular {
 		// Default Constructor
 		NamedMonthlyType() :
 			show( false )
-		{}
-
-		// Member Constructor
-		NamedMonthlyType(
-			std::string const & title, // report title
-			bool const show // if report should be shown
-		) :
-			title( title ),
-			show( show )
 		{}
 
 	};
@@ -488,23 +480,6 @@ namespace OutputReportTabular {
 			showDigits( 0 )
 		{}
 
-		// Member Constructor
-		MonthlyInputType(
-			std::string const & name, // identifier
-			int const numFieldSet, // number of monthly field sets
-			int const firstFieldSet, // pointer to the first field set
-			int const numTables, // number of tables
-			int const firstTable, // pointer to the first table
-			int const showDigits // the number of digits to be shown
-		) :
-			name( name ),
-			numFieldSet( numFieldSet ),
-			firstFieldSet( firstFieldSet ),
-			numTables( numTables ),
-			firstTable( firstTable ),
-			showDigits( showDigits )
-		{}
-
 	};
 
 	struct MonthlyFieldSetInputType
@@ -519,8 +494,8 @@ namespace OutputReportTabular {
 		int keyCount; // noel
 		int varAvgSum; // Variable  is Averaged=1 or Summed=2
 		int varStepType; // Variable time step is Zone=1 or HVAC=2
-		FArray1D_string NamesOfKeys; // keyNames !noel
-		FArray1D_int IndexesForKeyVar; // keyVarIndexes !noel
+		Array1D_string NamesOfKeys; // keyNames !noel
+		Array1D_int IndexesForKeyVar; // keyVarIndexes !noel
 
 		// Default Constructor
 		MonthlyFieldSetInputType() :
@@ -529,33 +504,6 @@ namespace OutputReportTabular {
 			keyCount( 0 ),
 			varAvgSum( 1 ),
 			varStepType( 1 )
-		{}
-
-		// Member Constructor
-		MonthlyFieldSetInputType(
-			std::string const & variMeter, // the name of the variable or meter
-			std::string const & colHead, // the column header to use instead of the variable name (only for predefined)
-			int const aggregate, // the type of aggregation for the variable (see aggType parameters)
-			std::string const & varUnits, // Units sting, may be blank
-			std::string const & variMeterUpper, // the name of the variable or meter uppercased
-			int const typeOfVar, // 0=not found, 1=integer, 2=real, 3=meter
-			int const keyCount, // noel
-			int const varAvgSum, // Variable  is Averaged=1 or Summed=2
-			int const varStepType, // Variable time step is Zone=1 or HVAC=2
-			FArray1_string const & NamesOfKeys, // keyNames !noel
-			FArray1_int const & IndexesForKeyVar // keyVarIndexes !noel
-		) :
-			variMeter( variMeter ),
-			colHead( colHead ),
-			aggregate( aggregate ),
-			varUnits( varUnits ),
-			variMeterUpper( variMeterUpper ),
-			typeOfVar( typeOfVar ),
-			keyCount( keyCount ),
-			varAvgSum( varAvgSum ),
-			varStepType( varStepType ),
-			NamesOfKeys( NamesOfKeys ),
-			IndexesForKeyVar( IndexesForKeyVar )
 		{}
 
 	};
@@ -573,17 +521,6 @@ namespace OutputReportTabular {
 			numColumns( 0 )
 		{}
 
-		// Member Constructor
-		MonthlyTablesType(
-			std::string const & keyValue, // the key value - the object names that result in the variable
-			int const firstColumn, // pointer to the monthly column array for the first item
-			int const numColumns // number of columns for the table
-		) :
-			keyValue( keyValue ),
-			firstColumn( firstColumn ),
-			numColumns( numColumns )
-		{}
-
 	};
 
 	struct MonthlyColumnsType
@@ -597,9 +534,9 @@ namespace OutputReportTabular {
 		int stepType; // Variable time step is Zone=1 or HVAC=2
 		std::string units; // the units string, may be blank
 		int aggType; // index to the type of aggregation (see list of parameters)
-		FArray1D< Real64 > reslt; // monthly results
-		FArray1D< Real64 > duration; // the time during which results are summed for use in averages
-		FArray1D_int timeStamp; // encoded timestamp of max or min
+		Array1D< Real64 > reslt; // monthly results
+		Array1D< Real64 > duration; // the time during which results are summed for use in averages
+		Array1D_int timeStamp; // encoded timestamp of max or min
 		Real64 aggForStep; // holds the aggregation for the HVAC time steps when smaller than
 		// the zone timestep
 
@@ -616,35 +553,6 @@ namespace OutputReportTabular {
 			aggForStep( 0.0 )
 		{}
 
-		// Member Constructor
-		MonthlyColumnsType(
-			std::string const & varName, // name of variable
-			std::string const & colHead, // column header (not used for user defined monthly)
-			int const varNum, // variable or meter number
-			int const typeOfVar, // 0=not found, 1=integer, 2=real, 3=meter
-			int const avgSum, // Variable  is Averaged=1 or Summed=2
-			int const stepType, // Variable time step is Zone=1 or HVAC=2
-			std::string const & units, // the units string, may be blank
-			int const aggType, // index to the type of aggregation (see list of parameters)
-			FArray1< Real64 > const & reslt, // monthly results
-			FArray1< Real64 > const & duration, // the time during which results are summed for use in averages
-			FArray1_int const & timeStamp, // encoded timestamp of max or min
-			Real64 const aggForStep // holds the aggregation for the HVAC time steps when smaller than
-		) :
-			varName( varName ),
-			colHead( colHead ),
-			varNum( varNum ),
-			typeOfVar( typeOfVar ),
-			avgSum( avgSum ),
-			stepType( stepType ),
-			units( units ),
-			aggType( aggType ),
-			reslt( 12, reslt ),
-			duration( 12, duration ),
-			timeStamp( 12, timeStamp ),
-			aggForStep( aggForStep )
-		{}
-
 	};
 
 	struct TOCEntriesType
@@ -657,17 +565,6 @@ namespace OutputReportTabular {
 		// Default Constructor
 		TOCEntriesType() :
 			isWritten( false )
-		{}
-
-		// Member Constructor
-		TOCEntriesType(
-			std::string const & reportName, // the name of the individual report
-			std::string const & sectionName, // the name of the section containing individual reports
-			bool const isWritten // flag if the entry has been written to TOC
-		) :
-			reportName( reportName ),
-			sectionName( sectionName ),
-			isWritten( isWritten )
 		{}
 
 	};
@@ -691,43 +588,26 @@ namespace OutputReportTabular {
 			is_default( false )
 		{}
 
-		// Member Constructor
-		UnitConvType(
-			std::string const & siName, // the name abbreviation or symbol of the SI units
-			std::string const & ipName, // the name abbreviation or symbol of the IP units
-			Real64 const mult, // the multiplier used to convert from SI to IP in IP = (SI * mult) + offset
-			Real64 const offset, // the offset used to convert from SI to IP in IP = (SI * mult) + offset
-			std::string const & hint, // the string used when multiple SI units match
-			bool const several, // several different options for the SI unit to be converted into IP
-			bool const is_default // if part of a set of "several" this should be used as default
-		) :
-			siName( siName ),
-			ipName( ipName ),
-			mult( mult ),
-			offset( offset ),
-			hint( hint ),
-			several( several ),
-			is_default( is_default )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< OutputTableBinnedType > OutputTableBinned;
-	extern FArray2D< BinResultsType > BinResults; // table number, number of intervals
-	extern FArray1D< BinResultsType > BinResultsBelow; // time below the lowest defined bin
-	extern FArray1D< BinResultsType > BinResultsAbove; // time above the highest defined bin
-	extern FArray1D< BinObjVarIDType > BinObjVarID;
-	extern FArray1D< BinStatisticsType > BinStatistics;
-	extern FArray1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
-	extern FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
-	extern FArray1D< MonthlyInputType > MonthlyInput;
-	extern FArray1D< MonthlyTablesType > MonthlyTables;
-	extern FArray1D< MonthlyColumnsType > MonthlyColumns;
-	extern FArray1D< TOCEntriesType > TOCEntries;
-	extern FArray1D< UnitConvType > UnitConv;
+	extern Array1D< OutputTableBinnedType > OutputTableBinned;
+	extern Array2D< BinResultsType > BinResults; // table number, number of intervals
+	extern Array1D< BinResultsType > BinResultsBelow; // time below the lowest defined bin
+	extern Array1D< BinResultsType > BinResultsAbove; // time above the highest defined bin
+	extern Array1D< BinObjVarIDType > BinObjVarID;
+	extern Array1D< BinStatisticsType > BinStatistics;
+	extern Array1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
+	extern Array1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
+	extern Array1D< MonthlyInputType > MonthlyInput;
+	extern Array1D< MonthlyTablesType > MonthlyTables;
+	extern Array1D< MonthlyColumnsType > MonthlyColumns;
+	extern Array1D< TOCEntriesType > TOCEntries;
+	extern Array1D< UnitConvType > UnitConv;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	UpdateTabularReports( int const IndexTypeKey ); // What kind of data to update (Zone, HVAC)
@@ -764,20 +644,17 @@ namespace OutputReportTabular {
 	GetInputTabularTimeBins();
 
 	bool
-	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName );
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, std::string const & moduleName );
 
 	void
 	GetInputTabularStyle();
 
-
 	int
-	SetUnitsStyleFromString(
-		std::string unitStringIn
-		);
+	SetUnitsStyleFromString( std::string const & unitStringIn );
 
 
 	void
-	GetInputTabularPredefined();
+	GetInputOutputTableSummaryReports();
 
 	bool
 	isCompLoadRepReq();
@@ -866,6 +743,12 @@ namespace OutputReportTabular {
 	void
 	WriteBEPSTable();
 
+	std::string
+	ResourceWarningMessage(std::string resource);
+
+	Real64
+	WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
+
 	void
 	WriteSourceEnergyEndUseSummary();
 
@@ -932,10 +815,10 @@ namespace OutputReportTabular {
 
 	void
 	WriteTable(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
-		FArray1S_int widthColumn,
+		Array2S_string const body, // row,column
+		Array1S_string const rowLabels,
+		Array1S_string const columnLabels,
+		Array1S_int widthColumn,
 		Optional_bool_const transposeXML = _,
 		Optional_string_const footnoteText = _
 	);
@@ -956,10 +839,49 @@ namespace OutputReportTabular {
 	ConvertToElementTag( std::string const & inString ); // Input String
 
 	std::string
+	ConvertUnicodeToUTF8( unsigned long const codepoint );
+
+	std::string
 	ConvertToEscaped( std::string const & inString ); // Input String
 
 	void
 	DetermineBuildingFloorArea();
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	//    ROUTINES TO RESET GATHERED VALUES TO ZERO
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	void
+	ResetTabularReports();
+
+	void
+	ResetMonthlyGathering();
+
+	void
+	ResetBinGathering();
+
+	void
+	ResetBEPSGathering();
+
+	void
+	ResetSourceEnergyEndUseGathering();
+
+	void
+	ResetPeakDemandGathering();
+
+	void
+	ResetHeatGainGathering();
+
+	void
+	ResetRemainingPredefinedEntries();
+
+	void
+	ResetAdaptiveComfort();
+
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -1037,6 +959,13 @@ namespace OutputReportTabular {
 		std::string & stringOutWithIP
 	);
 
+	void
+	LookupJtokWH(
+		std::string const & stringInWithJ,
+		int & unitConvIndex,
+		std::string & stringOutWithKWH
+	);
+
 	Real64
 	ConvertIP(
 		int const unitConvIndex,
@@ -1074,29 +1003,6 @@ namespace OutputReportTabular {
 		std::string const & SIunit,
 		std::string const & IPunit
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportTabular
 

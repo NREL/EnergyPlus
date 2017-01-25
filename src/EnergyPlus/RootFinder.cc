@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -102,7 +160,7 @@ namespace RootFinder {
 	// IterationCount = 0
 	// IsDoneFlag = .FALSE.
 	// RF%XCandidate = 0.1d0 ! Sets X to initial value XInit
-	// DO WHILE ( .NOT.IsDoneFlag  )
+	// DO WHILE ( .NOT.IsDoneFlag )
 	//   IterationCount = IterationCount+1
 	//   IF ( IterationCount>50 ) THEN
 	//     WRITE(*,*) 'Error: Too many iterations..."
@@ -313,9 +371,10 @@ namespace RootFinder {
 
 		// Reset iterate history with last 3 best points
 		RootFinderData.NumHistory = 0;
-		RootFinderData.History( _ ).X() = 0.0;
-		RootFinderData.History( _ ).Y() = 0.0;
-		RootFinderData.History( _ ).DefinedFlag() = false;
+		for ( auto & e : RootFinderData.History ) {
+			e.X = e.Y = 0.0;
+			e.DefinedFlag = false;
+		}
 
 		// Reset increments over successive iterationes
 		RootFinderData.Increment.X = 0.0;
@@ -1042,7 +1101,7 @@ namespace RootFinder {
 		// Check that the slope requirement is respected at the min and max points
 		// Note that the singularity check takes care of RootFinderData%MinPoint%Y == RootFinderData%MaxPoint%Y
 		// therefore we use strict comparison operators < and >.
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			if ( RootFinderData.MinPoint.Y < RootFinderData.MaxPoint.Y ) {
 				CheckSlope = true;
@@ -1062,7 +1121,7 @@ namespace RootFinder {
 			ShowContinueError( "CheckSlope: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "CheckSlope: Preceding error causes program termination." );
 
-		}} // SelectSlope
+		}}
 
 		CheckSlope = false;
 
@@ -1187,7 +1246,7 @@ namespace RootFinder {
 
 		// FLOW:
 
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			if ( RootFinderData.MinPoint.Y >= 0.0 ) {
 				CheckMinConstraint = true;
@@ -1206,7 +1265,7 @@ namespace RootFinder {
 			ShowContinueError( "CheckMinConstraint: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckMinConstraint: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "CheckMinConstraint: Preceding error causes program termination." );
-		}} // SelectSlope
+		}}
 
 		CheckMinConstraint = false;
 
@@ -1260,7 +1319,7 @@ namespace RootFinder {
 		// FLOW:
 
 		// Check for max constrained convergence with respect to the new iterate (X,Y)
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			if ( RootFinderData.MaxPoint.Y <= 0.0 ) {
 				CheckMaxConstraint = true;
@@ -1279,7 +1338,7 @@ namespace RootFinder {
 			ShowContinueError( "CheckMaxConstraint: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckMaxConstraint: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "CheckMaxConstraint: Preceding error causes program termination." );
-		}} // SelectSlope
+		}}
 
 		CheckMaxConstraint = false;
 
@@ -1576,7 +1635,7 @@ namespace RootFinder {
 
 		// FLOW:
 
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			// Update lower point
@@ -1690,7 +1749,7 @@ namespace RootFinder {
 			ShowContinueError( "UpdateBracket: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
 
-		}} // SelectSlope
+		}}
 
 	}
 
@@ -1745,9 +1804,10 @@ namespace RootFinder {
 		// Note that the history points are sorted so that
 		//   SIGN(History(1)%Y) = -SIGN(History(3)%Y)
 		// to ensure that the history points bracket the candidate root.
-		RootFinderData.History( _ ).DefinedFlag() = false;
-		RootFinderData.History( _ ).X() = 0.0;
-		RootFinderData.History( _ ).Y() = 0.0;
+		for ( auto & e : RootFinderData.History ) {
+			e.X = e.Y = 0.0;
+			e.DefinedFlag = false;
+		}
 
 		NumHistory = 0;
 		if ( RootFinderData.LowerPoint.DefinedFlag ) {
@@ -1864,7 +1924,7 @@ namespace RootFinder {
 	void
 	SortHistory(
 		int const N, // Number of points to sort in history array
-		FArray1S< PointType > History // Array of PointType variables. At least N of them
+		Array1S< PointType > History // Array of PointType variables. At least N of them
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2017,7 +2077,7 @@ namespace RootFinder {
 			// - the increments are defined (at least 2 history points are available)
 			//----------------------------------------------------------------------------
 		} else {
-			SelectRecoveryMethod: { auto const SELECT_CASE_var( RootFinderData.StatusFlag );
+			{ auto const SELECT_CASE_var( RootFinderData.StatusFlag );
 			if ( SELECT_CASE_var == iStatusOKRoundOff ) {
 				// Should never happen if we exit the root finder upon detecting round-off condition
 				RootFinderData.XCandidate = BisectionMethod( RootFinderData );
@@ -2033,7 +2093,7 @@ namespace RootFinder {
 				// Assuming that the root is bracketed between the lower and upper points,
 				// we execute the requested solution method to produce the next candidate value
 				// for the root.
-				SelectMethod: { auto const SELECT_CASE_var1( RootFinderData.Controls.MethodType );
+				{ auto const SELECT_CASE_var1( RootFinderData.Controls.MethodType );
 				if ( SELECT_CASE_var1 == iMethodBisection ) {
 					// Bisection method (aka interval halving)
 					RootFinderData.XCandidate = BisectionMethod( RootFinderData );
@@ -2053,8 +2113,8 @@ namespace RootFinder {
 					ShowContinueError( "AdvanceRootFinder: iMethodSecant=" + TrimSigDigits( iMethodSecant ) );
 					ShowContinueError( "AdvanceRootFinder: iMethodBrent=" + TrimSigDigits( iMethodBrent ) );
 					ShowFatalError( "AdvanceRootFinder: Preceding error causes program termination." );
-				}} // SelectMethod
-			}} // SelectRecoveryMethod
+				}}
+			}}
 		}
 
 	}
@@ -2571,7 +2631,7 @@ namespace RootFinder {
 		//'History(1)%DefinedFlag', ',', &
 		//'History(2)%DefinedFlag', ',', &
 		//'History(3)%DefinedFlag', ',', &
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(20(A,A))", flags ) << "Status" << "Method" << "CurrentPoint%X" << "CurrentPoint%Y" << "XCandidate" << "ConvergenceRate" << "MinPoint%X" << "MinPoint%Y" << "LowerPoint%X" << "LowerPoint%Y" << "UpperPoint%X" << "UpperPoint%Y" << "MaxPoint%X" << "MaxPoint%Y" << "History(1)%X" << "History(1)%Y" << "History(2)%X" << "History(2)%Y" << "History(3)%X" << "History(3)%Y"; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(20(A,A))", flags ) << "Status" << ',' << "Method" << ',' << "CurrentPoint%X" << ',' << "CurrentPoint%Y" << ',' << "XCandidate" << ',' << "ConvergenceRate" << ',' << "MinPoint%X" << ',' << "MinPoint%Y" << ',' << "LowerPoint%X" << ',' << "LowerPoint%Y" << ',' << "UpperPoint%X" << ',' << "UpperPoint%Y" << ',' << "MaxPoint%X" << ',' << "MaxPoint%Y" << ',' << "History(1)%X" << ',' << "History(1)%Y" << ',' << "History(2)%X" << ',' << "History(2)%Y" << ',' << "History(3)%X" << ',' << "History(3)%Y" << ','; }
 
 	}
 
@@ -2617,12 +2677,12 @@ namespace RootFinder {
 
 		// FLOW:
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << TrimSigDigits( RootFinderData.StatusFlag ) << TrimSigDigits( RootFinderData.CurrentMethodType ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << TrimSigDigits( RootFinderData.StatusFlag ) << ',' << TrimSigDigits( RootFinderData.CurrentMethodType ) << ','; }
 
 		// Only show current point if defined.
 		WritePoint( TraceFileUnit, RootFinderData.CurrentPoint, false );
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << RootFinderData.XCandidate << RootFinderData.ConvergenceRate; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << RootFinderData.XCandidate << ',' << RootFinderData.ConvergenceRate << ','; }
 
 		// Always show min and max points.
 		// Only show lower and upper points if defined.
@@ -2683,12 +2743,12 @@ namespace RootFinder {
 		// FLOW:
 
 		if ( PointData.DefinedFlag ) {
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << PointData.X << PointData.Y; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << PointData.X << ',' << PointData.Y << ','; }
 		} else {
 			if ( ShowXValue ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(1(F20.10,A),1(A,A))", flags ) << PointData.X << NoValue; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(1(F20.10,A),1(A,A))", flags ) << PointData.X << ',' << NoValue << ','; }
 			} else {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << NoValue << NoValue; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << NoValue << ',' << NoValue << ','; }
 			}
 		}
 
@@ -2830,29 +2890,6 @@ namespace RootFinder {
 		}}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RootFinder
 

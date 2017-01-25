@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -31,6 +31,7 @@
 #include <iomanip>
 #include <istream>
 #include <limits>
+#include <locale>
 #include <sstream>
 #include <string>
 
@@ -39,7 +40,6 @@ namespace ObjexxFCL {
 // Forward
 class byte;
 class ubyte;
-class Fstring;
 
 namespace fmt {
 
@@ -51,6 +51,16 @@ typedef  std::size_t  Size;
 // Constants
 static Size const NOSIZE = static_cast< Size >( -1 );
 
+// Globals
+extern fmt::Binary_num_put * binary_num_put;
+extern fmt::Exponent_num_put * exponent_num_put;
+extern fmt::Engineering_num_put * engineering_num_put;
+extern fmt::Scientific_num_put * scientific_num_put;
+extern std::locale const binary_locale;
+extern std::locale const exponent_locale;
+extern std::locale const engineering_locale;
+extern std::locale const scientific_locale;
+
 // Input /////
 
 // Skip: Skips Over a Bite of Specified Width from the Input Stream
@@ -60,14 +70,12 @@ class Skip
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	Skip( Size const w = 1ul ) :
 	 w_( w )
 	{}
 
 	// Destructor
-	inline
 	~Skip()
 	{}
 
@@ -136,10 +144,6 @@ A( char const c, Size const w = 1ul )
 std::string
 A( std::string const & s, Size const w = 0ul );
 
-// Fstring
-std::string
-A( Fstring const & s, Size const w = 0ul );
-
 // cstring
 inline
 std::string
@@ -177,12 +181,11 @@ inline
 std::string
 B( T const & t, Size w = TraitsB< T >::w, Size const m = 0ul )
 {
-	static std::locale const loc( std::locale(), new fmt::Binary_num_put );
 	if ( w == NOSIZE ) w = TraitsB< T >::w;
 	std::ostringstream stream;
 	if ( w > 0ul ) stream << std::setw( m > 0ul ? std::min( m, w ) : w );
 	if ( m > 0ul ) stream << std::setfill( '0' );
-	stream.imbue( loc );
+	stream.imbue( binary_locale );
 	stream << t;
 	return ( w > 0ul ? lpadded( stream.str(), w ) : stream.str() );
 }
@@ -262,15 +265,13 @@ F( std::complex< T > const & c, Size const w = TraitsF< T >::w, Size const d = T
 template< typename T >
 inline
 std::string
-E( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e, int const k = 0 )
+E( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e, int const k = 0 )
 {
-	static auto np( new fmt::Exponent_num_put );
-	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w;
 	if ( w == 0ul ) return std::string();
-	np->set( d, e, k );
+	exponent_num_put->set( d, e, k );
 	std::ostringstream stream;
-	stream.imbue( loc );
+	stream.imbue( exponent_locale );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -279,7 +280,7 @@ E( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e
 template< typename T >
 inline
 std::string
-E( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e, int const k = 0 )
+E( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e, int const k = 0 )
 {
 	return '(' + E( c.real(), w, d, e, k ) + ',' + E( c.imag(), w, d, e, k ) + ')';
 }
@@ -288,15 +289,13 @@ E( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = T
 template< typename T >
 inline
 std::string
-D( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e, int const k = 0 )
+D( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e, int const k = 0 )
 {
-	static auto np( new fmt::Exponent_num_put );
-	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w;
 	if ( w == 0ul ) return std::string();
-	np->set( d, e, k, 'D' );
+	exponent_num_put->set( d, e, k, 'D' );
 	std::ostringstream stream;
-	stream.imbue( loc );
+	stream.imbue( exponent_locale );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -305,7 +304,7 @@ D( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e
 template< typename T >
 inline
 std::string
-D( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e, int const k = 0 )
+D( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e, int const k = 0 )
 {
 	return '(' + D( c.real(), w, d, e, k ) + ',' + D( c.imag(), w, d, e, k ) + ')';
 }
@@ -314,15 +313,13 @@ D( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = T
 template< typename T >
 inline
 std::string
-EN( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e )
+EN( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e )
 {
-	static auto np( new fmt::Engineering_num_put );
-	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w;
 	if ( w == 0ul ) return std::string();
-	np->set( d, e );
+	engineering_num_put->set( d, e );
 	std::ostringstream stream;
-	stream.imbue( loc );
+	stream.imbue( engineering_locale );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -331,7 +328,7 @@ EN( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size 
 template< typename T >
 inline
 std::string
-EN( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e )
+EN( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e )
 {
 	return '(' + EN( c.real(), w, d, e ) + ',' + EN( c.imag(), w, d, e ) + ')';
 }
@@ -340,15 +337,13 @@ EN( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = 
 template< typename T >
 inline
 std::string
-ES( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e )
+ES( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e )
 {
-	static auto np( new fmt::Scientific_num_put );
-	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w;
 	if ( w == 0ul ) return std::string();
-	np->set( d, e );
+	scientific_num_put->set( d, e );
 	std::ostringstream stream;
-	stream.imbue( loc );
+	stream.imbue( scientific_locale );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -357,7 +352,7 @@ ES( T const & t, Size w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size 
 template< typename T >
 inline
 std::string
-ES( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size e = TraitsE< T >::e )
+ES( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = TraitsE< T >::d, Size const e = TraitsE< T >::e )
 {
 	return '(' + ES( c.real(), w, d, e ) + ',' + ES( c.imag(), w, d, e ) + ')';
 }
@@ -366,7 +361,7 @@ ES( std::complex< T > const & c, Size const w = TraitsE< T >::w, Size const d = 
 template< typename T >
 inline
 std::string
-G( T const & t, Size w = TraitsG< T >::w, Size const d = TraitsG< T >::d, Size e = TraitsG< T >::e, int const k = 0 )
+G( T const & t, Size w = TraitsG< T >::w, Size const d = TraitsG< T >::d, Size const e = TraitsG< T >::e, int const k = 0 )
 {
 	if ( w == NOSIZE ) w = TraitsG< T >::w;
 	if ( std::numeric_limits< T >::is_integer ) { // Integer
@@ -414,14 +409,6 @@ G( char const & c, Size const w = TraitsG< char >::w, Size const = 0ul, Size con
 inline
 std::string
 G( std::string const & s, Size const w = TraitsG< std::string >::w, Size const = 0ul, Size const = 0ul, int const = 0 )
-{
-	return A( s, w );
-}
-
-// General: Fstring Specialization
-inline
-std::string
-G( Fstring const & s, Size const w = TraitsG< Fstring >::w, Size const = 0ul, Size const = 0ul, int const = 0 )
 {
 	return A( s, w );
 }
@@ -597,10 +584,6 @@ LD( std::string const & s )
 {
 	return s;
 }
-
-// List-Directed: Fstring Specialization
-std::string
-LD( Fstring const & s );
 
 // Extras /////
 

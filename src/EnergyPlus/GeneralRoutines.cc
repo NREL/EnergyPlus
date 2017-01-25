@@ -1,13 +1,72 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -126,7 +185,7 @@ ControlCompOutput(
 	// Note - order in routine must match order below
 	//  Plus -- order in ListOfComponents array must be in sorted order.
 	int const NumComponents( 11 );
-	static FArray1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
+	static Array1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -665,17 +724,14 @@ CheckThisAirSystemForSizing(
 	// na
 	int ThisAirSysSizineInputLoop;
 
+	AirLoopWasSized = false;
 	if ( SysSizingRunDone ) {
 		for ( ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= NumSysSizInput; ++ThisAirSysSizineInputLoop ) {
 			if ( SysSizInput( ThisAirSysSizineInputLoop ).AirLoopNum == AirLoopNum ) {
 				AirLoopWasSized = true;
 				break;
-			} else {
-				AirLoopWasSized = false;
 			}
 		}
-	} else {
-		AirLoopWasSized = false;
 	}
 
 }
@@ -779,17 +835,14 @@ CheckThisZoneForSizing(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int ThisSizingInput;
 
+	ZoneWasSized = false;
 	if ( ZoneSizingRunDone ) {
 		for ( ThisSizingInput = 1; ThisSizingInput <= NumZoneSizingInput; ++ThisSizingInput ) {
 			if ( ZoneSizingInput( ThisSizingInput ).ZoneNum == ZoneNum ) {
 				ZoneWasSized = true;
 				break;
-			} else {
-				ZoneWasSized = false;
 			}
 		}
-	} else {
-		ZoneWasSized = false;
 	}
 
 }
@@ -860,7 +913,7 @@ ValidateComponent(
 
 void
 CalcPassiveExteriorBaffleGap(
-	FArray1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
 	Real64 const VentArea, // Area available for venting the gap [m2]
 	Real64 const Cv, // Oriface coefficient for volume-based discharge, wind-driven [--]
 	Real64 const Cd, // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -906,7 +959,6 @@ CalcPassiveExteriorBaffleGap(
 	using namespace DataPrecisionGlobals;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::WindSpeedAt;
-	using DataEnvironment::SunIsUp;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::IsRain;
 	// USE DataLoopNode    , ONLY: Node
@@ -914,6 +966,7 @@ CalcPassiveExteriorBaffleGap(
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using DataSurfaces::Surface;
+	using DataSurfaces::SurfaceData;
 	using DataHeatBalSurface::TH;
 	using DataHeatBalance::Material;
 	using DataHeatBalance::Construct;
@@ -931,7 +984,6 @@ CalcPassiveExteriorBaffleGap(
 	Real64 const g( 9.807 ); // gravitational constant (m/s**2)
 	Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
 	Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-	Real64 const Pr( 0.71 ); // Prandtl number for air
 	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const KelvinConv( 273.15 ); // Conversion from Celsius to Kelvin
 	static std::string const RoutineName( "CalcPassiveExteriorBaffleGap" );
@@ -942,12 +994,12 @@ CalcPassiveExteriorBaffleGap(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 	// following arrays are used to temporarily hold results from multiple underlying surfaces
-	FArray1D< Real64 > HSkyARR;
-	FArray1D< Real64 > HGroundARR;
-	FArray1D< Real64 > HAirARR;
-	FArray1D< Real64 > HPlenARR;
-	FArray1D< Real64 > HExtARR;
-	FArray1D< Real64 > LocalWindArr;
+	Array1D< Real64 > HSkyARR;
+	Array1D< Real64 > HGroundARR;
+	Array1D< Real64 > HAirARR;
+	Array1D< Real64 > HPlenARR;
+	Array1D< Real64 > HExtARR;
+	Array1D< Real64 > LocalWindArr;
 
 	// local working variables
 	Real64 RhoAir; // density of air
@@ -988,11 +1040,13 @@ CalcPassiveExteriorBaffleGap(
 	Real64 ICSULossbottom; // ICS solar collector bottom loss Conductance
 	static bool MyICSEnvrnFlag( true ); // Local environment flag for ICS
 
+	Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, SurfPtrARR ) );
+
 //	LocalOutDryBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutDryBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	LocalOutDryBulbTemp = sum_product_sub( Surface.Area(), Surface.OutDryBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	LocalOutDryBulbTemp = sum_product_sub( Surface, &SurfaceData::Area, &SurfaceData::OutDryBulbTemp, SurfPtrARR ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 //	LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	LocalWetBulbTemp = sum_product_sub( Surface.Area(), Surface.OutWetBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	LocalWetBulbTemp = sum_product_sub( Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName );
 
@@ -1004,7 +1058,7 @@ CalcPassiveExteriorBaffleGap(
 		Tamb = LocalWetBulbTemp;
 	}
 //	A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	A = sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	A = surfaceArea;
 	TmpTsBaf = TsBaffle;
 
 	//loop through underlying surfaces and collect needed data
@@ -1024,7 +1078,7 @@ CalcPassiveExteriorBaffleGap(
 		InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR( ThisSurf ), HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
 		ConstrNum = Surface( SurfPtr ).Construction;
 		AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
-		TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
+		TsoK = TH( 1, 1, SurfPtr ) + KelvinConv;
 		TsBaffK = TmpTsBaf + KelvinConv;
 		if ( TsBaffK == TsoK ) { // avoid divide by zero
 			HPlenARR( ThisSurf ) = 0.0; // no net heat transfer if same temperature
@@ -1059,7 +1113,7 @@ CalcPassiveExteriorBaffleGap(
 	if ( A == 0.0 ) { // should have been caught earlier
 
 	}
-	auto Area( array_sub( Surface.Area(), SurfPtrARR ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+	auto Area( array_sub( Surface, &SurfaceData::Area, SurfPtrARR ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
 	// now figure area-weighted averages from underlying surfaces.
 //	Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Vwind = sum( LocalWindArr * Area ) / A;
@@ -1082,10 +1136,10 @@ CalcPassiveExteriorBaffleGap(
 
 	if ( IsRain ) HExt = 1000.0;
 
-//	Tso = sum( TH( SurfPtrARR, 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+//	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+	Tso = sum_product_sub( TH( 1, 1, _ ), Surface, &SurfaceData::Area, SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+	Isc = sum_product_sub( QRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 
 	TmeanK = 0.5 * ( TmpTsBaf + Tso ) + KelvinConv;
 
@@ -1324,7 +1378,6 @@ TestAirPathIntegrity( bool & ErrFound )
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::OutputFileBNDetails;
 	using namespace DataLoopNode;
 	using DataHVACGlobals::NumPrimaryAirSys;
 	using DataAirLoop::AirToZoneNodeInfo;
@@ -1349,15 +1402,15 @@ TestAirPathIntegrity( bool & ErrFound )
 	int Count;
 	int TestNode;
 	bool errFlag;
-	FArray2D_int ValRetAPaths;
-	FArray2D_int NumRAPNodes;
-	FArray2D_int ValSupAPaths;
-	FArray2D_int NumSAPNodes;
+	Array2D_int ValRetAPaths;
+	Array2D_int NumRAPNodes;
+	Array2D_int ValSupAPaths;
+	Array2D_int NumSAPNodes;
 
-	NumSAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
-	NumRAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
-	ValRetAPaths.allocate( NumPrimaryAirSys, NumOfNodes );
-	ValSupAPaths.allocate( NumPrimaryAirSys, NumOfNodes );
+	NumSAPNodes.allocate( NumOfNodes, NumPrimaryAirSys );
+	NumRAPNodes.allocate( NumOfNodes, NumPrimaryAirSys );
+	ValRetAPaths.allocate( NumOfNodes, NumPrimaryAirSys );
+	ValSupAPaths.allocate( NumOfNodes, NumPrimaryAirSys );
 	NumSAPNodes = 0;
 	NumRAPNodes = 0;
 	ValRetAPaths = 0;
@@ -1370,20 +1423,20 @@ TestAirPathIntegrity( bool & ErrFound )
 
 	// Final tests, look for duplicate nodes
 	for ( Loop = 1; Loop <= NumPrimaryAirSys; ++Loop ) {
-		if ( ValRetAPaths( Loop, 1 ) != 0 ) continue;
+		if ( ValRetAPaths( 1, Loop ) != 0 ) continue;
 		if ( AirToZoneNodeInfo( Loop ).NumReturnNodes <= 0 ) continue;
-		ValRetAPaths( Loop, 1 ) = AirToZoneNodeInfo( Loop ).ZoneEquipReturnNodeNum( 1 );
+		ValRetAPaths( 1, Loop ) = AirToZoneNodeInfo( Loop ).ZoneEquipReturnNodeNum( 1 );
 	}
 
 	for ( Loop = 1; Loop <= NumPrimaryAirSys; ++Loop ) {
 		for ( Loop1 = 1; Loop1 <= NumOfNodes; ++Loop1 ) {
-			TestNode = ValRetAPaths( Loop, Loop1 );
+			TestNode = ValRetAPaths( Loop1, Loop );
 			Count = 0;
 			for ( Loop2 = 1; Loop2 <= NumPrimaryAirSys; ++Loop2 ) {
 				for ( Loop3 = 1; Loop3 <= NumOfNodes; ++Loop3 ) {
 					if ( Loop2 == Loop && Loop1 == Loop3 ) continue; // Don't count test node
-					if ( ValRetAPaths( Loop2, Loop3 ) == 0 ) break;
-					if ( ValRetAPaths( Loop2, Loop3 ) == TestNode ) ++Count;
+					if ( ValRetAPaths( Loop3, Loop2 ) == 0 ) break;
+					if ( ValRetAPaths( Loop3, Loop2 ) == TestNode ) ++Count;
 				}
 			}
 			if ( Count > 0 ) {
@@ -1453,9 +1506,9 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	int Count;
 	std::string AirPathNodeName; // Air Path Inlet Node Name
 	std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
-	FArray1D_bool FoundSupplyPlenum;
-	FArray1D_bool FoundZoneSplitter;
-	FArray1D_string FoundNames;
+	Array1D_bool FoundSupplyPlenum;
+	Array1D_bool FoundZoneSplitter;
+	Array1D_string FoundNames;
 	int NumErr( 0 ); // Error Counter //Autodesk:Init Initialization added
 	int BCount;
 	int Found;
@@ -1668,7 +1721,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 void
 TestReturnAirPathIntegrity(
 	bool & ErrFound,
-	FArray2S_int ValRetAPaths
+	Array2S_int ValRetAPaths
 )
 {
 
@@ -1744,9 +1797,9 @@ TestReturnAirPathIntegrity(
 	int Count;
 	std::string AirPathNodeName; // Air Path Inlet Node Name
 	std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
-	FArray1D_bool FoundReturnPlenum;
-	FArray1D_bool FoundZoneMixer;
-	FArray1D_string FoundNames;
+	Array1D_bool FoundReturnPlenum;
+	Array1D_bool FoundZoneMixer;
+	Array1D_string FoundNames;
 	int NumErr; // Error Counter
 	int BCount;
 	int Found;
@@ -1755,7 +1808,7 @@ TestReturnAirPathIntegrity(
 	int Count2;
 	bool HasMixer;
 	int MixerComp;
-	FArray1D_int AllNodes;
+	Array1D_int AllNodes;
 	int MixerCount;
 	int Count3;
 	int NumComp;
@@ -1952,8 +2005,8 @@ TestReturnAirPathIntegrity(
 			if ( AirToZoneNodeInfo( Count2 ).NumReturnNodes > 0 ) {
 				if ( AllNodes( 1 ) == AirToZoneNodeInfo( Count2 ).ZoneEquipReturnNodeNum( 1 ) ) {
 					WAirLoop = Count2;
-					ValRetAPaths( WAirLoop, _ ) = 0;
-					ValRetAPaths( WAirLoop, {1,CountNodes} ) = AllNodes( {1,CountNodes} );
+					ValRetAPaths( _, WAirLoop ) = 0;
+					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
 					break;
 				}
 			} else {
@@ -2051,25 +2104,6 @@ TestReturnAirPathIntegrity(
 	}
 
 }
-
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

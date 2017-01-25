@@ -1,9 +1,67 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -98,6 +156,19 @@ namespace ZoneContaminantPredictorCorrector {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetZoneAirContamInputFlag = true;
+		TotGCGenConstant = 0;
+		TotGCGenPDriven = 0;
+		TotGCGenCutoff = 0;
+		TotGCGenDecay = 0;
+		TotGCBLDiff = 0;
+		TotGCDVS = 0;
+		TotGCDRS = 0;
+	}
 
 	void
 	ManageZoneContaminanUpdates(
@@ -206,10 +277,9 @@ namespace ZoneContaminantPredictorCorrector {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using General::FindNumberInList;
-		using DataAirflowNetwork::AirflowNetworkNumOfSurfaces;
 		using DataAirflowNetwork::MultizoneSurfaceData;
+		using DataAirflowNetwork::MultizoneSurfaceProp;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExternalEnvironment;
 
 		// Locals
@@ -225,8 +295,8 @@ namespace ZoneContaminantPredictorCorrector {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName;
-		FArray1D< Real64 > IHGNumbers;
+		Array1D_string AlphaName;
+		Array1D< Real64 > IHGNumbers;
 		Real64 SchMin;
 		Real64 SchMax;
 		int NumAlpha;
@@ -240,7 +310,7 @@ namespace ZoneContaminantPredictorCorrector {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 		std::string CurrentModuleObject;
 
 		// FLOW:
@@ -293,7 +363,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -301,7 +371,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericConstant( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericConstant( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericConstant( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericConstant( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -386,7 +456,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -394,7 +464,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericPDriven( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericPDriven( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData.SurfName(), AirflowNetworkNumOfSurfaces );
+			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ShowContinueError( "which is not listed in AirflowNetwork:MultiZone:Surface." );
@@ -455,8 +525,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 ) {
 				ZonePtr = Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).Zone;
-			}
-			else {
+			} else {
 				ZonePtr = 0;
 			}
 			// Zone total report variables
@@ -478,7 +547,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -486,7 +555,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericCutoff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericCutoff( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericCutoff( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericCutoff( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericCutoff( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -554,7 +623,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -562,7 +631,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDecay( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDecay( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDecay( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericDecay( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDecay( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -631,7 +700,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -639,7 +708,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericBLDiff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericBLDiff( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericBLDiff( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface.Name(), TotSurfaces );
+			ZoneContamGenericBLDiff( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericBLDiff( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -707,7 +776,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -715,7 +784,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDVS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDVS( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericDVS( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface.Name(), TotSurfaces );
+			ZoneContamGenericDVS( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericDVS( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -776,7 +845,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -784,7 +853,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDRS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDRS( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDRS( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericDRS( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDRS( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -900,8 +969,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededControlTypes() :
@@ -909,36 +978,18 @@ namespace ZoneContaminantPredictorCorrector {
 				DidHave( 4, false )
 			{}
 
-			// Member Constructor
-			NeededControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
-			) :
-				MustHave( 4, MustHave ),
-				DidHave( 4, DidHave )
-			{}
-
 		};
 
 		struct NeededComfortControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededComfortControlTypes() :
 				MustHave( 12, false ),
 				DidHave( 12, false )
-			{}
-
-			// Member Constructor
-			NeededComfortControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
-			) :
-				MustHave( 12, MustHave ),
-				DidHave( 12, DidHave )
 			{}
 
 		};
@@ -955,14 +1006,14 @@ namespace ZoneContaminantPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone.Name(), ContControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone, ContControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ContaminantControlledZone( ContControlledZoneNum ).Name = cAlphaArgs( 1 );
 			ContaminantControlledZone( ContControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
@@ -1088,7 +1139,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using InternalHeatGains::SumAllInternalGenericContamGains;
 		using DataAirflowNetwork::MultizoneSurfaceData;
 		using DataAirflowNetwork::AirflowNetworkNodeSimu;
-		using DataAirflowNetwork::AirflowNetworkNumOfZones;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
 
@@ -1269,7 +1319,7 @@ namespace ZoneContaminantPredictorCorrector {
 				for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
 					Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam = OutdoorGC;
 				}
-				if ( TotGCGenDecay > 0 ) ZoneContamGenericDecay.GCTime() = 0.0;
+				if ( TotGCGenDecay > 0 ) for ( auto & e : ZoneContamGenericDecay ) e.GCTime = 0.0;
 			}
 			MyEnvrnFlag = false;
 		}
@@ -1334,7 +1384,7 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( Contaminant.CO2Simulation ) {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				SumAllInternalCO2Gains( Loop, ZoneCO2Gain( Loop ) );
-				SumInternalCO2GainsByTypes( Loop, FArray1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
+				SumInternalCO2GainsByTypes( Loop, Array1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
 			}
 		}
 
@@ -1958,7 +2008,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2304,29 +2353,6 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ZoneContaminantPredictorCorrector
 

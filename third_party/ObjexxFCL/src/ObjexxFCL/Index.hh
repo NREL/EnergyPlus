@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -31,46 +31,40 @@ class Index
 public: // Creation
 
 	// Default Constructor
-	inline
 	Index() :
-	 i_init_( false ),
+	 init_( false ),
 	 i_( 0 )
 	{}
 
 	// Copy Constructor
-	inline
 	Index( Index const & I ) :
-	 i_init_( I.i_init_ ),
+	 init_( I.init_ ),
 	 i_( I.i_ )
 	{}
 
 	// Index Constructor
-	inline
 	Index( int const i ) :
-	 i_init_( true ),
+	 init_( true ),
 	 i_( i )
 	{}
 
 	// Omit Constructor
-	inline
 	Index( Omit ) :
-	 i_init_( false ),
+	 init_( false ),
 	 i_( 0 )
 	{}
 
 	// Destructor
-	inline
 	~Index()
 	{}
 
 public: // Assignment
 
 	// Scalar Assignment
-	inline
 	Index &
 	operator =( int const i )
 	{
-		i_init_ = true;
+		init_ = true;
 		i_ = i;
 		return *this;
 	}
@@ -78,80 +72,61 @@ public: // Assignment
 public: // Conversion
 
 	// int Conversion
-	inline
 	operator int() const
 	{
-		assert( i_init_ );
+		assert( init_ );
 		return i_;
 	}
 
 public: // Predicate
 
 	// Initialized?
-	inline
 	bool
 	initialized() const
 	{
-		return i_init_;
+		return init_;
 	}
 
 public: // Inspector
 
 	// Index
-	inline
 	int
 	i() const
 	{
-		assert( i_init_ );
+		assert( init_ );
 		return i_;
 	}
 
 public: // Modifier
 
 	// Clear
-	inline
 	void
 	clear()
 	{
-		i_init_ = false;
-		i_ = 1;
+		init_ = false;
+		i_ = 0;
 	}
 
 	// Index Set
-	inline
 	Index &
 	i( int const i )
 	{
-		i_init_ = true;
+		init_ = true;
 		i_ = i;
 		return *this;
 	}
 
-	// Index Set if Uninitialized
-	inline
-	void
-	i_def( int const i )
-	{
-		if ( ! i_init_ ) {
-			i_ = i;
-			i_init_ = true;
-		}
-	}
-
 	// Swap
-	inline
 	void
 	swap( Index & I )
 	{
-		if ( this != &I ) {
-			std::swap( i_init_, I.i_init_ );
-			std::swap( i_, I.i_ );
-		}
+		std::swap( init_, I.init_ );
+		std::swap( i_, I.i_ );
 	}
 
 private: // Data
 
-	bool i_init_; // Index initialized?
+	bool init_; // Index initialized?
 	int i_; // Index
 
 }; // Index
@@ -218,11 +193,11 @@ operator !=( int const a, Index const & b )
 
 // I/O
 
-// Stream Input
+// Stream >> Index
 std::istream &
 operator >>( std::istream & stream, Index & a );
 
-// Stream Output
+// Stream << Index
 std::ostream &
 operator <<( std::ostream & stream, Index const & a );
 
