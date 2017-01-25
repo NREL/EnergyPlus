@@ -651,6 +651,7 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of external node
 		std::string WPCName; // Wind Pressure Coefficient Values Object Name
+		Real64 azimuth; // Azimuthal angle of the associated surface
 		Real64 orientation; // Orientation, not currently used
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
@@ -662,6 +663,7 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		MultizoneExternalNodeProp() :
+			azimuth( 0.0 ),
 			orientation( 0.0 ),
 			height( 0.0 ),
 			ExtNum( 0 ),

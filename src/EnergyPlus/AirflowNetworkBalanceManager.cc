@@ -2323,6 +2323,18 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		// Assign external node azimuth, should consider combining this with the above to avoid the repeated search
+		for (i = 1; i <= AirflowNetworkNumOfExtNode; ++i) {
+			for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
+				if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment || (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt && Surface(MultizoneSurfaceData(j).SurfNum).ExtWind)) {
+					if (SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
+						MultizoneExternalNodeData(i).azimuth = Surface(MultizoneSurfaceData(j).SurfNum).Azimuth;
+						break;
+					}
+				}
+			}
+		}
+
 		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 
 		// Write wind pressure coefficients in the EIO file
@@ -4542,7 +4554,13 @@ namespace AirflowNetworkBalanceManager {
 				if ( i > 0 ) {
 					if ( i <= AirflowNetworkNumOfExtNode ) {
 						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).height );
-						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
+						if (MultizoneExternalNodeData(i).curve) {
+							AirflowNetworkNodeSimu(n).PZ = CalcWindPressureFromCurve(MultizoneExternalNodeData(i).curve,
+								Vref, AirflowNetworkNodeData(n).NodeHeight, 0.0, MultizoneExternalNodeData(i).symmetricCurve,
+								MultizoneExternalNodeData(i).relativeAngle);
+						} else {
+							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
+						}
 					}
 					AirflowNetworkNodeSimu( n ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( n ).NodeHeight );
 					AirflowNetworkNodeSimu( n ).WZ = OutHumRat;
@@ -5160,10 +5178,11 @@ namespace AirflowNetworkBalanceManager {
 	Real64
 		CalcWindPressureFromCurve(
 			int const curve, // Curve index, change this to pointer after curve refactor
-			Real64 const windDir, // Wind direction
 			Real64 const Vref, // Velocity at reference height
 			Real64 const height, // Node height for outdoor temperature calculation
-			bool const symmetricCurve // True if the curve is symmetric (0 to 180)
+			Real64 const azimuth, // Azimuthal angle of surface
+			bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+			bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
 		)
 	{
 
@@ -5184,6 +5203,7 @@ namespace AirflowNetworkBalanceManager {
 		// Return value is wind pressure[Pa]
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 angle( DataEnvironment::WindDir );
 		Real64 rho; // Outdoor air density
 		Real64 Cp; // Cp value at given wind direction
 
@@ -5192,7 +5212,18 @@ namespace AirflowNetworkBalanceManager {
 			DataEnvironment::OutHumRat);
 
 		// Calculate pressure coefficient
-		Cp = CurveManager::CurveValue(curve, windDir);
+		if ( relativeAngle ) {
+			angle = angle - azimuth;
+			if ( angle < 0.0 ) {
+				angle += 360.0;
+			}
+		}
+		if ( symmetricCurve ) {
+			if ( angle > 180.0 ) {
+				angle = 360.0 - angle;
+			}
+		}
+		Cp = CurveManager::CurveValue(curve, angle);
 
 		return Cp * 0.5 * rho * Vref * Vref;
 	}
