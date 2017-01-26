@@ -761,16 +761,14 @@ namespace WaterCoils {
 		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
 	);
 
-	// checks if the design condition is a limiting case that leads to coil UA 
-	// autossizing to fail
+	// estimate heating coil design inlet water temperature for autosizing UA-value 
 	void
-	CheckSimpleHeatingCoilUASizing(
+	EstimateCoilInletWaterTemp(
 		int const CoilNum, // index to heating coil
 		int const FanOpMode, // fan operating mode
 		Real64 const PartLoadRatio, // part-load ratio of heating coil
-		Real64 const UAMax, // maximum UA-Value 1 = design calc; 2 = simulation calculation
-		Real64 & effectiveness, // calculated coil effectiveness at UA1
-		Real64 & TempWaterInSuggested // estimated design loop water exit temperature 
+		Real64 const UAMax, // maximum UA-Value
+		Real64 & TempWaterInSuggested // estimated heating coil design inlet water temperature
 		);
 	
 	// End of Coil Utility subroutines
