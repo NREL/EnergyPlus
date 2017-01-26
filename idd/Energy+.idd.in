@@ -31937,7 +31937,7 @@ ZoneControl:Thermostat:OperativeTemperature,
        \note Schedule values of 0.0 indicate no operative temperature control
        \type object-list
        \object-list ScheduleNames
-  A4 ; \field Adaptive Comfort Model Type
+  A4,  \field Adaptive Comfort Model Type
        \type choice
        \key None
        \key AdaptiveASH55_CentralLine
@@ -31949,7 +31949,12 @@ ZoneControl:Thermostat:OperativeTemperature,
        \key AdaptiveCEN15251_CategoryIIIUpperLine
        \default None
        \note the cooling setpoint temperature schedule of the referenced thermostat will be adjusted based on the selected adaptive comfort model type
-
+  A5 ; \field Adaptive Operative Temperature Applicability
+       \type choice
+       \key OverwriteWhenEnergySaving
+       \key AlwaysOverwrite
+       \default OverwriteWhenEnergySaving
+       \note the cooling setpoint temperature schedule will only be adjusted when adaptive setpoint is higher than the original in OverwriteWhenEnergySaving mode
 
 ZoneControl:Thermostat:ThermalComfort,
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
