@@ -42152,7 +42152,10 @@ Coil:Cooling:Water,
        \type real
        \units deltaC
        \minimum> 0.0
-
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note object is used for sizing the Design Water Flow Rate.
+   
 Coil:Cooling:Water:DetailedGeometry,
        \memo Chilled water cooling coil, detailed flat fin coil model for continuous plate fins,
        \memo with inputs for detailed coil geometry specifications.
@@ -42274,6 +42277,9 @@ Coil:Cooling:Water:DetailedGeometry,
        \type real
        \units deltaC
        \minimum> 0.0
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note object is used for sizing the Design Water Flow Rate.
    
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
@@ -44767,6 +44773,9 @@ Coil:Heating:Water,
       \type real
       \units deltaC
       \minimum> 0.0
+      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+      \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Heating:Steam,
        \memo Steam heating coil. Condenses and sub-cools steam at loop pressure and discharges

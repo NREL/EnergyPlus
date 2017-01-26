@@ -84,6 +84,9 @@ The coil is operable in two modes, Cross Flow for general A/C applications and C
 
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
 
+\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{Sizing:Plant} object is used for sizing the \textit{Design Water Flow Rate}.
+
 Examples when auto sized in an IDF are as below:
 
 \begin{lstlisting}
@@ -252,6 +255,9 @@ The outlet air temperature (degrees C) corresponding to the nominal heating capa
 \paragraph{Field: Rated Ratio for Air and Water Convection}\label{field-rated-ratio-for-air-and-water-convection}
 
 This is the ratio of convective heat transfers between air side and water side of the heating coil at the rated operating conditions. The default is .5. This ratio describes the geometry and the design of the coil and is defined by:
+
+\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{Sizing:Plant} object is used for sizing the \textit{Design Water Flow Rate}.
 
 \begin{equation}
 ratio = \frac{{{\eta_f}{{\left( {hA} \right)}_{air}}}}{{{{\left( {hA} \right)}_{water}}}}
@@ -1628,6 +1634,9 @@ The name of the air outlet from the water coil, i.e.~Cooling Coil Air Outlet Nod
 \paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name-1}
 
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
+
+\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{Sizing:Plant} object is used for sizing the \textit{Design Water Flow Rate}.
 
 Examples of these statements in an IDF are:
 
