@@ -6190,6 +6190,129 @@ Label10: ;
 
 	}
 
+	void
+	CheckSimpleHeatingCoilUASizing(
+		int const CoilNum, // index to heating coil
+		int const FanOpMode, // fan operating mode
+		Real64 const PartLoadRatio, // part-load ratio of heating coil
+		Real64 const UAMax, // maximum UA-Value = design heating capacity
+		Real64 & effectiveness, // calculated coil effectiveness at UA1
+		Real64 & TempWaterInSuggested // estimated design loop water exit temperature 
+	)
+	{
+		// SUBROUTINE INFORMATION:
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// returns effectiveness at UA max, also estimates coil inlet water temperature given 
+		// UA value for assumed maximum effectivness of 0.90 for heating coil
+
+		// METHODOLOGY EMPLOYED:
+		// (1) calculates heat coil effectivness at UA-value equal to design capacity
+		// (2) if the effectivness is high it estimates design loop exit temperature 
+		//     that avoids UA-value calculation failure assumed max effectivness is 0.9
+		
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CheckSimpleHeatingCoilUASizing" );
+		Real64 const EffectivnessMaxAssumed( 0.90 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 WaterMassFlowRate;
+		Real64 AirMassFlow;
+		Real64 TempAirIn;
+		Real64 Win;
+		Real64 TempWaterIn;
+		Real64 UA;
+		Real64 CapacitanceAir;
+		Real64 CapacitanceWater;
+		Real64 CapacitanceMin;
+		Real64 CapacitanceMax;
+		Real64 NTU;
+		Real64 ETA;
+		Real64 A;
+		Real64 CapRatio;
+		Real64 E1;
+		Real64 E2;
+		Real64 Effec;
+		Real64 Cp;
+
+		effectiveness = 0.0;
+		TempWaterInSuggested = 0.0;
+		UA = UAMax; 
+		TempAirIn = WaterCoil( CoilNum ).InletAirTemp;
+		Win = WaterCoil( CoilNum ).InletAirHumRat;
+		TempWaterIn = WaterCoil( CoilNum ).InletWaterTemp;
+		// adjust mass flow rates for cycling fan cycling coil operation
+		if ( FanOpMode == CycFanCycCoil ) {
+			if ( PartLoadRatio > 0.0 ) {
+				AirMassFlow = WaterCoil( CoilNum ).InletAirMassFlowRate / PartLoadRatio;
+				WaterMassFlowRate = min( WaterCoil( CoilNum ).InletWaterMassFlowRate / PartLoadRatio, WaterCoil( CoilNum ).MaxWaterMassFlowRate );
+			} else {
+				AirMassFlow = 0.0;
+				WaterMassFlowRate = 0.0;
+			}
+		} else {
+			AirMassFlow = WaterCoil( CoilNum ).InletAirMassFlowRate;
+			WaterMassFlowRate = WaterCoil( CoilNum ).InletWaterMassFlowRate;
+		}
+		if ( WaterMassFlowRate > MassFlowTolerance ) { // if the coil is operating
+			CapacitanceAir = PsyCpAirFnWTdb( Win, 0.5 * ( TempAirIn + TempWaterIn ) ) * AirMassFlow;
+			Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, TempWaterIn, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
+			CapacitanceWater = Cp * WaterMassFlowRate;
+			CapacitanceMin = min( CapacitanceAir, CapacitanceWater );
+			CapacitanceMax = max( CapacitanceAir, CapacitanceWater );
+		} else {
+			CapacitanceAir = 0.0;
+			CapacitanceWater = 0.0;
+		}
+		// calculate effectiveness and TempWaterInSuggested when there is flow across the coil
+		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) ) {
+			if ( UA <= 0.0 ) {
+				ShowFatalError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
+			}
+			NTU = UA / CapacitanceMin;
+			ETA = std::pow( NTU, 0.22 );
+			CapRatio = CapacitanceMin / CapacitanceMax;
+			A = CapRatio * NTU / ETA;
+			if ( A > 20.0 ) {
+				A = ETA * 1.0 / CapRatio;
+			} else {
+				E1 = std::exp( -A );
+				A = ETA * ( 1.0 - E1 ) / CapRatio;
+			}
+			if ( A > 20.0 ) {
+				Effec = 1.0;
+			} else {
+				E2 = std::exp( -A );
+				Effec = 1.0 - E2;
+			}
+			effectiveness = Effec;
+			if ( effectiveness > EffectivnessMaxAssumed ) {
+				// this formulation assumes that air is leaving at water inlet temperature and backs out a new coil water inlet 
+				// temperature for assumed effectiveness of 0.90 that avoids sizing very very huge UA value 
+				TempWaterInSuggested = CapacitanceAir * ( TempWaterIn - TempAirIn ) / ( CapacitanceMin * EffectivnessMaxAssumed ) + TempAirIn;
+			}			
+		} else { // If not running Conditions do not change across coil from inlet to outlet
+			effectiveness = 0.0;
+			TempWaterInSuggested = 0.0;
+		}
+
+	}
+
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 
