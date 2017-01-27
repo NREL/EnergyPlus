@@ -386,7 +386,7 @@ namespace FaultsManager {
 		{}
 
 		public:
-			Real64 CalFaultyFoulingFactor(); // To calculate the dynamic fouling factor
+			Real64 CalFoulingFactor(); // To calculate the dynamic fouling factor
 	};
 
 	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler

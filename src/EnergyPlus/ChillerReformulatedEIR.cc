@@ -2040,7 +2040,7 @@ namespace ChillerReformulatedEIR {
 			Real64 NomCap_ff = ChillerRefCap;
 		
 			//calculate the Faulty Chiller Fouling Factor using fault information
-			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingFactor();
+			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
 			
 			//update the Chiller nominal capacity at faulty cases
 			ChillerRefCap = NomCap_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;

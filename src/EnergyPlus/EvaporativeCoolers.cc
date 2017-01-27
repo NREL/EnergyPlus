@@ -70,6 +70,7 @@
 #include <DataWater.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -1742,7 +1743,7 @@ namespace EvaporativeCoolers {
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   October 2000
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Jan. 2017, Rongpeng Zhang, added fouling fault for evaporative coolers
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine needs a description.
@@ -1755,6 +1756,10 @@ namespace EvaporativeCoolers {
 
 		// USE STATEMENTS:
 		//     Use DataEnvironment, ONLY: OutDryBulbTemp, OutWetBulbTemp, OutHumRat, OutBaroPress
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::DoWeathSim;
+		using FaultsManager::FaultsEvapCoolerFouling;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1797,6 +1802,19 @@ namespace EvaporativeCoolers {
 			if ( StageEff >= 1.0 ) StageEff = 1.0;
 			// This is a rough approximation of the Total Indirect Stage Efficiency.  I think that
 			//   this would mainly be used for evap sizing purposes.
+			
+			//If there is a fault of fouling (zrp_Jan2017)
+			if( EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+				int FaultIndex = EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingIndex;
+				Real64 StageEff_ff = StageEff;
+			
+				//calculate the Faulty Evaporative Cooler Fouling Factor using fault information
+				EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFactor = FaultsEvapCoolerFouling( FaultIndex ).CalFoulingFactor();
+				
+				//update the StageEff at faulty cases
+				StageEff = StageEff_ff * EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFactor;
+			}
+ 
 			EvapCond( EvapCoolNum ).StageEff = StageEff;
 			//***************************************************************************
 			//   TEMP LEAVING DRY BULB IS CALCULATED FROM A SIMPLE WET BULB APPROACH
@@ -2924,7 +2942,7 @@ namespace EvaporativeCoolers {
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			Real64 FanPowerModCurveValue; // fan power modifier curve value
 			Real64 PumpPowerModCurveValue; // fan power modifier curve value
-			Real64 EvapCoolertotalPower; // current evapoartive cooler total electric power
+			Real64 EvapCoolertotalPower; // current evaporative cooler total electric power
 
 			EvapCoolertotalPower = 0.0;
 			if ( FlowRatio > 0.0 ) {

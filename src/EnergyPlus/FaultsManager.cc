@@ -1635,7 +1635,7 @@ namespace FaultsManager {
 	}
 	
 	Real64
-	FaultPropertiesFouling::CalFaultyFoulingFactor()
+	FaultPropertiesFouling::CalFoulingFactor()
 	{
 
 		// SUBROUTINE INFORMATION:
