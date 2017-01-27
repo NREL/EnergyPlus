@@ -94,6 +94,7 @@ namespace FaultsManager {
 	extern int const iFault_Fouling_Tower;
 	extern int const iFault_Fouling_Boiler;
 	extern int const iFault_Fouling_Chiller;
+	extern int const iFault_Fouling_EvapCooler;
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -143,6 +144,7 @@ namespace FaultsManager {
 	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
 	extern int NumFaultyBoilerFouling;  // Total number of faulty Boilers with Fouling
 	extern int NumFaultyChillerFouling;  // Total number of faulty Chillers with Fouling
+	extern int NumFaultyEvapCoolerFouling;  // Total number of faulty Evaporative Coolers with Fouling
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -296,7 +298,7 @@ namespace FaultsManager {
 		public:
 			bool CheckFaultyAirFilterFanCurve();
 	};
-	
+
 	struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
 	{
 		// Members
@@ -312,7 +314,7 @@ namespace FaultsManager {
 		{}
 			
 	};
-	
+
 	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
 	{
 		// Members
@@ -340,7 +342,7 @@ namespace FaultsManager {
 			);
 
 	};
-		
+
 	struct FaultPropertiesCondenserSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CondenserSupplyWater
 	{
 		// Members
@@ -354,8 +356,7 @@ namespace FaultsManager {
 		{}
 			
 	};
-	
-		
+
 	struct FaultPropertiesTowerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
 	{
 		// Members
@@ -373,7 +374,6 @@ namespace FaultsManager {
 		public:
 			Real64 CalFaultyTowerFoulingFactor();
 	};
-	
 
 	struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
 	{
@@ -401,7 +401,7 @@ namespace FaultsManager {
 			BoilerName( "" )
 		{}
 	};
-	
+
 	struct FaultPropertiesChillerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Chiller
 	{
 		// Members
@@ -415,7 +415,19 @@ namespace FaultsManager {
 		{}
 	};
 
+	struct FaultPropertiesEvapCoolerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:EvaporativeCooler
+	{
+		// Members
+		std::string EvaporativeCoolerType; // Evaporative Cooler type
+		std::string EvaporativeCoolerName; // Evaporative Cooler name
 	
+		// Default Constructor
+		FaultPropertiesEvapCoolerFouling():
+			EvaporativeCoolerType( "" ),
+			EvaporativeCoolerName( "" )
+		{}
+	};
+
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
@@ -428,6 +440,7 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 	extern Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
 	extern Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
+	extern Array1D< FaultPropertiesEvapCoolerFouling > FaultsEvapCoolerFouling;
 
 	// Functions
 

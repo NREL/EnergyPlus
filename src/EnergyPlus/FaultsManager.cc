@@ -55,6 +55,7 @@
 #include <CurveManager.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
+#include <EvaporativeCooler.hh>
 #include <Fans.hh>
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
@@ -125,7 +126,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 15 );
+	int const NumFaultTypes( 16 );
 	int const NumFaultTypesEconomizer( 5 );
 
 	// FaultTypeEnum
@@ -144,6 +145,7 @@ namespace FaultsManager {
 	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 113 );
 	int const iFault_Fouling_Boiler( 114 );
 	int const iFault_Fouling_Chiller( 115 );
+	int const iFault_Fouling_EvapCooler( 116 );
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -181,7 +183,8 @@ namespace FaultsManager {
 	"FaultModel:Fouling:CoolingTower",
 	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
 	"FaultModel:Fouling:Boiler",
-	"FaultModel:Fouling:Chiller"
+	"FaultModel:Fouling:Chiller",
+	"FaultModel:Fouling:EvaporativeCooler"
 	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -207,7 +210,8 @@ namespace FaultsManager {
 	iFault_Fouling_Tower,
 	iFault_TemperatureSensorOffset_CoilSupplyAir,
 	iFault_Fouling_Boiler,
-	iFault_Fouling_Chiller
+	iFault_Fouling_Chiller,
+	iFault_Fouling_EvapCooler
 	});
 
 	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
@@ -224,6 +228,7 @@ namespace FaultsManager {
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
 	int NumFaultyBoilerFouling( 0 );  // Total number of faulty Boilers with Fouling
 	int NumFaultyChillerFouling( 0 );  // Total number of faulty Chillers with Fouling
+	int NumFaultyEvapCoolerFouling( 0 );  // Total number of faulty Evaporative Coolers with Fouling
 	
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -239,6 +244,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 	Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
 	Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
+	Array1D< FaultPropertiesEvapCoolerFouling > FaultsEvapCoolerFouling;
 
 	// Functions
 
@@ -257,7 +263,8 @@ namespace FaultsManager {
 		//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
 		//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
 		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
-		//                      Dec. 2016, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
+		//                      Jan. 2017, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
+		//
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -341,8 +348,11 @@ namespace FaultsManager {
 				// 14th fault: Faulty Boiler with Fouling
 				NumFaultyBoilerFouling = NumFaultsTemp;  
 			} else if( i == 15 ) {
-				// 14th fault: Faulty Chiller with Fouling
+				// 15th fault: Faulty Chiller with Fouling
 				NumFaultyChillerFouling = NumFaultsTemp;  
+			} else if( i == 15 ) {
+				// 16th fault: Faulty Evaporative Cooler with Fouling
+				NumFaultyEvapCoolerFouling = NumFaultsTemp;  
 			}
 		}
 	
@@ -369,6 +379,7 @@ namespace FaultsManager {
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 		if( NumFaultyBoilerFouling > 0 ) FaultsBoilerFouling.allocate( NumFaultyBoilerFouling );
 		if( NumFaultyChillerFouling > 0 ) FaultsChillerFouling.allocate( NumFaultyChillerFouling );
+		if( NumFaultyEvapCoolerFouling > 0 ) FaultsEvapCoolerFouling.allocate( NumFaultyEvapCoolerFouling );
 		
 		// read faults input of Fault_type 115: Chiller Fouling
 		for ( int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling ) {
@@ -427,7 +438,7 @@ namespace FaultsManager {
 				int ChillerNum; 
 				
 				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetElectricInput ) {
 						PlantChillers::GetElectricChillerInput();
 						PlantChillers::GetElectricInput = false;
@@ -452,7 +463,7 @@ namespace FaultsManager {
   					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerElectricEIR::GetInputEIR ) {
 						ChillerElectricEIR::GetElectricEIRChillerInput();
 						ChillerElectricEIR::GetInputEIR = false;
@@ -478,7 +489,7 @@ namespace FaultsManager {
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
 				
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
 						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
 						ChillerReformulatedEIR::GetInputREIR = false;
@@ -503,7 +514,7 @@ namespace FaultsManager {
 					}
 				
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetConstCOPInput ) {
 						PlantChillers::GetConstCOPChillerInput();
 						PlantChillers::GetConstCOPInput = false;
@@ -528,7 +539,7 @@ namespace FaultsManager {
 					}
  
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetEngineDrivenInput ) {
 						PlantChillers::GetEngineDrivenChillerInput();
 						PlantChillers::GetEngineDrivenInput = false;
@@ -553,7 +564,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetGasTurbineInput ) {
 						PlantChillers::GetGTChillerInput();
 						PlantChillers::GetGasTurbineInput = false;
@@ -1067,7 +1078,7 @@ namespace FaultsManager {
 				int ChillerNum; 
 				
 				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetElectricInput ) {
 						PlantChillers::GetElectricChillerInput();
 						PlantChillers::GetElectricInput = false;
@@ -1084,7 +1095,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerElectricEIR::GetInputEIR ) {
 						ChillerElectricEIR::GetElectricEIRChillerInput();
 						ChillerElectricEIR::GetInputEIR = false;
@@ -1118,7 +1129,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetEngineDrivenInput ) {
 						PlantChillers::GetEngineDrivenChillerInput();
 						PlantChillers::GetEngineDrivenInput = false;
@@ -1135,7 +1146,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetGasTurbineInput ) {
 						PlantChillers::GetGTChillerInput();
 						PlantChillers::GetGasTurbineInput = false;
@@ -1152,7 +1163,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetConstCOPInput ) {
 						PlantChillers::GetConstCOPChillerInput();
 						PlantChillers::GetConstCOPInput = false;
@@ -1169,7 +1180,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerAbsorption::GetInput ) {
 						ChillerAbsorption::GetBLASTAbsorberInput();
 						ChillerAbsorption::GetInput = false;
@@ -1186,7 +1197,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerIndirectAbsorption::GetInput ) {
 						ChillerIndirectAbsorption::GetIndirectAbsorberInput();
 						ChillerIndirectAbsorption::GetInput = false;
