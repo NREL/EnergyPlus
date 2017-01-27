@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -64,8 +64,12 @@ public: // Types
 	using Super::conformable;
 	using Super::npos;
 	using Super::operator ();
+
+protected: // Types
+
 	using Super::shift_set;
 	using Super::size_set;
+
 	using Super::data_;
 	using Super::I_;
 	using Super::sdata_;
