@@ -53022,7 +53022,8 @@ AirLoopHVAC:UnitarySystem,
        \note Leaving this schedule name blank will default to constant fan mode for the
        \note entire simulation period.
        \note This field is not used when set point based control is used where a set point
-       \note controls the coil (i.e., model assumes constant fan mode operation).
+       \note controls the coil or ASHRAE90VariableFan control type is selected (i.e., model
+       \note assumes constant fan mode operation).
   A12, \field Heating Coil Object Type
        \type choice
        \key Coil:Heating:DX:SingleSpeed
@@ -53094,15 +53095,20 @@ AirLoopHVAC:UnitarySystem,
        \note If Yes, the DX cooling coil runs as 100% DOAS DX coil.
        \note If No, the DX cooling coil runs as a regular DX coil.
        \note If left blank the default is regular dx coil.
-  N2 , \field DOAS DX Cooling Coil Leaving Minimum Air Temperature
+  N2 , \field Minimum Supply Air Temperature
        \type real
        \units C
        \minimum 0.0
-       \maximum 7.2
+       \maximum 20.0
        \default 2.0
-       \note DX cooling coil leaving minimum air temperature defines the minimum DOAS DX cooling coil
-       \note leaving air temperature that should be maintained to avoid frost formation. This input
-       \note field is optional and only used along with the input field above.
+       \autosizable
+       \note When USE DOAS DX Cooling Coil is specified as Yes, Minimum Supply Air Temperature
+       \note defines the minimum DOAS DX cooling coil leaving air temperature that should
+       \note be maintained to avoid frost formation.
+       \note When ASHRAE90VariableFan Control Type is specified, this input
+       \note field specifies the minimum supply air temperature in cooling mode or
+       \note leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1.
+       \note In this case, a zone sizing simulation is required.
   A17, \field Latent Load Control
        \type choice
        \key SensibleOnlyLoadControl
@@ -53284,6 +53290,8 @@ AirLoopHVAC:UnitarySystem,
        \autosizable
        \default 80.0
        \note Enter the maximum supply air temperature leaving the heating coil.
+       \note When ASHRAE90VariableFan Control Type is selected, enter the maximum air temperature in heating mode.
+       \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
   N18, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
        \type real
        \units C

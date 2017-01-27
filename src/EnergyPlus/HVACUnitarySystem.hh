@@ -102,7 +102,7 @@ namespace HVACUnitarySystem {
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
 
-	extern int const ASHRAE90LOAD; // capacity control type
+	extern int const CCM_ASHRAE; // capacity control based on ASHRAE Standard 90.1
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -201,7 +201,7 @@ namespace HVACUnitarySystem {
 		int DehumidControlType_Num; // Set to Dehumid Control None, CoolReheat or MultiMode
 		int AirFlowControl; // UseCompressorOnFlow or UseCompressorOffFlow
 		int ControlType; // Setpoint or Load based control
-		int CapacityControlType; // ASHRAE90.1 control or normal control
+		int CapacityControlType; // operational system control
 		bool RequestAutoSize; // determines if inputs need autosizing
 		bool RunOnSensibleLoad; // logical determines if this system will run to
 		bool RunOnLatentLoad; // logical determines if this system will run to
@@ -255,6 +255,8 @@ namespace HVACUnitarySystem {
 		int HeatCoilCompNum; // Comp num of the heating coil in the plant loop
 		int HeatCoilFluidInletNode; // Heating coil fluid inlet node
 		Real64 MaxHeatCoilFluidFlow; // Maximum heating coil fluid flow for hot water or steam coil
+		Real64 CoolCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
+		Real64 HeatCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
 		Real64 HeatCompPartLoadRatio; // Unitary system compressor part load ratio in heating
 		// Supplemental heating coil specific data
 		std::string SuppHeatCoilName; // coil name (eliminate after blank is accepted in CALL)
@@ -389,6 +391,8 @@ namespace HVACUnitarySystem {
 		Real64 SpeedRatio; // current compressor speed ratio (variable speed)
 		Real64 CycRatio; // cycling part load ratio (variable speed)
 		int TESOpMode; // operating mode of TES DX cooling coil
+		Real64 LowSpeedCoolFanRatio;
+		Real64 LowSpeedHeatFanRatio;
 		// Warning message variables
 		int HXAssistedSensPLRIter; // used in HX Assisted calculations
 		int HXAssistedSensPLRIterIndex; // used in HX Assisted calculations
@@ -435,6 +439,7 @@ namespace HVACUnitarySystem {
 		int MSpdCycLatPLRIter; // used in MultiSpeed calculations
 		int MSpdCycLatPLRIterIndex; // used in MultiSpeed calculations
 		int MaxIterIndex; // used in PLR calculations for sensible load
+		int MaxIterIndex2; // used in PLR calculations for sensible load
 		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
 		int LatMaxIterIndex; // used in PLR calculations for moisture load
 		int LatRegulaFalsIFailedIndex; // used in PLR calculations for moisture load
@@ -538,6 +543,8 @@ namespace HVACUnitarySystem {
 			HeatCoilCompNum( 0 ),
 			HeatCoilFluidInletNode( 0 ),
 			MaxHeatCoilFluidFlow( AutoSize ),
+			CoolCoilWaterFlowRatio( 0.0 ),
+			HeatCoilWaterFlowRatio( 0.0 ),
 			HeatCompPartLoadRatio( 0.0 ),
 			SuppHeatCoilType_Num( 0 ),
 			SuppHeatCoilIndex( 0 ),
@@ -653,6 +660,8 @@ namespace HVACUnitarySystem {
 			SpeedRatio( 0.0 ),
 			CycRatio( 0.0 ),
 			TESOpMode( 0 ),
+			LowSpeedCoolFanRatio( 0.0),
+			LowSpeedHeatFanRatio( 0.0 ),
 			HXAssistedSensPLRIter( 0 ),
 			HXAssistedSensPLRIterIndex( 0 ),
 			HXAssistedSensPLRFail( 0 ),
@@ -698,6 +707,7 @@ namespace HVACUnitarySystem {
 			MSpdCycLatPLRIter( 0 ),
 			MSpdCycLatPLRIterIndex( 0 ),
 			MaxIterIndex( 0 ),
+			MaxIterIndex2( 0 ),
 			RegulaFalsIFailedIndex( 0 ),
 			LatMaxIterIndex( 0 ),
 			LatRegulaFalsIFailedIndex( 0 ),
@@ -867,6 +877,12 @@ namespace HVACUnitarySystem {
 		Optional_int CompOn = _
 	);
 
+	Real64
+	CalcUnitarySystemWaterFlowResidual(
+		Real64 const PartLoadRatio, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
 	void
 	SetSpeedVariables(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
@@ -897,6 +913,13 @@ namespace HVACUnitarySystem {
 	);
 
 	void
+	calculateCapacity(
+		int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
+		Real64 & SensOutput, // sensible output of AirloopHVAC:UnitarySystem
+		Real64 & LatOutput // latent output of AirloopHVAC:UnitarySystem
+	);
+
+	void
 	CalcUnitaryCoolingSystem(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		int const AirLoopNum, // index to air loop
@@ -905,7 +928,7 @@ namespace HVACUnitarySystem {
 		int const CompOn, // compressor control (0=off, 1=on)
 		Real64 const OnOffAirFlowRatio,
 		Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
-		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
+		bool const HXUnitOn // Flag to control HX for HXAssisted Cooling Coil
 	);
 
 	void

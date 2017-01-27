@@ -1963,6 +1963,58 @@ namespace ReportSizingManager {
 				} else if ( SizingType == DesiccantDehumidifierBFPerfDataFaceVelocitySizing ) {
 					AutosizeDes = 4.30551 + 0.01969 * DataAirFlowUsedForSizing;
 					AutosizeDes = min( 6.0, AutosizeDes);
+				} else if( SizingType == MinSATempCoolingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						if ( CurOASysNum > 0 ) { // coil is in OA stream
+							CoilInTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
+							CoilInHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
+						} else { // coil is in main air loop
+							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+								CoilInTemp = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
+								CoilInHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
+							} else { // thereis precooling of the OA stream
+								if ( DataFlowUsedForSizing > 0.0 ) {
+									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DataFlowUsedForSizing;
+								} else {
+									OutAirFrac = 1.0;
+								}
+								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+								CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
+								CoilInHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
+							}
+						}
+						AutosizeDes = CoilInTemp - ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( CoilInHumRat, CoilInTemp ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
+				} else if( SizingType == MaxSATempHeatingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						if ( CurOASysNum > 0 ) { // coil is in OA stream
+							CoilInTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+							CoilInHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+						} else { // coil is in main air loop
+							if ( PrimaryAirSystem( CurSysNum ).NumOAHeatCoils == 0 ) { // there is no precooling of the OA stream
+								CoilInTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
+								CoilInHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
+							} else { // thereis precooling of the OA stream
+								if ( DataFlowUsedForSizing > 0.0 ) {
+									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DataFlowUsedForSizing;
+								} else {
+									OutAirFrac = 1.0;
+								}
+								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+								CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+								CoilInHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetHumRat;
+							}
+						}
+						AutosizeDes = CoilInTemp + ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( CoilInHumRat, CoilInTemp ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
 				}
 			}
 		} else {
