@@ -84,33 +84,35 @@ Equally, if the Outside Boundary Condition is "OtherSideCoefficients", then...
 
 Foundation:Kiva objects describe boundary conditions for ground-coupled foundation surfaces. Surfaces with the "Outside Boundary Condition" defined as "Foundation", may also refer to a Foundation:Kiva object in the "Outside Boundary Condition Object" field (if unspecified, a default Foundation:Kiva object will be created and applied).
 
-Limitations when using Foundaiton:Kiva objects include:
+Limitations when using Foundation:Kiva objects include:
 
 - Only floors and walls may use Foundation:Kiva objects as Outside Boundary Conditions.
-- Exactly one floor surface must reference each Foundation object.
+- Exactly one floor surface must reference each Foundation:Kiva object. However, multiple floors may exist in the same thermal zone so long as they reference separate Foundation:Kiva objects.
 - All foundation wall surfaces must be quadrilateral and connect to the floor surface along one edge.
 
 The inputs from Foundation:Kiva objects are translated into Kiva's foundation heat transfer model. Kiva^TM^ generates a two-dimensional heat transfer calculation to represent heat flow between a zone and the adjacent ground. Foundation:Kiva surfaces do not use the same HeatBalanceAlgorithm (e.g., Conduction Transfer Functions) as the rest of the model.
 
-Foundation:Kiva objects are used to describe the two-dimensional features that cannot be captured by the typical one-dimensional constructions used in EnergyPlus. Figure 1 illustrates the two-dimensional context of these features as interpreted by Kiva.
+Foundation:Kiva objects are used to describe the two-dimensional features that cannot be captured by the typical one-dimensional constructions used in EnergyPlus. Figure @fig:context illustrates Kiva's two-dimensional context for a basement where the basement slab and wall both refer to "Foundation" as the Outside Boundary Condition, the ceiling of the basement and the exterior wall of the zone above the basement refer to "Surface" (or "Zone") and "Outdoors", respectively. Note: Not all of the foundation wall surface needs to be below grade (see the "Wall Height Above Grade" field for this object). Any part above grade is modeled in Kiva's two-dimensional heat transfer calculations. The non-foundation surfaces are shown in Figure @fig:context for context, but are not part of the Kiva model.
 
-![Figure 1: 2-dimensional context for Foundation:Kiva object input](Kiva-images/kiva-2d-boundaries.png)
+![Outside Boundary Conditions for surfaces within Kiva's Two-dimensional context. Only surfaces referencing "Foundation" are simulated in Kiva](Kiva-images/kiva-2d-otherside.png){#fig:context}
 
-This context allows for a finer description of the structural and insulation components of a foundation that impact heat transfer (Figure 2).
+This context allows for a finer description of the structural and insulation components of a foundation that impact heat transfer (Figure @fig:el).
 
-![Figure 2: Structural and insulation components of Foundation:Kiva objects](Kiva-images/kiva-2d-elements.png)
+![Structural and insulation components of Foundation:Kiva objects](Kiva-images/kiva-2d-elements.png){#fig:el}
 
-Foundation:Kiva objects define only the aspects of the foundation that are not already defined by the one-dimensional constructions of the respective surfaces. That is, the footing wall and slab constructions and their relative dimensions are inferred from the respective Surface objects (see Figure 3).
+Foundation:Kiva objects define only the aspects of the foundation that are not already defined by the one-dimensional constructions of the respective surfaces. That is, the footing wall and slab constructions and their relative dimensions are inferred from the respective Surface objects (see Figure @fig:surf).
 
-![Figure 3: Two-dimensional interpretation of foundation surface data](Kiva-images/kiva-2d-surfaces.png)
+![Two-dimensional interpretation of foundation surface data](Kiva-images/kiva-2d-surfaces.png){#fig:surf}
 
-The depth of the foundation is defined by the hight of the wall surfaces that reference the Foundation:Kiva boundary condition object. For slab-on-grade foundations, a depth of zero is implied by having no associated wall surfaces.
+The depth of the foundation is defined by the hight of the wall surfaces that reference the Foundation:Kiva boundary condition object. For slab-on-grade foundations, a depth of zero is implied by having no associated wall surfaces. Figure @fig:ws shows a slab-on-grade foundation with whole slab insulation. Notice there are no walls referencing the "Foundation" Outside Boundary Condition. In this case, the under-slab insulation is modeled as part of the slab construction, while the edge/gap insulation is modeled using the interior vertical insulation fields of a Foundation:Kiva object. Note: Since there are no wall surfaces for slab foundations, the footing wall construction is defined within the Foundation:Kiva object (or defaulted to a 0.3m wide cast concrete wall).
 
-For example, a walkout basement (with a variable grade along the sides; see Figure 4) must be modeled using discrete quadrilateral surfaces of varying heights for the walls as shown in Figure 5.
+![Two-dimensional interpretation of foundation surface data](Kiva-images/kiva-2d-whole-slab.png){#fig:ws}
 
-![Figure 4: Example walkout basement](Kiva-images/kiva-walkout-real.png)
+A walkout basement (with a variable grade along the sides; see Figure @fig:wo-r) must be modeled using discrete quadrilateral surfaces of stepped height for the walls as shown in Figure @fig:wo-s.
 
-![Figure 5: Walkout basement wall and floor surfaces (in gray) all reference the same Foundation:Kiva object](Kiva-images/kiva-walkout-segs.png)
+![Example walkout basement](Kiva-images/kiva-walkout-real.png){#fig:wo-r}
+
+![Walkout basement wall and floor surfaces (in gray) all reference the same Foundation:Kiva object](Kiva-images/kiva-walkout-segs.png){#fig:wo-s}
 
 The width of the floor surface in the two-dimensional context is defined by the area and the exposed perimeter (see SurfaceProperty:ExposedFoundationPerimeter) of the floor surface object. Details on this calculation can be found in the Engineering Reference document.
 
@@ -194,9 +196,9 @@ The unique identifier of the Foundation:Kiva object. Referenced by a the "Outsid
 
 A reference to a material object associated with the interior horizontal insulation. If left blank, no interior horizontal insulation will be used. Default: blank.
 
-The following two fields define the placement of this material within Kiva's two-dimensional context and are illustrated in Figure 6.
+The following two fields define the placement of this material within Kiva's two-dimensional context and are illustrated in Figure @fig:ihi.
 
-![Figure 6: Placement of interior horizontal insulation](Kiva-images/kiva-2d-ihi.png)
+![Placement of interior horizontal insulation](Kiva-images/kiva-2d-ihi.png){#fig:ihi}
 
 #### Field: Interior Horizontal Insulation Depth
 
@@ -210,9 +212,9 @@ Extent of insulation as measured from the wall interior to the edge of interior 
 
 A reference to a material object associated with the interior vertical insulation. If left blank, no interior vertical insulation will be used. Default: blank.
 
-The following field defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure 7.
+The following field defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure @fig:ivi.
 
-![Figure 7: Placement of interior vertical insulation](Kiva-images/kiva-2d-ivi.png)
+![Placement of interior vertical insulation](Kiva-images/kiva-2d-ivi.png){#fig:ivi}
 
 #### Field: Interior Vertical Insulation Depth
 
@@ -222,9 +224,9 @@ Extent of insulation as measured from the wall top to the bottom edge of the int
 
 A reference to a material object associated with the exterior horizontal insulation. If left blank, no exterior horizontal insulation will be used. Default: blank.
 
-The following two fields define the placement of this material within Kiva's two-dimensional context and are illustrated in Figure 8.
+The following two fields define the placement of this material within Kiva's two-dimensional context and are illustrated in Figure @fig:ehi.
 
-![Figure 8: Placement of exterior horizontal insulation](Kiva-images/kiva-2d-ehi.png)
+![Placement of exterior horizontal insulation](Kiva-images/kiva-2d-ehi.png){#fig:ehi}
 
 #### Field: Exterior Horizontal Insulation Depth
 
@@ -238,9 +240,9 @@ Extent of insulation as measured from the wall exterior to the edge of exterior 
 
 A reference to a material object associated with the exterior vertical insulation. If left blank, no exterior vertical insulation will be used. Default: blank
 
-The following field defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure 9.
+The following field defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure @fig:evi.
 
-![Figure 9: Placement of exterior vertical insulation](Kiva-images/kiva-2d-evi.png)
+![Placement of exterior vertical insulation](Kiva-images/kiva-2d-evi.png){#fig:evi}
 
 #### Field: Exterior Vertical Insulation Depth
 
@@ -250,9 +252,9 @@ Extent of insulation as measured from the wall top to the bottom edge of the ext
 
 Distance from the exterior grade to the wall top, in m. Default: 0.2 m
 
-Figure 10 illustrates the definition of both the "Wall Height Above Grade" and the following field, "Wall Depth Below Slab".
+Figure @fig:2d-w illustrates the definition of both the "Wall Height Above Grade" and the following field, "Wall Depth Below Slab".
 
-![Figure 10: Definition of exterior grade and footing wall depth relative to the wall surface](Kiva-images/kiva-2d-wall.png)
+![Definition of exterior grade and footing wall depth relative to the wall surface](Kiva-images/kiva-2d-wall.png){#fig:2d-w}
 
 #### Field: Wall Depth Below Slab
 
@@ -274,9 +276,9 @@ Note: all associated walls must have the same construction.
 
 A reference to a material object associated with the foundation footing (typically some form of concrete). The thickness of this material is used to determine the width of the footing. If left blank, no footing will be used. Default: blank
 
-The following field defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure 11.
+The following field defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure @fig:foot.
 
-![Figure 11: Placement of footing](Kiva-images/kiva-2d-footing.png)
+![Placement of footing](Kiva-images/kiva-2d-footing.png){#fig:foot}
 
 #### Field: Footing Depth
 
@@ -287,17 +289,17 @@ Top-to-bottom dimension of the footing (not to be confused with its depth in the
 
 A reference to a material object associated with a custom block in the two-dimensional foundation context. The thickness of this material determines the width of the block.
 
-Custom blocks can be used to represent solid materials in the two-dimensional context that are not otherwise covered by the fields above. Examples of this might include interior finishings and insulation (Figure 12) or backfill soil with different thermal properties (Figure 13).
+Custom blocks can be used to represent solid materials in the two-dimensional context that are not otherwise covered by the fields above. Examples of this might include interior finishings and insulation (Figure @fig:cw) or backfill soil with different thermal properties (Figure @fig:cf).
 
-![Figure 12: Custom blocks representing interior batt insulation and dry wall](Kiva-images/kiva-2d-custom-ex-wall.png)
+![Custom blocks representing interior batt insulation and dry wall](Kiva-images/kiva-2d-custom-ex-wall.png){#fig:cw}
 
-![Figure 13: Custom block representing exterior backfill](Kiva-images/kiva-2d-custom-ex-fill.png)
+![Custom block representing exterior backfill](Kiva-images/kiva-2d-custom-ex-fill.png){#fig:cf}
 
-If two or more custom blocks overlap, the final properties are determined by the higher block number (e.g., Custom Block 4 in the input object supersedes properties defined by Custom Block 2). All custom blocks properties are superseded by the elements shown in Figure 2.
+If two or more custom blocks overlap, the final properties are determined by the higher block number (e.g., Custom Block 4 in the input object supersedes properties defined by Custom Block 2). All custom blocks properties are superseded by the elements shown in Figure @fig:el.
 
-The following fields defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure 14.
+The following fields defines the placement of this material within Kiva's two-dimensional context and are illustrated in Figure @fig:custom.
 
-![Figure 14: Placement of a custom block](Kiva-images/kiva-2d-custom.png)
+![Placement of a custom block](Kiva-images/kiva-2d-custom.png){#fig:custom}
 
 #### Field: Custom Block \<x\> Depth
 
@@ -416,9 +418,13 @@ Number of years to simulate the ground before beginning of the run period. This 
 
 This object (currently only used in conjunction with Foundation:Kiva boundary conditions) defines the perimeter of a foundation floor that is exposed to the exterior environment through the floor. The user may either define the total exposed perimeter, the fraction of the total perimeter that is exposed, or individually define which segments of the floor surface perimeter are exposed. This object is optional. By default it is assumed that the entire perimeter of each foundation is exposed.
 
-Figure 15 illustrates how the exposed perimeter is determined from a floor plan of the foundation level.
+Figure @fig:ex illustrates how the exposed perimeter is determined from a floor plan of the foundation level.
 
-![Figure 15: Exposed foundation perimeter](Kiva-images/kiva-exposed-perim.png)
+Some buildings may have neighboring zones with different foundation types. For example, a crawlspace next to a garage with a slab (Figure @fig:ifw). The foundation wall in this case is NOT considered part of either floor's exposed perimeter, and should not reference a Foundation boundary condition. Kiva does not calculate heat flow between two zones through ground. In this case, it is best to approximate interior foundation wall using an Adiabatic Outside Boundary Condition.
+
+![Exposed foundation perimeter](Kiva-images/kiva-exposed-perim.png){#fig:ex}
+
+![Interior foundation wall](Kiva-images/kiva-interior-fnd-wall.png){#fig:ifw}
 
 ### Input Description
 
@@ -475,17 +481,17 @@ This approach allows for accurate representation of building foundation heat tra
 
 ### Numerical Calculations
 
-Kiva automatically discretizes the two-dimensional domain into rectangular cells. The size of each cell is defined by the Foundation:Kiva:Settings object's "Minimum Cell Dimension" and "Maximum Cell Growth Coefficient". The "Minimum Cell Dimension" defines the smallest possible dimension of a cell within the domain. Cells along a block boundary start at this size and grow geometrically away from the boundary according to the "Maximum Cell Growth Coefficient". This is evident from Figures 16 and 17 which show the discretization for a single foundation at close and far perspectives, respectively.
+Kiva automatically discretizes the two-dimensional domain into rectangular cells. The size of each cell is defined by the Foundation:Kiva:Settings object's "Minimum Cell Dimension" and "Maximum Cell Growth Coefficient". The "Minimum Cell Dimension" defines the smallest possible dimension of a cell within the domain. Cells along a block boundary start at this size and grow geometrically away from the boundary according to the "Maximum Cell Growth Coefficient". This is evident from Figures @fig:ms and @fig:mb which show the discretization for a single foundation at close and far perspectives, respectively.
 
-![Figure 16: Example generated discretization near foundation perimeter](Kiva-images/kiva-2d-mesh.png)
+![Example generated discretization near foundation perimeter](Kiva-images/kiva-2d-mesh.png){#fig:ms}
 
-![Figure 17: Example generated discretization of full domain](Kiva-images/kiva-2d-mesh-big.png)
+![Example generated discretization of full domain](Kiva-images/kiva-2d-mesh-big.png){#fig:mb}
 
 The discretized partial differential equations are solved using the Alternating Direction Implicit (ADI) finite difference time stepping scheme. This scheme provides relatively fast calculations with stable results as demonstrated by Kruis and Krarti (2015).
 
 ### Boundary Conditions
 
-![Figure 18: Boundary conditions in Kiva's two-dimensional context](Kiva-images/kiva-2d-boundaries.png)
+![Boundary conditions in Kiva's two-dimensional context](Kiva-images/kiva-2d-boundaries.png){#fig:bnd}
 
 **Symmetry Plane:** Zero heat flux in the horizontal direction.
 
@@ -514,11 +520,23 @@ In some cases, a single Foundation boundary condition might require multiple Kiv
 
 **Walk-Out Basements:** Walkout basements are defined by using walls of different heights all referencing the same Foundation:Kiva object.
 
-![Figure 19: Walkout basement surfaces (in gray) all reference the same Foundation:Kiva object](Kiva-images/kiva-walkout-segs.png)
+![Walkout basement surfaces (in gray) all reference the same Foundation:Kiva object](Kiva-images/kiva-walkout-segs.png){#fig:wo-s2}
 
-A separate Kiva instance will be run for any walls with different heights associated with the same Foundation:Kiva object. Figure 20 shows how the grouping of walls by height based on the basement in Figure 19, including the portion that is only a slab.
+A separate Kiva instance will be run for any walls with different heights associated with the same Foundation:Kiva object. Figure @fig:wo-s2 shows how the grouping of walls by height based on the basement in Figure @fig:wo-w, including the portion that is only a slab.
 
-![Figure 20: Walkout basement Kiva instances (one for each wall height)](Kiva-images/kiva-walkout-walls.png)
+![Figure 20: Walkout basement Kiva instances (one for each wall height)](Kiva-images/kiva-walkout-walls.png){#fig:wo-w}
+
+The resulting five two-dimensional contexts will look like Figures @fig:wo-1 - @fig:wo-5.
+
+![Group 1 Kiva context](Kiva-images/kiva-walkout-2d-1.png){#fig:wo-1}
+
+![Group 2 Kiva context](Kiva-images/kiva-walkout-2d-2.png){#fig:wo-2}
+
+![Group 3 Kiva context](Kiva-images/kiva-walkout-2d-3.png){#fig:wo-3}
+
+![Group 4 Kiva context](Kiva-images/kiva-walkout-2d-4.png){#fig:wo-4}
+
+![Group 5 Kiva context](Kiva-images/kiva-walkout-2d-5.png){#fig:wo-5}
 
 Each Kiva instance with a different wall height will calculate different heat fluxes, convective coefficients and surface temperatures for both the wall and the floor. The heat flux through the associated floor will be weighted according to the fraction of the total exposed perimeter, $P_{exp,tot}$, represented by each segment of different height. The total heat flux through the walkout basement floor is:
 
@@ -539,9 +557,9 @@ $$ \bar{T}_{floor} = T_\infty - \dot{q}/\bar{h} $$
 
 Because core zones have no exposed perimeter, they are assumed to exchange heat only with the deep ground boundary condition. This is calculated using a one-dimensional finite difference formulation. The associated Kiva instance will use only the description of the slab and the deep ground boundary condition to define the heat flux through the surface.
 
-![Core zone (no exposed perimeter)](Kiva-images/kiva-core-zone.png)
+![Core zone (no exposed perimeter)](Kiva-images/kiva-core-zone.png){#fig:cz}
 
-![Core zone one-dimensional context](Kiva-images/kiva-core-zone-1d.png)
+![Core zone one-dimensional context](Kiva-images/kiva-core-zone-1d.png){#fig:cz-1}
 
 ### Warm-Up
 
