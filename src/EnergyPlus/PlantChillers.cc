@@ -4293,7 +4293,7 @@ namespace PlantChillers {
 			Real64 NomCap_ff = ChillerNomCap;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
-			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingFactor();
 			
 			//update the Chiller nominal capacity at faulty cases
 			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
@@ -4956,7 +4956,7 @@ namespace PlantChillers {
 			Real64 NomCap_ff = ChillerNomCap;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
-			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingFactor();
 			
 			//update the Chiller nominal capacity at faulty cases
 			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
@@ -5606,7 +5606,7 @@ namespace PlantChillers {
 			Real64 NomCap_ff = ChillerNomCap;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
-			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingFactor();
 			
 			//update the Chiller nominal capacity at faulty cases
 			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
@@ -6160,7 +6160,7 @@ namespace PlantChillers {
 			Real64 NomCap_ff = ChillerNomCap;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
-			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingFactor();
 			
 			//update the Chiller nominal capacity at faulty cases
 			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;

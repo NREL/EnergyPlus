@@ -946,7 +946,7 @@ namespace Boilers {
 			Real64 NomCap_ff = BoilerNomCap;
 			
 			//calculate the Faulty Boiler Fouling Factor using fault information
-			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFaultyFoulingFactor();
 			
 			//update the boiler nominal capacity at faulty cases
 			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;

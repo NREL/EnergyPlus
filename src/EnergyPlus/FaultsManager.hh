@@ -378,15 +378,15 @@ namespace FaultsManager {
 	struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
 	{
 		// Members
-		Real64 RefCapReductionFactor; //UA Reduction Factor
+		Real64 FoulingFactor; //Fouling Factor
 	
 		// Default Constructor
 		FaultPropertiesFouling():
-			RefCapReductionFactor( 1.0 )
+			FoulingFactor( 1.0 )
 		{}
 
 		public:
-			Real64 CalFaultyFoulingCapReductionFactor(); // To calculate the dynamic fouling factor
+			Real64 CalFaultyFoulingFactor(); // To calculate the dynamic fouling factor
 	};
 
 	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler

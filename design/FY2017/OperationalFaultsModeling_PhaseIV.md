@@ -211,8 +211,7 @@ FaultModel:Fouling:EvaporativeCooler,
        \type object-list
        \object-list Chillers
    N1; \field Reference Fouling Factor
-       \note The factor indicates the decrease of the nominal capacity
-       \note It is the ratio between the nominal capacity at fouling case and that at fault free case
+       \note The factor indicates the decrease of the indirect stage efficiency
        \type real
        \minimum> 0
        \maximum<= 1

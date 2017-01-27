@@ -416,7 +416,7 @@ namespace FaultsManager {
 			}
 
 			// CapReductionFactor - degree of fault
-			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).RefCapReductionFactor = rNumericArgs( 1 );
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).FoulingFactor = rNumericArgs( 1 );
 			
 			// Evaporative cooler type
 			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerType = cAlphaArgs( 4 );
@@ -493,7 +493,7 @@ namespace FaultsManager {
 			}
 
 			// CapReductionFactor - degree of fault
-			FaultsChillerFouling( jFault_ChillerFouling ).RefCapReductionFactor = rNumericArgs( 1 );
+			FaultsChillerFouling( jFault_ChillerFouling ).FoulingFactor = rNumericArgs( 1 );
 			
 			// Chiller type
 			FaultsChillerFouling( jFault_ChillerFouling ).ChillerType = cAlphaArgs( 4 );
@@ -703,7 +703,7 @@ namespace FaultsManager {
 			}
 
 			// CapReductionFactor - degree of fault
-			FaultsBoilerFouling( jFault_BoilerFouling ).RefCapReductionFactor = rNumericArgs( 1 );
+			FaultsBoilerFouling( jFault_BoilerFouling ).FoulingFactor = rNumericArgs( 1 );
 			
 			// Boiler type
 			FaultsBoilerFouling( jFault_BoilerFouling ).BoilerType = cAlphaArgs( 4 );
@@ -1635,7 +1635,7 @@ namespace FaultsManager {
 	}
 	
 	Real64
-	FaultPropertiesFouling::CalFaultyFoulingCapReductionFactor()
+	FaultPropertiesFouling::CalFaultyFoulingFactor()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1643,8 +1643,8 @@ namespace FaultsManager {
 		//       DATE WRITTEN   Nov. 2016
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// To calculate the dynamic Nominal Capacity Reduction Factor due to fouling, based on the fault availability schedule and severity schedule.
-		// The factor is the ratio between the nominal capacity at fouling case and that at fault free case
+		// To calculate the dynamic Nominal Capacity or Efficiency Reduction due to fouling, based on the fault availability schedule and severity schedule.
+		// The factor is the ratio between the nominal capacity or efficiency at fouling case and that at fault free case
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
@@ -1652,7 +1652,7 @@ namespace FaultsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FaultFac( 0.0 ); // fault modification factor
-		Real64 FoulingCapReductionFactor( 1.0 ); // Actual Nominal Capacity Reduction Factor, ratio between the nominal capacity at fouling case and that at fault free case
+		Real64 FoulingFactor( 1.0 ); // Actual Nominal Fouling Factor, ratio between the nominal capacity or efficiency at fouling case and that at fault free case
 
 		// FLOW
 		
@@ -1667,10 +1667,10 @@ namespace FaultsManager {
 			}
 		}
 		
-		// The more severe the fouling fault is (i.e., larger FaultFac), the less the CapReductionFactor is
-		if( FaultFac > 0.0 ) FoulingCapReductionFactor = min( this->RefCapReductionFactor / FaultFac, 1.0 );
+		// The more severe the fouling fault is (i.e., larger FaultFac), the less the FoulingFactor is
+		if( FaultFac > 0.0 ) FoulingFactor = min( this->FoulingFactor / FaultFac, 1.0 );
 
-		return FoulingCapReductionFactor;
+		return FoulingFactor;
 	}
 
 	Real64
