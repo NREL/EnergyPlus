@@ -2101,45 +2101,22 @@ namespace WaterCoils {
 					DataFanOpMode = ContFanCycCoil;
 					TempSize = WaterCoil ( CoilNum ).UACoil;
 
-					Real64 lowLimitCap;
-					Real64 highLimitCap;
 					Real64 DesCoilWaterInTempSaved;
 					Real64 DesCoilInletWaterTempUsed( 0.0 ); // coil design inlet water temp for UA sizing only
-
-					WaterCoil( DataCoilNum ).UACoilVariable = 0.001 * DataCapacityUsedForSizing;
-					CalcSimpleHeatingCoil( DataCoilNum, DataFanOpMode, 1.0, 1 );
-					lowLimitCap = WaterCoil( DataCoilNum ).TotWaterHeatingCoilRate;
-					WaterCoil( DataCoilNum ).UACoilVariable = DataCapacityUsedForSizing;
-					CalcSimpleHeatingCoil( DataCoilNum, DataFanOpMode, 1.0, 1 );
-					highLimitCap = WaterCoil( DataCoilNum ).TotWaterHeatingCoilRate;		
-
-					if ( lowLimitCap < DataCapacityUsedForSizing && highLimitCap > DataCapacityUsedForSizing ) {
-						// design capacity used for UA sizing is bound by the capacities determined using the UA-value limits 
-						DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
-						if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
-							// at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
-							// is estimated in "EstimateCoilInletWaterTemp" and used for UA autosizing only
-							EstimateCoilInletWaterTemp( DataCoilNum, DataFanOpMode, 1.0, DataCapacityUsedForSizing, DesCoilInletWaterTempUsed );
-							WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilInletWaterTempUsed;
-						}
-						RequestSizing( CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName );
-						if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
-							ShowWarningError( "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"" );
-							ShowContinueError( " Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).ExitTemp, 2 ) + " C" );
-							ShowContinueError( " Plant design loop exit temperature is low for design load and leaving air temperature anticipated." );
-							ShowContinueError( " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits( DesCoilInletWaterTempUsed, 2 ) + " C" );
-						}
-					} else {
-						// design capacity used for UA sizing is not bound by the UA-limits hence coil design inlet water temperatures is increased				
+					DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
+					if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
+						// at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
+						// is estimated in "EstimateCoilInletWaterTemp" and used for UA autosizing only
 						EstimateCoilInletWaterTemp( DataCoilNum, DataFanOpMode, 1.0, DataCapacityUsedForSizing, DesCoilInletWaterTempUsed );
-						DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
 						WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilInletWaterTempUsed;
-						RequestSizing( CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName );
+					}
+					RequestSizing( CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName );
+					if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
 						ShowWarningError( "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"" );
 						ShowContinueError( " Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).ExitTemp, 2 ) + " C" );
-						ShowContinueError( " Plant design loop exit temperature is low for the design load and leaving air temperature anticipated." );
+						ShowContinueError( " Plant design loop exit temperature is low for design load and leaving air temperature anticipated." );
 						ShowContinueError( " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits( DesCoilInletWaterTempUsed, 2 ) + " C" );
-					}					
+					}
 					WaterCoil ( CoilNum ).UACoil = TempSize;
 					WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
 					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
