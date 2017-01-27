@@ -768,7 +768,7 @@ namespace WaterCoils {
 		int const FanOpMode, // fan operating mode
 		Real64 const PartLoadRatio, // part-load ratio of heating coil
 		Real64 const UAMax, // maximum UA-Value
-		Real64 & TempWaterInSuggested // estimated heating coil design inlet water temperature
+		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
 		);
 	
 	// End of Coil Utility subroutines
