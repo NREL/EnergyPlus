@@ -55,7 +55,7 @@
 #include <CurveManager.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
-#include <EvaporativeCooler.hh>
+#include <EvaporativeCoolers.hh>
 #include <Fans.hh>
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
@@ -84,7 +84,7 @@ namespace FaultsManager {
 	//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
 	//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
 	//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
-	//                      Dec. 2016, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
+	//                      Jan. 2017, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -380,6 +380,83 @@ namespace FaultsManager {
 		if( NumFaultyBoilerFouling > 0 ) FaultsBoilerFouling.allocate( NumFaultyBoilerFouling );
 		if( NumFaultyChillerFouling > 0 ) FaultsChillerFouling.allocate( NumFaultyChillerFouling );
 		if( NumFaultyEvapCoolerFouling > 0 ) FaultsEvapCoolerFouling.allocate( NumFaultyEvapCoolerFouling );
+		
+		// read faults input of Fault_type 116: Evaporative Cooler Fouling
+		for ( int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= NumFaultyEvapCoolerFouling; ++jFault_EvapCoolerFouling ) {
+
+			cFaultCurrentObject = cFaults( 16 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_EvapCoolerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).FaultType = cFaultCurrentObject;
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).FaultTypeEnum = iFault_Fouling_EvapCooler;
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// CapReductionFactor - degree of fault
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).RefCapReductionFactor = rNumericArgs( 1 );
+			
+			// Evaporative cooler type
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Evaporative cooler name
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Evaporative cooler check
+			{ auto const SELECT_CASE_VAR( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerType );
+			
+				int EvapCoolerNum; 
+				
+				if( SameString( SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil" ) ) {
+					// Read in evaporative cooler is not done yet
+					if ( EvaporativeCoolers::GetInputEvapComponentsFlag ) {
+						EvaporativeCoolers::GetEvapInput();
+						EvaporativeCoolers::GetInputEvapComponentsFlag = false;
+					}
+					
+					// Check whether the evaporative cooler  name and type match each other;
+					EvapCoolerNum = FindItemInList( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerName, EvaporativeCoolers::EvapCond, &EvaporativeCoolers::EvapConditions::EvapCoolerName );
+					if ( EvapCoolerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the boiler with the fault model
+						EvaporativeCoolers::EvapCond( EvapCoolerNum ).FaultyEvapCoolerFoulingFlag = true;
+						EvaporativeCoolers::EvapCond( EvapCoolerNum ).FaultyEvapCoolerFoulingIndex = jFault_EvapCoolerFouling;
+					}
+				}
+			}
+		}
 		
 		// read faults input of Fault_type 115: Chiller Fouling
 		for ( int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling ) {

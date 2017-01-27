@@ -418,13 +418,13 @@ namespace FaultsManager {
 	struct FaultPropertiesEvapCoolerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:EvaporativeCooler
 	{
 		// Members
-		std::string EvaporativeCoolerType; // Evaporative Cooler type
-		std::string EvaporativeCoolerName; // Evaporative Cooler name
+		std::string EvapCoolerType; // Evaporative Cooler type
+		std::string EvapCoolerName; // Evaporative Cooler name
 	
 		// Default Constructor
 		FaultPropertiesEvapCoolerFouling():
-			EvaporativeCoolerType( "" ),
-			EvaporativeCoolerName( "" )
+			EvapCoolerType( "" ),
+			EvapCoolerName( "" )
 		{}
 	};
 
