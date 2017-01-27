@@ -64,6 +64,7 @@
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 #include <WaterCoils.hh>
 
 namespace EnergyPlus {
@@ -412,6 +413,16 @@ namespace HVACHXAssistedCoolingCoil {
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
 				CoolingCoilErrFlag = false;
 				GetDXCoilIndex( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, CoolingCoilErrFlag, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ErrorsFound = true;
+				}
+			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
+				CoolingCoilErrFlag = false;
+				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed( AlphArray( 4 ), AlphArray( 5 ), CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
