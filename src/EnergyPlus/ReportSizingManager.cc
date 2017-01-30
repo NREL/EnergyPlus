@@ -1916,7 +1916,7 @@ namespace ReportSizingManager {
 						// find the design UA.
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
 
-						if (SolFla == -1) {
+						if ( SolFla == -1 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
 							ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
 							ShowContinueError( "  Lower UA estimate = " + TrimSigDigits( UA0, 6 ) + " W/m2-K (1% of Design Coil Load)" );
@@ -1930,7 +1930,7 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
 							DataErrorsFound = true;
 
-						} else if (SolFla == -2) {
+						} else if ( SolFla == -2 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
 							ShowContinueError( "  Bad starting values for UA" );
 							ShowContinueError( "  Lower UA estimate = " + TrimSigDigits( UA0, 6 ) + " W/m2-K (1% of Design Coil Load)" );
@@ -1941,7 +1941,7 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DataFlowUsedForSizing, 6 ) + " kg/s" );
 							ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( DataDesignCoilCapacity, 3 ) + " W" );
 							ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
-							if (DataDesignCoilCapacity < DataCapacityUsedForSizing) {
+							if ( DataDesignCoilCapacity < DataCapacityUsedForSizing ) {
 								ShowContinueError( "  Inadequate water side capacity: in Plant Sizing for this hot water loop" );
 								ShowContinueError( "  increase design loop exit temperature and/or decrease design loop delta T" );
 								ShowContinueError( "  Plant Sizing object = " + PlantSizData( DataPltSizHeatNum ).PlantLoopName );

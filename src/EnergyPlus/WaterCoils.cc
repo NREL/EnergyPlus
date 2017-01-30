@@ -1704,6 +1704,8 @@ namespace WaterCoils {
 		Real64 CpAirStd; // specific heat of air at standard conditions
 		Real64 DesCoilAirFlow; // design air flow rate for the coil [m3/s]
 		Real64 DesCoilExitTemp; // design coil exit temperature [C]
+		Real64 DesCoilWaterInTempSaved; // coil water inlet temp used for error checking UA sizing
+		Real64 DesCoilInletWaterTempUsed( 0.0 ); // coil design inlet water temp for UA sizing only
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
@@ -2101,8 +2103,6 @@ namespace WaterCoils {
 					DataFanOpMode = ContFanCycCoil;
 					TempSize = WaterCoil ( CoilNum ).UACoil;
 
-					Real64 DesCoilWaterInTempSaved;
-					Real64 DesCoilInletWaterTempUsed( 0.0 ); // coil design inlet water temp for UA sizing only
 					DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
 					if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
 						// at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
@@ -2116,10 +2116,10 @@ namespace WaterCoils {
 						ShowContinueError( " Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).ExitTemp, 2 ) + " C" );
 						ShowContinueError( " Plant design loop exit temperature is low for design load and leaving air temperature anticipated." );
 						ShowContinueError( " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits( DesCoilInletWaterTempUsed, 2 ) + " C" );
+						WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
 					}
 					WaterCoil ( CoilNum ).UACoil = TempSize;
 					WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
-					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
 				}
 				DataWaterLoopNum = 0; // reset all globals to 0 to ensure correct sizing for other child components
 				DataPltSizHeatNum = 0;
@@ -6300,7 +6300,8 @@ Label10: ;
 		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) ) {
 
 			if ( UA <= 0.0 ) {
-				ShowFatalError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
+				ShowWarningError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
+				return;
 			}
 			NTU = UA / CapacitanceMin;
 			ETA = std::pow( NTU, 0.22 );
