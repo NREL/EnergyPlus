@@ -6067,7 +6067,7 @@ namespace ZoneTempPredictorCorrector {
 					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( DayOfYear );
 					break;				
 				case CEN15251_CENTRAL:
-					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear );
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear);
 					break;
 				case CEN15251_UPPER_I:
 					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear );
