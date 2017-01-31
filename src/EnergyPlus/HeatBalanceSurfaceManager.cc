@@ -376,7 +376,7 @@ namespace HeatBalanceSurfaceManager {
 		int SurfNum; // DO loop counter for surfaces
 		int Term; // DO loop counter for conduction equation terms
 		Real64 TSC; // Intermediate calculation variable (temperature at source location)
-		Real64 TUC; // Intermediate calcultion variable (temperature at user specified location)
+		Real64 TUC; // Intermediate calculation variable (temperature at user specified location)
 
 		// RJH DElight Modification Begin
 		Real64 dPowerReducFac; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep

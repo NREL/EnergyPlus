@@ -1084,6 +1084,8 @@ namespace DataAirflowNetwork {
 		int DetOpenNum; // Large Opening number
 		int ConnectionFlag; // Return and supply connection flag
 		bool VAVTermDamper; // True if this component is a damper for a VAV terminal
+		int LinkageViewFactorObjectNum;
+		Real64 LinkageSurfaceTemp;
 
 		// Default Constructor
 		AirflowNetworkLinkageProp() :
@@ -1091,7 +1093,9 @@ namespace DataAirflowNetwork {
 			ZoneNum( 0 ),
 			DetOpenNum( 0 ),
 			ConnectionFlag( 0 ),
-			VAVTermDamper( false )
+			VAVTermDamper( false ),
+			LinkageViewFactorObjectNum( 0 ),
+			LinkageSurfaceTemp( 0.0 )
 		{}
 
 	};
@@ -1411,15 +1415,15 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string linkageName;
-		int linkageNum;
 		Real64 surfaceExposureFraction;
 		Real64 surfaceEmittance;
 		Array1D< LinkageSurfaceProp > linkageSurfaceData;
+		int objectNum;
 
 		AirflowNetworkLinkageViewFactorProp() :
-			linkageNum( 0 ),
 			surfaceExposureFraction( 0.0 ),
-			surfaceEmittance( 0.0 )
+			surfaceEmittance( 0.0 ),
+			objectNum( 0 )
 		{}
 	};
 

@@ -70,6 +70,7 @@
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
@@ -238,6 +239,7 @@ namespace AirflowNetworkBalanceManager {
 	// Inverse matrix
 	Array1D< Real64 > MA;
 	Array1D< Real64 > MV;
+	Array1D< Real64 > MV_rad;
 	Array1D_int IVEC;
 	Array1D_int SplitterNodeNumbers;
 
@@ -480,7 +482,7 @@ namespace AirflowNetworkBalanceManager {
 		CalcAirflowNetworkAirBalance();
 
 		if ( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
-			CalcAirflowNetworkRadiation();
+			//CalcAirflowNetworkRadiation();
 			CalcAirflowNetworkHeatBalance();
 			CalcAirflowNetworkMoisBalance();
 			if ( Contaminant.CO2Simulation ) CalcAirflowNetworkCO2Balance();
@@ -2862,6 +2864,47 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		// Read AirflowNetwork distribution system component: DuctViewFactors
+		CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
+		DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
+		if ( DisSysNumOfDuctViewFactors > 0 ) {
+			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
+			for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+
+				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
+
+				this_VF_object.linkageName = Alphas( 1 ); // Name of linkage
+				this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction
+				this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
+
+				this_VF_object.objectNum = i;
+
+				int numSurfaces = NumAlphas - 1;
+
+				this_VF_object.linkageSurfaceData.allocate( numSurfaces ) ;
+
+				for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
+				{
+					this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( surfNum + 1 ); // Surface name
+					this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
+
+					if ( this_VF_object.linkageSurfaceData( surfNum ).surfaceNum == 0 ) {
+						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+					}
+
+					this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 ); // Surface view factor
+				}
+			}
+		}
+
 		// Read AirflowNetwork Distribution system component: Damper
 		//  CurrentModuleObject='AIRFLOWNETWORK:DISTRIBUTION:COMPONENT DAMPER'
 		// Deleted on Aug. 13, 2008
@@ -3762,6 +3805,14 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkageData( count ).CompName = Alphas( 4 );
 				AirflowNetworkLinkageData( count ).ZoneName = Alphas( 5 );
 				AirflowNetworkLinkageData( count ).LinkNum = count;
+
+				for ( int i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
+					if ( AirflowNetworkLinkageData( count ).Name ==  AirflowNetworkLinkageViewFactorData( i ).linkageName ) {
+						AirflowNetworkLinkageData( count ).LinkageViewFactorObjectNum = AirflowNetworkLinkageViewFactorData( i ).objectNum;
+						break;
+					}
+				}
+
 				if ( ! lAlphaBlanks( 5 ) ) {
 					AirflowNetworkLinkageData( count ).ZoneNum = FindItemInList( AirflowNetworkLinkageData( count ).ZoneName, Zone );
 					if ( AirflowNetworkLinkageData( count ).ZoneNum == 0 ) {
@@ -3811,58 +3862,6 @@ namespace AirflowNetworkBalanceManager {
 				if ( ! found ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": The " + cAlphaFields( 3 ) + " is not found in the node data " + AirflowNetworkLinkageData( count ).Name );
 					ErrorsFound = true;
-				}
-			}
-
-			// Read AirflowNetwork distribution system component: DuctViewFactors
-			CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
-			DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
-			if ( DisSysNumOfDuctViewFactors > 0 ) {
-				AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
-				for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
-					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					}
-
-					auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
-
-					this_VF_object.linkageName = Alphas( 1 ); // Name of linkage
-
-					for ( int i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
-						if ( this_VF_object.linkageName == AirflowNetworkLinkageData( i ).Name ) {
-							this_VF_object.linkageNum = AirflowNetworkLinkageData( i ).CompNum;
-							break;
-						}
-					}
-
-					if ( this_VF_object.linkageNum == 0 ) {
-						ShowFatalError( "Linkage " + this_VF_object.linkageName + " not found. See: " + CurrentModuleObject + " " + this_VF_object.linkageName );
-					}
-
-					this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction
-					this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
-
-
-					int numSurfaces = NumAlphas - 1;
-
-					this_VF_object.linkageSurfaceData.allocate( numSurfaces ) ;
-
-					for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
-					{
-						this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( surfNum + 1 ); // Surface name
-						this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
-
-						if ( this_VF_object.linkageSurfaceData( surfNum ).surfaceNum == 0 ) {
-							ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.linkageName );
-						}
-
-						this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 ); // Surface view factor
-					}
 				}
 			}
 
@@ -4375,6 +4374,7 @@ namespace AirflowNetworkBalanceManager {
 
 		MA.allocate( AirflowNetworkNumOfNodes * AirflowNetworkNumOfNodes );
 		MV.allocate( AirflowNetworkNumOfNodes );
+		MV_rad.allocate( AirflowNetworkNumOfNodes );
 		IVEC.allocate( AirflowNetworkNumOfNodes + 20 );
 
 		AirflowNetworkReportData.allocate( NumOfZones ); // Report variables
@@ -4600,7 +4600,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) {
 				AirflowNetworkNodeSimu( n ).PZ = 0.0;
 			} else {
-				// Assing ambient conditions to external nodes
+				// Assigning ambient conditions to external nodes
 				i = AirflowNetworkNodeData( n ).ExtNodeNum;
 				if ( i > 0 ) {
 					if ( i <= AirflowNetworkNumOfExtNode ) {
@@ -4717,7 +4717,7 @@ namespace AirflowNetworkBalanceManager {
 			AIRMOV( );
 			ZonePressure1 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 			if ( ZonePressure1 <= PressureSet ) {
-				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				// The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
 				if ( !WarmupFlag ) {
 					if ( ErrCountLowPre == 0 ) {
 						++ErrCountLowPre;
@@ -4733,7 +4733,7 @@ namespace AirflowNetworkBalanceManager {
 				AIRMOV( );
 				ZonePressure2 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 				if ( ZonePressure2 >= PressureSet ) {
-					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
 					if ( !WarmupFlag ) {
 						if ( ErrCountHighPre == 0 ) {
 							++ErrCountHighPre;
@@ -4776,7 +4776,7 @@ namespace AirflowNetworkBalanceManager {
 			ZonePressure1 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 
 			if ( ZonePressure1 <= PressureSet ) {
-				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				// The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
 				if ( !WarmupFlag ) {
 					if ( ErrCountLowPre == 0 ) {
 						++ErrCountLowPre;
@@ -4793,7 +4793,7 @@ namespace AirflowNetworkBalanceManager {
 				AIRMOV( );
 				ZonePressure2 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 				if ( ZonePressure2 >= PressureSet ) {
-					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
 					if ( !WarmupFlag ) {
 						if ( ErrCountHighPre == 0 ) {
 							++ErrCountHighPre;
@@ -5223,14 +5223,104 @@ namespace AirflowNetworkBalanceManager {
 	void
 	CalcAirflowNetworkRadiation()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell, Tony Fontanini
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       n/a
+		//       RE-ENGINEERED  n/a
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Simulate radiant exchange between ducts and surfaces
+
+		using DataGlobals::KelvinConv;
+		using DataGlobals::StefanBoltzmann;
+		using DataHeatBalSurface::TH;
+
+		Real64 tolerance = 0.0001;
+
+		MV_rad = 0;
+
 		for ( int i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			int CompNum = AirflowNetworkLinkageData( i ).CompNum;
 			int CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
 			std::string CompName = AirflowNetworkCompData( CompNum ).EPlusName;
+
 			// Calculate duct radiation
 			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct element only
-				// Duct radiation calculations here
-				int a = 0;
+				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum == 0 ) continue;
+
+				int LF;
+				int LT;
+
+				int TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
+				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
+					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
+					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
+				} else { // flow direction is the opposite as input from node 2 to node 1
+					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
+					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
+				}
+
+				Real64 MassFlowRate = AirflowNetworkLinkSimu( i ).FLOW;
+				Real64 CpAir = PsyCpAirFnWTdb( ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).WZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).WZ ) / 2.0, ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).TZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).TZ ) / 2.0 );
+				Real64 inletTemp = Node( LF ).Temp;
+				Real64 outletTemp = Node( LT ).Temp;
+				Real64 TwoOld = ( inletTemp + outletTemp ) / 2 + KelvinConv;
+				Real64 Two = KelvinConv;
+				Real64 TSurr = KelvinConv;
+				Real64 Tamb = 0;
+				Real64 Qrad = 0;
+
+				Real64 ho = 20; // Dummy value for now
+
+				auto & VFObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
+				auto & DuctObj( DisSysCompDuctData( TypeNum ) );
+
+				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
+					Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).NodeHeight );
+				} else if ( AirflowNetworkLinkageData( i ).ZoneNum == 0 ) {
+					Tamb = AirflowNetworkNodeSimu( LT ).TZ;
+				} else {
+					Tamb = ANZT( AirflowNetworkLinkageData( i ).ZoneNum );
+				}
+
+				while ( std::abs( Two - TwoOld ) > tolerance ) {
+
+					Real64 hrjTj_sum = 0;
+					Real64 hrj_sum = 0;
+
+					TwoOld = Two;
+
+					for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
+						auto &  ZoneSurfNum( VFObj.linkageSurfaceData( j ).surfaceNum );
+						auto & Tj( TH( 1, 1, ZoneSurfNum ) );
+
+						Tj += KelvinConv;
+
+						Real64 hrj = VFObj.surfaceEmittance * StefanBoltzmann * ( Two + Tj ) * ( pow_2( Two ) + pow_2( Tj ) );
+
+						hrjTj_sum += hrj * Tj;
+						hrj_sum += hrj;
+
+					}
+
+					TSurr = ( ho * Tamb + hrjTj_sum ) / ( ho + hrj_sum );
+
+					Two = inletTemp - DuctObj.UThermal * ( inletTemp - ( TSurr - KelvinConv ) );
+
+					break; // Remove this
+
+				}
+
+				for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
+					Qrad +=  StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( Two ) - pow_4( TSurr ) );
+				}
+
+				Qrad = 0; // Remove this
+
+				MV_rad( i ) += Qrad;
+
 			}
 		}
 	}
@@ -5304,7 +5394,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5336,7 +5426,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5353,7 +5443,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5371,7 +5461,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -5490,7 +5580,7 @@ namespace AirflowNetworkBalanceManager {
 				MA( ( i - 1 )*AirflowNetworkNumOfNodes + i ) = 1.0e10;
 				ZoneNum = AirflowNetworkNodeData( i ).EPlusZoneNum;
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
-					MV( i ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp*1.0e10;
+					MV( i ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp * 1.0e10;
 		}
 			}
 		}
@@ -5500,6 +5590,11 @@ namespace AirflowNetworkBalanceManager {
 			if ( MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 1.0e-6 ) {
 				ShowFatalError( "CalcAirflowNetworkHeatBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );
 			}
+		}
+
+		// Add in radiative effects
+		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
+			MV( i ) += MV_rad( i );
 		}
 
 		// Get an inverse matrix
@@ -5583,7 +5678,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5606,7 +5701,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5623,7 +5718,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5641,7 +5736,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -5846,7 +5941,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5860,7 +5955,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5874,7 +5969,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5885,7 +5980,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -6059,7 +6154,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -6073,7 +6168,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -6087,7 +6182,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -6098,7 +6193,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -6777,6 +6872,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 CpAir;
 		Real64 Qsen;
 		Real64 Qlat;
+		Real64 Qrad;
 		Real64 AirDensity;
 		Real64 Tamb;
 		Real64 PartLoadRatio;
@@ -7106,10 +7202,13 @@ namespace AirflowNetworkBalanceManager {
 			Node1 = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 			Node2 = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 			CpAir = PsyCpAirFnWTdb( ( AirflowNetworkNodeSimu( Node1 ).WZ + AirflowNetworkNodeSimu( Node2 ).WZ ) / 2.0, ( AirflowNetworkNodeSimu( Node1 ).TZ + AirflowNetworkNodeSimu( Node2 ).TZ ) / 2.0 );
-			// Calculate sensible loads from duct conduction losses
+			// Calculate sensible loads from duct conduction losses and loads from duct radiation
 			if ( AirflowNetworkLinkageData( i ).ZoneNum > 0 && AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_DWC ) {
 				Qsen = AirflowNetworkLinkSimu( i ).FLOW * CpAir * ( AirflowNetworkNodeSimu( Node2 ).TZ - AirflowNetworkNodeSimu( Node1 ).TZ );
 				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).CondSen -= Qsen;
+
+				Qrad = 0.1;
+				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain += Qrad;
 			}
 			// Calculate sensible leakage losses
 			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_PLR || AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_ELR ) {
