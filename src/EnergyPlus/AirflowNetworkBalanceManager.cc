@@ -5317,7 +5317,7 @@ namespace AirflowNetworkBalanceManager {
 					Qrad +=  StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( Two ) - pow_4( TSurr ) );
 				}
 
-				Qrad = 10; // Remove this
+				Qrad = 0; // Remove this
 
 				MV_rad( LT ) += Qrad;
 
@@ -5419,7 +5419,7 @@ namespace AirflowNetworkBalanceManager {
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * Ei;
 				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
-				MV( LT ) += MV_rad( LT );
+				MV( LT ) += MV_rad( LT ); // Duct radiation effects added in here
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
