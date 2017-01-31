@@ -5294,8 +5294,7 @@ namespace AirflowNetworkBalanceManager {
 					TwoOld = Two;
 
 					for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
-						auto &  ZoneSurfNum( VFObj.linkageSurfaceData( j ).surfaceNum );
-						auto & Tj( TH( 1, 1, ZoneSurfNum ) );
+						Real64 Tj = TH( 1, 1, VFObj.linkageSurfaceData( j ).surfaceNum );
 
 						Tj += KelvinConv;
 
@@ -5318,9 +5317,9 @@ namespace AirflowNetworkBalanceManager {
 					Qrad +=  StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( Two ) - pow_4( TSurr ) );
 				}
 
-				Qrad = 0; // Remove this
+				Qrad = 10; // Remove this
 
-				MV_rad( i ) += Qrad;
+				MV_rad( LT ) += Qrad;
 
 			}
 		}
@@ -5420,6 +5419,7 @@ namespace AirflowNetworkBalanceManager {
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * Ei;
 				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
+				MV( LT ) += MV_rad( LT );
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
@@ -5591,11 +5591,6 @@ namespace AirflowNetworkBalanceManager {
 			if ( MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 1.0e-6 ) {
 				ShowFatalError( "CalcAirflowNetworkHeatBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );
 			}
-		}
-
-		// Add in radiative effects
-		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
-			MV( i ) += MV_rad( i );
 		}
 
 		// Get an inverse matrix
@@ -6828,7 +6823,7 @@ namespace AirflowNetworkBalanceManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine update varaibles used in the AirflowNetwork model.
+		// This subroutine update variables used in the AirflowNetwork model.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -8776,7 +8771,7 @@ namespace AirflowNetworkBalanceManager {
 
 		Real64 Tcomfort; // Thermal comfort temperature
 		Real64 ComfortBand; // Thermal comfort band
-		Real64 Toperative; // Oprative temperature
+		Real64 Toperative; // Operative temperature
 		Real64 OutDryBulb; // Outdoor dry-bulb temperature
 
 		// flow
