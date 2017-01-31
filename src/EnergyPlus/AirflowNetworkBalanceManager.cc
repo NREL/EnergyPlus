@@ -218,7 +218,7 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_ZoneLevel( 7 ); // ZoneLevel control for a heat transfer subsurface
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
-	int const FeeeOperation( 0 ); // Free operation
+	int const FreeOperation( 0 ); // Free operation
 	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time
 	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time
 	int const ProbNoAction( 0 ); // No action from probability check
@@ -482,7 +482,7 @@ namespace AirflowNetworkBalanceManager {
 		CalcAirflowNetworkAirBalance();
 
 		if ( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
-			//CalcAirflowNetworkRadiation();
+			CalcAirflowNetworkRadiation();
 			CalcAirflowNetworkHeatBalance();
 			CalcAirflowNetworkMoisBalance();
 			if ( Contaminant.CO2Simulation ) CalcAirflowNetworkCO2Balance();
@@ -4468,7 +4468,7 @@ namespace AirflowNetworkBalanceManager {
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).DiffLatGainJ, "System", "Sum", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).DiffLatLossW, "System", "Average", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).DiffLatLossJ, "System", "Sum", Zone( i ).Name );
-			// Radiation lossed due to forced air systems
+			// Radiation losses due to forced air systems
 			SetupOutputVariable( "AFN Zone Duct Radiation Heat Gain Rate [W]", AirflowNetworkReportData( i ).RadGainW, "System", "Average", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).RadGainJ, "System", "Sum", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Radiation Heat Loss Rate [W]", AirflowNetworkReportData( i ).RadLossW, "System", "Average", Zone( i ).Name );
@@ -4622,7 +4622,7 @@ namespace AirflowNetworkBalanceManager {
 			j = MultizoneSurfaceData( i ).SurfNum;
 			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
 				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
-					if ( MultizoneSurfaceData( i ).OpeningStatus == FeeeOperation ) {
+					if ( MultizoneSurfaceData( i ).OpeningStatus == FreeOperation ) {
 						if ( MultizoneSurfaceData( i ).OpeningProbStatus == ProbForceChange ) {
 							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).Factor;
 						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbForceChange ) {
@@ -5223,6 +5223,7 @@ namespace AirflowNetworkBalanceManager {
 	void
 	CalcAirflowNetworkRadiation()
 	{
+
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell, Tony Fontanini
@@ -7207,7 +7208,7 @@ namespace AirflowNetworkBalanceManager {
 				Qsen = AirflowNetworkLinkSimu( i ).FLOW * CpAir * ( AirflowNetworkNodeSimu( Node2 ).TZ - AirflowNetworkNodeSimu( Node1 ).TZ );
 				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).CondSen -= Qsen;
 
-				Qrad = 0.1;
+				Qrad = 0; // need to update this
 				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain += Qrad;
 			}
 			// Calculate sensible leakage losses
@@ -7375,7 +7376,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 ZoneAirEnthalpy; // Enthalpy of zone air (J/kg)
 		Real64 OpenFactorMult; // Window/door opening modulation multiplier on venting open factor
 		Real64 DelTemp; // Inside-outside air temperature difference (K)
-		Real64 DelEnthal; // Inside-outsdie air enthalpy difference (J/kg)
+		Real64 DelEnthal; // Inside-outside air enthalpy difference (J/kg)
 		int IZ; // AirflowNetwork zone number
 		int ZoneNum; // EnergyPlus zone number
 		int SurfNum; // Heat transfer surface number
@@ -8782,14 +8783,14 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( TimeOpenDuration > 0 ) {
 			if ( TimeOpenDuration >= MinOpeningTime ) {
-				OpeningStatus = FeeeOperation; // free operation
+				OpeningStatus = FreeOperation; // free operation
 			} else {
 				OpeningStatus = MinCheckForceOpen; // forced to open
 			}
 		}
 		if ( TimeCloseDuration > 0 ) {
 			if ( TimeCloseDuration >= MinClosingTime ) {
-				OpeningStatus = FeeeOperation; // free operation
+				OpeningStatus = FreeOperation; // free operation
 			} else {
 				OpeningStatus = MinCheckForceClose; // forced to close
 			}
