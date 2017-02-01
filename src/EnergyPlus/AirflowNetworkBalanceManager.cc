@@ -5263,8 +5263,6 @@ namespace AirflowNetworkBalanceManager {
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
 
-				Real64 MassFlowRate = AirflowNetworkLinkSimu( i ).FLOW;
-				Real64 CpAir = PsyCpAirFnWTdb( ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).WZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).WZ ) / 2.0, ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).TZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).TZ ) / 2.0 );
 				Real64 inletTemp = Node( LF ).Temp;
 				Real64 outletTemp = Node( LT ).Temp;
 				Real64 TwoOld = ( inletTemp + outletTemp ) / 2 + KelvinConv;
@@ -6868,7 +6866,6 @@ namespace AirflowNetworkBalanceManager {
 		Real64 CpAir;
 		Real64 Qsen;
 		Real64 Qlat;
-		Real64 Qrad;
 		Real64 AirDensity;
 		Real64 Tamb;
 		Real64 PartLoadRatio;
@@ -7201,10 +7198,9 @@ namespace AirflowNetworkBalanceManager {
 			// Calculate sensible loads from duct conduction losses and loads from duct radiation
 			if ( AirflowNetworkLinkageData( i ).ZoneNum > 0 && AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_DWC ) {
 				Qsen = AirflowNetworkLinkSimu( i ).FLOW * CpAir * ( AirflowNetworkNodeSimu( Node2 ).TZ - AirflowNetworkNodeSimu( Node1 ).TZ );
+				Qsen -= MV_rad( Node2 );
 				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).CondSen -= Qsen;
-
-				Qrad = 0; // need to update this
-				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain += Qrad;
+				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain += MV_rad( Node2 );
 			}
 			// Calculate sensible leakage losses
 			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_PLR || AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_ELR ) {
