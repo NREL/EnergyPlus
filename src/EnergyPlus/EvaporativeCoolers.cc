@@ -1758,7 +1758,6 @@ namespace EvaporativeCoolers {
 		//     Use DataEnvironment, ONLY: OutDryBulbTemp, OutWetBulbTemp, OutHumRat, OutBaroPress
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
-		using DataGlobals::DoWeathSim;
 		using FaultsManager::FaultsEvapCoolerFouling;
 
 		// Locals
@@ -1804,7 +1803,7 @@ namespace EvaporativeCoolers {
 			//   this would mainly be used for evap sizing purposes.
 			
 			//If there is a fault of fouling (zrp_Jan2017)
-			if( EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+			if( EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 				int FaultIndex = EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingIndex;
 				Real64 StageEff_ff = StageEff;
 			
