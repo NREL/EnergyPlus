@@ -81259,8 +81259,8 @@ FaultModel:Fouling:Boiler,
        \required-field
        \type object-list
        \object-list Boilers
-   N1; \field Reference Capacity Reduction Factor
-       \note The factor indicates the decrease of the nominal capacity
+   N1; \field Fouling Factor
+       \note The factor indicates the decrease of the nominal capacity of the boiler
        \note It is the ratio between the nominal capacity at fouling case and that at fault free case
        \type real
        \minimum> 0
@@ -81293,8 +81293,9 @@ FaultModel:Fouling:EvaporativeCooler,
        \required-field
        \type object-list
        \object-list Chillers
-   N1; \field Reference Efficiency Reduction Factor
+   N1; \field Fouling Factor
        \note The factor indicates the decrease of the indirect stage efficiency
+       \note It is the ratio between the indirect stage efficiency at fouling case and that at fault free case
        \type real
        \minimum> 0
        \maximum 1
@@ -81330,8 +81331,8 @@ FaultModel:Fouling:Chiller,
        \required-field
        \type object-list
        \object-list Chillers
-   N1; \field Reference Capacity Reduction Factor
-       \note The factor indicates the decrease of the nominal capacity
+   N1; \field Fouling Factor
+       \note The factor indicates the decrease of the nominal capacity of the chiller
        \note It is the ratio between the nominal capacity at fouling case and that at fault free case
        \type real
        \minimum> 0

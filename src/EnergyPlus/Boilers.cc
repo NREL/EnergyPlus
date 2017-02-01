@@ -877,7 +877,7 @@ namespace Boilers {
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
@@ -941,15 +941,17 @@ namespace Boilers {
 		}
 		
 		//If there is a fault of boiler fouling (zrp_Nov2016)
-		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = Boiler( BoilerNum ).FaultyBoilerFoulingIndex;
 			Real64 NomCap_ff = BoilerNomCap;
+			Real64 BoilerEff_ff = BoilerEff;
 			
 			//calculate the Faulty Boiler Fouling Factor using fault information
 			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFoulingFactor();
 			
 			//update the boiler nominal capacity at faulty cases
 			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
+			BoilerEff = BoilerEff_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
 			
 		}
  

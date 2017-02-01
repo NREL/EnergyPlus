@@ -4291,12 +4291,14 @@ namespace PlantChillers {
 		if( ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
+			Real64 RatedCOP_ff = RatedCOP;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
 			
-			//update the Chiller nominal capacity at faulty cases
+			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			RatedCOP = RatedCOP_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
 			
 		}
 		
@@ -4954,12 +4956,14 @@ namespace PlantChillers {
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
+			Real64 COP_ff = COP;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
 			
-			//update the Chiller nominal capacity at faulty cases
+			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			COP = COP_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			
 		}
 
@@ -5604,12 +5608,14 @@ namespace PlantChillers {
 		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
+			Real64 COP_ff = COP;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
 			
-			//update the Chiller nominal capacity at faulty cases
-			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;			
+			COP = COP_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			
 		}
 
@@ -6144,6 +6150,7 @@ namespace PlantChillers {
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
 		static std::string OutputChar; // character string for warning messages
+		Real64 COP; // coefficient of performance
 		Real64 Cp; // local for fluid specif heat, for evaporator
 		Real64 CpCond; // local for fluid specif heat, for condenser
 		Real64 ChillerNomCap; // chiller nominal capacity
@@ -6153,17 +6160,20 @@ namespace PlantChillers {
 		EvapOutletNode = ConstCOPChiller( ChillNum ).Base.EvapOutletNodeNum;
 		CondInletNode = ConstCOPChiller( ChillNum ).Base.CondInletNodeNum;
 		CondOutletNode = ConstCOPChiller( ChillNum ).Base.CondOutletNodeNum;
+		COP = ConstCOPChiller( ChillNum ).Base.COP;
 
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
+			Real64 COP_ff = COP;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
 			
-			//update the Chiller nominal capacity at faulty cases
+			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor; 
 			
 		}
 		
@@ -6313,7 +6323,7 @@ namespace PlantChillers {
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 0 ) {
 			ConstCOPChiller( ChillNum ).Base.PossibleSubcooling = false;
 			QEvaporator = std::abs( MyLoad );
-			Power = std::abs( MyLoad ) / ConstCOPChiller( ChillNum ).Base.COP;
+			Power = std::abs( MyLoad ) / COP;
 
 			// Either set the flow to the Constant value or caluclate the flow for the variable volume
 			if ( ( ConstCOPChiller( ChillNum ).Base.FlowMode == ConstantFlow ) || ( ConstCOPChiller( ChillNum ).Base.FlowMode == NotModulated ) ) {
@@ -6455,7 +6465,7 @@ namespace PlantChillers {
 				}
 			}
 			//Calculate the Power consumption of the Const COP chiller which is a simplified calculation
-			Power = QEvaporator / ConstCOPChiller( ChillNum ).Base.COP;
+			Power = QEvaporator / COP;
 			if ( EvapMassFlowRate == 0.0 ) {
 				QEvaporator = 0.0;
 				EvapOutletTemp = Node( EvapInletNode ).Temp;

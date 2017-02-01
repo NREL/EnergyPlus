@@ -350,7 +350,7 @@ namespace FaultsManager {
 			} else if( i == 15 ) {
 				// 15th fault: Faulty Chiller with Fouling
 				NumFaultyChillerFouling = NumFaultsTemp;  
-			} else if( i == 15 ) {
+			} else if( i == 16 ) {
 				// 16th fault: Faulty Evaporative Cooler with Fouling
 				NumFaultyEvapCoolerFouling = NumFaultsTemp;  
 			}
@@ -671,7 +671,7 @@ namespace FaultsManager {
 		// read faults input of Fault_type 114: Boiler Fouling
 		for ( int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling ) {
 
-			cFaultCurrentObject = cFaults( 12 ); // fault object string
+			cFaultCurrentObject = cFaults( 14 ); // fault object string
 			GetObjectItem( cFaultCurrentObject, jFault_BoilerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			
 			FaultsBoilerFouling( jFault_BoilerFouling ).FaultType = cFaultCurrentObject;

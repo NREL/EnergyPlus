@@ -1583,13 +1583,15 @@ namespace ChillerElectricEIR {
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerRefCap;
+			Real64 ReferenceCOP_ff = ReferenceCOP;
 			
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
 			
-			//update the Chiller nominal capacity at faulty cases
+			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerRefCap = NomCap_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
-			
+			ReferenceCOP = ReferenceCOP_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+
 		}
 		
 		// Set mass flow rates
