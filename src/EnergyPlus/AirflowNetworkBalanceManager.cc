@@ -4557,7 +4557,7 @@ namespace AirflowNetworkBalanceManager {
 						if (MultizoneExternalNodeData(i).curve) {
 							AirflowNetworkNodeSimu(n).PZ = CalcWindPressureFromCurve(MultizoneExternalNodeData(i).curve,
 								Vref, AirflowNetworkNodeData(n).NodeHeight, 0.0, MultizoneExternalNodeData(i).symmetricCurve,
-								MultizoneExternalNodeData(i).relativeAngle);
+								MultizoneExternalNodeData(i).useRelativeAngle);
 						} else {
 							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
 						}
