@@ -346,6 +346,8 @@ ThermostatSetpoint:SingleHeating, Heating Setpoint with SB, Heating Setpoints;
 
 This object is used to modify the program s behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related set point objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
 
+The object also indicates the applicability to overwrite the thermostat setpoint temperature schedule for space cooling with the calculated operative temperature using adaptive comfort models. The adaptive comfort model relates the zone operative temperature setpoint to the outdoor air temperature. ASHRAE Standard 55-2010 and CEN 15251-2007 provide adaptive thermal comfort models to be applied. The adaptive comfort model only applies to cooling mode. During summer time in hot climates, the zone thermostat setting can be higher than the traditional thermostat setting based on the adaptive thermal comfort model, which results in energy savings of HVAC systems. 
+
 This thermostatic operative temperature, \({T_{OP}}\) , is defined as:
 
 \begin{equation}
@@ -379,7 +381,14 @@ Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 \bottomrule
 \end{longtable}
 
-Reference: J. Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
+When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the selected acceptability limits of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007.The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. The user can choose whether to overwrite the cooling setpoint temperature when the adaptive setpoint is higher than the user input one for the purpose of energy saving.
+
+Reference: 
+\begin{itemize}
+\tightlist
+\item Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
+\item ASHRAE Standard 55-2010. Thermal environment conditions for human occupancy. ASHRAE, Atlanta.
+\end{itemize}
 
 \subsubsection{Inputs}\label{inputs-5-034}
 
@@ -401,6 +410,25 @@ This field contains the name of a schedule, defined elsewhere, that determines t
 
 Note that by setting the values in this schedule separately for design days, the user can control how operative temperature control is applied during autosizing. (Operative temperature control tends to increase the equipment capacities calculated during sizing.)
 
+\paragraph{Field: Adaptive Comfort Model Type}\label{field-adaptive-comfort-mode-type}
+
+This field controls which of the seven adaptive comfort model is chosen, listed as following: 
+\begin{itemize}
+\tightlist
+\item None . The adaptive comfort model is not applicable; 
+\item AdaptiveASH55\_CentralLine. The central line of the acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint; 
+\item AdaptiveASH55\_80PercentUpperLine. The upper line of the 80\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint;
+\item AdaptiveASH55\_90PercentUpperLine. The upper line of the 90\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint; 
+\item AdaptiveCEN15251\_CentralLine. The central line of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint;
+\item AdaptiveCEN15251\_CategoryIUpperLine. The upper line of the Category I of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint; 
+\item AdaptiveCEN15251\_CategoryIIUpperLine. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint; and 
+\item AdaptiveCEN15251\_CategoryIIIUpperLine. The upper line of the Category III of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint;
+\end{itemize}
+
+\paragraph{Field: Adaptive Operative Temperature Applicability}\label{field-adaptive-operative-temperature-applicability}
+
+This field controls whether to overwrite the cooling setpoint temperature schedule when the adaptive setpoint is higher than the user input one. Enter \textbf{OverwriteWhenEnergySaving} here to overwrite the operative setpoint only when the calculated adaptive setpoint is higher than the original one. Enter \textbf{AlwaysOverwrite} to overwrite the operative setpoint under any circumstance when the object is defined.
+
 An example of this object follows.
 
 \begin{lstlisting}
@@ -408,7 +436,9 @@ ZoneControl:Thermostat:OperativeTemperature,
   Zone 1 Thermostat,    !- ZoneControl:Thermostat Name
   Constant,             !- Radiative Fraction Input Mode
   0.5,                  !- Fixed Radiative Fraction
-  ;                     !- Radiative Fraction Schedule
+  ,                     !- Radiative Fraction Schedule
+  AdaptiveASH55_CentralLine,               !- Adaptive Comfort Model Type
+  OverwriteWhenEnergySaving;               !- Adaptive Operative Temperature Applicability
 \end{lstlisting}
 
 Global operative temperature applied to all zones for a global thermostat:

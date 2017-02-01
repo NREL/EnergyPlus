@@ -2128,8 +2128,6 @@ namespace ZoneTempPredictorCorrector {
 
 		Real64 dryBulb;
 		Real64 avgDryBulb;
-		Real64 GrossApproxAvgDryBulbDesignDay;
-
 
 		int epwFile;
 		bool epwFileExists;
@@ -2296,7 +2294,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
 		for ( int day = 1; day <= NumDaysInYear; day++ ) {
-			Real64 test = runningAverageASH( day );
 			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 33.5 ) {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = 0.31 * runningAverageASH( day ) + 17.8;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = 0.31 * runningAverageASH( day ) + 20.3;
