@@ -1,7 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -52,23 +99,23 @@ namespace ThermalEN673Calc {
 		int const nlayer,
 		Real64 const tout,
 		Real64 const tind,
-		FArray1A< Real64 > gap,
-		FArray1A< Real64 > thick,
-		FArray1A< Real64 > scon,
-		FArray1A< Real64 > const emis,
+		Array1A< Real64 > gap,
+		Array1A< Real64 > thick,
+		Array1A< Real64 > scon,
+		Array1A< Real64 > const emis,
 		Real64 const totsol,
 		Real64 const tilt,
 		Real64 const dir,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const presure,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray1A_int const nmix,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght,
-		FArray1A< Real64 > theta,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const presure,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array1A_int const nmix,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array1A< Real64 > theta,
 		Real64 & ufactor,
 		Real64 & hcin,
 		Real64 & hin,
@@ -76,12 +123,12 @@ namespace ThermalEN673Calc {
 		Real64 & shgc,
 		int & nperr,
 		std::string & ErrorMessage,
-		FArray1A_int const ibc,
-		FArray1A< Real64 > hg,
-		FArray1A< Real64 > hr,
-		FArray1A< Real64 > hs,
-		FArray1A< Real64 > Ra,
-		FArray1A< Real64 > Nu
+		Array1A_int const ibc,
+		Array1A< Real64 > hg,
+		Array1A< Real64 > hr,
+		Array1A< Real64 > hs,
+		Array1A< Real64 > Ra,
+		Array1A< Real64 > Nu
 	)
 	{
 
@@ -102,12 +149,12 @@ namespace ThermalEN673Calc {
 		emis.dim( maxlay2 );
 		asol.dim( maxlay );
 		presure.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		nmix.dim( maxlay1 );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		theta.dim( maxlay2 );
 		ibc.dim( 2 );
@@ -133,7 +180,7 @@ namespace ThermalEN673Calc {
 
 		/// Gaps:
 
-		FArray1D< Real64 > rs( maxlay3 );
+		Array1D< Real64 > rs( maxlay3 );
 		Real64 rtot;
 		Real64 sft;
 
@@ -160,32 +207,32 @@ namespace ThermalEN673Calc {
 		int const nlayer,
 		Real64 const tout,
 		Real64 const tind,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
 		Real64 const tilt,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray1A< Real64 > theta,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array1A< Real64 > theta,
 		int const standard,
-		FArray1A< Real64 > hg,
-		FArray1A< Real64 > hr,
-		FArray1A< Real64 > hs,
+		Array1A< Real64 > hg,
+		Array1A< Real64 > hr,
+		Array1A< Real64 > hs,
 		Real64 & hin,
 		Real64 const hout,
 		Real64 & hcin,
-		FArray1A_int const ibc,
-		FArray1A< Real64 > rs,
+		Array1A_int const ibc,
+		Array1A< Real64 > rs,
 		Real64 & ufactor,
-		FArray1A< Real64 > Ra,
-		FArray1A< Real64 > Nu,
+		Array1A< Real64 > Ra,
+		Array1A< Real64 > Nu,
 		int & nperr,
 		std::string & ErrorMessage
 	)
@@ -199,11 +246,11 @@ namespace ThermalEN673Calc {
 		gap.dim( MaxGap );
 		thick.dim( maxlay );
 		scon.dim( maxlay );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
@@ -221,7 +268,7 @@ namespace ThermalEN673Calc {
 		Real64 Tm;
 		Real64 diff;
 		Real64 Rg;
-		FArray1D< Real64 > dT( maxlay1 );
+		Array1D< Real64 > dT( maxlay1 );
 		int i;
 		int j;
 		int iter;
@@ -230,7 +277,7 @@ namespace ThermalEN673Calc {
 		Real64 con;
 		Real64 cp;
 		Real64 pr;
-		FArray1D< Real64 > Gr( maxlay );
+		Array1D< Real64 > Gr( maxlay );
 		Real64 A;
 		Real64 n;
 		Real64 hrin;
@@ -239,8 +286,8 @@ namespace ThermalEN673Calc {
 
 		Real64 const eps( 1.0e-4 ); // set iteration accuracy
 
-		FArray1D< Real64 > frctg( maxgas );
-		FArray1D_int ipropg( maxgas );
+		Array1D< Real64 > frctg( maxgas );
+		Array1D_int ipropg( maxgas );
 
 		//jel..hrin is 4.4 for standard clear glass:
 		if ( ( emis( 2 * nlayer ) < 0.85 ) && ( emis( 2 * nlayer ) > 0.83 ) ) {
@@ -252,7 +299,7 @@ namespace ThermalEN673Calc {
 
 		if ( ibc( 1 ) != 1 ) {
 			nperr = 38;
-			ErrorMessage = "Boundary conditions for EN673 can be combined hout for outdoor and either convective (hcin) " "or combined (hin) for indoor.  Others are not supported currently.";
+			ErrorMessage = "Boundary conditions for EN673 can be combined hout for outdoor and either convective (hcin) or combined (hin) for indoor.  Others are not supported currently.";
 			return;
 		}
 
@@ -320,8 +367,8 @@ namespace ThermalEN673Calc {
 					//   write(18, 22222) iprop(i+1, j), tempDens, gvis(iprop(i+1,j), 1), gcon(iprop(i+1,j), 1), gcp(iprop(i+1,j), 1)
 					dT( i ) = 15.0 / ( nlayer - 1 ); // set initial temperature distribution
 					for ( j = 1; j <= nmix( i + 1 ); ++j ) {
-						ipropg( j ) = iprop( i + 1, j );
-						frctg( j ) = frct( i + 1, j );
+						ipropg( j ) = iprop( j, i + 1 );
+						frctg( j ) = frct( j, i + 1 );
 					}
 					GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
 					Gr( i ) = ( GravityConstant * pow_3( gap( i ) ) * dT( i ) * pow_2( dens ) ) / ( Tm * pow_2( visc ) );
@@ -372,8 +419,8 @@ namespace ThermalEN673Calc {
 								Tm = ( theta( 2 * i ) + theta( 2 * i + 1 ) ) / 2.0;
 							}
 							for ( j = 1; j <= nmix( i + 1 ); ++j ) {
-								ipropg( j ) = iprop( i + 1, j );
-								frctg( j ) = frct( i + 1, j );
+								ipropg( j ) = iprop( j, i + 1 );
+								frctg( j ) = frct( j, i + 1 );
 							} // j, gas mix
 							GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
 							Gr( i ) = ( GravityConstant * pow_3( gap( i ) ) * dT( i ) * pow_2( dens ) ) / ( Tm * pow_2( visc ) );
@@ -436,9 +483,9 @@ namespace ThermalEN673Calc {
 		Real64 const dir,
 		Real64 const totsol,
 		Real64 const rtot,
-		FArray1A< Real64 > const rs,
+		Array1A< Real64 > const rs,
 		int const nlayer,
-		FArray1A< Real64 > const absol,
+		Array1A< Real64 > const absol,
 		Real64 & sf,
 		int const standard,
 		int & nperr,
@@ -494,29 +541,6 @@ namespace ThermalEN673Calc {
 		sf = totsol + fract; // add inward fraction to directly transmitted fraction
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ThermalEN673Calc
 

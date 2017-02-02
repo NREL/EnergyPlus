@@ -49,6 +49,8 @@ LgOffVAVusingBasement USA_IL_Chicago-OHare.Intl.AP.725300_TMY3
 1ZoneUncontrolledFourAlgorithms USA_CO_Golden-NREL.724666_TMY3
 1ZoneUncontrolledResLayers USA_CO_Golden-NREL.724666_TMY3
 1ZoneWith14ControlledHeat-CoolPanels USA_CO_Golden-NREL.724666_TMY3
+1ZoneDataCenterCRAC_wPumpedDXCoolingCoil USA_CO_Golden-NREL.724666_TMY3
+2ZoneDataCenterHVAC_wEconomizer USA_IL_Chicago-OHare.Intl.AP.725300_TMY3
 4ZoneWithShading_Simple_1
 4ZoneWithShading_Simple_2
 5Zone_Transformer USA_IL_Chicago-OHare.Intl.AP.725300_TMY3

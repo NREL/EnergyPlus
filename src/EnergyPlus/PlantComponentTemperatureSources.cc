@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -43,37 +89,25 @@ namespace PlantComponentTemperatureSources {
 	// Called by plantloopequipment, model accepts inputs, and calculates a
 	// thermal response using new plant routines such as SetComponentFlowRate
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using DataPlant::TypeOf_WaterSource;
-	using DataPlant::PlantLocation;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS:
 	int const TempSpecType_Constant( -1 );
 	int const TempSpecType_Schedule( -2 );
-
-	//MODULE DERIVED TYPE DEFINITIONS:
 
 	//MODULE VARIABLES
 	int NumSources( 0 );
 	bool GetInput( true ); // then TRUE, calls subroutine to read input file.
 
-	//MODULE ROUTINES
-
 	// Object Data
-	FArray1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
-
-	// Functions
+	Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
 
 	void
 	SimWaterSource(
@@ -132,7 +166,7 @@ namespace PlantComponentTemperatureSources {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			SourceNum = FindItemInList( SourceName, WaterSource.Name(), NumSources );
+			SourceNum = FindItemInList( SourceName, WaterSource );
 			if ( SourceNum == 0 ) {
 				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
 			}
@@ -151,9 +185,7 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		if ( InitLoopEquip ) {
-			WaterSource( SourceNum ).IsThisSized = false;
 			InitWaterSource( SourceNum, RunFlag, MyLoad, FirstHVACIteration );
-			WaterSource( SourceNum ).IsThisSized = true;
 			SizeWaterSource( SourceNum );
 			if ( GetSizingFactor ) {
 				SizingFactor = WaterSource( SourceNum ).SizFac;
@@ -203,6 +235,7 @@ namespace PlantComponentTemperatureSources {
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -242,7 +275,7 @@ namespace PlantComponentTemperatureSources {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WaterSource.Name(), SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WaterSource, SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -254,6 +287,9 @@ namespace PlantComponentTemperatureSources {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 
 			WaterSource( SourceNum ).DesVolFlowRate = rNumericArgs( 1 );
+			if ( WaterSource( SourceNum ).DesVolFlowRate == AutoSize ) {
+				WaterSource( SourceNum ).DesVolFlowRateWasAutoSized = true;
+			}
 
 			if ( cAlphaArgs( 4 ) == "CONSTANT" ) {
 				WaterSource( SourceNum ).TempSpecType = TempSpecType_Constant;
@@ -296,9 +332,9 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const RunFlag, // TRUE when component operating
+		bool const EP_UNUSED( RunFlag ), // TRUE when component operating
 		Real64 const MyLoad,
-		bool const FirstHVACIteration // initialize variables when TRUE
+		bool const EP_UNUSED( FirstHVACIteration ) // initialize variables when TRUE
 	)
 	{
 
@@ -319,11 +355,9 @@ namespace PlantComponentTemperatureSources {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
@@ -353,7 +387,7 @@ namespace PlantComponentTemperatureSources {
 		if ( WaterSource( SourceNum ).MyFlag ) {
 			// Locate the component on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
+			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
 			}
@@ -361,11 +395,11 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		//Initialize critical Demand Side Variables at the beginning of each environment
-		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeWaterSource( SourceNum );
-			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+
+			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).MassFlowRateMax = WaterSource( SourceNum ).DesVolFlowRate * rho;
-			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
+			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 
 			WaterSource( SourceNum ).MyEnvironFlag = false;
 		}
@@ -381,7 +415,7 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		// Calculate specific heat
-		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 
 		// Calculate deltaT
 		Real64 delta_temp = WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp;
@@ -420,7 +454,7 @@ namespace PlantComponentTemperatureSources {
 			}
 		}
 
-		SetComponentFlowRate( WaterSource( SourceNum ).MassFlowRate, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
+		SetComponentFlowRate( WaterSource( SourceNum ).MassFlowRate, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 
 		// at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
 		// the calc routine will update the outlet temp and heat transfer rate/energies
@@ -449,7 +483,9 @@ namespace PlantComponentTemperatureSources {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -469,43 +505,40 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 tmpVolFlowRate; // local design volume flow rate
-		bool IsAutoSize; // Indicator to autosize for reporting
-		Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
+		Real64 DesVolFlowRateUser( 0.0 ); // Hardsized design volume flow rate for reporting
 
-		PltSizNum = 0;
-		ErrorsFound = false;
 		tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-		IsAutoSize = false;
-		DesVolFlowRateUser = 0.0;
 
-		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).PlantSizNum;
+		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.loopNum ).PlantSizNum;
 
-		if ( WaterSource( SourceNum ).DesVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
-				if ( ! IsAutoSize ) tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
+				if ( ! WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
+				if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) tmpVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) {
 					WaterSource( SourceNum ).DesVolFlowRate = tmpVolFlowRate;
-					if ( ! WaterSource( SourceNum ).IsThisSized ) {
-						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
 					}
 				} else {
 					if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0 ) {
 						DesVolFlowRateUser = WaterSource( SourceNum ).DesVolFlowRate;
-						if ( ! WaterSource( SourceNum ).IsThisSized ) {
-							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate, "User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate,
+							"User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpVolFlowRate - DesVolFlowRateUser ) / DesVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + WaterSource( SourceNum ).Name );
@@ -521,20 +554,20 @@ namespace PlantComponentTemperatureSources {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in PlantComponent:TemperatureSource object=" + WaterSource( SourceNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! WaterSource( SourceNum ).IsThisSized ) {
-					if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "User-Specified Design Fluid Flow Rate [m3/s]", WaterSource( SourceNum ).DesVolFlowRate );
-					}
+			}
+			if ( ! WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport ) {
+				if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 ) {
+					ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+						"User-Specified Design Fluid Flow Rate [m3/s]", WaterSource( SourceNum ).DesVolFlowRate );
 				}
 			}
 		}
 
-		RegisterPlantCompDesignFlow( WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).DesVolFlowRate );
+		RegisterPlantCompDesignFlow( WaterSource( SourceNum ).InletNodeNum, tmpVolFlowRate );
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
@@ -579,10 +612,6 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-		int LoopSideNum;
 		Real64 Cp;
 		Real64 rDummy;
 		int iDummy;
@@ -594,7 +623,7 @@ namespace PlantComponentTemperatureSources {
 
 		if ( WaterSource( SourceNum ).MassFlowRate > 0.0 ) {
 			WaterSource( SourceNum ).OutletTemp = WaterSource( SourceNum ).BoundaryTemp;
-			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).HeatRate = WaterSource( SourceNum ).MassFlowRate * Cp * ( WaterSource( SourceNum ).OutletTemp - WaterSource( SourceNum ).InletTemp );
 			WaterSource( SourceNum ).HeatEnergy = WaterSource( SourceNum ).HeatRate * TimeStepSys * SecInHour;
 		} else {

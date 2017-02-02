@@ -1,15 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef BranchNodeConnections_hh_INCLUDED
 #define BranchNodeConnections_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward
+namespace DataBranchNodeConnections {
+	struct NodeConnectionDef;
+}
 
 namespace BranchNodeConnections {
 
@@ -38,6 +89,18 @@ namespace BranchNodeConnections {
 		bool const IsParent, // True when node is a parent node
 		bool & errFlag, // Will be True if errors already detected or if errors found here
 		Optional_string_const InputFieldName = _ // Input Field Name
+	);
+
+	void
+	OverrideNodeConnectionType(
+		int const NodeNumber, // Number for this Node
+		std::string const & NodeName, // Name of this Node
+		std::string const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		std::string const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		std::string const & ConnectionType, // Connection Type for this Node (must be valid)
+		int const FluidStream, // Count on Fluid Streams
+		bool const IsParent, // True when node is a parent node
+		bool & errFlag // Will be True if errors already detected or if errors found here
 	);
 
 	bool
@@ -99,13 +162,13 @@ namespace BranchNodeConnections {
 		std::string const & ComponentName,
 		bool & IsParent,
 		int & NumInlets,
-		FArray1D_string & InletNodeNames,
-		FArray1D_int & InletNodeNums,
-		FArray1D_int & InletFluidStreams,
+		Array1D_string & InletNodeNames,
+		Array1D_int & InletNodeNums,
+		Array1D_int & InletFluidStreams,
 		int & NumOutlets,
-		FArray1D_string & OutletNodeNames,
-		FArray1D_int & OutletNodeNums,
-		FArray1D_int & OutletFluidStreams,
+		Array1D_string & OutletNodeNames,
+		Array1D_int & OutletNodeNums,
+		Array1D_int & OutletFluidStreams,
 		bool & ErrorsFound
 	);
 
@@ -114,12 +177,12 @@ namespace BranchNodeConnections {
 		std::string const & ComponentType,
 		std::string const & ComponentName,
 		int & NumChildren,
-		FArray1S_string ChildrenCType,
-		FArray1S_string ChildrenCName,
-		FArray1S_string InletNodeName,
-		FArray1S_int InletNodeNum,
-		FArray1S_string OutletNodeName,
-		FArray1S_int OutletNodeNum,
+		Array1S_string ChildrenCType,
+		Array1S_string ChildrenCName,
+		Array1S_string InletNodeName,
+		Array1S_int InletNodeNum,
+		Array1S_string OutletNodeName,
+		Array1S_int OutletNodeNum,
 		bool & ErrorsFound
 	);
 
@@ -152,55 +215,18 @@ namespace BranchNodeConnections {
 	void
 	GetNodeConnectionType(
 		int const NodeNumber,
-		FArray1D_int & NodeConnectType,
+		Array1D_int & NodeConnectType,
 		bool & errFlag
 	);
 
 	void
-	FindAllNumbersInList(
+	FindAllNodeNumbersInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1< DataBranchNodeConnections::NodeConnectionDef > const & NodeConnections,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
-		FArray1D_int & AllNumbersInList // Index array to all numbers found
+		Array1D_int & AllNumbersInList // Index array to all numbers found
 	);
-
-	template< typename A >
-	inline
-	void
-	FindAllNumbersInList(
-		int const WhichNumber,
-		MArray1< A, int > const & ListOfItems,
-		int const NumItems,
-		int & CountOfItems, // Number of items found
-		FArray1D_int & AllNumbersInList // Index array to all numbers found
-	)
-	{
-		FindAllNumbersInList( WhichNumber, FArray1D_int( ListOfItems ), NumItems, CountOfItems, AllNumbersInList );
-	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BranchNodeConnections
 

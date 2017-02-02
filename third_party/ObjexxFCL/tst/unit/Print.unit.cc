@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -136,18 +136,6 @@ TEST_F( PrintTest, PrintLD_1E17 ) // Exact output is platform/compiler dependent
 #endif
 }
 
-#ifndef __INTEL_COMPILER
-TEST_F( PrintTest, PrintLD_1E_Big )
-{
-	Print( "*" ) << 8.0e-309; // Intel C++ says this underflows
-#ifdef _MSC_VER // Overflow
-	EXPECT_EQ( "  1.#INF00000000000E-309\n", buf.str() );
-#else
-	EXPECT_EQ( "  8.000000000000000E-309\n", buf.str() );
-#endif
-}
-#endif
-
 TEST_F( PrintTest, PrintStringLiteralNestedToStream )
 {
 	Print( "(\"A \\\"big\\\" fish\"$)" ); // Also tests that Print does the output with no << arg
@@ -219,18 +207,18 @@ TEST_F( PrintTest, Fmt )
 	EXPECT_EQ( "  1125.", buf.str() );
 }
 
-TEST_F( PrintTest, FArray1DOut )
+TEST_F( PrintTest, Array1DOut )
 {
-	FArray1D_int const A( 3, { 1, 2, 3 } );
+	Array1D_int const A( 3, { 1, 2, 3 } );
 	gio::Fmt const fmt( "(3I3)" );
 	Print( fmt ) << A;
 	EXPECT_EQ( "  1  2  3\n", buf.str() );
 }
 
-TEST_F( PrintTest, FArray1SOut )
+TEST_F( PrintTest, Array1SOut )
 {
-	FArray1D_int const A( 3, { 1, 2, 3 } );
-	FArray1S_int S( A );
+	Array1D_int const A( 3, { 1, 2, 3 } );
+	Array1S_int S( A );
 	gio::Fmt const fmt( "(3I3)" );
 	Print( fmt ) << S;
 	EXPECT_EQ( "  1  2  3\n", buf.str() );

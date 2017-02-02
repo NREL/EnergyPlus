@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HighTempRadiantSystem.hh>
@@ -99,24 +145,40 @@ namespace HighTempRadiantSystem {
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
 	int NumOfHighTempRadSys( 0 ); // Number of hydronic low tempererature radiant systems
-	FArray1D< Real64 > QHTRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QHTRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	Array1D< Real64 > QHTRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QHTRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QHTRadSrcAvg locally
-	FArray1D< Real64 > LastQHTRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D< Real64 > LastQHTRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
 
 	// Object Data
-	FArray1D< HighTempRadiantSystemData > HighTempRadSys;
-	FArray1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
+	Array1D< HighTempRadiantSystemData > HighTempRadSys;
+	Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
+	void
+ 	clear_state()
+ 	{
+		NumOfHighTempRadSys = 0;
+		QHTRadSource.deallocate();
+		QHTRadSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQHTRadSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		HighTempRadSys.deallocate();
+		HighTempRadSysNumericFields.deallocate();
+	}
 
+	
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
@@ -161,17 +223,20 @@ namespace HighTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
+		bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
 		int RadSysNum; // Radiant system number/index in local derived types
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetHighTempRadiantSystem();
+			ErrorsFoundInGet = false;
+			GetHighTempRadiantSystem( ErrorsFoundInGet );
+			if ( ErrorsFoundInGet ) ShowFatalError( "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination." );
 			GetInputFlag = false;
 		}
 
 		// Find the correct ZoneHVAC:HighTemperatureRadiant
 		if ( CompIndex == 0 ) {
-			RadSysNum = FindItemInList( CompName, HighTempRadSys.Name(), NumOfHighTempRadSys );
+			RadSysNum = FindItemInList( CompName, HighTempRadSys );
 			if ( RadSysNum == 0 ) {
 				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + CompName );
 			}
@@ -205,7 +270,9 @@ namespace HighTempRadiantSystem {
 	}
 
 	void
-	GetHighTempRadiantSystem()
+	GetHighTempRadiantSystem(
+			bool & ErrorsFound // TRUE if errors are found on processing the input
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -226,10 +293,8 @@ namespace HighTempRadiantSystem {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
@@ -239,7 +304,6 @@ namespace HighTempRadiantSystem {
 		using ScheduleManager::GetScheduleIndex;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::HeatingDesignCapacity;
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
@@ -270,12 +334,13 @@ namespace HighTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant, latent, and lost (must be <= 1)
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
+		Real64 FracOfRadPotentiallyLost; // Difference between unity and AllFracsSummed for error reporting
 		int IOStatus; // Used in GetObjectItem
 		int Item; // Item to be "gotten"
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int SurfNum; // Surface number DO loop counter
+		Real64 TotalFracToSurfs; // Sum of fractions of radiation to surfaces
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
@@ -302,7 +367,7 @@ namespace HighTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HighTempRadSys.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HighTempRadSys, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -322,7 +387,7 @@ namespace HighTempRadiantSystem {
 			}
 
 			HighTempRadSys( Item ).ZoneName = cAlphaArgs( 3 );
-			HighTempRadSys( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			HighTempRadSys( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( HighTempRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -530,7 +595,7 @@ namespace HighTempRadiantSystem {
 			AllFracsSummed = HighTempRadSys( Item ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= HighTempRadSys( Item ).TotSurfToDistrib; ++SurfNum ) {
 				HighTempRadSys( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 7 );
-				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface.Name(), TotSurfaces );
+				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface );
 				HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
 				// Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
 				if ( HighTempRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) {
@@ -538,7 +603,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != HighTempRadSys( Item ).ZonePtr ) {
-					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System," "surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
+					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System, surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
 					ShowContinueError( "Surface is in Zone=" + Zone( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs( 3 ) );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
@@ -569,14 +634,22 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 			if ( AllFracsSummed < ( MaxFraction - 0.01 ) ) { // User didn't distribute all of the radiation warn that some will be lost
-				ShowWarningError( "Fraction of radiation distributed to surfaces sums up to less than 1 for " + cAlphaArgs( 1 ) );
-				ShowContinueError( "As a result, some of the radiant energy delivered by the high temp radiant heater will be lost." );
-				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				TotalFracToSurfs = AllFracsSummed - HighTempRadSys( Item ).FracDistribPerson;
+				FracOfRadPotentiallyLost = 1.0 - AllFracsSummed;
+				ShowSevereError( "Fraction of radiation distributed to surfaces and people sums up to less than 1 for " + cAlphaArgs( 1 ) );
+				ShowContinueError( "This would result in some of the radiant energy delivered by the high temp radiant heater being lost." );
+				ShowContinueError( "The sum of all radiation fractions to surfaces = " + TrimSigDigits( TotalFracToSurfs, 5) );
+				ShowContinueError( "The radiant fraction to people = " + TrimSigDigits( HighTempRadSys( Item ).FracDistribPerson, 5) );
+				ShowContinueError( "So, all radiant fractions including surfaces and people = " + TrimSigDigits( AllFracsSummed, 5) );
+				ShowContinueError( "This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = " +  TrimSigDigits( FracOfRadPotentiallyLost, 5) );
+				ShowContinueError( "Please check and correct this so that all radiant energy is accounted for in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ErrorsFound = true;
 			}
 
 		} // ...end of DO loop through all of the high temperature radiant heaters
 
 		// Set up the output variables for high temperature radiant heaters
+		// cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant"
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HighTempRadSys( Item ).HeatPower, "System", "Average", HighTempRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HighTempRadSys( Item ).HeatEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
@@ -588,10 +661,6 @@ namespace HighTempRadiantSystem {
 				SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", HighTempRadSys( Item ).ElecEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
 		}
 
 	}
@@ -622,7 +691,6 @@ namespace HighTempRadiantSystem {
 		// Using/Aliasing
 		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 
@@ -796,6 +864,7 @@ namespace HighTempRadiantSystem {
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
+				DataScalableCapSizingON = false;
 			}
 
 		}
@@ -837,7 +906,6 @@ namespace HighTempRadiantSystem {
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using DataHeatBalFanSys::MAT;
-		using DataHVACGlobals::SmallLoad;
 		using namespace DataZoneEnergyDemands;
 		using ScheduleManager::GetCurrentScheduleValue;
 
@@ -902,7 +970,7 @@ namespace HighTempRadiantSystem {
 
 	void
 	CalcHighTempRadiantSystemSP(
-		bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // true if this is the first HVAC iteration at this system time step !unused1208
 		int const RadSysNum // name of the low temperature radiant system
 	)
 	{
@@ -983,8 +1051,8 @@ namespace HighTempRadiantSystem {
 			DistributeHTRadGains();
 
 			// Now "simulate" the system by recalculating the heat balances
-			CalcHeatBalanceOutsideSurf( ZoneNum );
-			CalcHeatBalanceInsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 			// First determine whether or not the unit should be on
 			// Determine the proper temperature on which to control
@@ -1024,8 +1092,8 @@ namespace HighTempRadiantSystem {
 					DistributeHTRadGains();
 
 					// Now "simulate" the system by recalculating the heat balances
-					CalcHeatBalanceOutsideSurf( ZoneNum );
-					CalcHeatBalanceInsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 					// Redetermine the current value of the controlling temperature
 					{ auto const SELECT_CASE_var( HighTempRadSys( RadSysNum ).ControlType );
@@ -1154,8 +1222,8 @@ namespace HighTempRadiantSystem {
 
 			// Now "simulate" the system by recalculating the heat balances
 			ZoneNum = HighTempRadSys( RadSysNum ).ZonePtr;
-			CalcHeatBalanceOutsideSurf( ZoneNum );
-			CalcHeatBalanceInsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 		}}
 
 		if ( QHTRadSource( RadSysNum ) <= 0.0 ) {
@@ -1266,7 +1334,6 @@ namespace HighTempRadiantSystem {
 		using DataHeatBalFanSys::QHTRadSysSurf;
 		using DataHeatBalFanSys::MaxRadHeatFlux;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -1369,16 +1436,13 @@ namespace HighTempRadiantSystem {
 
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
-		using DataGlobals::OutputFileDebug;
 		using DataHVACGlobals::TimeStepSys;
-		using DataLoopNode::Node;
 		using DataSurfaces::Surface;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const NotOperating( -9999.0 ); // Some unreasonable value that should clue the user in that this is not running
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1475,29 +1539,6 @@ namespace HighTempRadiantSystem {
 		return SumHATsurf;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HighTempRadiantSystem
 

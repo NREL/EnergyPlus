@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef RuntimeLanguageProcessor_hh_INCLUDED
 #define RuntimeLanguageProcessor_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -65,8 +111,8 @@ namespace RuntimeLanguageProcessor {
 	extern int OffVariableNum;
 	extern int OnVariableNum;
 	extern int PiVariableNum;
-	extern FArray1D_int CurveIndexVariableNums;
-	extern FArray1D_int ConstructionIndexVariableNums;
+	extern Array1D_int CurveIndexVariableNums;
+	extern Array1D_int ConstructionIndexVariableNums;
 	extern int YearVariableNum;
 	extern int MonthVariableNum;
 	extern int DayOfMonthVariableNum;
@@ -84,6 +130,7 @@ namespace RuntimeLanguageProcessor {
 	extern int CurrentEnvironmentPeriodNum;
 	extern int ActualDateAndTimeNum;
 	extern int ActualTimeNum;
+	extern int WarmUpFlagNum;
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -112,27 +159,6 @@ namespace RuntimeLanguageProcessor {
 			Expression( 0 )
 		{}
 
-		// Member Constructor
-		TokenType(
-			int const Type, // token type, eg. TokenNumber
-			Real64 const Number, // May want to store all literals as a variable?
-			std::string const & String, // Serves double duty, also saves string version of token for easy debugging
-			int const Operator, // indentifies operator or function 1..64
-			int const Variable, // points to a variable in ErlVariable structure
-			int const Parenthesis, // identifes if token is left or right parenthesis
-			int const Expression, // points to an expression in ErlExpression structure
-			std::string const & Error // holds token processing error message content
-		) :
-			Type( Type ),
-			Number( Number ),
-			String( String ),
-			Operator( Operator ),
-			Variable( Variable ),
-			Parenthesis( Parenthesis ),
-			Expression( Expression ),
-			Error( Error )
-		{}
-
 	};
 
 	struct RuntimeReportVarType
@@ -148,23 +174,14 @@ namespace RuntimeLanguageProcessor {
 			Value( 0.0 )
 		{}
 
-		// Member Constructor
-		RuntimeReportVarType(
-			std::string const & Name, // name of custom Erl report variable
-			int const VariableNum, // pointer to Erl variable associated with custom report variable
-			Real64 const Value // Value registered with output processor for report variable
-		) :
-			Name( Name ),
-			VariableNum( VariableNum ),
-			Value( Value )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< RuntimeReportVarType > RuntimeReportVar;
+	extern Array1D< RuntimeReportVarType > RuntimeReportVar;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	InitializeRuntimeLanguage();
@@ -198,7 +215,8 @@ namespace RuntimeLanguageProcessor {
 	WriteTrace(
 		int const StackNum,
 		int const InstructionNum,
-		ErlValueType const & ReturnValue
+		ErlValueType const & ReturnValue,
+		bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
 	);
 
 	//******************************************************************************************
@@ -217,7 +235,7 @@ namespace RuntimeLanguageProcessor {
 
 	int
 	ProcessTokens(
-		FArray1S< TokenType > const TokenIN,
+		Array1S< TokenType > const TokenIN,
 		int const NumTokensIN,
 		int const StackNum,
 		std::string const & ParsingString
@@ -227,7 +245,10 @@ namespace RuntimeLanguageProcessor {
 	NewExpression();
 
 	ErlValueType
-	EvaluateExpression( int const ExpressionNum );
+	EvaluateExpression( 
+		int const ExpressionNum,
+		bool & seriousErrorFound
+	);
 
 	void
 	GetRuntimeLanguageUserInput();
@@ -281,29 +302,6 @@ namespace RuntimeLanguageProcessor {
 
 	bool
 	isExternalInterfaceErlVariable( int const varNum ); // The variable index to be written during run time
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RuntimeLanguageProcessor
 

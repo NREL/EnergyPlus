@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -17,6 +17,7 @@
 #include <ObjexxFCL/MArrayR.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
+#include <ObjexxFCL/Vector4.hh>
 
 // C++ Headers
 #include <array>
@@ -40,7 +41,7 @@ private: // Friend
 
 public: // Types
 
-	typedef  typename Super::Array  Array;
+	typedef  typename Super::ArrayType  ArrayType;
 	typedef  typename Super::Class  Class;
 	typedef  typename Super::MPtr  MPtr;
 	typedef  typename Super::Traits  Traits;
@@ -64,32 +65,32 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	// Using
-	using Super::in_range;
 	using Super::isize;
 	using Super::l;
 	using Super::u;
 	using Super::size;
+
+protected: // Types
+
+	using Super::in_range;
 	using Super::j1;
+
 	using Super::array_;
 	using Super::pmem_;
 
 public: // Creation
 
 	// Copy Constructor
-	inline
 	MArray1( MArray1 const & a ) :
 	 Super( a )
 	{}
 
 	// Constructor
-	inline
 	MArray1( A & a, T Class::* pmem ) :
 	 Super( a, pmem )
 	{}
 
 	// Destructor
-	inline
 	virtual
 	~MArray1()
 	{}
@@ -97,7 +98,6 @@ public: // Creation
 public: // Assignment: Array
 
 	// Copy Assignment
-	inline
 	MArray1 &
 	operator =( MArray1 const & a )
 	{
@@ -112,7 +112,6 @@ public: // Assignment: Array
 
 	// Copy Assignment Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray1 &
 	operator =( MArray1< Aa, Ta > const & a )
 	{
@@ -124,10 +123,9 @@ public: // Assignment: Array
 	}
 
 	// Array Assignment Template
-	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
+	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	MArray1 &
-	operator =( ArrayType< U > const & a )
+	operator =( Ar< U > const & a )
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
@@ -138,7 +136,6 @@ public: // Assignment: Array
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator =( std::initializer_list< U > const l )
 	{
@@ -152,7 +149,6 @@ public: // Assignment: Array
 
 	// std::array Assignment Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator =( std::array< U, s > const & a )
 	{
@@ -166,7 +162,6 @@ public: // Assignment: Array
 
 	// std::vector Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator =( std::vector< U > const & v )
 	{
@@ -180,32 +175,42 @@ public: // Assignment: Array
 
 	// Vector2 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator =( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		operator ()( 1 ) = v[ 0 ];
-		operator ()( 2 ) = v[ 1 ];
+		operator ()( 1 ) = v.x;
+		operator ()( 2 ) = v.y;
 		return *this;
 	}
 
 	// Vector3 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator =( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		operator ()( 1 ) = v[ 0 ];
-		operator ()( 2 ) = v[ 1 ];
-		operator ()( 3 ) = v[ 2 ];
+		operator ()( 1 ) = v.x;
+		operator ()( 2 ) = v.y;
+		operator ()( 3 ) = v.z;
+		return *this;
+	}
+
+	// Vector4 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	operator =( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		operator ()( 1 ) = v.x;
+		operator ()( 2 ) = v.y;
+		operator ()( 3 ) = v.z;
+		operator ()( 3 ) = v.w;
 		return *this;
 	}
 
 	// += MArray1 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray1 &
 	operator +=( MArray1< Aa, Ta > const & a )
 	{
@@ -218,7 +223,6 @@ public: // Assignment: Array
 
 	// -= MArray1 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray1 &
 	operator -=( MArray1< Aa, Ta > const & a )
 	{
@@ -231,7 +235,6 @@ public: // Assignment: Array
 
 	// *= MArray1 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray1 &
 	operator *=( MArray1< Aa, Ta > const & a )
 	{
@@ -244,7 +247,6 @@ public: // Assignment: Array
 
 	// /= MArray1 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray1 &
 	operator /=( MArray1< Aa, Ta > const & a )
 	{
@@ -257,10 +259,9 @@ public: // Assignment: Array
 	}
 
 	// += Array Template
-	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
+	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	MArray1 &
-	operator +=( ArrayType< U > const & a )
+	operator +=( Ar< U > const & a )
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
@@ -270,10 +271,9 @@ public: // Assignment: Array
 	}
 
 	// -= Array Template
-	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
+	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	MArray1 &
-	operator -=( ArrayType< U > const & a )
+	operator -=( Ar< U > const & a )
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
@@ -283,10 +283,9 @@ public: // Assignment: Array
 	}
 
 	// *= Array Template
-	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
+	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	MArray1 &
-	operator *=( ArrayType< U > const & a )
+	operator *=( Ar< U > const & a )
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
@@ -296,10 +295,9 @@ public: // Assignment: Array
 	}
 
 	// /= Array Template
-	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
+	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	MArray1 &
-	operator /=( ArrayType< U > const & a )
+	operator /=( Ar< U > const & a )
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
@@ -311,7 +309,6 @@ public: // Assignment: Array
 
 	// += Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator +=( std::initializer_list< U > const l )
 	{
@@ -325,7 +322,6 @@ public: // Assignment: Array
 
 	// -= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator -=( std::initializer_list< U > const l )
 	{
@@ -339,7 +335,6 @@ public: // Assignment: Array
 
 	// *= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator *=( std::initializer_list< U > const l )
 	{
@@ -353,7 +348,6 @@ public: // Assignment: Array
 
 	// /= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator /=( std::initializer_list< U > const l )
 	{
@@ -368,7 +362,6 @@ public: // Assignment: Array
 
 	// += std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator +=( std::array< U, s > const & a )
 	{
@@ -382,7 +375,6 @@ public: // Assignment: Array
 
 	// -= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator -=( std::array< U, s > const & a )
 	{
@@ -396,7 +388,6 @@ public: // Assignment: Array
 
 	// *= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator *=( std::array< U, s > const & a )
 	{
@@ -410,7 +401,6 @@ public: // Assignment: Array
 
 	// /= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator /=( std::array< U, s > const & a )
 	{
@@ -425,7 +415,6 @@ public: // Assignment: Array
 
 	// += std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator +=( std::vector< U > const & v )
 	{
@@ -439,7 +428,6 @@ public: // Assignment: Array
 
 	// -= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator -=( std::vector< U > const & v )
 	{
@@ -453,7 +441,6 @@ public: // Assignment: Array
 
 	// *= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator *=( std::vector< U > const & v )
 	{
@@ -467,7 +454,6 @@ public: // Assignment: Array
 
 	// /= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator /=( std::vector< U > const & v )
 	{
@@ -482,106 +468,154 @@ public: // Assignment: Array
 
 	// += Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator +=( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		operator ()( 1 ) += v[ 0 ];
-		operator ()( 2 ) += v[ 1 ];
+		operator ()( 1 ) += v.x;
+		operator ()( 2 ) += v.y;
 		return *this;
 	}
 
 	// -= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator -=( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		operator ()( 1 ) -= v[ 0 ];
-		operator ()( 2 ) -= v[ 1 ];
+		operator ()( 1 ) -= v.x;
+		operator ()( 2 ) -= v.y;
 		return *this;
 	}
 
 	// *= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator *=( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		operator ()( 1 ) *= v[ 0 ];
-		operator ()( 2 ) *= v[ 1 ];
+		operator ()( 1 ) *= v.x;
+		operator ()( 2 ) *= v.y;
 		return *this;
 	}
 
 	// /= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator /=( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		operator ()( 1 ) /= v[ 0 ];
-		operator ()( 2 ) /= v[ 1 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		operator ()( 1 ) /= v.x;
+		operator ()( 2 ) /= v.y;
 		return *this;
 	}
 
 	// += Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator +=( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		operator ()( 1 ) += v[ 0 ];
-		operator ()( 2 ) += v[ 1 ];
-		operator ()( 3 ) += v[ 2 ];
+		operator ()( 1 ) += v.x;
+		operator ()( 2 ) += v.y;
+		operator ()( 3 ) += v.z;
 		return *this;
 	}
 
 	// -= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator -=( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		operator ()( 1 ) -= v[ 0 ];
-		operator ()( 2 ) -= v[ 1 ];
-		operator ()( 3 ) -= v[ 2 ];
+		operator ()( 1 ) -= v.x;
+		operator ()( 2 ) -= v.y;
+		operator ()( 3 ) -= v.z;
 		return *this;
 	}
 
 	// *= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator *=( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		operator ()( 1 ) *= v[ 0 ];
-		operator ()( 2 ) *= v[ 1 ];
-		operator ()( 3 ) *= v[ 2 ];
+		operator ()( 1 ) *= v.x;
+		operator ()( 2 ) *= v.y;
+		operator ()( 3 ) *= v.z;
 		return *this;
 	}
 
 	// /= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator /=( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		assert( v[ 2 ] != T( 0 ) );
-		operator ()( 1 ) /= v[ 0 ];
-		operator ()( 2 ) /= v[ 1 ];
-		operator ()( 3 ) /= v[ 2 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		operator ()( 1 ) /= v.x;
+		operator ()( 2 ) /= v.y;
+		operator ()( 3 ) /= v.z;
+		return *this;
+	}
+
+	// += Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	operator +=( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		operator ()( 1 ) += v.x;
+		operator ()( 2 ) += v.y;
+		operator ()( 3 ) += v.z;
+		operator ()( 4 ) += v.w;
+		return *this;
+	}
+
+	// -= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	operator -=( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		operator ()( 1 ) -= v.x;
+		operator ()( 2 ) -= v.y;
+		operator ()( 3 ) -= v.z;
+		operator ()( 4 ) -= v.w;
+		return *this;
+	}
+
+	// *= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	operator *=( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		operator ()( 1 ) *= v.x;
+		operator ()( 2 ) *= v.y;
+		operator ()( 3 ) *= v.z;
+		operator ()( 4 ) *= v.w;
+		return *this;
+	}
+
+	// /= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	operator /=( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		assert( v.w != T( 0 ) );
+		operator ()( 1 ) /= v.x;
+		operator ()( 2 ) /= v.y;
+		operator ()( 3 ) /= v.z;
+		operator ()( 4 ) /= v.w;
 		return *this;
 	}
 
@@ -589,7 +623,6 @@ public: // Assignment: Logical
 
 	// &&= MArray1 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	and_equals( MArray1 const & a )
 	{
@@ -602,7 +635,6 @@ public: // Assignment: Logical
 
 	// ||= MArray1 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	or_equals( MArray1 const & a )
 	{
@@ -615,7 +647,6 @@ public: // Assignment: Logical
 
 	// &&= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	and_equals( std::initializer_list< U > const l )
 	{
@@ -629,7 +660,6 @@ public: // Assignment: Logical
 
 	// ||= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	or_equals( std::initializer_list< U > const l )
 	{
@@ -643,7 +673,6 @@ public: // Assignment: Logical
 
 	// &&= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	and_equals( std::array< U, s > const & a )
 	{
@@ -657,7 +686,6 @@ public: // Assignment: Logical
 
 	// ||= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	or_equals( std::array< U, s > const & a )
 	{
@@ -671,7 +699,6 @@ public: // Assignment: Logical
 
 	// &&= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	and_equals( std::vector< U > const & v )
 	{
@@ -685,7 +712,6 @@ public: // Assignment: Logical
 
 	// ||= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	or_equals( std::vector< U > const & v )
 	{
@@ -699,58 +725,79 @@ public: // Assignment: Logical
 
 	// &&= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	and_equals( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		operator ()( 1 ) = operator ()( 1 ) && v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) && v[ 1 ];
+		operator ()( 1 ) = operator ()( 1 ) && v.x;
+		operator ()( 2 ) = operator ()( 2 ) && v.y;
 		return *this;
 	}
 
 	// ||= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	or_equals( Vector2< U > const & v )
 	{
 		assert( size() == 2u );
-		operator ()( 1 ) = operator ()( 1 ) || v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) || v[ 1 ];
+		operator ()( 1 ) = operator ()( 1 ) || v.x;
+		operator ()( 2 ) = operator ()( 2 ) || v.y;
 		return *this;
 	}
 
 	// &&= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	and_equals( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		operator ()( 1 ) = operator ()( 1 ) && v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) && v[ 1 ];
-		operator ()( 3 ) = operator ()( 3 ) && v[ 2 ];
+		operator ()( 1 ) = operator ()( 1 ) && v.x;
+		operator ()( 2 ) = operator ()( 2 ) && v.y;
+		operator ()( 3 ) = operator ()( 3 ) && v.z;
 		return *this;
 	}
 
 	// ||= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	or_equals( Vector3< U > const & v )
 	{
 		assert( size() == 3u );
-		operator ()( 1 ) = operator ()( 1 ) || v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) || v[ 1 ];
-		operator ()( 3 ) = operator ()( 3 ) || v[ 2 ];
+		operator ()( 1 ) = operator ()( 1 ) || v.x;
+		operator ()( 2 ) = operator ()( 2 ) || v.y;
+		operator ()( 3 ) = operator ()( 3 ) || v.z;
+		return *this;
+	}
+
+	// &&= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	and_equals( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		operator ()( 1 ) = operator ()( 1 ) && v.x;
+		operator ()( 2 ) = operator ()( 2 ) && v.y;
+		operator ()( 3 ) = operator ()( 3 ) && v.z;
+		operator ()( 4 ) = operator ()( 4 ) && v.w;
+		return *this;
+	}
+
+	// ||= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	MArray1 &
+	or_equals( Vector4< U > const & v )
+	{
+		assert( size() == 4u );
+		operator ()( 1 ) = operator ()( 1 ) || v.x;
+		operator ()( 2 ) = operator ()( 2 ) || v.y;
+		operator ()( 3 ) = operator ()( 3 ) || v.z;
+		operator ()( 4 ) = operator ()( 4 ) || v.w;
 		return *this;
 	}
 
 public: // Assignment: Value
 
 	// = Value
-	inline
 	MArray1 &
 	operator =( T const & t )
 	{
@@ -762,7 +809,6 @@ public: // Assignment: Value
 
 	// = Value Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator =( U const & t )
 	{
@@ -773,7 +819,6 @@ public: // Assignment: Value
 	}
 
 	// += Value
-	inline
 	MArray1 &
 	operator +=( T const & t )
 	{
@@ -784,7 +829,6 @@ public: // Assignment: Value
 	}
 
 	// -= Value
-	inline
 	MArray1 &
 	operator -=( T const & t )
 	{
@@ -795,7 +839,6 @@ public: // Assignment: Value
 	}
 
 	// *= Value
-	inline
 	MArray1 &
 	operator *=( T const & t )
 	{
@@ -807,7 +850,6 @@ public: // Assignment: Value
 
 	// /= Value
 	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray1 &
 	operator /=( U const & u )
 	{
@@ -820,8 +862,7 @@ public: // Assignment: Value
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	MArray1 &
 	operator /=( U const & u )
 	{
@@ -835,7 +876,6 @@ public: // Assignment: Value
 public: // Subscript
 
 	// array( i ) const
-	inline
 	T const &
 	operator ()( int const i ) const
 	{
@@ -844,7 +884,6 @@ public: // Subscript
 	}
 
 	// array( i )
-	inline
 	T &
 	operator ()( int const i )
 	{
@@ -853,7 +892,6 @@ public: // Subscript
 	}
 
 	// array[ i ] const: 0-Based Subscript
-	inline
 	T const &
 	operator []( size_type const i ) const
 	{
@@ -862,7 +900,6 @@ public: // Subscript
 	}
 
 	// array[ i ]: 0-Based Subscript
-	inline
 	T &
 	operator []( size_type const i )
 	{
@@ -873,7 +910,6 @@ public: // Subscript
 public: // Predicate
 
 	// Contains Indexed Element?
-	inline
 	bool
 	contains( int const i ) const
 	{
@@ -882,7 +918,6 @@ public: // Predicate
 
 	// Conformable?
 	template< typename Aa, typename Ta >
-	inline
 	bool
 	conformable( MArray1< Aa, Ta > const & a ) const
 	{
@@ -890,17 +925,15 @@ public: // Predicate
 	}
 
 	// Conformable?
-	template< class ArrayType >
-	inline
+	template< class Ar >
 	bool
-	conformable( ArrayType const & a ) const
+	conformable( Ar const & a ) const
 	{
 		return ( ( a.rank() == 1 ) && ( size() == a.size() ) );
 	}
 
 	// Equal Dimensions?
 	template< typename Aa, typename Ta >
-	inline
 	bool
 	equal_dimensions( MArray1< Aa, Ta > const & a ) const
 	{
@@ -908,10 +941,9 @@ public: // Predicate
 	}
 
 	// Equal Dimensions?
-	template< class ArrayType >
-	inline
+	template< class Ar >
 	bool
-	equal_dimensions( ArrayType const & a ) const
+	equal_dimensions( Ar const & a ) const
 	{
 		return conformable( a );
 	}
@@ -919,7 +951,6 @@ public: // Predicate
 public: // Inspector
 
 	// IndexRange
-	inline
 	IR
 	I() const
 	{
@@ -927,7 +958,6 @@ public: // Inspector
 	}
 
 	// Lower Index
-	inline
 	int
 	l() const
 	{
@@ -935,7 +965,6 @@ public: // Inspector
 	}
 
 	// Upper Index
-	inline
 	int
 	u() const
 	{
@@ -943,7 +972,6 @@ public: // Inspector
 	}
 
 	// IndexRange of Dimension 1
-	inline
 	IR
 	I1() const
 	{
@@ -951,7 +979,6 @@ public: // Inspector
 	}
 
 	// Lower Index of Dimension 1
-	inline
 	int
 	l1() const
 	{
@@ -959,7 +986,6 @@ public: // Inspector
 	}
 
 	// Upper Index of Dimension 1
-	inline
 	int
 	u1() const
 	{
@@ -967,7 +993,6 @@ public: // Inspector
 	}
 
 	// Size of Dimension 1
-	inline
 	size_type
 	size1() const
 	{
@@ -975,7 +1000,6 @@ public: // Inspector
 	}
 
 	// Size of Dimension 1
-	inline
 	int
 	isize1() const
 	{
@@ -983,7 +1007,6 @@ public: // Inspector
 	}
 
 	// Length
-	inline
 	T
 	length() const
 	{
@@ -996,7 +1019,6 @@ public: // Inspector
 	}
 
 	// Length Squared
-	inline
 	T
 	length_squared() const
 	{
@@ -1010,19 +1032,7 @@ public: // Inspector
 
 public: // Modifier
 
-	// Assign Default Value to all Elements
-	inline
-	MArray1 &
-	to_default()
-	{
-		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator ()( i ) = Traits::initial_value();
-		}
-		return *this;
-	}
-
 	// Normalize to Unit Length
-	inline
 	MArray1 &
 	normalize()
 	{
@@ -1040,7 +1050,6 @@ public: // MArray Generators
 
 	// MArray Generator
 	template< typename M >
-	inline
 	MArray1< MArray1 const, M >
 	ma( M ClassT::* pmem ) const
 	{
@@ -1049,19 +1058,15 @@ public: // MArray Generators
 
 	// MArray Generator
 	template< typename M >
-	inline
 	MArray1< MArray1, M >
 	ma( M ClassT::* pmem )
 	{
 		return MArray1< MArray1, M >( *this, pmem );
 	}
 
-#include <ObjexxFCL/MArray1.Project.MArray.hh> // Inject project-specific MArray generators
-
 public: // Comparison: Predicate
 
 	// MArray1 == MArray1
-	inline
 	friend
 	bool
 	eq( MArray1 const & a, MArray1 const & b )
@@ -1076,7 +1081,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 != MArray1
-	inline
 	friend
 	bool
 	ne( MArray1 const & a, MArray1 const & b )
@@ -1085,7 +1089,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 < MArray1
-	inline
 	friend
 	bool
 	lt( MArray1 const & a, MArray1 const & b )
@@ -1100,7 +1103,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 <= MArray1
-	inline
 	friend
 	bool
 	le( MArray1 const & a, MArray1 const & b )
@@ -1115,7 +1117,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 > MArray1
-	inline
 	friend
 	bool
 	gt( MArray1 const & a, MArray1 const & b )
@@ -1124,7 +1125,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 >= MArray1
-	inline
 	friend
 	bool
 	ge( MArray1 const & a, MArray1 const & b )
@@ -1133,7 +1133,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 == Value
-	inline
 	friend
 	bool
 	eq( MArray1 const & a, T const & t )
@@ -1145,7 +1144,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 != Value
-	inline
 	friend
 	bool
 	ne( MArray1 const & a, T const & t )
@@ -1154,7 +1152,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 < Value
-	inline
 	friend
 	bool
 	lt( MArray1 const & a, T const & t )
@@ -1167,7 +1164,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 <= Value
-	inline
 	friend
 	bool
 	le( MArray1 const & a, T const & t )
@@ -1180,7 +1176,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 > Value
-	inline
 	friend
 	bool
 	gt( MArray1 const & a, T const & t )
@@ -1189,7 +1184,6 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 >= Value
-	inline
 	friend
 	bool
 	ge( MArray1 const & a, T const & t )
@@ -1198,7 +1192,6 @@ public: // Comparison: Predicate
 	}
 
 	// Value == MArray1
-	inline
 	friend
 	bool
 	eq( T const & t, MArray1 const & a )
@@ -1207,7 +1200,6 @@ public: // Comparison: Predicate
 	}
 
 	// Value != MArray1
-	inline
 	friend
 	bool
 	ne( T const & t, MArray1 const & a )
@@ -1216,7 +1208,6 @@ public: // Comparison: Predicate
 	}
 
 	// Value < MArray1
-	inline
 	friend
 	bool
 	lt( T const & t, MArray1 const & a )
@@ -1229,7 +1220,6 @@ public: // Comparison: Predicate
 	}
 
 	// Value <= MArray1
-	inline
 	friend
 	bool
 	le( T const & t, MArray1 const & a )
@@ -1242,7 +1232,6 @@ public: // Comparison: Predicate
 	}
 
 	// Value > MArray1
-	inline
 	friend
 	bool
 	gt( T const & t, MArray1 const & a )
@@ -1251,7 +1240,6 @@ public: // Comparison: Predicate
 	}
 
 	// Value >= MArray1
-	inline
 	friend
 	bool
 	ge( T const & t, MArray1 const & a )
@@ -1262,7 +1250,6 @@ public: // Comparison: Predicate
 public: // Comparison: Predicate: Any
 
 	// Any MArray1 == MArray1
-	inline
 	friend
 	bool
 	any_eq( MArray1 const & a, MArray1 const & b )
@@ -1277,7 +1264,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 != MArray1
-	inline
 	friend
 	bool
 	any_ne( MArray1 const & a, MArray1 const & b )
@@ -1286,7 +1272,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 < MArray1
-	inline
 	friend
 	bool
 	any_lt( MArray1 const & a, MArray1 const & b )
@@ -1301,7 +1286,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 <= MArray1
-	inline
 	friend
 	bool
 	any_le( MArray1 const & a, MArray1 const & b )
@@ -1316,7 +1300,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 > MArray1
-	inline
 	friend
 	bool
 	any_gt( MArray1 const & a, MArray1 const & b )
@@ -1325,7 +1308,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 >= MArray1
-	inline
 	friend
 	bool
 	any_ge( MArray1 const & a, MArray1 const & b )
@@ -1334,7 +1316,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 == Value
-	inline
 	friend
 	bool
 	any_eq( MArray1 const & a, T const & t )
@@ -1347,7 +1328,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 != Value
-	inline
 	friend
 	bool
 	any_ne( MArray1 const & a, T const & t )
@@ -1356,7 +1336,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 < Value
-	inline
 	friend
 	bool
 	any_lt( MArray1 const & a, T const & t )
@@ -1369,7 +1348,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 <= Value
-	inline
 	friend
 	bool
 	any_le( MArray1 const & a, T const & t )
@@ -1382,7 +1360,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 > Value
-	inline
 	friend
 	bool
 	any_gt( MArray1 const & a, T const & t )
@@ -1391,7 +1368,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 >= Value
-	inline
 	friend
 	bool
 	any_ge( MArray1 const & a, T const & t )
@@ -1400,7 +1376,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value == MArray1
-	inline
 	friend
 	bool
 	any_eq( T const & t, MArray1 const & a )
@@ -1409,7 +1384,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value != MArray1
-	inline
 	friend
 	bool
 	any_ne( T const & t, MArray1 const & a )
@@ -1418,7 +1392,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value < MArray1
-	inline
 	friend
 	bool
 	any_lt( T const & t, MArray1 const & a )
@@ -1431,7 +1404,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value <= MArray1
-	inline
 	friend
 	bool
 	any_le( T const & t, MArray1 const & a )
@@ -1444,7 +1416,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value > MArray1
-	inline
 	friend
 	bool
 	any_gt( T const & t, MArray1 const & a )
@@ -1453,7 +1424,6 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value >= MArray1
-	inline
 	friend
 	bool
 	any_ge( T const & t, MArray1 const & a )
@@ -1464,7 +1434,6 @@ public: // Comparison: Predicate: Any
 public: // Comparison: Predicate: All
 
 	// All MArray1 == MArray1
-	inline
 	friend
 	bool
 	all_eq( MArray1 const & a, MArray1 const & b )
@@ -1473,7 +1442,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 != MArray1
-	inline
 	friend
 	bool
 	all_ne( MArray1 const & a, MArray1 const & b )
@@ -1482,7 +1450,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 < MArray1
-	inline
 	friend
 	bool
 	all_lt( MArray1 const & a, MArray1 const & b )
@@ -1491,7 +1458,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 <= MArray1
-	inline
 	friend
 	bool
 	all_le( MArray1 const & a, MArray1 const & b )
@@ -1500,7 +1466,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 > MArray1
-	inline
 	friend
 	bool
 	all_gt( MArray1 const & a, MArray1 const & b )
@@ -1509,7 +1474,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 >= MArray1
-	inline
 	friend
 	bool
 	all_ge( MArray1 const & a, MArray1 const & b )
@@ -1518,7 +1482,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 == Value
-	inline
 	friend
 	bool
 	all_eq( MArray1 const & a, T const & t )
@@ -1527,7 +1490,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 != Value
-	inline
 	friend
 	bool
 	all_ne( MArray1 const & a, T const & t )
@@ -1536,7 +1498,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 < Value
-	inline
 	friend
 	bool
 	all_lt( MArray1 const & a, T const & t )
@@ -1545,7 +1506,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 <= Value
-	inline
 	friend
 	bool
 	all_le( MArray1 const & a, T const & t )
@@ -1554,7 +1514,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 > Value
-	inline
 	friend
 	bool
 	all_gt( MArray1 const & a, T const & t )
@@ -1563,7 +1522,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 >= Value
-	inline
 	friend
 	bool
 	all_ge( MArray1 const & a, T const & t )
@@ -1572,7 +1530,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value == MArray1
-	inline
 	friend
 	bool
 	all_eq( T const & t, MArray1 const & a )
@@ -1581,7 +1538,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value != MArray1
-	inline
 	friend
 	bool
 	all_ne( T const & t, MArray1 const & a )
@@ -1590,7 +1546,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value < MArray1
-	inline
 	friend
 	bool
 	all_lt( T const & t, MArray1 const & a )
@@ -1599,7 +1554,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value <= MArray1
-	inline
 	friend
 	bool
 	all_le( T const & t, MArray1 const & a )
@@ -1608,7 +1562,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value > MArray1
-	inline
 	friend
 	bool
 	all_gt( T const & t, MArray1 const & a )
@@ -1617,7 +1570,6 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value >= MArray1
-	inline
 	friend
 	bool
 	all_ge( T const & t, MArray1 const & a )
@@ -1628,7 +1580,6 @@ public: // Comparison: Predicate: All
 public: // Comparison: Count
 
 	// Count MArray1 == MArray1
-	inline
 	friend
 	size_type
 	count_eq( MArray1 const & a, MArray1 const & b )
@@ -1636,7 +1587,7 @@ public: // Comparison: Count
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size();
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) == b( i ) ) ++n;
 		}
@@ -1644,7 +1595,6 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 != MArray1
-	inline
 	friend
 	size_type
 	count_ne( MArray1 const & a, MArray1 const & b )
@@ -1652,7 +1602,7 @@ public: // Comparison: Count
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) != b( i ) ) ++n;
 		}
@@ -1660,7 +1610,6 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 < MArray1
-	inline
 	friend
 	size_type
 	count_lt( MArray1 const & a, MArray1 const & b )
@@ -1668,7 +1617,7 @@ public: // Comparison: Count
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) < b( i ) ) ++n;
 		}
@@ -1676,7 +1625,6 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 <= MArray1
-	inline
 	friend
 	size_type
 	count_le( MArray1 const & a, MArray1 const & b )
@@ -1684,7 +1632,7 @@ public: // Comparison: Count
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size();
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) <= b( i ) ) ++n;
 		}
@@ -1692,7 +1640,6 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 > MArray1
-	inline
 	friend
 	size_type
 	count_gt( MArray1 const & a, MArray1 const & b )
@@ -1700,7 +1647,7 @@ public: // Comparison: Count
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) > b( i ) ) ++n;
 		}
@@ -1708,7 +1655,6 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 >= MArray1
-	inline
 	friend
 	size_type
 	count_ge( MArray1 const & a, MArray1 const & b )
@@ -1716,7 +1662,7 @@ public: // Comparison: Count
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size();
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) >= b( i ) ) ++n;
 		}
@@ -1724,13 +1670,12 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 == Value
-	inline
 	friend
 	size_type
 	count_eq( MArray1 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) == t ) ++n;
 		}
@@ -1738,7 +1683,6 @@ public: // Comparison: Count
 	}
 
 	// Count Value == MArray1
-	inline
 	friend
 	size_type
 	count_eq( T const & t, MArray1 const & a )
@@ -1747,13 +1691,12 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 != Value
-	inline
 	friend
 	size_type
 	count_ne( MArray1 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) != t ) ++n;
 		}
@@ -1761,7 +1704,6 @@ public: // Comparison: Count
 	}
 
 	// Count Value != MArray1
-	inline
 	friend
 	size_type
 	count_ne( T const & t, MArray1 const & a )
@@ -1770,13 +1712,12 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 < Value
-	inline
 	friend
 	size_type
 	count_lt( MArray1 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) < t ) ++n;
 		}
@@ -1784,7 +1725,6 @@ public: // Comparison: Count
 	}
 
 	// Count Value < MArray1
-	inline
 	friend
 	size_type
 	count_lt( T const & t, MArray1 const & a )
@@ -1793,13 +1733,12 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 <= Value
-	inline
 	friend
 	size_type
 	count_le( MArray1 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) <= t ) ++n;
 		}
@@ -1807,7 +1746,6 @@ public: // Comparison: Count
 	}
 
 	// Count Value <= MArray1
-	inline
 	friend
 	size_type
 	count_le( T const & t, MArray1 const & a )
@@ -1816,13 +1754,12 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 > Value
-	inline
 	friend
 	size_type
 	count_gt( MArray1 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) > t ) ++n;
 		}
@@ -1830,7 +1767,6 @@ public: // Comparison: Count
 	}
 
 	// Count Value > MArray1
-	inline
 	friend
 	size_type
 	count_gt( T const & t, MArray1 const & a )
@@ -1839,13 +1775,12 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 >= Value
-	inline
 	friend
 	size_type
 	count_ge( MArray1 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) >= t ) ++n;
 		}
@@ -1853,7 +1788,6 @@ public: // Comparison: Count
 	}
 
 	// Count Value >= MArray1
-	inline
 	friend
 	size_type
 	count_ge( T const & t, MArray1 const & a )
@@ -1865,22 +1799,22 @@ public: // Comparison: Count
 
 // Functions
 
-// Make a MArray1
+// Make an MArray1
 template< class A, typename T >
 inline
 MArray1< A, T >
-make_MArray1( A & array, T A::value_type::* pmem )
+make_MArray1( A & a, T A::value_type::* pmem )
 {
-	return MArray1< A, T >( array, pmem );
+	return MArray1< A, T >( a, pmem );
 }
 
-// Make a MArray1
+// Make an MArray1
 template< class A, typename T >
 inline
 MArray1< A, T >
-MA1( A & array, T A::value_type::* pmem )
+MA1( A & a, T A::value_type::* pmem )
 {
-	return MArray1< A, T >( array, pmem );
+	return MArray1< A, T >( a, pmem );
 }
 
 // Conformable?
@@ -1944,6 +1878,78 @@ distance( MArray1< A, T > const & a, MArray1< A, T > const & b )
 	return std::sqrt( distance_sq );
 }
 
+// Distance
+template< class A, typename T >
+inline
+T
+distance( MArray1< A, T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< class A, typename T >
+inline
+T
+distance( Vector2< T > const & a, MArray1< A, T > const & b )
+{
+	return distance( b, a );
+}
+
+// Distance
+template< class A, typename T >
+inline
+T
+distance( MArray1< A, T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< class A, typename T >
+inline
+T
+distance( Vector3< T > const & a, MArray1< A, T > const & b )
+{
+	return distance( b, a );
+}
+
+// Distance
+template< class A, typename T >
+inline
+T
+distance( MArray1< A, T > const & a, Vector4< T > const & b )
+{
+	assert( a.size() == 4u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< class A, typename T >
+inline
+T
+distance( Vector4< T > const & a, MArray1< A, T > const & b )
+{
+	return distance( b, a );
+}
+
 // Distance Squared
 template< class A, typename T >
 inline
@@ -1957,6 +1963,78 @@ distance_squared( MArray1< A, T > const & a, MArray1< A, T > const & b )
 		distance_sq += distance_i * distance_i;
 	}
 	return distance_sq;
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( MArray1< A, T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( Vector2< T > const & a, MArray1< A, T > const & b )
+{
+	return distance_squared( b, a );
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( MArray1< A, T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( Vector3< T > const & a, MArray1< A, T > const & b )
+{
+	return distance_squared( b, a );
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( MArray1< A, T > const & a, Vector4< T > const & b )
+{
+	assert( a.size() == 4u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( Vector4< T > const & a, MArray1< A, T > const & b )
+{
+	return distance_squared( b, a );
 }
 
 // Dot Product
@@ -1990,6 +2068,75 @@ dot( MArray1< A, bool > const & a, MArray1< A, bool > const & b )
 	return result;
 }
 
+// Dot Product with Vector2
+template< class A, typename T >
+inline
+T
+dot( MArray1< A, T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	T result( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		result += a( i ) * b( i );
+	}
+	return result;
+}
+
+// Dot Product with Vector2
+template< class A, typename T >
+inline
+T
+dot( Vector2< T > const & a, MArray1< A, T > const & b )
+{
+	return dot( b, a );
+}
+
+// Dot Product with Vector3
+template< class A, typename T >
+inline
+T
+dot( MArray1< A, T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	T result( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		result += a( i ) * b( i );
+	}
+	return result;
+}
+
+// Dot Product with Vector3
+template< class A, typename T >
+inline
+T
+dot( Vector3< T > const & a, MArray1< A, T > const & b )
+{
+	return dot( b, a );
+}
+
+// Dot Product with Vector4
+template< class A, typename T >
+inline
+T
+dot( MArray1< A, T > const & a, Vector4< T > const & b )
+{
+	assert( a.size() == 4u );
+	T result( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		result += a( i ) * b( i );
+	}
+	return result;
+}
+
+// Dot Product with Vector4
+template< class A, typename T >
+inline
+T
+dot( Vector4< T > const & a, MArray1< A, T > const & b )
+{
+	return dot( b, a );
+}
+
 // Dot Product (Fortran Intrinsic Name)
 template< class A, typename T >
 inline
@@ -2007,6 +2154,128 @@ dot_product( MArray1< A, bool > const & a, MArray1< A, bool > const & b )
 {
 	return dot( a, b );
 }
+
+// Cross Product of 2-Tuples
+template< class A, typename T >
+inline
+T
+cross2( MArray1< A, T > const & a, MArray1< A, T > const & b )
+{
+	assert( conformable( a, b ) );
+	assert( a.size() == 2u );
+	return ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
+}
+
+// Cross Product of 2-Tuples
+template< class A, typename T >
+inline
+T
+cross2( MArray1< A, T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	return ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
+}
+
+// Cross Product of 2-Tuples
+template< class A, typename T >
+inline
+T
+cross2( Vector2< T > const & a, MArray1< A, T > const & b )
+{
+	return cross2( b, a );
+}
+
+// Stream >> MArray1
+template< class A, typename T >
+inline
+std::istream &
+operator >>( std::istream & stream, MArray1< A, T > & a )
+{
+	if ( stream && ( a.size() > 0u ) ) {
+		for ( int i = 1, e = a.u(); i <= e; ++i ) {
+			stream >> a( i );
+			if ( ! stream ) break;
+		}
+	}
+	return stream;
+}
+
+// Stream << MArray1
+template< class A, typename T >
+inline
+std::ostream &
+operator <<( std::ostream & stream, MArray1< A, T > const & a )
+{
+	typedef  TypeTraits< T >  Traits;
+	if ( stream && ( a.size() > 0u ) ) {
+		std::ios_base::fmtflags const old_flags( stream.flags() );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
+		stream << std::right << std::showpoint << std::uppercase;
+		int const w( Traits::iwidth );
+		for ( int i = 1, e = a.u(); i <= e; ++i ) {
+			stream << std::setw( w ) << a( i ) << ' ';
+			if ( ! stream ) break;
+		}
+		stream.precision( old_precision );
+		stream.flags( old_flags );
+	}
+	return stream;
+}
+
+// Read an MArray1 from a Binary File
+template< class A, typename T >
+inline
+std::istream &
+read_binary( std::istream & stream, MArray1< A, T > & a )
+{
+	std::size_t const n( a.size() );
+	if ( stream && ( n > 0u ) ) {
+		std::size_t const type_size( sizeof( T ) / sizeof( std::istream::char_type ) );
+		for ( int i = 1, e = a.u(); i <= e; ++i ) {
+			stream.read( ( std::istream::char_type * )&a( i ), type_size );
+			if ( ! stream ) break;
+		}
+	}
+	return stream;
+}
+
+// Write an MArray1 to a Binary File
+template< class A, typename T >
+inline
+std::ostream &
+write_binary( std::ostream & stream, MArray1< A, T > const & a )
+{
+	std::size_t const n( a.size() );
+	if ( stream && ( n > 0u ) ) {
+		std::size_t const type_size( sizeof( T ) / sizeof( std::ostream::char_type ) );
+		for ( int i = 1, e = a.u(); i <= e; ++i ) {
+			stream.write( ( std::ostream::char_type const * )&a( i ), type_size );
+			if ( ! stream ) break;
+		}
+	}
+	return stream;
+}
+
+namespace fmt {
+
+// List-Directed Format: MArray1
+template< class A, typename T >
+inline
+std::string
+LD( MArray1< A, T > const & a )
+{
+	std::string s;
+	std::size_t const n( a.size() );
+	if ( n > 0u ) {
+		s.reserve( n * TypeTraits< T >::width );
+		for ( int i = 1, e = a.u(); i <= e; ++i ) {
+			s.append( fmt::LD( a( i ) ) );
+		}
+	}
+	return s;
+}
+
+} // fmt
 
 } // ObjexxFCL
 

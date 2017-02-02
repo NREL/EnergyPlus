@@ -42,9 +42,10 @@ PROGRAM Transition
 
           ! USE STATEMENTS:
 USE InputProcessor
-USE DataStringGlobals
 USE DataGlobals
+USE DataStringGlobals
 USE DataVCompareGlobals
+USE SetVersion
 
   IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
 
@@ -82,7 +83,6 @@ USE DataVCompareGlobals
     LOGICAL EndOfFile
     INTEGER IoS
     INTEGER LenPath
-    CHARACTER(len=255) :: RepVarFileNameWithPath
     CHARACTER(len=10) :: Yesno
     CHARACTER(len=200) :: RepVarLine
     integer pos
@@ -133,133 +133,9 @@ USE DataVCompareGlobals
       AuditF=GetNewUnitNumber()
 
       CALL DisplayString('Transition Starting')
-! 1_0_1
-! 1_0_2
-! 1_0_3
-! 1_1_0
-! 1_1_1
-! 1_2_0
-! 1_2_1
-! 1_2_2
-! 1_2_3
-! 1_3_0
-! 1_4_0
-! 2_0_0
-! 2_1_0
-! 2_2_0
-! 3_0_0
-! 3_1_0
-! 4_0_0
-! 5_0_0
-! 6_0_0
-! 7_0_0
-! 7_1_0
-! 7_2_0
-! 8_0_0
-#ifdef V1_0_1
-INCLUDE 'VerStringV1_0_1.f90'
-INCLUDE 'IDDAssignV1_0_1.f90'
-#endif
-#ifdef V1_0_2
-INCLUDE 'VerStringV1_0_2.f90'
-INCLUDE 'IDDAssignV1_0_2.f90'
-#endif
-#ifdef V1_0_3
-INCLUDE 'VerStringV1_0_3.f90'
-INCLUDE 'IDDAssignV1_0_3.f90'
-#endif
-#ifdef V1_1_0
-INCLUDE 'VerStringV1_1_0.f90'
-INCLUDE 'IDDAssignV1_1_0.f90'
-#endif
-#ifdef V1_1_1
-INCLUDE 'VerStringV1_1_1.f90'
-INCLUDE 'IDDAssignV1_1_1.f90'
-#endif
-#ifdef V1_2_0
-INCLUDE 'VerStringV1_2_0.f90'
-INCLUDE 'IDDAssignV1_2_0.f90'
-#endif
-#ifdef V1_2_1
-INCLUDE 'VerStringV1_2_1.f90'
-INCLUDE 'IDDAssignV1_2_1.f90'
-#endif
-#ifdef V1_2_2
-INCLUDE 'VerStringV1_2_2.f90'
-INCLUDE 'IDDAssignV1_2_2.f90'
-#endif
-#ifdef V1_2_3
-INCLUDE 'VerStringV1_2_3.f90'
-INCLUDE 'IDDAssignV1_2_3.f90'
-#endif
-#ifdef V1_3_0
-INCLUDE 'VerStringV1_3_0.f90'
-INCLUDE 'IDDAssignV1_3_0.f90'
-#endif
-#ifdef V1_4_0
-INCLUDE 'VerStringV1_4_0.f90'
-INCLUDE 'IDDAssignV1_4_0.f90'
-#endif
-#ifdef V2_0_0
-INCLUDE 'VerStringV2_0_0.f90'
-INCLUDE 'IDDAssignV2_0_0.f90'
-#endif
-#ifdef V2_1_0
-INCLUDE 'VerStringV2_1_0.f90'
-INCLUDE 'IDDAssignV2_1_0.f90'
-#endif
-#ifdef V2_2_0
-INCLUDE 'VerStringV2_2_0.f90'
-INCLUDE 'IDDAssignV2_2_0.f90'
-#endif
-#ifdef V3_0_0
-INCLUDE 'VerStringV3_0_0.f90'
-INCLUDE 'IDDAssignV3_0_0.f90'
-#endif
-#ifdef V3_1_0
-INCLUDE 'VerStringV3_1_0.f90'
-INCLUDE 'IDDAssignV3_1_0.f90'
-#endif
-#ifdef V4_0_0
-INCLUDE 'VerStringV4_0_0.f90'
-INCLUDE 'IDDAssignV4_0_0.f90'
-#endif
-#ifdef V5_0_0
-INCLUDE 'VerStringV5_0_0.f90'
-INCLUDE 'IDDAssignV5_0_0.f90'
-#endif
-#ifdef V6_0_0
-INCLUDE 'VerStringV6_0_0.f90'
-INCLUDE 'IDDAssignV6_0_0.f90'
-#endif
-#ifdef V7_0_0
-INCLUDE 'VerStringV7_0_0.f90'
-INCLUDE 'IDDAssignV7_0_0.f90'
-#endif
-#ifdef V7_1_0
-INCLUDE 'VerStringV7_1_0.f90'
-INCLUDE 'IDDAssignV7_1_0.f90'
-#endif
-#ifdef V7_2_0
-INCLUDE 'VerStringV7_2_0.f90'
-INCLUDE 'IDDAssignV7_2_0.f90'
-#endif
-#ifdef V8_0_0
-INCLUDE 'VerStringV8_0_0.f90'
-INCLUDE 'IDDAssignV8_0_0.f90'
-#endif
-#ifdef V8_1_0
-INCLUDE 'VerStringV8_1_0.f90'
-INCLUDE 'IDDAssignV8_1_0.f90'
-#endif
-#ifdef V8_2_0
-INCLUDE 'VerStringV8_2_0.f90'
-INCLUDE 'IDDAssignV8_2_0.f90'
-#endif
-#ifdef V8_3_0
-INCLUDE 'VerStringV8_3_0.f90'
-INCLUDE 'IDDAssignV8_3_0.f90'
-#endif
+
+      CALL SetThisVersionVariables()
+
       Progname='Conversion'
       PrognameConversion=VerString
       CALL DisplayString(VerString)
@@ -446,11 +322,10 @@ INCLUDE 'IDDAssignV8_3_0.f90'
         WRITE(Auditf,fmta) ' New IDF lines will have blank fields filled with defaults as applicable'
       ENDIF
 
-
-   100  INQUIRE(File=RepVarFileNameWithPath,EXIST=InExist)
+100   INQUIRE(File=TRIM(RepVarFileNameWithPath),EXIST=InExist)
       IF (InExist) THEN
         LFN=GetNewUnitNumber()
-        OPEN(LFN,FILE=RepVarFileNameWithPath,IOSTAT=Ios,action='READ')
+        OPEN(LFN,FILE=TRIM(RepVarFileNameWithPath),IOSTAT=Ios,action='READ')
         IF (Ios == 0) THEN
           READ(LFN,'(1X)')
           READ(LFN,*) NumRepVarNames
@@ -584,7 +459,9 @@ INCLUDE 'IDDAssignV8_3_0.f90'
         CMtrDVarCaution=.false.
       ENDIF
 
-       IF (.not. LstFile) THEN
+      WRITE(*,*) LstFile
+
+      IF (.not. LstFile) THEN
         CALL CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgFileExtension)
       ELSE
         LFN=GetNewUnitNumber()

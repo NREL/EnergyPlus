@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef Humidifiers_hh_INCLUDED
 #define Humidifiers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,22 +63,35 @@ namespace Humidifiers {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	extern int const Humidifier_Steam_Electric;
+	extern int const Humidifier_Steam_Gas;
 
-	extern FArray1D_string const HumidifierType;
+	extern Array1D_string const HumidifierType;
 
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumHumidifiers; // number of humidifiers of all types
 	extern int NumElecSteamHums; // number of electric steam humidifiers
-	extern FArray1D_bool CheckEquipName;
+	extern int NumGasSteamHums; // number of gas steam humidifiers
+	extern Array1D_bool CheckEquipName;
+
+	// Humidifier normalized thermal efficiency curve types
+	extern int const Linear;
+	extern int const Quadratic;
+	extern int const Cubic;
+	extern int const FixedInletWaterTemperature;
+	extern int const VariableInletWaterTemperature;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Types
 
-	struct HumidifierData
+	class HumidifierData
 	{
+
+	private:
+	public:
+
 		// Members
 		std::string Name; // unique name of component
 		//    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
@@ -43,6 +102,11 @@ namespace Humidifiers {
 		Real64 NomCapVol; // nominal capacity [m3/s of water]
 		Real64 NomCap; // nominal capacity [kg/s of water]
 		Real64 NomPower; // power consumption at full output [watts]
+		Real64 ThermalEffRated; // rated thermal efficiency of the gas fired humidifier [-]
+		Real64 CurMakeupWaterTemp; // makeup water temperature from main water [C]
+		int EfficiencyCurvePtr; // index to efficiency curve
+		int EfficiencyCurveType; // type of efficiency curve
+		int InletWaterTempOption; // type inlet water temperature fixed or variable
 		Real64 FanPower; // nominal fan power [watts]
 		Real64 StandbyPower; // standby power consumption [watts]
 		int AirInNode; // air inlet node of humidifier
@@ -68,6 +132,16 @@ namespace Humidifiers {
 		Real64 TankSupplyVol;
 		Real64 StarvedSupplyVdot;
 		Real64 StarvedSupplyVol;
+		int TankSupplyID; // index pointer to WaterStorage supply arrays.
+		bool MySizeFlag;
+		bool MyEnvrnFlag;
+		bool MySetPointCheckFlag;
+		// report variables for gas humidifier
+		Real64 ThermalEff; // current actual thermal efficiency gas humidifier [-]
+		Real64 GasUseRate; // gas consumption rate [W]
+		Real64 GasUseEnergy; // gas energy consumption [J]
+		Real64 AuxElecUseRate; // auxiliary electric power input [W]
+		Real64 AuxElecUseEnergy; //  auxiliary electric energy consumption [J]'
 
 		// Default Constructor
 		HumidifierData() :
@@ -77,6 +151,11 @@ namespace Humidifiers {
 			NomCapVol( 0.0 ),
 			NomCap( 0.0 ),
 			NomPower( 0.0 ),
+			ThermalEffRated( 1.0 ),
+			CurMakeupWaterTemp( 0.0 ),
+			EfficiencyCurvePtr( 0 ),
+			EfficiencyCurveType( 0 ),
+			InletWaterTempOption( 0 ),
 			FanPower( 0.0 ),
 			StandbyPower( 0.0 ),
 			AirInNode( 0 ),
@@ -101,86 +180,59 @@ namespace Humidifiers {
 			TankSupplyVdot( 0.0 ),
 			TankSupplyVol( 0.0 ),
 			StarvedSupplyVdot( 0.0 ),
-			StarvedSupplyVol( 0.0 )
+			StarvedSupplyVol( 0.0 ),
+			TankSupplyID( 0 ),
+			MySizeFlag( true ),
+			MyEnvrnFlag( true ),
+			MySetPointCheckFlag( true ),
+			ThermalEff( 0.0 ),
+			GasUseRate( 0.0 ),
+			GasUseEnergy( 0.0 ),
+			AuxElecUseRate( 0.0 ),
+			AuxElecUseEnergy( 0.0 )
 		{}
 
-		// Member Constructor
-		HumidifierData(
-			std::string const & Name, // unique name of component
-			int const HumType_Code, // Pointer to Humidifier in list of humidifiers
-			int const EquipIndex, // Pointer to Humidifier in list of humidifiers
-			std::string const & Sched, // name of availability schedule
-			int const SchedPtr, // index of availability schedule
-			Real64 const NomCapVol, // nominal capacity [m3/s of water]
-			Real64 const NomCap, // nominal capacity [kg/s of water]
-			Real64 const NomPower, // power consumption at full output [watts]
-			Real64 const FanPower, // nominal fan power [watts]
-			Real64 const StandbyPower, // standby power consumption [watts]
-			int const AirInNode, // air inlet node of humidifier
-			int const AirOutNode, // air outlet node of humidifier
-			Real64 const AirInTemp, // inlet air temperature [C]
-			Real64 const AirInHumRat, // inlet air humidity ratio [kg water / kg air]
-			Real64 const AirInEnthalpy, // inlet air specific enthalpy [J/kg]
-			Real64 const AirInMassFlowRate, // inlet air mass flow rate [kg/s]
-			Real64 const AirOutTemp, // outlet air temperature [C]
-			Real64 const AirOutHumRat, // outlet air humidity ratio [kg water / kg air]
-			Real64 const AirOutEnthalpy, // outlet air specific enthalpy [J/kg]
-			Real64 const AirOutMassFlowRate, // outlet air mass flow rate [kg/s]
-			Real64 const HumRatSet, // humidity ratio setpoint [kg water / kg air]
-			Real64 const WaterAdd, // water output (and consumption) [kg/s]
-			Real64 const ElecUseEnergy, // electricity consumption [J]
-			Real64 const ElecUseRate, // electricity consumption [W]
-			Real64 const WaterCons, // water consumption in cubic meters
-			Real64 const WaterConsRate, // water consumption rate in m3/s
-			bool const SuppliedByWaterSystem, // true means there is storage tank, otherwise mains
-			int const WaterTankID, // index pointer to water storage tank
-			int const WaterTankDemandARRID, // index pointer to WaterStorage Demand arrays.
-			Real64 const TankSupplyVdot,
-			Real64 const TankSupplyVol,
-			Real64 const StarvedSupplyVdot,
-			Real64 const StarvedSupplyVol
-		) :
-			Name( Name ),
-			HumType_Code( HumType_Code ),
-			EquipIndex( EquipIndex ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			NomCapVol( NomCapVol ),
-			NomCap( NomCap ),
-			NomPower( NomPower ),
-			FanPower( FanPower ),
-			StandbyPower( StandbyPower ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			AirInTemp( AirInTemp ),
-			AirInHumRat( AirInHumRat ),
-			AirInEnthalpy( AirInEnthalpy ),
-			AirInMassFlowRate( AirInMassFlowRate ),
-			AirOutTemp( AirOutTemp ),
-			AirOutHumRat( AirOutHumRat ),
-			AirOutEnthalpy( AirOutEnthalpy ),
-			AirOutMassFlowRate( AirOutMassFlowRate ),
-			HumRatSet( HumRatSet ),
-			WaterAdd( WaterAdd ),
-			ElecUseEnergy( ElecUseEnergy ),
-			ElecUseRate( ElecUseRate ),
-			WaterCons( WaterCons ),
-			WaterConsRate( WaterConsRate ),
-			SuppliedByWaterSystem( SuppliedByWaterSystem ),
-			WaterTankID( WaterTankID ),
-			WaterTankDemandARRID( WaterTankDemandARRID ),
-			TankSupplyVdot( TankSupplyVdot ),
-			TankSupplyVol( TankSupplyVol ),
-			StarvedSupplyVdot( StarvedSupplyVdot ),
-			StarvedSupplyVol( StarvedSupplyVol )
-		{}
+		void
+		InitHumidifier(); // number of the current humidifier being simulated
+
+		void
+		SizeHumidifier(); // number of the current humidifier being sized
+
+		void
+		ControlHumidifier(
+			Real64 & WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
+		);
+
+		void
+		CalcElecSteamHumidifier(
+			Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+		);
+
+		void
+		CalcGasSteamHumidifier(
+			Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+		);
+
+		void
+		UpdateReportWaterSystem(); // number of the current humidifier being simulated
+
+		void
+		UpdateHumidifier(); // number of the current humidifier being simulated
+
+		void
+		ReportHumidifier(); // number of the current humidifier being simulated
 
 	};
 
 	// Object Data
-	extern FArray1D< HumidifierData > Humidifier;
+	extern Array1D< HumidifierData > Humidifier;
 
 	// Functions
+
+	// Clears the global data in Humidifiers.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	SimHumidifier(
@@ -191,56 +243,6 @@ namespace Humidifiers {
 
 	void
 	GetHumidifierInput();
-
-	void
-	InitHumidifier( int const HumNum ); // number of the current humidifier being simulated
-
-	void
-	SizeHumidifier( int const HumNum ); // number of the current humidifier being sized
-
-	void
-	ControlHumidifier(
-		int const HumNum, // number of the current humidifier being simulated
-		Real64 & WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
-	);
-
-	void
-	CalcElecSteamHumidifier(
-		int const HumNum, // number of the current humidifier being simulated
-		Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
-	);
-
-	void
-	UpdateReportWaterSystem( int const HumNum ); // number of the current humidifier being simulated
-
-	void
-	UpdateHumidifier( int const HumNum ); // number of the current humidifier being simulated
-
-	void
-	ReportHumidifier( int const HumNum ); // number of the current humidifier being simulated
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Humidifiers
 

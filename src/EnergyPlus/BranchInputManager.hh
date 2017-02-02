@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef BranchInputManager_hh_INCLUDED
 #define BranchInputManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -56,9 +102,9 @@ namespace BranchInputManager {
 		int NumOfConnectors; // Number of Connectors in this group
 		int NumOfSplitters; // Number of Splitters in this connector group
 		int NumOfMixers; // Number of Mixers in this connector group
-		FArray1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
-		FArray1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
-		FArray1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
+		Array1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
+		Array1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
+		Array1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
 		// Splitter => Mixer or Mixer => Splitter.  0 indicates no match
 
 		// Default Constructor
@@ -68,25 +114,6 @@ namespace BranchInputManager {
 			NumOfMixers( 0 )
 		{}
 
-		// Member Constructor
-		ConnectorData(
-			std::string const & Name, // Name for this Connector
-			int const NumOfConnectors, // Number of Connectors in this group
-			int const NumOfSplitters, // Number of Splitters in this connector group
-			int const NumOfMixers, // Number of Mixers in this connector group
-			FArray1_string const & ConnectorType, // Connector:Splitter or Connector:Mixer
-			FArray1_string const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
-			FArray1_int const & ConnectorMatchNo // Pointer to index where this Splitter or Mixer matches
-		) :
-			Name( Name ),
-			NumOfConnectors( NumOfConnectors ),
-			NumOfSplitters( NumOfSplitters ),
-			NumOfMixers( NumOfMixers ),
-			ConnectorType( ConnectorType ),
-			ConnectorName( ConnectorName ),
-			ConnectorMatchNo( ConnectorMatchNo )
-		{}
-
 	};
 
 	struct BranchListData
@@ -94,28 +121,13 @@ namespace BranchInputManager {
 		// Members
 		std::string Name; // Name of this Branch List
 		int NumOfBranchNames; // Number of Branches on the Branch List
-		FArray1D_string BranchNames; // Names of the branches on this branch list
+		Array1D_string BranchNames; // Names of the branches on this branch list
 		std::string LoopName; // Name of Loop this Branch list belongs to
 		std::string LoopType; // Loop type this branch is on
 
 		// Default Constructor
 		BranchListData() :
 			NumOfBranchNames( 0 )
-		{}
-
-		// Member Constructor
-		BranchListData(
-			std::string const & Name, // Name of this Branch List
-			int const NumOfBranchNames, // Number of Branches on the Branch List
-			FArray1_string const & BranchNames, // Names of the branches on this branch list
-			std::string const & LoopName, // Name of Loop this Branch list belongs to
-			std::string const & LoopType // Loop type this branch is on
-		) :
-			Name( Name ),
-			NumOfBranchNames( NumOfBranchNames ),
-			BranchNames( BranchNames ),
-			LoopName( LoopName ),
-			LoopType( LoopType )
 		{}
 
 	};
@@ -138,25 +150,6 @@ namespace BranchInputManager {
 			OutletNode( 0 )
 		{}
 
-		// Member Constructor
-		ComponentData(
-			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			std::string const & Name, // Component Name
-			int const CtrlType, // Active, Passive, Bypass (1,2,3)
-			std::string const & InletNodeName, // Inlet Node ID
-			int const InletNode, // Inlet Node Number
-			std::string const & OutletNodeName, // Outlet Node ID
-			int const OutletNode // Outlet Node Number
-		) :
-			CType( CType ),
-			Name( Name ),
-			CtrlType( CtrlType ),
-			InletNodeName( InletNodeName ),
-			InletNode( InletNode ),
-			OutletNodeName( OutletNodeName ),
-			OutletNode( OutletNode )
-		{}
-
 	};
 
 	struct BranchData
@@ -164,41 +157,18 @@ namespace BranchInputManager {
 		// Members
 		std::string Name; // Name for this Branch
 		std::string AssignedLoopName; // Loop Name for this branch
-		Real64 MaxFlowRate; // Max Flow Rate of the Branch
 		int PressureCurveType; // Integer index of pressure curve type
 		int PressureCurveIndex; // Integer index of pressure curve
 		int FluidType; // Fluid type (see DataLoopNode)
 		int NumOfComponents; // Number of Components on this Branch
-		FArray1D< ComponentData > Component; // Component definitions for each component
+		Array1D< ComponentData > Component; // Component definitions for each component
 
 		// Default Constructor
 		BranchData() :
-			MaxFlowRate( 0.0 ),
 			PressureCurveType( 0 ),
 			PressureCurveIndex( 0 ),
 			FluidType( NodeType_Unknown ),
 			NumOfComponents( 0 )
-		{}
-
-		// Member Constructor
-		BranchData(
-			std::string const & Name, // Name for this Branch
-			std::string const & AssignedLoopName, // Loop Name for this branch
-			Real64 const MaxFlowRate, // Max Flow Rate of the Branch
-			int const PressureCurveType, // Integer index of pressure curve type
-			int const PressureCurveIndex, // Integer index of pressure curve
-			int const FluidType, // Fluid type (see DataLoopNode)
-			int const NumOfComponents, // Number of Components on this Branch
-			FArray1< ComponentData > const & Component // Component definitions for each component
-		) :
-			Name( Name ),
-			AssignedLoopName( AssignedLoopName ),
-			MaxFlowRate( MaxFlowRate ),
-			PressureCurveType( PressureCurveType ),
-			PressureCurveIndex( PressureCurveIndex ),
-			FluidType( FluidType ),
-			NumOfComponents( NumOfComponents ),
-			Component( Component )
 		{}
 
 	};
@@ -209,24 +179,11 @@ namespace BranchInputManager {
 		std::string Name; // Splitter Name
 		std::string InletBranchName; // Splitter Inlet Branch Name
 		int NumOutletBranches; // Number of outlets on this Splitter
-		FArray1D_string OutletBranchNames; // Names of the Outlet Branches
+		Array1D_string OutletBranchNames; // Names of the Outlet Branches
 
 		// Default Constructor
 		SplitterData() :
 			NumOutletBranches( 0 )
-		{}
-
-		// Member Constructor
-		SplitterData(
-			std::string const & Name, // Splitter Name
-			std::string const & InletBranchName, // Splitter Inlet Branch Name
-			int const NumOutletBranches, // Number of outlets on this Splitter
-			FArray1_string const & OutletBranchNames // Names of the Outlet Branches
-		) :
-			Name( Name ),
-			InletBranchName( InletBranchName ),
-			NumOutletBranches( NumOutletBranches ),
-			OutletBranchNames( OutletBranchNames )
 		{}
 
 	};
@@ -237,36 +194,25 @@ namespace BranchInputManager {
 		std::string Name; // Mixer Name
 		std::string OutletBranchName; // Mixer Outlet Branch Name
 		int NumInletBranches; // Number of inlets for this Mixer
-		FArray1D_string InletBranchNames; // Names of Inlet Branches
+		Array1D_string InletBranchNames; // Names of Inlet Branches
 
 		// Default Constructor
 		MixerData() :
 			NumInletBranches( 0 )
 		{}
 
-		// Member Constructor
-		MixerData(
-			std::string const & Name, // Mixer Name
-			std::string const & OutletBranchName, // Mixer Outlet Branch Name
-			int const NumInletBranches, // Number of inlets for this Mixer
-			FArray1_string const & InletBranchNames // Names of Inlet Branches
-		) :
-			Name( Name ),
-			OutletBranchName( OutletBranchName ),
-			NumInletBranches( NumInletBranches ),
-			InletBranchNames( InletBranchNames )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< BranchListData > BranchList; // Branch List data for each Branch List
-	extern FArray1D< BranchData > Branch; // Branch Data for each Branch
-	extern FArray1D< ConnectorData > ConnectorLists; // Connector List data for each Connector List
-	extern FArray1D< SplitterData > Splitters; // Splitter Data for each Splitter
-	extern FArray1D< MixerData > Mixers; // Mixer Data for each Mixer
+	extern Array1D< BranchListData > BranchList; // Branch List data for each Branch List
+	extern Array1D< BranchData > Branch; // Branch Data for each Branch
+	extern Array1D< ConnectorData > ConnectorLists; // Connector List data for each Connector List
+	extern Array1D< SplitterData > Splitters; // Splitter Data for each Splitter
+	extern Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageBranchInput();
@@ -280,7 +226,7 @@ namespace BranchInputManager {
 		std::string const & LoopName, // Name of Loop Branch List is on
 		std::string const & BranchListName, // Branch List Name from Input
 		int & NumBranchNames, // Number of Branches for this Branch List
-		FArray1S_string BranchNames, // Names of Branches on this Branch List
+		Array1S_string BranchNames, // Names of Branches on this Branch List
 		std::string const & LoopType // Type of Loop Branch list is on
 	);
 
@@ -291,16 +237,15 @@ namespace BranchInputManager {
 	GetBranchData(
 		std::string const & LoopName, // Loop Name of this Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S_string CompType, // Component Type for each item on Branch
-		FArray1S_string CompName, // Component Name for each item on Branch
-		FArray1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
-		FArray1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
-		FArray1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
-		FArray1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
+		Array1S_string CompType, // Component Type for each item on Branch
+		Array1S_string CompName, // Component Name for each item on Branch
+		Array1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
+		Array1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
+		Array1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+		Array1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
 		bool & ErrorsFound
 	);
 
@@ -313,9 +258,6 @@ namespace BranchInputManager {
 		std::string const & CompName
 	);
 
-	Real64
-	GetBranchFlow( int const BranchNum );
-
 	void
 	GetBranchFanTypeName(
 		int const BranchNum,
@@ -325,22 +267,13 @@ namespace BranchInputManager {
 	);
 
 	void
-	CheckBranchForOASys(
-		std::string const & CompType,
-		std::string const & CompName,
-		bool & OASysFlag,
-		bool & ErrFound
-	);
-
-	void
 	GetInternalBranchData(
 		std::string const & LoopName, // Loop Name for Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S< ComponentData > BComponents, // Component data returned
+		Array1S< ComponentData > BComponents, // Component data returned
 		bool & ErrorsFound // True when Loop Name is already assigned and this not same loop
 	);
 
@@ -369,8 +302,8 @@ namespace BranchInputManager {
 		std::string & OutletNodeName, // Outlet Node ID
 		int & OutletNodeNum, // Outlet Node Number
 		int & NumInletNodes, // Number of Inlet Nodes
-		FArray1S_string InletNodeNames, // Inlet Node IDs
-		FArray1S_int InletNodeNums, // Inlet Node Numbers
+		Array1S_string InletNodeNames, // Inlet Node IDs
+		Array1S_int InletNodeNums, // Inlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber = _, // number of the current item in connector list
 		Optional_int MixerNumber = _ // Mixer number for this specific splitter
@@ -385,8 +318,8 @@ namespace BranchInputManager {
 		std::string & InletNodeName, // Inlet Node ID
 		int & InletNodeNum, // Inlet Node Number
 		int & NumOutletNodes, // Number of Outlet Nodes
-		FArray1S_string OutletNodeNames, // Outlet Node IDs
-		FArray1S_int OutletNodeNums, // Outlet Node Numbers
+		Array1S_string OutletNodeNames, // Outlet Node IDs
+		Array1S_int OutletNodeNums, // Outlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber = _, // number of the current item in connector list
 		Optional_int SplitterNumber = _ // splitter number for this specific splitter
@@ -398,21 +331,23 @@ namespace BranchInputManager {
 	std::string
 	GetLastBranchOutletNodeName( std::string const & BranchListName ); // Branch List name to search
 
-	void
-	CheckSystemBranchFlow(
-		std::string const & SystemType, // type of air loop equipment
-		std::string const & SystemName, // name of air loop equipment
-		Real64 & BranchFlow, // branch volumetric flow rate [m3/s]
-		Real64 const BranchFanFlow, // branch flow rate [m3/s]
-		bool & ErrFound // logical error flag
-	);
-
 	//==================================================================================
 	//   Routines that get the input for the internal branch management structure
 	//==================================================================================
 
 	void
 	GetBranchInput();
+
+	void
+	GetSingleBranchInput(
+		std::string const RoutineName,
+		int const BCount,
+		Array1D_string &Alphas,
+		Array1D_string &cAlphaFields,
+		int const NumAlphas,
+		Array1D_int &NodeNums,
+		Array1D_bool &lAlphaBlanks
+	);
 
 	void
 	GetBranchListInput();
@@ -477,29 +412,6 @@ namespace BranchInputManager {
 
 	void
 	TestBranchIntegrity( bool & ErrFound );
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BranchInputManager
 

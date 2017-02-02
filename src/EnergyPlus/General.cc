@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -19,6 +65,10 @@
 #include <DataSurfaces.hh>
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
+
+#if defined( _WIN32 ) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
 
 namespace EnergyPlus {
 
@@ -73,11 +123,11 @@ namespace General {
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
-		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
-		std::function< Real64( Real64 const, Optional< FArray1S< Real64 > const > ) > f,
+		Real64 & XRes, // value of x that solves f(x,Par) = 0
+		std::function< Real64( Real64 const, Array1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		Optional< FArray1S< Real64 > const > Par // array with additional parameters used for function evaluation
+		Array1< Real64 > const & Par // array with additional parameters used for function evaluation
 	)
 	{
 
@@ -88,7 +138,7 @@ namespace General {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Find the value of x between x0 and x1 such that f(x,[,Par])
+		// Find the value of x between x0 and x1 such that f(x,Par)
 		// is equal to zero.
 
 		// METHODOLOGY EMPLOYED:
@@ -137,13 +187,8 @@ namespace General {
 		Cont = true;
 		NIte = 0;
 
-		if ( present( Par ) ) {
-			Y0 = f( X0, Par );
-			Y1 = f( X1, Par );
-		} else {
-			Y0 = f( X0, _ );
-			Y1 = f( X1, _ );
-		}
+		Y0 = f( X0, Par );
+		Y1 = f( X1, Par );
 		// check initial values
 		if ( Y0 * Y1 > 0 ) {
 			Flag = -2;
@@ -157,11 +202,139 @@ namespace General {
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
 			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
-			if ( present( Par ) ) {
-				YTemp = f( XTemp, Par );
+			YTemp = f( XTemp, Par );
+
+			++NIte;
+
+			// check convergence
+			if ( std::abs( YTemp ) < Eps ) Conv = true;
+
+			if ( NIte > MaxIte ) StopMaxIte = true;
+
+			if ( ( ! Conv ) && ( ! StopMaxIte ) ) {
+				Cont = true;
 			} else {
-				YTemp = f( XTemp, _ );
+				Cont = false;
 			}
+
+			if ( Cont ) {
+
+				// reassign values (only if further iteration required)
+				if ( Y0 < 0.0 ) {
+					if ( YTemp < 0.0 ) {
+						X0 = XTemp;
+						Y0 = YTemp;
+					} else {
+						X1 = XTemp;
+						Y1 = YTemp;
+					}
+				} else {
+					if ( YTemp < 0.0 ) {
+						X1 = XTemp;
+						Y1 = YTemp;
+					} else {
+						X0 = XTemp;
+						Y0 = YTemp;
+					}
+				} // ( Y0 < 0 )
+
+			} // (Cont)
+
+		} // Cont
+
+		if ( Conv ) {
+			Flag = NIte;
+		} else {
+			Flag = -1;
+		}
+		XRes = XTemp;
+
+	}
+
+	void
+	SolveRegulaFalsi(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1 // 2nd bound of interval that contains the solution
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   March 1999
+		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Find the value of x between x0 and x1 such that f(x)
+		// is equal to zero.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses the Regula Falsi (false position) method (similar to secant method)
+
+		// REFERENCES:
+		// See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+		// 2nd edition, 1992. Page 347 ff.
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// = -2: f(x0) and f(x1) have the same sign
+		// = -1: no convergence
+		// >  0: number of iterations performed
+		// optional
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		Real64 const SMALL( 1.e-10 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 X0; // present 1st bound
+		Real64 X1; // present 2nd bound
+		Real64 XTemp; // new estimate
+		Real64 Y0; // f at X0
+		Real64 Y1; // f at X1
+		Real64 YTemp; // f at XTemp
+		Real64 DY; // DY = Y0 - Y1
+		bool Conv; // flag, true if convergence is achieved
+		bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+		bool Cont; // flag, if true, continue searching
+		int NIte; // number of interations
+
+		X0 = X_0;
+		X1 = X_1;
+		Conv = false;
+		StopMaxIte = false;
+		Cont = true;
+		NIte = 0;
+
+		Y0 = f( X0 );
+		Y1 = f( X1 );
+		// check initial values
+		if ( Y0 * Y1 > 0 ) {
+			Flag = -2;
+			XRes = X0;
+			return;
+		}
+
+		while ( Cont ) {
+
+			DY = Y0 - Y1;
+			if ( std::abs( DY ) < SMALL ) DY = SMALL;
+			// new estimation
+			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			YTemp = f( XTemp );
 
 			++NIte;
 
@@ -263,7 +436,7 @@ namespace General {
 	Real64
 	InterpBlind(
 		Real64 const ProfAng, // Profile angle (rad)
-		FArray1A< Real64 > const PropArray // Array of blind properties
+		Array1A< Real64 > const PropArray // Array of blind properties
 	)
 	{
 
@@ -321,7 +494,7 @@ namespace General {
 	Real64
 	InterpProfAng(
 		Real64 const ProfAng, // Profile angle (rad)
-		FArray1S< Real64 > const PropArray // Array of blind properties
+		Array1S< Real64 > const PropArray // Array of blind properties
 	)
 	{
 
@@ -371,7 +544,7 @@ namespace General {
 //	InterpSlatAng(
 //		Real64 const SlatAng, // Slat angle (rad)
 //		bool const VarSlats, // True if slat angle is variable
-//		FArray1A< Real64 > const PropArray // Array of blind properties as function of slat angle
+//		Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
 //	)
 //	{
 //
@@ -437,7 +610,7 @@ namespace General {
 	InterpSlatAng(
 		Real64 const SlatAng, // Slat angle (rad)
 		bool const VarSlats, // True if slat angle is variable
-		FArray1S< Real64 > const PropArray // Array of blind properties as function of slat angle
+		Array1S< Real64 > const PropArray // Array of blind properties as function of slat angle
 	)
 	{
 
@@ -500,7 +673,7 @@ namespace General {
 		Real64 const ProfAng, // Profile angle (rad)
 		Real64 const SlatAng, // Slat angle (rad)
 		bool const VarSlats, // True if variable-angle slats
-		FArray2A< Real64 > const PropArray // Array of blind properties
+		Array2A< Real64 > const PropArray // Array of blind properties
 	)
 	{
 
@@ -528,7 +701,7 @@ namespace General {
 		Real64 InterpProfSlatAng;
 
 		// Argument array dimensioning
-		PropArray.dim( 37, MaxSlatAngs );
+		PropArray.dim( MaxSlatAngs, 37 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -570,16 +743,16 @@ namespace General {
 		if ( VarSlats ) { // Variable-angle slats: interpolate in profile angle and slat angle
 			IBeta = int( SlatAng1 / DeltaSlatAng ) + 1;
 			SlatAngRatio = ( SlatAng1 - ( IBeta - 1 ) * DeltaSlatAng ) / DeltaSlatAng;
-			Val1 = PropArray( IAlpha, IBeta );
-			Val2 = PropArray( IAlpha, min( MaxSlatAngs, IBeta + 1 ) );
-			Val3 = PropArray( min( 37, IAlpha + 1 ), IBeta );
-			Val4 = PropArray( min( 37, IAlpha + 1 ), min( MaxSlatAngs, IBeta + 1 ) );
+			Val1 = PropArray( IBeta, IAlpha );
+			Val2 = PropArray( min( MaxSlatAngs, IBeta + 1 ), IAlpha );
+			Val3 = PropArray( IBeta, min( 37, IAlpha + 1 ) );
+			Val4 = PropArray( min( MaxSlatAngs, IBeta + 1 ), min( 37, IAlpha + 1 ) );
 			ValA = Val1 + SlatAngRatio * ( Val2 - Val1 );
 			ValB = Val3 + SlatAngRatio * ( Val4 - Val3 );
 			InterpProfSlatAng = ValA + ProfAngRatio * ( ValB - ValA );
 		} else { // Fixed-angle slats: interpolate only in profile angle
-			Val1 = PropArray( IAlpha, 1 );
-			Val2 = PropArray( min( 37, IAlpha + 1 ), 1 );
+			Val1 = PropArray( 1, IAlpha );
+			Val2 = PropArray( 1, min( 37, IAlpha + 1 ) );
 			InterpProfSlatAng = Val1 + ProfAngRatio * ( Val2 - Val1 );
 		}
 
@@ -658,7 +831,7 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1A< Real64 > const A // Polynomial coefficients
+		Array1A< Real64 > const A // Polynomial coefficients
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -713,7 +886,7 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1< Real64 > const & A // Polynomial coefficients
+		Array1< Real64 > const & A // Polynomial coefficients
 	)
 	{
 		// Return value
@@ -730,7 +903,7 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1S< Real64 > const & A // Polynomial coefficients
+		Array1S< Real64 > const & A // Polynomial coefficients
 	)
 	{
 		// Return value
@@ -747,7 +920,7 @@ namespace General {
 	Real64
 	POLY1F(
 		Real64 & X, // independent variable
-		FArray1A< Real64 > A, // array of polynomial coefficients
+		Array1A< Real64 > A, // array of polynomial coefficients
 		int & N // number of terms in polynomial
 	)
 	{
@@ -807,7 +980,7 @@ namespace General {
 	Real64
 	POLY2F(
 		Real64 & X, // independent variable
-		FArray1A< Real64 > A, // array of polynomial coefficients
+		Array1A< Real64 > A, // array of polynomial coefficients
 		int & N // number of terms in polynomial
 	)
 	{
@@ -943,7 +1116,7 @@ namespace General {
 	std::string
 	TrimSigDigits(
 		int const IntegerValue,
-		Optional_int_const SigDigits // ignored
+		Optional_int_const EP_UNUSED( SigDigits ) // ignored
 	)
 	{
 
@@ -1132,7 +1305,7 @@ namespace General {
 	std::string
 	RoundSigDigits(
 		int const IntegerValue,
-		Optional_int_const SigDigits // ignored
+		Optional_int_const EP_UNUSED( SigDigits ) // ignored
 	)
 	{
 
@@ -1285,10 +1458,10 @@ namespace General {
 
 	void
 	MovingAvg(
-		FArray1A< Real64 > const DataIn, // input data that needs smoothing
+		Array1A< Real64 > const DataIn, // input data that needs smoothing
 		int const NumDataItems, // number of values in DataIn
 		int const NumItemsInAvg, // number of items in the averaging window
-		FArray1A< Real64 > SmoothedData // output data after smoothing
+		Array1A< Real64 > SmoothedData // output data after smoothing
 	)
 	{
 
@@ -1326,7 +1499,7 @@ namespace General {
 		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TempData( 3 * NumDataItems ); // a scratch array
+		Array1D< Real64 > TempData( 3 * NumDataItems ); // a scratch array
 
 		for ( int i = 1; i <= NumDataItems; ++i ) {
 			TempData( i ) = TempData( NumDataItems + i ) = TempData( 2 * NumDataItems + i ) = DataIn( i );
@@ -1392,7 +1565,6 @@ namespace General {
 		int TokenDay;
 		int TokenMonth;
 		int TokenWeekday;
-		int TokenYear; // what should this be initialized to?
 
 		FstNum = int( ProcessNumber( String, errFlag ) );
 		DateType = -1;
@@ -1414,6 +1586,7 @@ namespace General {
 			if ( ! present( PYear ) ) {
 				DetermineDateTokens( String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound );
 			} else {
+				int TokenYear = 0;
 				DetermineDateTokens( String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear );
 				PYear = TokenYear;
 			}
@@ -1469,11 +1642,11 @@ namespace General {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static int const NumSingleChars( 3 );
-		static FArray1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
+		static Array1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
 		static int const NumDoubleChars( 6 );
-		static FArray1D_string const DoubleChars( NumDoubleChars, { "ST ", "ND ", "RD ", "TH ", "OF ", "IN " } ); // Need trailing spaces: Want thse only at end of words
-		static FArray1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
-		static FArray1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
+		static Array1D_string const DoubleChars( NumDoubleChars, { "ST ", "ND ", "RD ", "TH ", "OF ", "IN " } ); // Need trailing spaces: Want thse only at end of words
+		static Array1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
+		static Array1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
 		static std::string const Numbers( "0123456789" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1486,7 +1659,7 @@ namespace General {
 		std::string CurrentString;
 		std::string::size_type Pos;
 		int Loop;
-		FArray1D_string Fields( 3 );
+		Array1D_string Fields( 3 );
 		int NumField1;
 		int NumField2;
 		int NumField3;
@@ -1684,7 +1857,7 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const EndMonthDay( 12, { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
+		static Array1D_int const EndMonthDay( 12, { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1753,7 +1926,7 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_int EndDayofMonth( 12, { 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
+		static Array1D_int EndDayofMonth( 12, { 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
 		// End day numbers of each month (without Leap Year)
 
 		if ( Month == 1 ) {
@@ -1810,7 +1983,7 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const EndOfMonth( {0,12}, { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
+		static Array1D_int const EndOfMonth( {0,12}, { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2075,8 +2248,8 @@ namespace General {
 
 	void
 	Invert3By3Matrix(
-		FArray2A< Real64 > const A, // Input 3X3 Matrix
-		FArray2A< Real64 > InverseA // Output 3X3 Matrix - Inverse Of A
+		Array2A< Real64 > const A, // Input 3X3 Matrix
+		Array2A< Real64 > InverseA // Output 3X3 Matrix - Inverse Of A
 	)
 	{
 
@@ -2120,7 +2293,7 @@ namespace General {
 
 		// Compute Determinant
 
-		Determinant = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) + A( 1, 2 ) * A( 2, 3 ) * A( 3, 1 ) + A( 1, 3 ) * A( 2, 1 ) * A( 3, 2 ) - A( 1, 1 ) * A( 3, 2 ) * A( 2, 3 ) - A( 2, 1 ) * A( 1, 2 ) * A( 3, 3 ) - A( 3, 1 ) * A( 2, 2 ) * A( 1, 3 );
+		Determinant = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) + A( 2, 1 ) * A( 3, 2 ) * A( 1, 3 ) + A( 3, 1 ) * A( 1, 2 ) * A( 2, 3 ) - A( 1, 1 ) * A( 2, 3 ) * A( 3, 2 ) - A( 1, 2 ) * A( 2, 1 ) * A( 3, 3 ) - A( 1, 3 ) * A( 2, 2 ) * A( 3, 1 );
 
 		if ( std::abs( Determinant ) < .1E-12 ) {
 			ShowFatalError( "Determinant = [Zero] in Invert3By3Matrix", OutputFileStandard );
@@ -2128,15 +2301,15 @@ namespace General {
 
 		// Compute Inverse
 
-		InverseA( 1, 1 ) = ( A( 2, 2 ) * A( 3, 3 ) - A( 3, 2 ) * A( 2, 3 ) ) / Determinant;
-		InverseA( 2, 1 ) = ( A( 3, 1 ) * A( 2, 3 ) - A( 2, 1 ) * A( 3, 3 ) ) / Determinant;
-		InverseA( 3, 1 ) = ( A( 2, 1 ) * A( 3, 2 ) - A( 3, 1 ) * A( 2, 2 ) ) / Determinant;
-		InverseA( 1, 2 ) = ( A( 3, 2 ) * A( 1, 3 ) - A( 1, 2 ) * A( 3, 3 ) ) / Determinant;
-		InverseA( 2, 2 ) = ( A( 1, 1 ) * A( 3, 3 ) - A( 3, 1 ) * A( 1, 3 ) ) / Determinant;
-		InverseA( 3, 2 ) = ( A( 3, 1 ) * A( 1, 2 ) - A( 1, 1 ) * A( 3, 2 ) ) / Determinant;
-		InverseA( 1, 3 ) = ( A( 1, 2 ) * A( 2, 3 ) - A( 2, 2 ) * A( 1, 3 ) ) / Determinant;
-		InverseA( 2, 3 ) = ( A( 2, 1 ) * A( 1, 3 ) - A( 1, 1 ) * A( 2, 3 ) ) / Determinant;
-		InverseA( 3, 3 ) = ( A( 1, 1 ) * A( 2, 2 ) - A( 2, 1 ) * A( 1, 2 ) ) / Determinant;
+		InverseA( 1, 1 ) = ( A( 2, 2 ) * A( 3, 3 ) - A( 2, 3 ) * A( 3, 2 ) ) / Determinant;
+		InverseA( 1, 2 ) = ( A( 1, 3 ) * A( 3, 2 ) - A( 1, 2 ) * A( 3, 3 ) ) / Determinant;
+		InverseA( 1, 3 ) = ( A( 1, 2 ) * A( 2, 3 ) - A( 1, 3 ) * A( 2, 2 ) ) / Determinant;
+		InverseA( 2, 1 ) = ( A( 2, 3 ) * A( 3, 1 ) - A( 2, 1 ) * A( 3, 3 ) ) / Determinant;
+		InverseA( 2, 2 ) = ( A( 1, 1 ) * A( 3, 3 ) - A( 1, 3 ) * A( 3, 1 ) ) / Determinant;
+		InverseA( 2, 3 ) = ( A( 1, 3 ) * A( 2, 1 ) - A( 1, 1 ) * A( 2, 3 ) ) / Determinant;
+		InverseA( 3, 1 ) = ( A( 2, 1 ) * A( 3, 2 ) - A( 2, 2 ) * A( 3, 1 ) ) / Determinant;
+		InverseA( 3, 2 ) = ( A( 1, 2 ) * A( 3, 1 ) - A( 1, 1 ) * A( 3, 2 ) ) / Determinant;
+		InverseA( 3, 3 ) = ( A( 1, 1 ) * A( 2, 2 ) - A( 1, 2 ) * A( 2, 1 ) ) / Determinant;
 
 	}
 
@@ -2234,7 +2407,7 @@ namespace General {
 	int
 	FindNumberInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1A_int const ListOfItems,
 		int const NumItems
 	)
 	{
@@ -2263,7 +2436,7 @@ namespace General {
 		int FindNumberInList;
 
 		// Argument array dimensioning
-		ListOfItems.dim( star );
+		ListOfItems.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2376,7 +2549,6 @@ namespace General {
 
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
-		using DataGlobals::ZoneTSReporting;
 		using DataGlobals::HVACTSReporting;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::CurrentTime;
@@ -2699,13 +2871,11 @@ namespace General {
 		// na
 
 		// Return value
-		std::string OutputString; // Contains time stamp
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2714,36 +2884,29 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		std::string TimeStamp; // Character representation of time using hh:mm:ss.ssss format
 		int Hours; // Number of hours <= 24
 		int Minutes; // Remaining minutes < 60
 		Real64 Seconds; // Remaining seconds < 60
 
 		ParseTime( Time, Hours, Minutes, Seconds );
 
-		TimeStamp = "";
 		// TimeStamp written with formatting
 		// "hh:mm:ss.s"
-		// "1234567890"
-		gio::write( TimeStamp, TStampFmt ) << Hours << Minutes << Seconds;
-		if ( TimeStamp[ 3 ] == ' ' ) TimeStamp[ 3 ] = '0';
-		if ( TimeStamp[ 6 ] == ' ' ) TimeStamp[ 6 ] = '0';
-		if ( TimeStamp[ 9 ] == ' ' ) TimeStamp[ 9 ] = '0';
-		strip( TimeStamp );
+		// 10 chars + null terminator = 11
+		// This approach should not normally be used due to the fixed width c-style
+		// string but in this case the output string is a fixed size so this is more
+		// clear for formatting and faster. If formatted string changes, make sure to
+		// add more to buffer.
+		static char buffer[ 11 ];
+		int cx = snprintf( buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds );
 
-		OutputString = TimeStamp;
+		// Make sure output string is only between 0 and 10 characters so string is
+		// not out of bounds of the buffer.
+		assert( cx >= 0 && cx < 11 );
+		// Only done to quiet release compiler warning for unused variable.
+		(void) cx;
 
-		// For debugging only
-		//WRITE(*,'(A)') '  UtilityRoutines::CreateTimeString()'
-		//WRITE(*,'(A,F15.10)') '    Time    = ', Time
-		//WRITE(*,*) '    Hours   = ', Hours
-		//WRITE(*,*) '    Minutes = ', Minutes
-		//WRITE(*,*) '    Seconds = ', Seconds
-		//WRITE(*,*) '    TimeStamp    = ', TimeStamp
-		//WRITE(*,*) '    OutputString = ', OutputString
-
-		return OutputString;
-
+		return std::string( buffer );
 	}
 
 	std::string
@@ -2774,7 +2937,6 @@ namespace General {
 		// na
 
 		// Return value
-		std::string OutputString; // Contains time stamp
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2793,14 +2955,9 @@ namespace General {
 		std::string TimeStmpE; // Character representation of end of interval
 
 		TimeStmpS = CreateTimeString( StartTime );
-		strip( TimeStmpS );
-
 		TimeStmpE = CreateTimeString( EndTime );
-		strip( TimeStmpE );
 
-		OutputString = TimeStmpS + " - " + TimeStmpE;
-
-		return OutputString;
+		return TimeStmpS + " - " + TimeStmpE;
 
 	}
 
@@ -2837,8 +2994,6 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const MinToSec( 60.0 );
-		Real64 const HourToSec( MinToSec * 60.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2847,33 +3002,22 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Real64 Remainder( 0.0 );
+		int const MinToSec( 60 );
+		int const HourToSec( MinToSec * 60 );
+		Real64 Remainder( 0.0 );
 
 		// Get number of hours
 		// This might undershoot the actual number of hours. See DO WHILE loop.
-		Hours = int( Time / HourToSec );
+		Hours = int( Time ) / HourToSec;
 
 		// Compute remainder in seconds
-		Remainder = ( Time - Hours * 3600.0 );
-
-		// Correct number of hours whenever Remainder >= 60 to fix round-off errors
-		// E.g., Time = 2.0 would return Hours=1 and Minutes=60 instead of Hours=2!
-		while ( nint64( Remainder / MinToSec ) >= 60.0 ) {
-			++Hours;
-			Remainder = ( Time - Hours * 3600.0 );
-		}
+		Remainder = ( Time - Hours * HourToSec );
 
 		// Compute minutes
-		Minutes = int( Remainder / MinToSec );
+		Minutes = int( Remainder ) / MinToSec;
 
 		// Compute remainder in seconds
-		Remainder = ( Time - Hours * 3600.0 - Minutes * 60.0 );
-
-		// Correct number of minutes whenever Remainder >= 60 to fix round-off errors
-		while ( nint64( Remainder ) >= 60.0 ) {
-			++Minutes;
-			Remainder = ( Time - Hours * 3600.0 - Minutes * 60.0 );
-		}
+		Remainder -= Minutes * MinToSec;
 
 		// Compute seconds
 		Seconds = Remainder;
@@ -3004,11 +3148,11 @@ namespace General {
 
 				} else if ( SELECT_CASE_var == "" ) {
 					ShowWarningError( cCurrentModuleObject + ": No " + cAlphaFieldNames( 1 ) + " supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				} else {
 					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				}}
 			}
@@ -3236,7 +3380,7 @@ namespace General {
 		std::string const & ZoneName, // Zone Name associated
 		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
 		std::string const & ItemName, // Item name (People, Lights, etc object)
-		FArray1S_string const ItemNames, // Item Names to check for duplication
+		Array1_string const & ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
 		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
@@ -3281,7 +3425,6 @@ namespace General {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		errFlag = false;
-		bool DuplicateNameError = false;
 		std::string::size_type const ItemNameLength = len( ItemName );
 		std::string::size_type const ItemLength = len( ZoneName ) + ItemNameLength;
 		ResultName = ZoneName + ' ' + ItemName;
@@ -3307,29 +3450,6 @@ namespace General {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // General
 

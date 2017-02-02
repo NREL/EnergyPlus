@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <string>
 
@@ -8,7 +54,9 @@
 
 // EnergyPlus Headers
 #include <TARCOGOutput.hh>
+#include <CommandLineInterface.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <TARCOGCommon.hh>
 #include <TARCOGGassesParams.hh>
@@ -100,7 +148,7 @@ namespace TARCOGOutput {
 		Real64 const fclr,
 		Real64 const VacuumPressure,
 		Real64 const VacuumMaxGapThickness,
-		FArray1A_int const ibc,
+		Array1A_int const ibc,
 		Real64 const hout,
 		Real64 const hin,
 		int const standard,
@@ -112,38 +160,38 @@ namespace TARCOGOutput {
 		Real64 const tilt,
 		Real64 const totsol,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A< Real64 > const SlatThick,
-		FArray1A< Real64 > const SlatWidth,
-		FArray1A< Real64 > const SlatAngle,
-		FArray1A< Real64 > const SlatCond,
-		FArray1A< Real64 > const SlatSpacing,
-		FArray1A< Real64 > const SlatCurve,
-		FArray1A_int const nslice,
-		FArray1A< Real64 > const LaminateA,
-		FArray1A< Real64 > const LaminateB,
-		FArray1A< Real64 > const sumsol,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght
+		Array1A_int const LayerType,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A< Real64 > const SlatThick,
+		Array1A< Real64 > const SlatWidth,
+		Array1A< Real64 > const SlatAngle,
+		Array1A< Real64 > const SlatCond,
+		Array1A< Real64 > const SlatSpacing,
+		Array1A< Real64 > const SlatCurve,
+		Array1A_int const nslice,
+		Array1A< Real64 > const LaminateA,
+		Array1A< Real64 > const LaminateB,
+		Array1A< Real64 > const sumsol,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght
 	)
 	{
 
@@ -178,20 +226,19 @@ namespace TARCOGOutput {
 		tvent.dim( maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 
 		// Locals
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int i;
 		int j;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_10001( "('TARCOG v.',A,'compiled ',A)" );
@@ -292,7 +339,7 @@ namespace TARCOGOutput {
 		// File is not open and nothing cannot be written
 		if ( InArgumentsFile == statusClosed ) return;
 
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 
 		gio::write( InArgumentsFile, fmtLD );
 		//  write(InArgumentsFile, 10001) VersionNumber, VersionCompileDateCC
@@ -468,15 +515,15 @@ namespace TARCOGOutput {
 			//if (mgas.eq.0) then ! show received gass properties:
 			for ( j = 1; j <= nmix( i ); ++j ) {
 				//if (iprop(i, j).eq.1) write(InArgumentsFile, 1115) iprop(i, j), ' ' 100*frct(i, j) ! Air
-				gio::write( InArgumentsFile, Format_1115 ) << iprop( i, j ) << " " << 100 * frct( i, j ); // gas
+				gio::write( InArgumentsFile, Format_1115 ) << iprop( j, i ) << ' ' << 100 * frct( j, i ); // gas
 				//if (iprop(i, j).eq.2) write(InArgumentsFile, 1116) iprop(i, j), 100*frct(i, j) ! Argon
 				//if (iprop(i, j).eq.3) write(InArgumentsFile, 1117) iprop(i, j), 100*frct(i, j) ! Krypton
 				//if (iprop(i, j).eq.4) write(InArgumentsFile, 1118) iprop(i, j), 100*frct(i, j) ! Xenon
-				gio::write( InArgumentsFile, Format_1130 ) << iprop( i, j ) << 100 * frct( i, j );
-				gio::write( InArgumentsFile, Format_1131 ) << xgcon( iprop( i, j ), 1 ) << xgcon( iprop( i, j ), 2 ) << xgcon( iprop( i, j ), 3 );
-				gio::write( InArgumentsFile, Format_1132 ) << xgvis( iprop( i, j ), 1 ) << xgvis( iprop( i, j ), 2 ) << xgvis( iprop( i, j ), 3 );
-				gio::write( InArgumentsFile, Format_1133 ) << xgcp( iprop( i, j ), 1 ) << xgcp( iprop( i, j ), 2 ) << xgcp( iprop( i, j ), 3 );
-				gio::write( InArgumentsFile, Format_1134 ) << xwght( iprop( i, j ) );
+				gio::write( InArgumentsFile, Format_1130 ) << iprop( j, i ) << 100 * frct( j, i );
+				gio::write( InArgumentsFile, Format_1131 ) << xgcon( 1, iprop( j, i ) ) << xgcon( 2, iprop( j, i ) ) << xgcon( 3, iprop( j, i ) );
+				gio::write( InArgumentsFile, Format_1132 ) << xgvis( 1, iprop( j, i ) ) << xgvis( 2, iprop( j, i ) ) << xgvis( 3, iprop( j, i ) );
+				gio::write( InArgumentsFile, Format_1133 ) << xgcp( 1, iprop( j, i ) ) << xgcp( 2, iprop( j, i ) ) << xgcp( 3, iprop( j, i ) );
+				gio::write( InArgumentsFile, Format_1134 ) << xwght( iprop( j, i ) );
 			} // - j - one mix
 			//end if  ! MGAS = 1 - "table" gasses
 		} // i - gas loop
@@ -514,7 +561,7 @@ namespace TARCOGOutput {
 	void
 	WriteModifiedArguments(
 		int const InArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED( DBGD ),
 		Real64 const esky,
 		Real64 const trmout,
 		Real64 const trmin,
@@ -523,16 +570,16 @@ namespace TARCOGOutput {
 		Real64 const Gout,
 		Real64 const Gin,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A_int const nmix,
-		FArray2A< Real64 > const frct,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const gap,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght
+		Array1A_int const LayerType,
+		Array1A_int const nmix,
+		Array2A< Real64 > const frct,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const gap,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght
 	)
 	{
 
@@ -542,19 +589,18 @@ namespace TARCOGOutput {
 		// Argument array dimensioning
 		LayerType.dim( maxlay );
 		nmix.dim( maxlay1 );
-		frct.dim( maxlay1, maxgas );
+		frct.dim( maxgas, maxlay1 );
 		thick.dim( maxlay );
 		scon.dim( maxlay );
 		gap.dim( MaxGap );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 
 		// Locals
 		int i;
 		int j;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_1014( "('Adjusted input arguments:')" );
@@ -614,10 +660,10 @@ namespace TARCOGOutput {
 			if ( i == nlayer + 1 ) gio::write( InArgumentsFile, Format_11111 );
 			//    write(InArgumentsFile, 1111) i-1
 			for ( j = 1; j <= nmix( i ); ++j ) {
-				gio::write( InArgumentsFile, Format_1130 ) << j << 100 * frct( i, j );
-				gio::write( InArgumentsFile, Format_1131 ) << xgcon( j, 1 ) << xgcon( j, 2 ) << xgcon( j, 3 );
-				gio::write( InArgumentsFile, Format_1132 ) << xgvis( j, 1 ) << xgvis( j, 2 ) << xgvis( j, 3 );
-				gio::write( InArgumentsFile, Format_1133 ) << xgcp( j, 1 ) << xgcp( j, 2 ) << xgcp( j, 3 );
+				gio::write( InArgumentsFile, Format_1130 ) << j << 100 * frct( j, i );
+				gio::write( InArgumentsFile, Format_1131 ) << xgcon( 1, j ) << xgcon( 2, j ) << xgcon( 3, j );
+				gio::write( InArgumentsFile, Format_1132 ) << xgvis( 1, j ) << xgvis( 2, j ) << xgvis( 3, j );
+				gio::write( InArgumentsFile, Format_1133 ) << xgcp( 1, j ) << xgcp( 2, j ) << xgcp( 3, j );
 				gio::write( InArgumentsFile, Format_1134 ) << xwght( j );
 			} // j - gas mix
 		} // i - gaps
@@ -636,18 +682,18 @@ namespace TARCOGOutput {
 	void
 	WriteOutputArguments(
 		int & OutArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED( DBGD ),
 		int const nlayer,
 		Real64 const tamb,
-		FArray1A< Real64 > const q,
-		FArray1A< Real64 > const qv,
-		FArray1A< Real64 > const qcgas,
-		FArray1A< Real64 > const qrgas,
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const vfreevent,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const Keff,
-		FArray1A< Real64 > const ShadeGapKeffConv,
+		Array1A< Real64 > const q,
+		Array1A< Real64 > const qv,
+		Array1A< Real64 > const qcgas,
+		Array1A< Real64 > const qrgas,
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const vfreevent,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const Keff,
+		Array1A< Real64 > const ShadeGapKeffConv,
 		Real64 const troom,
 		Real64 const ufactor,
 		Real64 const shgc,
@@ -658,13 +704,13 @@ namespace TARCOGOutput {
 		Real64 const hrin,
 		Real64 const hcout,
 		Real64 const hrout,
-		FArray1A< Real64 > const Ra,
-		FArray1A< Real64 > const Nu,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const Ebf,
-		FArray1A< Real64 > const Ebb,
-		FArray1A< Real64 > const Rf,
-		FArray1A< Real64 > const Rb,
+		Array1A< Real64 > const Ra,
+		Array1A< Real64 > const Nu,
+		Array1A_int const LayerType,
+		Array1A< Real64 > const Ebf,
+		Array1A< Real64 > const Ebb,
+		Array1A< Real64 > const Rf,
+		Array1A< Real64 > const Rb,
 		Real64 const ebsky,
 		Real64 const Gout,
 		Real64 const ebroom,
@@ -675,8 +721,8 @@ namespace TARCOGOutput {
 		Real64 const ShadeHcRatioOut,
 		Real64 const HcUnshadedIn,
 		Real64 const HcUnshadedOut,
-		FArray1A< Real64 > const hcgas,
-		FArray1A< Real64 > const hrgas,
+		Array1A< Real64 > const hcgas,
+		Array1A< Real64 > const hrgas,
 		Real64 const AchievedErrorTolerance,
 		int const NumOfIter
 	)
@@ -706,11 +752,10 @@ namespace TARCOGOutput {
 		hrgas.dim( maxlay );
 
 		// Locals
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int i;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_2000( "('TARCOG calculation results - ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)" );
@@ -774,7 +819,7 @@ namespace TARCOGOutput {
 		//      position=FilePosition, form='formatted', iostat=nperr)
 		//if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
 		//      position=FilePosition, form='formatted', iostat=nperr)
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2000 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
 		gio::write( OutArgumentsFile, fmtLD );
@@ -943,17 +988,17 @@ namespace TARCOGOutput {
 	void
 	WriteOutputEN673(
 		int & OutArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED( DBGD ),
 		int const nlayer,
 		Real64 const ufactor,
 		Real64 const hout,
 		Real64 const hin,
-		FArray1A< Real64 > const Ra,
-		FArray1A< Real64 > const Nu,
-		FArray1A< Real64 > const hg,
-		FArray1A< Real64 > const hr,
-		FArray1A< Real64 > const hs,
-		int & nperr
+		Array1A< Real64 > const Ra,
+		Array1A< Real64 > const Nu,
+		Array1A< Real64 > const hg,
+		Array1A< Real64 > const hr,
+		Array1A< Real64 > const hs,
+		int & EP_UNUSED( nperr )
 	)
 	{
 
@@ -967,8 +1012,8 @@ namespace TARCOGOutput {
 		// Locals
 		//character(len=*), intent (inout) :: ErrorMessage
 
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int i;
 
@@ -984,7 +1029,7 @@ namespace TARCOGOutput {
 		//      position=FilePosition, form='formatted', iostat=nperr)
 		//if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
 		//      position=FilePosition, form='formatted', iostat=nperr)
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2000 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
 		gio::write( OutArgumentsFile, fmtLD );
@@ -1034,7 +1079,7 @@ namespace TARCOGOutput {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A_int const ibc,
+		Array1A_int const ibc,
 		Real64 const hout,
 		Real64 const hin,
 		int const standard,
@@ -1046,42 +1091,42 @@ namespace TARCOGOutput {
 		Real64 const tilt,
 		Real64 const totsol,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const YoungsMod,
-		FArray1A< Real64 > const PoissonsRat,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A_int const SupportPillar, // Shows whether or not gap have support pillar
-		FArray1A< Real64 > const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-		FArray1A< Real64 > const PillarRadius, // Pillar radius for each gap (used in case there is support pillar)
-		FArray1A< Real64 > const SlatThick,
-		FArray1A< Real64 > const SlatWidth,
-		FArray1A< Real64 > const SlatAngle,
-		FArray1A< Real64 > const SlatCond,
-		FArray1A< Real64 > const SlatSpacing,
-		FArray1A< Real64 > const SlatCurve,
-		FArray1A_int const nslice,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const GapDef,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght,
-		FArray1A< Real64 > const gama
+		Array1A_int const LayerType,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const YoungsMod,
+		Array1A< Real64 > const PoissonsRat,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A_int const SupportPillar, // Shows whether or not gap have support pillar
+		Array1A< Real64 > const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+		Array1A< Real64 > const PillarRadius, // Pillar radius for each gap (used in case there is support pillar)
+		Array1A< Real64 > const SlatThick,
+		Array1A< Real64 > const SlatWidth,
+		Array1A< Real64 > const SlatAngle,
+		Array1A< Real64 > const SlatCond,
+		Array1A< Real64 > const SlatSpacing,
+		Array1A< Real64 > const SlatCurve,
+		Array1A_int const nslice,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const GapDef,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array1A< Real64 > const gama
 	)
 	{
 
@@ -1119,11 +1164,11 @@ namespace TARCOGOutput {
 		tvent.dim( maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		gama.dim( maxgas );
 
@@ -1136,10 +1181,9 @@ namespace TARCOGOutput {
 		int j;
 		int NumOfProvGasses;
 
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
-		int nperr;
 
 		static std::string dynFormat;
 
@@ -1216,7 +1260,7 @@ namespace TARCOGOutput {
 
 		//bi...Write the header:
 
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 
 		gio::write( WINCogFile, Format_112 );
 		gio::write( WINCogFile, Format_111 );
@@ -1269,19 +1313,19 @@ namespace TARCOGOutput {
 			gio::write( WINCogFile, Format_2031 );
 			gio::write( Format_2020 ) << xgcon( 1, 1 );
 			for ( j = 2; i <= 3; ++j ) {
-				gio::write( WINCogFile, Format_2030 ) << xgcon( i, j );
+				gio::write( WINCogFile, Format_2030 ) << xgcon( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2032 );
 			gio::write( Format_2020 ) << xgvis( 1, 1 );
 			for ( j = 2; i <= 3; ++j ) {
-				gio::write( WINCogFile, Format_2030 ) << xgvis( i, j );
+				gio::write( WINCogFile, Format_2030 ) << xgvis( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2033 );
 			gio::write( Format_2020 ) << xgcp( 1, 1 );
 			for ( j = 2; i <= 3; ++j ) {
-				gio::write( WINCogFile, Format_2030 ) << xgcp( i, j );
+				gio::write( WINCogFile, Format_2030 ) << xgcp( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2034 );
@@ -1351,10 +1395,10 @@ namespace TARCOGOutput {
 				gio::write( WINCogFile, Format_1048 );
 				gio::write( WINCogFile, "('    ',F24.12, ', ', F24.12,', ',F24.12,', ',I1,', ',$)" ) << gap( i ) << GapDef( i ) << presure( i + 1 ) << nmix( i + 1 );
 				for ( j = 1; j <= nmix( i + 1 ); ++ j ) {
-					gio::write( WINCogFile, "(I1,', ',$)" ) << iprop( i + 1, j );
+					gio::write( WINCogFile, "(I1,', ',$)" ) << iprop( j, i + 1 );
 				}
 				for ( j = 1; j <= nmix( i + 1 ); ++ j ) {
-					gio::write( WINCogFile, "(F24.12,', ',$)" ) << frct( i + 1, j );
+					gio::write( WINCogFile, "(F24.12,', ',$)" ) << frct( j, i + 1 );
 				}
 				gio::write( WINCogFile, "('    ',F24.12,', ', F24.12,', ',F24.12,', ',I1)" ) << vvent( i + 1 ) << tvent( i + 1 ) << SupportPillar( i );
 				if ( SupportPillar( i ) == YES_SupportPillar ) {
@@ -1400,7 +1444,6 @@ namespace TARCOGOutput {
 	{
 
 		// Locals
-		int ferr;
 
 		// Formats
 		static gio::Fmt Format_2360( "('TARCOG status: ',I3,' - Normal termination.')" );
@@ -1528,11 +1571,11 @@ namespace TARCOGOutput {
 				TarcogIterationsFileNumber = GetNewUnitNumber();
 				//        open(newunit=TarcogIterationsFileNumber,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
 				//              form='formatted', iostat=nperr)
-				{ IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DBGD + "TarcogIterations.dbg", flags ); nperr = flags.ios(); }
+				{ IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DBGD + DataStringGlobals::TarcogIterationsFileName, flags ); nperr = flags.ios(); }
 
 				//        if (nperr.ne.0)  open(newunit=TarcogIterationsFileNumber, file='TarcogIterations.dbg',status='unknown', position='APPEND',  &
 				//              &  form='formatted', iostat=nperr)
-				if ( nperr != 0 ) { IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, "TarcogIterations.dbg", flags ); nperr = flags.ios(); }
+				if ( nperr != 0 ) { IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DataStringGlobals::TarcogIterationsFileName, flags ); nperr = flags.ios(); }
 
 				IterationCSVFileNumber = GetNewUnitNumber();
 				//        open(newunit=IterationCSVFileNumber,  file=TRIM(DBGD)//TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
@@ -1546,29 +1589,6 @@ namespace TARCOGOutput {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // TARCOGOutput
 

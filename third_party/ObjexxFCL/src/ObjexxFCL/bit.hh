@@ -5,16 +5,16 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -38,10 +38,10 @@ TRANSFER( T const & v, U const & )
 // Value Reinterpreted as an Array of Another Type
 template< typename T, typename U >
 inline
-FArray1D< U >
-TRANSFER( T const & v, FArray< U > const & )
+Array1D< U >
+TRANSFER( T const & v, Array< U > const & )
 {
-	FArray1D< U > r( typename FArray< U >::size_type( std::ceil( double( sizeof( T ) ) / sizeof( U ) ) ) );
+	Array1D< U > r( typename Array< U >::size_type( std::ceil( double( sizeof( T ) ) / sizeof( U ) ) ) );
 	r.data_copy_from( &v, sizeof( T ) );
 	return r;
 }
@@ -50,7 +50,7 @@ TRANSFER( T const & v, FArray< U > const & )
 template< typename T, typename U >
 inline
 U
-TRANSFER( FArray< T > const & a, U const & )
+TRANSFER( Array< T > const & a, U const & )
 {
 	return *reinterpret_cast< U const * >( a.data() );
 }
@@ -58,10 +58,10 @@ TRANSFER( FArray< T > const & a, U const & )
 // Array Reinterpreted as an Array of Another Type
 template< typename T, typename U >
 inline
-FArray1D< U >
-TRANSFER( FArray< T > const & a, FArray< U > const & )
+Array1D< U >
+TRANSFER( Array< T > const & a, Array< U > const & )
 {
-	FArray1D< U > r( typename FArray< U >::size_type( std::ceil( double( a.size() * sizeof( T ) ) / sizeof( U ) ) ) );
+	Array1D< U > r( typename Array< U >::size_type( std::ceil( double( a.size() * sizeof( T ) ) / sizeof( U ) ) ) );
 	r.data_copy_from( a.data(), a.size() * sizeof( T ) );
 	return r;
 }
@@ -69,28 +69,28 @@ TRANSFER( FArray< T > const & a, FArray< U > const & )
 // Value Reinterpreted as an Array of Another Type
 template< typename T, typename U, typename I >
 inline
-FArray1D< U >
+Array1D< U >
 TRANSFER( T const & v, U const &, I const size )
 {
-	return FArray1D< U >( size, *reinterpret_cast< U const * >( &v ) );
+	return Array1D< U >( size, *reinterpret_cast< U const * >( &v ) );
 }
 
 // Value Reinterpreted as an Array of Another Type
 template< typename T, typename U, typename I >
 inline
-FArray1D< U >
-TRANSFER( T const & v, FArray< U > const &, I const size )
+Array1D< U >
+TRANSFER( T const & v, Array< U > const &, I const size )
 {
-	return FArray1D< U >( size, *reinterpret_cast< U const * >( &v ) );
+	return Array1D< U >( size, *reinterpret_cast< U const * >( &v ) );
 }
 
 // Array Reinterpreted as an Array of Another Type
 template< typename T, typename U, typename I >
 inline
-FArray1D< U >
-TRANSFER( FArray< T > const & a, U const &, I const size )
+Array1D< U >
+TRANSFER( Array< T > const & a, U const &, I const size )
 {
-	FArray1D< U > r( size );
+	Array1D< U > r( size );
 	r.data_copy_from( a.data(), std::min( a.size() * sizeof( T ), size * sizeof( U ) ) );
 	return r;
 }
@@ -98,10 +98,10 @@ TRANSFER( FArray< T > const & a, U const &, I const size )
 // Array Reinterpreted as an Array of Another Type
 template< typename T, typename U, typename I >
 inline
-FArray1D< U >
-TRANSFER( FArray< T > const & a, FArray< U > const &, I const size )
+Array1D< U >
+TRANSFER( Array< T > const & a, Array< U > const &, I const size )
 {
-	FArray1D< U > r( size );
+	Array1D< U > r( size );
 	r.data_copy_from( a.data(), std::min( a.size() * sizeof( T ), size * sizeof( U ) ) );
 	return r;
 }
@@ -291,14 +291,32 @@ bit_cshift( T const & x, S const & shift ) // x<0 behavior varies in Fortran ISH
 }
 
 // Bit Arithmetic Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
 bit_ashift( T const & x, S const & shift )
 {
-	static auto const x_bits( bit_size( x ) );
+	auto const x_bits( std::numeric_limits< T >::digits );
 	if ( shift >= S( 0 ) ) {
 		return ( shift < x_bits ? x << shift : T( 0 ) );
+	} else { // Negative (right) shift
+		if ( x >= T( 0 ) ) {
+			return ( -shift < x_bits ? x >> -shift : T( 0 ) );
+		} else {
+			return ( -shift < x_bits ? x >> -shift | ~( ( S( 1 ) << ( x_bits + shift ) ) - 1 ) : T( 0 ) );
+		}
+	}
+}
+
+// Bit Arithmetic Shifted
+template< typename T, typename S, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
+inline
+T
+bit_ashift( T const & x, S const & shift )
+{
+	auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	if ( shift >= S( 0 ) ) {
+		return ( shift < x_bits ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift : T( 0 ) );
 	} else { // Negative (right) shift
 		if ( x >= T( 0 ) ) {
 			return ( -shift < x_bits ? x >> -shift : T( 0 ) );

@@ -1,10 +1,56 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -75,6 +121,15 @@ namespace HeatBalanceAirManager {
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool ManageAirHeatBalanceGetInputFlag( true );
+	}
 	//         Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
 
@@ -89,6 +144,12 @@ namespace HeatBalanceAirManager {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		ManageAirHeatBalanceGetInputFlag =  true;
+	}
+
 
 	void
 	ManageAirHeatBalance()
@@ -129,14 +190,15 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
-
+		/////////// hoisted into namespace changed to ManageAirHeatBalanceGetInputFlag////////////
+		//static bool ManageAirHeatBalanceGetInputFlag( true );
+		/////////////////////////////////////////////
 		// FLOW:
 
 		// Obtains and Allocates heat balance related parameters from input file
-		if ( GetInputFlag ) {
+		if ( ManageAirHeatBalanceGetInputFlag ) {
 			GetAirHeatBalanceInput();
-			GetInputFlag = false;
+			ManageAirHeatBalanceGetInputFlag = false;
 		}
 
 		InitAirHeatBalance(); // Initialize all heat balance related parameters
@@ -192,7 +254,6 @@ namespace HeatBalanceAirManager {
 
 		// FLOW:
 
-		CrossMixingFlag.dimension( NumOfZones, false );
 		GetAirFlowFlag( ErrorsFound );
 
 		SetZoneMassConservationFlag();
@@ -305,7 +366,7 @@ namespace HeatBalanceAirManager {
 
 			// flow
 
-			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
 				for (Loop = 1; Loop <= TotMixing; ++Loop) {
 					ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
 					ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
@@ -381,30 +442,26 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > SVals1;
-		FArray2D< Real64 > SVals2;
+		Array2D< Real64 > SVals1;
+		Array2D< Real64 > SVals2;
 		int NumAlpha; // Number of Alphas for each GetobjectItem call
 		int NumNumber; // Number of Numbers for each GetobjectItem call
 		int maxAlpha; // max of Alphas for allocation
 		int maxNumber; // max of Numbers for allocation
 		int NumArgs;
 		int IOStat;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 
 		int i;
 		int Loop;
 		int Loop1;
-		int JDay;
-		int Hr;
-		FArray1D_bool RepVarSet;
-		FArray1D_bool OverLap;
-		int TS;
+		Array1D_bool RepVarSet;
 		bool IsNotOK;
 		bool IsBlank;
 		int ZoneNum;
@@ -417,9 +474,9 @@ namespace HeatBalanceAirManager {
 		int Item1;
 		bool errFlag;
 		int ZLItem;
-		FArray1D< Real64 > TotInfilVentFlow;
-		FArray1D< Real64 > TotMixingFlow;
-		FArray1D< Real64 > ZoneMixingNum;
+		Array1D< Real64 > TotInfilVentFlow;
+		Array1D< Real64 > TotMixingFlow;
+		Array1D< Real64 > ZoneMixingNum;
 		int ConnectTest;
 		int ConnectionNumber;
 		int NumbNum;
@@ -428,17 +485,16 @@ namespace HeatBalanceAirManager {
 		int Zone2Num;
 		int ZoneNumA;
 		int ZoneNumB;
-		int MixingNum;
 		int SourceCount;
 		int ReceivingCount;
 		int IsSourceZone;
 
 		// Formats
-		static gio::Fmt Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
+		static gio::Fmt Format_720( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
 		static gio::Fmt Format_722( "(' ',A,', ',A)" );
-		static gio::Fmt Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
+		static gio::Fmt Format_723( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_724( "('! <',A,' Airflow Stats Nominal>, ',A)" );
 
 		RepVarSet.dimension( NumOfZones, true );
 
@@ -516,19 +572,19 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
-			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneAirBalance( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance.ZoneName(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance, &ZoneAirBalanceData::ZoneName, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -557,7 +613,7 @@ namespace HeatBalanceAirManager {
 				if ( lAlphaFieldBlanks( 4 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 4 ) + " is required but field is blank." );
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 				}
 				ErrorsFound = true;
 			}
@@ -572,7 +628,7 @@ namespace HeatBalanceAirManager {
 			if ( ControlFlag && ZoneAirBalance( Loop ).BalanceMethod == AirBalanceQuadrature ) {
 				ZoneAirBalance( Loop ).BalanceMethod = AirBalanceNone;
 				ShowWarningError( cCurrentModuleObject + " = " + ZoneAirBalance( Loop ).Name + ": This Zone (" + cAlphaArgs( 2 ) + ") is controlled by AvailabilityManager:HybridVentilation with Simple Airflow Control Type option." );
-				ShowContinueError( "Air balance method type QUADRATURE and Simple Airflow Control Type cannot co-exist. " "The NONE method is assigned" );
+				ShowContinueError( "Air balance method type QUADRATURE and Simple Airflow Control Type cannot co-exist. The NONE method is assigned" );
 			}
 
 			if ( ZoneAirBalance( Loop ).BalanceMethod == AirBalanceQuadrature ) {
@@ -611,16 +667,16 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				InfiltrationObjects( Item ).StartPtr = TotDesignFlowInfiltration + 1;
 				++TotDesignFlowInfiltration;
@@ -663,7 +719,7 @@ namespace HeatBalanceAirManager {
 						Infiltration( Loop ).Name = cAlphaArgs( 1 );
 						Infiltration( Loop ).ZonePtr = InfiltrationObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, InfiltrationObjects( Item ).Name, Infiltration.Name(), Loop - 1, Infiltration( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, InfiltrationObjects( Item ).Name, Infiltration, Loop - 1, Infiltration( Loop ).Name, errFlag );
 						Infiltration( Loop ).ZonePtr = ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -675,7 +731,7 @@ namespace HeatBalanceAirManager {
 							if ( lAlphaFieldBlanks( 3 ) ) {
 								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 							} else {
-								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 							}
 							ErrorsFound = true;
 						}
@@ -812,14 +868,14 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration.Name(), InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -843,7 +899,7 @@ namespace HeatBalanceAirManager {
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				}
 				ErrorsFound = true;
 			}
@@ -866,14 +922,14 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration.Name(), InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -897,7 +953,7 @@ namespace HeatBalanceAirManager {
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				}
 				ErrorsFound = true;
 			}
@@ -962,7 +1018,7 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentilationObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VentilationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -970,9 +1026,9 @@ namespace HeatBalanceAirManager {
 			}
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				VentilationObjects( Item ).StartPtr = TotDesignFlowVentilation + 1;
 				++TotDesignFlowVentilation;
@@ -1014,7 +1070,7 @@ namespace HeatBalanceAirManager {
 						Ventilation( Loop ).Name = cAlphaArgs( 1 );
 						Ventilation( Loop ).ZonePtr = VentilationObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, VentilationObjects( Item ).Name, Ventilation.Name(), Loop - 1, Ventilation( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, VentilationObjects( Item ).Name, Ventilation, Loop - 1, Ventilation( Loop ).Name, errFlag );
 						Ventilation( Loop ).ZonePtr = ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1039,7 +1095,7 @@ namespace HeatBalanceAirManager {
 							if ( lAlphaFieldBlanks( 3 ) ) {
 								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 							} else {
-								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 							}
 						}
 						ErrorsFound = true;
@@ -1191,7 +1247,7 @@ namespace HeatBalanceAirManager {
 					Ventilation( Loop ).MinIndoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 					if ( Ventilation( Loop ).MinIndoorTempSchedPtr > 0 ) {
 						if ( Item1 == 1 ) {
-							if ( ! lNumericFieldBlanks( 11 ) ) ShowWarningError( RoutineName + "The Minimum Indoor Temperature value and schedule are provided." " The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+							if ( ! lNumericFieldBlanks( 11 ) ) ShowWarningError( RoutineName + "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 							// Check min and max values in the schedule to ensure both values are within the range
 							if ( ! CheckScheduleValueMinMax( Ventilation( Loop ).MinIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 								ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a minimum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 6 ) );
@@ -1201,7 +1257,7 @@ namespace HeatBalanceAirManager {
 					}
 					if ( Ventilation( Loop ).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 11 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 11 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 11 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
@@ -1228,7 +1284,7 @@ namespace HeatBalanceAirManager {
 					Ventilation( Loop ).MaxIndoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
 					if ( Ventilation( Loop ).MaxIndoorTempSchedPtr > 0 ) {
 						if ( Item1 == 1 ) {
-							if ( ! lNumericFieldBlanks( 12 ) ) ShowWarningError( RoutineName + "The Maximum Indoor Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+							if ( ! lNumericFieldBlanks( 12 ) ) ShowWarningError( RoutineName + "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 							// Check min and max values in the schedule to ensure both values are within the range
 							if ( ! CheckScheduleValueMinMax( Ventilation( Loop ).MaxIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + " must have a maximum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 7 ) );
@@ -1238,14 +1294,14 @@ namespace HeatBalanceAirManager {
 					}
 					if ( Ventilation( Loop ).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 12 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 12 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 12 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
 					// Check Maximum indoor temperature value and schedule fields
 					if ( ! lNumericFieldBlanks( 12 ) && ( ( ! lAlphaFieldBlanks( 7 ) ) && Ventilation( Loop ).MaxIndoorTempSchedPtr == 0 ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) + " is invalid. " "The constant value will be used at " + RoundSigDigits( rNumericArgs( 12 ), 1 ) + " degrees C " );
+							ShowWarningError( RoutineName + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 12 ), 1 ) + " degrees C " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
@@ -1260,7 +1316,7 @@ namespace HeatBalanceAirManager {
 					Ventilation( Loop ).DeltaTempSchedPtr = GetScheduleIndex( cAlphaArgs( 8 ) );
 					if ( Ventilation( Loop ).DeltaTempSchedPtr > 0 ) {
 						if ( Item1 == 1 ) {
-							if ( ! lNumericFieldBlanks( 13 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+							if ( ! lNumericFieldBlanks( 13 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 							// Check min value in the schedule to ensure both values are within the range
 							if ( GetScheduleMinValue( Ventilation( Loop ).DeltaTempSchedPtr ) < -VentilTempLimit ) {
 								ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs( 8 ) );
@@ -1270,7 +1326,7 @@ namespace HeatBalanceAirManager {
 					}
 					if ( Ventilation( Loop ).DeltaTempSchedPtr == 0 && lNumericFieldBlanks( 13 ) && ( ! lAlphaFieldBlanks( 8 ) ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 13 ) + ": the value field is blank and schedule field is invalid. " "The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 13 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
@@ -1284,7 +1340,7 @@ namespace HeatBalanceAirManager {
 					//    END IF
 					if ( ! lNumericFieldBlanks( 13 ) && ( ( ! lAlphaFieldBlanks( 8 ) ) && Ventilation( Loop ).DeltaTempSchedPtr == 0 ) ) {
 						if ( Item1 == 1 ) {
-							ShowWarningError( RoutineName + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) + " is invalid. " "The constant value will be used at " + RoundSigDigits( rNumericArgs( 13 ), 1 ) + " degrees C " );
+							ShowWarningError( RoutineName + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 13 ), 1 ) + " degrees C " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 					}
@@ -1304,7 +1360,7 @@ namespace HeatBalanceAirManager {
 					Ventilation( Loop ).MinOutdoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 9 ) );
 					if ( Item1 == 1 ) {
 						if ( Ventilation( Loop ).MinOutdoorTempSchedPtr > 0 ) {
-							if ( ! lNumericFieldBlanks( 14 ) ) ShowWarningError( RoutineName + "The Minimum Outdoor Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+							if ( ! lNumericFieldBlanks( 14 ) ) ShowWarningError( RoutineName + "The Minimum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 							// Check min and max values in the schedule to ensure both values are within the range
 							if ( ! CheckScheduleValueMinMax( Ventilation( Loop ).MinOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 								ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 9 ) );
@@ -1312,7 +1368,7 @@ namespace HeatBalanceAirManager {
 							}
 						}
 						if ( Ventilation( Loop ).MinOutdoorTempSchedPtr == 0 && lNumericFieldBlanks( 14 ) && ( ! lAlphaFieldBlanks( 9 ) ) ) {
-							ShowWarningError( RoutineName + "Minimum Outdoor Temperature: " "the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + "Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 						// Check Minimum outdoor temperature value and schedule fields
@@ -1337,14 +1393,14 @@ namespace HeatBalanceAirManager {
 					Ventilation( Loop ).MaxOutdoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 10 ) );
 					if ( Item1 == 1 ) {
 						if ( Ventilation( Loop ).MaxOutdoorTempSchedPtr > 0 ) {
-							if ( ! lNumericFieldBlanks( 15 ) ) ShowWarningError( RoutineName + "The Maximum Outdoor Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+							if ( ! lNumericFieldBlanks( 15 ) ) ShowWarningError( RoutineName + "The Maximum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 							if ( ! CheckScheduleValueMinMax( Ventilation( Loop ).MaxOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 								ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 10 ) );
 								ErrorsFound = true;
 							}
 						}
 						if ( Ventilation( Loop ).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks( 15 ) && ( ! lAlphaFieldBlanks( 10 ) ) ) {
-							ShowWarningError( RoutineName + cNumericFieldNames( 15 ) + ": the value field is blank and schedule field is invalid." " The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+							ShowWarningError( RoutineName + cNumericFieldNames( 15 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 						}
 						// Check Maximum outdoor temperature value and schedule fields
@@ -1406,7 +1462,7 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			VentiCount = TotDesignFlowVentilation + Loop;
-			VerifyName( cAlphaArgs( 1 ), Ventilation.Name(), VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Ventilation, VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1414,7 +1470,7 @@ namespace HeatBalanceAirManager {
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
-			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Ventilation( VentiCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1444,7 +1500,7 @@ namespace HeatBalanceAirManager {
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				}
 				ErrorsFound = true;
 			}
@@ -1485,7 +1541,7 @@ namespace HeatBalanceAirManager {
 
 			Ventilation( VentiCount ).MinIndoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
 			if ( Ventilation( VentiCount ).MinIndoorTempSchedPtr > 0 ) {
-				if ( ! lNumericFieldBlanks( 6 ) ) ShowWarningError( RoutineName + "The Minimum Indoor Temperature value and schedule are provided." " The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+				if ( ! lNumericFieldBlanks( 6 ) ) ShowWarningError( RoutineName + "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 				// Check min and max values in the schedule to ensure both values are within the range
 				if ( ! CheckScheduleValueMinMax( Ventilation( VentiCount ).MinIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a minimum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 4 ) );
@@ -1493,7 +1549,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 6 ) && ( ! lAlphaFieldBlanks( 4 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 6 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 6 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Minimum indoor temperature value and schedule fields
@@ -1514,7 +1570,7 @@ namespace HeatBalanceAirManager {
 
 			Ventilation( VentiCount ).MaxIndoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 5 ) );
 			if ( Ventilation( VentiCount ).MaxIndoorTempSchedPtr > 0 ) {
-				if ( ! lNumericFieldBlanks( 7 ) ) ShowWarningError( RoutineName + "The Maximum Indoor Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+				if ( ! lNumericFieldBlanks( 7 ) ) ShowWarningError( RoutineName + "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 				// Check min and max values in the schedule to ensure both values are within the range
 				if ( ! CheckScheduleValueMinMax( Ventilation( VentiCount ).MaxIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + " must have a maximum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 5 ) );
@@ -1522,12 +1578,12 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks( 7 ) && ( ! lAlphaFieldBlanks( 5 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 7 ) + ": the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 7 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Maximum indoor temperature value and schedule fields
 			if ( ! lNumericFieldBlanks( 7 ) && ( ( ! lAlphaFieldBlanks( 5 ) ) && Ventilation( VentiCount ).MaxIndoorTempSchedPtr == 0 ) ) {
-				ShowWarningError( RoutineName + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 5 ) + " is invalid. " "The constant value will be used at " + RoundSigDigits( rNumericArgs( 7 ), 1 ) + " degrees C " );
+				ShowWarningError( RoutineName + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 5 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 7 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 
@@ -1539,7 +1595,7 @@ namespace HeatBalanceAirManager {
 
 			Ventilation( VentiCount ).DeltaTempSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 			if ( Ventilation( VentiCount ).DeltaTempSchedPtr > 0 ) {
-				if ( ! lNumericFieldBlanks( 8 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature will" " be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+				if ( ! lNumericFieldBlanks( 8 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 				// Check min value in the schedule to ensure both values are within the range
 				if ( GetScheduleMinValue( Ventilation( VentiCount ).DeltaTempSchedPtr ) < -VentilTempLimit ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs( 8 ) );
@@ -1547,11 +1603,11 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).DeltaTempSchedPtr == 0 && lNumericFieldBlanks( 8 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 8 ) + ": the value field is blank and schedule field is invalid. " "The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 8 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			if ( ! lNumericFieldBlanks( 8 ) && ( ( ! lAlphaFieldBlanks( 6 ) ) && Ventilation( VentiCount ).DeltaTempSchedPtr == 0 ) ) {
-				ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. " "The constant value will be used at " + RoundSigDigits( rNumericArgs( 8 ), 1 ) + " degrees C " );
+				ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 8 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 
@@ -1567,7 +1623,7 @@ namespace HeatBalanceAirManager {
 
 			Ventilation( VentiCount ).MinOutdoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
 			if ( Ventilation( VentiCount ).MinOutdoorTempSchedPtr > 0 ) {
-				if ( ! lNumericFieldBlanks( 9 ) ) ShowWarningError( RoutineName + "The Minimum Outdoor Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+				if ( ! lNumericFieldBlanks( 9 ) ) ShowWarningError( RoutineName + "The Minimum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 				// Check min and max values in the schedule to ensure both values are within the range
 				if ( ! CheckScheduleValueMinMax( Ventilation( VentiCount ).MinOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 7 ) );
@@ -1575,7 +1631,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( Ventilation( VentiCount ).MinOutdoorTempSchedPtr == 0 && lNumericFieldBlanks( 9 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
-				ShowWarningError( RoutineName + "Minimum Outdoor Temperature: " "the value field is blank and schedule field is invalid. The default " "value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + "Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( -VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Minimum outdoor temperature value and schedule fields
@@ -1596,14 +1652,14 @@ namespace HeatBalanceAirManager {
 
 			Ventilation( VentiCount ).MaxOutdoorTempSchedPtr = GetScheduleIndex( cAlphaArgs( 8 ) );
 			if ( Ventilation( VentiCount ).MaxOutdoorTempSchedPtr > 0 ) {
-				if ( ! lNumericFieldBlanks( 10 ) ) ShowWarningError( RoutineName + "The Maximum Outdoor Temperature value and schedule are provided. " "The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+				if ( ! lNumericFieldBlanks( 10 ) ) ShowWarningError( RoutineName + "The Maximum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 				if ( ! CheckScheduleValueMinMax( Ventilation( VentiCount ).MaxOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs( 8 ) );
 					ErrorsFound = true;
 				}
 			}
 			if ( Ventilation( VentiCount ).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks( 10 ) && ( ! lAlphaFieldBlanks( 8 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 10 ) + ": the value field is blank and schedule field is invalid." " The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 10 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( VentilTempLimit, 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Maximum outdoor temperature value and schedule fields
@@ -1663,14 +1719,14 @@ namespace HeatBalanceAirManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Mixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Mixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
-			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Mixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1682,7 +1738,7 @@ namespace HeatBalanceAirManager {
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				}
 				ErrorsFound = true;
 			}
@@ -1748,7 +1804,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( Mixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cAlphaFieldNames( 5 ) + " not found=" + cAlphaArgs( 5 ) + " for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -1758,19 +1814,19 @@ namespace HeatBalanceAirManager {
 			if ( NumAlpha > 5 ) {
 				Mixing( Loop ).DeltaTempSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 				if ( Mixing( Loop ).DeltaTempSchedPtr > 0 ) {
-					if ( ! lNumericFieldBlanks( 5 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature" " will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+					if ( ! lNumericFieldBlanks( 5 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 					if ( GetScheduleMinValue( Mixing( Loop ).DeltaTempSchedPtr ) < -MixingTempLimit ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have" " a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs( 6 ) );
+						ShowSevereError( RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs( 1 ) + " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs( 6 ) );
 						ErrorsFound = true;
 					}
 				}
 			}
 			if ( Mixing( Loop ).DeltaTempSchedPtr == 0 && lNumericFieldBlanks( 5 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 5 ) + ": the value field is blank and schedule field is invalid. " "The default value will be used (" + RoundSigDigits( rNumericArgs( 5 ), 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 5 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( rNumericArgs( 5 ), 1 ) + ") " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			if ( ! lNumericFieldBlanks( 5 ) && ( ( ! lAlphaFieldBlanks( 6 ) ) && Mixing( Loop ).DeltaTempSchedPtr == 0 ) ) {
-				ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. " "The constant value will be used at " + RoundSigDigits( rNumericArgs( 5 ), 1 ) + " degrees C " );
+				ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 5 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 
@@ -1880,8 +1936,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( Mixing( Loop ).ZonePtr ) ) {
 					RepVarSet( Mixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
@@ -1903,22 +1959,22 @@ namespace HeatBalanceAirManager {
 
 		// added by BAN, 02/14
 		if ( TotMixing > 0 ) {
-		   ZoneMixingNum.allocate( TotMixing );
-		   // get source zones mixing objects index
-		   for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			   SourceCount = 0;
-			   for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
-				   if ( ZoneNum == Mixing( Loop ).FromZone ) {
-					  SourceCount += 1;
-					  ZoneMixingNum( SourceCount ) = Loop;
+			ZoneMixingNum.allocate( TotMixing );
+			// get source zones mixing objects index
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				SourceCount = 0;
+				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+					if ( ZoneNum == Mixing( Loop ).FromZone ) {
+						SourceCount += 1;
+						ZoneMixingNum( SourceCount ) = Loop;
 					}
 				}
 				// save mixing objects index for zones which serve as a source zone
 				MassConservation( ZoneNum ).NumSourceZonesMixingObject = SourceCount;
 				if ( SourceCount > 0 ) {
-				   MassConservation( ZoneNum ).ZoneMixingSourcesPtr.allocate( SourceCount );
-				   for ( Loop = 1; Loop <= SourceCount; ++Loop ) {
-					   MassConservation( ZoneNum ).ZoneMixingSourcesPtr( Loop ) = ZoneMixingNum( Loop );
+					MassConservation( ZoneNum ).ZoneMixingSourcesPtr.allocate( SourceCount );
+					for ( Loop = 1; Loop <= SourceCount; ++Loop ) {
+						MassConservation( ZoneNum ).ZoneMixingSourcesPtr( Loop ) = ZoneMixingNum( Loop );
 					}
 				}
 			}
@@ -1927,12 +1983,12 @@ namespace HeatBalanceAirManager {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				IsSourceZone = false;
 				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
-				    if (ZoneNum != Mixing( Loop ).FromZone ) continue;
+					if (ZoneNum != Mixing( Loop ).FromZone ) continue;
 					MassConservation( ZoneNum ).IsOnlySourceZone = true;
 					for ( Loop1 = 1; Loop1 <= TotMixing; ++Loop1 ) {
-					    if ( ZoneNum == Mixing(Loop1).ZonePtr ) {
-						   MassConservation( ZoneNum ).IsOnlySourceZone = false;
-						   break;
+						if ( ZoneNum == Mixing(Loop1).ZonePtr ) {
+							MassConservation( ZoneNum ).IsOnlySourceZone = false;
+							break;
 						}
 					}
 				}
@@ -1942,18 +1998,18 @@ namespace HeatBalanceAirManager {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				ReceivingCount = 0;
 				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
-				    if ( ZoneNum == Mixing( Loop ).ZonePtr ) {
-						 ReceivingCount += 1;
-						 ZoneMixingNum( ReceivingCount ) = Loop;
+					if ( ZoneNum == Mixing( Loop ).ZonePtr ) {
+						ReceivingCount += 1;
+						ZoneMixingNum( ReceivingCount ) = Loop;
 					}
 				}
 				// save mixing objects index for zones which serve as a receiving zone
 				MassConservation( ZoneNum ).NumReceivingZonesMixingObject = ReceivingCount;
 				if ( ReceivingCount > 0 ) {
-					 MassConservation( ZoneNum ).ZoneMixingReceivingPtr.allocate( ReceivingCount );
-					 MassConservation( ZoneNum ).ZoneMixingReceivingFr.allocate( ReceivingCount );
-					 for ( Loop = 1; Loop <= ReceivingCount; ++Loop ) {
-						 MassConservation( ZoneNum ).ZoneMixingReceivingPtr( Loop ) = ZoneMixingNum( Loop );
+					MassConservation( ZoneNum ).ZoneMixingReceivingPtr.allocate( ReceivingCount );
+					MassConservation( ZoneNum ).ZoneMixingReceivingFr.allocate( ReceivingCount );
+					for ( Loop = 1; Loop <= ReceivingCount; ++Loop ) {
+						MassConservation( ZoneNum ).ZoneMixingReceivingPtr( Loop ) = ZoneMixingNum( Loop );
 					}
 				}
 			}
@@ -1971,36 +2027,10 @@ namespace HeatBalanceAirManager {
 		}
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( MassConservation( ZoneNum ).IsOnlySourceZone ) {
-			   Loop += 1;
-			   ZoneReOrder( Loop ) = ZoneNum;
+				Loop += 1;
+				ZoneReOrder( Loop ) = ZoneNum;
 			}
 		}
-		if ( TotMixing > 0 ) {
-			for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
-
-				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) ) {
-					ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) = false;
-					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).ZonePtr).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-				}
-
-				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) ) {
-					ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) = false;
-					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).FromZone).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-				}
-			}
-		}
-		if (allocated( ZoneMassBalanceRepVarFlag ) ) ZoneMassBalanceRepVarFlag.deallocate();
-
 
 		cCurrentModuleObject = "ZoneCrossMixing";
 		TotCrossMixing = GetNumObjectsFound( cCurrentModuleObject );
@@ -2012,7 +2042,7 @@ namespace HeatBalanceAirManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CrossMixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), CrossMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -2020,7 +2050,7 @@ namespace HeatBalanceAirManager {
 			}
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
-			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( CrossMixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -2031,7 +2061,7 @@ namespace HeatBalanceAirManager {
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," + cAlphaFieldNames( 3 ) + " is required but field is blank." );
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				}
 				ErrorsFound = true;
 			}
@@ -2097,7 +2127,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( CrossMixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
@@ -2107,7 +2137,7 @@ namespace HeatBalanceAirManager {
 			if ( NumAlpha > 5 ) {
 				CrossMixing( Loop ).DeltaTempSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
 				if ( CrossMixing( Loop ).DeltaTempSchedPtr > 0 ) {
-					if ( ! lNumericFieldBlanks( 5 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature " "will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
+					if ( ! lNumericFieldBlanks( 5 ) ) ShowWarningError( RoutineName + "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) );
 					if ( GetScheduleMinValue( CrossMixing( Loop ).DeltaTempSchedPtr ) < 0.0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs( 6 ) );
 						ErrorsFound = true;
@@ -2115,11 +2145,11 @@ namespace HeatBalanceAirManager {
 				}
 			}
 			if ( CrossMixing( Loop ).DeltaTempSchedPtr == 0 && lNumericFieldBlanks( 5 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-				ShowWarningError( RoutineName + cNumericFieldNames( 5 ) + ": the value field is blank and schedule field is invalid. " "The default value will be used (" + RoundSigDigits( rNumericArgs( 5 ), 1 ) + ") " );
+				ShowWarningError( RoutineName + cNumericFieldNames( 5 ) + ": the value field is blank and schedule field is invalid. The default value will be used (" + RoundSigDigits( rNumericArgs( 5 ), 1 ) + ") " );
 				ShowContinueError( "in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			if ( ! lNumericFieldBlanks( 5 ) && ( ( ! lAlphaFieldBlanks( 6 ) ) && CrossMixing( Loop ).DeltaTempSchedPtr == 0 ) ) {
-				ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. " "The constant value will be used at " + RoundSigDigits( rNumericArgs( 5 ), 1 ) + " degrees C " );
+				ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 5 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 
@@ -2229,8 +2259,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( CrossMixing( Loop ).ZonePtr ) ) {
 					RepVarSet( CrossMixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
@@ -2241,63 +2271,35 @@ namespace HeatBalanceAirManager {
 					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 				}
 			}
+			if ( CrossMixing( Loop ).FromZone > 0 ) {
+				if ( RepVarSet( CrossMixing( Loop ).FromZone ) ) {
+					RepVarSet( CrossMixing( Loop ).FromZone ) = false;
+					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+				}
+			}
+
+
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "ZoneCrossMixing", CrossMixing( Loop ).Name, "Air Exchange Flow Rate", "[m3/s]", CrossMixing( Loop ).EMSSimpleMixingOn, CrossMixing( Loop ).EMSimpleMixingFlowRate );
 			}
 
 		}
 
-		// Detect invalid Crossmixings
-		if ( TotCrossMixing > 1 && ! ErrorsFound ) {
-			SVals1.allocate( 24, NumOfTimeStepInHour );
-			SVals1 = 0.0;
-			SVals2.allocate( 24, NumOfTimeStepInHour );
-			SVals2 = 0.0;
-			OverLap.dimension( TotCrossMixing, false );
-			for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
-				for ( Loop1 = 1; Loop1 <= TotCrossMixing; ++Loop1 ) {
-
-					if ( Loop == Loop1 ) continue;
-
-					if ( CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).FromZone && CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).ZonePtr ) continue; // Reciprocal cross mixing is OK
-
-					if ( ! ( CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).ZonePtr || CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).FromZone || CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).FromZone || CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).ZonePtr ) ) continue; // Any other overlap is not OK | if the schedules overlap
-
-					for ( JDay = 1; JDay <= 366; ++JDay ) {
-						GetScheduleValuesForDay( CrossMixing( Loop ).SchedPtr, SVals1, JDay );
-						if ( ! any_gt( SVals1, 0.0 ) ) continue;
-						GetScheduleValuesForDay( CrossMixing( Loop1 ).SchedPtr, SVals2, JDay );
-						if ( ! any_gt( SVals2, 0.0 ) ) continue;
-						if ( OverLap( Loop ) && OverLap( Loop1 ) ) continue; // Already problem for these Cross Mixings
-						HrLoop: for ( Hr = 1; Hr <= 24; ++Hr ) {
-							TSLoop: for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-								if ( SVals1( Hr, TS ) == 0.0 || SVals2( Hr, TS ) == 0.0 ) continue;
-								ShowSevereError( RoutineName + "Overlapping Cross Mixings found" );
-								ShowContinueError( "Cross Mixing with receiving zone " + Zone( CrossMixing( Loop ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop ).FromZone ).Name );
-								ShowContinueError( "overlaps with Cross Mixing with receiving zone " + Zone( CrossMixing( Loop1 ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop1 ).FromZone ).Name );
-								OverLap( Loop ) = true;
-								OverLap( Loop1 ) = true;
-								ErrorsFound = true;
-								goto HrLoop_exit;
-								TSLoop_loop: ;
-							}
-							TSLoop_exit: ;
-							HrLoop_loop: ;
-						}
-						HrLoop_exit: ;
-					}
-				}
-			}
-			SVals1.deallocate();
-			SVals2.deallocate();
-			OverLap.deallocate();
-		}
-
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
 		TotRefDoorMixing = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotRefDoorMixing > 0 ) {
 			RefDoorMixing.allocate( NumOfZones );
-			RefDoorMixing.NumRefDoorConnections() = 0;
+			for ( auto & e : RefDoorMixing ) e.NumRefDoorConnections = 0;
 
 			for ( Loop = 1; Loop <= TotRefDoorMixing; ++Loop ) {
 
@@ -2305,7 +2307,7 @@ namespace HeatBalanceAirManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RefDoorMixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), RefDoorMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2313,20 +2315,20 @@ namespace HeatBalanceAirManager {
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;
-				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone.Name(), NumOfZones );
+				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone1Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				++AlphaNum; //3
-				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone.Name(), NumOfZones );
+				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone2Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 				if ( Zone1Num == Zone2Num ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " The same zone name has been entered for both sides of a refrigerated door " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", The same zone name has been entered for both sides of a refrigerated door " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				} else if ( Zone1Num < Zone2Num ) { //zone 1 will come first in soln loop, id zone 2 as mate zone
 					ZoneNumA = Zone1Num;
@@ -2392,7 +2394,7 @@ namespace HeatBalanceAirManager {
 					if ( RefDoorMixing( ZoneNumA ).NumRefDoorConnections > 1 ) {
 						for ( ConnectTest = 1; ConnectTest <= ( ConnectionNumber - 1 ); ++ConnectTest ) {
 							if ( RefDoorMixing( ZoneNumA ).MateZonePtr( ConnectTest ) != RefDoorMixing( ZoneNumA ).MateZonePtr( ConnectionNumber ) ) continue;
-							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " and " + RefDoorMixing( ZoneNumA ).DoorMixingObjectName( ConnectTest ) );
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", and " + RefDoorMixing( ZoneNumA ).DoorMixingObjectName( ConnectTest ) );
 							ShowContinueError( " Share same pair of zones: \"" + Zone( ZoneNumA ).Name + "\" and \"" + Zone( ZoneNumB ).Name + "\". Only one RefrigerationDoorMixing object is allowed for any unique pair of zones." );
 							ErrorsFound = true;
 						} //ConnectTest
@@ -2409,7 +2411,7 @@ namespace HeatBalanceAirManager {
 				} else { //(lAlphaFieldBlanks(AlphaNum)) THEN
 					RefDoorMixing( ZoneNumA ).OpenSchedPtr( ConnectionNumber ) = GetScheduleIndex( cAlphaArgs( AlphaNum ) );
 					if ( RefDoorMixing( ZoneNumA ).OpenSchedPtr( ConnectionNumber ) == 0 ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," " invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 						ErrorsFound = true;
 					} else { //OpenSchedPtr(ConnectionNumber) ne 0)
 						if ( ! CheckScheduleValueMinMax( RefDoorMixing( ZoneNumA ).OpenSchedPtr( ConnectionNumber ), ">=", 0.0, "<=", 1.0 ) ) {
@@ -2469,8 +2471,8 @@ namespace HeatBalanceAirManager {
 					if ( RepVarSet( ZoneNumA ) ) {
 						RepVarSet( ZoneNumA ) = false;
 						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumA ).MixVolume, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumA ).MixMass, "System", "Sum", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumA ).MixMdot, "System", "Average", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumA ).MixHeatLoss, "System", "Sum", Zone( ZoneNumA ).Name );
@@ -2489,8 +2491,8 @@ namespace HeatBalanceAirManager {
 					if ( RepVarSet( ZoneNumB ) ) {
 						RepVarSet( ZoneNumB ) = false;
 						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumB ).MixVolume, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumB ).MixMass, "System", "Sum", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumB ).MixMdot, "System", "Average", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumB ).MixHeatLoss, "System", "Sum", Zone( ZoneNumB ).Name );
@@ -2519,7 +2521,7 @@ namespace HeatBalanceAirManager {
 		TotInfilVentFlow.dimension( NumOfZones, 0.0 );
 
 		for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Infiltration" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2}," "ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {}," "Equation B - Temperature Term Coefficient {1/C}," "Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneInfiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
 
 			ZoneNum = Infiltration( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
@@ -2558,14 +2560,15 @@ namespace HeatBalanceAirManager {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
-		for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
-			ZoneNum = Infiltration(Loop).ZonePtr;
-			MassConservation(ZoneNum).InfiltrationPtr = Loop;
-			SetupOutputVariable("Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]", MassConservation(Infiltration(Loop).ZonePtr).InfiltrationMassFlowRate, "System", "Average", Zone(Infiltration(Loop).ZonePtr).Name);
+		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+			for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
+				ZoneNum = Infiltration(Loop).ZonePtr;
+				MassConservation(ZoneNum).InfiltrationPtr = Loop;
+			}
 		}
 
 		for ( Loop = 1; Loop <= TotVentilation; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneVentilation" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person}," "ACH - Air Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa}," "Fan Efficiency {},Equation A - Constant Term Coefficient {}," "Equation B - Temperature Term Coefficient {1/C}," "Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}," "Minimum Indoor Temperature{C}/Schedule,Maximum Indoor Temperature{C}/Schedule,Delta Temperature{C}/Schedule," "Minimum Outdoor Temperature{C}/Schedule,Maximum Outdoor Temperature{C}/Schedule,Maximum WindSpeed{m/s}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneVentilation" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa},Fan Efficiency {},Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2},Minimum Indoor Temperature{C}/Schedule,Maximum Indoor Temperature{C}/Schedule,Delta Temperature{C}/Schedule,Minimum Outdoor Temperature{C}/Schedule,Maximum Outdoor Temperature{C}/Schedule,Maximum WindSpeed{m/s}";
 
 			ZoneNum = Ventilation( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
@@ -2652,7 +2655,7 @@ namespace HeatBalanceAirManager {
 
 		TotMixingFlow.dimension( NumOfZones, 0.0 );
 		for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Mixing" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person}," "ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Mixing" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
 			ZoneNum = Mixing( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
@@ -2687,7 +2690,7 @@ namespace HeatBalanceAirManager {
 		}
 
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "CrossMixing" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person}," "ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "CrossMixing" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
 			ZoneNum = CrossMixing( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
@@ -2722,7 +2725,7 @@ namespace HeatBalanceAirManager {
 		}
 
 		if ( TotRefDoorMixing > 0 ) {
-			gio::write( OutputFileInits, Format_724 ) << "RefrigerationDoorMixing " << "Name, Zone 1 Name," "Zone 2 Name,Door Opening Schedule Name," "Door Height {m},Door Area {m2},Door Protection Type";
+			gio::write( OutputFileInits, Format_724 ) << "RefrigerationDoorMixing " << "Name, Zone 1 Name,Zone 2 Name,Door Opening Schedule Name,Door Height {m},Door Area {m2},Door Protection Type";
 			for ( ZoneNumA = 1; ZoneNumA <= ( NumOfZones - 1 ); ++ZoneNumA ) {
 				if ( ! RefDoorMixing( ZoneNumA ).RefDoorMixFlag ) continue;
 				for ( ConnectionNumber = 1; ConnectionNumber <= RefDoorMixing( ZoneNumA ).NumRefDoorConnections; ++ConnectionNumber ) {
@@ -2739,11 +2742,30 @@ namespace HeatBalanceAirManager {
 		}
 
 		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			// Check for infiltration in zone which are only a mixing source zone
 			for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-				if (MassConservation(ZoneNum).IsOnlySourceZone) {
+				if ( ( ZoneAirMassFlow.BalanceMixing && MassConservation( ZoneNum ).IsOnlySourceZone ) && ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) ) {
 					if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
 						ShowSevereError(RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
 						ShowContinueError("Zone air mass flow balance requires infiltration object for source zones of mixing objects");
+					}
+				}
+			}
+			// Set up zone air mass balance output variables
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				if ( ZoneAirMassFlow.BalanceMixing && ( ( MassConservation( ZoneNum ).NumSourceZonesMixingObject + MassConservation( ZoneNum ).NumReceivingZonesMixingObject ) > 0 ) ) {
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				}
+				if ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) {
+					if ( ZoneAirMassFlow.InfiltrationZoneType == AllZones || (MassConservation( ZoneNum ).NumSourceZonesMixingObject > 0 ) ) {
+						if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( ZoneNum ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
+						}
 					}
 				}
 			}
@@ -2800,6 +2822,7 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using DataRoomAirModel::RoomAirModel_UCSDUFI;
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
+		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2841,7 +2864,7 @@ namespace HeatBalanceAirManager {
 
 		for ( AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum ) {
 			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum != 0 ) {
 				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -2910,6 +2933,14 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UserDefined;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UserDefinedUsed = true;
+				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
+					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
+					AirModel( ZoneNum ).SimAirModel = true;
+					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					if ( IsNotOK ) {
+						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
+						ErrorsFound = true;
+					}
 					// Need to make sure that Room Air controls are used for this one.
 				} else {
 					ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
@@ -2965,6 +2996,8 @@ namespace HeatBalanceAirManager {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UnderFloorAirDistributionExterior";
 			} else if ( SELECT_CASE_var == RoomAirModel_UserDefined ) {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UserDefined";
+			} else if ( SELECT_CASE_var == RoomAirModel_AirflowNetwork ) {
+				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "AirflowNetwork";
 			}}
 		}
 
@@ -2988,8 +3021,6 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   February 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for  initializations within the
@@ -2998,42 +3029,6 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool FirstCall( true );
-
-		// FLOW:
-
-		// Do the Begin Simulation initializations
-		if ( FirstCall ) {
-			AllocateAirHeatBalArrays(); // Allocate the Module Arrays
-			FirstCall = false;
-		}
-
-		// Do the Begin Environment initializations
-		if ( BeginEnvrnFlag ) {
-			MVFC = 0.0;
-			MTC = 0.0;
-		}
-
 		// Do the Begin Day initializations
 		if ( BeginDayFlag ) {
 
@@ -3041,50 +3036,6 @@ namespace HeatBalanceAirManager {
 
 		// Do the following initializations (every time step):
 		InitSimpleMixingConvectiveHeatGains();
-
-	}
-
-	void
-	AllocateAirHeatBalArrays()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Liesen
-		//       DATE WRITTEN   February 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine allocates the arrays at execution time
-
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger variable allocation.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// FLOW:
-
-		// Use the total number of zones to allocate variables to avoid a zone number limit
-		MVFC.dimension( NumOfZones, 0.0 );
-		MTC.dimension( NumOfZones, 0.0 );
 
 	}
 
@@ -3136,10 +3087,6 @@ namespace HeatBalanceAirManager {
 		Real64 ZoneMixingFlowSum;  // sum of zone mixing flows for a zone
 		int NumOfMixingObjects;    // number of mixing objects for a receiving zone
 
-		//  Zero out time step variables
-		MTC = 0.0;
-		MVFC = 0.0;
-
 		// Select type of airflow calculation
 
 		{ auto const SELECT_CASE_var( AirFlowFlag );
@@ -3175,8 +3122,6 @@ namespace HeatBalanceAirManager {
 				NZ = CrossMixing( Loop ).ZonePtr;
 				CrossMixing( Loop ).DesiredAirFlowRate = CrossMixing( Loop ).DesignLevel * GetCurrentScheduleValue( CrossMixing( Loop ).SchedPtr );
 				if ( CrossMixing( Loop ).EMSSimpleMixingOn ) CrossMixing( Loop ).DesiredAirFlowRate = CrossMixing( Loop ).EMSimpleMixingFlowRate;
-				MTC( Loop ) = CrossMixing( Loop ).DeltaTemperature;
-				MVFC( Loop ) = CrossMixing( Loop ).DesiredAirFlowRate;
 			}
 
 			//Note - do each Pair a Single time, so must do increment reports for both zones
@@ -3330,31 +3275,6 @@ namespace HeatBalanceAirManager {
 		}
 
 	}
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatBalanceAirManager
 

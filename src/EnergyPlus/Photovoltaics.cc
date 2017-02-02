@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -83,7 +129,7 @@ namespace Photovoltaics {
 	// DERIVED TYPE DEFINITIONS:
 	//   see DataPhotovoltaics.cc
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
 
@@ -101,11 +147,11 @@ namespace Photovoltaics {
 
 	void
 	SimPVGenerator(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
-		Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+		Real64 const EP_UNUSED( PVLoad ) // electrical load on the PV (not really used... PV models assume "full on" !unused1208
 	)
 	{
 
@@ -129,7 +175,6 @@ namespace Photovoltaics {
 		using InputProcessor::FindItemInList;
 		//unused0909  USE DataEnvironment, ONLY : EnvironmentName, DayOfYear
 		//unused0909  USE DataGlobals, ONLY: BeginEnvrnFlag, EndEnvrnFlag
-		using DataGlobalConstants::iGeneratorPV;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -155,7 +200,7 @@ namespace Photovoltaics {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			PVnum = FindItemInList( GeneratorName, PVarray.Name(), NumPVs );
+			PVnum = FindItemInList( GeneratorName, PVarray );
 			if ( PVnum == 0 ) {
 				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );
 			}
@@ -187,7 +232,7 @@ namespace Photovoltaics {
 			CalcTRNSYSPV( PVnum, RunFlag );
 
 		} else if ( SELECT_CASE_var == iSandiaPVModel ) {
-			// 'PhotovoltaicPerformance:Sandia' (aka. King model, Sandia Nat. Labs.  )
+			// 'PhotovoltaicPerformance:Sandia' (aka. King model, Sandia Nat. Labs.)
 
 			CalcSandiaPV( PVnum, RunFlag );
 
@@ -203,7 +248,7 @@ namespace Photovoltaics {
 
 	void
 	GetPVGeneratorResults(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -288,15 +333,9 @@ namespace Photovoltaics {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
-		using DataGlobals::DegToRadians;
 		using DataGlobals::KelvinConv;
 		//unused0909  USE DataEnvironment, ONLY: Longitude, TimeZoneMeridian
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::ExternalEnvironment;
-		using DataSurfaces::SurfaceClass_Shading;
-		using DataSurfaces::SurfaceClass_Detached_F;
-		using DataSurfaces::SurfaceClass_Detached_B;
 		using namespace DataHeatBalance;
 		using ScheduleManager::GetScheduleIndex;
 		using TranspiredCollector::GetTranspiredCollectorIndex;
@@ -329,9 +368,9 @@ namespace Photovoltaics {
 		int dupPtr;
 
 		// Object Data
-		FArray1D< SimplePVParamsStruct > tmpSimpleModuleParams; // temporary, for processing input data
-		FArray1D< TRNSYSPVModuleParamsStruct > tmpTNRSYSModuleParams; // temporary, for processing input data
-		FArray1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
+		Array1D< SimplePVParamsStruct > tmpSimpleModuleParams; // temporary, for processing input data
+		Array1D< TRNSYSPVModuleParamsStruct > tmpTNRSYSModuleParams; // temporary, for processing input data
+		Array1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
 
 		// count how many photovoltaic arrays of different types are in the .idf
 		NumPVs = GetNumObjectsFound( cPVGeneratorObjectName );
@@ -352,7 +391,7 @@ namespace Photovoltaics {
 			GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVarray.Name(), PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PVarray, PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -360,7 +399,7 @@ namespace Photovoltaics {
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
 			PVarray( PVnum ).SurfaceName = cAlphaArgs( 2 );
-			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface );
 			// required-surface
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -452,7 +491,7 @@ namespace Photovoltaics {
 			{ auto const SELECT_CASE_var( PVarray( PVnum ).CellIntegrationMode );
 
 			if ( ( SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration ) || ( SELECT_CASE_var == iTranspiredCollectorCellIntegration ) || ( SELECT_CASE_var == iExteriorVentedCavityCellIntegration ) ) {
-				dupPtr = FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ).SurfaceName(), ( NumPVs - PVnum ) );
+				dupPtr = FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ), &PVArrayStruct::SurfaceName );
 				if ( dupPtr != 0 ) dupPtr += PVnum; // to correct for shortened array in find item
 				if ( dupPtr != 0 ) {
 					if ( PVarray( dupPtr ).CellIntegrationMode == iSurfaceOutsideFaceCellIntegration ) {
@@ -463,12 +502,12 @@ namespace Photovoltaics {
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iTranspiredCollectorCellIntegration ) {
 						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC " "surface = " + PVarray( PVnum ).SurfaceName );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iExteriorVentedCavityCellIntegration ) {
 						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior " "vented surface = " + PVarray( PVnum ).SurfaceName );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior vented surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					}
 				}
@@ -482,7 +521,7 @@ namespace Photovoltaics {
 				GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -527,7 +566,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -582,7 +621,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams.name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams, &SNLModuleParamsStuct::name, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -639,7 +678,7 @@ namespace Photovoltaics {
 
 			if ( SELECT_CASE_var == iSimplePVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams.Name(), NumSimplePVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SimplePVModule = tmpSimpleModuleParams( ThisParamObj ); //entire structure assignment
 
@@ -653,7 +692,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iTRNSYSPVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams.Name(), Num1DiodePVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).TRNSYSPVModule = tmpTNRSYSModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -664,7 +703,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iSandiaPVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams.name(), NumSNLPVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SNLPVModule = tmpSNLModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -676,7 +715,7 @@ namespace Photovoltaics {
 
 			//set up report variables CurrentModuleObject='Photovoltaics'
 			SetupOutputVariable( "Generator Produced DC Electric Power [W]", PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
-			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
 			SetupOutputVariable( "Generator PV Array Efficiency []", PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
 
 			// CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
@@ -707,7 +746,7 @@ namespace Photovoltaics {
 			}
 
 			if ( PVarray( PVnum ).CellIntegrationMode == iPVTSolarCollectorCellIntegration ) {
-				// Call GetPVTmodelIndex(  PVarray(PVNum)%SurfacePtr , PVarray(PVNum)%PVTPtr )
+				// Call GetPVTmodelIndex( PVarray(PVNum)%SurfacePtr , PVarray(PVNum)%PVTPtr )
 			}
 
 		}
@@ -723,7 +762,7 @@ namespace Photovoltaics {
 	void
 	CalcSimplePV(
 		int const thisPV,
-		bool const RunFlag // unused1208
+		bool const EP_UNUSED( RunFlag ) // unused1208
 	)
 	{
 
@@ -1097,7 +1136,6 @@ namespace Photovoltaics {
 		// Using/Aliasing
 		using DataHeatBalance::QRadSWOutIncident;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
@@ -1120,7 +1158,7 @@ namespace Photovoltaics {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
 		// perform the one time initializations
@@ -1203,7 +1241,6 @@ namespace Photovoltaics {
 		Real64 const EPS( 0.001 );
 		Real64 const ERR( 0.001 );
 		Real64 const MinInsolation( 30.0 );
-		int const CCMAX( 10 );
 		int const KMAX( 100 );
 		Real64 const EtaIni( 0.10 ); // initial value of eta
 
@@ -1485,7 +1522,6 @@ namespace Photovoltaics {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const CCMAX( 10 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2097,8 +2133,8 @@ namespace Photovoltaics {
 			Real64 const AM( 1.0 / ( std::cos( SolZen * DegToRadians ) + 0.5057 * std::pow( 96.08 - SolZen, -1.634 ) ) );
 			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		} else {
-			AbsoluteAirMass = 999.0;
-			// should maybe add a show warning msg.
+			Real64 const AM( 36.32 ); // evaluated above at SolZen = 89.9 issue #5528
+			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		}
 
 		return AbsoluteAirMass;
@@ -2653,7 +2689,6 @@ namespace Photovoltaics {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
 
@@ -2689,7 +2724,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;
@@ -2753,29 +2788,6 @@ namespace Photovoltaics {
 	//     referred to as the Generator:PV:Equivalent One-Diode model developed by Thermal Energy
 	//     System Specialists, 2916 Marketplace Drive, Suite 104, Madison, WI 53719;
 	//     Tel: (608) 274-2577
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Photovoltaics
 

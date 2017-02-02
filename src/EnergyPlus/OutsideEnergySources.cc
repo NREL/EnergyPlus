@@ -1,8 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
+#include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -13,12 +60,14 @@
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
+#include <DataSizing.hh>
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <ReportSizingManager.hh>
 #include <PlantUtilities.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -36,44 +85,57 @@ namespace OutsideEnergySources {
 	// PURPOSE OF THIS MODULE:
 	// Module containing the routines dealing with the OutsideEnergySources
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::SecInHour;
+	using DataGlobals::MaxNameLength;
+	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataEnvironment;
 	using namespace DataHVACGlobals;
 	using namespace DataLoopNode;
 	using General::TrimSigDigits;
+	using General::RoundSigDigits;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_PurchHotWater;
 	using DataPlant::TypeOf_PurchChilledWater;
 	using DataPlant::ScanPlantLoopsForObject;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const EnergyType_DistrictHeating( 1 );
 	int const EnergyType_DistrictCooling( 2 );
-
-	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDistrictUnits( 0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool SimOutsideEnergyGetInputFlag( true );
+	}
 	// Object Data
-	FArray1D< OutsideEnergySourceSpecs > EnergySource;
-	FArray1D< ReportVars > EnergySourceReport;
+	Array1D< OutsideEnergySourceSpecs > EnergySource;
+	Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumDistrictUnits = 0;
+		SimOutsideEnergyGetInputFlag = true;
+		EnergySource.deallocate();
+		EnergySourceReport.deallocate();
+	}
+
 
 	void
 	SimOutsideEnergy(
-		std::string const & EnergyType,
+		std::string const & EP_UNUSED( EnergyType ),
 		std::string const & EquipName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex,
 		bool const RunFlag,
 		bool const InitLoopEquip,
@@ -81,7 +143,7 @@ namespace OutsideEnergySources {
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -116,7 +178,9 @@ namespace OutsideEnergySources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Get input once and once only
+		/////////// hoisted into namespace SimOutsideEnergyGetInputFlag ////////////
+		// static bool GetInputFlag( true ); // Get input once and once only
+		/////////////////////////////////////////////////
 		int EqNum;
 		Real64 InletTemp;
 		Real64 OutletTemp;
@@ -124,14 +188,14 @@ namespace OutsideEnergySources {
 		//FLOW
 
 		//GET INPUT
-		if ( GetInputFlag ) {
+		if ( SimOutsideEnergyGetInputFlag ) {
 			GetOutsideEnergySourcesInput();
-			GetInputFlag = false;
+			SimOutsideEnergyGetInputFlag = false;
 		}
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			EqNum = FindItemInList( EquipName, EnergySource.Name(), NumDistrictUnits );
+			EqNum = FindItemInList( EquipName, EnergySource );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
 			}
@@ -152,6 +216,8 @@ namespace OutsideEnergySources {
 		//CALCULATE
 		if ( InitLoopEquip ) {
 			InitSimVars( EqNum, MassFlowRate, InletTemp, OutletTemp, MyLoad );
+			SizeDistrictEnergy( EqNum );
+
 			MinCap = 0.0;
 			MaxCap = EnergySource( EqNum ).NomCap;
 			OptCap = EnergySource( EqNum ).NomCap;
@@ -196,6 +262,7 @@ namespace OutsideEnergySources {
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using DataGlobals::ScheduleAlwaysOn;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -244,7 +311,7 @@ namespace OutsideEnergySources {
 			if ( EnergySourceNum > 1 ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -258,6 +325,9 @@ namespace OutsideEnergySources {
 			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Hot Water Nodes" );
 			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
+			if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
+				EnergySource( EnergySourceNum ).NomCapWasAutoSized = true;
+			}
 			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
 			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
 			EnergySource( EnergySourceNum ).EnergyType = EnergyType_DistrictHeating;
@@ -304,7 +374,7 @@ namespace OutsideEnergySources {
 			if ( EnergySourceNum > 1 ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -318,6 +388,9 @@ namespace OutsideEnergySources {
 			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
+			if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
+				EnergySource( EnergySourceNum ).NomCapWasAutoSized = true;
+			}
 			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
 			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
 			EnergySource( EnergySourceNum ).EnergyType = EnergyType_DistrictCooling;
@@ -472,6 +545,100 @@ namespace OutsideEnergySources {
 
 	// Beginning of OutsideEnergySources Module Utility Subroutines
 	// *****************************************************************************
+
+	void
+	SizeDistrictEnergy(
+		int const EnergySourceNum
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Daeho Kang
+		//       DATE WRITTEN   April 2014
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		//  This subroutine is for sizing capacities of district cooling and heating objects.
+
+		// USE STATEMENTS:
+		using DataSizing::AutoSize;
+		using DataSizing::PlantSizData;
+		using DataSizing::AutoVsHardSizingThreshold;
+		using ReportSizingManager::ReportSizingOutput;
+		using FluidProperties::GetDensityGlycol;
+		using FluidProperties::GetSpecificHeatGlycol;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int PltSizNum( 0 );	// Plant sizing index for hot water loop
+		bool ErrorsFound( false );	// If errors detected in input
+		Real64 NomCapDes( 0.0 );	// Autosized nominal capacity for reporting
+		Real64 NomCapUser( 0.0 );	// Hardsized nominal capacity for reporting
+		Real64 rho( 0.0 );	// Density (kg/m3)
+		Real64 Cp( 0.0 );	// Specific Heat (J/kg-K)
+
+		// Type name string variable to collapse the sizing for cooling and heating into one block
+		std::string typeName;
+		if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {
+			typeName = "Cooling";
+		} else { // Heating
+			typeName = "Heating";
+		}
+
+		// Do the sizing here
+
+		PltSizNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
+		if ( PltSizNum > 0 ) {
+			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
+			NomCapDes = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized ) {
+					EnergySource( EnergySourceNum ).NomCap = NomCapDes;
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
+							"Design Size Nominal Capacity [W]", NomCapDes );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
+							"Initial Design Size Nominal Capacity [W]", NomCapDes );
+					}
+				} else {  // Hard-size with sizing data
+					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
+						NomCapUser = EnergySource( EnergySourceNum ).NomCap;
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
+								"Design Size Nominal Capacity [W]", NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser );
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
+									ShowContinueError ( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
+				ShowSevereError( "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object" );
+				ShowContinueError( "Occurs in District" + typeName + " object=" + EnergySource( EnergySourceNum ).Name );
+				ErrorsFound = true;
+			}
+			if ( ! EnergySource( EnergySourceNum ).NomCapWasAutoSized && EnergySource( EnergySourceNum ).NomCap > 0.0 && PlantFinalSizesOkayToReport ) {
+				ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
+				 "User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
+			}
+		}
+		if ( ErrorsFound ) {
+			ShowFatalError( "Preceding sizing errors cause program termination" );
+		}
+	}
 
 	void
 	SimDistrictEnergy(
@@ -636,29 +803,6 @@ namespace OutsideEnergySources {
 
 	// End of Record Keeping subroutines for the OutsideEnergySources Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutsideEnergySources
 

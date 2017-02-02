@@ -5,17 +5,18 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArrayP.fwd.hh>
-#include <ObjexxFCL/proxy_const_assert.hh>
+#include <ObjexxFCL/noexcept.hh>
+#include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -23,6 +24,10 @@
 #include <cmath>
 #include <cstddef>
 #include <initializer_list>
+#include <iomanip>
+#include <istream>
+#include <iterator>
+#include <ostream>
 #include <type_traits>
 #include <utility>
 
@@ -31,7 +36,7 @@ namespace ObjexxFCL {
 // CArrayP: Memory-Managed C Array Wrapper Supporting Proxies
 //
 //  Proxy CArrayPs are invalidated if the underlying (owning) array data is deleted
-//  Proxy CPArras can be created at construction with the Proxy named constructors
+//  Proxy CArrayPs can be created at construction with the Proxy named constructors
 //  CArrayPs can become proxies with the attach() member function
 //  CArrayPs can stop being proxies with the detach() member function
 template< typename T >
@@ -44,6 +49,10 @@ private: // Friend
 
 public: // Types
 
+	typedef  TypeTraits< T >  Traits;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+
 	// STL Style
 	typedef  T  value_type;
 	typedef  T &  reference;
@@ -52,6 +61,8 @@ public: // Types
 	typedef  T const *  const_pointer;
 	typedef  T *  iterator;
 	typedef  T const *  const_iterator;
+	typedef  std::reverse_iterator< T * >  reverse_iterator;
+	typedef  std::reverse_iterator< T const * >  const_reverse_iterator;
 	typedef  std::size_t  size_type;
 	typedef  std::ptrdiff_t  difference_type;
 
@@ -63,6 +74,8 @@ public: // Types
 	typedef  T const *  ConstPointer;
 	typedef  T *  Iterator;
 	typedef  T const *  ConstIterator;
+	typedef  std::reverse_iterator< T * >  ReverseIterator;
+	typedef  std::reverse_iterator< T const * >  ConstReverseIterator;
 	typedef  std::size_t  Size;
 	typedef  std::ptrdiff_t  Difference;
 
@@ -72,25 +85,17 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	CArrayP() :
-	 size_( 0 ),
+	 size_( 0u ),
 	 data_( nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
 	// Copy Constructor
-	inline
 	CArrayP( CArrayP const & a ) :
 	 size_( a.size_ ),
 	 data_( a.owner_ ? ( size_ > 0u ? new T[ size_ ] : nullptr ) : a.data_ ),
 	 owner_( a.owner_ )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( ! a.owner_ )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		if ( owner_ ) {
 			for ( size_type i = 0; i < size_; ++i ) {
@@ -99,33 +104,23 @@ public: // Creation
 		}
 	}
 
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	// Non-Const Copy Constructor
-	inline
-	CArrayP( CArrayP & a ) :
+	// Move Constructor
+	CArrayP( CArrayP && a ) NOEXCEPT :
 	 size_( a.size_ ),
-	 data_( a.owner_ ? ( size_ > 0u ? new T[ size_ ] : nullptr ) : a.data_ ),
-	 owner_( a.owner_ ),
-	 const_proxy_( a.const_proxy_ )
+	 data_( a.data_ ),
+	 owner_( a.owner_ )
 	{
-		if ( owner_ ) {
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = a.data_[ i ];
-			}
-		}
+		a.size_ = 0u;
+		a.data_ = nullptr;
+		a.owner_ = true;
 	}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	CArrayP( CArrayP< U > const & a ) :
 	 size_( a.size_ ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = T( a.data_[ i ] );
@@ -133,7 +128,6 @@ public: // Creation
 	}
 
 	// Pointer + Size Constructor
-	inline
 	CArrayP(
 	 T const * const p,
 	 size_type const size
@@ -141,9 +135,6 @@ public: // Creation
 	 size_( size ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = p[ i ];
@@ -152,7 +143,6 @@ public: // Creation
 
 	// Pointer + Size Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	CArrayP(
 	 U const * const p,
 	 size_type const size
@@ -160,9 +150,6 @@ public: // Creation
 	 size_( size ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = T( p[ i ] );
@@ -171,7 +158,6 @@ public: // Creation
 
 	// Iterator Range Constructor Template
 	template< typename InputIterator >
-	inline
 	CArrayP(
 	 InputIterator const beg,
 	 InputIterator const end
@@ -179,9 +165,6 @@ public: // Creation
 	 size_( end - beg ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		if ( size_ > 0u ) {
 			InputIterator k( beg );
@@ -191,31 +174,22 @@ public: // Creation
 		}
 	}
 
-	// Size Constructor
-	//  Built-in value types are not initialized
-	inline
+	// Size Constructor: Built-in types are default, not zero, initialized for performance
 	explicit
 	CArrayP( size_type const size ) :
 	 size_( size ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
 	// Size + Uniform Value Constructor
-	inline
 	CArrayP(
 	 size_type const size,
-	 T const & t
+	 Tc t
 	) :
 	 size_( size ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = t;
@@ -224,21 +198,16 @@ public: // Creation
 
 	// Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	CArrayP( std::initializer_list< U > const l ) :
 	 size_( l.size() ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	 , const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		std::copy( l.begin(), l.end(), data_ );
 	}
 
 	// Proxy Copy Named Constructor
 	static
-	inline
 	CArrayP
 	Proxy( CArrayP const & a )
 	{
@@ -246,31 +215,11 @@ public: // Creation
 		p.size_ = a.size_;
 		p.data_ = a.data_;
 		p.owner_ = false;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		p.const_proxy_ = true;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return p;
 	}
-
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	// Non-Const Proxy Copy Named Constructor
-	static
-	inline
-	CArrayP
-	Proxy( CArrayP & a )
-	{
-		CArrayP p;
-		p.size_ = a.size_;
-		p.data_ = a.data_;
-		p.owner_ = false;
-		p.const_proxy_ = a.const_proxy_;
-		return p;
-	}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Proxy Copy + Size Named Constructor
 	static
-	inline
 	CArrayP
 	Proxy(
 	 CArrayP const & a,
@@ -282,34 +231,10 @@ public: // Creation
 		p.size_ = size;
 		p.data_ = a.data_;
 		p.owner_ = false;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		p.const_proxy_ = true;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return p;
 	}
-
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	// Non-Const Proxy Copy + Size Named Constructor
-	static
-	inline
-	CArrayP
-	Proxy(
-	 CArrayP & a,
-	 size_type const size
-	)
-	{
-		assert( size <= a.size_ );
-		CArrayP p;
-		p.size_ = size;
-		p.data_ = a.data_;
-		p.owner_ = false;
-		p.const_proxy_ = a.const_proxy_;
-		return p;
-	}
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
-	inline
 	~CArrayP()
 	{
 		if ( owner_ ) delete[] data_;
@@ -318,20 +243,29 @@ public: // Creation
 public: // Conversion
 
 	// Active?
-	inline
 	operator bool() const
 	{
 		return ( data_ != nullptr );
 	}
 
+	// Data
+	operator T const *() const
+	{
+		return data_;
+	}
+
+	// Data
+	operator T *()
+	{
+		return data_;
+	}
+
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	CArrayP &
 	operator =( CArrayP const & a )
 	{
-		proxy_const_assert( not_const_proxy() );
 		if ( this != &a ) {
 			if ( size_ != a.size_ ) {
 				assert( owner_ );
@@ -345,13 +279,27 @@ public: // Assignment
 		return *this;
 	}
 
+	// Move Assignment
+	CArrayP &
+	operator =( CArrayP && a ) NOEXCEPT
+	{
+		if ( owner_ && a.owner_ ) {
+			assert( this != &a );
+			size_ = a.size_;
+			delete[] data_; data_ = a.data_;
+			a.size_ = 0u;
+			a.data_ = nullptr;
+			return *this;
+		} else {
+			return operator =( a );
+		}
+	}
+
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator =( CArrayP< U > const & a )
 	{
-		proxy_const_assert( not_const_proxy() );
 		if ( size_ != a.size_ ) {
 			assert( owner_ );
 			size_ = a.size_;
@@ -364,11 +312,9 @@ public: // Assignment
 	}
 
 	// Uniform Value Assignment
-	inline
 	CArrayP &
-	operator =( T const & t )
+	operator =( Tc t )
 	{
-		proxy_const_assert( not_const_proxy() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = t;
 		}
@@ -377,7 +323,6 @@ public: // Assignment
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator =( std::initializer_list< U > const l )
 	{
@@ -387,14 +332,12 @@ public: // Assignment
 	}
 
 	// Pointer + Size Assignment
-	inline
 	CArrayP &
 	assign(
 	 T const * const p,
 	 size_type const size
 	)
 	{
-		proxy_const_assert( not_const_proxy() );
 		if ( size_ != size ) {
 			assert( owner_ );
 			size_ = size;
@@ -408,14 +351,12 @@ public: // Assignment
 
 	// Pointer + Size Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	assign(
 	 U const * const p,
 	 size_type const size
 	)
 	{
-		proxy_const_assert( not_const_proxy() );
 		if ( size_ != size ) {
 			assert( owner_ );
 			size_ = size;
@@ -429,14 +370,12 @@ public: // Assignment
 
 	// Iterator Range Assignment Template
 	template< typename InputIterator >
-	inline
 	CArrayP &
 	assign(
 	 InputIterator const beg,
 	 InputIterator const end
 	)
 	{
-		proxy_const_assert( not_const_proxy() );
 		size_type const size( end - beg );
 		if ( size_ != size ) {
 			assert( owner_ );
@@ -453,30 +392,26 @@ public: // Assignment
 	}
 
 	// Size + Value Assignment
-	inline
 	CArrayP &
 	assign(
 	 size_type const size,
-	 T const & value
+	 Tc t
 	)
 	{
-		proxy_const_assert( not_const_proxy() );
 		if ( size_ != size ) { // Set to new array with uniform values
 			assert( owner_ );
-			CArrayP( size, value ).swap( *this );
+			CArrayP( size, t ).swap( *this );
 		} else { // Set to uniform value
-			(*this) = value;
+			(*this) = t;
 		}
 		return *this;
 	}
 
 	// += CArrayP
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator +=( CArrayP< U > const & a )
 	{
-		proxy_const_assert( not_const_proxy() );
 		assert( size_ == a.size_ );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += T( a.data_[ i ] );
@@ -486,11 +421,9 @@ public: // Assignment
 
 	// -= CArrayP
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator -=( CArrayP< U > const & a )
 	{
-		proxy_const_assert( not_const_proxy() );
 		assert( size_ == a.size_ );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= T( a.data_[ i ] );
@@ -499,11 +432,9 @@ public: // Assignment
 	}
 
 	// += Value
-	inline
 	CArrayP &
-	operator +=( T const & t )
+	operator +=( Tc t )
 	{
-		proxy_const_assert( not_const_proxy() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += t;
 		}
@@ -511,11 +442,9 @@ public: // Assignment
 	}
 
 	// -= Value
-	inline
 	CArrayP &
-	operator -=( T const & t )
+	operator -=( Tc t )
 	{
-		proxy_const_assert( not_const_proxy() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= t;
 		}
@@ -523,11 +452,9 @@ public: // Assignment
 	}
 
 	// *= Value
-	inline
 	CArrayP &
-	operator *=( T const & t )
+	operator *=( Tc t )
 	{
-		proxy_const_assert( not_const_proxy() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= t;
 		}
@@ -536,11 +463,9 @@ public: // Assignment
 
 	// /= Value
 	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator /=( U const & u )
 	{
-		proxy_const_assert( not_const_proxy() );
 		assert( u != U( 0 ) );
 		U const inv_u( U( 1 ) / u );
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -550,12 +475,10 @@ public: // Assignment
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	CArrayP &
 	operator /=( U const & u )
 	{
-		proxy_const_assert( not_const_proxy() );
 		assert( u != U( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] /= u;
@@ -566,7 +489,6 @@ public: // Assignment
 public: // Predicate
 
 	// Active?
-	inline
 	bool
 	active() const
 	{
@@ -574,7 +496,6 @@ public: // Predicate
 	}
 
 	// Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -582,7 +503,6 @@ public: // Predicate
 	}
 
 	// Owner?
-	inline
 	bool
 	owner() const
 	{
@@ -590,7 +510,6 @@ public: // Predicate
 	}
 
 	// Proxy?
-	inline
 	bool
 	proxy() const
 	{
@@ -600,7 +519,6 @@ public: // Predicate
 public: // Inspector
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -608,7 +526,6 @@ public: // Inspector
 	}
 
 	// Lower Index
-	inline
 	size_type
 	l() const
 	{
@@ -616,16 +533,14 @@ public: // Inspector
 	}
 
 	// Upper index
-	inline
 	size_type
 	u() const
 	{
 		return size_ - 1u; // npos if size_ == 0
 	}
 
-	// First element
-	inline
-	T const &
+	// First Element
+	Tr
 	front() const
 	{
 		assert( size_ > 0u );
@@ -633,8 +548,7 @@ public: // Inspector
 	}
 
 	// Last Element
-	inline
-	T const &
+	Tr
 	back() const
 	{
 		assert( size_ > 0u );
@@ -642,27 +556,23 @@ public: // Inspector
 	}
 
 	// Length
-	inline
 	T
 	length() const
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			T const data_i( data_[ i ] );
-			length_sq += data_i * data_i;
+			length_sq += data_[ i ] * data_[ i ];
 		}
 		return std::sqrt( length_sq );
 	}
 
 	// Length Squared
-	inline
 	T
 	length_squared() const
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			T const data_i( data_[ i ] );
-			length_sq += data_i * data_i;
+			length_sq += data_[ i ] * data_[ i ];
 		}
 		return length_sq;
 	}
@@ -670,28 +580,23 @@ public: // Inspector
 public: // Modifier
 
 	// First Element
-	inline
 	T &
 	front()
 	{
-		proxy_const_assert( not_const_proxy() );
 		assert( size_ > 0u );
 		return data_[ 0 ];
 	}
 
 	// Last Element
-	inline
 	T &
 	back()
 	{
-		proxy_const_assert( not_const_proxy() );
 		assert( size_ > 0u );
 		return data_[ size_ - 1 ];
 	}
 
 	// Resize: Values not Preserved
 	// Built-in values are uninitialized if size changes
-	inline
 	CArrayP &
 	size( size_type const size )
 	{
@@ -703,11 +608,10 @@ public: // Modifier
 	}
 
 	// Resize to Size With Fill Value: Values Preserved
-	inline
 	CArrayP &
 	resize(
 	 size_type const size,
-	 T const & fill = T()
+	 Tc fill = T()
 	)
 	{
 		assert( owner_ );
@@ -728,34 +632,25 @@ public: // Modifier
 	}
 
 	// Swap
-	inline
 	void
 	swap( CArrayP & a )
 	{
 		std::swap( size_, a.size_ );
 		std::swap( data_, a.data_ );
 		std::swap( owner_, a.owner_ );
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		std::swap( const_proxy_, a.const_proxy_ );
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	}
 
 	// Clear
-	inline
 	CArrayP &
 	clear()
 	{
 		size_ = 0u;
 		if ( owner_ ) delete[] data_; data_ = nullptr;
 		owner_ = true;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_ = false;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return *this;
 	}
 
 	// Normalize to Unit Length
-	inline
 	CArrayP &
 	normalize()
 	{
@@ -766,35 +661,26 @@ public: // Modifier
 	}
 
 	// Attach as Proxy to a const CArrayP
-	inline
 	CArrayP &
 	attach( CArrayP const & a )
 	{
 		size_ = a.size_;
 		if ( owner_ ) delete[] data_; data_ = a.data_;
 		owner_ = false;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_ = true;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return *this;
 	}
 
 	// Attach as Proxy to a CArrayP
-	inline
 	CArrayP &
 	attach( CArrayP & a )
 	{
 		size_ = a.size_;
 		if ( owner_ ) delete[] data_; data_ = a.data_;
 		owner_ = false;
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_ = a.const_proxy_;
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		return *this;
 	}
 
 	// Detach as Proxy to a CArrayP
-	inline
 	CArrayP &
 	detach()
 	{
@@ -805,131 +691,156 @@ public: // Modifier
 public: // Subscript
 
 	// CArrayP[ i ] const: 0-Based Indexing
-	inline
-	T const &
-	operator []( size_type const i ) const
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value && std::is_const< T >::value >::type >
+	Tr
+	operator []( I const i ) const
+	{
+		assert( i < size_ );
+		return data_[ i ];
+	}
+
+	// CArrayP[ i ] const: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value && std::is_const< T >::value >::type, typename = void >
+	Tr
+	operator []( I const i ) const
+	{
+		assert( ( i >= 0 ) && ( static_cast< size_type >( i ) < size_ ) );
+		return data_[ i ];
+	}
+
+	// CArrayP[ i ]: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value >::type >
+	T &
+	operator []( I const i )
 	{
 		assert( i < size_ );
 		return data_[ i ];
 	}
 
 	// CArrayP[ i ]: 0-Based Indexing
-	inline
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value >::type, typename = void >
 	T &
-	operator []( size_type const i )
+	operator []( I const i )
 	{
-		proxy_const_assert( not_const_proxy() );
-		assert( i < size_ );
+		assert( ( i >= 0 ) && ( static_cast< size_type >( i ) < size_ ) );
 		return data_[ i ];
 	}
 
 	// CArrayP( i ) const: 1-Based Indexing
-	inline
-	T const &
-	operator ()( size_type const i ) const
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value && std::is_const< T >::value >::type >
+	Tr
+	operator ()( I const i ) const
+	{
+		assert( ( i > 0u ) && ( i <= size_ ) );
+		return data_[ i - 1 ];
+	}
+
+	// CArrayP( i ) const: 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value && std::is_const< T >::value >::type, typename = void >
+	Tr
+	operator ()( I const i ) const
+	{
+		assert( ( i > 0 ) && ( static_cast< size_type >( i ) <= size_ ) );
+		return data_[ i - 1 ];
+	}
+
+	// CArrayP( i ): 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value >::type >
+	T &
+	operator ()( I const i )
 	{
 		assert( ( i > 0u ) && ( i <= size_ ) );
 		return data_[ i - 1 ];
 	}
 
 	// CArrayP( i ): 1-Based Indexing
-	inline
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value >::type, typename = void >
 	T &
-	operator ()( size_type const i )
+	operator ()( I const i )
 	{
-		proxy_const_assert( not_const_proxy() );
-		assert( ( i > 0u ) && ( i <= size_ ) );
+		assert( ( i > 0 ) && ( static_cast< size_type >( i ) <= size_ ) );
 		return data_[ i - 1 ];
 	}
 
 public: // Iterator
 
-	// const_iterator to Beginning of Array
-	inline
+	// Begin Iterator
 	const_iterator
 	begin() const
 	{
 		return data_;
 	}
 
-	// iterator to Beginning of Array
-	inline
+	// Begin Iterator
 	iterator
 	begin()
 	{
-		proxy_const_assert( not_const_proxy() );
 		return data_;
 	}
 
-	// const_iterator to Element Past End of Array
-	inline
+	// End Iterator
 	const_iterator
 	end() const
 	{
-		return data_ + size_;
+		return ( data_ != nullptr ? data_ + size_ : nullptr );
 	}
 
-	// iterator to element past end of array
-	inline
+	// End Iterator
 	iterator
 	end()
 	{
-		proxy_const_assert( not_const_proxy() );
-		return data_ + size_;
+		return ( data_ != nullptr ? data_ + size_ : nullptr );
+	}
+
+	// Reverse Begin Iterator
+	const_reverse_iterator
+	rbegin() const
+	{
+		return const_reverse_iterator( data_ != nullptr ? data_ + size_ : nullptr );
+	}
+
+	// Reverse Begin Iterator
+	reverse_iterator
+	rbegin()
+	{
+		return reverse_iterator( data_ != nullptr ? data_ + size_ : nullptr );
+	}
+
+	// Reverse End Iterator
+	const_reverse_iterator
+	rend() const
+	{
+		return const_reverse_iterator( data_ );
+	}
+
+	// Reverse End Iterator
+	reverse_iterator
+	rend()
+	{
+		return reverse_iterator( data_ );
 	}
 
 public: // Array Accessor
 
 	// C Array const Accessor
-	inline
-	T const &
+	T const *
 	operator ()() const
 	{
 		return data_;
 	}
 
 	// C Array Non-const Accessor
-	inline
-	T &
+	T *
 	operator ()()
 	{
-		proxy_const_assert( not_const_proxy() );
 		return data_;
 	}
-
-private: // Functions
-
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-
-	// Const Proxy?
-	inline
-	bool
-	const_proxy() const
-	{
-		return const_proxy_;
-	}
-
-	// Not a Const Proxy Under Strict Const-Correctness?
-	inline
-	bool
-	not_const_proxy() const
-	{
-		return ! const_proxy_;
-	}
-
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 private: // Data
 
 	size_type size_; // Number of array elements
-
 	T * data_; // C array
-
 	bool owner_; // Owner of the data array or proxy?
-
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-	bool const_proxy_; // Proxy for const data array?
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 }; // CArrayP
 
@@ -943,8 +854,7 @@ magnitude( CArrayP< T > const & a )
 {
 	T mag_sq( T( 0 ) );
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		T const a_i( a[ i ] );
-		mag_sq += a_i * a_i;
+		mag_sq += a[ i ] * a[ i ];
 	}
 	return std::sqrt( mag_sq );
 }
@@ -957,8 +867,7 @@ magnitude_squared( CArrayP< T > const & a )
 {
 	T mag_sq( T( 0 ) );
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		T const a_i( a[ i ] );
-		mag_sq += a_i * a_i;
+		mag_sq += a[ i ] * a[ i ];
 	}
 	return mag_sq;
 }
@@ -1144,7 +1053,7 @@ operator >( CArrayP< T > const & a, CArrayP< T > const & b )
 template< typename T >
 inline
 bool
-operator ==( CArrayP< T > const & a, T const & t )
+operator ==( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( a[ i ] != t ) return false;
@@ -1156,7 +1065,7 @@ operator ==( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator !=( CArrayP< T > const & a, T const & t )
+operator !=( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	return !( a == t );
 }
@@ -1165,7 +1074,7 @@ operator !=( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator <( CArrayP< T > const & a, T const & t )
+operator <( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] < t ) ) return false;
@@ -1177,7 +1086,7 @@ operator <( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator <=( CArrayP< T > const & a, T const & t )
+operator <=( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] <= t ) ) return false;
@@ -1189,7 +1098,7 @@ operator <=( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator >=( CArrayP< T > const & a, T const & t )
+operator >=( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] >= t ) ) return false;
@@ -1201,7 +1110,7 @@ operator >=( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator >( CArrayP< T > const & a, T const & t )
+operator >( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] > t ) ) return false;
@@ -1213,7 +1122,7 @@ operator >( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator ==( T const & t, CArrayP< T > const & a )
+operator ==( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	return ( a == t );
 }
@@ -1222,7 +1131,7 @@ operator ==( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator !=( T const & t, CArrayP< T > const & a )
+operator !=( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	return !( t == a );
 }
@@ -1231,7 +1140,7 @@ operator !=( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator <( T const & t, CArrayP< T > const & a )
+operator <( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t < a[ i ] ) ) return false;
@@ -1243,7 +1152,7 @@ operator <( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator <=( T const & t, CArrayP< T > const & a )
+operator <=( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t <= a[ i ] ) ) return false;
@@ -1255,7 +1164,7 @@ operator <=( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator >=( T const & t, CArrayP< T > const & a )
+operator >=( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t >= a[ i ] ) ) return false;
@@ -1267,7 +1176,7 @@ operator >=( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator >( T const & t, CArrayP< T > const & a )
+operator >( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t > a[ i ] ) ) return false;
@@ -1314,7 +1223,7 @@ operator -( CArrayP< T > const & a, CArrayP< T > const & b )
 template< typename T >
 inline
 CArrayP< T >
-operator +( CArrayP< T > const & a, T const & t )
+operator +( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r += t;
@@ -1325,7 +1234,7 @@ operator +( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 CArrayP< T >
-operator +( T const & t, CArrayP< T > const & a )
+operator +( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	CArrayP< T > r( a );
 	r += t;
@@ -1336,7 +1245,7 @@ operator +( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 CArrayP< T >
-operator -( CArrayP< T > const & a, T const & t )
+operator -( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r -= t;
@@ -1347,7 +1256,7 @@ operator -( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 CArrayP< T >
-operator -( T const & t, CArrayP< T > const & a )
+operator -( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	CArrayP< T > r( -a );
 	r += t;
@@ -1358,7 +1267,7 @@ operator -( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 CArrayP< T >
-operator *( CArrayP< T > const & a, T const & t )
+operator *( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r *= t;
@@ -1369,7 +1278,7 @@ operator *( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 CArrayP< T >
-operator *( T const & t, CArrayP< T > const & a )
+operator *( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	CArrayP< T > r( a );
 	r *= t;
@@ -1380,11 +1289,51 @@ operator *( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 CArrayP< T >
-operator /( CArrayP< T > const & a, T const & t )
+operator /( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r /= t;
 	return r;
+}
+
+// Stream >> CArrayP
+template< typename T >
+inline
+std::istream &
+operator >>( std::istream & stream, CArrayP< T > & a )
+{
+	typedef  typename CArrayP< T >::size_type  size_type;
+	if ( stream && ( ! a.emtpy() ) ) {
+		for ( size_type i = 0, e = a.size(); i < e; ++i ) {
+			stream >> a[ i ];
+			if ( ! stream ) break;
+		}
+	}
+	return stream;
+}
+
+// Stream << CArrayP
+template< typename T >
+inline
+std::ostream &
+operator <<( std::ostream & stream, CArrayP< T > const & a )
+{
+	using std::setw;
+	typedef  TypeTraits< T >  Traits;
+	typedef  typename CArrayP< T >::size_type  size_type;
+	if ( stream && ( ! a.emtpy() ) ) {
+		std::ios_base::fmtflags const old_flags( stream.flags() );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
+		stream << std::right << std::showpoint << std::uppercase;
+		size_type const e( a.size() - 1 );
+		int const w( Traits::iwidth );
+		for ( size_type i = 0; i < e; ++i ) {
+			stream << setw( w ) << a[ i ] << ' ';
+		} stream << setw( w ) << a[ e ];
+		stream.precision( old_precision );
+		stream.flags( old_flags );
+	}
+	return stream;
 }
 
 } // ObjexxFCL

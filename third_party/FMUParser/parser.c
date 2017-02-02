@@ -14,8 +14,8 @@
 /// This file parse the FMU for co-simulation and translate related information
 /// into Energyplus input file (.idf)
 ///
-/// Copyright (c) 2012, The Regents of the University of California, 
-/// through Lawrence Berkeley National Laboratory 
+/// Copyright (c) 2012, The Regents of the University of California,
+/// through Lawrence Berkeley National Laboratory
 /// subject to receipt of any required approvals from the U.S. Dept. of Energy.
 /// All rights reserved.
 ///////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ int callparser(const char* fmuFilNam, const char* tmpPat){
 
   // Get the model description
   xmlPat = calloc(sizeof(char), strlen(fmuFilNam) + strlen(XML_FILE)-1);
-  printfDebug("fmuFilNam is \"%s\"\n", fmuFilNam);  
+  printfDebug("fmuFilNam is \"%s\"\n", fmuFilNam);
   printfDebug("Start to parse model description file\n", xmlPat);
   sprintf(xmlPat, "%s%s%s", tmpPat, PATH_SEP, XML_FILE);
 
@@ -54,19 +54,19 @@ int callparser(const char* fmuFilNam, const char* tmpPat){
     return -1;
   }
 
-  length = strlen(fmuFilNam);	
-  tmp = malloc(length*sizeof(char)); 
+  length = strlen(fmuFilNam);
+  tmp = malloc(length*sizeof(char));
   strcpy(tmp, fmuFilNam);
-  
+
 #ifdef _MSC_VER // Command in windows
-  filNam = malloc(length*sizeof(char)); 
+  filNam = malloc(length*sizeof(char));
   if(filNam == NULL) {
     printError("Can not allocate memory for filName\n");
     free(tmp);
     return -1;
   }
 
-  ext = malloc(length*sizeof(char)); 
+  ext = malloc(length*sizeof(char));
   if(ext == NULL) {
     printError("Can not allocate memory for ext\n");
     free(filNam);
@@ -74,10 +74,10 @@ int callparser(const char* fmuFilNam, const char* tmpPat){
     return -1;
   }
 
-  _splitpath(tmp, NULL, NULL, filNam, ext); 
+  _splitpath(tmp, NULL, NULL, filNam, ext);
   filNam = strcat(filNam, ext);
 #else   // Command in linux
-  filNam = basename(tmp); 
+  filNam = basename(tmp);
 #endif
   printidf(filNam, fmu.modelDescription);
   printfDebug("***** Model description is \"%s\".\n", getModelIdentifier(fmu.modelDescription));
@@ -118,10 +118,10 @@ void help(){
   printf("\t-n, --name\n");
   printf("\t\textract the fmu in folder objNam. The default folder name is fmu's name without the \".fmu\".\n\n");
   printf("EXAMPLE\n");
-  printf("\tTo generate a temporary IDF file from a fmu named havc.fmu in Linux\n"); 
+  printf("\tTo generate a temporary IDF file from a fmu named havc.fmu in Linux\n");
   printf("\t\tparser -p hvac.fmu\n\n");
   printf("\tTo unpack the fmu havc.fmu in a folder called MyFMU in linux\n");
-  printf("\t\tparser -u havc.fmu -n MyFMU\n");  
+  printf("\t\tparser -u havc.fmu -n MyFMU\n");
   printf("AUTHOR\n");
   printf("\tWangda Zuo, Thierry S. Nouidui, Michael Wetter @ Lawrence Berkeley National Laboratory\n");
   printf("LICENSE\n");
@@ -149,32 +149,32 @@ int main(int argc, char* argv[]){
 
   // Read command line arguments
   for(i = 1; i < argc; i++) {
-    if (strcmp(argv[i], "--delete") == 0 || strcmp(argv[i], "-d") == 0) {         
+    if (strcmp(argv[i], "--delete") == 0 || strcmp(argv[i], "-d") == 0) {
       opt = opt_delete;
       optNum++;
       printDebug("Get option: delete");
     }
-    else if (strcmp(argv[i], "--printidf") == 0 || strcmp(argv[i], "-p") == 0) { 
+    else if (strcmp(argv[i], "--printidf") == 0 || strcmp(argv[i], "-p") == 0) {
       opt = opt_printidf;
       optNum++;
       printDebug("Get option: printidf");
     }
-    else if (strcmp(argv[i], "--unpack") == 0 || strcmp(argv[i], "-u") == 0) {   
+    else if (strcmp(argv[i], "--unpack") == 0 || strcmp(argv[i], "-u") == 0) {
       opt = opt_unpack;
       optNum++;
       printDebug("Get option: unpack");
     }
-    else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {     
+    else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
       opt = opt_help;
       optNum++;
       printDebug("Get option: help");
     }
-    else if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0) {  
+    else if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0) {
       setDebug();
       printDebug("Get option: verbose");
     }
     else if (strcmp(argv[i], "--name") == 0 || strcmp(argv[i], "-n") == 0) {
-      i++; nam = 1; 
+      i++; nam = 1;
       if(argv[i] != NULL)
         objNam = argv[i];
       else {
@@ -186,7 +186,7 @@ int main(int argc, char* argv[]){
     else if (strstr(argv[i], ".fmu") != NULL)
       fmuFilNam = argv[i];
     else
-      printf("Warning: Ingore unrecognized input \"%s\"\n", argv[i]);   
+      printf("Warning: Ingore unrecognized input \"%s\"\n", argv[i]);
   }
 
   if (optNum == 0) {
@@ -199,11 +199,11 @@ int main(int argc, char* argv[]){
       printf("For help, use: parser -h \n");
     }
 	    return -1;
-  }  
-  
+  }
+
   if (optNum > 1) {
     printError("Can not use more than 1 option at the same time except \"-u\".");
-    if (WINDOWS) {	   
+    if (WINDOWS) {
       printf("For help, use: parser.exe -h \n");
     }
     else {
@@ -214,9 +214,9 @@ int main(int argc, char* argv[]){
 
   if(fmuFilNam == NULL && opt != opt_help) {
     switch (opt) {
-      case opt_printidf: 
-      case opt_unpack: 
-        printError("No FMU file name is given.\n"); 
+      case opt_printidf:
+      case opt_unpack:
+        printError("No FMU file name is given.\n");
         break;
       case opt_delete:
         printError("No FMU folder is given.\n"); break;
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]){
 
     return -1;
   }
-  else    
+  else
     printfDebug("FMU file/folder name is \"%s\".\n", fmuFilNam);
 
 
@@ -241,18 +241,18 @@ int main(int argc, char* argv[]){
   // Check command line arguments
   switch (opt){
 	  case opt_printidf:
-    case opt_unpack:		
+    case opt_unpack:
     case opt_delete:
       if(nam == 0){
-  		  length = strlen(fmuFilNam)-4;	
+  		  length = strlen(fmuFilNam)-4;
         if(length<0) {
           printError("Cannot get correct length of fmu file name");
           return -1;
         }
 
         objNam = calloc((length+1), sizeof(char));
-        // Copy the fmufilNam without extension as objNam 
-        if(strncpy(objNam, fmuFilNam, length)==NULL) { 
+        // Copy the fmufilNam without extension as objNam
+        if(strncpy(objNam, fmuFilNam, length)==NULL) {
           printError("Can not get name \"objNam\" for new folder.\n");
           free(objNam);
           return -1;
@@ -265,37 +265,37 @@ int main(int argc, char* argv[]){
         }
         printfDebug("objNam = \"%s\"\n", objNam);
       }
-      else 
+      else
         length = strlen(objNam);
-		  break; 
+		  break;
     case opt_help:
       help();
       return 0;
 	  default:
 		  printError("Missing options: --delete | -d | --printidf | -p | --unpack | -u| --verbose | -v \n");
-		  return -1;    
-  } 
+		  return -1;
+  }
 
   printDebug("Get length of file name");
   // Define the temporary folder
-  tmpPat = getTmpPath(objNam, length);    
+  tmpPat = getTmpPath(objNam, length);
   if(tmpPat == NULL){
      printError("Fail to allocate memory for temp dir.\n");
 	    return -1;
     }
- 
+
   printfDebug("Received tmpPat \"%s\".\n", tmpPat);
 
   // Act according to the option
   switch (opt)
   {
-	  case opt_delete:      
+	  case opt_delete:
 	    if(delete(objNam)!= 0){
 		    printfError("Fail to delete \"%s\".\n", objNam);
         return -1;
 	    }
 	    else
-		    printfDebug("Successfully deleted the temporary folder \"%s\".\n", objNam);      
+		    printfDebug("Successfully deleted the temporary folder \"%s\".\n", objNam);
 	    break;
 	  case opt_unpack:
 	  case opt_printidf:
@@ -308,17 +308,17 @@ int main(int argc, char* argv[]){
 		    printDebug("Successfully unpacked the fmu.\n");
 
       // Parser: Additional part for printidf
-	    if (opt == opt_printidf) {    
+	    if (opt == opt_printidf) {
         if ( callparser(fmuFilNam, tmpPat) != 0 ){
 	        printfError("Fail to print the idf file from \"%s\".\n", fmuFilNam);
           return -1;
         }
         else printDebug("Successfully printed the idf file.\n");
-      }  
-    break;    
+      }
+    break;
   }
 
   free(objNam);
-  free(tmpPat);  
+  free(tmpPat);
   return 0;
 }

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef DataSystemVariables_hh_INCLUDED
 #define DataSystemVariables_hh_INCLUDED
 
@@ -34,14 +80,13 @@ namespace DataSystemVariables {
 	extern std::string const cDisplayZoneAirHeatBalanceOffBalance;
 	extern std::string const cSortIDD;
 	extern std::string const cReportDuringWarmup;
+	extern std::string const cReportDuringHVACSizingSimulation;
 	extern std::string const cIgnoreSolarRadiation;
 	extern std::string const cIgnoreBeamRadiation;
 	extern std::string const cIgnoreDiffuseRadiation;
 	extern std::string const cSutherlandHodgman;
 	extern std::string const cMinimalSurfaceVariables;
 	extern std::string const cMinimalShadowing;
-	extern std::string const cNumThreads;
-	extern std::string const cepNumThreads;
 	extern std::string const cNumActiveSims;
 	extern std::string const cInputPath1; // EP-Launch setting.  Full path + project name
 	extern std::string const cInputPath2; // RunEplus.bat setting.  Full path
@@ -55,6 +100,7 @@ namespace DataSystemVariables {
 	//  each individual HVAC controller with all controller iterations
 
 	extern std::string const MinReportFrequencyEnvVar; // environment var for reporting frequency.
+	extern std::string const cDisplayInputInAuditEnvVar; // environmental variable that enables the echoing of the input file into the audit file
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -78,6 +124,7 @@ namespace DataSystemVariables {
 	extern bool TraceHVACControllerEnvFlag; // If TRUE generates a trace file for each individual HVAC
 	// controller with all controller iterations
 	extern bool ReportDuringWarmup; // True when the report outputs even during warmup
+	extern bool ReportDuringHVACSizingSimulation; // true when reporting outputs during HVAC sizing Simulation
 	extern bool ReportDetailedWarmupConvergence; // True when the detailed warmup convergence is requested
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
 	// This update the value during the warmup added for FMI
@@ -114,29 +161,6 @@ namespace DataSystemVariables {
 		bool & FileFound, // Set to true if file found and is in CheckedFileName
 		std::string & CheckedFileName // Blank if not found.
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataSystemVariables
 

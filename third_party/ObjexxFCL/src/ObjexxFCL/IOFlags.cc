@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,7 +15,9 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // C++ Headers
-#include <cassert>
+#ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
+#include <iostream>
+#endif
 
 namespace ObjexxFCL {
 
@@ -31,7 +33,7 @@ namespace ObjexxFCL {
 		} else if ( STATUS == "SCRATCH" ) {
 			scratch_on();
 		} else if ( STATUS == "REPLACE" ) {
-			unknown_on();
+			replace_on();
 		} else if ( STATUS == "UNKNOWN" ) {
 			unknown_on();
 		} else {
@@ -46,17 +48,20 @@ namespace ObjexxFCL {
 	IOFlags::ACCESS( std::string const & access )
 	{
 		std::string const ACCESS( uppercased( access ) );
-		if ( ACCESS == "DIRECT" ) {
-			// Not supported
-		} else if ( ACCESS == "SEQUENTIAL" ) {
-			// Default
+		if ( ACCESS == "SEQUENTIAL" ) {
+			sequential_on();
+		} else if ( ACCESS == "DIRECT" ) {
+			assert( false ); // DIRECT not supported
+			direct_on();
 		} else if ( ACCESS == "STREAM" ) {
-			// Not supported
+			assert( false ); // STREAM not supported
+			stream_on();
 		} else if ( ACCESS == "APPEND" ) {
-			append_ = true;
-			asis_ = false;
+			sequential_on(); // APPEND => SEQUENTIAL
+			append_on();
 		} else {
 			assert( false ); // Invalid i/o flag value
+			sequential_on();
 		}
 		return *this;
 	}
@@ -67,72 +72,14 @@ namespace ObjexxFCL {
 	{
 		std::string const ACTION( uppercased( action ) );
 		if ( ACTION == "READ" ) {
-			read_ = true;
-			write_ = false;
+			read_on();
 		} else if ( ACTION == "WRITE" ) {
-			read_ = false;
-			write_ = true;
+			write_on();
 		} else if ( ACTION == "READWRITE" ) {
-			read_ = true;
-			write_ = true;
+			readwrite_on();
 		} else {
 			assert( false ); // Invalid i/o flag value
-			read_ = true;
-			write_ = true;
-		}
-		return *this;
-	}
-
-	// Position String Set
-	IOFlags &
-	IOFlags::POSITION( std::string const & position )
-	{
-		std::string const POSITION( uppercased( position ) );
-		if ( POSITION == "ASIS" ) {
-			append_ = false;
-			asis_ = true;
-		} else if ( POSITION == "REWIND" ) { // Default
-			append_ = false;
-			asis_ = false;
-		} else if ( POSITION == "APPEND" ) {
-			append_ = true;
-			asis_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			append_ = false;
-			asis_ = true;
-		}
-		return *this;
-	}
-
-	// Binary String Set
-	IOFlags &
-	IOFlags::BINARY( std::string const & binary )
-	{
-		std::string const BINARY( uppercased( binary ) );
-		if ( BINARY == "YES" ) {
-			binary_ = true;
-		} else if ( BINARY == "NO" ) {
-			binary_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			binary_ = false;
-		}
-		return *this;
-	}
-
-	// Append String Set
-	IOFlags &
-	IOFlags::APPEND( std::string const & append )
-	{
-		std::string const APPEND( uppercased( append ) );
-		if ( APPEND == "YES" ) {
-			append_ = true;
-		} else if ( APPEND == "NO" ) {
-			append_ = false;
-		} else {
-			assert( false ); // Invalid i/o flag value
-			append_ = false;
+			readwrite_on();
 		}
 		return *this;
 	}
@@ -143,14 +90,32 @@ namespace ObjexxFCL {
 	{
 		std::string const FORM( uppercased( form ) );
 		if ( FORM == "FORMATTED" ) {
-			binary_ = false;
+			formatted_on();
 		} else if ( FORM == "UNFORMATTED" ) {
-			binary_ = true; // Unsupported: Treat as binary
+			binary_on(); // Treat as binary
 		} else if ( FORM == "BINARY" ) {
-			binary_ = true;
+			binary_on();
 		} else {
 			assert( false ); // Invalid i/o flag value
-			binary_ = false;
+			formatted_on();
+		}
+		return *this;
+	}
+
+	// Positioning String Set
+	IOFlags &
+	IOFlags::POSITION( std::string const & position )
+	{
+		std::string const POSITION( uppercased( position ) );
+		if ( POSITION == "ASIS" ) {
+			asis_on();
+		} else if ( POSITION == "REWIND" ) {
+			rewind_on();
+		} else if ( POSITION == "APPEND" ) {
+			append_on();
+		} else {
+			assert( false ); // Invalid i/o flag value
+			asis_on();
 		}
 		return *this;
 	}
@@ -161,12 +126,12 @@ namespace ObjexxFCL {
 	{
 		std::string const BLANK( uppercased( blank ) );
 		if ( BLANK == "NULL" ) {
-			bz_ = false;
+			blank_null_on();
 		} else if ( BLANK == "ZERO" ) {
-			bz_ = true;
+			blank_zero_on();
 		} else {
 			assert( false ); // Invalid i/o flag value
-			bz_ = false;
+			blank_null_on();
 		}
 		return *this;
 	}
@@ -177,12 +142,12 @@ namespace ObjexxFCL {
 	{
 		std::string const ADVANCE( uppercased( advance ) );
 		if ( ADVANCE == "YES" ) {
-			nad_ = false;
+			advancing_on();
 		} else if ( ADVANCE == "NO" ) {
-			nad_ = true;
+			non_advancing_on();
 		} else {
 			assert( false ); // Invalid i/o flag value
-			nad_ = false;
+			advancing_on();
 		}
 		return *this;
 	}
@@ -193,24 +158,34 @@ namespace ObjexxFCL {
 	{
 		std::string const DISPOSE( uppercased( dispose ) );
 		if ( DISPOSE == "KEEP" ) {
-			del_ = false;
+			keep_on();
 		} else if ( DISPOSE == "SAVE" ) {
-			del_ = false;
+			keep_on();
 		} else if ( DISPOSE == "DELETE" ) {
-			del_ = true;
+			delete_on();
 		} else if ( DISPOSE == "PRINT" ) {
-			del_ = false;
+			keep_on();
 		} else if ( DISPOSE == "PRINT/DELETE" ) {
-			del_ = true;
+			delete_on();
 		} else if ( DISPOSE == "SUBMIT" ) {
-			del_ = false;
+			keep_on();
 		} else if ( DISPOSE == "SUBMIT/DELETE" ) {
-			del_ = true;
+			delete_on();
 		} else {
 			assert( false ); // Invalid i/o flag value
-			del_ = false;
+			keep_on();
 		}
 		return *this;
 	}
+
+	// Error Handler
+#ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
+	void
+	IOFlags::error() const
+	{
+		std::cerr << '\n' << msg_ << std::endl;
+		std::exit( EXIT_FAILURE );
+	}
+#endif
 
 } // ObjexxFCL

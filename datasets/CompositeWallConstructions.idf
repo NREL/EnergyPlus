@@ -17,9 +17,7 @@
 ! Area-average R-Value = 11.391 ft2-F-h/Btu (2.005 m2-K/W).
 ! Total wall thickness = 5.00in (0.127m)
 ! Material layer names follow:
-
-!  Version,
-!    8.0;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Construction,
     Composite 2x4 Wood Stud R11,  !- Name

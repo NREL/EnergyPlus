@@ -6,29 +6,39 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 
 SET(SRC epfilter.f90) 
 
-# the Fortran apps require a DEF for proper path handling on Windows
-if( WIN32 ) 
-  add_definitions(-D_WIN32) 
-  if( CMAKE_Fortran_COMPILER MATCHES "ifort" )
-    add_definitions( "/fpp" )
-    set(CMAKE_Fortran_FLAGS /lib:static)
-  else() # assume mingw gfortran if not intel fortran
-    add_definitions( "-x f95-cpp-input" )
-    set(CMAKE_Fortran_FLAGS "-static")
-  endif()  
-else()
-  if( CMAKE_Fortran_COMPILER MATCHES "ifort" )
-    add_definitions( "-fpp" )
-  elseif( CMAKE_Fortran_COMPILER_ID MATCHES "GNU" ) # could use this above in WIN32 block to be more specific
-    add_definitions( "-cpp" )
+if(APPLE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-200")
+  endif()
+elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-200")
+  endif()
+else()  # Windows
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    # Set release flags to be empty
+    set(CMAKE_Fortran_FLAGS_RELEASE "")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /fpp")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-200")
   endif()
 endif()
 
+set(SKIP_BUILD_RPATH true)
 ADD_EXECUTABLE( ExpandObjects ${SRC} )
-
-SET_TARGET_PROPERTIES(ExpandObjects PROPERTIES
-  COMPILE_FLAGS "-ffree-line-length-200  ${SHARED_FLAGS}"
-)
   
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
 install_and_fixup_exe_target( ExpandObjects "./" )

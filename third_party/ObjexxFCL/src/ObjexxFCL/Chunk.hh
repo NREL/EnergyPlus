@@ -5,13 +5,16 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -39,6 +42,9 @@ private: // Friend
 
 public: // Types
 
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+
 	// STL style
 	typedef  T  value_type;
 	typedef  T &  reference;
@@ -58,7 +64,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Chunk() :
 	 size_( 0u ),
 	 capacity_( 0u ),
@@ -66,7 +71,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	Chunk( Chunk const & c ) :
 	 size_( c.size_ ),
 	 capacity_( size_ ),
@@ -77,9 +81,19 @@ public: // Creation
 		}
 	}
 
+	// Move Constructor
+	Chunk( Chunk && c ) NOEXCEPT :
+	 size_( c.size_ ),
+	 capacity_( c.capacity_ ),
+	 data_( c.data_ )
+	{
+		c.size_ = 0u;
+		c.capacity_ = 0u;
+		c.data_ = nullptr;
+	}
+
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Chunk( Chunk< U > const & c ) :
 	 size_( c.size_ ),
@@ -92,7 +106,6 @@ public: // Creation
 	}
 
 	// Size Constructor: Built-In Types are Not Initialized!
-	inline
 	explicit
 	Chunk( size_type const size ) :
 	 size_( size ),
@@ -101,10 +114,9 @@ public: // Creation
 	{}
 
 	// Size + Uniform Value Constructor
-	inline
 	Chunk(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	) :
 	 size_( size ),
 	 capacity_( size_ ),
@@ -116,7 +128,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~Chunk()
 	{
 		delete[] data_;
@@ -125,7 +136,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Chunk &
 	operator =( Chunk const & c )
 	{
@@ -142,9 +152,22 @@ public: // Assignment
 		return *this;
 	}
 
+	// Move Assignment
+	Chunk &
+	operator =( Chunk && c ) NOEXCEPT
+	{
+		assert( this != &c );
+		size_ = c.size_;
+		capacity_ = c.capacity_;
+		delete[] data_; data_ = c.data_;
+		c.size_ = 0u;
+		c.capacity_ = 0u;
+		c.data_ = nullptr;
+		return *this;
+	}
+
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Chunk &
 	operator =( Chunk< U > const & c )
 	{
@@ -160,11 +183,10 @@ public: // Assignment
 	}
 
 	// Size + Value Assignment
-	inline
 	Chunk &
 	assign(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -179,7 +201,6 @@ public: // Assignment
 	}
 
 	// += Chunk
-	inline
 	Chunk &
 	operator +=( Chunk const & c )
 	{
@@ -191,7 +212,6 @@ public: // Assignment
 	}
 
 	// -= Chunk
-	inline
 	Chunk &
 	operator -=( Chunk const & c )
 	{
@@ -204,7 +224,6 @@ public: // Assignment
 
 	// += Chunk Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Chunk &
 	operator +=( Chunk< U > const & c )
 	{
@@ -217,7 +236,6 @@ public: // Assignment
 
 	// -= Chunk Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Chunk &
 	operator -=( Chunk< U > const & c )
 	{
@@ -229,9 +247,8 @@ public: // Assignment
 	}
 
 	// = Value
-	inline
 	Chunk &
-	operator =( T const & value )
+	operator =( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = value;
@@ -240,9 +257,8 @@ public: // Assignment
 	}
 
 	// += Value
-	inline
 	Chunk &
-	operator +=( T const & value )
+	operator +=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += value;
@@ -251,9 +267,8 @@ public: // Assignment
 	}
 
 	// -= Value
-	inline
 	Chunk &
-	operator -=( T const & value )
+	operator -=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= value;
@@ -262,9 +277,8 @@ public: // Assignment
 	}
 
 	// *= Value
-	inline
 	Chunk &
-	operator *=( T const & value )
+	operator *=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= value;
@@ -273,9 +287,8 @@ public: // Assignment
 	}
 
 	// /= Value
-	inline
 	Chunk &
-	operator /=( T const & value )
+	operator /=( Tc value )
 	{
 		assert( value != T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -287,8 +300,7 @@ public: // Assignment
 public: // Subscript
 
 	// Chunk[ i ] const: 0-Based Indexing
-	inline
-	T const &
+	Tr
 	operator []( size_type const i ) const
 	{
 		assert( i < size_ );
@@ -296,7 +308,6 @@ public: // Subscript
 	}
 
 	// Chunk[ i ]: 0-Based Indexing
-	inline
 	T &
 	operator []( size_type const i )
 	{
@@ -307,7 +318,6 @@ public: // Subscript
 public: // Inspector
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -315,23 +325,13 @@ public: // Inspector
 	}
 
 	// Capacity
-	inline
 	size_type
 	capacity() const
 	{
 		return capacity_;
 	}
 
-	// Maximum Size
-	inline
-	size_type
-	max_size() const
-	{
-		return std::numeric_limits< size_type >::max();
-	}
-
 	// Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -339,8 +339,7 @@ public: // Inspector
 	}
 
 	// First Element
-	inline
-	T const &
+	Tr
 	front() const
 	{
 		assert( size_ > 0u );
@@ -348,8 +347,7 @@ public: // Inspector
 	}
 
 	// Last Element
-	inline
-	T const &
+	Tr
 	back() const
 	{
 		assert( size_ > 0u );
@@ -359,7 +357,6 @@ public: // Inspector
 public: // Modifier
 
 	// First Element
-	inline
 	T &
 	front()
 	{
@@ -368,7 +365,6 @@ public: // Modifier
 	}
 
 	// Last Element
-	inline
 	T &
 	back()
 	{
@@ -377,11 +373,10 @@ public: // Modifier
 	}
 
 	// Append an Element
-	inline
 	Chunk &
-	push_back( T const & value )
+	push_back( Tc value )
 	{
-		assert( size_ < max_size() );
+		assert( size_ < max_size );
 		if ( size_ == capacity_ ) reserve( 2 * capacity_ );
 		data_[ size_ ] = value;
 		++size_;
@@ -389,7 +384,6 @@ public: // Modifier
 	}
 
 	// Remove the Last Element
-	inline
 	Chunk &
 	pop_back()
 	{
@@ -399,7 +393,6 @@ public: // Modifier
 	}
 
 	// Resize: Values Preserved: Added Built-In Values are Not Initialized!
-	inline
 	Chunk &
 	resize( size_type const size )
 	{
@@ -419,11 +412,10 @@ public: // Modifier
 	}
 
 	// Resize + Fill Value: Values Preserved
-	inline
 	Chunk &
 	resize(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -445,7 +437,6 @@ public: // Modifier
 	}
 
 	// Resize: Values Not Preserved: Built-In Values are Not Initialized!
-	inline
 	Chunk &
 	non_preserving_resize( size_type const size )
 	{
@@ -460,11 +451,10 @@ public: // Modifier
 	}
 
 	// Resize + Fill Value: Values Not Preserved
-	inline
 	Chunk &
 	non_preserving_resize(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -481,7 +471,6 @@ public: // Modifier
 	}
 
 	// Reserve: Values Preserved: Added Built-In Values are Not Initialized!
-	inline
 	Chunk &
 	reserve( size_type const capacity )
 	{
@@ -497,7 +486,6 @@ public: // Modifier
 	}
 
 	// Shrink Capacity to Size
-	inline
 	Chunk &
 	shrink()
 	{
@@ -512,8 +500,22 @@ public: // Modifier
 		return *this;
 	}
 
+	// Shrink Capacity to Size
+	Chunk &
+	shrink_to_fit()
+	{
+		if ( size_ < capacity_ ) {
+			T * const new_array( size_ > 0u ? new T[ size_ ] : nullptr );
+			for ( size_type i = 0; i < size_; ++i ) {
+				new_array[ i ] = data_[ i ];
+			}
+			delete[] data_; data_ = new_array;
+			capacity_ = size_;
+		}
+		return *this;
+	}
+
 	// Swap
-	inline
 	void
 	swap( Chunk & c )
 	{
@@ -523,7 +525,6 @@ public: // Modifier
 	}
 
 	// Clear
-	inline
 	Chunk &
 	clear()
 	{
@@ -533,15 +534,20 @@ public: // Modifier
 		return *this;
 	}
 
+public: // Static Data
+
+	static size_type const max_size; // Max size
+
 private: // Data
 
 	size_type size_; // Number of elements in use
-
-	size_type capacity_; // Number of elements it can hold without resizing
-
+	size_type capacity_; // Number of elements Chunk can hold without resizing
 	T * data_; // Data array
 
 }; // Chunk
+
+	// Static Data Member Template Definitions
+	template< typename T > typename Chunk< T >::size_type const Chunk< T >::max_size = static_cast< size_type >( -1 );
 
 // Swap
 template< typename T >

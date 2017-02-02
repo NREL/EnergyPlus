@@ -1,11 +1,58 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef ZoneTempPredictorCorrector_hh_INCLUDED
 #define ZoneTempPredictorCorrector_hh_INCLUDED
 
+// C++ Headers
+#include <vector>
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,11 +74,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	extern FArray1D_string const ValidControlTypes;
+	extern Array1D_string const ValidControlTypes;
 
-	extern FArray1D_string const ValidComfortControlTypes;
+	extern Array1D_string const ValidComfortControlTypes;
 
-	extern FArray1D_string const cZControlTypes;
+	extern Array1D_string const cZControlTypes;
 
 	extern int const iZC_TStat;
 	extern int const iZC_TCTStat;
@@ -39,7 +86,7 @@ namespace ZoneTempPredictorCorrector {
 	extern int const iZC_HStat;
 	extern int const iZC_TandHStat;
 	extern int const iZC_StagedDual;
-	extern FArray1D_int const iZControlTypes;
+	extern Array1D_int const iZControlTypes;
 
 	extern int const SglHeatSetPoint;
 	extern int const SglCoolSetPoint;
@@ -85,14 +132,14 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	extern int NumStageCtrZone;
 
-	extern FArray1D< Real64 > ZoneSetPointLast;
-	extern FArray1D< Real64 > TempIndZnLd;
-	extern FArray1D< Real64 > TempDepZnLd;
-	extern FArray1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
+	extern Array1D< Real64 > ZoneSetPointLast;
+	extern Array1D< Real64 > TempIndZnLd;
+	extern Array1D< Real64 > TempDepZnLd;
+	extern Array1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
 
 	// Zone temperature history - used only for oscillation test
-	extern FArray2D< Real64 > ZoneTempHist;
-	extern FArray1D< Real64 > ZoneTempOscillate;
+	extern Array2D< Real64 > ZoneTempHist;
+	extern Array1D< Real64 > ZoneTempOscillate;
 	extern Real64 AnyZoneTempOscillate;
 
 	// SUBROUTINE SPECIFICATIONS:
@@ -117,25 +164,6 @@ namespace ZoneTempPredictorCorrector {
 			CoolTempSchedIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneTempControlType(
-			std::string const & Name, // Name of the zone
-			std::string const & TempSchedName, // Name of the schedule which determines the zone temp setpoint
-			int const TempSchedIndex,
-			std::string const & HeatTempSetptSchedName,
-			int const HeatTempSchedIndex,
-			std::string const & CoolTempSetptSchedName,
-			int const CoolTempSchedIndex
-		) :
-			Name( Name ),
-			TempSchedName( TempSchedName ),
-			TempSchedIndex( TempSchedIndex ),
-			HeatTempSetptSchedName( HeatTempSetptSchedName ),
-			HeatTempSchedIndex( HeatTempSchedIndex ),
-			CoolTempSetptSchedName( CoolTempSetptSchedName ),
-			CoolTempSchedIndex( CoolTempSchedIndex )
-		{}
-
 	};
 
 	struct ZoneComfortFangerControlType
@@ -156,38 +184,21 @@ namespace ZoneTempPredictorCorrector {
 			CoolPMVSchedIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneComfortFangerControlType(
-			std::string const & Name, // Name of the zone
-			std::string const & PMVSchedName, // Name of the schedule which determines the zone temp setpoint
-			int const PMVSchedIndex, // Index to PMV dual set point schedule
-			std::string const & HeatPMVSetptSchedName, // Name of PMV heating set point schedule
-			int const HeatPMVSchedIndex, // Index to PMV heating set point schedule
-			std::string const & CoolPMVSetptSchedName, // Name of PMV cooling set point schedule
-			int const CoolPMVSchedIndex // INdex to PMV cooling set point schedule
-		) :
-			Name( Name ),
-			PMVSchedName( PMVSchedName ),
-			PMVSchedIndex( PMVSchedIndex ),
-			HeatPMVSetptSchedName( HeatPMVSetptSchedName ),
-			HeatPMVSchedIndex( HeatPMVSchedIndex ),
-			CoolPMVSetptSchedName( CoolPMVSetptSchedName ),
-			CoolPMVSchedIndex( CoolPMVSchedIndex )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ZoneTempControlType > SetPointSingleHeating;
-	extern FArray1D< ZoneTempControlType > SetPointSingleCooling;
-	extern FArray1D< ZoneTempControlType > SetPointSingleHeatCool;
-	extern FArray1D< ZoneTempControlType > SetPointDualHeatCool;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern Array1D< ZoneTempControlType > SetPointSingleHeating;
+	extern Array1D< ZoneTempControlType > SetPointSingleCooling;
+	extern Array1D< ZoneTempControlType > SetPointSingleHeatCool;
+	extern Array1D< ZoneTempControlType > SetPointDualHeatCool;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneAirUpdates(
@@ -215,10 +226,10 @@ namespace ZoneTempPredictorCorrector {
 	CalcZoneAirTempSetPoints();
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum );
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
 
 	void
-	CalcPredictedHumidityRatio( int const ZoneNum );
+	CalcPredictedHumidityRatio( int const ZoneNum, Real64 RAFNFrac );
 
 	void
 	CorrectZoneAirTemp(
@@ -238,7 +249,10 @@ namespace ZoneTempPredictorCorrector {
 	RevertZoneTimestepHistories();
 
 	void
-	CorrectZoneHumRat( int const ZoneNum );
+	CorrectZoneHumRat(
+		int const ZoneNum,
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+	);
 
 	void
 	DownInterpolate4HistoryValues(
@@ -266,7 +280,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
+		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	);
 
 	void
@@ -281,7 +296,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
+		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	);
 
 	bool
@@ -314,7 +330,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = PMV set point
+		Array1< Real64 > const & Par // par(1) = PMV set point
 	);
 
 	void
@@ -322,29 +338,6 @@ namespace ZoneTempPredictorCorrector {
 		int const TempControlledZoneID,
 		int const ActualZoneNum // controlled zone actual zone number
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ZoneTempPredictorCorrector
 

@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef SurfaceGeometry_hh_INCLUDED
 #define SurfaceGeometry_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -20,11 +66,11 @@ namespace SurfaceGeometry {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern FArray1D_string const BaseSurfCls;
-	extern FArray1D_string const SubSurfCls;
-	extern FArray1D_int const BaseSurfIDs;
+	extern Array1D_string const BaseSurfCls;
+	extern Array1D_string const SubSurfCls;
+	extern Array1D_int const BaseSurfIDs;
 
-	extern FArray1D_int const SubSurfIDs;
+	extern Array1D_int const SubSurfIDs;
 
 	extern int const UnenteredAdjacentZoneSurface; // allows users to enter one zone surface ("Zone")
 	// referencing another in adjacent zone
@@ -39,8 +85,8 @@ namespace SurfaceGeometry {
 	extern Real64 SinBldgRelNorth; // Sine of the building rotation (relative north)   (includes appendix G rotation)
 	extern Real64 CosBldgRotAppGonly; // Cosine of the building rotation for appendix G only(relative north)
 	extern Real64 SinBldgRotAppGonly; // Sine of the building rotation for appendix G only (relative north)
-	extern FArray1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-	extern FArray1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
+	extern Array1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+	extern Array1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
 	extern bool NoGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "Ground"
 	// outside environment are used but no ground temperature object was input.
@@ -54,9 +100,14 @@ namespace SurfaceGeometry {
 	//SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
 	// Object Data
-	extern FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	extern Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
 
 	// Functions
+
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	SetupZoneGeometry( bool & ErrorsFound );
@@ -66,6 +117,14 @@ namespace SurfaceGeometry {
 
 	void
 	GetSurfaceData( bool & ErrorsFound ); // If errors found in input
+
+
+	void
+	checkSubSurfAzTiltNorm(
+		SurfaceData & baseSurface, // Base surface data (in)
+		SurfaceData & subSurface, // Subsurface data (in)
+		bool & surfaceError // True if there is subsurface error that requires a fatal
+	);
 
 	void
 	GetGeometryParameters( bool & ErrorsFound ); // set to true if errors found during input
@@ -94,8 +153,8 @@ namespace SurfaceGeometry {
 		int const TotDetailedWalls, // Number of Wall:Detailed items to obtain
 		int const TotDetailedRoofs, // Number of RoofCeiling:Detailed items to obtain
 		int const TotDetailedFloors, // Number of Floor:Detailed items to obtain
-		FArray1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
-		FArray1S_int const BaseSurfIDs,
+		Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
+		Array1S_int const BaseSurfIDs,
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
 
@@ -113,7 +172,7 @@ namespace SurfaceGeometry {
 		int const TotRectGCFloors, // Number of Floors with Ground Contact to obtain
 		int const TotRectIntFloors, // Number of Adiabatic Walls to obtain
 		int const TotRectIZFloors, // Number of Interzone Floors to obtain
-		FArray1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
+		Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
 
@@ -133,8 +192,8 @@ namespace SurfaceGeometry {
 		bool & ErrorsFound, // Error flag indicator (true if errors found)
 		int & SurfNum, // Count of Current SurfaceNumber
 		int const TotHTSubs, // Number of Heat Transfer SubSurfaces to obtain
-		FArray1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
-		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+		Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
+		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
@@ -149,7 +208,7 @@ namespace SurfaceGeometry {
 		int const TotIZWindows, // Number of Interzone Window SubSurfaces to obtain
 		int const TotIZDoors, // Number of Interzone Door SubSurfaces to obtain
 		int const TotIZGlazedDoors, // Number of Interzone Glass Door SubSurfaces to obtain
-		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSubSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
@@ -181,7 +240,13 @@ namespace SurfaceGeometry {
 		Real64 const Length,
 		Real64 const Height
 	);
-
+	
+	void
+	MakeEquivalentRectangle(
+		int const SurfNum, // Surface number
+		bool & ErrorsFound // Error flag indicator (true if errors found)
+	);
+	
 	void
 	GetAttShdSurfaceData(
 		bool & ErrorsFound, // Error flag indicator (true if errors found)
@@ -219,7 +284,7 @@ namespace SurfaceGeometry {
 	GetVertices(
 		int const SurfNum, // Current surface number
 		int const NSides, // Number of sides to figure
-		FArray1S< Real64 > const Vertices // Vertices, in specified order
+		Array1S< Real64 > const Vertices // Vertices, in specified order
 	);
 
 	void
@@ -254,7 +319,7 @@ namespace SurfaceGeometry {
 	void
 	CalculateZoneVolume(
 		bool & ErrorsFound, // If errors found in input
-		FArray1S_bool const CeilingHeightEntered
+		Array1S_bool const CeilingHeightEntered
 	);
 
 	void
@@ -311,29 +376,11 @@ namespace SurfaceGeometry {
 		int const NSides // Number of sides to figure
 	);
 
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
+	bool
+	isRectangle(
+		int const ThisSurf // Current surface number
+	);
+		
 } // SurfaceGeometry
 
 } // EnergyPlus

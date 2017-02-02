@@ -1,10 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef FluidCoolers_hh_INCLUDED
 #define FluidCoolers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -48,7 +92,7 @@ namespace FluidCoolers {
 	extern Real64 Qactual; // Fluid cooler heat transfer
 	extern Real64 FanPower; // Fluid cooler fan power used
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopFluidCoolers
 
@@ -73,15 +117,22 @@ namespace FluidCoolers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the fluid cooler [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; // true if design water rate was autosize on input
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the fluid cooler [kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through the fluid cooler at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if high speed air rate was autosize on input
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; // true if high fan power was autosize on input
 		Real64 HighSpeedFluidCoolerUA; // UA of fluid cooler at high fan speed [W/C]
+		bool HighSpeedFluidCoolerUAWasAutoSized; // true if high speed UA was autosized on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through fluid cooler at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if low speed air rate was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed air flow rate []
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized; // true if low speed fan power set to autosize on input
 		Real64 LowSpeedFanPowerSizingFactor; // sizing factor for low speed fan power []
 		Real64 LowSpeedFluidCoolerUA; // UA of fluid cooler at low fan speed [W/C]
+		bool LowSpeedFluidCoolerUAWasAutoSized; //true if low speed UA set to autosize on input
 		Real64 LowSpeedFluidCoolerUASizingFactor; // sizing factor for low speed UA []
 		Real64 DesignEnteringWaterTemp; // Entering water temperature at design conditions
 		Real64 DesignLeavingWaterTemp; // Entering water temperature at design conditions
@@ -90,6 +141,7 @@ namespace FluidCoolers {
 		Real64 FluidCoolerMassFlowRateMultiplier; // Maximum fluid cooler flow rate is this multiplier * design flow rate
 		Real64 FluidCoolerNominalCapacity; // Nominal capacity of the fluid cooler [W] at high speed
 		Real64 FluidCoolerLowSpeedNomCap; // Nominal capacity of the fluid cooler [W] at low speed
+		bool FluidCoolerLowSpeedNomCapWasAutoSized; // true if previous was set to autosize on input
 		Real64 FluidCoolerLowSpeedNomCapSizingFactor; // sizing factor for low speed capacity []
 		int WaterInletNodeNum; // Node number on the water inlet side of the fluid cooler
 		int WaterOutletNodeNum; // Node number on the water outlet side of the fluid cooler
@@ -117,15 +169,22 @@ namespace FluidCoolers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesWaterMassFlowRate( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			HighSpeedFluidCoolerUA( 0.0 ),
+			HighSpeedFluidCoolerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedFluidCoolerUA( 0.0 ),
+			LowSpeedFluidCoolerUAWasAutoSized( false ),
 			LowSpeedFluidCoolerUASizingFactor( 0.0 ),
 			DesignEnteringWaterTemp( 0.0 ),
 			DesignLeavingWaterTemp( 0.0 ),
@@ -134,6 +193,7 @@ namespace FluidCoolers {
 			FluidCoolerMassFlowRateMultiplier( 0.0 ),
 			FluidCoolerNominalCapacity( 0.0 ),
 			FluidCoolerLowSpeedNomCap( 0.0 ),
+			FluidCoolerLowSpeedNomCapWasAutoSized( false ),
 			FluidCoolerLowSpeedNomCapSizingFactor( 0.0 ),
 			WaterInletNodeNum( 0 ),
 			WaterOutletNodeNum( 0 ),
@@ -152,95 +212,6 @@ namespace FluidCoolers {
 			LoopSideNum( 0 ),
 			BranchNum( 0 ),
 			CompNum( 0 )
-		{}
-
-		// Member Constructor
-		FluidCoolerspecs(
-			std::string const & Name, // User identifier
-			std::string const & FluidCoolerType, // Type of fluid cooler
-			int const FluidCoolerType_Num,
-			int const PerformanceInputMethod_Num,
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // Simulate the machine at it's operating part load ratio
-			Real64 const DesignWaterFlowRate, // Design water flow rate through the fluid cooler [m3/s]
-			Real64 const DesWaterMassFlowRate, // Design water flow rate through the fluid cooler [kg/s]
-			Real64 const HighSpeedAirFlowRate, // Air flow rate through the fluid cooler at high speed [m3/s]
-			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
-			Real64 const HighSpeedFluidCoolerUA, // UA of fluid cooler at high fan speed [W/C]
-			Real64 const LowSpeedAirFlowRate, // Air flow rate through fluid cooler at low speed [m3/s]
-			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed air flow rate []
-			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
-			Real64 const LowSpeedFanPowerSizingFactor, // sizing factor for low speed fan power []
-			Real64 const LowSpeedFluidCoolerUA, // UA of fluid cooler at low fan speed [W/C]
-			Real64 const LowSpeedFluidCoolerUASizingFactor, // sizing factor for low speed UA []
-			Real64 const DesignEnteringWaterTemp, // Entering water temperature at design conditions
-			Real64 const DesignLeavingWaterTemp, // Entering water temperature at design conditions
-			Real64 const DesignEnteringAirTemp, // Entering water temperature at design conditions
-			Real64 const DesignEnteringAirWetBulbTemp, // Entering water temperature at design condition
-			Real64 const FluidCoolerMassFlowRateMultiplier, // Maximum fluid cooler flow rate is this multiplier * design flow rate
-			Real64 const FluidCoolerNominalCapacity, // Nominal capacity of the fluid cooler [W] at high speed
-			Real64 const FluidCoolerLowSpeedNomCap, // Nominal capacity of the fluid cooler [W] at low speed
-			Real64 const FluidCoolerLowSpeedNomCapSizingFactor, // sizing factor for low speed capacity []
-			int const WaterInletNodeNum, // Node number on the water inlet side of the fluid cooler
-			int const WaterOutletNodeNum, // Node number on the water outlet side of the fluid cooler
-			int const OutdoorAirInletNodeNum, // Node number of outdoor air inlet for the fluid cooler
-			int const HighMassFlowErrorCount, // Counter when mass flow rate is > Design*FluidCoolerMassFlowRateMultiplier
-			int const HighMassFlowErrorIndex, // Index for high mass flow recurring error message
-			int const OutletWaterTempErrorCount, // Counter when outlet water temperature is < minimum allowed temperature
-			int const OutletWaterTempErrorIndex, // Index for outlet water temperature recurring error message
-			int const SmallWaterMassFlowErrorCount, // Counter when water mass flow rate is very small
-			int const SmallWaterMassFlowErrorIndex, // Index for very small water mass flow rate recurring error message
-			int const WMFRLessThanMinAvailErrCount, // Counter when water mass flow rate is less than minimum available
-			int const WMFRLessThanMinAvailErrIndex, // Index for water mass flow rate less than minavail recurring message
-			int const WMFRGreaterThanMaxAvailErrCount, // Counter when water mass flow rate is greater than minimum available
-			int const WMFRGreaterThanMaxAvailErrIndex, // Index for water mass flow rate > minavail recurring message
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			FluidCoolerType( FluidCoolerType ),
-			FluidCoolerType_Num( FluidCoolerType_Num ),
-			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
-			Available( Available ),
-			ON( ON ),
-			DesignWaterFlowRate( DesignWaterFlowRate ),
-			DesWaterMassFlowRate( DesWaterMassFlowRate ),
-			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
-			HighSpeedFanPower( HighSpeedFanPower ),
-			HighSpeedFluidCoolerUA( HighSpeedFluidCoolerUA ),
-			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
-			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
-			LowSpeedFanPower( LowSpeedFanPower ),
-			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
-			LowSpeedFluidCoolerUA( LowSpeedFluidCoolerUA ),
-			LowSpeedFluidCoolerUASizingFactor( LowSpeedFluidCoolerUASizingFactor ),
-			DesignEnteringWaterTemp( DesignEnteringWaterTemp ),
-			DesignLeavingWaterTemp( DesignLeavingWaterTemp ),
-			DesignEnteringAirTemp( DesignEnteringAirTemp ),
-			DesignEnteringAirWetBulbTemp( DesignEnteringAirWetBulbTemp ),
-			FluidCoolerMassFlowRateMultiplier( FluidCoolerMassFlowRateMultiplier ),
-			FluidCoolerNominalCapacity( FluidCoolerNominalCapacity ),
-			FluidCoolerLowSpeedNomCap( FluidCoolerLowSpeedNomCap ),
-			FluidCoolerLowSpeedNomCapSizingFactor( FluidCoolerLowSpeedNomCapSizingFactor ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			OutdoorAirInletNodeNum( OutdoorAirInletNodeNum ),
-			HighMassFlowErrorCount( HighMassFlowErrorCount ),
-			HighMassFlowErrorIndex( HighMassFlowErrorIndex ),
-			OutletWaterTempErrorCount( OutletWaterTempErrorCount ),
-			OutletWaterTempErrorIndex( OutletWaterTempErrorIndex ),
-			SmallWaterMassFlowErrorCount( SmallWaterMassFlowErrorCount ),
-			SmallWaterMassFlowErrorIndex( SmallWaterMassFlowErrorIndex ),
-			WMFRLessThanMinAvailErrCount( WMFRLessThanMinAvailErrCount ),
-			WMFRLessThanMinAvailErrIndex( WMFRLessThanMinAvailErrIndex ),
-			WMFRGreaterThanMaxAvailErrCount( WMFRGreaterThanMaxAvailErrCount ),
-			WMFRGreaterThanMaxAvailErrIndex( WMFRGreaterThanMaxAvailErrIndex ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
 		{}
 
 	};
@@ -262,22 +233,6 @@ namespace FluidCoolers {
 			AirPress( 0.0 ),
 			AirHumRat( 0.0 )
 		{}
-
-		// Member Constructor
-		FluidCoolerInletConds(
-			Real64 const WaterTemp, // Fluid cooler water inlet temperature (C)
-			Real64 const AirTemp, // Fluid cooler air inlet dry-bulb temperature (C)
-			Real64 const AirWetBulb, // Fluid cooler air inlet wet-bulb temperature (C)
-			Real64 const AirPress, // Fluid cooler air barometric pressure
-			Real64 const AirHumRat // Fluid cooler air inlet humidity ratio (kg/kg)
-		) :
-			WaterTemp( WaterTemp ),
-			AirTemp( AirTemp ),
-			AirWetBulb( AirWetBulb ),
-			AirPress( AirPress ),
-			AirHumRat( AirHumRat )
-		{}
-
 	};
 
 	struct ReportVars
@@ -299,32 +254,31 @@ namespace FluidCoolers {
 			FanPower( 0.0 ),
 			FanEnergy( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const InletWaterTemp, // Fluid cooler inlet water temperature (C)
-			Real64 const OutletWaterTemp, // Fluid cooler outlet water temperature (C)
-			Real64 const WaterMassFlowRate, // Fluid cooler water mass flow rate (m3/s)
-			Real64 const Qactual, // Fluid cooler heat rejection rate (W)
-			Real64 const FanPower, // Fluid cooler fan power (W)
-			Real64 const FanEnergy // Fluid cooler fan energy consumption (J)
-		) :
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			Qactual( Qactual ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
-	extern FArray1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
-	extern FArray1D< ReportVars > SimpleFluidCoolerReport; // report variables
+	extern Array1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
+	extern Array1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
+	extern Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
 	// Functions
+	bool
+	TestFluidCoolerSingleSpeedInputForDesign(
+		std::string const & cCurrentModuleObject,
+		Array1D<std::string> const &  AlphArray,
+		Array1D<std::string> const & cNumericFieldNames,
+		Array1D<std::string> const & cAlphaFieldNames,
+		int const &	FluidCoolerNum
+		);
+
+	bool
+	TestFluidCoolerTwoSpeedInputForDesign(
+		std::string const & cCurrentModuleObject,
+		Array1D<std::string> const &  AlphArray,
+		Array1D<std::string> const & cNumericFieldNames,
+		Array1D<std::string> const & cAlphaFieldNames,
+		int const &	FluidCoolerNum
+	);
 
 	void
 	SimFluidCoolers(
@@ -389,7 +343,7 @@ namespace FluidCoolers {
 	Real64
 	SimpleFluidCoolerUAResidual(
 		Real64 const UA, // UA of fluid cooler
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design fluid cooler load [W]
+		Array1< Real64 > const & Par // par(1) = design fluid cooler load [W]
 	);
 
 	// End of the CondenserLoopFluidCoolers Module Simulation Subroutines
@@ -412,29 +366,6 @@ namespace FluidCoolers {
 		bool const RunFlag,
 		int const FluidCoolerNum
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // FluidCoolers
 

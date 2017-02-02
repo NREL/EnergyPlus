@@ -1,9 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -65,8 +110,6 @@ namespace IceThermalStorage {
 	using DataGlobals::HourOfDay;
 	using DataGlobals::TimeStep;
 	using DataGlobals::ScheduleAlwaysOn;
-	using DataEnvironment::OutWetBulbTemp; // This value is used to model Cooling Tower.  Twb + 2[degF]
-	using DataEnvironment::OutDryBulbTemp;
 	using namespace DataHVACGlobals;
 	using General::TrimSigDigits;
 
@@ -154,16 +197,16 @@ namespace IceThermalStorage {
 	Real64 ITSCoolingRate( 0.0 ); // ITS Discharge(-)/Charge(+) rate [W]
 	Real64 ITSCoolingEnergy( 0.0 );
 	Real64 ChillerOutletTemp( 0.0 ); // Chiller outlet brine temperature [C]
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 	// General routine
 
 	// Object Data
-	FArray1D< IceStorageSpecs > IceStorage; // dimension to number of machines
-	FArray1D< ReportVars > IceStorageReport; // dimension to number of machines
-	FArray1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
-	FArray1D< IceStorageMapping > IceStorageTypeMap;
+	Array1D< IceStorageSpecs > IceStorage; // dimension to number of machines
+	Array1D< ReportVars > IceStorageReport; // dimension to number of machines
+	Array1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
+	Array1D< IceStorageMapping > IceStorageTypeMap;
 
 	//*************************************************************************
 
@@ -194,11 +237,9 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys; // [hr]
 		using InputProcessor::FindItemInList;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -249,7 +290,7 @@ namespace IceThermalStorage {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap.Name(), TotalIceStorages );
+			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
 				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
@@ -420,6 +461,7 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::SetComponentFlowRate;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using DataGlobals::WarmupFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -432,8 +474,8 @@ namespace IceThermalStorage {
 		Real64 const TankChargeToler( 0.999 ); // Above this fraction, we don't have anything left to charge
 		Real64 const TemperatureToler( 0.1 ); // Temperature difference between iterations that indicates convergence [C]
 		Real64 const SIEquiv100GPMinMassFlowRate( 6.31 ); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
-														  // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
-														  // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
+														// Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
+														// Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
 		static std::string const RoutineName( "SimDetailedIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -744,7 +786,7 @@ namespace IceThermalStorage {
 					} // ...loop iterating for the ice storage outlet temperature
 
 					// Keep track of times that the iterations got excessive
-					if ( IterNum >= MaxIterNum ) {
+					if ( IterNum >= MaxIterNum && ( !WarmupFlag ) ) {
 						++DetIceStor( IceNum ).DischargeIterErrors;
 						if ( DetIceStor( IceNum ).DischargeIterErrors <= 25 ) {
 							ShowWarningError( "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit" );
@@ -859,7 +901,7 @@ namespace IceThermalStorage {
 			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IceStorage.Name(), IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -955,7 +997,7 @@ namespace IceThermalStorage {
 			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DetIceStor.Name(), IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1205,8 +1247,8 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CompNum; // local do loop index
 		// FLOW:
 
@@ -1311,9 +1353,9 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyPlantScanFlag;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool errFlag;
 		int CompNum; // local do loop counter
 
@@ -1388,10 +1430,6 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::NumOfTimeStepInHour;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
@@ -1404,9 +1442,8 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate  [fraction]
-		Real64 Umin; // Min Urate  [fraction]
-		Real64 Uact; // Acting between Umax and Umin [fraction]
+		Real64 Umin( 0.0 ); // Min Urate  [fraction]
+		Real64 Uact( 0.0 ); // Acting between Umax and Umin [fraction]
 		Real64 ITSCoolingRateMax;
 		Real64 ITSCoolingRateOpt;
 		Real64 ITSCoolingRateMin;
@@ -1427,11 +1464,6 @@ namespace IceThermalStorage {
 			MinCap = 0.0;
 			OptCap = 0.0;
 
-			// Initialize processed Usys values
-			Umax = 0.0;
-			Umin = 0.0;
-			Uact = 0.0;
-
 			// XCurIceFrac is reset to 1.0 when first hour of day.
 			// Starting full is assumed, because most ice systems are fully charged overnight
 			if ( ResetXForITSFlag ) {
@@ -1449,8 +1481,6 @@ namespace IceThermalStorage {
 			// QiceMin is REAL(r64) ITS capacity.
 			CalcQiceDischageMax( QiceMin );
 
-			// Check Umax and Umin to verify the input U value.
-			Umax = 0.0;
 			// At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
 			// Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
 			Umin = min( max( ( -( 1.0 - EpsLimitForDisCharge ) * QiceMin * TimeInterval / ITSNomCap ), ( -XCurIceFrac + EpsLimitForX ) ), 0.0 );
@@ -1505,19 +1535,11 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate  [fraction]
-		Real64 Umin; // Min Urate  [fraction]
-		Real64 Uact; // Acting between Umax and Umin [fraction]
 
 		// FLOW
 		{ auto const SELECT_CASE_var( IceStorageType ); //by ZG
 
 		if ( SELECT_CASE_var == IceStorageType_Simple ) { //by ZG
-
-			// Initialize processed Usys values
-			Umax = 0.0;
-			Umin = 0.0;
-			Uact = 0.0;
 
 			// Provide output results for ITS.
 			ITSMassFlowRate = 0.0; //[kg/s]
@@ -1582,9 +1604,9 @@ namespace IceThermalStorage {
 		// FLOW
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate adjusted Urate based on Error protection (I) [fraction]
-		Real64 Umin; // Min Urate adjusted Urate based on Error protection (I) [fraction]
-		Real64 Uact; // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
+		Real64 Umax( 0.0 ); // Max Urate adjusted Urate based on Error protection (I) [fraction]
+		Real64 Umin( 0.0 ); // Min Urate adjusted Urate based on Error protection (I) [fraction]
+		Real64 Uact( 0.0 ); // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
 		Real64 QiceMax; // [W]
 		Real64 QiceMaxByChiller; // [W]
 		Real64 QiceMaxByITS; // [W]
@@ -1615,9 +1637,6 @@ namespace IceThermalStorage {
 			ITSCoolingEnergy = 0.0; //[J]
 
 			// Initialize processed U values
-			Umax = 0.0;
-			Umin = 0.0;
-			Uact = 0.0;
 			Urate = 0.0;
 
 			// Calculate QiceMax which is REAL(r64) ITS capacity.
@@ -1751,7 +1770,7 @@ namespace IceThermalStorage {
 
 	void
 	CalcQiceChargeMaxByITS(
-		int & IceNum,
+		int & EP_UNUSED( IceNum ),
 		Real64 const ChillerOutletTemp, // [degC]
 		Real64 & QiceMaxByITS // [W]
 	)
@@ -1820,7 +1839,7 @@ namespace IceThermalStorage {
 		int const IceNum, // ice storage number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when ice storage operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep
 		Real64 const MaxCap // Max possible discharge rate (positive value)
 	)
 	{
@@ -1835,21 +1854,17 @@ namespace IceThermalStorage {
 
 		// Using/Aliasing
 		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
-		using DataGlobals::NumOfTimeStepInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const TempTol( 0.0001 ); // C - minimum significant mass flow rate
 		static std::string const RoutineName( "CalcIceStorageDischarge" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2189,7 +2204,7 @@ namespace IceThermalStorage {
 	UpdateNode(
 		Real64 const MyLoad,
 		bool const RunFlag,
-		int const Num
+		int const EP_UNUSED( Num )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2522,29 +2537,6 @@ namespace IceThermalStorage {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // IceThermalStorage
 

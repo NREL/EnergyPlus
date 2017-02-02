@@ -1,10 +1,56 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -79,26 +125,26 @@ namespace ConductionTransferFunctionCalc {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray2D< Real64 > AExp; // Exponential of AMat
-	FArray2D< Real64 > AInv; // Inverse of AMat
-	FArray2D< Real64 > AMat; // "A" matrix from Seem's dissertation
+	Array2D< Real64 > AExp; // Exponential of AMat
+	Array2D< Real64 > AInv; // Inverse of AMat
+	Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
 	// (constant coefficients of linear system)
-	FArray1D< Real64 > BMat( 3 ); // "B" matrix of state space method (non-zero elements)
-	FArray1D< Real64 > CMat( 2 ); // "C" matrix of state space method (non-zero elements)
-	FArray1D< Real64 > DMat( 2 ); // "D" matrix of state space method (non-zero elements)
-	FArray1D< Real64 > e; // Coefficients for the surface flux history term
-	FArray2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
+	Array1D< Real64 > BMat( 3 ); // "B" matrix of state space method (non-zero elements)
+	Array1D< Real64 > CMat( 2 ); // "C" matrix of state space method (non-zero elements)
+	Array1D< Real64 > DMat( 2 ); // "D" matrix of state space method (non-zero elements)
+	Array1D< Real64 > e; // Coefficients for the surface flux history term
+	Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
-	FArray2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
+	Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
 	int NodeSource; // Node at which a source or sink is present
 	int NodeUserTemp; // Node where user wishes to calculate a temperature
 	// (for constructions with sources/sinks only)
 	int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	FArray3D< Real64 > s; // Coefficients for the surface temperature history terms
-	FArray2D< Real64 > s0( 4, 3 ); // Coefficients for the current surface temperature terms
+	Array3D< Real64 > s; // Coefficients for the surface temperature history terms
+	Array2D< Real64 > s0( 3, 4 ); // Coefficients for the current surface temperature terms
 	Real64 TinyLimit;
-	FArray2D< Real64 > IdenMatrix; // Identity Matrix
+	Array2D< Real64 > IdenMatrix; // Identity Matrix
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
@@ -209,7 +255,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_int AdjacentResLayerNum( MaxLayersInConstruct ); // Layers that are adjacent to each other which are resistive
+		Array1D_int AdjacentResLayerNum( MaxLayersInConstruct ); // Layers that are adjacent to each other which are resistive
 		// only can and should be combined
 		int AdjLayer; // Loop counter for adjacent resistance-only layers
 		Real64 amatx; // Intermediate calculation variable
@@ -221,13 +267,13 @@ namespace ConductionTransferFunctionCalc {
 		Real64 cnd; // Total thermal conductance (1/Rtot) of the bldg element
 		int Constr; // Loop counter
 		int ConstrNum; // Loop counter (construct number)
-		FArray1D< Real64 > cp( MaxLayersInConstruct ); // Specific heat of a material layer
+		Array1D< Real64 > cp( MaxLayersInConstruct ); // Specific heat of a material layer
 		bool CTFConvrg; // Set after CTFs are calculated, based on whether there are too
 		// many CTF terms
 		int CurrentLayer; // Pointer to material number in Material derived type (current layer)
-		FArray1D< Real64 > dl( MaxLayersInConstruct ); // Thickness of a material layer
+		Array1D< Real64 > dl( MaxLayersInConstruct ); // Thickness of a material layer
 		Real64 dtn; // Intermediate calculation of the time step
-		FArray1D< Real64 > dx( MaxLayersInConstruct ); // Distance between nodes in a particular material layer
+		Array1D< Real64 > dx( MaxLayersInConstruct ); // Distance between nodes in a particular material layer
 		Real64 dxn; // Intermediate calculation of nodal spacing
 		Real64 dxtmp; // Intermediate calculation variable ( = 1/dx/cap)
 		Real64 dyn; // Nodal spacing in the direction perpendicular to the main direction
@@ -240,21 +286,21 @@ namespace ConductionTransferFunctionCalc {
 		int Layer1; // Loop counter
 		int LayersInConstruct; // Array containing the number of layers for each construct
 		// Different from TotLayers because shades are not include in local var
-		FArray1D< Real64 > lr( MaxLayersInConstruct ); // R value of a material layer
+		Array1D< Real64 > lr( MaxLayersInConstruct ); // R value of a material layer
 		int Node; // Loop counter
 		int Node2; // Node number (modification of Node and NodeInRow)
 		int NodeInLayer; // Loop counter
 		int NodeInRow; // Loop counter
-		FArray1D_int Nodes( MaxLayersInConstruct ); // Array containing the number of nodes per layer
+		Array1D_int Nodes( MaxLayersInConstruct ); // Array containing the number of nodes per layer
 		int NumResLayers; // Number of resistive layers in the construction
 		// property allowable, traditional value from BLAST
 		int NumAdjResLayers; // Number of resistive layers that are adjacent
 		int OppositeLayer; // Used for comparing constructions (to see if one is the reverse of another)
-		FArray1D_bool ResLayer( MaxLayersInConstruct ); // Set true if the layer must be handled as a resistive
+		Array1D_bool ResLayer( MaxLayersInConstruct ); // Set true if the layer must be handled as a resistive
 		bool RevConst; // Set true if one construct is the reverse of another (CTFs already
 		// available)
-		FArray1D< Real64 > rho( MaxLayersInConstruct ); // Density of a material layer
-		FArray1D< Real64 > rk( MaxLayersInConstruct ); // Thermal conductivity of a material layer
+		Array1D< Real64 > rho( MaxLayersInConstruct ); // Density of a material layer
+		Array1D< Real64 > rk( MaxLayersInConstruct ); // Thermal conductivity of a material layer
 		Real64 rs; // Total thermal resistance of the building element
 		Real64 SumXi; // Summation of all of the Xi terms (inside CTFs) for a construction
 		Real64 SumYi; // Summation of all of the Xi terms (cross CTFs) for a construction
@@ -323,11 +369,11 @@ namespace ConductionTransferFunctionCalc {
 					if ( ( rho( Layer ) * cp( Layer ) ) > 0.0 ) {
 						Alpha = rk( Layer ) / ( rho( Layer ) * cp( Layer ) );
 						if ( Alpha > HighDiffusivityThreshold ) {
-							DeltaTimestep = TimeStepZone * SecInHour;
+							DeltaTimestep = TimeStepZoneSec;
 							ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 							if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
-								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too " "highly conductive, material name = " + Material( CurrentLayer ).Name );
-								ShowContinueError( "High conductivity Material layers are not well supported for internal source " "constructions, material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
+								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, material name = " + Material( CurrentLayer ).Name );
+								ShowContinueError( "High conductivity Material layers are not well supported for internal source constructions, material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
 								ShowContinueError( "Material thermal diffusivity = " + RoundSigDigits( Alpha, 3 ) + " [m2/s]" );
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThicknessThreshold, 5 ) + " [m]" );
 								if ( Material( CurrentLayer ).Thickness < ThinMaterialLayerThreshold ) {
@@ -739,11 +785,11 @@ namespace ConductionTransferFunctionCalc {
 						IdenMatrix( ir, ir ) = 1.0;
 					}
 					e.dimension( rcmax, 0.0 );
-					Gamma1.allocate( rcmax, 3 );
+					Gamma1.allocate( 3, rcmax );
 					Gamma1 = 0.0;
-					Gamma2.allocate( rcmax, 3 );
+					Gamma2.allocate( 3, rcmax );
 					Gamma2 = 0.0;
-					s.allocate( rcmax, 4, 3 );
+					s.allocate( 3, 4, rcmax );
 					s = 0.0;
 
 					while ( ! CTFConvrg ) { // Begin CTF calculation loop ...
@@ -761,7 +807,7 @@ namespace ConductionTransferFunctionCalc {
 							dxtmp = 1.0 / dx( 1 ) / cap;
 
 							AMat( 1, 1 ) = -2.0 * rk( 1 ) * dxtmp; // Assign the matrix values for the
-							AMat( 1, 2 ) = rk( 1 ) * dxtmp; // first node.
+							AMat( 2, 1 ) = rk( 1 ) * dxtmp; // first node.
 							BMat( 1 ) = rk( 1 ) * dxtmp; // Assign non-zero value of BMat.
 
 							Layer = 1; // Initialize the "layer" counter
@@ -779,9 +825,9 @@ namespace ConductionTransferFunctionCalc {
 
 									cap = ( rho( Layer ) * cp( Layer ) * dx( Layer ) + rho( Layer + 1 ) * cp( Layer + 1 ) * dx( Layer + 1 ) ) * 0.5;
 
-									AMat( Node, Node - 1 ) = rk( Layer ) / dx( Layer ) / cap; // Assign matrix
+									AMat( Node - 1, Node ) = rk( Layer ) / dx( Layer ) / cap; // Assign matrix
 									AMat( Node, Node ) = -1.0 * ( rk( Layer ) / dx( Layer ) + rk( Layer + 1 ) / dx( Layer + 1 ) ) / cap; // values for | the current
-									AMat( Node, Node + 1 ) = rk( Layer + 1 ) / dx( Layer + 1 ) / cap; // node.
+									AMat( Node + 1, Node ) = rk( Layer + 1 ) / dx( Layer + 1 ) / cap; // node.
 
 									NodeInLayer = 0; // At an interface, reset nodes in layer counter
 									++Layer; // Also increment the layer counter
@@ -790,9 +836,9 @@ namespace ConductionTransferFunctionCalc {
 
 									cap = rho( Layer ) * cp( Layer ) * dx( Layer ); // Intermediate
 									dxtmp = 1.0 / dx( Layer ) / cap; // calculations.
-									AMat( Node, Node - 1 ) = rk( Layer ) * dxtmp; // Assign matrix
+									AMat( Node - 1, Node ) = rk( Layer ) * dxtmp; // Assign matrix
 									AMat( Node, Node ) = -2.0 * rk( Layer ) * dxtmp; // values for the
-									AMat( Node, Node + 1 ) = rk( Layer ) * dxtmp; // current node.
+									AMat( Node + 1, Node ) = rk( Layer ) * dxtmp; // current node.
 
 								}
 
@@ -810,7 +856,7 @@ namespace ConductionTransferFunctionCalc {
 							dxtmp = 1.0 / dx( LayersInConstruct ) / cap;
 
 							AMat( rcmax, rcmax ) = -2.0 * rk( LayersInConstruct ) * dxtmp; // Assign matrix
-							AMat( rcmax, rcmax - 1 ) = rk( LayersInConstruct ) * dxtmp; // values for the
+							AMat( rcmax - 1, rcmax ) = rk( LayersInConstruct ) * dxtmp; // values for the
 							BMat( 2 ) = rk( LayersInConstruct ) * dxtmp; // last node.
 
 							CMat( 1 ) = -rk( 1 ) / dx( 1 ); // Compute the necessary elements
@@ -834,19 +880,19 @@ namespace ConductionTransferFunctionCalc {
 							// different from the rest since they are on an adiabatic plane in
 							// the direction perpendicular to the main direction of heat transfer.
 							AMat( 1, 1 ) = -2.0 * ( amatx + amaty );
-							AMat( 1, 2 ) = 2.0 * amaty;
-							AMat( 1, NumOfPerpendNodes + 1 ) = amatx;
+							AMat( 2, 1 ) = 2.0 * amaty;
+							AMat( NumOfPerpendNodes + 1, 1 ) = amatx;
 
 							for ( Node = 2; Node <= NumOfPerpendNodes - 1; ++Node ) {
-								AMat( Node, Node - 1 ) = amaty;
+								AMat( Node - 1, Node ) = amaty;
 								AMat( Node, Node ) = -2.0 * ( amatx + amaty );
-								AMat( Node, Node + 1 ) = amaty;
-								AMat( Node, Node + NumOfPerpendNodes ) = amatx;
+								AMat( Node + 1, Node ) = amaty;
+								AMat( Node + NumOfPerpendNodes, Node ) = amatx;
 							}
 
 							AMat( NumOfPerpendNodes, NumOfPerpendNodes ) = -2.0 * ( amatx + amaty );
-							AMat( NumOfPerpendNodes, NumOfPerpendNodes - 1 ) = 2.0 * amaty;
-							AMat( NumOfPerpendNodes, NumOfPerpendNodes + NumOfPerpendNodes ) = amatx;
+							AMat( NumOfPerpendNodes - 1, NumOfPerpendNodes ) = 2.0 * amaty;
+							AMat( NumOfPerpendNodes + NumOfPerpendNodes, NumOfPerpendNodes ) = amatx;
 
 							BMat( 1 ) = amatx;
 
@@ -873,24 +919,24 @@ namespace ConductionTransferFunctionCalc {
 									// from the rest since they are on an adiabatic plane in the direction
 									// perpendicular to the main direction of heat transfer.
 									AMat( Node, Node ) = -2.0 * ( amatx + amaty );
-									AMat( Node, Node + 1 ) = 2.0 * amaty;
-									AMat( Node, Node - NumOfPerpendNodes ) = amatx;
-									AMat( Node, Node + NumOfPerpendNodes ) = amatx;
+									AMat( Node + 1, Node ) = 2.0 * amaty;
+									AMat( Node - NumOfPerpendNodes, Node ) = amatx;
+									AMat( Node + NumOfPerpendNodes, Node ) = amatx;
 
 									for ( NodeInRow = 2; NodeInRow <= NumOfPerpendNodes - 1; ++NodeInRow ) {
 										Node2 = Node + NodeInRow - 1;
-										AMat( Node2, Node2 - 1 ) = amaty;
+										AMat( Node2 - 1, Node2 ) = amaty;
 										AMat( Node2, Node2 ) = -2.0 * ( amatx + amaty );
-										AMat( Node2, Node2 + 1 ) = amaty;
-										AMat( Node2, Node2 - NumOfPerpendNodes ) = amatx;
-										AMat( Node2, Node2 + NumOfPerpendNodes ) = amatx;
+										AMat( Node2 + 1, Node2 ) = amaty;
+										AMat( Node2 - NumOfPerpendNodes, Node2 ) = amatx;
+										AMat( Node2 + NumOfPerpendNodes, Node2 ) = amatx;
 									}
 
 									Node2 = Node - 1 + NumOfPerpendNodes;
 									AMat( Node2, Node2 ) = -2.0 * ( amatx + amaty );
-									AMat( Node2, Node2 - 1 ) = 2.0 * amaty;
-									AMat( Node2, Node2 - NumOfPerpendNodes ) = amatx;
-									AMat( Node2, Node2 + NumOfPerpendNodes ) = amatx;
+									AMat( Node2 - 1, Node2 ) = 2.0 * amaty;
+									AMat( Node2 - NumOfPerpendNodes, Node2 ) = amatx;
+									AMat( Node2 + NumOfPerpendNodes, Node2 ) = amatx;
 
 								} else { // Row at a two-layer interface (half of node consists of one layer's materials
 									// and the other half consist of the next layer's materials)
@@ -900,24 +946,24 @@ namespace ConductionTransferFunctionCalc {
 									amaty = ( rk( Layer ) * dx( Layer ) + rk( Layer + 1 ) * dx( Layer + 1 ) ) / ( capavg * dyn * dyn );
 
 									AMat( Node, Node ) = -amatx - amatxx - 2.0 * amaty;
-									AMat( Node, Node + 1 ) = 2.0 * amaty;
-									AMat( Node, Node - NumOfPerpendNodes ) = amatx;
-									AMat( Node, Node + NumOfPerpendNodes ) = amatxx;
+									AMat( Node + 1, Node ) = 2.0 * amaty;
+									AMat( Node - NumOfPerpendNodes, Node ) = amatx;
+									AMat( Node + NumOfPerpendNodes, Node ) = amatxx;
 
 									for ( NodeInRow = 2; NodeInRow <= NumOfPerpendNodes - 1; ++NodeInRow ) {
 										Node2 = Node + NodeInRow - 1;
-										AMat( Node2, Node2 - 1 ) = amaty;
+										AMat( Node2 - 1, Node2 ) = amaty;
 										AMat( Node2, Node2 ) = -amatx - amatxx - 2.0 * amaty;
-										AMat( Node2, Node2 + 1 ) = amaty;
-										AMat( Node2, Node2 - NumOfPerpendNodes ) = amatx;
-										AMat( Node2, Node2 + NumOfPerpendNodes ) = amatxx;
+										AMat( Node2 + 1, Node2 ) = amaty;
+										AMat( Node2 - NumOfPerpendNodes, Node2 ) = amatx;
+										AMat( Node2 + NumOfPerpendNodes, Node2 ) = amatxx;
 									}
 
 									Node2 = Node - 1 + NumOfPerpendNodes;
 									AMat( Node2, Node2 ) = -amatx - amatxx - 2.0 * amaty;
-									AMat( Node2, Node2 - 1 ) = 2.0 * amaty;
-									AMat( Node2, Node2 - NumOfPerpendNodes ) = amatx;
-									AMat( Node2, Node2 + NumOfPerpendNodes ) = amatxx;
+									AMat( Node2 - 1, Node2 ) = 2.0 * amaty;
+									AMat( Node2 - NumOfPerpendNodes, Node2 ) = amatx;
+									AMat( Node2 + NumOfPerpendNodes, Node2 ) = amatxx;
 
 									if ( Node == NodeSource ) BMat( 3 ) = 2.0 * double( NumOfPerpendNodes - 1 ) / capavg;
 									NodeInLayer = 0;
@@ -940,19 +986,19 @@ namespace ConductionTransferFunctionCalc {
 
 							Node = rcmax + 1 - NumOfPerpendNodes;
 							AMat( Node, Node ) = -2.0 * ( amatx + amaty );
-							AMat( Node, Node + 1 ) = 2.0 * amaty;
-							AMat( Node, Node - NumOfPerpendNodes ) = amatx;
+							AMat( Node + 1, Node ) = 2.0 * amaty;
+							AMat( Node - NumOfPerpendNodes, Node ) = amatx;
 
 							for ( Node = rcmax + 2 - NumOfPerpendNodes; Node <= rcmax - 1; ++Node ) {
-								AMat( Node, Node - 1 ) = amaty;
+								AMat( Node - 1, Node ) = amaty;
 								AMat( Node, Node ) = -2.0 * ( amatx + amaty );
-								AMat( Node, Node + 1 ) = amaty;
-								AMat( Node, Node - NumOfPerpendNodes ) = amatx;
+								AMat( Node + 1, Node ) = amaty;
+								AMat( Node - NumOfPerpendNodes, Node ) = amatx;
 							}
 
 							AMat( rcmax, rcmax ) = -2.0 * ( amatx + amaty );
-							AMat( rcmax, rcmax - 1 ) = 2.0 * amaty;
-							AMat( rcmax, rcmax - NumOfPerpendNodes ) = amatx;
+							AMat( rcmax - 1, rcmax ) = 2.0 * amaty;
+							AMat( rcmax - NumOfPerpendNodes, rcmax ) = amatx;
 
 							BMat( 2 ) = amatx;
 
@@ -1009,12 +1055,12 @@ namespace ConductionTransferFunctionCalc {
 						// we need to increase the number of histories and the time step as above.
 						if ( CTFConvrg ) {
 							SumXi = s0( 2, 2 );
-							SumYi = s0( 2, 1 );
+							SumYi = s0( 1, 2 );
 							SumZi = s0( 1, 1 );
 							for ( HistTerm = 1; HistTerm <= Construct( ConstrNum ).NumCTFTerms; ++HistTerm ) {
-								SumXi += s( HistTerm, 2, 2 );
-								SumYi += s( HistTerm, 2, 1 );
-								SumZi += s( HistTerm, 1, 1 );
+								SumXi += s( 2, 2, HistTerm );
+								SumYi += s( 1, 2, HistTerm );
+								SumZi += s( 1, 1, HistTerm );
 							}
 							SumXi = std::abs( SumXi );
 							SumYi = std::abs( SumYi );
@@ -1047,7 +1093,7 @@ namespace ConductionTransferFunctionCalc {
 									ShowContinueError( "(inside)=\"" + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name + "\"" );
 								}
 							}
-							ShowContinueError( "The Construction report will be produced. This will show more " "details on Constructions and their materials." );
+							ShowContinueError( "The Construction report will be produced. This will show more details on Constructions and their materials." );
 							ShowContinueError( "Attempts will be made to complete the CTF process but the report may be incomplete." );
 							ShowContinueError( "Constructs reported after this construction may appear to have all 0 CTFs." );
 							ShowContinueError( "The potential causes of this problem are related to the input for the construction" );
@@ -1081,18 +1127,18 @@ namespace ConductionTransferFunctionCalc {
 				Construct( ConstrNum ).NumCTFTerms = 1;
 
 				s0( 1, 1 ) = cnd; // CTFs for current time
-				s0( 1, 2 ) = -cnd; // step are set to the
-				s0( 2, 1 ) = cnd; // overall conductance
+				s0( 2, 1 ) = -cnd; // step are set to the
+				s0( 1, 2 ) = cnd; // overall conductance
 				s0( 2, 2 ) = -cnd; // of the construction.
 
 				e.allocate( 1 );
 				e = 0.0;
-				s.allocate( 1, 2, 2 );
+				s.allocate( 2, 2, 1 );
 				s = 0.0;
 				s( 1, 1, 1 ) = 0.0; // CTF temperature
-				s( 1, 1, 2 ) = 0.0; // and flux
+				s( 2, 1, 1 ) = 0.0; // and flux
 				s( 1, 2, 1 ) = 0.0; // history terms
-				s( 1, 2, 2 ) = 0.0; // are all
+				s( 2, 2, 1 ) = 0.0; // are all
 				e( 1 ) = 0.0; // zero.
 
 				if ( Construct( ConstrNum ).SourceSinkPresent ) {
@@ -1117,43 +1163,43 @@ namespace ConductionTransferFunctionCalc {
 				// Copy the CTFs into the storage arrays, converting them back to SI
 				// units in the process.  First the "zero" terms and then the history terms...
 				Construct( ConstrNum ).CTFOutside( 0 ) = s0( 1, 1 ) * CFU;
-				Construct( ConstrNum ).CTFCross( 0 ) = s0( 2, 1 ) * CFU;
+				Construct( ConstrNum ).CTFCross( 0 ) = s0( 1, 2 ) * CFU;
 				Construct( ConstrNum ).CTFInside( 0 ) = -s0( 2, 2 ) * CFU;
 				if ( Construct( ConstrNum ).SourceSinkPresent ) {
 					// QTFs...
-					Construct( ConstrNum ).CTFSourceOut( 0 ) = s0( 1, 3 );
-					Construct( ConstrNum ).CTFSourceIn( 0 ) = s0( 2, 3 );
+					Construct( ConstrNum ).CTFSourceOut( 0 ) = s0( 3, 1 );
+					Construct( ConstrNum ).CTFSourceIn( 0 ) = s0( 3, 2 );
 					// QTFs for temperature calculation at source/sink location
-					Construct( ConstrNum ).CTFTSourceOut( 0 ) = s0( 3, 1 );
-					Construct( ConstrNum ).CTFTSourceIn( 0 ) = s0( 3, 2 );
+					Construct( ConstrNum ).CTFTSourceOut( 0 ) = s0( 1, 3 );
+					Construct( ConstrNum ).CTFTSourceIn( 0 ) = s0( 2, 3 );
 					Construct( ConstrNum ).CTFTSourceQ( 0 ) = s0( 3, 3 ) / CFU;
 					if ( Construct( ConstrNum ).TempAfterLayer != 0 ) {
 						// QTFs for user specified interior temperature calculations...
-						Construct( ConstrNum ).CTFTUserOut( 0 ) = s0( 4, 1 );
-						Construct( ConstrNum ).CTFTUserIn( 0 ) = s0( 4, 2 );
-						Construct( ConstrNum ).CTFTUserSource( 0 ) = s0( 4, 3 ) / CFU;
+						Construct( ConstrNum ).CTFTUserOut( 0 ) = s0( 1, 4 );
+						Construct( ConstrNum ).CTFTUserIn( 0 ) = s0( 2, 4 );
+						Construct( ConstrNum ).CTFTUserSource( 0 ) = s0( 3, 4 ) / CFU;
 					}
 				}
 
 				for ( HistTerm = 1; HistTerm <= Construct( ConstrNum ).NumCTFTerms; ++HistTerm ) {
 					// "REGULAR" CTFs...
-					Construct( ConstrNum ).CTFOutside( HistTerm ) = s( HistTerm, 1, 1 ) * CFU;
-					Construct( ConstrNum ).CTFCross( HistTerm ) = s( HistTerm, 2, 1 ) * CFU;
-					Construct( ConstrNum ).CTFInside( HistTerm ) = -s( HistTerm, 2, 2 ) * CFU;
+					Construct( ConstrNum ).CTFOutside( HistTerm ) = s( 1, 1, HistTerm ) * CFU;
+					Construct( ConstrNum ).CTFCross( HistTerm ) = s( 1, 2, HistTerm ) * CFU;
+					Construct( ConstrNum ).CTFInside( HistTerm ) = -s( 2, 2, HistTerm ) * CFU;
 					if ( HistTerm != 0 ) Construct( ConstrNum ).CTFFlux( HistTerm ) = -e( HistTerm );
 					if ( Construct( ConstrNum ).SourceSinkPresent ) {
 						// QTFs...
-						Construct( ConstrNum ).CTFSourceOut( HistTerm ) = s( HistTerm, 1, 3 );
-						Construct( ConstrNum ).CTFSourceIn( HistTerm ) = s( HistTerm, 2, 3 );
+						Construct( ConstrNum ).CTFSourceOut( HistTerm ) = s( 3, 1, HistTerm );
+						Construct( ConstrNum ).CTFSourceIn( HistTerm ) = s( 3, 2, HistTerm );
 						// QTFs for temperature calculation at source/sink location
-						Construct( ConstrNum ).CTFTSourceOut( HistTerm ) = s( HistTerm, 3, 1 );
-						Construct( ConstrNum ).CTFTSourceIn( HistTerm ) = s( HistTerm, 3, 2 );
-						Construct( ConstrNum ).CTFTSourceQ( HistTerm ) = s( HistTerm, 3, 3 ) / CFU;
+						Construct( ConstrNum ).CTFTSourceOut( HistTerm ) = s( 1, 3, HistTerm );
+						Construct( ConstrNum ).CTFTSourceIn( HistTerm ) = s( 2, 3, HistTerm );
+						Construct( ConstrNum ).CTFTSourceQ( HistTerm ) = s( 3, 3, HistTerm ) / CFU;
 						if ( Construct( ConstrNum ).TempAfterLayer != 0 ) {
 							// QTFs for user specified interior temperature calculations...
-							Construct( ConstrNum ).CTFTUserOut( HistTerm ) = s( HistTerm, 4, 1 );
-							Construct( ConstrNum ).CTFTUserIn( HistTerm ) = s( HistTerm, 4, 2 );
-							Construct( ConstrNum ).CTFTUserSource( HistTerm ) = s( HistTerm, 4, 3 ) / CFU;
+							Construct( ConstrNum ).CTFTUserOut( HistTerm ) = s( 1, 4, HistTerm );
+							Construct( ConstrNum ).CTFTUserIn( HistTerm ) = s( 2, 4, HistTerm );
+							Construct( ConstrNum ).CTFTUserSource( HistTerm ) = s( 3, 4, HistTerm ) / CFU;
 						}
 					}
 				}
@@ -1251,9 +1297,9 @@ namespace ConductionTransferFunctionCalc {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AMatRowNorm; // Row norm for AMat
 		Real64 AMatRowNormMax; // Largest row norm for AMat
-		FArray2D< Real64 > AMat1; // AMat factored by (delt/2^k)
-		FArray2D< Real64 > AMato; // AMat raised to the previous power (power of AMat1-1)
-		FArray2D< Real64 > AMatN; // Current value of AMat raised to power n (n = 1,2...)
+		Array2D< Real64 > AMat1; // AMat factored by (delt/2^k)
+		Array2D< Real64 > AMato; // AMat raised to the previous power (power of AMat1-1)
+		Array2D< Real64 > AMatN; // Current value of AMat raised to power n (n = 1,2...)
 		bool Backup; // Used when numerics get to small in Exponentiation
 		Real64 CheckVal; // Used to avoid possible overflow from Double->REAL(r64)->Integer
 		Real64 fact; // Intermediate calculation variable (delt/2^k)
@@ -1291,13 +1337,15 @@ namespace ConductionTransferFunctionCalc {
 		// maximum summation of the elements in a row of AMat multiplied by
 		// the time step.
 
+		//Note With change to row-major arrays "row" here now means "column"
+
 		AMatRowNormMax = 0.0; // Start of Step 1 ...
 
 		for ( i = 1; i <= rcmax; ++i ) {
 
 			AMatRowNorm = 0.0;
 			for ( j = 1; j <= rcmax; ++j ) {
-				AMatRowNorm += std::abs( AMat1( i, j ) );
+				AMatRowNorm += std::abs( AMat1( j, i ) );
 			}
 
 			AMatRowNorm *= delt;
@@ -1359,13 +1407,13 @@ namespace ConductionTransferFunctionCalc {
 				// For 2-D heat transfer, the number of off-diagonal non-zero terms
 				// is slightly more complicated as well.
 				for ( ic = 1; ic <= rcmax; ++ic ) {
-					AMatN( ir, ic ) = 0.0;
+					AMatN( ic, ir ) = 0.0;
 					for ( ict = 1; ict <= rcmax; ++ict ) {
 						// Make sure the next term won't cause an underflow.  If it will end up being
 						// so small as to go below TinyLimit, then ignore it since it won't add anything
 						// to AMatN anyway.
-						if ( std::abs( AMat1( ict, ic ) ) > TinyLimit ) {
-							if ( std::abs( AMato( ir, ict ) ) > std::abs( double( i ) * TinyLimit / AMat1( ict, ic ) ) ) AMatN( ir, ic ) += AMato( ir, ict ) * AMat1( ict, ic ) / double( i );
+						if ( std::abs( AMat1( ic, ict ) ) > TinyLimit ) {
+							if ( std::abs( AMato( ict, ir ) ) > std::abs( double( i ) * TinyLimit / AMat1( ic, ict ) ) ) AMatN( ic, ir ) += AMato( ict, ir ) * AMat1( ic, ict ) / double( i );
 						}
 					}
 				}
@@ -1380,7 +1428,7 @@ namespace ConductionTransferFunctionCalc {
 			for ( ir = 1; ir <= rcmax; ++ir ) {
 				for ( ic = 1; ic <= rcmax; ++ic ) {
 					// Test of limit criteria:
-					if ( std::abs( AExp( ir, ic ) ) > TinyLimit ) { // Next line divides by AExp entry so it
+					if ( std::abs( AExp( ic, ir ) ) > TinyLimit ) { // Next line divides by AExp entry so it
 						// must be checked to avoid dividing by zero.
 						// If the ratio between any current element in the power
 						// of AMat and its corresponding element in AExp is
@@ -1388,7 +1436,7 @@ namespace ConductionTransferFunctionCalc {
 						// exponential matrix based on stability criteria, then
 						// continue raising AMat to another power (SigFigLimit = false).
 
-						if ( std::abs( AMato( ir, ic ) / AExp( ir, ic ) ) > DPLimit ) {
+						if ( std::abs( AMato( ic, ir ) / AExp( ic, ir ) ) > DPLimit ) {
 							SigFigLimit = false;
 							break; // DO loop (anytime SigFigLimit is false, AMat must continue to be raised another power)
 						}
@@ -1428,8 +1476,8 @@ namespace ConductionTransferFunctionCalc {
 			for ( ir = 1; ir <= rcmax; ++ir ) {
 				for ( ic = 1; ic <= rcmax; ++ic ) {
 					for ( idm = 1; idm <= rcmax; ++idm ) {
-						if ( std::abs( AMato( ir, idm ) * AMato( idm, ic ) ) > TinyLimit ) {
-							AExp( ir, ic ) += AMato( ir, idm ) * AMato( idm, ic );
+						if ( std::abs( AMato( idm, ir ) * AMato( ic, idm ) ) > TinyLimit ) {
+							AExp( ic, ir ) += AMato( idm, ir ) * AMato( ic, idm );
 							Backup = false;
 						}
 					}
@@ -1492,7 +1540,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > AMat1; // Intermediate calculation matrix equivalent at first to AMat
+		Array2D< Real64 > AMat1; // Intermediate calculation matrix equivalent at first to AMat
 		int ic; // Loop counter
 		int ir; // Loop counter
 		int irr; // Loop counter
@@ -1519,13 +1567,13 @@ namespace ConductionTransferFunctionCalc {
 			// We should only need to factor the elements to the right of the
 			// diagonal since those to the right of it should be zero.
 			for ( ic = ir + 1; ic <= rcmax; ++ic ) {
-				AMat1( ir, ic ) /= AMat1( ir, ir );
+				AMat1( ic, ir ) /= AMat1( ir, ir );
 			}
 
 			// In the forward elimination process, all the elements in AInv to the
 			// right of the diagonal are zero so they do not need to be factored.
 			for ( ic = 1; ic <= ir; ++ic ) {
-				AInv( ir, ic ) /= AMat1( ir, ir );
+				AInv( ic, ir ) /= AMat1( ir, ir );
 			}
 
 			AMat1( ir, ir ) = 1.0; // By definition, the diagonal of AMat is now 1.
@@ -1536,7 +1584,7 @@ namespace ConductionTransferFunctionCalc {
 			for ( irr = ir + 1; irr <= rcmax; ++irr ) { // Start of row reduction loop...
 
 				for ( ic = ir + 1; ic <= rcmax; ++ic ) {
-					AMat1( irr, ic ) -= AMat1( irr, ir ) * AMat1( ir, ic );
+					AMat1( ic, irr ) -= AMat1( ir, irr ) * AMat1( ic, ir );
 				}
 
 				// Now, determine the effect on the next row of AInv.  Again, all of
@@ -1544,10 +1592,10 @@ namespace ConductionTransferFunctionCalc {
 				// can be ignored.
 
 				for ( ic = 1; ic <= ir; ++ic ) {
-					AInv( irr, ic ) -= AMat1( irr, ir ) * AInv( ir, ic );
+					AInv( ic, irr ) -= AMat1( ir, irr ) * AInv( ic, ir );
 				}
 
-				AMat1( irr, ir ) = 0.0; // By definition, the element to the left of the
+				AMat1( ir, irr ) = 0.0; // By definition, the element to the left of the
 				// diagonal in the next row of AMat is now zero.
 
 			} // ...end of row reduction loop
@@ -1560,7 +1608,7 @@ namespace ConductionTransferFunctionCalc {
 		// the diagonal are zero.
 
 		for ( ic = 1; ic <= rcmax; ++ic ) {
-			AInv( rcmax, ic ) /= AMat1( rcmax, rcmax );
+			AInv( ic, rcmax ) /= AMat1( rcmax, rcmax );
 		}
 		AMat1( rcmax, rcmax ) = 1.0;
 
@@ -1580,9 +1628,9 @@ namespace ConductionTransferFunctionCalc {
 		for ( ir = rcmax; ir >= 2; --ir ) { // Begin reverse elimination loop ...
 			for ( irr = 1; irr <= ir - 1; ++irr ) {
 				for ( ic = 1; ic <= rcmax; ++ic ) {
-					AInv( irr, ic ) -= AMat1( irr, ir ) * AInv( ir, ic );
+					AInv( ic, irr ) -= AMat1( ir, irr ) * AInv( ic, ir );
 				}
-				AMat1( irr, ir ) = 0.0;
+				AMat1( ir, irr ) = 0.0;
 			}
 		} // ... end of reverse elimination loop.
 
@@ -1640,7 +1688,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > ATemp; // Intermediate variable equal to AExp - I
+		Array2D< Real64 > ATemp; // Intermediate variable equal to AExp - I
 		int i; // Loop counter
 		int is1; // Loop counter
 		int j; // Loop counter
@@ -1661,17 +1709,17 @@ namespace ConductionTransferFunctionCalc {
 			for ( is1 = 1; is1 <= rcmax; ++is1 ) {
 
 				if ( SolutionDimensions == 1 ) {
-					Gamma1( i, 1 ) += AInv( i, is1 ) * ATemp( is1, 1 ) * BMat( 1 );
-					Gamma1( i, 2 ) += AInv( i, is1 ) * ATemp( is1, rcmax ) * BMat( 2 );
+					Gamma1( 1, i ) += AInv( is1, i ) * ATemp( 1, is1 ) * BMat( 1 );
+					Gamma1( 2, i ) += AInv( is1, i ) * ATemp( rcmax, is1 ) * BMat( 2 );
 				} else { // SolutionDimensions = 2
 					for ( SurfNode = 1; SurfNode <= NumOfPerpendNodes; ++SurfNode ) {
-						Gamma1( i, 1 ) += AInv( i, is1 ) * ATemp( is1, SurfNode ) * BMat( 1 );
-						Gamma1( i, 2 ) += AInv( i, is1 ) * ATemp( is1, rcmax + 1 - SurfNode ) * BMat( 2 );
+						Gamma1( 1, i ) += AInv( is1, i ) * ATemp( SurfNode, is1 ) * BMat( 1 );
+						Gamma1( 2, i ) += AInv( is1, i ) * ATemp( rcmax + 1 - SurfNode, is1 ) * BMat( 2 );
 					}
 				}
 
 				if ( NodeSource > 0 ) {
-					Gamma1( i, 3 ) += AInv( i, is1 ) * ATemp( is1, NodeSource ) * BMat( 3 );
+					Gamma1( 3, i ) += AInv( is1, i ) * ATemp( NodeSource, is1 ) * BMat( 3 );
 				}
 
 			}
@@ -1692,23 +1740,23 @@ namespace ConductionTransferFunctionCalc {
 
 					if ( SolutionDimensions == 1 ) {
 						if ( ( j == 1 ) && ( is1 == 1 ) ) {
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt - BMat( 1 ) );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt - BMat( 1 ) );
 						} else if ( ( j == 2 ) && ( is1 == rcmax ) ) {
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt - BMat( 2 ) );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt - BMat( 2 ) );
 						} else if ( ( j == 3 ) && ( is1 == NodeSource ) ) {
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt - BMat( 3 ) );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt - BMat( 3 ) );
 						} else { // the element of the actual BMat is zero
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt );
 						}
 					} else { // SolutionDimensions = 2
 						if ( ( j == 1 ) && ( ( is1 >= 1 ) && ( is1 <= NumOfPerpendNodes ) ) ) {
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt - BMat( 1 ) );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt - BMat( 1 ) );
 						} else if ( ( j == 2 ) && ( ( is1 <= rcmax ) && ( is1 >= rcmax + 1 - NumOfPerpendNodes ) ) ) {
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt - BMat( 2 ) );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt - BMat( 2 ) );
 						} else if ( ( j == 3 ) && ( is1 == NodeSource ) ) {
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt - BMat( 3 ) );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt - BMat( 3 ) );
 						} else { // the element of the actual BMat is zero
-							Gamma2( i, j ) += AInv( i, is1 ) * ( Gamma1( is1, j ) / delt );
+							Gamma2( j, i ) += AInv( is1, i ) * ( Gamma1( j, is1 ) / delt );
 						}
 					}
 
@@ -1785,12 +1833,12 @@ namespace ConductionTransferFunctionCalc {
 		int is; // Loop counter
 		int is2; // Loop counter
 		int j; // Loop counter
-		FArray2D< Real64 > PhiR0; // Product of Phi( = AExp) and R0 matrices from the state
+		Array2D< Real64 > PhiR0; // Product of Phi( = AExp) and R0 matrices from the state
 		// space method
 		Real64 rat; // Intermediate calculation variable (ratio of flux history
 		// terms)
-		FArray2D< Real64 > Rnew; // Current R matrix
-		FArray2D< Real64 > Rold; // R matrix from the last iteration
+		Array2D< Real64 > Rnew; // Current R matrix
+		Array2D< Real64 > Rold; // R matrix from the last iteration
 		int SurfNode; // Loop counter (for nodes at a surface)
 		Real64 SurfNodeFac; // Multiplying factor applied to various surface nodes
 		Real64 trace; // Trace of the product of Phi( = AExp) and R0
@@ -1814,7 +1862,7 @@ namespace ConductionTransferFunctionCalc {
 		// Gamma1-Gamma2
 		for ( i = 1; i <= rcmax; ++i ) {
 			for ( j = 1; j <= 3; ++j ) {
-				Gamma1( i, j ) -= Gamma2( i, j );
+				Gamma1( j, i ) -= Gamma2( j, i );
 			}
 		}
 
@@ -1825,11 +1873,11 @@ namespace ConductionTransferFunctionCalc {
 		// together.
 		if ( SolutionDimensions == 1 ) {
 			s0( 1, 1 ) = CMat( 1 ) * Gamma2( 1, 1 ) + DMat( 1 );
-			s0( 1, 2 ) = CMat( 1 ) * Gamma2( 1, 2 );
-			s0( 1, 3 ) = CMat( 1 ) * Gamma2( 1, 3 );
-			s0( 2, 1 ) = CMat( 2 ) * Gamma2( rcmax, 1 );
-			s0( 2, 2 ) = CMat( 2 ) * Gamma2( rcmax, 2 ) + DMat( 2 );
-			s0( 2, 3 ) = CMat( 2 ) * Gamma2( rcmax, 3 );
+			s0( 2, 1 ) = CMat( 1 ) * Gamma2( 2, 1 );
+			s0( 3, 1 ) = CMat( 1 ) * Gamma2( 3, 1 );
+			s0( 1, 2 ) = CMat( 2 ) * Gamma2( 1, rcmax );
+			s0( 2, 2 ) = CMat( 2 ) * Gamma2( 2, rcmax ) + DMat( 2 );
+			s0( 3, 2 ) = CMat( 2 ) * Gamma2( 3, rcmax );
 		} else { // SolutionDimensions = 2
 			for ( SurfNode = 1; SurfNode <= NumOfPerpendNodes; ++SurfNode ) {
 				if ( ( SurfNode == 1 ) || ( SurfNode == NumOfPerpendNodes ) ) {
@@ -1837,33 +1885,33 @@ namespace ConductionTransferFunctionCalc {
 				} else {
 					SurfNodeFac = 1.0;
 				}
-				s0( 1, 1 ) += SurfNodeFac * CMat( 1 ) * Gamma2( SurfNode, 1 );
-				s0( 1, 2 ) += SurfNodeFac * CMat( 1 ) * Gamma2( SurfNode, 2 );
-				s0( 1, 3 ) += SurfNodeFac * CMat( 1 ) * Gamma2( SurfNode, 3 );
-				s0( 2, 1 ) += SurfNodeFac * CMat( 2 ) * Gamma2( rcmax + 1 - SurfNode, 1 );
-				s0( 2, 2 ) += SurfNodeFac * CMat( 2 ) * Gamma2( rcmax + 1 - SurfNode, 2 );
-				s0( 2, 3 ) += SurfNodeFac * CMat( 2 ) * Gamma2( rcmax + 1 - SurfNode, 3 );
+				s0( 1, 1 ) += SurfNodeFac * CMat( 1 ) * Gamma2( 1, SurfNode );
+				s0( 2, 1 ) += SurfNodeFac * CMat( 1 ) * Gamma2( 2, SurfNode );
+				s0( 3, 1 ) += SurfNodeFac * CMat( 1 ) * Gamma2( 3, SurfNode );
+				s0( 1, 2 ) += SurfNodeFac * CMat( 2 ) * Gamma2( 1, rcmax + 1 - SurfNode );
+				s0( 2, 2 ) += SurfNodeFac * CMat( 2 ) * Gamma2( 2, rcmax + 1 - SurfNode );
+				s0( 3, 2 ) += SurfNodeFac * CMat( 2 ) * Gamma2( 3, rcmax + 1 - SurfNode );
 			}
 			s0( 1, 1 ) += double( NumOfPerpendNodes - 1 ) * DMat( 1 );
 			s0( 2, 2 ) += double( NumOfPerpendNodes - 1 ) * DMat( 2 );
 		}
 
 		if ( NodeSource > 0 ) {
-			s0( 3, 1 ) = Gamma2( NodeSource, 1 );
-			s0( 3, 2 ) = Gamma2( NodeSource, 2 );
-			s0( 3, 3 ) = Gamma2( NodeSource, 3 );
+			s0( 1, 3 ) = Gamma2( 1, NodeSource );
+			s0( 2, 3 ) = Gamma2( 2, NodeSource );
+			s0( 3, 3 ) = Gamma2( 3, NodeSource );
 		}
 		if ( NodeUserTemp > 0 ) {
-			s0( 4, 1 ) = Gamma2( NodeUserTemp, 1 );
-			s0( 4, 2 ) = Gamma2( NodeUserTemp, 2 );
-			s0( 4, 3 ) = Gamma2( NodeUserTemp, 3 );
+			s0( 1, 4 ) = Gamma2( 1, NodeUserTemp );
+			s0( 2, 4 ) = Gamma2( 2, NodeUserTemp );
+			s0( 3, 4 ) = Gamma2( 3, NodeUserTemp );
 		}
 
 		// Check for and enforce symmetry in the cross term (Y)
-		if ( std::abs( s0( 1, 2 ) ) != std::abs( s0( 2, 1 ) ) ) {
-			avg = ( std::abs( s0( 1, 2 ) ) + std::abs( s0( 2, 1 ) ) ) * 0.5;
-			s0( 1, 2 ) *= avg / std::abs( s0( 1, 2 ) );
+		if ( std::abs( s0( 2, 1 ) ) != std::abs( s0( 1, 2 ) ) ) {
+			avg = ( std::abs( s0( 2, 1 ) ) + std::abs( s0( 1, 2 ) ) ) * 0.5;
 			s0( 2, 1 ) *= avg / std::abs( s0( 2, 1 ) );
+			s0( 1, 2 ) *= avg / std::abs( s0( 1, 2 ) );
 		}
 
 		// Compute S's and e's from 1 to n-1.  See equations (2.1.25) and
@@ -1885,13 +1933,13 @@ namespace ConductionTransferFunctionCalc {
 			for ( ir = 1; ir <= rcmax; ++ir ) {
 
 				for ( ic = 1; ic <= rcmax; ++ic ) {
-					PhiR0( ir, ic ) = 0.0;
+					PhiR0( ic, ir ) = 0.0;
 					for ( is = 1; is <= rcmax; ++is ) {
 						// Make sure the next term won't cause an underflow.  If it will end up being
 						// so small as to go below TinyLimit, then ignore it since it won't add anything
 						// to PhiR0 anyway.
-						if ( std::abs( Rnew( is, ic ) ) > TinyLimit ) {
-							if ( std::abs( AExp( ir, is ) ) > std::abs( TinyLimit / Rnew( is, ic ) ) ) PhiR0( ir, ic ) += AExp( ir, is ) * Rnew( is, ic );
+						if ( std::abs( Rnew( ic, is ) ) > TinyLimit ) {
+							if ( std::abs( AExp( is, ir ) ) > std::abs( TinyLimit / Rnew( ic, is ) ) ) PhiR0( ic, ir ) += AExp( is, ir ) * Rnew( ic, is );
 						}
 					}
 				}
@@ -1910,8 +1958,8 @@ namespace ConductionTransferFunctionCalc {
 
 			for ( ir = 1; ir <= rcmax; ++ir ) {
 				for ( ic = 1; ic <= rcmax; ++ic ) {
-					Rold( ir, ic ) = Rnew( ir, ic );
-					Rnew( ir, ic ) = PhiR0( ir, ic );
+					Rold( ic, ir ) = Rnew( ic, ir );
+					Rnew( ic, ir ) = PhiR0( ic, ir );
 				}
 				Rnew( ir, ir ) += e( inum );
 			}
@@ -1922,17 +1970,17 @@ namespace ConductionTransferFunctionCalc {
 			if ( SolutionDimensions == 1 ) {
 				for ( j = 1; j <= 3; ++j ) {
 					for ( is2 = 1; is2 <= rcmax; ++is2 ) {
-						s( inum, 1, j ) += CMat( 1 ) * ( Rold( 1, is2 ) * Gamma1( is2, j ) + Rnew( 1, is2 ) * Gamma2( is2, j ) );
-						s( inum, 2, j ) += CMat( 2 ) * ( Rold( rcmax, is2 ) * Gamma1( is2, j ) + Rnew( rcmax, is2 ) * Gamma2( is2, j ) );
+						s( j, 1, inum ) += CMat( 1 ) * ( Rold( is2, 1 ) * Gamma1( j, is2 ) + Rnew( is2, 1 ) * Gamma2( j, is2 ) );
+						s( j, 2, inum ) += CMat( 2 ) * ( Rold( is2, rcmax ) * Gamma1( j, is2 ) + Rnew( is2, rcmax ) * Gamma2( j, is2 ) );
 						if ( NodeSource > 0 ) {
-							s( inum, 3, j ) += ( Rold( NodeSource, is2 ) * Gamma1( is2, j ) + Rnew( NodeSource, is2 ) * Gamma2( is2, j ) );
+							s( j, 3, inum ) += ( Rold( is2, NodeSource ) * Gamma1( j, is2 ) + Rnew( is2, NodeSource ) * Gamma2( j, is2 ) );
 						}
 						if ( NodeUserTemp > 0 ) {
-							s( inum, 4, j ) += ( Rold( NodeUserTemp, is2 ) * Gamma1( is2, j ) + Rnew( NodeUserTemp, is2 ) * Gamma2( is2, j ) );
+							s( j, 4, inum ) += ( Rold( is2, NodeUserTemp ) * Gamma1( j, is2 ) + Rnew( is2, NodeUserTemp ) * Gamma2( j, is2 ) );
 						}
 
 					}
-					if ( j != 3 ) s( inum, j, j ) += e( inum ) * DMat( j );
+					if ( j != 3 ) s( j, j, inum ) += e( inum ) * DMat( j );
 				}
 			} else { // SolutionDimensions = 2
 				for ( j = 1; j <= 3; ++j ) {
@@ -1943,26 +1991,26 @@ namespace ConductionTransferFunctionCalc {
 							} else {
 								SurfNodeFac = 1.0;
 							}
-							s( inum, 1, j ) += SurfNodeFac * CMat( 1 ) * ( Rold( SurfNode, is2 ) * Gamma1( is2, j ) + Rnew( SurfNode, is2 ) * Gamma2( is2, j ) );
-							s( inum, 2, j ) += SurfNodeFac * CMat( 2 ) * ( Rold( rcmax + 1 - SurfNode, is2 ) * Gamma1( is2, j ) + Rnew( rcmax + 1 - SurfNode, is2 ) * Gamma2( is2, j ) );
+							s( j, 1, inum ) += SurfNodeFac * CMat( 1 ) * ( Rold( is2, SurfNode ) * Gamma1( j, is2 ) + Rnew( is2, SurfNode ) * Gamma2( j, is2 ) );
+							s( j, 2, inum ) += SurfNodeFac * CMat( 2 ) * ( Rold( is2, rcmax + 1 - SurfNode ) * Gamma1( j, is2 ) + Rnew( is2, rcmax + 1 - SurfNode ) * Gamma2( j, is2 ) );
 						}
 						if ( NodeSource > 0 ) {
-							s( inum, 3, j ) += ( Rold( NodeSource, is2 ) * Gamma1( is2, j ) + Rnew( NodeSource, is2 ) * Gamma2( is2, j ) );
+							s( j, 3, inum ) += ( Rold( is2, NodeSource ) * Gamma1( j, is2 ) + Rnew( is2, NodeSource ) * Gamma2( j, is2 ) );
 						}
 						if ( NodeUserTemp > 0 ) {
-							s( inum, 4, j ) += ( Rold( NodeUserTemp, is2 ) * Gamma1( is2, j ) + Rnew( NodeUserTemp, is2 ) * Gamma2( is2, j ) );
+							s( j, 4, inum ) += ( Rold( is2, NodeUserTemp ) * Gamma1( j, is2 ) + Rnew( is2, NodeUserTemp ) * Gamma2( j, is2 ) );
 						}
 					}
 				}
-				s( inum, 1, 1 ) += e( inum ) * DMat( 1 ) * double( NumOfPerpendNodes - 1 );
-				s( inum, 2, 2 ) += e( inum ) * DMat( 2 ) * double( NumOfPerpendNodes - 1 );
+				s( 1, 1, inum ) += e( inum ) * DMat( 1 ) * double( NumOfPerpendNodes - 1 );
+				s( 2, 2, inum ) += e( inum ) * DMat( 2 ) * double( NumOfPerpendNodes - 1 );
 			}
 
 			// Check for and enforce symmetry in the cross term (Y)
-			if ( std::abs( s( inum, 1, 2 ) ) != std::abs( s( inum, 2, 1 ) ) ) {
-				avg = ( std::abs( s( inum, 1, 2 ) ) + std::abs( s( inum, 2, 1 ) ) ) * 0.5;
-				s( inum, 1, 2 ) *= avg / std::abs( s( inum, 1, 2 ) );
-				s( inum, 2, 1 ) *= avg / std::abs( s( inum, 2, 1 ) );
+			if ( std::abs( s( 2, 1, inum ) ) != std::abs( s( 1, 2, inum ) ) ) {
+				avg = ( std::abs( s( 2, 1, inum ) ) + std::abs( s( 1, 2, inum ) ) ) * 0.5;
+				s( 2, 1, inum ) *= avg / std::abs( s( 2, 1, inum ) );
+				s( 1, 2, inum ) *= avg / std::abs( s( 1, 2, inum ) );
 			}
 
 			// Check for convergence of the CTFs.
@@ -1999,7 +2047,7 @@ namespace ConductionTransferFunctionCalc {
 
 			for ( ir = 1; ir <= rcmax; ++ir ) {
 				for ( is = 1; is <= rcmax; ++is ) {
-					trace += AExp( ir, is ) * Rnew( is, ir );
+					trace += AExp( is, ir ) * Rnew( ir, is );
 				}
 			}
 
@@ -2011,18 +2059,18 @@ namespace ConductionTransferFunctionCalc {
 			if ( SolutionDimensions == 1 ) {
 				for ( j = 1; j <= 3; ++j ) {
 					for ( is2 = 1; is2 <= rcmax; ++is2 ) {
-						s( rcmax, 1, j ) += CMat( 1 ) * Rnew( 1, is2 ) * Gamma1( is2, j );
-						s( rcmax, 2, j ) += CMat( 2 ) * Rnew( rcmax, is2 ) * Gamma1( is2, j );
+						s( j, 1, rcmax ) += CMat( 1 ) * Rnew( is2, 1 ) * Gamma1( j, is2 );
+						s( j, 2, rcmax ) += CMat( 2 ) * Rnew( is2, rcmax ) * Gamma1( j, is2 );
 						if ( NodeSource > 0 ) {
-							s( rcmax, 3, j ) += Rnew( NodeSource, is2 ) * Gamma1( is2, j );
+							s( j, 3, rcmax ) += Rnew( is2, NodeSource ) * Gamma1( j, is2 );
 						}
 						if ( NodeUserTemp > 0 ) {
-							s( rcmax, 4, j ) += Rnew( NodeUserTemp, is2 ) * Gamma1( is2, j );
+							s( j, 4, rcmax ) += Rnew( is2, NodeUserTemp ) * Gamma1( j, is2 );
 						}
 					}
 				}
-				s( rcmax, 1, 1 ) += e( rcmax ) * DMat( 1 );
-				s( rcmax, 2, 2 ) += e( rcmax ) * DMat( 2 );
+				s( 1, 1, rcmax ) += e( rcmax ) * DMat( 1 );
+				s( 2, 2, rcmax ) += e( rcmax ) * DMat( 2 );
 				nrf = rcmax;
 			} else { // SolutionDimensions = 2
 				for ( j = 1; j <= 3; ++j ) {
@@ -2033,27 +2081,27 @@ namespace ConductionTransferFunctionCalc {
 							} else {
 								SurfNodeFac = 1.0;
 							}
-							s( rcmax, 1, j ) += SurfNodeFac * CMat( 1 ) * Rnew( SurfNode, is2 ) * Gamma1( is2, j );
-							s( rcmax, 2, j ) += SurfNodeFac * CMat( 2 ) * Rnew( rcmax + 1 - SurfNode, is2 ) * Gamma1( is2, j );
+							s( j, 1, rcmax ) += SurfNodeFac * CMat( 1 ) * Rnew( is2, SurfNode ) * Gamma1( j, is2 );
+							s( j, 2, rcmax ) += SurfNodeFac * CMat( 2 ) * Rnew( is2, rcmax + 1 - SurfNode ) * Gamma1( j, is2 );
 						}
 						if ( NodeSource > 0 ) {
-							s( rcmax, 3, j ) += Rnew( NodeSource, is2 ) * Gamma1( is2, j );
+							s( j, 3, rcmax ) += Rnew( is2, NodeSource ) * Gamma1( j, is2 );
 						}
 						if ( NodeUserTemp > 0 ) {
-							s( rcmax, 4, j ) += Rnew( NodeUserTemp, is2 ) * Gamma1( is2, j );
+							s( j, 4, rcmax ) += Rnew( is2, NodeUserTemp ) * Gamma1( j, is2 );
 						}
 					}
 				}
-				s( rcmax, 1, 1 ) += e( rcmax ) * DMat( 1 ) * double( NumOfPerpendNodes - 1 );
-				s( rcmax, 2, 2 ) += e( rcmax ) * DMat( 2 ) * double( NumOfPerpendNodes - 1 );
+				s( 1, 1, rcmax ) += e( rcmax ) * DMat( 1 ) * double( NumOfPerpendNodes - 1 );
+				s( 2, 2, rcmax ) += e( rcmax ) * DMat( 2 ) * double( NumOfPerpendNodes - 1 );
 			}
 
 			// Check for and enforce symmetry in the cross term (Y)
 
-			if ( std::abs( s( rcmax, 1, 2 ) ) != std::abs( s( rcmax, 2, 1 ) ) ) {
-				avg = ( std::abs( s( rcmax, 1, 2 ) ) + std::abs( s( rcmax, 2, 1 ) ) ) * 0.5;
-				s( rcmax, 1, 2 ) *= avg / std::abs( s( rcmax, 1, 2 ) );
-				s( rcmax, 2, 1 ) *= avg / std::abs( s( rcmax, 2, 1 ) );
+			if ( std::abs( s( 2, 1, rcmax ) ) != std::abs( s( 1, 2, rcmax ) ) ) {
+				avg = ( std::abs( s( 2, 1, rcmax ) ) + std::abs( s( 1, 2, rcmax ) ) ) * 0.5;
+				s( 2, 1, rcmax ) *= avg / std::abs( s( 2, 1, rcmax ) );
+				s( 1, 2, rcmax ) *= avg / std::abs( s( 1, 2, rcmax ) );
 			}
 
 		} // ... end of IF block for calculation of last e and S.
@@ -2177,29 +2225,6 @@ namespace ConductionTransferFunctionCalc {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ConductionTransferFunctionCalc
 

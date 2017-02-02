@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <RoomAirModelUserTempPattern.hh>
@@ -177,7 +223,7 @@ namespace RoomAirModelUserTempPattern {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
 		static bool MyOneTimeFlag( true ); // one time setup flag
 		int SurfNum; // do loop counter
 
@@ -232,7 +278,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::ZTAV;
-		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 
 		// Locals
@@ -254,7 +299,7 @@ namespace RoomAirModelUserTempPattern {
 		AirPatternZoneInfo( ZoneNum ).Tstat = MAT( ZoneNum );
 		AirPatternZoneInfo( ZoneNum ).Tleaving = MAT( ZoneNum );
 		AirPatternZoneInfo( ZoneNum ).Texhaust = MAT( ZoneNum );
-		AirPatternZoneInfo( ZoneNum ).Surf.TadjacentAir() = MAT( ZoneNum );
+		for ( auto & e : AirPatternZoneInfo( ZoneNum ).Surf ) e.TadjacentAir = MAT( ZoneNum );
 
 		// the only input this method needs is the zone MAT or ZT or ZTAV  ?  (original was ZT)
 		AirPatternZoneInfo( ZoneNum ).TairMean = MAT( ZoneNum ); // this is lagged from previous corrector result
@@ -283,11 +328,8 @@ namespace RoomAirModelUserTempPattern {
 		// na
 
 		// Using/Aliasing
-		using DataSurfaces::Surface;
-		using DataSurfaces::AdjacentAirTemp;
 		using DataSurfaces::ZoneMeanAirTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
 		using General::FindNumberInList;
@@ -327,7 +369,7 @@ namespace RoomAirModelUserTempPattern {
 			AirPatternZoneInfo( ZoneNum ).Tstat = AirPatternZoneInfo( ZoneNum ).TairMean;
 			AirPatternZoneInfo( ZoneNum ).Tleaving = AirPatternZoneInfo( ZoneNum ).TairMean;
 			AirPatternZoneInfo( ZoneNum ).Texhaust = AirPatternZoneInfo( ZoneNum ).TairMean;
-			AirPatternZoneInfo( ZoneNum ).Surf.TadjacentAir() = AirPatternZoneInfo( ZoneNum ).TairMean;
+			for ( auto & e : AirPatternZoneInfo( ZoneNum ).Surf ) e.TadjacentAir = AirPatternZoneInfo( ZoneNum ).TairMean;
 
 			return;
 
@@ -335,7 +377,7 @@ namespace RoomAirModelUserTempPattern {
 
 			CurntPatternKey = GetCurrentScheduleValue( AirPatternZoneInfo( ZoneNum ).PatternSchedID );
 
-			CurPatrnID = FindNumberInList( CurntPatternKey, RoomAirPattern.PatrnID(), NumAirTempPatterns );
+			CurPatrnID = FindNumberInList( CurntPatternKey, RoomAirPattern, &TemperaturePatternStruct::PatrnID );
 
 			if ( CurPatrnID == 0 ) {
 				// throw error here ? way to test schedules before getting to this point?
@@ -573,7 +615,7 @@ namespace RoomAirModelUserTempPattern {
 		Real64 thisZeta; // non-dimensional height
 		Real64 DeltaHeight; // height difference in m
 		Real64 tempDeltaTai; // temporary temperature difference
-		static FArray1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
+		static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 		static bool MyOneTimeFlag( true );
 
 		if ( MyOneTimeFlag ) {
@@ -593,23 +635,8 @@ namespace RoomAirModelUserTempPattern {
 		{ auto const SELECT_CASE_var( RoomAirPattern( PattrnID ).TwoGradPatrn.InterpolationMode );
 
 		if ( SELECT_CASE_var == OutdoorDryBulbMode ) {
-			if ( Zone( ZoneNum ).OutDryBulbTemp >= RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale ) {
-				Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.HiGradient;
 
-			} else if ( Zone( ZoneNum ).OutDryBulbTemp <= RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) {
-
-				Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
-			} else { // interpolate
-
-				if ( ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) != 0.0 ) {
-					// bad user input. should be trapped during get input in RoomAirManager.cc
-					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
-				} else {
-
-					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient + ( ( Zone( ZoneNum ).OutDryBulbTemp - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) / ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) ) * ( RoomAirPattern( PattrnID ).TwoGradPatrn.HiGradient - RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient );
-
-				}
-			}
+			Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp, RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient, RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
 		} else if ( SELECT_CASE_var == ZoneAirTempMode ) {
 
@@ -706,6 +733,38 @@ namespace RoomAirModelUserTempPattern {
 		AirPatternZoneInfo( ZoneNum ).Gradient = Grad;
 
 	}
+	Real64
+	OutdoorDryBulbGrad(
+		Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
+		Real64 UpperBound, // RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale
+		Real64 HiGradient, // RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient
+		Real64 LowerBound, // RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale
+		Real64 LowGradient // RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient
+	)
+	{
+		Real64 Grad;
+		if (DryBulbTemp >= UpperBound) {
+			Grad = HiGradient;
+
+		}
+		else if (DryBulbTemp <= LowerBound) {
+
+			Grad = LowGradient;
+		}
+		else { // interpolate
+
+			if ((UpperBound - LowerBound) == 0.0) {
+				// bad user input. should be trapped during get input in RoomAirManager.cc
+				Grad = LowGradient;
+			}
+			else {
+
+				Grad = LowGradient + ((DryBulbTemp - LowerBound) / (UpperBound -LowerBound)) * (HiGradient - LowGradient);
+
+			}
+		}
+		return Grad;
+	}
 
 	void
 	FigureConstGradPattern(
@@ -801,6 +860,7 @@ namespace RoomAirModelUserTempPattern {
 		using DataSurfaces::SurfaceClass_Floor;
 		using DataSurfaces::SurfaceClass_Wall;
 		using DataHeatBalance::Zone;
+		using DataVectorTypes::Vector;
 		using General::RoundSigDigits;
 		using DataErrorTracking::TotalRoomAirPatternTooLow;
 		using DataErrorTracking::TotalRoomAirPatternTooHigh;
@@ -852,8 +912,8 @@ namespace RoomAirModelUserTempPattern {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Floor ) {
 				// Use Average Z for surface, more important for roofs than floors...
 				++FloorCount;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 				ZFlrAvg += ( Z1 + Z2 ) / 2.0;
 			}
 			if ( Surface( SurfNum ).Class == SurfaceClass_Wall ) {
@@ -863,8 +923,8 @@ namespace RoomAirModelUserTempPattern {
 					ZMax = Surface( SurfNum ).Vertex( 1 ).z;
 					ZMin = ZMax;
 				}
-				ZMax = max( ZMax, maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() ) );
-				ZMin = min( ZMin, minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() ) );
+				ZMax = max( ZMax, maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z ) );
+				ZMin = min( ZMin, minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z ) );
 			}
 		}
 		if ( FloorCount > 0.0 ) {
@@ -875,10 +935,10 @@ namespace RoomAirModelUserTempPattern {
 		ZoneZorig = ZFlrAvg; // Z floor  [M]
 		ZoneCeilHeight = Zone( thisZone ).CeilingHeight;
 
-		//first check if some basic things are reasonable
+		// first check if some basic things are reasonable
 
-		SurfMinZ = minval( Surface( thisHBsurf ).Vertex.z() );
-		SurfMaxZ = maxval( Surface( thisHBsurf ).Vertex.z() );
+		SurfMinZ = minval( Surface( thisHBsurf ).Vertex, &Vector::z );
+		SurfMaxZ = maxval( Surface( thisHBsurf ).Vertex, &Vector::z );
 
 		if ( SurfMinZ < ( ZoneZorig - TolValue ) ) {
 			if ( DisplayExtraWarnings ) {
@@ -949,9 +1009,7 @@ namespace RoomAirModelUserTempPattern {
 		using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::TempEffBulkAir;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::RefrigCaseCredit;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -1135,38 +1193,19 @@ namespace RoomAirModelUserTempPattern {
 		// set thermostat reading for air system .
 		TempTstatAir( ZoneNum ) = AirPatternZoneInfo( ZoneNum ).Tstat;
 
-		// set results for all surface (note array assignments instead of looping)
-		TempEffBulkAir( {SurfFirst,SurfLast} ) = AirPatternZoneInfo( ZoneNum ).Surf.TadjacentAir();
+		// set results for all surface
+		for ( int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j ) {
+			TempEffBulkAir( i ) = AirPatternZoneInfo( ZoneNum ).Surf( j ).TadjacentAir;
+		}
 
 		// set flag for reference air temperature mode
-		Surface( {SurfFirst,SurfLast} ).TAirRef() = AdjacentAirTemp;
+		for ( int i = SurfFirst; i <= SurfLast; ++i ) {
+			Surface( i ).TAirRef = AdjacentAirTemp;
+		}
 
 	}
 
 	//*****************************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RoomAirModelUserTempPattern
 

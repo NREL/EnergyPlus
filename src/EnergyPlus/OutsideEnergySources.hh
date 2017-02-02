@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef OutsideEnergySources_hh_INCLUDED
 #define OutsideEnergySources_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -36,6 +82,7 @@ namespace OutsideEnergySources {
 		std::string ScheduleID; // equipment availability schedule
 		std::string Name; // user identifier
 		Real64 NomCap; // design nominal capacity of district service
+		bool NomCapWasAutoSized; // ture if Nominal Capacity was autosize on input
 		int CapFractionSchedNum; // capacity modifier schedule number
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the inlet side of the plant
@@ -56,6 +103,7 @@ namespace OutsideEnergySources {
 		// Default Constructor
 		OutsideEnergySourceSpecs() :
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			CapFractionSchedNum( 0 ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
@@ -70,49 +118,6 @@ namespace OutsideEnergySources {
 			OneTimeInitFlag( true ),
 			BeginEnvrnInitFlag( true ),
 			CheckEquipName( true )
-		{}
-
-		// Member Constructor
-		OutsideEnergySourceSpecs(
-			std::string const & PlantLoopID, // main plant loop ID
-			std::string const & SecndryLoopID, // secondary chiller loop (cond loop) ID
-			std::string const & ScheduleID, // equipment availability schedule
-			std::string const & Name, // user identifier
-			Real64 const NomCap, // design nominal capacity of district service
-			int const CapFractionSchedNum, // capacity modifier schedule number
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the inlet side of the plant
-			Real64 const EnergyTransfer, // cooling energy provided in time step
-			Real64 const EnergyRate, // cooling power
-			int const EnergyType, // flag for district heating OR cooling
-			int const MassFlowReSimIndex,
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum,
-			bool const OneTimeInitFlag,
-			bool const BeginEnvrnInitFlag,
-			bool const CheckEquipName
-		) :
-			PlantLoopID( PlantLoopID ),
-			SecndryLoopID( SecndryLoopID ),
-			ScheduleID( ScheduleID ),
-			Name( Name ),
-			NomCap( NomCap ),
-			CapFractionSchedNum( CapFractionSchedNum ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			EnergyTransfer( EnergyTransfer ),
-			EnergyRate( EnergyRate ),
-			EnergyType( EnergyType ),
-			MassFlowReSimIndex( MassFlowReSimIndex ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			OneTimeInitFlag( OneTimeInitFlag ),
-			BeginEnvrnInitFlag( BeginEnvrnInitFlag ),
-			CheckEquipName( CheckEquipName )
 		{}
 
 	};
@@ -132,27 +137,15 @@ namespace OutsideEnergySources {
 			OutletTemp( 0.0 ),
 			EnergyTransfer( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const MassFlowRate,
-			Real64 const InletTemp,
-			Real64 const OutletTemp,
-			Real64 const EnergyTransfer
-		) :
-			MassFlowRate( MassFlowRate ),
-			InletTemp( InletTemp ),
-			OutletTemp( OutletTemp ),
-			EnergyTransfer( EnergyTransfer )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< OutsideEnergySourceSpecs > EnergySource;
-	extern FArray1D< ReportVars > EnergySourceReport;
+	extern Array1D< OutsideEnergySourceSpecs > EnergySource;
+	extern Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimOutsideEnergy(
@@ -200,6 +193,11 @@ namespace OutsideEnergySources {
 	// *****************************************************************************
 
 	void
+	SizeDistrictEnergy(
+		int const EnergySourceNum
+	);
+
+	void
 	SimDistrictEnergy(
 		bool const RunFlag,
 		int const DistrictEqNum,
@@ -225,29 +223,6 @@ namespace OutsideEnergySources {
 
 	// End of Record Keeping subroutines for the OutsideEnergySources Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutsideEnergySources
 

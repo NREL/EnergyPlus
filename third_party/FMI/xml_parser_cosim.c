@@ -4,7 +4,7 @@
 /// \brief  xml parser for fmu.
 ///
 /// \author Wangda Zuo,
-///         Simulation Research Group, 
+///         Simulation Research Group,
 ///         LBNL,
 ///         WZuo@lbl.gov
 ///
@@ -13,20 +13,20 @@
 /// \version $Id: xml_parser_cosim.c 55724 2011-10-10 17:51:58 wzuo $
 ///
 /// This file is based on xml_parser.c that is copyrighted by
-/// QTronic GmbH and that is distributed under the BSD license. 
-/// The original file, its copyright notice and its license can 
+/// QTronic GmbH and that is distributed under the BSD license.
+/// The original file, its copyright notice and its license can
 /// be found in FMI/Copyright
 ///
-/// The file has been modified for use with the FMU standard for 
+/// The file has been modified for use with the FMU standard for
 /// co-simulation. The original file was developed for model exchange.
-/// The original file used 0 as indicator for failure and 
-/// 1 as indicator for success.  
+/// The original file used 0 as indicator for failure and
+/// 1 as indicator for success.
 /// The new file uses 0 as indicator for success according to STL.
 ///
 ///
 ///////////////////////////////////////////////////////
 /// Copyright notice of original file that served as the basis of this imlementation.
-/* ------------------------------------------------------------------------- 
+/* -------------------------------------------------------------------------
  * xml_Parser.c
  * A parser for file modelVariables.xml of an FMU.
  * The parser creates an AST (abstract syntax tree) for a given XML file.
@@ -37,12 +37,12 @@
  * - check for each element that is has the expected parent element
  * - check for correct sequence of elements
  * Validation to be performed by this parser
- * - check for each attribute value that it is of the expected type 
- * - check that required attributes are present  
+ * - check for each attribute value that it is of the expected type
+ * - check that required attributes are present
  * - check that all decalaredType values reference an existing Type
  * - check that dependencies are only declared for outputs and
  *   refer only to inputs
- * Copyright 2010 QTronic GmbH. All rights reserved. 
+ * Copyright 2010 QTronic GmbH. All rights reserved.
  * -------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -50,7 +50,7 @@
 #include <string.h>
 #include <limits.h>
 #include "xml_parser_cosim.h"
-#include "util.h"  
+#include "util.h"
 
 const char *elmNames[SIZEOF_ELM] = {
     "fmiModelDescription","UnitDefinitions","BaseUnit","DisplayUnitDefinition","TypeDefinitions",
@@ -714,7 +714,7 @@ void XMLCALL handleData(void *context, const XML_Char *s, int len) {
 
 // -------------------------------------------------------------------------
 // printing
- 
+
 static void printList(int indent, void** list);
 
 void printElement(int indent, void* element){
@@ -825,14 +825,14 @@ void printidf(const char* fmuFilNam, ModelDescription* md)
 
 			/////////////////////////////////////////////////////////////////////////////////////
 			// Define ExternalInterface:FunctionalMockupUnitImport:From:Variable
-			// Define part of ExternalInterface:FunctionalMockupUnitImport:To,      
+			// Define part of ExternalInterface:FunctionalMockupUnitImport:To,
 			if(val == enu_input || val == enu_output)
 			{
 				switch (val)
 				{
 				case enu_input:
 					fprintf(fp, "\nExternalInterface:FunctionalMockupUnitImport:From:Variable,\n");
-					fprintf(fp, "   ,\t\t!- Output:Variable Index Key Name\n");    
+					fprintf(fp, "   ,\t\t!- Output:Variable Index Key Name\n");
 					fprintf(fp, "   ,\t\t!- Output:Variable Name\n");
 					break;
 				case enu_output:
@@ -851,7 +851,7 @@ void printidf(const char* fmuFilNam, ModelDescription* md)
 					fprintf(fp, "   %s;\t\t!- FMU Variable Name\n", e->attributes[varname]);
 					break;
 				case enu_output:
-					fprintf(fp, "   %s,\t\t!- FMU Variable Name\n", e->attributes[varname]);				   
+					fprintf(fp, "   %s,\t\t!- FMU Variable Name\n", e->attributes[varname]);
 					break;
 				default:
 					break;

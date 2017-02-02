@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -48,17 +94,10 @@ namespace Boilers {
 	// METHODOLOGY EMPLOYED:
 	// The BLAST/DOE-2 empirical model based on mfg. data
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using namespace DataHVACGlobals;
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;
@@ -67,12 +106,6 @@ namespace Boilers {
 	using DataBranchAirLoopPlant::ControlType_SeriesActive;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
-
-	//USE FunctionFluidProperties
-	// Use statements for access to subroutines in other modules
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Boiler normalized efficiency curve types
 	int const Linear( 1 );
@@ -95,8 +128,6 @@ namespace Boilers {
 	int const NotModulated( 202 );
 	int const LeavingSetPointModulated( 203 );
 
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DECLARATIONS:
 	int NumBoilers( 0 ); // Number of boilers
 	Real64 FuelUsed( 0.0 ); // W - Boiler fuel used
@@ -106,13 +137,13 @@ namespace Boilers {
 	Real64 BoilerOutletTemp( 0.0 ); // W - Boiler outlet temperature
 	Real64 BoilerPLR( 0.0 ); // Boiler operating part-load ratio
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
 	// Object Data
-	FArray1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
-	FArray1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
+	Array1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
+	Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// MODULE SUBROUTINES:
 
@@ -122,8 +153,23 @@ namespace Boilers {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumBoilers = 0;
+		FuelUsed = 0.0;
+		ParasiticElecPower = 0.0;
+		BoilerLoad = 0.0;
+		BoilerMassFlowRate = 0.0;
+		BoilerOutletTemp = 0.0;
+		BoilerPLR = 0.0;
+		CheckEquipName.deallocate();
+		Boiler.deallocate();
+		BoilerReport.deallocate();
+	}
+
+	void
 	SimBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
@@ -175,7 +221,7 @@ namespace Boilers {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler.Name(), NumBoilers );
+			BoilerNum = FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -195,9 +241,9 @@ namespace Boilers {
 
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
-			Boiler( BoilerNum ).IsThisSized = false;
+//			Boiler( BoilerNum ).IsThisSized = false;
 			InitBoiler( BoilerNum );
-			Boiler( BoilerNum ).IsThisSized = true;
+//			Boiler( BoilerNum ).IsThisSized = true;
 			SizeBoiler( BoilerNum );
 			MinCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MinPartLoadRat;
 			MaxCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MaxPartLoadRat;
@@ -247,6 +293,7 @@ namespace Boilers {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using General::RoundSigDigits;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// PARAMETERS
@@ -261,7 +308,7 @@ namespace Boilers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool errFlag; // Flag to show errors were found during function call
-		FArray1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
+		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		//GET NUMBER OF ALL EQUIPMENT
 		cCurrentModuleObject = "Boiler:HotWater";
@@ -289,7 +336,7 @@ namespace Boilers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Boiler.Name(), BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Boiler, BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -359,6 +406,9 @@ namespace Boilers {
 				ShowContinueError( "..." + cNumericFieldNames( 1 ) + " must be greater than 0.0" );
 				ErrorsFound = true;
 			}
+			if ( Boiler( BoilerNum ).NomCap == AutoSize ) {
+				Boiler( BoilerNum ).NomCapWasAutoSized = true;
+			}
 
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			if ( rNumericArgs( 2 ) == 0.0 ) {
@@ -426,6 +476,9 @@ namespace Boilers {
 
 			Boiler( BoilerNum ).TempDesBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).VolFlowRate = rNumericArgs( 4 );
+			if ( Boiler( BoilerNum ).VolFlowRate ==  AutoSize ) {
+				Boiler( BoilerNum ).VolFlowRateWasAutoSized = true;
+			}
 			Boiler( BoilerNum ).MinPartLoadRat = rNumericArgs( 5 );
 			Boiler( BoilerNum ).MaxPartLoadRat = rNumericArgs( 6 );
 			Boiler( BoilerNum ).OptPartLoadRat = rNumericArgs( 7 );
@@ -512,43 +565,29 @@ namespace Boilers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using DataPlant::TypeOf_Boiler_Simple;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitBoiler" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag; // environment flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // environment flag
+		static Array1D_bool MyFlag;
 		Real64 rho;
 		bool FatalError;
 		bool errFlag;
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -576,9 +615,9 @@ namespace Boilers {
 			MyFlag( BoilerNum ) = false;
 		}
 
-		if ( MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeBoiler( BoilerNum );
-			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
+		if ( MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			//if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
+			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).VolFlowRate * rho;
 
 			InitComponentNodes( 0.0, Boiler( BoilerNum ).DesMassFlowRate, Boiler( BoilerNum ).BoilerInletNodeNum, Boiler( BoilerNum ).BoilerOutletNodeNum, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
@@ -588,7 +627,7 @@ namespace Boilers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
 							Boiler( BoilerNum ).ModulatedFlowErrDone = true;
 						}
@@ -599,7 +638,7 @@ namespace Boilers {
 						if ( FatalError ) {
 							if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
@@ -651,78 +690,64 @@ namespace Boilers {
 		// Obtains hot water flow rate from the plant sizing array. Calculates nominal capacity from
 		// the hot water flow rate and the hot water loop design delta T.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeBoiler" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		std::string equipName; // Name of boiler object
 		Real64 rho;
 		Real64 Cp;
 		Real64 tmpNomCap; // local nominal capacity cooling power
 		Real64 tmpBoilerVolFlowRate; // local boiler design volume flow rate
-		bool IsAutoSize; // Indicator to autosize for reporting
-		Real64 NomCapUser; // Hardsized nominal capacity for reporting
-		Real64 VolFlowRateUser; // Hardsized volume flow for reporting
+		Real64 NomCapUser( 0.0 ); // Hardsized nominal capacity for reporting
+		Real64 VolFlowRateUser( 0.0 ); // Hardsized volume flow for reporting
 
-		PltSizNum = 0;
-		ErrorsFound = false;
-		IsAutoSize = false;
 		tmpNomCap = Boiler( BoilerNum ).NomCap;
-		NomCapUser = 0.0;
 		tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
-		VolFlowRateUser = 0.0;
 
 		PltSizNum = PlantLoop( Boiler( BoilerNum ).LoopNum ).PlantSizNum;
 
-		if ( Boiler( BoilerNum ).NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
-				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-				if ( ! IsAutoSize ) tmpNomCap = Boiler( BoilerNum ).NomCap;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
+				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;
+
 			} else {
-				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
+
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) {
 					Boiler( BoilerNum ).NomCap = tmpNomCap;
-					if ( ! Boiler( BoilerNum ).IsThisSized ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+							"Design Size Nominal Capacity [W]", tmpNomCap );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
 					if ( Boiler( BoilerNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = Boiler( BoilerNum ).NomCap;
-						if ( ! Boiler( BoilerNum ).IsThisSized ) {
+						if ( PlantFinalSizesOkayToReport ) {
 							ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
@@ -739,42 +764,41 @@ namespace Boilers {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( Boiler( BoilerNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} else { // Hard-sized with no sizing data
-				if ( ! Boiler( BoilerNum ).IsThisSized ) {
-					if ( Boiler( BoilerNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
-					}
-				}
+			}
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && PlantFinalSizesOkayToReport
+					&& ( Boiler( BoilerNum ).NomCap > 0.0 ) ) { // Hard-sized with no sizing data
+					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}
 		}
 
-		IsAutoSize = false;
-		if ( Boiler( BoilerNum ).VolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
+
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpBoilerVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * Boiler( BoilerNum ).SizFac;
-				if ( ! IsAutoSize ) tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%VolFlowRate = tmpBoilerVolFlowRate
+				if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpBoilerVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%VolFlowRate = tmpBoilerVolFlowRate
+				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) {
 					Boiler( BoilerNum ).VolFlowRate = tmpBoilerVolFlowRate;
-					if ( ! Boiler( BoilerNum ).IsThisSized ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
+					if ( PlantFinalSizesOkayToReport) {
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+							"Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport) {
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+							"Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
 					}
 				} else {
 					if ( Boiler( BoilerNum ).VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0 ) {
 						VolFlowRateUser = Boiler( BoilerNum ).VolFlowRate;
-						if ( ! Boiler( BoilerNum ).IsThisSized ) {
+						if ( PlantFinalSizesOkayToReport ) {
 							ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate, "User-Specified Design Water Flow Rate [m3/s]", VolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpBoilerVolFlowRate - VolFlowRateUser ) / VolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -791,22 +815,21 @@ namespace Boilers {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} else { // Hard-sized with no sizing data
-				if ( ! Boiler( BoilerNum ).IsThisSized ) {
-					if ( Boiler( BoilerNum ).VolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "User-Specified Design Water Flow Rate [m3/s]", Boiler( BoilerNum ).VolFlowRate );
-					}
-				}
+			}
+			if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport
+					&& ( Boiler( BoilerNum ).VolFlowRate > 0.0 ) ) { // Hard-sized with no sizing data
+					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+						"User-Specified Design Water Flow Rate [m3/s]", Boiler( BoilerNum ).VolFlowRate );
 			}
 		}
 
 		RegisterPlantCompDesignFlow( Boiler( BoilerNum ).BoilerInletNodeNum, tmpBoilerVolFlowRate );
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
 			equipName = Boiler( BoilerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "Boiler:HotWater" );
@@ -1147,29 +1170,6 @@ namespace Boilers {
 
 	// End of Record Keeping subroutines for the BOILER:HOTWATER Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Boilers
 

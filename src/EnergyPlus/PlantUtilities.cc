@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -48,18 +94,41 @@ namespace PlantUtilities {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+	namespace {
+		struct CriteriaData
+		{
+			// Members
+			int CallingCompLoopNum; // for debug error handling
+			int CallingCompLoopSideNum; // for debug error handling
+			int CallingCompBranchNum; // for debug error handling
+			int CallingCompCompNum; // for debug error handling
+			Real64 ThisCriteriaCheckValue; // the previous value, to check the current against
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+			// Default Constructor
+			CriteriaData() :
+				CallingCompLoopNum( 0 ),
+				CallingCompLoopSideNum( 0 ),
+				CallingCompBranchNum( 0 ),
+				CallingCompCompNum( 0 ),
+				ThisCriteriaCheckValue( 0.0 )
+			{}
 
+		};
+
+		// Object Data
+		Array1D< CriteriaData > CriteriaChecks; // stores criteria information
+	}
 	// MODULE VARIABLE DECLARATIONS:
 	// na
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Functions
+	void
+	clear_state()
+	{
+		CriteriaChecks.deallocate();
+	}
 
 	void
 	InitComponentNodes(
@@ -67,10 +136,10 @@ namespace PlantUtilities {
 		Real64 const MaxCompMdot,
 		int const InletNode, // component's inlet node index in node structure
 		int const OutletNode, // component's outlet node index in node structure
-		int const LoopNum, // plant loop index for PlantLoop structure
-		int const LoopSideNum, // Loop side index for PlantLoop structure
-		int const BranchIndex, // branch index for PlantLoop
-		int const CompIndex // component index for PlantLoop
+		int const EP_UNUSED( LoopNum ), // plant loop index for PlantLoop structure
+		int const EP_UNUSED( LoopSideNum ), // Loop side index for PlantLoop structure
+		int const EP_UNUSED( BranchIndex ), // branch index for PlantLoop
+		int const EP_UNUSED( CompIndex ) // component index for PlantLoop
 	)
 	{
 
@@ -94,7 +163,6 @@ namespace PlantUtilities {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeID;
-		using DataPlant::PlantLoop;
 		using DataPlant::DemandOpSchemeType;
 
 		// Locals
@@ -192,7 +260,7 @@ namespace PlantUtilities {
 		using DataPlant::DemandOpSchemeType;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using General::RoundSigDigits;
@@ -213,7 +281,8 @@ namespace PlantUtilities {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeDiagSetup( true );
-		static FArray1D_bool NodeErrorMsgIssued;
+		bool EMSLoadOverride;
+		static Array1D_bool NodeErrorMsgIssued;
 		static bool NullPlantErrorMsgIssued;
 		Real64 MdotOldRequest; // initial value of mass flow
 		int CompInletNodeNum;
@@ -245,8 +314,10 @@ namespace PlantUtilities {
 		// FLOW:
 
 		MdotOldRequest = Node( InletNode ).MassFlowRateRequest;
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & comp( loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType == DemandOpSchemeType ) {
+		if ( comp.CurOpSchemeType == DemandOpSchemeType ) {
 			// store flow request on inlet node
 
 			Node( InletNode ).MassFlowRateRequest = CompFlow;
@@ -270,7 +341,7 @@ namespace PlantUtilities {
 			Node( OutletNode ).MassFlowRateMaxAvail = min( Node( InletNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRateMax );
 		} else {
 
-			if ( ! SysSizingCalc && PlantSizesOkayToFinalize ) {
+			if ( ! SysSizingCalc && PlantFirstSizesOkayToFinalize ) {
 				// throw error for developers, need to change a componennt model to set hardware limits on inlet
 				if ( ! NodeErrorMsgIssued( InletNode ) ) {
 
@@ -282,25 +353,38 @@ namespace PlantUtilities {
 		}
 
 		//Set loop flow rate
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowUnlocked ) {
+		if ( loop_side.FlowLock == FlowUnlocked ) {
 			if ( PlantLoop( LoopNum ).MaxVolFlowRate == AutoSize ) { //still haven't sized the plant loop
 				Node( OutletNode ).MassFlowRate = CompFlow;
 				Node( InletNode ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 			} else { //bound the flow by Min/Max available and hardware limits
-				if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).FlowCtrl == ControlType_SeriesActive ) {
+				if ( comp.FlowCtrl == ControlType_SeriesActive ) {
 					// determine highest flow request for all the components on the branch
 					SeriesBranchHighFlowRequest = 0.0;
 					SeriesBranchHardwareMaxLim = Node( InletNode ).MassFlowRateMax;
 					SeriesBranchHardwareMinLim = 0.0;
 					SeriesBranchMaxAvail = Node( InletNode ).MassFlowRateMaxAvail;
 					SeriesBranchMinAvail = 0.0;
-					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompNum ) {
-						CompInletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompNum ).NodeNumIn;
+
+					// inserting EMS On/Off Supervisory control here to series branch constraint and assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+
+					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
+						CompInletNodeNum = comp.NodeNumIn;
 						SeriesBranchHighFlowRequest = max( Node( CompInletNodeNum ).MassFlowRateRequest, SeriesBranchHighFlowRequest );
 						SeriesBranchHardwareMaxLim = min( Node( CompInletNodeNum ).MassFlowRateMax, SeriesBranchHardwareMaxLim );
 						SeriesBranchHardwareMinLim = max( Node( CompInletNodeNum ).MassFlowRateMin, SeriesBranchHardwareMinLim );
 						SeriesBranchMaxAvail = min( Node( CompInletNodeNum ).MassFlowRateMaxAvail, SeriesBranchMaxAvail );
 						SeriesBranchMinAvail = max( Node( CompInletNodeNum ).MassFlowRateMinAvail, SeriesBranchMinAvail );
+
+						// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+						auto & thisComp( loop_side.Branch( BranchIndex ).Comp( CompNum ) );
+						if ( thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						SeriesBranchHardwareMaxLim = 0.0;
 					}
 
 					//take higher of branch max flow request and this new flow request
@@ -315,9 +399,9 @@ namespace PlantUtilities {
 					if ( CompFlow < MassFlowTolerance ) CompFlow = 0.0;
 					Node( OutletNode ).MassFlowRate = CompFlow;
 					Node( InletNode ).MassFlowRate = Node( OutletNode ).MassFlowRate;
-					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).TotalComponents; ++CompNum ) {
-						CompInletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompNum ).NodeNumIn;
-						CompOutletNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompNum ).NodeNumOut;
+					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
+						CompInletNodeNum = comp.NodeNumIn;
+						CompOutletNodeNum = comp.NodeNumOut;
 						Node( CompInletNodeNum ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 						Node( CompOutletNodeNum ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 					}
@@ -327,39 +411,38 @@ namespace PlantUtilities {
 					Node( OutletNode ).MassFlowRate = max( Node( InletNode ).MassFlowRateMin, Node( OutletNode ).MassFlowRate );
 					Node( OutletNode ).MassFlowRate = min( Node( OutletNode ).MassFlowRateMaxAvail, Node( OutletNode ).MassFlowRate );
 					Node( OutletNode ).MassFlowRate = min( Node( InletNode ).MassFlowRateMax, Node( OutletNode ).MassFlowRate );
+
+					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+
+					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
+						// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+						auto & thisComp( loop_side.Branch( BranchIndex ).Comp( CompNum ) );
+						if ( thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						Node( OutletNode ).MassFlowRate = 0.0;
+					}
+
 					if ( Node( OutletNode ).MassFlowRate < MassFlowTolerance ) Node( OutletNode ).MassFlowRate = 0.0;
 					CompFlow = Node( OutletNode ).MassFlowRate;
 					Node( InletNode ).MassFlowRate = Node( OutletNode ).MassFlowRate;
 				}
 
 			}
-		} else if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowLocked ) {
+		} else if ( loop_side.FlowLock == FlowLocked ) {
 			Node( OutletNode ).MassFlowRate = Node( InletNode ).MassFlowRate;
 			CompFlow = Node( OutletNode ).MassFlowRate;
-			//    IF (((CompFlow - Node(OutletNode)%MassFlowRateMaxAvail) > MassFlowTol) .OR. &
-			//        ((Node(OutletNode)%MassFlowRateMinAvail - CompFlow) > MassFlowTol)) THEN
-			//      IF ( .NOT. NodeErrorMsgIssued(InletNode)) THEN
-			//        CALL ShowSevereError('SetComponentFlowRate: Flow rate is out of range') !DEBUG error...should never get here
-			//        CALL ShowContinueErrorTimeStamp(' ')
-			//        CALL ShowContinueError('Component flow rate [kg/s] = '//TRIM(RoundSigDigits(CompFlow,8)) )
-			//        CALL ShowContinueError('Node maximum flow rate available [kg/s] = ' &
-			//                                 //TRIM(RoundSigDigits(Node(OutletNode)%MassFlowRateMaxAvail,8)) )
-			//        CALL ShowContinueError('Node minimum flow rate available [kg/s] = '&
-			//                                 //TRIM(RoundSigDigits(Node(OutletNode)%MassFlowRateMinAvail,8)) )
-			//        CALL ShowContinueError('Component named = ' &
-			//                             //TRIM(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchIndex)%Comp(CompIndex)%Name) )
-			//        NodeErrorMsgIssued(InletNode) = .TRUE.
-			//      ENDIF
-			//   !   CALL ShowFatalError('SetComponentFlowRate: out of range flow rate problem caused termination')
-			//    ENDIF
 		} else {
 			ShowFatalError( "SetComponentFlowRate: Flow lock out of range" ); //DEBUG error...should never get here
 		}
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchIndex ).Comp( CompIndex ).CurOpSchemeType == DemandOpSchemeType ) {
+		if ( comp.CurOpSchemeType == DemandOpSchemeType ) {
 			if ( ( MdotOldRequest > 0.0 ) && ( CompFlow > 0.0 ) ) { // sure that not coming back from a no flow reset
 				if ( std::abs( MdotOldRequest - Node( InletNode ).MassFlowRateRequest ) > MassFlowTolerance ) { //demand comp changed its flow request
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimLoopSideNeeded = true;
+					loop_side.SimLoopSideNeeded = true;
 				}
 			}
 		}
@@ -421,6 +504,7 @@ namespace PlantUtilities {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum;
 		Real64 MdotOldRequest;
+		bool EMSLoadOverride;
 
 		// FLOW:
 
@@ -449,6 +533,20 @@ namespace PlantUtilities {
 					a_node.MassFlowRate = max( a_node.MassFlowRateMinAvail, CompFlow );
 					a_node.MassFlowRate = max( a_node.MassFlowRateMin, a_node.MassFlowRate );
 					// add MassFlowRateMin hardware constraints
+
+					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					EMSLoadOverride = false;
+					// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
+					for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+						auto const & comp( branch.Comp( CompNum ) );
+						if ( comp.EMSLoadOverrideOn && comp.EMSLoadOverrideValue == 0.0 ) EMSLoadOverride = true;
+					}
+					if ( EMSLoadOverride ) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
+						a_node.MassFlowRate = 0.0;
+						a_node.MassFlowRateRequest = 0.0;
+					}
+
 					a_node.MassFlowRate = min( a_node.MassFlowRateMaxAvail, a_node.MassFlowRate );
 					a_node.MassFlowRate = min( a_node.MassFlowRateMax, a_node.MassFlowRate );
 					if ( a_node.MassFlowRate < MassFlowTolerance ) a_node.MassFlowRate = 0.0;
@@ -623,8 +721,6 @@ namespace PlantUtilities {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataPlant::PlantLoop;
-		using DataPlant::SupplySide;
-		using DataPlant::DemandSide;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1301,10 +1397,12 @@ namespace PlantUtilities {
 
 		// Flow:
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-			PlantLoop( LoopNum ).LoopSide.SimAirLoopsNeeded() = false;
-			PlantLoop( LoopNum ).LoopSide.SimZoneEquipNeeded() = false;
-			PlantLoop( LoopNum ).LoopSide.SimNonZoneEquipNeeded() = false;
-			PlantLoop( LoopNum ).LoopSide.SimElectLoadCentrNeeded() = false;
+			for ( auto & e : PlantLoop( LoopNum ).LoopSide ) {
+				e.SimAirLoopsNeeded = false;
+				e.SimZoneEquipNeeded = false;
+				e.SimNonZoneEquipNeeded = false;
+				e.SimElectLoadCentrNeeded = false;
+			}
 		}
 
 	}
@@ -1370,43 +1468,7 @@ namespace PlantUtilities {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		struct CriteriaData
-		{
-			// Members
-			int CallingCompLoopNum; // for debug error handling
-			int CallingCompLoopSideNum; // for debug error handling
-			int CallingCompBranchNum; // for debug error handling
-			int CallingCompCompNum; // for debug error handling
-			Real64 ThisCriteriaCheckValue; // the previous value, to check the current against
 
-			// Default Constructor
-			CriteriaData() :
-				CallingCompLoopNum( 0 ),
-				CallingCompLoopSideNum( 0 ),
-				CallingCompBranchNum( 0 ),
-				CallingCompCompNum( 0 ),
-				ThisCriteriaCheckValue( 0.0 )
-			{}
-
-			// Member Constructor
-			CriteriaData(
-				int const CallingCompLoopNum, // for debug error handling
-				int const CallingCompLoopSideNum, // for debug error handling
-				int const CallingCompBranchNum, // for debug error handling
-				int const CallingCompCompNum, // for debug error handling
-				Real64 const ThisCriteriaCheckValue // the previous value, to check the current against
-			) :
-				CallingCompLoopNum( CallingCompLoopNum ),
-				CallingCompLoopSideNum( CallingCompLoopSideNum ),
-				CallingCompBranchNum( CallingCompBranchNum ),
-				CallingCompCompNum( CallingCompCompNum ),
-				ThisCriteriaCheckValue( ThisCriteriaCheckValue )
-			{}
-
-		};
-
-		// Object Data
-		static FArray1D< CriteriaData > CriteriaChecks; // stores criteria information
 		CriteriaData CurCriteria; // for convenience
 
 		if ( UniqueCriteriaCheckIndex <= 0 ) { // If we don't yet have an index, we need to initialize
@@ -1474,7 +1536,7 @@ namespace PlantUtilities {
 	UpdateChillerComponentCondenserSide(
 		int const LoopNum, // component's loop index
 		int const LoopSide, // component's loop side number
-		int const TypeOfNum, // Component's type index
+		int const EP_UNUSED( TypeOfNum ), // Component's type index
 		int const InletNodeNum, // Component's inlet node pointer
 		int const OutletNodeNum, // Component's outlet node pointer
 		Real64 const ModelCondenserHeatRate, // model's heat rejection rate at condenser (W)
@@ -1581,7 +1643,7 @@ namespace PlantUtilities {
 	UpdateComponentHeatRecoverySide(
 		int const LoopNum, // component's loop index
 		int const LoopSide, // component's loop side number
-		int const TypeOfNum, // Component's type index
+		int const EP_UNUSED( TypeOfNum ), // Component's type index
 		int const InletNodeNum, // Component's inlet node pointer
 		int const OutletNodeNum, // Component's outlet node pointer
 		Real64 const ModelRecoveryHeatRate, // model's heat rejection rate at recovery (W)
@@ -1688,9 +1750,9 @@ namespace PlantUtilities {
 	UpdateAbsorberChillerComponentGeneratorSide(
 		int const LoopNum, // component's loop index
 		int const LoopSide, // component's loop side number
-		int const TypeOfNum, // Component's type index
+		int const EP_UNUSED( TypeOfNum ), // Component's type index
 		int const InletNodeNum, // Component's inlet node pointer
-		int const OutletNodeNum, // Component's outlet node pointer
+		int const EP_UNUSED( OutletNodeNum ), // Component's outlet node pointer
 		int const HeatSourceType, // Type of fluid in Generator loop
 		Real64 const ModelGeneratorHeatRate, // model's generator heat rate (W)
 		Real64 const ModelMassFlowRate, // model's generator mass flow rate (kg/s)
@@ -1921,7 +1983,7 @@ namespace PlantUtilities {
 		}
 
 		// store copy of prior structure
-		FArray1D< PlantCallingOrderInfoStruct > TempPlantCallingOrderInfo( PlantCallingOrderInfo );
+		Array1D< PlantCallingOrderInfoStruct > TempPlantCallingOrderInfo( PlantCallingOrderInfo );
 
 		RecordToMoveInPlantCallingOrderInfo = PlantCallingOrderInfo( OldIndex );
 
@@ -2026,9 +2088,6 @@ namespace PlantUtilities {
 		bool Found;
 		int thisCallNodeIndex;
 
-		// Object Data
-		FArray1D< CompDesWaterFlowData > CompDesWaterFlow0; // scratch array to store components'
-
 		NumPlantComps = SaveNumPlantComps;
 
 		if ( NumPlantComps == 0 ) { // first time in, fill and return
@@ -2053,31 +2112,11 @@ namespace PlantUtilities {
 
 		if ( ! Found ) { // grow structure and add new node at the end
 			++NumPlantComps; // increment the number of components that use water as a source of heat or coolth
-			// save the existing data in a scratch array
-			CompDesWaterFlow0.allocate( NumPlantComps - 1 );
-			CompDesWaterFlow0( {1,NumPlantComps - 1} ).SupNode() = CompDesWaterFlow( {1,NumPlantComps - 1} ).SupNode();
-			CompDesWaterFlow0( {1,NumPlantComps - 1} ).DesVolFlowRate() = CompDesWaterFlow( {1,NumPlantComps - 1} ).DesVolFlowRate();
-
-			// get rid of the old array
-			CompDesWaterFlow.deallocate();
-			// allocate a new array
-			CompDesWaterFlow.allocate( NumPlantComps );
-			// save the new data
-			CompDesWaterFlow( NumPlantComps ).SupNode = ComponentInletNodeNum;
-			CompDesWaterFlow( NumPlantComps ).DesVolFlowRate = DesPlantFlow;
-			// move the old data back from the scratch array
-
-			CompDesWaterFlow( {1,NumPlantComps - 1} ).SupNode() = CompDesWaterFlow0( {1,NumPlantComps - 1} ).SupNode();
-			CompDesWaterFlow( {1,NumPlantComps - 1} ).DesVolFlowRate() = CompDesWaterFlow0( {1,NumPlantComps - 1} ).DesVolFlowRate();
-
-			CompDesWaterFlow0.deallocate();
+			CompDesWaterFlow.emplace_back( ComponentInletNodeNum, DesPlantFlow ); // Append the new element
 			SaveNumPlantComps = NumPlantComps;
-
 		} else {
-
 			CompDesWaterFlow( thisCallNodeIndex ).SupNode = ComponentInletNodeNum;
 			CompDesWaterFlow( thisCallNodeIndex ).DesVolFlowRate = DesPlantFlow;
-
 		}
 
 	}
@@ -2087,7 +2126,7 @@ namespace PlantUtilities {
 		int const InletNodeNum,
 		int const OutletNodeNum,
 		Optional_int_const LoopNum,
-		Optional< Real64 const > OutletTemp // set on outlet node if present and water.
+		Optional< Real64 const > EP_UNUSED( OutletTemp ) // set on outlet node if present and water.
 	)
 	{
 
@@ -2320,15 +2359,13 @@ namespace PlantUtilities {
 
 	// In-Place Right Shift by 1 of Array Elements
 	void
-	rshift1( FArray1< Real64 > & a, Real64 const a_l )
+	rshift1( Array1< Real64 > & a, Real64 const a_l )
 	{
 		assert( a.size_bounded() );
-		if ( a.dimensions_initialized() ) {
-			for ( int i = a.u(), e = a.l(); i > e; --i ) {
-				a( i ) = a( i - 1 );
-			}
-			a( a.l() ) = a_l;
+		for ( int i = a.u(), e = a.l(); i > e; --i ) {
+			a( i ) = a( i - 1 );
 		}
+		a( a.l() ) = a_l;
 	}
 
 	void
@@ -2490,29 +2527,6 @@ namespace PlantUtilities {
 		return Converged;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantUtilities
 

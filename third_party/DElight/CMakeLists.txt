@@ -11,7 +11,7 @@ TRY_COMPILE( HAS_ISNAN "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR
 IF( MSVC )
   ADD_DEFINITIONS( "/w" )
 ELSE()
-  ADD_DEFINITIONS( "-w" )
+  ADD_DEFINITIONS( "-w -fPIC" )
 ENDIF()
 
 IF( HAS_ISNAN )
@@ -99,14 +99,5 @@ SET( delight_src
   WxTMY2.h
 )
 
-IF( NOT UNIX )
-  ADD_LIBRARY( DElight STATIC ${delight_src} )
-ELSE()
-  ADD_LIBRARY( DElight SHARED ${delight_src} )
-  set_target_properties(
-    DElight
-    PROPERTIES
-    INSTALL_NAME_DIR "@executable_path"
-  )
-  INSTALL( TARGETS DElight DESTINATION ./ )
-ENDIF()
+ADD_LIBRARY( DElight STATIC ${delight_src} )
+

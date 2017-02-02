@@ -1,9 +1,51 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
@@ -49,6 +91,7 @@ namespace DataEnvironment {
 	Real64 const EarthRadius( 6356000.0 ); // Radius of the Earth (m)
 	Real64 const AtmosphericTempGradient( 0.0065 ); // Standard atmospheric air temperature gradient (K/m)
 	Real64 const SunIsUpValue( 0.00001 ); // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+	Real64 const StdPressureSeaLevel( 101325.0 ); // Standard barometric pressure at sea level (Pa)
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -80,8 +123,6 @@ namespace DataEnvironment {
 	Real64 GroundTempFC; // Current ground temperature defined for F or C factor method {C}
 	Real64 GroundTemp_Surface; // Current surface ground temperature {C}
 	Real64 GroundTemp_Deep; // Current deep ground temperature
-	FArray1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
-	bool PubGroundTempSurfFlag; // Flag for if Surf Ground Temps Exist in idf  (assigned, used same as PubGroundTempSurface)
 	int HolidayIndex; // Indicates whether current day is a holiday and if so what type
 	// HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
 	int HolidayIndexTomorrow; // Tomorrow's Holiday Index
@@ -119,7 +160,7 @@ namespace DataEnvironment {
 	Real64 WaterMainsTemp; // Current water mains temperature
 	int Year; // Current calendar year of the simulation
 	int YearTomorrow; // Tomorrow's calendar year of the simulation
-	FArray1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
+	Array1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
 	Real64 CloudFraction; // Fraction of sky covered by clouds
 	Real64 HISKF; // Exterior horizontal illuminance from sky (lux).
 	Real64 HISUNF; // Exterior horizontal beam illuminance (lux)
@@ -128,8 +169,9 @@ namespace DataEnvironment {
 	Real64 PDIFLW; // Luminous efficacy (lum/W) of sky diffuse solar radiation
 	Real64 SkyClearness; // Sky clearness (see subr. DayltgLuminousEfficacy)
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
-	Real64 StdBaroPress( 101325.0 ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+	Real64 StdBaroPress( StdPressureSeaLevel ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
+	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	std::string EnvironmentName; // Current environment name (longer for weather file names)
@@ -180,6 +222,120 @@ namespace DataEnvironment {
 	//PUBLIC OutAirDensityAt
 
 	// Functions
+
+	// Clears the global data in DataEnvironment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		BeamSolarRad = Real64();
+		EMSBeamSolarRadOverrideOn = false;
+		EMSBeamSolarRadOverrideValue = Real64();
+		DayOfMonth = int();
+		DayOfMonthTomorrow = int();
+		DayOfWeek = int();
+		DayOfWeekTomorrow = int();
+		DayOfYear = int();
+		DayOfYear_Schedule = int();
+		DifSolarRad = Real64();
+		EMSDifSolarRadOverrideOn = false;
+		EMSDifSolarRadOverrideValue = Real64();
+		DSTIndicator = int();
+		Elevation = Real64();
+		EndMonthFlag = bool();
+		GndReflectanceForDayltg = Real64();
+		GndReflectance = Real64();
+		GndSolarRad = Real64();
+		GroundTemp = Real64();
+		GroundTempKelvin = Real64();
+		GroundTempFC = Real64();
+		GroundTemp_Surface = Real64();
+		GroundTemp_Deep = Real64();
+		HolidayIndex = int();
+		HolidayIndexTomorrow = int();
+		IsRain = bool();
+		IsSnow = bool();
+		Latitude = Real64();
+		Longitude = Real64();
+		Month = int();
+		MonthTomorrow = int();
+		OutBaroPress = Real64();
+		OutDryBulbTemp = Real64();
+		EMSOutDryBulbOverrideOn = false;
+		EMSOutDryBulbOverrideValue = Real64();
+		OutHumRat = Real64();
+		OutRelHum = Real64();
+		OutRelHumValue = Real64();
+		EMSOutRelHumOverrideOn = false;
+		EMSOutRelHumOverrideValue = Real64();
+		OutEnthalpy = Real64();
+		OutAirDensity = Real64();
+		OutWetBulbTemp = Real64();
+		OutDewPointTemp = Real64();
+		EMSOutDewPointTempOverrideOn = false;
+		EMSOutDewPointTempOverrideValue = Real64();
+		SkyTemp = Real64();
+		SkyTempKelvin = Real64();
+		LiquidPrecipitation = Real64();
+		SunIsUp = bool();
+		WindDir = Real64();
+		EMSWindDirOverrideOn = false;
+		EMSWindDirOverrideValue = Real64();
+		WindSpeed = Real64();
+		EMSWindSpeedOverrideOn = false;
+		EMSWindSpeedOverrideValue = Real64();
+		WaterMainsTemp = Real64();
+		Year = int();
+		YearTomorrow = int();
+		SOLCOS.dimension( 3 );
+		CloudFraction = Real64();
+		HISKF = Real64();
+		HISUNF = Real64();
+		HISUNFnorm = Real64();
+		PDIRLW = Real64();
+		PDIFLW = Real64();
+		SkyClearness = Real64();
+		SkyBrightness = Real64();
+		StdBaroPress = 101325.0;
+		StdRhoAir = Real64();
+		TimeZoneNumber = Real64();
+		TimeZoneMeridian = Real64();
+		EnvironmentName = std::string();
+		WeatherFileLocationTitle = std::string();
+		CurMnDyHr = std::string();
+		CurMnDy = std::string();
+		CurEnvirNum = int();
+		TotDesDays = 0;
+		TotRunDesPersDays = 0;
+		CurrentOverallSimDay = int();
+		TotalOverallSimDays = int();
+		MaxNumberSimYears = int();
+		RunPeriodStartDayOfWeek = int();
+		CosSolarDeclinAngle = Real64();
+		EquationOfTime = Real64();
+		SinLatitude = Real64();
+		CosLatitude = Real64();
+		SinSolarDeclinAngle = Real64();
+		TS1TimeOffset = -0.5;
+		WeatherFileWindModCoeff = 1.5863;
+		WeatherFileTempModCoeff = 0.0;
+		SiteWindExp = 0.22;
+		SiteWindBLHeight = 370.0;
+		SiteTempGradient = 0.0065;
+		GroundTempObjInput = false;
+		GroundTemp_SurfaceObjInput = false;
+		GroundTemp_DeepObjInput = false;
+		FCGroundTemps = false;
+		DisplayWeatherMissingDataWarnings = false;
+		IgnoreSolarRadiation = false;
+		IgnoreBeamRadiation = false;
+		IgnoreDiffuseRadiation = false;
+		PrintEnvrnStampWarmup = false;
+		PrintEnvrnStampWarmupPrinted = false;
+		RunPeriodEnvironment = false;
+		EnvironmentStartEnd = std::string();
+		CurrentYearIsLeapYear = false;
+	}
 
 	Real64
 	OutDryBulbTempAt( Real64 const Z ) // Height above ground (m)
@@ -426,81 +582,10 @@ namespace DataEnvironment {
 	}
 
 	void
-	SetOutBulbTempAt(
-		int const NumItems,
-		FArray1S< Real64 > const Heights,
-		FArray1S< Real64 > DryBulb,
-		FArray1S< Real64 > WetBulb,
-		std::string const & Settings
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Routine provides facility for doing bulk Set Temperature at Height.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::RoundSigDigits;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i; // Loop Control
-		Real64 BaseDryTemp; // Base temperature at Z = 0 (C)
-		Real64 BaseWetTemp;
-		Real64 Z; // Centroid value
-
-		BaseDryTemp = OutDryBulbTemp + WeatherFileTempModCoeff;
-		BaseWetTemp = OutWetBulbTemp + WeatherFileTempModCoeff;
-
-		if ( SiteTempGradient == 0.0 ) {
-			DryBulb = OutDryBulbTemp;
-			WetBulb = OutWetBulbTemp;
-		} else {
-			for ( i = 1; i <= NumItems; ++i ) {
-				Z = Heights( i );
-				if ( Z <= 0.0 ) {
-					DryBulb( i ) = BaseDryTemp;
-					WetBulb( i ) = BaseWetTemp;
-				} else {
-					DryBulb( i ) = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-					WetBulb( i ) = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-				}
-			}
-			if ( any_lt( DryBulb, -100.0 ) || any_lt( WetBulb, -100.0 ) ) {
-				SetOutBulbTempAt_error( Settings, maxval( Heights ) );
-			}
-		}
-
-	}
-
-	void
 	SetOutBulbTempAt_error(
 		std::string const & Settings,
-		Real64 const max_height
+		Real64 const max_height,
+		std::string const & SettingsName
 	)
 	{
 		// Using/Aliasing
@@ -510,6 +595,7 @@ namespace DataEnvironment {
 		ShowContinueError( "...check " + Settings + " Heights - Maximum " + Settings + " Height=[" + RoundSigDigits( max_height, 0 ) + "]." );
 		if ( max_height >= 20000.0 ) {
 			ShowContinueError( "...according to your maximum Z height, your building is somewhere in the Stratosphere." );
+			ShowContinueError( "...look at " + Settings + " Name= " + SettingsName );
 		}
 		ShowFatalError( "Program terminates due to preceding condition(s)." );
 	}
@@ -517,9 +603,9 @@ namespace DataEnvironment {
 	void
 	SetWindSpeedAt(
 		int const NumItems,
-		FArray1S< Real64 > const Heights,
-		FArray1S< Real64 > LocalWindSpeed,
-		std::string const & Settings
+		Array1S< Real64 > const Heights,
+		Array1S< Real64 > LocalWindSpeed,
+		std::string const & EP_UNUSED( Settings )
 	)
 	{
 
@@ -575,29 +661,6 @@ namespace DataEnvironment {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataEnvironment
 

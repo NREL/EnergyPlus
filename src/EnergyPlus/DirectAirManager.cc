@@ -1,8 +1,53 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -70,12 +115,30 @@ namespace DirectAirManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDirectAir( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetDirectAirInputFlag( true );
+	}
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
 	// Object Data
-	FArray1D< DirectAirProps > DirectAir;
+	Array1D< DirectAirProps > DirectAir;
+
+	void
+	clear_state()
+	{
+		NumDirectAir = 0;
+		CheckEquipName.deallocate();
+		DirectAir.deallocate();
+		GetDirectAirInputFlag = true;
+	}
 
 	// Functions
 
@@ -123,7 +186,6 @@ namespace DirectAirManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DirectAirNum;
-		static bool GetDirectAirInputFlag( true );
 
 		if ( GetDirectAirInputFlag ) { //First time subroutine has been entered
 			GetDirectAirInput();
@@ -132,7 +194,7 @@ namespace DirectAirManager {
 
 		// Find the correct Direct Air Equipment
 		if ( CompIndex == 0 ) {
-			DirectAirNum = FindItemInList( EquipName, DirectAir.EquipID(), NumDirectAir );
+			DirectAirNum = FindItemInList( EquipName, DirectAir, &DirectAirProps::EquipID );
 			if ( DirectAirNum == 0 ) {
 				ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
 			}
@@ -154,13 +216,13 @@ namespace DirectAirManager {
 		}
 
 		// With the correct DirectAirNum to Initialize the system
-		InitDirectAir( DirectAirNum, FirstHVACIteration );
+		InitDirectAir( DirectAirNum, ControlledZoneNum, FirstHVACIteration );
 
 		CalcDirectAir( DirectAirNum, ControlledZoneNum, SensOutputProvided, LatOutputProvided );
 
 		// No Update
 
-		ReportDirectAir( DirectAirNum );
+		// ReportDirectAir( DirectAirNum );
 
 	}
 
@@ -235,7 +297,7 @@ namespace DirectAirManager {
 				GetObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), DirectAir.EquipID(), DirectAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), DirectAir, &DirectAirProps::EquipID, DirectAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";
@@ -265,6 +327,7 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
 						}
 					}
 				}
@@ -312,6 +375,7 @@ namespace DirectAirManager {
 	void
 	InitDirectAir(
 		int const DirectAirNum,
+		int const ControlledZoneNum,
 		bool const FirstHVACIteration
 	)
 	{
@@ -332,13 +396,13 @@ namespace DirectAirManager {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkFanActivated;
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -355,8 +419,8 @@ namespace DirectAirManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
 		int ZoneNode;
 		int Loop;
 
@@ -384,6 +448,9 @@ namespace DirectAirManager {
 		if ( ! SysSizingCalc && MySizeFlag( DirectAirNum ) ) {
 
 			SizeDirectAir( DirectAirNum );
+
+			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
+			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
 
 			MySizeFlag( DirectAirNum ) = false;
 		}
@@ -432,6 +499,7 @@ namespace DirectAirManager {
 				} else {
 					Node( ZoneNode ).MassFlowRate = 0.0;
 					Node( ZoneNode ).MassFlowRateMaxAvail = 0.0;
+					Node( ZoneNode ).MassFlowRateMinAvail = 0.0;
 				}
 			} else { // EMS override on
 				Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).EMSMassFlowRateValue;
@@ -619,53 +687,6 @@ namespace DirectAirManager {
 		DirectAir( DirectAirNum ).SensOutputProvided = SensOutputProvided;
 
 	}
-
-	void
-	ReportDirectAir( int & DirectAirNum )
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Russ Taylor
-		//       DATE WRITTEN:    Nov 1997
-
-		// PURPOSE OF THIS SUBROUTINE: This subroutine
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
-
-		//report the Direct Air Output
-		DirectAir( DirectAirNum ).HeatRate = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 );
-		DirectAir( DirectAirNum ).CoolRate = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) );
-		DirectAir( DirectAirNum ).HeatEnergy = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour;
-		DirectAir( DirectAirNum ).CoolEnergy = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour );
-
-	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DirectAirManager
 

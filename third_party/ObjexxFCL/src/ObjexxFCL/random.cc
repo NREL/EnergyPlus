@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,7 @@ namespace { // Internal shared global
 std::default_random_engine random_generator;
 }
 
-// Random float on [0,1]
+// Random int on [0,1]
 std::int32_t
 IRANDM()
 {
@@ -32,7 +32,7 @@ IRANDM()
 	return distribution( random_generator );
 }
 
-// Random float on [0,1]
+// Random int on [0,1]
 std::int32_t
 IRANDM( int const iflag )
 {
@@ -76,16 +76,16 @@ DRANDM( int const iflag )
 
 // Array of Random float on [0,1]
 void
-RANDOM_NUMBER( FArray< float > & harvest )
+RANDOM_NUMBER( Array< float > & harvest )
 {
-	for ( FArray< float >::size_type i = 0, e = harvest.size(); i < e; ++i ) harvest[ i ] = RANDOM( 0 );
+	for ( Array< float >::size_type i = 0, e = harvest.size(); i < e; ++i ) harvest[ i ] = RANDOM( 0 );
 }
 
 // Array of Random double on [0,1]
 void
-RANDOM_NUMBER( FArray< double > & harvest )
+RANDOM_NUMBER( Array< double > & harvest )
 {
-	for ( FArray< float >::size_type i = 0, e = harvest.size(); i < e; ++i ) harvest[ i ] = DRANDM( 0 );
+	for ( Array< float >::size_type i = 0, e = harvest.size(); i < e; ++i ) harvest[ i ] = DRANDM( 0 );
 }
 
 // Random Seed Set
@@ -97,7 +97,7 @@ SRAND( int const iseed )
 
 // Random Seed Interface
 void
-RANDOM_SEED( Optional< int > size, Optional< FArray1< int > const > put, Optional< FArray1< int > > get )
+RANDOM_SEED( Optional< int > size, Optional< Array1< int > const > put, Optional< Array1< int > > get )
 {
 	static std::vector< int > seed_vals{ int( std::time( NULL ) ), int( std::time( NULL ) ) }; // C++ doesn't provide access to the seed values so we cache them here
 	if ( size.present() ) {
@@ -106,7 +106,7 @@ RANDOM_SEED( Optional< int > size, Optional< FArray1< int > const > put, Optiona
 	} else if ( put.present() ) {
 		assert( ( ! size.present() ) && ( ! get.present() ) ); // At most one arg allowed
 		seed_vals.clear();
-		for ( FArray1< int >::size_type i = 0, e = put().size(); i < e; ++i ) seed_vals.push_back( put()[ i ] );
+		for ( Array1< int >::size_type i = 0, e = put().size(); i < e; ++i ) seed_vals.push_back( put()[ i ] );
 		std::seed_seq seed_val_seq( seed_vals.begin(), seed_vals.end() );
 		random_generator.seed( seed_val_seq ); // Not clear how to know how many seed values the generator is using
 	} else if ( get.present() ) {

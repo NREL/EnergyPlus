@@ -1,0 +1,1723 @@
+\section{Group Setpoint Managers}\label{group-setpoint-managers}
+
+Setpoint Managers are one of the high-level control constructs in EnergyPlus. A Setpoint Manager is able to access data from any of the HVAC system nodes and use this data to calculate a setpoint (usually a temperature setpoint) for one or more other HVAC system nodes. Setpoints are then used by Controllers or Plant or Condenser Loops as a goal for their control actions.
+
+Setpoint Managers are executed at the start of each HVAC timestep, and they reside outside the HVAC system iteration loops. Thus, the Setpoint Managers are executed once per HVAC timestep, and they use previous timestep information (except for zone load) to calculate their setpoints.
+
+The following situations require the use of a Setpoint Manager:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  any use of Controller:WaterCoil; either in Temperature control only or 2 Setpoint Managers for the " TemperatureAndHumidityRatio " control variable option.
+\item
+  use of Controller:OutdoorAir with \emph{Economizer Control Type} set to anything but \emph{NoEconomizer};
+\item
+  use of Coil:Heating:Fuel or Coil: Heating: Electric with the field \emph{Temperature Setpoint Node Name} set to a node name;
+\item
+  any use of CoilSystem:Cooling:DX;
+\item
+  any use of Humidifier:Steam:Electric.
+\item
+  Any use of PlantLoop or CondenserLoop which doesn't use an environment reference such as AIR or GROUND as a set point
+\end{enumerate}
+
+Setpoint managers will place a calculated or scheduled setpoint value on the setpoint node and overwrite any previous value. This value may represent one of several control types (e.g., Temperature, HumidityRatio, MassFlowRate, etc.). No two setpoint managers should use the same setpoint node for like control types.
+
+For the case when two setpoint managers place a setpoint on the same setpoint node (e.g., a temperature setpoint placed on the same node by two different setpoint managers), the setpoint value on the node is calculated by the last setpoint manager simulated. Within a specific type of setpoint manager (e.g., Scheduled), the setpoint managers are simulated in the order found in the input data file (idf) when viewed using a text editor. It is also possible for two different types of setpoint managers to place setpoints of like control variable on the same node. In this case, the order of simulation for the type of setpoint manager determines which setpoint manager is the last to write a setpoint value to the node. This conflict in setpoint node data is most likely to cause inaccurate simulation results. For this reason, a conflicting setpoint node name warning message is issued so that the conflict can be resolved. Duplicate setpoint node names found within a specific node list will not typically cause problems with the simulation (the same value is written twice to the same node). In this case a duplicate setpoint node name warning is issued, however, this could be an error in the spelling of the node name and should be corrected.
+
+Simulation order for setpoint managers:
+
+\begin{itemize}
+\item
+  SetpointManager:Scheduled
+\item
+  SetpointManager:Scheduled:DualSetpoint
+\item
+  SetpointManager:OutdoorAirReset
+\item
+  SetpointManager:SingleZone:Reheat
+\item
+  SetpointManager: SingleZone:Heating
+\item
+  SetpointManager: SingleZone:Cooling
+\item
+  SetpointManager: SingleZone:Humidity:Minimum
+\item
+  SetpointManager: SingleZone:Humidity:Maximum
+\item
+  SetpointManager:Warmest
+\item
+  SetpointManager:Coldest
+\item
+  SetpointManager:WarmestTemperatureFlow
+\item
+  SetpointManager:ReturnAirBypassFlow
+\item
+  SetpointManager:MultiZone:Cooling:Average
+\item
+  SetpointManager:MultiZone:Heating:Average
+\item
+  SetpointManager:MultiZone:MinimumHumidity:Average
+\item
+  SetpointManager:MultiZone:MaximumHumidity:Average
+\item
+  SetpointManager:MultiZone:Humidity:Minimum
+\item
+  SetpointManager:MultiZone:Humidity:Maximum
+\item
+  SetpointManager:FollowOutdoorAirTemperature
+\item
+  SetpointManager:FollowSystemNodeTemperature
+\item
+  SetpointManager:FollowGroundTemperature
+\item
+  SetpointManager:CondenserEnteringReset
+\item
+  SetpointManager:CondenserEnteringReset:Ideal
+\item
+  SetpointManager:MixedAir
+\item
+  SetpointManager:OutdoorAirPretreat
+\item
+  SetpointManager:ReturnTemperature:ChilledWater,
+\item
+  SetpointManager:ReturnTemperature:HotWater
+\end{itemize}
+
+\subsection{SetpointManager:Scheduled}\label{setpointmanagerscheduled}
+
+The simplest Setpoint Manager simply uses a schedule to determine one or more setpoints. No node data is used as input. The input consists of the Setpoint Manager name, the control variable, the schedule name, and the name of a node list. The node list contains the name of those nodes at which the setpoint is to be applied. Of course, a node list name can always be simply the name of a single node.
+
+Note that although this object provides a very general method of setting the values of many different control variables on nodes, the component models and system solvers may or may not be able to use them. Therefore, it is important to understand that simply setting a control variable using this object will not necessarily always produce the desired behavior.
+
+\subsubsection{Inputs}\label{inputs-043}
+
+\paragraph{Field: Name}\label{field-name-042}
+
+A unique, user-assigned name for an instance of a scheduled setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-000}
+
+The type of variable that will be controlled. There are several choices for this type of set point manager. The most common control variable is Temperature but other major choices include: HumidityRatio and MassFlowRate. The versatility of control variables available here (probably) exceeds what is actually available in the component and systems models. However, a large number of possible control variables are made available here for maximum flexibility and because some (but not all) component models will be able to use them. The complete list of key words and the units required in the associated schedules follow.
+
+\begin{itemize}
+\item
+  Temperature Temperture of fluid at node ( °C)
+\item
+  MaximumTemperature Maximum temperature of fluid at node ( °C)
+\item
+  MinimumTemperature Minimum temperature of fluid at node ( °C)
+\item
+  HumidityRatio Humidity ratio of fluid at node (kgWater/kgDryAir)
+\item
+  MaximumHumidityRatio Maximum humidity ratio of fluid at node (kgWater/kgDryAir)
+\item
+  MinimumHumidityRatio Minimum humidity ratio of fluid at node (kgWater/kgDryAir)
+\item
+  MassFlowRate Mass flow rate of fluid at node (kg/s)
+\item
+  MaximumMassFlowRate Maximum mass flow rate of fluid at node (kg/s)
+\item
+  MinimumMassFlowRate Minimum mass flow rate of fluid at node (kg/s)
+\end{itemize}
+
+\paragraph{Field: Schedule Name}\label{field-schedule-name-005}
+
+The name of a schedule whose values are to be used as setpoints on the node or node list. The schedule value for each time period is the setpoint for this type of setpoint manager. The schedule must have values that are in the appropriate units as defined in the previous field.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which setpoints will be established by this setpoint manager.
+
+Following is an example of the input for a Scheduled Setpoint Manager.
+
+\begin{lstlisting}
+
+SetpointManager:Scheduled,
+  Supply Air Temp Manager 1,   !- Name
+  Temperature,                               !- Control Variable
+  Seasonal Reset Supply Air Temp Sch,   !- Schedule Name
+  VAV Sys 1 Outlet Node;           !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:Scheduled:DualSetpoint}\label{setpointmanagerscheduleddualsetpoint}
+
+This setpoint manager places a high and low schedule value on one or more nodes. The input consists of the Setpoint Manager name, the control variable, the high and low set point schedule names, and the name of a node list. The node list contains the name of those nodes at which the setpoint is to be applied. Of course, a node list name can simply be the name of a single node. Currently the DualSetpoint Manager will be used with PlantLoop when the Plant Loop Demand Calculation Scheme is set to DualSetpointDeadband .
+
+\subsubsection{Inputs}\label{inputs-1-040}
+
+\paragraph{Field: Name}\label{field-name-1-039}
+
+A unique, user-assigned name for an instance of this scheduled setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-1}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+
+\paragraph{Field: High Setpoint Schedule Name}\label{field-high-setpoint-schedule-name}
+
+The name of a schedule that contains the high setpoint values. The schedule value for each time period is the high setpoint for this type of setpoint manager.
+
+\paragraph{Field: Low Setpoint Schedule Name}\label{field-low-setpoint-schedule-name}
+
+The name of a schedule that contains the low setpoint values. The schedule value for each time period is the low setpoint for this type of setpoint manager.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-1}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+Following is an example of the input for a SetpointManager:Scheduled:DualSetpoint object.
+
+\begin{lstlisting}
+
+SetpointManager:Scheduled:DualSetpoint,
+  Water Loop Setpoint Manager,       !- Name
+  Temperature,                                       !- Control Variable
+  Plant Loop High Temp Schedule,   !- High Setpoint Schedule Name
+  Plant Loop Low Temp Schedule,     !- Low Setpoint Schedule Name
+  Plant Supply Outlet Node;             !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:OutdoorAirReset}\label{setpointmanageroutdoorairreset}
+
+The Outdoor Air Reset Setpoint Manager sets the supply air temperature according to the outdoor air temperature using a reset rule. The reset rule is determined by 2 points: the supply air setpoint temperature at the outdoor high temperature (SATOH) and the supply air setpoint temperature at the outdoor low temperature (SATOL). If the outdoor temperature is above the outdoor high temperature, the supply air temperature is set to SATOH. If the outdoor temperature is below the outdoor low temperature, the supply air temperature is set to SATOL. If the outdoor temperature is between the outdoor high and outdoor low temperatures, the supply air temperature is linearly interpolated between SATOH and SATOL.
+
+The input consists of the setpoint manager name, the type of control variable, a node list name of the nodes affected by the setpoint, and the data for the reset rule: the supply air setpoint temperature at the outdoor low temperature, the outdoor low temperature, the supply air setpoint temperature at the outdoor high temperature, and the outdoor high temperature.
+
+There are optional inputs for a second reset rule. First there is the name of a schedule that indicates which rule to use: a schedule value of 1 means use the first rule; a schedule value of 2 means use the second rule. Next, there are the 4 inputs specifying the second reset rule.
+
+\subsubsection{Inputs}\label{inputs-2-037}
+
+\paragraph{Field: Name}\label{field-name-2-035}
+
+A unique, user-assigned name for an instance of an outdoor air reset setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-2}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+
+\paragraph{Field: Setpoint at Outdoor Low Temperature}\label{field-setpoint-at-outdoor-low-temperature}
+
+The supply air temperature setpoint in \(^{o}\)C at the outdoor low temperature for the first reset rule.
+
+\paragraph{Field: Outdoor Low Temperature}\label{field-outdoor-low-temperature}
+
+The outdoor air low temperature in \(^{o}\)C for the first supply air temperature reset rule. Generally, at this outdoor air temperature the supply temperature is at its maximum.
+
+\paragraph{Field: Setpoint at Outdoor High Temperature}\label{field-setpoint-at-outdoor-high-temperature}
+
+The supply air temperature setpoint in \(^{o}\)C at the outdoor high temperature for the first reset rule.
+
+\paragraph{Field: Outdoor High Temperature}\label{field-outdoor-high-temperature}
+
+The outdoor air high temperature in \(^{o}\)C for the first supply air temperature reset rule. Generally, at this outdoor air temperature the supply temperature is at its minimum.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-2}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+\paragraph{Field: Schedule Name}\label{field-schedule-name-1-002}
+
+The name of a schedule whose values indicate which reset rule to use. Schedule values of 1 indicate that the first reset rule will be used. Schedule values of 2 select the second reset rule.
+
+\paragraph{Field: Setpoint at Outdoor Low Temperature 2}\label{field-setpoint-at-outdoor-low-temperature-2}
+
+The supply air temperature setpoint in \(^{o}\)C at the outdoor low temperature for the second reset rule.
+
+\paragraph{Field: Outdoor Low Temperature 2}\label{field-outdoor-low-temperature-2}
+
+The outdoor air low temperature in \(^{o}\)C for the second supply air temperature reset rule. Generally, at this outdoor air temperature the supply temperature is at its maximum.
+
+\paragraph{Field: Setpoint at Outdoor High Temperature 2}\label{field-setpoint-at-outdoor-high-temperature-2}
+
+The supply air temperature setpoint in \(^{o}\)C at the outdoor high temperature for the second reset rule.
+
+\paragraph{Field: Outdoor High Temperature 2}\label{field-outdoor-high-temperature-2}
+
+The outdoor air high temperature in \(^{o}\)C for the second supply air temperature reset rule. Generally, at this outdoor air temperature the supply temperature is at its minimum.
+
+Below is an example of the input for an Outdoor Air Reset Setpoint Manager:
+
+\begin{lstlisting}
+
+SetpointManager:OutdoorAirReset,
+  Supply Air Temp Manager 1,   !- Name
+  Temperature,   !- Control Variable
+  16.7,   !- Setpoint at Outdoor Low Temperature {C}
+  0.0,     !- Outdoor Low Temperature {C}
+  12.8,   !- Setpoint at Outdoor High Temperature {C}
+  32.0,   !- Outdoor High Temperature {C}
+  Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
+
+  NodeList,
+  Supply Air Temp Nodes, !- Name
+  Air Loop Outlet Node;   !- Node 1 Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:Reheat}\label{setpointmanagersinglezonereheat}
+
+The Single Zone Reheat Setpoint Manager allows the simulation of a single zone reheat system. This setpoint manager detects the control zone load, zone inlet node flow rate, and zone node temperature and calculates a setpoint temperature for the supply air that will satisfy the zone load for the control zone. This setpoint manager creates a variable temperature system. The input consists of the setpoint manager name, the control variable type, the minimum and maximum supply air temperatures, the name of the control zone, the name of the control zone node, the name of the control zone inlet node, and the name of a node or node list containing the nodes whose setpoint temperatures are to be set by this manager.
+
+\subsubsection{Inputs}\label{inputs-3-033}
+
+\paragraph{Field: Name}\label{field-name-3-029}
+
+A unique, user-assigned name for an instance of this setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-3}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+
+\paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature}
+
+The minimum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager).
+
+\paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature}
+
+The maximum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager)
+
+\paragraph{Field: Control Zone Name}\label{field-control-zone-name-2016-06-16}
+
+The name of the control zone for this single zone reheat system. The heating or cooling load for this zone determines the supply air temperature setpoint.
+
+\paragraph{Field: Zone Node Name}\label{field-zone-node-name-000}
+
+The name of the zone node for the control zone.
+
+\paragraph{Field: Zone Inlet Node Name}\label{field-zone-inlet-node-name}
+
+The name of the zone inlet node that is supplying air to the control zone.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-3}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example input for a SetpointManager:SingleZone:Reheat object.
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:Reheat,
+  Supply Air Temp Manager,   !- Name
+  Temperature,  !- Control Variable
+  13.,  !- Minimum Supply Air Temperature {C}
+  45.,  !- Maximum Supply Air Temperature {C}
+  NORTH ZONE,     !- Control Zone Name
+  Zone 3 Node,   !- Zone Node Name
+  Zone 3 Inlet Node,  !- Zone Inlet Node Name
+  Supply Air Temp Nodes;  !- Setpoint Node or NodeList Name
+
+
+  NodeList,
+  Supply Air Temp Nodes, !- Name
+  Heating Coil Air Inlet Node,   !- Node 1 Name
+  Air Loop Outlet Node; !- Node 2 Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:Heating}\label{setpointmanagersinglezoneheating}
+
+The Single Zone Heating Setpoint Manager allows a component to be controlled based on the load required to meet the zone heating setpoint. Ths setpoint manager detects the control zone load to meet the current heating setpoint, zone inlet node flow rate, and zone node temperature, and calculates a setpoint temperature for the supply air that will satisfy the zone heating load for the control zone. This setpoint manager creates a variable temperature system. The input consists of the setpoint manager name, the controlled variable type, the minimum and maximum supply air temperatures, the name of the control zone, the name of the control zone node, the name of the control zone inlet node, and the name of a node or node list containing the nodes whose setpoint temperatures are to be set by this manager.
+
+\subsubsection{Inputs}\label{inputs-4-030}
+
+\paragraph{Field: Name}\label{field-name-4-026}
+
+A unique, user-assigned name for an instance of a single zone heating setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-4}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+
+\paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature-1}
+
+The minimum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager).
+
+\paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-1}
+
+The maximum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager)
+
+\paragraph{Field: Control Zone Name}\label{field-control-zone-name-1}
+
+The name of the control zone for this setpoint manager. The heating load for this zone (to meet the zone heating setpoint) determines the supply air temperature setpoint.
+
+\paragraph{Field: Zone Node Name}\label{field-zone-node-name-1-000}
+
+The name of the zone node for the control zone.
+
+\paragraph{Field: Zone Inlet Node Name}\label{field-zone-inlet-node-name-1}
+
+The name of the zone inlet node that is supplying air to the control zone.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-4}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example input for a SetpointManager:SingleZone:Heating object.
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:Heating,
+  Zone 1 Heating Supply Air Temp Manager,   !- Name
+  Temperature,                         !- Control Variable
+  7.22,                                       !- Minimum Supply Air Temperature {C}
+  45.,                                         !- Maximum Supply Air Temperature {C}
+  Zone 1,                                   !- Control Zone Name
+  Zone 1 Zone Node,               !- Zone Node Name
+  Zone 1 Supply Inlet,         !- Zone Inlet Node Name
+  Zone 1 Heating Coil Outlet;   !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:Cooling}\label{setpointmanagersinglezonecooling}
+
+The Single Zone Cooling Setpoint Manager allows a component to be controlled based on the load required to meet the zone cooling setpoint. This setpoint manager detects the control zone load to meet the current cooling setpoint, zone inlet node flow rate, and zone node temperature, and calculates a setpoint temperature for the supply air that will satisfy the zone cooling load for the control zone. This setpoint manager creates a variable temperature system. The input consists of the setpoint manager name, the controlled variable type, the minimum and maximum supply air temperatures, the name of the control zone, the name of the control zone node, the name of the control zone inlet node, and the name of a node or node list containing the nodes whose setpoint temperatures are to be set by this manager.
+
+\subsubsection{Inputs}\label{inputs-5-027}
+
+\paragraph{Field: Name}\label{field-name-5-022}
+
+A unique, user-assigned name for an instance of a single zone cooling setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-5}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+
+\paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature-2}
+
+The minimum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager).
+
+\paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-2}
+
+The maximum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager)
+
+\paragraph{Field: Control Zone Name}\label{field-control-zone-name-2}
+
+The name of the control zone for this setpoint manager. The cooling load of this zone (to meet the zone cooling set point) determines the supply air temperature setpoint.
+
+\paragraph{Field: Zone Node Name}\label{field-zone-node-name-2}
+
+The name of the zone node for the control zone.
+
+\paragraph{Field: Zone Inlet Node Name}\label{field-zone-inlet-node-name-2}
+
+The name of the zone inlet node that is supplying air to the control zone.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-5}
+
+The name of a Node List object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example input for a SetpointManager:SingleZone:Cooling object.
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:Cooling,
+  Zone 1 Cooling Supply Air Temp Manager,   !- Name
+  Temperature,                         !- Control Variable
+  7.22,                                       !- Minimum Supply Air Temperature {C}
+  45.,                                         !- Maximum Supply Air Temperature {C}
+  Zone 1,                                   !- Control Zone Name
+  Zone 1 Zone Node,               !- Zone Node Name
+  Zone 1 Supply Inlet,         !- Zone Inlet Node Name
+  Zone 1 Cooling Coil Outlet;   !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:Humidity:Minimum}\label{setpointmanagersinglezonehumidityminimum}
+
+The Single Zone Minimum Humidity Setpoint Manager allows the control of a single zone minimum humidity level. This setpoint manager detects the humidity level in a control zone and, using air and moisture mass balance, calculates the supply air humidity ratio needed to maintain the zone relative humidity at or above a given setpoint. The calculated supply air humidity ratio is then used as the setpoint for the designated setpoint node. A humidifier component placed upstream of the setpoint node can then use the humidity ratio setpoint to control its moisture addition rate.
+
+The use of this object requires that a ZoneControl:Humidistat object be specified with a humidifying relative humidity schedule for the controlling zone. The humidistat s controlling zone must correspond with the control zone air node name specified in this setpoint manager.
+
+\subsubsection{Inputs}\label{inputs-6-024}
+
+\paragraph{Field: Name}\label{field-name-6-020}
+
+A unique, user-assigned name for an instance of a single zone minimum humidity setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-6}
+
+The name of the HVAC system node where the calculated humidity ratio setpoint is set. If the setpoint is being placed on more than one node, this input should be the name of a NodeList.
+
+\paragraph{Field: Control Zone Air Node Name}\label{field-control-zone-air-node-name}
+
+The name of the zone node for the humidity control zone (as specified in the object ZoneHVAC:EquipmentConnections).
+
+An IDF example for this setpoint manager is shown below with the required humidistat:
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:Humidity:Minimum,
+  Zone Min Set Point Manager,  !- Name
+  Air Loop Outlet Node,        !- Setpoint Node or NodeList Name
+  Zone 2 Node;                 !- Control Zone Air Node Name
+
+
+  ZoneControl:Humidistat,
+  Zone 2 Humidistat,           !- Name
+  ZONE 2,                      !-Zone Name
+  Min rel Hum Set Sch2;        !- Humidifying Relative Humidity Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:Humidity:Maximum}\label{setpointmanagersinglezonehumiditymaximum}
+
+The Single Zone Maximum Humidity Setpoint Manager allows the control of a single zone maximum humidity level. This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level in a single control zone and uses air/moisture mass balances to calculate the supply air humidity ratio needed to maintain the zone relative humidity at or below a given setpoint. The calculated supply air humidity ratio is then used as the setpoint for the designated setpoint node. A dehumidification component placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate (e.g., desiccant dehumidifiers).
+
+In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determine the minimum supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone. See object Controller:WaterCoil in the EnergyPlus Engineering Reference for a detailed discussion of how this is achieved.
+
+The use of this object requires that a ZoneControl:Humidistat object be specified with a relative humidity setpoint schedule for the controlling zone. The humidistat s controlling zone must correspond with the control zone air node name specified in this setpoint manager..
+
+\subsubsection{Inputs}\label{inputs-7-024}
+
+\paragraph{Field: Name}\label{field-name-7-019}
+
+A unique, user-assigned name for an instance of a single zone maximum humidity setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-7}
+
+The name of the HVAC system node where the calculated humidity ratio setpoint is set. If the setpoint is being placed on more than one node, this input should be the name of a NodeList.
+
+\paragraph{Field: Control Zone Air Node Name}\label{field-control-zone-air-node-name-1}
+
+The name of the zone air node for the humidity control zone (as specified in the object ZoneHVAC:EquipmentConnections).
+
+An example of this object in an input data file (IDF), along with a temperature set point manager, humidistat, and a simple controller, is shown below:
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:Humidity:Maximum,
+  Zone Max Set Point Manager,           !- Name
+  VAV Sys 1 Outlet Node,                !- Setpoint Node or NodeList Name
+  Zone 2 Node;                          !-Control Zone Air Node Name
+
+
+  SetpointManager:Scheduled,
+  Scheduled Set Point Manager 1,        !- Name
+  Temperature,                          !- Control Variable
+  Seasonal Reset Supply Air Temp Sch,   !- Schedule Name
+  VAV Sys 1 Outlet Node;                !- Setpoint Node or NodeList Name
+
+
+  ZoneControl:Humidistat,
+  Zone 2 Humidistat,                    !-Name
+  ZONE 2,                               !- Zone Name
+  Min rel Hum Set Sch2;                 !- Humidifying Relative Humidity Setpoint Schedule Name
+
+
+  Controller:WaterCoil,
+  Central Cooling Coil Contoller 1,     !- Name
+  TEMPandHUMRAT,                        !- Control Variable
+  Reverse,                              !- Action
+  FLOW,                                 !- Actuator Variable
+  VAV Sys 1 Outlet Node,                !- Sensor Node Name
+  Main Cooling Coil 1 Water Inlet Node, !- Actuator Node Name
+  0.002,                                !- Controller Convergence Tolerance {deltaC}
+  0.025,                                !- Maximum Actuated Flow {m3/s}
+  0.0;                                  !- Minimum Actuated Flow {m3/s}
+\end{lstlisting}
+
+\subsection{SetpointManager:MixedAir}\label{setpointmanagermixedair}
+
+The Mixed Air Setpoint Manager is meant to be used in conjunction with a Controller:OutdoorAir object. This setpoint manager is used to establish a temperature setpoint at the mixed air node. The Controller:OutdoorAir then operates the outdoor air damper to attempt to meet this setpoint.
+
+In EnergyPlus the relief and outdoor air dampers, the economizer, and any outdoor air conditioning equipment form a separate subsystem of an air loop system (ref. AirLoopHVAC). The outdoor air controller operates within the subsystem. Consequently the mixed air temperature setpoint must take into account any downstream system fan heat if it is to meet a desired system supply air leaving temperature. The Mixed Air Setpoint Manager accomplishes this by referencing a supply air setpoint set by another setpoint manager (most likely at the AirLoopHVAC outlet node). The supply fan inlet and outlet nodes are also inputs to the Mixed Air Setpoint Manager. From this information the Mixed Air Setpoint Manager calculates the supply fan air temperature rise, subtracts it from the reference setpoint temperature, and sets the result as the mixed air node setpoint temperature.
+
+Of course any type of setpoint manager can be used to establish a temperature setpoint at the mixed air node. But the Mixed Air Setpoint Manager is likely to be the most useful.
+
+When optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node are provided, the setpoint temperature at the mixed air node is calculated based on the maximum of both the reference setpoint temperature and minimum cooling coil outlet temperature, minus the cooling coil air temperature reduction and the supply fan air temperature rise if the supply fan placement is blow through. The setpoint temperature at the mixed air node is used to calculate the maximum outdoor air flow fraction in the corresponding Controller:OutdoorAir object. The outdoor air flow fraction is capped at the maximum outdoor air flow fraction to prevent the cooling coil from freezing, even though the fraction is below the minimum outdoor air flow fraction.
+
+\subsubsection{Inputs}\label{inputs-8-022}
+
+\paragraph{Field: Name}\label{field-name-8-019}
+
+A unique, user-assigned name for an instance of a mixed air setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-8}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+
+\paragraph{Field: Reference Setpoint Node Name}\label{field-reference-setpoint-node-name}
+
+The name of an HVAC system node where the system supply air temperature is set. Normally this would be the AirLoopHVAC outlet node. The temperature setpoint at this reference node is set by a different setpoint manager.
+
+\paragraph{Field: Fan Inlet Node Name}\label{field-fan-inlet-node-name}
+
+The name of the supply fan inlet node.
+
+\paragraph{Field: Fan Outlet Node Name}\label{field-fan-outlet-node-name-000}
+
+The name of the supply fan outlet node.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-8}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name where temperature setpoints will be established by this setpoint manager. The node name(s) specified here cannot be the same as the Reference Setpoint Node Name in the previous field.
+
+\paragraph{Field: Cooling Coil Inlet Node Name}\label{field-cooling-coil-inlet-node-name}
+
+The name of the cooling coil inlet node.
+
+\paragraph{Field: Cooling Coil Outlet Node Name}\label{field-cooling-coil-outlet-node-name}
+
+The name of the cooling coil outlet node.
+
+\paragraph{Field: Minimum Temperature at Cooling Coil Outlet Node}\label{field-minimum-temperature-at-cooling-coil-outlet-node}
+
+In order to prevent cooling coil freezing during economizer operation, the minimum temperature at the cooling coil outlet is required based on requirement of ASHRAE Standard 90.1. The default value is 7.2C.
+
+Below is an example input for a Mixed Air Setpoint Manager.
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:Reheat, ! establishes the setpoint at the system outlet node
+  Supply Air Temp Manager,   !- Name
+  Temperature,   !- Control Variable
+  13.,  !- Minimum Supply Air Temperature
+  45.,  !- Maximum Supply Air Temperature
+  NORTH ZONE,  !- Control Zone Name
+  Zone 3 Node,  !- Zone Node Name
+  Zone 3 Inlet Node,  !- Zone Inlet Node Name
+  Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
+
+
+  SetpointManager:MixedAir, ! uses the system outlet setpoint to establish the mixed air setpoint
+  Mixed Air Temp Manager 1,   !- Name
+  Temperature,   !- Control Variable
+  Air Loop Outlet Node,                   !- Reference Setpoint Node Name
+  Heating Coil Air Outlet Node,   !- Fan Inlet Node Name
+  Air Loop Outlet Node,                   !- Fan Outlet Node Name
+  Mixed Air Nodes;                             !- Setpoint Node or NodeList Name
+
+
+  NodeList, Supply Air Temp Nodes,
+  Air Loop Outlet Node; ! Setpoint Nodes
+  NodeList, Mixed Air Nodes,
+  Mixed Air Node; ! Setpoint Nodes
+\end{lstlisting}
+
+\subsection{SetpointManager:OutdoorAirPretreat}\label{setpointmanageroutdoorairpretreat}
+
+The OutdoorAir Pretreat Setpoint Manager is meant to be used in conjunction with an OutdoorAir:Mixer object. The Outdoor air Pretreat Setpoint Manager is used to establish a temperature or humidity ratio setpoint in the outdoor air stream flowing into the ``Outdoor Air Stream Node'' of an OutdoorAir:Mixer object. This setpoint manager determines the required setpoint in the outdoor air stream to produce the reference setpoint in the mixed air stream after mixing with return air. For example, if the temperature setpoint at the mixed air node is 15 °C, the return air temperature is 20 °C, and the outdoor air flow fraction is 0.5, the Outdoor Air Pretreat setpoint would be set to 10 °C.
+
+Of course any type of setpoint manager can be used to establish setpoints in the outdoor air stream, but this setpoint manager is likely to be the most useful for systems which precondition outdoor air with equipment such as a DX cooling coil or desiccant dehumidifier.
+
+\subsubsection{Inputs}\label{inputs-9-020}
+
+\paragraph{Field: Name}\label{field-name-9-016}
+
+A unique, user-assigned name for an instance of an outdoor air pretreat setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-9}
+
+The type of variable that will be controlled. The choices are:
+
+\begin{itemize}
+\item
+  Temperature references and sets the ``System Node Setpoint Temperature'' property. This single temperature setpoint is set and used by all temperature setpoint managers and equipment controls except dual-setpoint equipment.
+\item
+  MaximumHumidityRatio references and sets the ``System Node Humidity Ratio Max'' property. This type of reference setpoint may be set using SetpointManager:SingleZone:Humidity:Maximum, SetpointManager:MultiZone:MaximumHumidity:Average, or SetpointManager:MultiZone:Humidity:Maximum and is used by equipment such as Controller:WaterCoil (with control variable TemperatureAndHumidityRatio ) and Dehumidifier:Desiccant:NoFans.
+\item
+  MinimumHumidityRatio references and sets the ``System Node Humidity Ratio Min'' property. This type of reference setpoint may be set using SetpointManager:SingleZone:Humidity:Minimum, SetpointManager:Multizone:MinimumHumidity:Average or SetpointManager:MultiZone:Humidity:Minimum and is used by equipment such as Humidifier:Steam:Electric.
+\item
+  HumidityRatio references and sets the ``System Node Setpoint Humidity Ratio'' property. This type of reference setpoint may be set using (no applicable setpoint managers at this time) and is used by equipment such as Controller:WaterCoil (with control variable HumidityRatio ).
+\end{itemize}
+
+The system node properties listed above are all available as an Output:Variable to facilitate tracking these setpoints both at the reference node and the setpoint nodes.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature}
+
+The minimum temperature (in \(^{o}\)C) that is allowed by this setpoint manager. Applicable only if Control variable is Temperature.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature}
+
+The maximum temperature (in \(^{o}\)C) that is allowed by this setpoint manager. Applicable only if Control variable is Temperature.
+
+\paragraph{Field: Minimum Setpoint Humidity Ratio}\label{field-minimum-setpoint-humidity-ratio}
+
+The minimum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. Applicable only if Control variable is MaximumHumidityRatio, MinimumHumidityRatio, or HumidityRatio. Note that zero is not allowed as the computed setpoint humidity ratio, because zero is used as a special value to indicate that no humidification or dehumidification is needed. If the reference humidity ratio setpoint value is zero, the zero value will be passed directly to the Set Point Node(s).
+
+\paragraph{Field: Maximum Setpoint Humidity Ratio}\label{field-maximum-setpoint-humidity-ratio}
+
+The maximum humidity ratio (kgWater/kgDryAir) that is allowed by this set point manager. Applicable only if Control variable is MaximumHumidityRatio, MinimumHumidityRatio, or HumidityRatio.
+
+\paragraph{Field: Reference Setpoint Node Name}\label{field-reference-setpoint-node-name-1}
+
+The name of an HVAC system node where the desired mixed air condition has been set. Normally this would be the mixed air node leaving the OutdoorAir:Mixer. The temperature or humidity setpoint at this reference node must be set by a different setpoint manager of the appropriate type (see Control Variable above).
+
+\paragraph{Field: Mixed Air Stream Node Name}\label{field-mixed-air-stream-node-name}
+
+The name of the mixed air node. This node is used to obtain the flow rate of the combined air stream. This node is usually the same node at the Reference Setpoint Node Name, but does not have to be.
+
+\paragraph{Field: Outdoor Air Stream Node Name}\label{field-outdoor-air-stream-node-name-000}
+
+The name of a node in the outdoor air stream. This node is used to obtain the flow rate of the outdoor air stream.
+
+\paragraph{Field: Return Air Stream Node Name}\label{field-return-air-stream-node-name-000}
+
+The name of a node in the return air stream. This node is used to obtain the flow rate of the return air stream.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-9}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature or humidity ratio setpoints will be established by this setpoint manager. The node name(s) specified here cannot be the same as the Reference Setpoint Node Name in the previous field.
+
+
+Below is an example input for an Outdoor Air Pretreat Setpoint Manager.
+
+\begin{lstlisting}
+
+SetpointManager:OutdoorAirPretreat,
+  DXSystem 1 Desiccant Set Point Manager,   !- Name
+  MaximumHumidityRatio,       !- Control Variable
+  -99,                                         !- Minimum Setpoint Temperature {C}
+  99,                                           !- Maximum Setpoint Temperature {C}
+  0.00001,                                 !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  1.0,                                         !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  DXSystem 1 Fan Air Inlet Node,   !- Reference Setpoint Node Name
+  DXSystem 1 Mixed Air Node,           !- Mixed Air Stream Node Name
+  Heat Recovery Outlet Node,           !- Outdoor Air Stream Node Name
+  DXSystem 1 Air Loop Inlet Node, !- Return Air Stream Node Name
+  Desiccant Process Outlet Node;   !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:Warmest}\label{setpointmanagerwarmest}
+
+The Warmest Setpoint Manager resets the cooling supply air temperature of a central forced air HVAC system according to the cooling demand of the warmest zone. For each zone in the system at each system timestep, the manager calculates a supply air temperature that will meet the zone cooling load at the maximum zone supply air flow rate. The lowest of the possible supply air temperatures becomes the new supply air temperature setpoint, subject to minimum and maximum supply air temperature constraints. The resulting temperature setpoint is the highest supply air temperature that will meet the cooling requirements of all the zones. When compared to a fixed cooling supply air temperature setpoint, this strategy minimizes zone reheat coil energy (or overcooling) and central chiller energy consumption (if the chilled water temperature is also reset) at the cost of possible increased fan energy.
+
+\subsubsection{Inputs}\label{inputs-10-018}
+
+\paragraph{Field: Name}\label{field-name-10-015}
+
+A unique, user-assigned name for an instance of a warmest setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-10}
+
+The type of variable that will be controlled. Currently there is only one choice: Temperature.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its cooling supply air temperature.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-1}
+
+The minimum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is less than this minimum, the setpoint is set to the minimum.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-1}
+
+The maximum allowed setpoint temperature in degrees C. If the calculated setpoint is greater than this value the setpoint is set to the maximum. This value is also used as the setpoint temperature when none of the zones have a cooling load.
+
+\paragraph{Field: Strategy}\label{field-strategy}
+
+Currently, the only choice for this field is MaximumTemperature.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-10}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example input for a Warmest Setpoint Manager.
+
+\begin{lstlisting}
+
+SetpointManager:Warmest,
+  Supply Air Temperature Manager 1,   !- Name
+  Temperature,   !- Control Variable
+  VAV Sys 1,   !- HVAC Air Loop Name
+  11.2,   !- Minimum Setpoint Temperature
+  16.,   !- Maximum Setpoint Temperature
+  MaximumTemperature,   !- Strategy
+  Supply Air Temp Nodes 1;   !- Setpoint Node or NodeList Name
+
+
+  SetpointManager:MixedAir,
+  Mixed Air Temp Manager 1,   !- Name
+  Temperature,   !- Control Variable
+  VAV Sys 1 Outlet Node,   !- Reference Setpoint Node Name
+  Main Heating Coil 1 Outlet Node,   !- Fan Inlet Node Name
+  VAV Sys 1 Outlet Node,   !- Fan Outlet Node Name
+  Mixed Air Node 1;             !- Setpoint Node or NodeList Name
+
+
+  NodeList, Supply Air Temp Nodes 1,
+  VAV Sys 1 Outlet Node; ! Setpoint Node
+\end{lstlisting}
+
+\subsection{SetpointManager:Coldest}\label{setpointmanagercoldest}
+
+The Coldest Setpoint Manager is used in dual duct systems to reset the setpoint temperature of the air in the heating supply duct. Usually it is used in conjunction with a SetpointManager:Warmest resetting the temperature of the air in the cooling supply duct. For each zone in the system at each system timestep, the manager calculates a supply air temperature that will meet the zone heating load at the maximum zone supply air flow rate. The highest of the possible supply air temperatures becomes the new supply air temperature setpoint, subject to minimum and maximum supply air temperature constraints. The resulting temperature setpoint is the lowest supply air temperature that will meet the heating requirements of all the zones. When compared to a fixed heating supply air temperature setpoint, this strategy minimizes central boiler energy consumption (if the hot water temperature is also reset or there are variable speed pumps) at the cost of possible increased fan energy (if there is variable volume control in the air system).
+
+\subsubsection{Inputs}\label{inputs-11-017}
+
+\paragraph{Field: Name}\label{field-name-11-013}
+
+A unique, user-assigned name for an instance of a coldest setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-11}
+
+The type of variable that will be controlled. Currently there is only one choice: Temperature.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-1}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its heating supply air temperature.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-2}
+
+The minimum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is less than this minimum, the setpoint is set to the minimum. This value is also used as the setpoint temperature when none of the zones have a heating load.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-2}
+
+The maximum allowed setpoint temperature in degrees C. If the calculated setpoint is greater than this value the setpoint is set to the maximum.
+
+\paragraph{Field: Strategy}\label{field-strategy-1}
+
+Currently, the only choice for this field is MinimumTemperature.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-11}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example input for a Coldest Setpoint Manager.
+
+\begin{lstlisting}
+
+Controller:Simple,
+  Central Cooling Coil Controller 1,   !- Name
+  Temperature,   !- Control Variable
+  Reverse,   !- Action
+  Flow,         !- Actuator Variable
+  VAV Sys 1 Cold Outlet Node,                       !- Sensor Node Name
+  Main Cooling Coil 1 Water Inlet Node,   !- Actuator Node Name
+  0.001,       !- Controller Convergence Tolerance {deltaC}
+  autosize, !- Maximum Actuated Flow {m3/s}
+  0.0;           !- Minimum Actuated Flow {m3/s}
+
+
+  Controller:WaterCoil,
+  Central Heating Coil Controller 1,   !- Name
+  Temperature,   !- Control Variable
+  Normal,   !- Action
+  Flow,       !- Actuator Variable
+  VAV Sys 1 Hot Outlet Node,                         !- Sensor Node Name
+  Main Heating Coil 1 Water Inlet Node,   !- Actuator Node Name
+  0.001,         !- Controller Convergence Tolerance {deltaC}
+  autosize,   !- Maximum Actuated Flow {m3/s}
+  0.0;             !- Minimum Actuated Flow {m3/s}
+
+
+  SetpointManager:Warmest,
+  Supply Air Temperature Manager 1,   !- Name
+  Temperature,             !- Control Variable
+  VAV Sys 1,   !- HVAC Air Loop Name
+  11.2,             !- Minimum Setpoint Temperature {C}
+  16.,               !- Maximum Setpoint Temperature {C}
+  MaximumTemperature,             !- Strategy
+  Supply Air Temp Nodes 1;   !- Setpoint Node or NodeList Name
+
+
+  NodeList,
+  Supply Air Temp Nodes 1,         !- Name
+  VAV Sys 1 Cold Outlet Node;   !- Node 1 Name
+
+
+  SetpointManager:Coldest,
+  Supply Air Temperature Manager 2,   !- Name
+  Temperature,             !- Control Variable
+  VAV Sys 1,   !- HVAC Air Loop Name
+  25.,               !- Minimum Setpoint Temperature {C}
+  50.,               !- Maximum Setpoint Temperature {C}
+  MinimumTemperature,             !- Strategy
+  Supply Air Temp Nodes 2;   !- Setpoint Node or NodeList Name
+
+
+  NodeList,
+  Supply Air Temp Nodes 2,       !- Name
+  VAV Sys 1 Hot Outlet Node;   !- Node 1 Name
+\end{lstlisting}
+
+\subsection{SetpointManager:ReturnAirBypassFlow}\label{setpointmanagerreturnairbypassflow}
+
+This manager is user in conjunction with a return air bypass configuration. This type of air system is basically a standard single duct system with the addition of a bypass duct that bypasses return air around the main system components in particular, the central cooling coil. This allows the central cooling coil to sufficiently dehumidify the mixed air; the bypassed air is then added to the supply air stream to bring the supply air temperature up to the desired temperature set point. This scheme is very useful in situations where an higher than normal supply air temperature is used for instance, in underfloor air distribution systems.
+
+This manager relies on the program to figure out the system configuration and to extract the needed data from the system nodes. All the user needs to input is the name of the air system and a schedule giving the desired supply air temperature setpoint. No node names are required. The manager will establish a bypass air flow rate that upon mixing with the non-bypassed air will yield the temperature given in the schedule.
+
+\subsubsection{Inputs}\label{inputs-12-016}
+
+\paragraph{Field: Name}\label{field-name-12-010}
+
+A unique, user-assigned name for an instance of an Return Air Bypass Flow setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-12}
+
+The type of variable that will be controlled. Currently there is only one choice: Flow.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-2}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its return air bypass flow rate.
+
+\paragraph{Field: Temperature Setpoint Schedule Name}\label{field-temperature-setpoint-schedule-name}
+
+The name of a schedule whose values are temperatures in \(^{o}\)C. The schedule value for the time period is the setpoint for this type of setpoint manager. The setpoint is assumed to be at the air handler outlet.
+
+The following shows an example input for SetpointManager:ReturnAirBypassFlow.
+
+\begin{lstlisting}
+
+SetpointManager:ReturnAirBypassFlow,
+  RETURN AIR BYPASS Manager 1,   !- Name
+  Flow,   !- Control Variable
+  VAV Sys 1,   !- HVAC Air Loop Name
+  Seasonal Reset Supply Air Temp Sch;   !- Temperature Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:WarmestTemperatureFlow}\label{setpointmanagerwarmesttemperatureflow}
+
+The Warmest Temperature Flow Setpoint Manager resets the cooling supply air temperature of a central forced air HVAC system according to the cooling demand of the warmest zone. The user can select one of two strategies: \emph{TemperatureFirst} or \emph{FlowFirst}.
+
+For \emph{TemperatureFirst} the manager tries to find the highest setpoint temperature that will satisfy all the zone cooling loads at minimum supply air flow rate. If this setpoint temperature is less than the minimum, the setpoint temperature is set to the minimum, and the supply air flow rate is increased to meet the loads.
+
+For \emph{FlowFirst} the manager tries to find the lowest supply air flow rate that will satisfy all the zone cooling loads at the maximum setpoint temperature. If this flow is greater than the maximum, the flow is set to the maximum and the setpoint temperature is reduced to satisfy the cooling loads.
+
+When compared to a fixed cooling supply air temperature setpoint, the \emph{TemperatureFirst} strategy minimizes fan energy at the cost of possible increased zone reheat coil energy (or overcooling) and central chiller energy consumption, whereas the \emph{FlowFirst} strategy minimizes zone reheat coil energy (or overcooling) and central chiller energy consumption at the cost of possible increased fan energy.
+
+\subsubsection{Inputs}\label{inputs-13-013}
+
+\paragraph{Field: Name}\label{field-name-13-009}
+
+A unique, user-assigned name for an instance of this setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-13}
+
+The type of variable that will be controlled. For this setpoint manager, this input should be Temperature.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-3}
+
+he name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its cooling supply air temperature.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-3}
+
+The minimum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is less than this minimum, the setpoint is set to the minimum.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-3}
+
+The maximum allowed setpoint temperature in degrees C. If the calculated setpoint is greater than this value the setpoint is set to the maximum. This value is also used as the setpoint temperature when none of the zones have a cooling load.
+
+\paragraph{Field: Strategy}\label{field-strategy-2}
+
+The choices for this field are \emph{TemperatureFirst} and \emph{FlowFirst}. See discussion above for a description of what each strategy does.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-12}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
+
+\paragraph{Field: Minimum Turndown Ratio}\label{field-minimum-turndown-ratio}
+
+The minimum value of the ratio of the actual air flow rate to the maximum air flow rate, either for the supply fan if there are no VAV terminal boxes, or for the VAV boxes if present. If there are VAV boxes, it is assumed that the same value of minimum turndown applies to all boxes.
+
+Below is an example input for a SetpointManager:WarmestTemperatureFlow object.
+
+\begin{lstlisting}
+
+SetpointManager:WarmestTemperatureFlow,
+  Supply Air Temperature Manager 1,   !- Name
+  Temperature,   !- Control Variable
+  VAV Sys 1,   !- HVAC Air Loop Name
+  11.2,   !- Minimum Setpoint Temperature
+  16.,     !- Maximum Setpoint Temperature
+  TemperatureFirst,   !- Strategy
+  Supply Air Temp Nodes 1,   !- Setpoint Node or NodeList Name
+  0.3;   !- Minimum Turndown Ratio
+
+
+  SetpointManager:MixedAir,
+  Mixed Air Temp Manager 1,   !- Name
+  Temperature,   !- Control Variable
+  VAV Sys 1 Outlet Node,   !- Reference Setpoint Node Name
+  Main Heating Coil 1 Outlet Node,   !- Fan Inlet Node Name
+  VAV Sys 1 Outlet Node,   !- Fan Outlet Node Name
+  Mixed Air Node 1;   !- Setpoint Node or NodeList Name
+
+
+  NodeList, Supply Air Temp Nodes 1,
+  VAV Sys 1 Outlet Node; ! Set Point Node
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-032}
+
+\paragraph{Setpoint Manager Warmest Temperature Critical Zone Number {[]}}\label{setpoint-manager-warmest-temperature-critical-zone-number}
+
+This is the number of the zone that was the critical zone for the setpoint manager.
+
+\paragraph{Setpoint Manager Warmest Temperature Turndown Flow Fraction {[]}}\label{setpoint-manager-warmest-temperature-turndown-flow-fraction}
+
+This is the fraction that flow was reduced by the setpoint manager. This is the actual air flow rate divided by the maximum air flow rate.
+
+\subsection{SetpointManager:MultiZone:Cooling:Average}\label{setpointmanagermultizonecoolingaverage}
+
+This setpoint manager is used to establish a supply air temperature setpoint for a central forced air HVAC system (air loop) based on the predicted sensible cooling loads and actual supply air mass flow rates for all zones served by the system. For all controlled zones in the air loop (i.e., zones with a thermostat object), the setpoint manager calculates an average supply air temperature that will meet the zone cooling loads based on the actual zone supply air mass flow rates (lagged by one time step). The calculated setpoint temperature is subject to the minimum and maximum setpoint temperature constraints specified by the user. When compared to a fixed cooling supply air temperature setpoint, this strategy may reduce zone reheat coil energy (or overcooling) and central chiller energy consumption (if the chilled water temperature is also reset) at the cost of possible increased fan energy.
+
+\subsubsection{Inputs}\label{inputs-14-013}
+
+\paragraph{Field: Name}\label{field-name-14-008}
+
+A unique, user-assigned name for an instance of this multizone average cooling setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-4}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its cooling supply air temperature.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-4}
+
+The minimum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is less than this minimum, the setpoint is set to the minimum. The default value is 12C.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-4}
+
+The maximum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is greater than this value, the setpoint is set to this maximum value. The default value is 18C.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-13}
+
+The name of a NodeList object containing the names of the HVAC system nodes, or the HVAC System Node Name, for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example of this object in an input file.
+
+\begin{lstlisting}
+
+SetpointManager:MultiZone:Cooling:Average,
+  Cooling Coil Air Sys Branch Set Point,   !- Name
+  Main Dual Duct Air Loop, !- HVAC Air Loop Name
+  12.0,                                       !- Minimum Setpoint Temperature {C}
+  22.0,                                       !- Maximum Setpoint Temperature {C}
+  Cooling Coil Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:MultiZone:Heating:Average}\label{setpointmanagermultizoneheatingaverage}
+
+This setpoint manager is used to establish a supply air temperature setpoint for a central forced air HVAC system (air loop) based on the predicted sensible heating loads and actual supply air mass flow rates for all zones served by the system. For all controlled zones in the air loop (i.e., zones with a thermostat object), the setpoint manager calculates an average supply air temperature that will meet the zone heating loads based on the actual zone supply air mass flow rates (lagged by one time step). The calculated setpoint temperature is subject to the minimum and maximum setpoint temperature constraints specified by the user. When compared to a fixed heating supply air temperature setpoint, this strategy may reduce central boiler energy consumption (if the hot water temperature is also reset or there are variable speed pumps) at the cost of possible increased fan energy (if there is variable volume control for the air system).
+
+\subsubsection{Inputs}\label{inputs-15-013}
+
+\paragraph{Field: Name}\label{field-name-15-008}
+
+A unique, user-assigned name for an instance of a multizone average heating setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-5}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its heating supply air temperature.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-5}
+
+The minimum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is less than this minimum, the setpoint is set to the minimum. The default value is 20C.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-5}
+
+The maximum allowed setpoint temperature in degrees C. If the calculated setpoint temperature is greater than this value, the setpoint is set to this maximum value. The default value is 50C.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-14}
+
+The name of a NodeList object containing the names of the HVAC system nodes, or the HVAC System Node Name, for which temperature setpoints will be established by this setpoint manager.
+
+Below is an example of this object in an input file.
+
+\begin{lstlisting}
+
+SetpointManager:MultiZone:Heating:Average,
+  Heating Coil Air Sys Branch Set Point,   !- Name
+  Main Dual Duct Air Loop, !- HVAC Air Loop Name
+  24.0,                                       !- Minimum Setpoint Temperature {C}
+  41.0,                                       !- Maximum Setpoint Temperature {C}
+  Heating Coil Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:MultiZone:MinimumHumidity:Average}\label{setpointmanagermultizoneminimumhumidityaverage}
+
+This setpoint manager allows for controlling the minimum humidity level is multiple zones served by a central forced air HVAC system (air loop). This setpoint manager, used in conjunction with one or more ZoneControl:Humidistat objects, detects the air humidity level in multiple controlled zones served by the HVAC air loop and uses air/moisture mass balances to calculate an average supply air humidity ratio needed to maintain the zone relative humidity levels near their respective humidifying setpoints. The calculated humidity ratio is then used as the minimum humidity ratio setpoint for the designated setpoint node(s). A humidification component (e.g., Humidifier:Steam:Electric) placed upstream of the setpoint node can then use the minimum humidity ratio setpoint to control humidification rate. The use of this object requires that a ZoneControl:Humidistat object be specified with a humidifying relative humidity schedule for one or more controlled zones served by the HVAC air loop.
+
+\subsubsection{Inputs}\label{inputs-16-009}
+
+\paragraph{Field: Name}\label{field-name-16-008}
+
+A unique, user-assigned name for an instance of an average minimum humidity (humidifying) multizone setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-6}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its humidification setpoint (minimum air humidity ratio).
+
+\paragraph{Field: Minimum Setpoint Humidity Ratio}\label{field-minimum-setpoint-humidity-ratio-1}
+
+The minimum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. If the calculated setpoint humidity ratio is less than this value, then the setpoint is set to this minimum value. The default value is 0.005 (kgWater/kgDryAir).
+
+\paragraph{Field: Maximum Setpoint Humidity Ratio}\label{field-maximum-setpoint-humidity-ratio-1}
+
+The maximum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. If the calculated setpoint humidity ratio is greater than this value, then the setpoint is set to this maximum value. The default value is 0.012 (kgWater/kgDryAir).
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-15}
+
+The name of a NodeList object containing the names of the HVAC system nodes, or the HVAC System Node Name, for which humidity ratio setpoints will be established by this setpoint manager.
+
+An example of this object in an input data file (IDF), along with a humidistat object, is shown below.
+
+\begin{lstlisting}
+
+SetpointManager:MultiZone:MinimumHumidity:Average,
+  VAV_1 Humidifier HUMRAT setpoint, !- Name
+  VAV_1,                                                       !- HVAC Air Loop Name
+  0.003,                                                       !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  0.012,                                                       !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  VAV_1 Humidifier-Outlet Nodes List;           !- Setpoint Node or NodeList Name
+
+
+  ZoneControl:Humidistat,
+  ICU_NURSESTN_LOBBY_FLR_2 Humidistat,   !- Name
+  ICU_NURSESTN_LOBBY_FLR_2,   !- Zone Name
+  MinRelHumSetSch,   !- Humidifying Relative Humidity Setpoint Schedule Name
+  MaxRelHumSetSch;   !- Dehumidifying Relative Humidity Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:MultiZone:MaximumHumidity:Average}\label{setpointmanagermultizonemaximumhumidityaverage}
+
+This setpoint manager allows for controlling the maximum humidity level is multiple zones served by a central forced air HVAC system (air loop). This setpoint manager, used in conjunction with one or more ZoneControl:Humidistat objects, detects the air humidity level in multiple controlled zones served by the HVAC air loop and uses air/moisture mass balances to calculate an average supply air humidity ratio needed to maintain the zone relative humidity levels near their respective dehumidifying setpoints. The calculated humidity ratio is then used as the maximum humidity ratio setpoint for the designated setpoint node(s). A dehumidification component (e.g., desiccant dehumidifiers) placed upstream of the setpoint node can then use the maximum humidity ratio setpoint to control its moisture removal rate. The use of this object requires that a ZoneControl:Humidistat object be specified with a dehumidifying relative humidity schedule for one or more controlled zones served by the HVAC air loop.
+
+In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determine the supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone. See object Controller:WaterCoil in the EnergyPlus Engineering Reference for a detailed discussion of how this is achieved.
+
+\subsubsection{Inputs}\label{inputs-17-007}
+
+\paragraph{Field: Name}\label{field-name-17-006}
+
+A unique, user-assigned name for an instance of an average maximum humidity ratio (dehumidifying) multizone setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-7}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its dehumidification setpoint (maximum air humidity ratio).
+
+\paragraph{Field: Minimum Setpoint Humidity Ratio}\label{field-minimum-setpoint-humidity-ratio-2}
+
+The minimum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. If the calculated setpoint humidity ratio is less than this value, then the setpoint is set to this minimum value. The default value is 0.008 (kgWater/kgDryAir).
+
+\paragraph{Field: Maximum Setpoint Humidity Ratio}\label{field-maximum-setpoint-humidity-ratio-2}
+
+The maximum humidity ratio (kgWater/kgDryAir) that is allowed by this set point manager. If the calculated setpoint humidity ratio is greater than this value, then the setpoint is set to this maximum value. The default value is 0.015 (kgWater/kgDryAir).
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-16}
+
+The name of a NodeList object containing the names of the HVAC system nodes, or the HVAC System Node Name, for which humidity ratio setpoints will be established by this setpoint manager.
+
+An example of this object in an input data file (IDF), along with a humidistat object, is shown below:
+
+\begin{lstlisting}
+
+SetpointManager:MultiZone:MaximumHumidity:Average,
+  VAV_1_CoolC HUMRAT setpoint,           !- Name
+  VAV_1,                                                       !- HVAC Air Loop Name
+  0.005,                                                       !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  0.015,                                                       !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  VAV_1 DeHumidifier-Outlet Nodes List;       !- Setpoint Node or NodeList Name
+
+
+  ZoneControl:Humidistat,
+  ICU_NURSESTN_LOBBY_FLR_2 Humidistat,   !- Name
+  ICU_NURSESTN_LOBBY_FLR_2,   !- Zone Name
+  MinRelHumSetSch,   !- Humidifying Relative Humidity Setpoint Schedule Name
+  MaxRelHumSetSch;   !- Dehumidifying Relative Humidity Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:MultiZone:Humidity:Minimum}\label{setpointmanagermultizonehumidityminimum}
+
+This setpoint manager allows for controlling the minimum humidity level in multiple zones served by a central forced air HVAC system (air loop). This setpoint manager, used in conjunction with one or more ZoneControl:Humidistat objects, detects the air humidity level in multiple controlled zones served by the HVAC air loop and uses air/moisture mass balances to calculate a supply air minimum humidity ratio based on a zone with the critical humidification requirement (i.e., a zone with the highest humidity ratio setpoint) to maintain the zone relative humidity levels near their respective humidifying setpoints. The calculated humidity ratio is then used as the minimum humidity ratio setpoint for the designated setpoint node(s). A humidification component (e.g., Humidifier:Steam:Electric) placed upstream of the setpoint node can then use the minimum humidity ratio setpoint to control humidification rate. The use of this object requires that a ZoneControl:Humidistat object be specified with a humidifying relative humidity schedule for one or more controlled zones served by the HVAC air loop. If ZoneControl:Humidistat object is defined for only one of the zones served by the air loop then the SetpointManager:MultiZone:Humidity:Minimum perform as SepointManager:SingleZone:Humidity:Minimum.
+
+\subsubsection{Inputs}\label{inputs-18-007}
+
+\paragraph{Field: Name}\label{field-name-18-006}
+
+A unique, user-assigned name for an instance of a multizone minimum humidity (humidifying) setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-8}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its humidification setpoint (minimum air humidity ratio).
+
+\paragraph{Field: Minimum Setpoint Humidity Ratio}\label{field-minimum-setpoint-humidity-ratio-3}
+
+The minimum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. If the calculated setpoint humidity ratio is less than this value, then the setpoint is set to this minimum value. The default value is 0.005 (kgWater/kgDryAir).
+
+\paragraph{Field: Maximum Setpoint Humidity Ratio}\label{field-maximum-setpoint-humidity-ratio-3}
+
+The maximum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. If the calculated setpoint humidity ratio is greater than this value, then the setpoint is set to this maximum value. The default value is 0.012 (kgWater/kgDryAir).
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-17}
+
+The name of a NodeList object containing the names of the HVAC system nodes, or the HVAC System Node Name, for which humidity ratio setpoints will be established by this setpoint manager.
+
+An example of this object in an input data file (IDF), along with a humidistat object, is shown below.
+
+\begin{lstlisting}
+
+SetpointManager:MultiZone:Humidity:Minimum,
+  Main Humidifier setpoint Mgr,     !- Name
+  VAV Sys 1,                                           !- HVAC Air Loop Name
+  0.003,                                                   !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  0.015,                                                   !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  Main Humidifier Outlet Node;       !- Setpoint Node or NodeList Name
+
+
+  ZoneControl:Humidistat,
+  Space5-1 Humidistat,         !- Name
+  SPACE5-1,                               !- Zone Name
+  HumidifyingHumSetSch,       !- Humidifying Relative Humidity Setpoint Schedule Name
+  DehumidifyingHumSetSch;   !- Dehumidifying Relative Humidity Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:MultiZone:Humidity:Maximum}\label{setpointmanagermultizonehumiditymaximum}
+
+This setpoint manager allows for controlling the maximum humidity level in multiple zones served by a central forced air HVAC system (air loop). This setpoint manager, used in conjunction with one or more ZoneControl:Humidistat objects, detects the air humidity level in multiple controlled zones served by the HVAC air loop and uses air/moisture mass balances to calculate the maximum supply air humidity ratio based on a zone with the critical dehumidification requirement (i.e., a zone with the lowest humidity ratio setpoint) to maintain the zone relative humidity levels near their respective dehumidifying setpoints. The calculated humidity ratio is then used as the maximum humidity ratio setpoint for the designated setpoint node(s). A dehumidification component (e.g., desiccant dehumidifiers) placed upstream of the setpoint node can then use the maximum humidity ratio setpoint to control its moisture removal rate. The use of this object requires that a ZoneControl:Humidistat object be specified with a dehumidifying relative humidity schedule for one or more controlled zones served by the HVAC air loop. If ZoneControl:Humidistat object is defined for only one of the zones served by the air loop then the SetpointManager:MultiZone:Humidity:Maximum perform as SetpointManager:SingleZone:Humidity:Maximum.
+
+In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determine the supply air temperature required to meet both the temperature (sensible) and dehumidification (latent) load in the control zone. See object Controller:WaterCoil in the EnergyPlus Engineering Reference for a detailed discussion of how this is achieved.
+
+\subsubsection{Inputs}\label{inputs-19-005}
+
+\paragraph{Field: Name}\label{field-name-19-003}
+
+A unique, user-assigned name for an instance of a multizone maximum humidity ratio (dehumidifying) setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: HVAC Air Loop Name}\label{field-hvac-air-loop-name-9}
+
+The name of the AirLoopHVAC object (the central air system) which will use this setpoint manager to set its dehumidification setpoint (maximum air humidity ratio).
+
+\paragraph{Field: Minimum Setpoint Humidity Ratio}\label{field-minimum-setpoint-humidity-ratio-4}
+
+The minimum humidity ratio (kgWater/kgDryAir) that is allowed by this setpoint manager. If the calculated setpoint humidity ratio is less than this value, then the setpoint is set to this minimum value. The default value is 0.008 (kgWater/kgDryAir).
+
+\paragraph{Field: Maximum Setpoint Humidity Ratio}\label{field-maximum-setpoint-humidity-ratio-4}
+
+The maximum humidity ratio (kgWater/kgDryAir) that is allowed by this set point manager. If the calculated setpoint humidity ratio is greater than this value, then the setpoint is set to this maximum value. The default value is 0.015 (kgWater/kgDryAir).
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-18}
+
+The name of a NodeList object containing the names of the HVAC system nodes, or the HVAC System Node Name, for which humidity ratio setpoints will be established by this setpoint manager.
+
+An example of this object in an input data file (IDF), along with a humidistat object, is shown below.
+
+\begin{lstlisting}
+
+SetpointManager:MultiZone:Humidity:Maximum,
+  Maximum Mzone HUMRAT setpoint,   !- Name
+  VAV Sys 1,                                           !- HVAC Air Loop Name
+  0.003,                                                   !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  0.015,                                                   !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
+  DeHumidifier-Outlet Nodes;           !- Setpoint Node or NodeList Name
+
+
+  ZoneControl:Humidistat,
+  Space5-1 Humidistat,         !- Name
+  SPACE5-1,                               !- Zone Name
+  HumidifyingHumSetSch,       !- Humidifying Relative Humidity Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:FollowOutdoorAirTemperature}\label{setpointmanagerfollowoutdoorairtemperature}
+
+This setpoint manager is used to place a temperature setpoint on a system node that is derived from the current outdoor air environmental conditions. The outdoor air conditions are obtained from the weather information during the simulation.
+
+\subsubsection{Inputs}\label{inputs-20-005}
+
+\paragraph{Field: Name}\label{field-name-20-002}
+
+A unique user-defined name for an instance of this setpoint manager.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-14}
+
+The type of variable that will be controlled. There are three choices available: Temperature, MaximumTemperature, or MinimumTemperature.
+
+\paragraph{Field: Reference Temperature Type}\label{field-reference-temperature-type}
+
+The field specifies the type of temperature value to obtain from the system node referenced in the previous field. The two available options are OutdoorDryBulb and OutdoorWetBulb.
+
+\paragraph{Field: Offset Temperature Difference}\label{field-offset-temperature-difference}
+
+This field provides a temperature offset that will be applied to the value of the reference temperature (outdoor air wetbulb/drybulb). If this value is zero, and the limits are met, then the resulting setpoint will be exactly the same as the outdoor air wetbulb/drybulb temperature. The sign convention is that a positive value here will increase the resulting setpoint to higher than the outdoor air wetbulb/drybulb.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-6}
+
+This field provides an upper limit to the resulting setpoint value.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-6}
+
+This field provides a lower limit to the resulting setpoint value.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-19}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which setpoints will be established by this setpoint manager.
+
+An IDF example of use:
+
+\begin{lstlisting}
+
+SetpointManager:FollowOutdoorAirTemperature,
+  MyCondenserControl,         !- Name
+  Temperature,                       !- Control Variable
+  OutdoorAirDryBulb,           !- Reference Temperature Type
+  0.5,                                       !- Offset Temperature Difference {deltaC}
+  200,                                       !- Maximum Setpoint Temperature {C}
+  21.1,                                     !- Minimum Setpoint Temperature {C}
+  CondSupplyOutletNode;     !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:FollowSystemNodeTemperature}\label{setpointmanagerfollowsystemnodetemperature}
+
+This setpoint manager is used to place a temperature setpoint on a system node that is derived from the current temperatures at a separate system node. The current value of the temperature at a reference node is obtained and used to generate setpoint on a second system node. If the reference node is also designated to be an outdoor air (intake) node, then this setpoint manager can be used to follow outdoor air conditions that are adjusted for altitude.
+
+\subsubsection{Inputs}\label{inputs-21-005}
+
+\paragraph{Field: Name}\label{field-name-21-002}
+
+A unique user-defined name for an instance of this setpoint manager.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-15}
+
+The type of variable that will be controlled. There are three choices available: Temperature, MaximumTemperature, or MinimumTemperature.
+
+\paragraph{Field: Reference Node Name}\label{field-reference-node-name}
+
+The name of a system node where this setpoint manager will obtain a reference temperature to follow. Note that the temperature to obtained is the current temperature on the node and not the current value of a temperature \emph{setpoint}.
+
+\paragraph{Field: Reference Temperature Type}\label{field-reference-temperature-type-1}
+
+The field specifies the type of temperature value to obtain from the system node referenced in the previous field. The two available options are NodeDryBulb and NodeWetBulb.
+
+\paragraph{Field: Offset Temperature Difference}\label{field-offset-temperature-difference-1}
+
+This field provides a temperature offset that will be applied to the value obtained from the reference system node. If this value is zero, and the limits are met, then the resulting setpoint will be exactly the same as the reference system node temperature. The sign convention is that a positive value here will increase the resulting setpoint to higher than the temperature at the reference node.
+
+\paragraph{Field: Maximum Limit Setpoint Temperature}\label{field-maximum-limit-setpoint-temperature}
+
+This field provides an upper limit to the resulting setpoint value.
+
+\paragraph{Field: Minimum Limit Setpoint Temperature}\label{field-minimum-limit-setpoint-temperature}
+
+This field provides a lower limit to the resulting setpoint value.
+
+\paragraph{Field: Setpoint System Node or NodeList Name}\label{field-setpoint-system-node-or-nodelist-name}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which setpoints will be established by this setpoint manager.
+
+An IDF example of use:
+
+\begin{lstlisting}
+
+SetpointManager:FollowSystemNodeTemperature,
+  MyCondenserControl,         !- Name
+  Temperature,                       !- Control Variable
+  MyOAinletNode,                   !- Reference Node Name
+  NodeDryBulb,                       !- Reference Temperature Type
+  0.5,                                       !- Offset Temperature Difference {deltaC}
+  200,                                       !- Maximum Setpoint Temperature {C}
+  24.0,                                     !- Minimum Setpoint Temperature {C}
+  CondSupplyOutletNode;     !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:FollowGroundTemperature}\label{setpointmanagerfollowgroundtemperature}
+
+This setpoint manager is used to place a temperature setpoint on a system node that is derived from a current ground temperature. The ground temperatures are specified in different Site:GroundTemperature:* objects and used during the simulation. This setpoint manager is primarily intended for condenser or plant loops using some type of ground heat exchanger.
+
+\subsubsection{Inputs}\label{inputs-22-004}
+
+\paragraph{Field: Name}\label{field-name-22-002}
+
+A unique user-defined name for an instance of this setpoint manager.
+
+\paragraph{Field: Control Variable}\label{field-control-variable-16}
+
+The type of variable that will be controlled. There are three choices available: Temperature, MaximumTemperature, or MinimumTemperature.
+
+\paragraph{Field: Reference Ground Temperature Object Type}\label{field-reference-ground-temperature-object-type}
+
+This field is used to specify the type of ground temperature to be used by the setpoint manager. There are four options, Site:GroundTemperature:BuildingSurface, Site:GroundTemperature:Shallow, Site:GroundTemperature:Deep, or Site:GroundTemperature:FCfactorMethod. Generally the deep ground temperatures are the most useful for a plant loop serving a vertical borehole ground heat exchanger.
+
+\paragraph{Field: Offset Temperature Difference}\label{field-offset-temperature-difference-2}
+
+This field provides a temperature offset that will be applied to the value of the ground temperature. If this value is zero, and the limits are met, then the resulting setpoint will be exactly the same as the ground temperature. The sign convention is that a positive value here will increase the resulting setpoint to higher than the ground temperature.
+
+\paragraph{Field: Maximum Setpoint Temperature}\label{field-maximum-setpoint-temperature-7}
+
+This field provides an upper limit to the resulting setpoint value.
+
+\paragraph{Field: Minimum Setpoint Temperature}\label{field-minimum-setpoint-temperature-7}
+
+This field provides a lower limit to the resulting setpoint value.
+
+\paragraph{Field: Setpoint System Node or NodeList Name}\label{field-setpoint-system-node-or-nodelist-name-1}
+
+The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name for which setpoints will be established by this setpoint manager.
+
+An IDF example of use:
+
+\begin{lstlisting}
+
+SetpointManager:FollowGroundTemperature,
+  MyCondenserControl,                   !- Name
+  Temperature,                                 !- Control Variable
+  Site:GroundTemperature:Deep, !- Reference Ground Temperature Object Type
+  1.5,                                                 !- Offset Temperature Difference {deltaC}
+  50.0,                                               !- Maximum Setpoint Temperature {C}
+  10.0,                                               !- Minimum Setpoint Temperature {C}
+  CondSupplyOutletNode;               !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:CondenserEnteringReset}\label{setpointmanagercondenserenteringreset}
+
+The object resets the condenser entering water temperature setpoint to the optimal setpoint temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place limit conditions on the optimized setpoint value. Note that this object will work with only one cooling tower object in a plant loop.
+
+\subsubsection{Inputs}\label{inputs-23-004}
+
+\paragraph{Field: Name}\label{field-name-23-002}
+
+A unique, user assigned name for an instance of the optimized condenser entering water setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control variable}\label{field-control-variable-17}
+
+The type of variable that will be controlled. The only valid choice for this setpoint manager is \textbf{Temperature}.
+
+\paragraph{Field: Default Condenser Entering Water Temperature Schedule Name}\label{field-default-condenser-entering-water-temperature-schedule-name}
+
+This schedule should define the default condenser entering water temperature setpoint. This scheduled setpoint value is only used in a given time step if the optimized setpoint value (see the Optimized Condenser Entering Water Temperature Curve Name field) does not fall within its prescribed boundary conditions.
+
+\paragraph{Field: Minimum Design Wetbulb Temperature Curve Name}\label{field-minimum-design-wetbulb-temperature-curve-name}
+
+The curve name associated with the coefficients in the equation used to determine the minimum design tower wetbulb referenced by the minimum outside air wetbulb temperature curve below. The value from this curve is compared to the tower design wet bulb each timestep to establish one of the governing boundaries over the optimized condenser entering water temperature setpoint calculation. This curve must be quad-linear (Curve:QuadLinear) and is defined as:
+
+\begin{equation}
+T = {C_1} + {C_2}\cdot OaWb + {C_3}\cdot WPLR + {C_4}TwrWb + {C_5}NF
+\end{equation}
+
+where,
+
+OaWb = Outside air wet bulb for current timestep, ˚C
+
+WPLR = Weighted Part Load Ratio, dimensionless
+
+TwrWb = Design tower wet bulb boundary condition, ˚C
+
+NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
+
+\paragraph{Field: Minimum Outside Air Wetbulb Temperature Curve Name}\label{field-minimum-outside-air-wetbulb-temperature-curve-name}
+
+The curve name associated with the coefficients in the equation used to determine the minimum actual wetbulb referenced by the optimized condenser entering water temperature curve. The value from this curve is compared the actual outside wet bulb each timestep to establish one of the governing boundaries over the optimized condenser entering water temperature setpoint calculation. This curve must be quad-linear (Curve:QuadLinear) and is defined as:
+
+\begin{equation}
+T = {C_1} + {C_2}\cdot MinWb + {C_3}\cdot WPLR + {C_4}\cdot TwrWb + {C_5}NF
+\end{equation}
+
+Where
+
+MinWb = Minimum design wetbulb for current timestep, ˚C
+
+WPLR = Weighted Part Load Ratio, dimensionless
+
+TwrWb = Design tower wet bulb boundary condition, ˚C
+
+NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
+
+\paragraph{Field: Optimized Condenser Entering Temperature Curve Name}\label{field-optimized-condenser-entering-temperature-curve-name}
+
+The curve name associated with the coefficients in the optimized condenser entering water temperature equation. The value from this curve is used to calculate the optimized condenser entering water temperature for each timestep. If this optimized setpoint does not fall within the bounds established by the two boundary conditions, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Setpoint for that timestep. This curve must be quad-linear (Curve:QuadLinear) and is defined as:
+
+\begin{equation}
+T = {C_1} + {C_2}OaWb + {C_3}WPLR + {C_4}TwrWb + {C_5}NF
+\end{equation}
+
+where,
+
+OaWb = Outside air wet bulb for current timestep, ˚C
+
+WPLR = Weighted Part Load Ratio, dimensionless
+
+TwrWb = Design tower wet bulb boundary condition, ˚C
+
+NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
+
+\paragraph{Field: Minimum Lift}\label{field-minimum-lift}
+
+This field establishes the minimum Lift allowed. Lift is generally thought of as the difference between condenser refrigerant pressure and the evaporator refrigerant pressure. Using defined pressure and temperature relationships, lift also can be related to the difference between the leaving chilled water and the leaving condenser water temperature. Further, when the leaving condenser water temperature and condenser water flow are constant, the entering condenser temperature can be used as a proxy for lift. Because most condenser water systems are designed for constant flow, entering condenser temperature is the most common metric for lift, and that is what meant here. If the calculated Condenser Entering Water Setpoint falls below (TEvapLvgWater+ MinimumLift), then the Condenser Entering Water Setpoint is reset to equal TEvapLvgWater+ MinimumLift. The units for this field are deg C TD. Default is 11.1 ˚C (20 F).
+
+\paragraph{Field: Maximum Condenser Entering Temperature}\label{field-maximum-condenser-entering-temperature}
+
+This field establishes the maximum condenser entering water setpoint temperature allowed. If the scheduled or calculated setpoint is above TCondEntMax, then TCondEntSetpoint is reset to equal TCondEntMax. The units for this field are deg C.
+
+\paragraph{Field: Cooling Tower Design Inlet Air Wet-Bulb Temperature}\label{field-cooling-tower-design-inlet-air-wet-bulb-temperature}
+
+This field defines the reference wet bulb temperature used to size the cooling tower. Typically, the design condenser entering water temperature equals TwrRefOaWb + TowerApproachTD. The units for this field are deg C.
+
+\paragraph{Field: Setpoint Node or Node List Name}\label{field-setpoint-node-or-node-list-name}
+
+This field defines the condenser node being controlled.
+
+Below is an example input for a CondenserEnteringReset Setpoint Manager.
+
+\begin{lstlisting}
+
+SetpointManager:CondenserEnteringReset,
+  Condenser Optimized Setpoint Manager,   !- Name
+  Temperature,                   !- Control Variable
+  DefaultCondEntSch,       !- Default Condenser Entering Water Temperature Schedule Name
+  MinDsnWBCurveName,       !- Minimum Design Wetbulb Temperature Curve Name
+  MinActWBCurveName,       !- Minimum Outside Air Wetbulb Temperature Curve Name
+  OptCondEntCurveName,   !- Optimized Cond Entering Water Temperature Curve Name
+  12,                                     !- Minimum Lift, C
+  32,                                     !- Maximum Condenser Entering Water Temp, C
+  25.56,                               !- Cooling Tower Design Inlet Air Wetbulb Temperature, C
+  Cond Water Setpoint Node;   !- Setpoint Node or Node List Name
+\end{lstlisting}
+
+\subsection{SetpointManager:CondenserEnteringReset:Ideal}\label{setpointmanagercondenserenteringresetideal}
+
+The object determines a near-optimal condenser water entering setpoint at each time step that will result in minimum net energy consumption for the chiller and coolingtower plant. The ideal chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint at a given timestep. Note that this object will work with only one chiller object and only one cooling tower object in a plant loop.
+
+\subsubsection{Inputs}\label{inputs-24-002}
+
+\paragraph{Field: Name}\label{field-name-24-001}
+
+A unique, user assigned name for an instance of the optimized condenser entering water setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
+
+\paragraph{Field: Control variable}\label{field-control-variable-18}
+
+The type of variable that will be controlled. There is only one choice for this type of setpoint manager: \textbf{Temperature}.
+
+\paragraph{Field: Minimum Lift}\label{field-minimum-lift-1}
+
+This field establishes the minimum lift allowed. Lift is generally thought of as the difference between condenser refrigerant pressure and the evaporator refrigerant pressure. Using defined pressure and temperature relationships, lift also can be related to the difference between the leaving chilled water and the leaving condenser water temperature. Further, when the leaving condenser water temperature and condenser water flow are constant, the entering condenser temperature can be used as a proxy for lift. Because most condenser water systems are designed for constant flow, entering condenser temperature is the most common metric for lift, and that is what meant here. If the optimized condenser entering water setpoint falls below leaving evaporator water temperature plus minimum lift, then the condenser entering water setpoint is reset to equal this field value plus leaving evaporator water temperature. This determines the minimum boundary of condenser entering water setpoint. The unit for this field is deg C TD. Default is 11.1 deg C (20 deg F).
+
+\paragraph{Field: Maximum Condenser Entering Water Temperature}\label{field-maximum-condenser-entering-water-temperature}
+
+This field establishes the maximum condenser entering water setpoint temperature allowed. If the optimized condenser entering water setpoint is above this field value, then the condenser entering water setpoint is reset to equal this filed value. The units for this field are deg C. Default is 34 deg C
+
+\paragraph{Field: Setpoint Node or Node List Name}\label{field-setpoint-node-or-node-list-name-1}
+
+This field defines the condenser node being controlled.
+
+Below is an example input for a IdealCondenserEnteringReset Setpoint Manager.
+
+\begin{lstlisting}
+
+SetpointManager:CondenserEnteringReset:Ideal,
+  Condenser Optimized Setpoint Manager,   !- Name
+  Temperature,                   !- Control Variable
+  12,                                     !- Minimum Lift, C
+  32,                                     !- Maximum Condenser Entering Water Temp, C
+  Cond Water Setpoint Node;   !- Setpoint Node or Node List Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:OneStageCooling}\label{setpointmanagersinglezoneonestagecooling}
+
+The singe-zone, one-stage cooling setpoint manager allows a component to be controlled based on thermostatic control using the object ZoneControl:Thermostat:StagedDualSetpoint. This setpoint manager differs from other parts of EnergyPlus that control based on predicted loads to setpoint. This setpoint manager allows modeling on/off cycling of DX coils using CoilSystem:Cooling:DX in continuous fan air handlers. This setpoint manger detects if the zone is calling for a cooling stage and applies one setpoint value if cooling is called for and another setpoint value if cooling is not called for.
+
+This method of control is much more like real world thermostatic control but it requires short zone timesteps. Models using this type of control should use 60 timesteps per hour and will run much slower because of that.
+
+\subsubsection{Inputs}\label{inputs-25-002}
+
+\paragraph{Field: Name}\label{field-name-25-001}
+
+This alpha field is a unique, user-assigned name for an instance of a single zone one stage cooling setpoint manager.
+
+\paragraph{Field: Cooling Stage On Supply Air Setpoint Temperature}\label{field-cooling-stage-on-supply-air-setpoint-temperature}
+
+This numeric field is the setpoint temperature to apply when the manager intends to turn on cooling, in degrees Celsius. The default is -99.0 °C.
+
+\paragraph{Field: Cooling Stage Off Supply Air Setpoint Temperature}\label{field-cooling-stage-off-supply-air-setpoint-temperature}
+
+This numeric field is the setpoint temperature to apply when the manager intends to turn off cooling, in degrees Celsius. The value in this field must be higher than the value in the previous field. The default is 99.0 °C.
+
+\paragraph{Field: Control Zone Name}\label{field-control-zone-name-3}
+
+This alpha field is the name of the control zone for this setpoint manager. This zone needs to be controlled using ZoneControl:Thermostat:StagedDualSetpoint.
+
+\paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-20}
+
+This alpha field is the name of a NodeList objet containing the names of the HVAC system nodes, or the name of a system node, for which temperature setpoints will be established by this setpoint manager.
+
+An example input follows.
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:OneStageCooling,
+  ZSF2 cooling on_off , !- Name
+  -99.0 , !- Cooling Stage On Supply Air Setpoint Temperature
+  99.0 , !- Cooling Stage Off Supply Air Setpoint Temperature
+  ZSF2 , !- Control Zone Name
+  DX Cooling Coil 3 Outlet Node ; !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:SingleZone:OneStageHeating}\label{setpointmanagersinglezoneonestageheating}
+
+The singe-zone, one-stage heating setpoint manager allows a component to be controlled based on thermostatic control using the object ZoneControl:Thermostat:StagedDualSetpoint. This setpoint manager differs from other parts of EnergyPlus that control based on predicted loads to setpoint. This setpoint manager allows modeling on/off cycling of heating coils in continuous fan air handlers. This setpoint manger detects if the zone is calling for a heating stage and applies one setpoint value if heating is called for and another setpoint value if heating is not called for.
+
+This method of control is much more like real world thermostatic control but it requires short zone timesteps. Models using this type of control should use 60 timesteps per hour and will run much slower because of that.
+
+\subsubsection{Field: Name}\label{field-name-26-001}
+
+This alpha field is a unique, user-assigned name for an instance of a single zone one stage heating setpoint manager.
+
+\subsubsection{Field: Heating Stage On Supply Air Setpoint Temperature}\label{field-heating-stage-on-supply-air-setpoint-temperature}
+
+This numeric field is the setpoint temperature to apply when the manager intends to turn on heating, in degrees Celsius. The default is 99.0 °C.
+
+\subsubsection{Field: Heating Stage Off Supply Air Setpoint Temperature}\label{field-heating-stage-off-supply-air-setpoint-temperature}
+
+This numeric field is the setpoint temperature to apply when the manager intends to turn off heating, in degrees Celsius. The value in this field must be lower than the value in the previous field. The default is -99.0 °C.
+
+\subsubsection{Field: Control Zone Name}\label{field-control-zone-name-4}
+
+This alpha field is the name of the control zone for this setpoint manager. This zone needs to be controlled using ZoneControl:Thermostat:StagedDualSetpoint.
+
+\subsubsection{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-21}
+
+This alpha field is the name of a NodeList objet containing the names of the HVAC system nodes, or the name of a system node, for which temperature setpoints will be established by this setpoint manager.
+
+An example input follows.
+
+\begin{lstlisting}
+
+SetpointManager:SingleZone:OneStageHeating,
+  ZNF1 heating on_off , !- Name
+  99.0 , !- Heating Stage On Supply Air Setpoint Temperature
+  -99.0 , !- Heating Stage Off Supply Air Setpoint Temperature
+  ZNF1 , !- Control Zone Name
+  Main Heating Coil 2 Air Outlet Node ; !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\subsection{SetpointManager:ReturnTemperature:ChilledWater}\label{setpointmanagerreturntemperaturechilledwater}
+
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment. This setpoint manager is specifically for ``chilled water'' (although it could be any fluid) applications. This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what set-point temperature would provide the desired target return temperature.
+
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be. To make tighter control, the time step can be reduced down even to one minute. However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size. If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
+
+\subsubsection{Inputs}\label{inputs-26-001}
+
+\paragraph{Field: Name}\label{field-name-27-001}
+
+This alpha field is a unique, user-assigned name for an instance of a chilled water return temperature reset setpoint manager.
+
+\paragraph{Plant Loop Supply Outlet Node}\label{plant-loop-supply-outlet-node}
+
+This alpha field is the name of the plant loop supply side outlet node for the plant being managed by this setpoint manager. The current temperature of this node is sensed in order to calculate current loop demand. This node is typically also where the plant loop setpoint is specified, but not necessarily. This setpoint manager looks up the actual setpoint node from the PlantLoop internal data structures as it is specified on the PlantLoop object. If the plant loop setpoint is on a different node than the supply outlet node, the loop may not maintain return temperature control as expected.
+
+\paragraph{Plant Loop Supply Inlet Node}\label{plant-loop-supply-inlet-node}
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply setpoint temperature. The current temperature of this node is also sensed in order to calculate current loop demand.
+
+\paragraph{Minimum Supply Temperature Setpoint}\label{minimum-supply-temperature-setpoint}
+
+This numeric field plays multiple roles. During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature. During normal calculation, this is used as the minimum chilled water supply temperature to avoid resetting the setpoint too low. During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+\paragraph{Maximum Supply Temperature Setpoint}\label{maximum-supply-temperature-setpoint}
+
+This numeric field is the maximum value to which the supply setpoint can be reset. This ensures that the chilled water temperature does not go too high during reset operations.
+
+\paragraph{Return Temperature Setpoint Input Type}\label{return-temperature-setpoint-input-type}
+
+This alpha field must be one of three strings: ``Constant'', ``Scheduled'', or ``ReturnTemperatureSetpoint''. If the choice is ``Constant'', the constant value in the next field is used as the target return temperature. If the choice is ``Scheduled'', the current value of the schedule named in the following field is used as the target return temperature. If the choice is ``ReturnTemperatureSetpoint'', the actual setpoint temperature on the ``Plant Loop Supply Inlet Node'' specified above is retrieved and used as the target return temperature. This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally. Then when this return temperature manager executes, the setpoint will be updated and utilized.
+
+\paragraph{Return Temperature Setpoint Constant Value}\label{return-temperature-setpoint-constant-value}
+
+If the ``Return Temperature Setpoint Input Type'' field is ``constant'', the numeric value entered here is used as the target return temperature throughout the simulation.
+
+\paragraph{Return Temperature Setpoint Schedule Name}\label{return-temperature-setpoint-schedule-name}
+
+If the ``Return Temperature Setpoint Input Type'' field is ``scheduled'', this alpha field defines the name of a user-defined schedule storing values of return target temperature. The ``current'' value is looked up throughout the simulation. This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+
+An example idf input for a constant return reset setpoint manager is shown here:
+
+\begin{lstlisting}
+
+SetpointManager:ReturnTemperature:ChilledWater,
+  Main Loop Setpoint Manager, !- Name
+  Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+  Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+  7.0,                     !- Minimum Supply Temperature Setpoint
+  10.0,                    !- Maximum Supply Temperature Setpoint
+  Constant,                !- Return Temperature Setpoint Input Type
+  12.0,                    !- Return Temperature Setpoint Constant Value
+  ;                        !- Return Temperature Setpoint Schedule Name
+\end{lstlisting}
+
+Another example which uses the ``ReturnTemperatureSetpoint'' is shown here with the accompanying setpoint being used to set the setpoint on the return node:
+
+\begin{lstlisting}
+  SetpointManager:Scheduled,
+    Return Temperature Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    Return Temperature Sch,  !- Schedule Name
+    Supply Inlet Node;       !- Setpoint Node or NodeList Name
+\end{lstlisting}
+
+\begin{lstlisting}
+  Schedule:Constant,
+    Return Temperature Sch,  !- Name
+    Any Number,              !- Schedule Limits
+    11.75;                   !- Value
+\end{lstlisting}
+
+\begin{lstlisting}
+  SetpointManager:ReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    ReturnTemperatureSetpoint, !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
+\end{lstlisting}
+
+\subsection{SetpointManager:ReturnTemperature:HotWater}\label{setpointmanagerreturntemperaturehotwater}
+
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment. This setpoint manager is specifically for ``hot water'' (although it could be any fluid) applications. This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what supply set-point temperature would provide the desired target return temperature.
+
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be. To make tighter control, the time step can be reduced down even to one minute. However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size. If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
+
+\subsubsection{Inputs}\label{inputs-27-001}
+
+\paragraph{Field: Name}\label{field-name-28-000}
+
+This alpha field is a unique, user-assigned name for an instance of a hot water return temperature reset setpoint manager.
+
+\paragraph{Plant Loop Supply Outlet Node}\label{plant-loop-supply-outlet-node-1}
+
+This alpha field is the name of the plant loop supply side outlet node for the plant being managed by this setpoint manager. The current temperature of this node is sensed in order to calculate current loop demand. This node is typically also where the plant loop setpoint is specified, but not necessarily. This setpoint manager looks up the actual setpoint node from the PlantLoop internal data structures as it is specified on the PlantLoop object. If the plant loop setpoint is on a different node than the supply outlet node, the loop may not maintain return temperature control as expected.
+
+\paragraph{Plant Loop Supply Inlet Node}\label{plant-loop-supply-inlet-node-1}
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply setpoint temperature. The current temperature of this node is also sensed in order to calculate current loop demand.
+
+\paragraph{Minimum Supply Temperature Setpoint}\label{minimum-supply-temperature-setpoint-1}
+
+This numeric field is the minimum value to which the supply setpoint can be reset. This ensures that the hot water temperature does not go too low during reset operations.
+
+\paragraph{Maximum Supply Temperature Setpoint}\label{maximum-supply-temperature-setpoint-1}
+
+This numeric field plays multiple roles. During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature. During normal calculation, this is used as the maximum hot water supply temperature to avoid resetting the setpoint too high. During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+\paragraph{Return Temperature Setpoint Input Type}\label{return-temperature-setpoint-input-type-1}
+
+This alpha field must be one of three strings: ``Constant'', ``Scheduled'', or ``ReturnTemperatureSetpoint''. If the choice is ``Constant'', the constant value in the next field is used as the target return temperature. If the choice is ``Scheduled'', the current value of the schedule named in the following field is used as the target return temperature. If the choice is ``ReturnTemperatureSetpoint'', the actual setpoint temperature on the ``Plant Loop Supply Inlet Node'' specified above is retrieved and used as the target return temperature. This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally. Then when this return temperature manager executes, the setpoint will be updated and utilized.
+
+\paragraph{Return Temperature Setpoint Constant Value}\label{return-temperature-setpoint-constant-value-1}
+
+If the ``Return Temperature Setpoint Input Type'' field is ``constant'', the numeric value entered here is used as the target return temperature throughout the simulation.
+
+\paragraph{Return Temperature Setpoint Schedule Name}\label{return-temperature-setpoint-schedule-name-1}
+
+If the ``Return Temperature Setpoint Input Type'' field is ``scheduled'', this alpha field defines the name of a user-defined schedule storing values of return target temperature. The ``current'' value is looked up throughout the simulation. This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+
+An example idf input for a scheduled return reset setpoint manager is shown here:
+
+\begin{lstlisting}
+
+SetpointManager:ReturnTemperature:HotWater,
+  Main Loop Setpoint Manager, !- Name
+  Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+  Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+  57.0,                    !- Minimum Supply Temperature Setpoint
+  60.0,                    !- Maximum Supply Temperature Setpoint
+  Scheduled,               !- Return Temperature Setpoint Input Type
+  ,                        !- Return Temperature Setpoint Constant Value
+  ReturnTempSchedule;      !- Return Temperature Setpoint Schedule Name
+
+  Schedule:Compact,
+  ReturnTempSchedule,  !- Name
+  Any Number,              !- Schedule Type Limits Name
+  THROUGH: 12/31,          !- Field 1
+  FOR: AllDays,            !- Field 2
+  UNTIL: 12:00, 55,        !- Field 3
+  UNTIL: 17:00, 53,        !- Field 3
+  UNTIL: 24:00, 55;        !- Field 3
+\end{lstlisting}

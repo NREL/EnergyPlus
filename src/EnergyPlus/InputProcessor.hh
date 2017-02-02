@@ -1,12 +1,60 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef InputProcessor_hh_INCLUDED
 #define InputProcessor_hh_INCLUDED
 
 // C++ Headers
 #include <iosfwd>
+#include <type_traits>
+#include <memory>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Vector2.hh>
@@ -84,13 +132,13 @@ namespace InputProcessor {
 
 	//Character Variables for Module
 	extern std::string InputLine;
-	extern FArray1D_string ListOfSections;
-	extern FArray1D_string ListOfObjects;
-	extern FArray1D_int iListOfObjects;
-	extern FArray1D_int ObjectGotCount;
-	extern FArray1D_int ObjectStartRecord;
+	extern Array1D_string ListOfSections;
+	extern Array1D_string ListOfObjects;
+	extern Array1D_int iListOfObjects;
+	extern Array1D_int ObjectGotCount;
+	extern Array1D_int ObjectStartRecord;
 	extern std::string CurrentFieldName; // Current Field Name (IDD)
-	extern FArray1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
+	extern Array1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
 	extern std::string ReplacementName;
 
 	//Logical Variables for Module
@@ -106,11 +154,14 @@ namespace InputProcessor {
 	extern bool UniqueObject; // Set to true when ReadInputLine has a unique object
 	extern bool ExtensibleObject; // Set to true when ReadInputLine has an extensible object
 	extern int ExtensibleNumFields; // set to number when ReadInputLine has an extensible object
-	extern FArray1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
+	extern Array1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
 	//Derived Types Variables
 
 	// Types
+
+	template <class T> struct is_shared_ptr : std::false_type {};
+	template <class T> struct is_shared_ptr<std::shared_ptr<T> > : std::true_type {};
 
 	struct RangeCheckDef
 	{
@@ -146,39 +197,6 @@ namespace InputProcessor {
 			AutoCalculateValue( 0.0 )
 		{}
 
-		// Member Constructor
-		RangeCheckDef(
-			bool const MinMaxChk, // true when Min/Max has been added
-			int const FieldNumber, // which field number this is
-			std::string const & FieldName, // Name of the field
-			Vector2_string const & MinMaxString, // appropriate Min/Max Strings
-			Vector2< Real64 > const & MinMaxValue, // appropriate Min/Max Values
-			Vector2_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-			bool const DefaultChk, // true when default has been entered
-			Real64 const Default, // Default value
-			bool const DefAutoSize, // Default value is "autosize"
-			bool const AutoSizable, // True if this field can be autosized
-			Real64 const AutoSizeValue, // Value to return for autosize field
-			bool const DefAutoCalculate, // Default value is "autocalculate"
-			bool const AutoCalculatable, // True if this field can be autocalculated
-			Real64 const AutoCalculateValue // Value to return for autocalculate field
-		) :
-			MinMaxChk( MinMaxChk ),
-			FieldNumber( FieldNumber ),
-			FieldName( FieldName ),
-			MinMaxString( MinMaxString ),
-			MinMaxValue( MinMaxValue ),
-			WhichMinMax( WhichMinMax ),
-			DefaultChk( DefaultChk ),
-			Default( Default ),
-			DefAutoSize( DefAutoSize ),
-			AutoSizable( AutoSizable ),
-			AutoSizeValue( AutoSizeValue ),
-			DefAutoCalculate( DefAutoCalculate ),
-			AutoCalculatable( AutoCalculatable ),
-			AutoCalculateValue( AutoCalculateValue )
-		{}
-
 	};
 
 	struct ObjectsDefinition
@@ -198,13 +216,13 @@ namespace InputProcessor {
 		int LastExtendNum; // Count for extended numeric fields
 		int ObsPtr; // If > 0, object is obsolete and this is the
 		// Pointer to ObsoleteObjectRepNames Array for replacement object
-		FArray1D_bool AlphaOrNumeric; // Positionally, whether the argument
+		Array1D_bool AlphaOrNumeric; // Positionally, whether the argument
 		// is alpha (true) or numeric (false)
-		FArray1D_bool ReqField; // True for required fields
-		FArray1D_bool AlphRetainCase; // true if retaincase is set for this field (alpha fields only)
-		FArray1D_string AlphFieldChks; // Field names for alphas
-		FArray1D_string AlphFieldDefs; // Defaults for alphas
-		FArray1D< RangeCheckDef > NumRangeChks; // Used to range check and default numeric fields
+		Array1D_bool ReqField; // True for required fields
+		Array1D_bool AlphRetainCase; // true if retaincase is set for this field (alpha fields only)
+		Array1D_string AlphFieldChks; // Field names for alphas
+		Array1D_string AlphFieldDefs; // Defaults for alphas
+		Array1D< RangeCheckDef > NumRangeChks; // Used to range check and default numeric fields
 		int NumFound; // Number of this object found in IDF
 
 		// Default Constructor
@@ -224,50 +242,6 @@ namespace InputProcessor {
 			NumFound( 0 )
 		{}
 
-		// Member Constructor
-		ObjectsDefinition(
-			std::string const & Name, // Name of the Object
-			int const NumParams, // Number of parameters to be processed for each object
-			int const NumAlpha, // Number of Alpha elements in the object
-			int const NumNumeric, // Number of Numeric elements in the object
-			int const MinNumFields, // Minimum number of fields to be passed to the Get routines
-			bool const NameAlpha1, // True if the first alpha appears to "name" the object for error messages
-			bool const UniqueObject, // True if this object has been designated \unique-object
-			bool const RequiredObject, // True if this object has been designated \required-object
-			bool const ExtensibleObject, // True if this object has been designated \extensible
-			int const ExtensibleNum, // how many fields to extend
-			int const LastExtendAlpha, // Count for extended alpha fields
-			int const LastExtendNum, // Count for extended numeric fields
-			int const ObsPtr, // If > 0, object is obsolete and this is the
-			FArray1_bool const & AlphaOrNumeric, // Positionally, whether the argument
-			FArray1_bool const & ReqField, // True for required fields
-			FArray1_bool const & AlphRetainCase, // true if retaincase is set for this field (alpha fields only)
-			FArray1_string const & AlphFieldChks, // Field names for alphas
-			FArray1_string const & AlphFieldDefs, // Defaults for alphas
-			FArray1< RangeCheckDef > const & NumRangeChks, // Used to range check and default numeric fields
-			int const NumFound // Number of this object found in IDF
-		) :
-			NumParams( NumParams ),
-			NumAlpha( NumAlpha ),
-			NumNumeric( NumNumeric ),
-			MinNumFields( MinNumFields ),
-			NameAlpha1( NameAlpha1 ),
-			UniqueObject( UniqueObject ),
-			RequiredObject( RequiredObject ),
-			ExtensibleObject( ExtensibleObject ),
-			ExtensibleNum( ExtensibleNum ),
-			LastExtendAlpha( LastExtendAlpha ),
-			LastExtendNum( LastExtendNum ),
-			ObsPtr( ObsPtr ),
-			AlphaOrNumeric( AlphaOrNumeric ),
-			ReqField( ReqField ),
-			AlphRetainCase( AlphRetainCase ),
-			AlphFieldChks( AlphFieldChks ),
-			AlphFieldDefs( AlphFieldDefs ),
-			NumRangeChks( NumRangeChks ),
-			NumFound( NumFound )
-		{}
-
 	};
 
 	struct SectionsDefinition
@@ -279,15 +253,6 @@ namespace InputProcessor {
 		// Default Constructor
 		SectionsDefinition() :
 			NumFound( 0 )
-		{}
-
-		// Member Constructor
-		SectionsDefinition(
-			std::string const & Name, // Name of the Section
-			int const NumFound // Number of this object found in IDF
-		) :
-			Name( Name ),
-			NumFound( NumFound )
 		{}
 
 	};
@@ -307,19 +272,6 @@ namespace InputProcessor {
 			LastRecord( 0 )
 		{}
 
-		// Member Constructor
-		FileSectionsDefinition(
-			std::string const & Name, // Name of this section
-			int const FirstRecord, // Record number of first object in section
-			int const FirstLineNo, // Record number of first object in section
-			int const LastRecord // Record number of last object in section
-		) :
-			Name( Name ),
-			FirstRecord( FirstRecord ),
-			FirstLineNo( FirstLineNo ),
-			LastRecord( LastRecord )
-		{}
-
 	};
 
 	struct LineDefinition // Will be saved for each "object" input
@@ -331,36 +283,16 @@ namespace InputProcessor {
 		int NumAlphas; // Number of alphas on this record
 		int NumNumbers; // Number of numbers on this record
 		int ObjectDefPtr; // Which Object Def is this
-		FArray1D_string Alphas; // Storage for the alphas
-		FArray1D_bool AlphBlank; // Set to true if this field was blank on input
-		FArray1D< Real64 > Numbers; // Storage for the numbers
-		FArray1D_bool NumBlank; // Set to true if this field was blank on input
+		Array1D_string Alphas; // Storage for the alphas
+		Array1D_bool AlphBlank; // Set to true if this field was blank on input
+		Array1D< Real64 > Numbers; // Storage for the numbers
+		Array1D_bool NumBlank; // Set to true if this field was blank on input
 
 		// Default Constructor
 		LineDefinition() :
 			NumAlphas( 0 ),
 			NumNumbers( 0 ),
 			ObjectDefPtr( 0 )
-		{}
-
-		// Member Constructor
-		LineDefinition(
-			std::string const & Name, // Object name for this record
-			int const NumAlphas, // Number of alphas on this record
-			int const NumNumbers, // Number of numbers on this record
-			int const ObjectDefPtr, // Which Object Def is this
-			FArray1_string const & Alphas, // Storage for the alphas
-			FArray1_bool const & AlphBlank, // Set to true if this field was blank on input
-			FArray1< Real64 > const & Numbers, // Storage for the numbers
-			FArray1_bool const & NumBlank // Set to true if this field was blank on input
-		) :
-			NumAlphas( NumAlphas ),
-			NumNumbers( NumNumbers ),
-			ObjectDefPtr( ObjectDefPtr ),
-			Alphas( Alphas ),
-			AlphBlank( AlphBlank ),
-			Numbers( Numbers ),
-			NumBlank( NumBlank )
 		{}
 
 	};
@@ -383,34 +315,22 @@ namespace InputProcessor {
 			TransitionDefer( false )
 		{}
 
-		// Member Constructor
-		SecretObjects(
-			std::string const & OldName, // Old Object Name
-			std::string const & NewName, // New Object Name if applicable
-			bool const Deleted, // true if this (old name) was deleted
-			bool const Used, // true when used (and reported) in this input file
-			bool const Transitioned, // true if old name will be transitioned to new object within IP
-			bool const TransitionDefer // true if old name will be transitioned to new object within IP
-		) :
-			OldName( OldName ),
-			NewName( NewName ),
-			Deleted( Deleted ),
-			Used( Used ),
-			Transitioned( Transitioned ),
-			TransitionDefer( TransitionDefer )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
-	extern FArray1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
-	extern FArray1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
+	extern Array1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
+	extern Array1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
+	extern Array1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
 	extern LineDefinition LineItem; // Description of current record
-	extern FArray1D< LineDefinition > IDFRecords; // All the objects read from the IDF
-	extern FArray1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
+	extern Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
+	extern Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
 
 	// Functions
+
+	// Clears the global data in InputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	ProcessInput();
@@ -464,7 +384,7 @@ namespace InputProcessor {
 
 	void
 	GetListofSectionsinInput(
-		FArray1S_string SectionList,
+		Array1S_string SectionList,
 		int & NuminList
 	);
 
@@ -482,15 +402,15 @@ namespace InputProcessor {
 	GetObjectItem(
 		std::string const & Object,
 		int const Number,
-		FArray1S_string Alphas,
+		Array1S_string Alphas,
 		int & NumAlphas,
-		FArray1S< Real64 > Numbers,
+		Array1S< Real64 > Numbers,
 		int & NumNumbers,
 		int & Status,
-		Optional< FArray1_bool > NumBlank = _,
-		Optional< FArray1_bool > AlphaBlank = _,
-		Optional< FArray1_string > AlphaFieldNames = _,
-		Optional< FArray1_string > NumericFieldNames = _
+		Optional< Array1_bool > NumBlank = _,
+		Optional< Array1_bool > AlphaBlank = _,
+		Optional< Array1_string > AlphaFieldNames = _,
+		Optional< Array1_string > NumericFieldNames = _
 	);
 
 	int
@@ -514,10 +434,10 @@ namespace InputProcessor {
 		std::string & ObjectWord,
 		int & NumAlpha,
 		int & NumNumeric,
-		Optional< FArray1S_string > AlphaArgs = _,
-		Optional< FArray1S< Real64 > > NumericArgs = _,
-		Optional< FArray1S_bool > AlphaBlanks = _,
-		Optional< FArray1S_bool > NumericBlanks = _
+		Optional< Array1S_string > AlphaArgs = _,
+		Optional< Array1S< Real64 > > NumericArgs = _,
+		Optional< Array1S_bool > AlphaBlanks = _,
+		Optional< Array1S_bool > NumericBlanks = _
 	);
 
 	// Utility Functions/Routines for Module
@@ -573,9 +493,36 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		FArray1S_string const ListOfItems,
+		Array1_string const & ListOfItems,
 		int const NumItems
 	);
+
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1_string const & ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1S_string const ListOfItems,
+		int const NumItems
+	);
+
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1S_string const ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
 
 	template< typename A >
 	inline
@@ -592,12 +539,87 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
+	template< typename A >
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs and operator[i] and elements need Name
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems,
+		int const NumItems
+	)
+	{
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( String == ListOfItems[ i ].Name ) return int( i + 1 ); // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and elements need Name
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs operator[i] and value_type
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p,
+		int const NumItems
+	)
+	{
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( String == ListOfItems[ i ].*name_p ) return int( i + 1 ); // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and value_type
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p
+	)
+	{
+		return FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
+	}
+
 	int
 	FindItemInSortedList(
 		std::string const & String,
-		FArray1S_string const ListOfItems,
+		Array1S_string const ListOfItems,
 		int const NumItems
 	);
+
+	inline
+	int
+	FindItemInSortedList(
+		std::string const & String,
+		Array1S_string const ListOfItems
+	)
+	{
+		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
+	}
 
 	template< typename A >
 	inline
@@ -628,12 +650,106 @@ namespace InputProcessor {
 		return Probe;
 	}
 
+	template< typename A >
+	inline
+	int
+	FindItemInSortedList(
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems
+	)
+	{
+		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::false_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s.name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::true_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s->name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str
+	)
+	{
+		return FindItem( first, last, str, is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{} );
+	}
+
 	int
 	FindItem(
 		std::string const & String,
-		FArray1S_string const ListOfItems,
+		Array1D_string const & ListOfItems,
 		int const NumItems
 	);
+
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Array1D_string const & ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	int
+	FindItem(
+		std::string const & String,
+		Array1S_string const ListOfItems,
+		int const NumItems
+	);
+
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Array1S_string const ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
 
 	template< typename A >
 	inline
@@ -652,8 +768,81 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
+	template< typename A >
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems,
+		int const NumItems
+	)
+	{
+		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		if ( item_number != 0 ) return item_number;
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( equali( String, ListOfItems[ i ].Name ) ) return i + 1; // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p,
+		int const NumItems
+	)
+	{
+		int const item_number( FindItemInList( String, ListOfItems, name_p, NumItems ) );
+		if ( item_number != 0 ) return item_number;
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( equali( String, ListOfItems[ i ].*name_p ) ) return i + 1; // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p
+	)
+	{
+		return FindItem( String, ListOfItems, name_p, ListOfItems.isize() );
+	}
+
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
+
+	std::string
+	deAllCaps( std::string const & );
+
 
 	typedef char const * c_cstring;
 
@@ -689,10 +878,47 @@ namespace InputProcessor {
 		return equali( s, t );
 	}
 
+	template < typename InputIterator >
+	inline
+	void
+	VerifyName(
+		InputIterator first,
+		InputIterator last,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		IsBlank = false;
+		ErrorFound = false;
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+			return;
+		}
+		int Found = FindItem( first, last, NameToVerify );
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			ErrorFound = true;
+		}
+	}
+
 	void
 	VerifyName(
 		std::string const & NameToVerify,
-		FArray1S_string const NamesList,
+		Array1D_string const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	);
+
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Array1S_string const NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
 		bool & IsBlank,
@@ -710,12 +936,71 @@ namespace InputProcessor {
 		bool & IsBlank,
 		std::string const & StringToDisplay
 	)
-	{ // Overload for member arrays: Implemented here to avoid copy to FArray_string to forward to other VerifyName
-		int Found;
-
+	{ // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
 		ErrorFound = false;
 		if ( NumOfNames > 0 ) {
-			Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			int const Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
+	inline
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Container const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			int const Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+	}
+
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
+	inline
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Container const & NamesList,
+		std::string Container::value_type::*name_p,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			int const Found = FindItem( NameToVerify, NamesList, name_p, NumOfNames );
 			if ( Found != 0 ) {
 				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
 				ErrorFound = true;
@@ -773,7 +1058,7 @@ namespace InputProcessor {
 
 	void
 	GetListOfObjectsInIDD(
-		FArray1S_string ObjectNames, // List of Object Names (from IDD)
+		Array1S_string ObjectNames, // List of Object Names (from IDD)
 		int & Number // Number in List
 	);
 
@@ -781,8 +1066,8 @@ namespace InputProcessor {
 	GetObjectDefInIDD(
 		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
-		FArray1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
-		FArray1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
+		Array1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
+		Array1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
 		int & MinNumFields // Minimum Number of Fields to be returned to Get routines
 	);
 
@@ -857,7 +1142,7 @@ namespace InputProcessor {
 		std::string const & cStartName,
 		int const CurLine,
 		int const NumConxLines,
-		FArray1S_string const LineBuf,
+		Array1S_string const LineBuf,
 		int const CurQPtr
 	);
 
@@ -869,29 +1154,6 @@ namespace InputProcessor {
 
 	std::string
 	IPTrimSigDigits( int const IntegerValue );
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // InputProcessor
 

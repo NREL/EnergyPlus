@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <SteamBaseboardRadiator.hh>
@@ -95,24 +141,24 @@ namespace SteamBaseboardRadiator {
 	int NumSteamBaseboards( 0 );
 	int SteamIndex( 0 );
 
-	FArray1D< Real64 > QBBSteamRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QBBSteamRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
+	Array1D< Real64 > QBBSteamRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QBBSteamRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
 	// with no source
 
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	FArray1D< Real64 > LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	Array1D< Real64 > LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< SteamBaseboardParams > SteamBaseboard;
-	FArray1D< SteamBaseboardNumericFieldData > SteamBaseboardNumericFields;
+	Array1D< SteamBaseboardParams > SteamBaseboard;
+	Array1D< SteamBaseboardNumericFieldData > SteamBaseboardNumericFields;
 
 	// Functions
 
@@ -154,7 +200,6 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -176,7 +221,7 @@ namespace SteamBaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, SteamBaseboard.EquipID(), NumSteamBaseboards );
+			BaseboardNum = FindItemInList( EquipName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
 			}
@@ -270,7 +315,6 @@ namespace SteamBaseboardRadiator {
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using GlobalNames::VerifyUniqueBaseboardName;
@@ -337,7 +381,7 @@ namespace SteamBaseboardRadiator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SteamBaseboard.EquipID(), BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Steam + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SteamBaseboard, &SteamBaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Steam + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -407,7 +451,7 @@ namespace SteamBaseboardRadiator {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ){
+			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				SteamBaseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -507,7 +551,7 @@ namespace SteamBaseboardRadiator {
 			AllFracsSummed = SteamBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= SteamBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
 				SteamBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 5 );
-				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface.Name(), TotSurfaces );
+				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface );
 				SteamBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 8 );
 				if ( SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 5 ) + "=\"" + cAlphaArgs( SurfNum + 5 ) + "\" invalid - not found." );
@@ -552,6 +596,14 @@ namespace SteamBaseboardRadiator {
 
 			SteamBaseboard( BaseboardNum ).FluidIndex = SteamIndex;
 
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == SteamBaseboard( BaseboardNum ).EquipID ) {
+						SteamBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -605,7 +657,6 @@ namespace SteamBaseboardRadiator {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::InitComponentNodes;
@@ -626,7 +677,7 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 		int SteamInletNode;
 		int ZoneNode;
@@ -763,7 +814,6 @@ namespace SteamBaseboardRadiator {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataEnvironment::StdBaroPress;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
@@ -787,19 +837,18 @@ namespace SteamBaseboardRadiator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizSteamNum; // Index of plant sizing object for 1st steam loop
-		Real64 DesCoilLoad; // Design heating load in the zone
+		int PltSizSteamNum( 0 ); // Index of plant sizing object for 1st steam loop
+		Real64 DesCoilLoad( 0.0 ); // Design heating load in the zone
 		Real64 SteamInletTemp; // Inlet steam temperature in C
 		Real64 EnthSteamInDry; // Enthalpy of dry steam
 		Real64 EnthSteamOutWet; // Enthalpy of wet steam
 		Real64 LatentHeatSteam; // latent heat of steam
 		Real64 SteamDensity; // Density of steam
 		Real64 Cp; // local fluid specific heat
-		Real64 tmpSteamVolFlowRateMax; // local temporary design steam flow
-		bool ErrorsFound; // If errors detected in input
-		bool IsAutoSize; // Indicator to autosizing steam flow
-		Real64 SteamVolFlowRateMaxDes; // Design maximum steam volume flow for reporting
-		Real64 SteamVolFlowRateMaxUser; // User hard-sized maximum steam volume flow for reporting
+		bool ErrorsFound( false ); // If errors detected in input
+		bool IsAutoSize( false ); // Indicator to autosizing steam flow
+		Real64 SteamVolFlowRateMaxDes( 0.0 ); // Design maximum steam volume flow for reporting
+		Real64 SteamVolFlowRateMaxUser( 0.0 ); // User hard-sized maximum steam volume flow for reporting
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -809,14 +858,6 @@ namespace SteamBaseboardRadiator {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
 
-
-		PltSizSteamNum = 0;
-		DesCoilLoad = 0.0;
-		ErrorsFound = false;
-		IsAutoSize = false;
-		SteamVolFlowRateMaxDes = 0.0;
-		SteamVolFlowRateMaxUser = 0.0;
-
 		// Find the appropriate steam plant sizing object
 		PltSizSteamNum = PlantLoop( SteamBaseboard( BaseboardNum ).LoopNum ).PlantSizNum;
 		//    PltSizSteamNum = MyPlantSizingIndex('Coil:Heating:Steam', SteamBaseboard(BaseboardNum)%EquipID, &
@@ -825,6 +866,8 @@ namespace SteamBaseboardRadiator {
 
 		if ( PltSizSteamNum > 0 ) {
 
+			DataScalableCapSizingON = false;
+			
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax == AutoSize ) {
@@ -849,19 +892,19 @@ namespace SteamBaseboardRadiator {
 					ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 
-						if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( CapSizingMethod == HeatingDesignCapacity ) {
 							if ( SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing( CompType, CompName );
 								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							}
 							TempSize = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 							DataScalableCapSizingON = true;
-						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
@@ -873,6 +916,7 @@ namespace SteamBaseboardRadiator {
 						}
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					}
@@ -901,7 +945,7 @@ namespace SteamBaseboardRadiator {
 							if ( DisplayExtraWarnings ) {
 								// Report difference between design size and user-specified values
 								if ( ( std::abs( SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser ) / SteamVolFlowRateMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeSteamBaseboard: Potential issue with equipment sizing for " "ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" + SteamBaseboard( BaseboardNum ).EquipID + "\"." );
+									ShowMessage( "SizeSteamBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" + SteamBaseboard( BaseboardNum ).EquipID + "\"." );
 									ShowContinueError( "User-Specified Maximum Steam Flow Rate of " + RoundSigDigits( SteamVolFlowRateMaxUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Steam Flow Rate of " + RoundSigDigits( SteamVolFlowRateMaxDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -961,7 +1005,6 @@ namespace SteamBaseboardRadiator {
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
 		using DataHVACGlobals::SmallLoad;
-		using DataBranchAirLoopPlant::MassFlowTolerance;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1011,8 +1054,8 @@ namespace SteamBaseboardRadiator {
 			// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 			DistributeBBSteamRadGains();
 			// Now "simulate" the system by recalculating the heat balances
-			CalcHeatBalanceOutsideSurf( ZoneNum );
-			CalcHeatBalanceInsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 			// Here an assumption is made regarding radiant heat transfer to people.
 			// While the radiant heat transfer to people array will be used by the thermal comfort
@@ -1072,7 +1115,6 @@ namespace SteamBaseboardRadiator {
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataEnvironment::StdBaroPress;
 		using PlantUtilities::SafeCopyPlantNode;
 
 		// Locals
@@ -1218,7 +1260,6 @@ namespace SteamBaseboardRadiator {
 		using DataHeatBalFanSys::QSteamBaseboardSurf;
 		using DataHeatBalFanSys::MaxRadHeatFlux;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -1394,11 +1435,11 @@ namespace SteamBaseboardRadiator {
 	UpdateSteamBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
 		std::string const & BaseboardName, // component name
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int const LoopNum, // Plant loop index for where called from
-		int const LoopSide, // Plant loop side index for where called from
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
+		int const EP_UNUSED( LoopNum ), // Plant loop index for where called from
+		int const EP_UNUSED( LoopSide ), // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{
@@ -1445,12 +1486,10 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum;
-		int InletNodeNum;
-		int OutletNodeNum;
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard.EquipID(), NumSteamBaseboards );
+			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );
 			}
@@ -1481,29 +1520,6 @@ namespace SteamBaseboardRadiator {
 		PullCompInterconnectTrigger( SteamBaseboard( BaseboardNum ).LoopNum, SteamBaseboard( BaseboardNum ).LoopSideNum, SteamBaseboard( BaseboardNum ).BranchNum, SteamBaseboard( BaseboardNum ).CompNum, SteamBaseboard( BaseboardNum ).BBLoadReSimIndex, SteamBaseboard( BaseboardNum ).LoopNum, SteamBaseboard( BaseboardNum ).LoopSideNum, CriteriaType_Temperature, SteamBaseboard( BaseboardNum ).SteamOutletTemp );
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SteamBaseboardRadiator
 

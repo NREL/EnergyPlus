@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef TARCOGOutput_hh_INCLUDED
 #define TARCOGOutput_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -62,7 +108,7 @@ namespace TARCOGOutput {
 		Real64 const fclr,
 		Real64 const VacuumPressure,
 		Real64 const VacuumMaxGapThickness,
-		FArray1A_int const ibc,
+		Array1A_int const ibc,
 		Real64 const hout,
 		Real64 const hin,
 		int const standard,
@@ -74,38 +120,38 @@ namespace TARCOGOutput {
 		Real64 const tilt,
 		Real64 const totsol,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A< Real64 > const SlatThick,
-		FArray1A< Real64 > const SlatWidth,
-		FArray1A< Real64 > const SlatAngle,
-		FArray1A< Real64 > const SlatCond,
-		FArray1A< Real64 > const SlatSpacing,
-		FArray1A< Real64 > const SlatCurve,
-		FArray1A_int const nslice,
-		FArray1A< Real64 > const LaminateA,
-		FArray1A< Real64 > const LaminateB,
-		FArray1A< Real64 > const sumsol,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght
+		Array1A_int const LayerType,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A< Real64 > const SlatThick,
+		Array1A< Real64 > const SlatWidth,
+		Array1A< Real64 > const SlatAngle,
+		Array1A< Real64 > const SlatCond,
+		Array1A< Real64 > const SlatSpacing,
+		Array1A< Real64 > const SlatCurve,
+		Array1A_int const nslice,
+		Array1A< Real64 > const LaminateA,
+		Array1A< Real64 > const LaminateB,
+		Array1A< Real64 > const sumsol,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght
 	);
 
 	void
@@ -120,16 +166,16 @@ namespace TARCOGOutput {
 		Real64 const Gout,
 		Real64 const Gin,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A_int const nmix,
-		FArray2A< Real64 > const frct,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const gap,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght
+		Array1A_int const LayerType,
+		Array1A_int const nmix,
+		Array2A< Real64 > const frct,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const gap,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght
 	);
 
 	void
@@ -138,15 +184,15 @@ namespace TARCOGOutput {
 		std::string const & DBGD,
 		int const nlayer,
 		Real64 const tamb,
-		FArray1A< Real64 > const q,
-		FArray1A< Real64 > const qv,
-		FArray1A< Real64 > const qcgas,
-		FArray1A< Real64 > const qrgas,
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const vfreevent,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const Keff,
-		FArray1A< Real64 > const ShadeGapKeffConv,
+		Array1A< Real64 > const q,
+		Array1A< Real64 > const qv,
+		Array1A< Real64 > const qcgas,
+		Array1A< Real64 > const qrgas,
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const vfreevent,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const Keff,
+		Array1A< Real64 > const ShadeGapKeffConv,
 		Real64 const troom,
 		Real64 const ufactor,
 		Real64 const shgc,
@@ -157,13 +203,13 @@ namespace TARCOGOutput {
 		Real64 const hrin,
 		Real64 const hcout,
 		Real64 const hrout,
-		FArray1A< Real64 > const Ra,
-		FArray1A< Real64 > const Nu,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const Ebf,
-		FArray1A< Real64 > const Ebb,
-		FArray1A< Real64 > const Rf,
-		FArray1A< Real64 > const Rb,
+		Array1A< Real64 > const Ra,
+		Array1A< Real64 > const Nu,
+		Array1A_int const LayerType,
+		Array1A< Real64 > const Ebf,
+		Array1A< Real64 > const Ebb,
+		Array1A< Real64 > const Rf,
+		Array1A< Real64 > const Rb,
 		Real64 const ebsky,
 		Real64 const Gout,
 		Real64 const ebroom,
@@ -174,8 +220,8 @@ namespace TARCOGOutput {
 		Real64 const ShadeHcRatioOut,
 		Real64 const HcUnshadedIn,
 		Real64 const HcUnshadedOut,
-		FArray1A< Real64 > const hcgas,
-		FArray1A< Real64 > const hrgas,
+		Array1A< Real64 > const hcgas,
+		Array1A< Real64 > const hrgas,
 		Real64 const AchievedErrorTolerance,
 		int const NumOfIter
 	);
@@ -188,11 +234,11 @@ namespace TARCOGOutput {
 		Real64 const ufactor,
 		Real64 const hout,
 		Real64 const hin,
-		FArray1A< Real64 > const Ra,
-		FArray1A< Real64 > const Nu,
-		FArray1A< Real64 > const hg,
-		FArray1A< Real64 > const hr,
-		FArray1A< Real64 > const hs,
+		Array1A< Real64 > const Ra,
+		Array1A< Real64 > const Nu,
+		Array1A< Real64 > const hg,
+		Array1A< Real64 > const hr,
+		Array1A< Real64 > const hs,
 		int & nperr
 	);
 
@@ -217,7 +263,7 @@ namespace TARCOGOutput {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A_int const ibc,
+		Array1A_int const ibc,
 		Real64 const hout,
 		Real64 const hin,
 		int const standard,
@@ -229,42 +275,42 @@ namespace TARCOGOutput {
 		Real64 const tilt,
 		Real64 const totsol,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const YoungsMod,
-		FArray1A< Real64 > const PoissonsRat,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A_int const SupportPillar, // Shows whether or not gap have support pillar
-		FArray1A< Real64 > const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-		FArray1A< Real64 > const PillarRadius, // Pillar radius for each gap (used in case there is support pillar)
-		FArray1A< Real64 > const SlatThick,
-		FArray1A< Real64 > const SlatWidth,
-		FArray1A< Real64 > const SlatAngle,
-		FArray1A< Real64 > const SlatCond,
-		FArray1A< Real64 > const SlatSpacing,
-		FArray1A< Real64 > const SlatCurve,
-		FArray1A_int const nslice,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const GapDef,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght,
-		FArray1A< Real64 > const gama
+		Array1A_int const LayerType,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const YoungsMod,
+		Array1A< Real64 > const PoissonsRat,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A_int const SupportPillar, // Shows whether or not gap have support pillar
+		Array1A< Real64 > const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+		Array1A< Real64 > const PillarRadius, // Pillar radius for each gap (used in case there is support pillar)
+		Array1A< Real64 > const SlatThick,
+		Array1A< Real64 > const SlatWidth,
+		Array1A< Real64 > const SlatAngle,
+		Array1A< Real64 > const SlatCond,
+		Array1A< Real64 > const SlatSpacing,
+		Array1A< Real64 > const SlatCurve,
+		Array1A_int const nslice,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const GapDef,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array1A< Real64 > const gama
 	);
 
 	void
@@ -279,29 +325,6 @@ namespace TARCOGOutput {
 		int const igu_ID,
 		int & nperr
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // TARCOGOutput
 

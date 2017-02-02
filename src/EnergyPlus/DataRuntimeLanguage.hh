@@ -1,9 +1,60 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef DataRuntimeLanguage_hh_INCLUDED
 #define DataRuntimeLanguage_hh_INCLUDED
 
+// C++ Headers
+#include <functional>
+#include <unordered_set>
+#include <utility>
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
@@ -132,7 +183,7 @@ namespace DataRuntimeLanguage {
 	// INTERFACE BLOCK SPECIFICATIONS: na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int EMSProgram;
+	extern Array1D_int EMSProgram;
 
 	extern int NumProgramCallManagers; // count of Erl program managers with calling points
 	extern int NumSensors; // count of EMS sensors used in model (data from output variables)
@@ -178,8 +229,8 @@ namespace DataRuntimeLanguage {
 	extern bool OutputEMSInternalVarsFull; // how much to write out to EDD file, if true dump full combinatorial internal list
 	extern bool OutputEMSInternalVarsSmall; // how much to write out to EDD file, if true dump internal list without key names
 
-	extern FArray2D_bool EMSConstructActuatorChecked;
-	extern FArray2D_bool EMSConstructActuatorIsOkay;
+	extern Array2D_bool EMSConstructActuatorChecked;
+	extern Array2D_bool EMSConstructActuatorIsOkay;
 
 	// Types
 
@@ -205,27 +256,6 @@ namespace DataRuntimeLanguage {
 			SchedNum( 0 )
 		{}
 
-		// Member Constructor
-		OutputVarSensorType(
-			std::string const & Name, // name of associated Erl Variable
-			std::string const & UniqueKeyName, // unique key name associated with output variable
-			std::string const & OutputVarName, // name of output variable
-			bool const CheckedOkay, // set to true once checked out okay
-			int const Type, // type of output var, 1=integer, 2=real, 3=meter
-			int const Index, // ref index in output processor, points to variable
-			int const VariableNum, // ref to global variable in runtime language
-			int const SchedNum // ref index ptr to schedule service (filled if Schedule Value)
-		) :
-			Name( Name ),
-			UniqueKeyName( UniqueKeyName ),
-			OutputVarName( OutputVarName ),
-			CheckedOkay( CheckedOkay ),
-			Type( Type ),
-			Index( Index ),
-			VariableNum( VariableNum ),
-			SchedNum( SchedNum )
-		{}
-
 	};
 
 	struct InternalVarsAvailableType
@@ -242,23 +272,6 @@ namespace DataRuntimeLanguage {
 		// Default Constructor
 		InternalVarsAvailableType() :
 			PntrVarTypeUsed( 0 )
-		{}
-
-		// Member Constructor
-		InternalVarsAvailableType(
-			std::string const & DataTypeName, // general internal variable name registered, All uppercase
-			std::string const & UniqueIDName, // unique id for internal var, All uppercase
-			std::string const & Units, // registered units, used for reporting and checks.
-			int const PntrVarTypeUsed, // data type used: integer (PntrInteger) or real (PntrReal)
-			Reference< Real64 > const RealValue, // fortran POINTER to the REAL value that is being accessed
-			Reference_int const IntValue // fortran POINTER to the Integer value that is being accessed
-		) :
-			DataTypeName( DataTypeName ),
-			UniqueIDName( UniqueIDName ),
-			Units( Units ),
-			PntrVarTypeUsed( PntrVarTypeUsed ),
-			RealValue( RealValue ),
-			IntValue( IntValue )
 		{}
 
 	};
@@ -279,23 +292,6 @@ namespace DataRuntimeLanguage {
 			CheckedOkay( false ),
 			ErlVariableNum( 0 ),
 			InternVarNum( 0 )
-		{}
-
-		// Member Constructor
-		InternalVarsUsedType(
-			std::string const & Name, // Erl variable name
-			std::string const & InternalDataTypeName, // general internal variable name, All uppercase
-			std::string const & UniqueIDName, // unique id for internal var, All uppercase
-			bool const CheckedOkay, // set to true once matched to available internal var
-			int const ErlVariableNum, // points to global Erl variable, matches Name
-			int const InternVarNum // points to index match in EMSInternalVarsAvailable structure
-		) :
-			Name( Name ),
-			InternalDataTypeName( InternalDataTypeName ),
-			UniqueIDName( UniqueIDName ),
-			CheckedOkay( CheckedOkay ),
-			ErlVariableNum( ErlVariableNum ),
-			InternVarNum( InternVarNum )
 		{}
 
 	};
@@ -320,29 +316,6 @@ namespace DataRuntimeLanguage {
 			PntrVarTypeUsed( 0 )
 		{}
 
-		// Member Constructor
-		EMSActuatorAvailableType(
-			std::string const & ComponentTypeName, // general actuator name registered, All uppercase
-			std::string const & UniqueIDName, // unique id for actuator, All uppercase
-			std::string const & ControlTypeName, // control type id for actuator, All uppercase
-			std::string const & Units, // control value units, used for reporting and checks.
-			int const PntrVarTypeUsed, // data type used: integer (PntrInteger), real (PntrReal)
-			Reference_bool const Actuated, // fortran POINTER to the logical value that signals EMS is actuating
-			Reference< Real64 > const RealValue, // fortran POINTER to the REAL value that is being actuated
-			Reference_int const IntValue, // fortran POINTER to the Integer value that is being actuated
-			Reference_bool const LogValue // fortran POINTER to the Logical value that is being actuated
-		) :
-			ComponentTypeName( ComponentTypeName ),
-			UniqueIDName( UniqueIDName ),
-			ControlTypeName( ControlTypeName ),
-			Units( Units ),
-			PntrVarTypeUsed( PntrVarTypeUsed ),
-			Actuated( Actuated ),
-			RealValue( RealValue ),
-			IntValue( IntValue ),
-			LogValue( LogValue )
-		{}
-
 	};
 
 	struct ActuatorUsedType
@@ -364,25 +337,6 @@ namespace DataRuntimeLanguage {
 			ActuatorVariableNum( 0 )
 		{}
 
-		// Member Constructor
-		ActuatorUsedType(
-			std::string const & Name, // Erl variable name
-			std::string const & ComponentTypeName, // general actuator name, All uppercase
-			std::string const & UniqueIDName, // unique id for actuator, All uppercase
-			std::string const & ControlTypeName, // control type id for actuator, All uppercase
-			bool const CheckedOkay, // set to true once matched to available actuator
-			int const ErlVariableNum, // points to global Erl variable, matches Name
-			int const ActuatorVariableNum // points to index match in EMSActuatorAvailable structure
-		) :
-			Name( Name ),
-			ComponentTypeName( ComponentTypeName ),
-			UniqueIDName( UniqueIDName ),
-			ControlTypeName( ControlTypeName ),
-			CheckedOkay( CheckedOkay ),
-			ErlVariableNum( ErlVariableNum ),
-			ActuatorVariableNum( ActuatorVariableNum )
-		{}
-
 	};
 
 	struct EMSProgramCallManagementType
@@ -392,25 +346,12 @@ namespace DataRuntimeLanguage {
 		std::string Name; // user defined name for calling manager
 		int CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
 		int NumErlPrograms; // count of total number of Erl programs called by this manager
-		FArray1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
+		Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
 		// Default Constructor
 		EMSProgramCallManagementType() :
 			CallingPoint( 0 ),
 			NumErlPrograms( 0 )
-		{}
-
-		// Member Constructor
-		EMSProgramCallManagementType(
-			std::string const & Name, // user defined name for calling manager
-			int const CallingPoint, // EMS Calling point for this manager, see parameters emsCallFrom*
-			int const NumErlPrograms, // count of total number of Erl programs called by this manager
-			FArray1_int const & ErlProgramARR // list of integer pointers to Erl programs used by this manager
-		) :
-			Name( Name ),
-			CallingPoint( CallingPoint ),
-			NumErlPrograms( NumErlPrograms ),
-			ErlProgramARR( ErlProgramARR )
 		{}
 
 	};
@@ -428,6 +369,7 @@ namespace DataRuntimeLanguage {
 		bool TrendVariable; // true if Erl variable is really a trend variable
 		int TrendVarPointer; // index to match in TrendVariable structure
 		std::string Error; // holds error message string for reporting
+		bool initialized; // true if number value has been SET (ie. has been on LHS in SET expression)
 
 		// Default Constructor
 		ErlValueType() :
@@ -436,7 +378,8 @@ namespace DataRuntimeLanguage {
 			Variable( 0 ),
 			Expression( 0 ),
 			TrendVariable( false ),
-			TrendVarPointer( 0 )
+			TrendVarPointer( 0 ),
+			initialized( false )
 		{}
 
 		// Member Constructor
@@ -448,7 +391,8 @@ namespace DataRuntimeLanguage {
 			int const Expression, // Pointer to another Erl expression (e.g. compound operators)
 			bool const TrendVariable, // true if Erl variable is really a trend variable
 			int const TrendVarPointer, // index to match in TrendVariable structure
-			std::string const & Error // holds error message string for reporting
+			std::string const & Error, // holds error message string for reporting
+			bool const initialized
 		) :
 			Type( Type ),
 			Number( Number ),
@@ -457,7 +401,8 @@ namespace DataRuntimeLanguage {
 			Expression( Expression ),
 			TrendVariable( TrendVariable ),
 			TrendVarPointer( TrendVarPointer ),
-			Error( Error )
+			Error( Error ),
+			initialized( initialized )
 		{}
 
 	};
@@ -479,21 +424,6 @@ namespace DataRuntimeLanguage {
 			SetByExternalInterface( false )
 		{}
 
-		// Member Constructor
-		ErlVariableType(
-			std::string const & Name, // Erl Variable Name
-			int const StackNum, // 0 for global Erl variables, index in ErlStack structure if local
-			ErlValueType const & Value, // values taken by Erl variables
-			bool const ReadOnly, // true if Erl variable is read-only
-			bool const SetByExternalInterface // set to true if value is set by ExternalInterface
-		) :
-			Name( Name ),
-			StackNum( StackNum ),
-			Value( Value ),
-			ReadOnly( ReadOnly ),
-			SetByExternalInterface( SetByExternalInterface )
-		{}
-
 	};
 
 	struct InstructionType
@@ -513,19 +443,6 @@ namespace DataRuntimeLanguage {
 			Argument2( 0 )
 		{}
 
-		// Member Constructor
-		InstructionType(
-			int const LineNum, // Erl program line number reference
-			int const Keyword, // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
-			int const Argument1, // Index to a variable, function, expression, or stack
-			int const Argument2 // Index to a variable, function, expression, or stack
-		) :
-			LineNum( LineNum ),
-			Keyword( Keyword ),
-			Argument1( Argument1 ),
-			Argument2( Argument2 )
-		{}
-
 	};
 
 	struct ErlStackType // Stores Erl programs in a stack of statements/instructions
@@ -533,36 +450,17 @@ namespace DataRuntimeLanguage {
 		// Members
 		std::string Name; // Erl program or subroutine name, user defined
 		int NumLines; // count of lines in Erl program or subroutine
-		FArray1D_string Line; // string array holding lines of Erl code (for processing)
+		Array1D_string Line; // string array holding lines of Erl code (for processing)
 		int NumInstructions; // count of program instructions in stack
-		FArray1D< InstructionType > Instruction; // structure array of program instructions
+		Array1D< InstructionType > Instruction; // structure array of program instructions
 		int NumErrors; // count of errors during stack parsing
-		FArray1D_string Error; // array of error messages from stack parsing
+		Array1D_string Error; // array of error messages from stack parsing
 
 		// Default Constructor
 		ErlStackType() :
 			NumLines( 0 ),
 			NumInstructions( 0 ),
 			NumErrors( 0 )
-		{}
-
-		// Member Constructor
-		ErlStackType(
-			std::string const & Name, // Erl program or subroutine name, user defined
-			int const NumLines, // count of lines in Erl program or subroutine
-			FArray1_string const & Line, // string array holding lines of Erl code (for processing)
-			int const NumInstructions, // count of program instructions in stack
-			FArray1< InstructionType > const & Instruction, // structure array of program instructions
-			int const NumErrors, // count of errors during stack parsing
-			FArray1_string const & Error // array of error messages from stack parsing
-		) :
-			Name( Name ),
-			NumLines( NumLines ),
-			Line( Line ),
-			NumInstructions( NumInstructions ),
-			Instruction( Instruction ),
-			NumErrors( NumErrors ),
-			Error( Error )
 		{}
 
 	};
@@ -572,23 +470,12 @@ namespace DataRuntimeLanguage {
 		// Members
 		int Operator; // indicates the type of operator or function 1..64
 		int NumOperands; // count of operands in expression
-		FArray1D< ErlValueType > Operand; // holds Erl values for operands in expression
+		Array1D< ErlValueType > Operand; // holds Erl values for operands in expression
 
 		// Default Constructor
 		ErlExpressionType() :
 			Operator( 0 ),
 			NumOperands( 0 )
-		{}
-
-		// Member Constructor
-		ErlExpressionType(
-			int const Operator, // indicates the type of operator or function 1..64
-			int const NumOperands, // count of operands in expression
-			FArray1< ErlValueType > const & Operand // holds Erl values for operands in expression
-		) :
-			Operator( Operator ),
-			NumOperands( NumOperands ),
-			Operand( Operand )
 		{}
 
 	};
@@ -607,17 +494,6 @@ namespace DataRuntimeLanguage {
 			NumOperands( 0 )
 		{}
 
-		// Member Constructor
-		OperatorType(
-			std::string const & Symbol, // string representation of operator or function (for reporting)
-			int const Code, // integer code 1..64, identifies operator or function
-			int const NumOperands // count of operands or function arguments.
-		) :
-			Symbol( Symbol ),
-			Code( Code ),
-			NumOperands( NumOperands )
-		{}
-
 	};
 
 	struct TrendVariableType
@@ -626,9 +502,9 @@ namespace DataRuntimeLanguage {
 		std::string Name;
 		int ErlVariablePointer; // the Erl variable being logged in trend
 		int LogDepth; // number of timesteps back
-		FArray1D< Real64 > TrendValARR; // the main storage of trend data
-		FArray1D< Real64 > tempTrendARR; // temporary holder during push
-		FArray1D< Real64 > TimeARR; // hours back in time for trend points
+		Array1D< Real64 > TrendValARR; // the main storage of trend data
+		Array1D< Real64 > tempTrendARR; // temporary holder during push
+		Array1D< Real64 > TimeARR; // hours back in time for trend points
 
 		// Default Constructor
 		TrendVariableType() :
@@ -636,42 +512,53 @@ namespace DataRuntimeLanguage {
 			LogDepth( 0 )
 		{}
 
-		// Member Constructor
-		TrendVariableType(
-			std::string const & Name,
-			int const ErlVariablePointer, // the Erl variable being logged in trend
-			int const LogDepth, // number of timesteps back
-			FArray1< Real64 > const & TrendValARR, // the main storage of trend data
-			FArray1< Real64 > const & tempTrendARR, // temporary holder during push
-			FArray1< Real64 > const & TimeARR // hours back in time for trend points
-		) :
-			Name( Name ),
-			ErlVariablePointer( ErlVariablePointer ),
-			LogDepth( LogDepth ),
-			TrendValARR( TrendValARR ),
-			tempTrendARR( tempTrendARR ),
-			TimeARR( TimeARR )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ErlVariableType > ErlVariable; // holds Erl variables in a structure array
-	extern FArray1D< ErlStackType > ErlStack; // holds Erl programs in separate "stacks"
-	extern FArray1D< ErlExpressionType > ErlExpression; // holds Erl expressions in structure array
-	extern FArray1D< OperatorType > PossibleOperators; // hard library of available operators and functions
-	extern FArray1D< TrendVariableType > TrendVariable; // holds Erl trend varialbes in a structure array
-	extern FArray1D< OutputVarSensorType > Sensor; // EMS:SENSOR objects used (from output variables)
-	extern FArray1D< EMSActuatorAvailableType > EMSActuatorAvailable; // actuators that could be used
-	extern FArray1D< ActuatorUsedType > EMSActuatorUsed; // actuators that are used
-	extern FArray1D< InternalVarsAvailableType > EMSInternalVarsAvailable; // internal data that could be used
-	extern FArray1D< InternalVarsUsedType > EMSInternalVarsUsed; // internal data that are used
-	extern FArray1D< EMSProgramCallManagementType > EMSProgramCallManager; // program calling managers
+	extern Array1D< ErlVariableType > ErlVariable; // holds Erl variables in a structure array
+	extern Array1D< ErlStackType > ErlStack; // holds Erl programs in separate "stacks"
+	extern Array1D< ErlExpressionType > ErlExpression; // holds Erl expressions in structure array
+	extern Array1D< OperatorType > PossibleOperators; // hard library of available operators and functions
+	extern Array1D< TrendVariableType > TrendVariable; // holds Erl trend varialbes in a structure array
+	extern Array1D< OutputVarSensorType > Sensor; // EMS:SENSOR objects used (from output variables)
+	extern Array1D< EMSActuatorAvailableType > EMSActuatorAvailable; // actuators that could be used
+	extern Array1D< ActuatorUsedType > EMSActuatorUsed; // actuators that are used
+	extern Array1D< InternalVarsAvailableType > EMSInternalVarsAvailable; // internal data that could be used
+	extern Array1D< InternalVarsUsedType > EMSInternalVarsUsed; // internal data that are used
+	extern Array1D< EMSProgramCallManagementType > EMSProgramCallManager; // program calling managers
 	extern ErlValueType Null; // special "null" Erl variable value instance
 	extern ErlValueType False; // special "false" Erl variable value instance
 	extern ErlValueType True; // special "True" Erl variable value instance, gets reset
 
+	// EMS Actuator fast duplicate check lookup support
+	typedef  std::tuple< std::string, std::string, std::string >  EMSActuatorKey;
+	struct EMSActuatorKey_hash : public std::unary_function< EMSActuatorKey, std::size_t >
+	{
+		inline
+		static
+		void
+		hash_combine( std::size_t & seed, std::string const & s )
+		{
+			std::hash< std::string > hasher;
+			seed ^= hasher( s ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
+		}
+
+		inline
+		std::size_t
+		operator ()( EMSActuatorKey const & key ) const
+		{
+			std::size_t seed( 0 );
+			hash_combine( seed, std::get< 0 >( key ) );
+			hash_combine( seed, std::get< 1 >( key ) );
+			hash_combine( seed, std::get< 2 >( key ) );
+			return seed;
+		}
+	};
+	extern std::unordered_set< std::tuple< std::string, std::string, std::string >, EMSActuatorKey_hash > EMSActuator_lookup; // Fast duplicate lookup structure
+
 	// Functions
+	void
+	clear_state();
 
 	void
 	ValidateEMSVariableName(
@@ -691,29 +578,6 @@ namespace DataRuntimeLanguage {
 		bool & errFlag, // true if errors found in this routine.
 		bool & ErrorsFound // true if errors found in this routine.
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataRuntimeLanguage
 

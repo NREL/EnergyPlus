@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // EnergyPlus Headers
 #include <DataSizing.hh>
 #include <DataPrecisionGlobals.hh>
@@ -44,7 +90,7 @@ namespace DataSizing {
 	int const OAFlowSum( 5 );
 	int const OAFlowMax( 6 );
 
-	FArray1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
+	Array1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
 
 	// parameters for outside air
 	int const AllOA( 1 );
@@ -60,6 +106,16 @@ namespace DataSizing {
 	int const NonCoincident( 1 );
 	int const Coincident( 2 );
 
+	// parameters for Cooling Peak Load TYpe
+	int const SensibleCoolingLoad( 1 );
+	int const TotalCoolingLoad( 2 );
+
+	// parameters for Central Cooling Capacity Control Method
+	int const VAV( 1 );
+	int const Bypass( 2 );
+	int const VT( 3 );
+	int const OnOff( 4 );
+
 	// paramters for supply air flow rate method
 	int const SupplyAirTemperature( 1 );
 	int const TemperatureDifference( 2 );
@@ -68,6 +124,10 @@ namespace DataSizing {
 	int const FromDDCalc( 1 );
 	int const InpDesAirFlow( 2 );
 	int const DesAirFlowWithLim( 3 );
+
+	int const DOANeutralSup( 1 );
+	int const DOANeutralDehumSup( 2 );
+	int const DOACoolSup( 3 );
 
 	// parameters for Type of Load to Size On
 	int const Sensible( 0 );
@@ -95,12 +155,14 @@ namespace DataSizing {
 	//  considering the zone air distribution effectiveness and the system ventilation efficiency
 	int const SOAM_IAQP( 3 ); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
 	// based on the CO2 setpoint
-	int const SOAM_ProportionalControl( 4 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-	// to calculate the system level outdoor air flow rates
+	int const SOAM_ProportionalControlSchOcc( 4 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	// to calculate the system level outdoor air flow rates based on scheduled occupancy
 	int const SOAM_IAQPGC( 5 ); // Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
 	// based on the generic contaminant setpoint
 	int const SOAM_IAQPCOM( 6 ); // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	// based on the generic contaminant setpoint
+	int const SOAM_ProportionalControlDesOcc( 7 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	// to calculate the system level outdoor air flow rates based on design occupancy
 
 	// Zone HVAC Equipment Supply Air Sizing Option
 	int const None( 1 );
@@ -116,6 +178,12 @@ namespace DataSizing {
 	int const CapacityPerFloorArea( 10 );
 	int const FractionOfAutosizedCoolingCapacity( 11 );
 	int const FractionOfAutosizedHeatingCapacity( 12 );
+
+	int const NoSizingFactorMode( 101 );
+	int const GlobalHeatingSizingFactorMode( 102 );
+	int const GlobalCoolingSizingFactorMode( 103 );
+	int const LoopComponentSizingFactorMode( 104 );
+
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -148,6 +216,7 @@ namespace DataSizing {
 	int NumTimeStepsInAvg( 0 ); // number of time steps in the averaging window for the design flow and load sequences
 	int SaveNumPlantComps( 0 ); // Number of components using water as an energy source or sink (e.g. water coils)
 	int DataTotCapCurveIndex( 0 ); // index to total capacity as a function of temperature curve
+	Real64 DataTotCapCurveValue( 0 ); // value of total capacity as a function of temperature curve for CoilVRF_FluidTCtrl_*
 	int DataPltSizCoolNum( 0 ); // index to cooling plant sizing data
 	int DataPltSizHeatNum( 0 ); // index to heating plant sizing data
 	int DataWaterLoopNum( 0 ); // index to plant water loop
@@ -180,6 +249,7 @@ namespace DataSizing {
 	Real64 DataDesInletAirHumRat( 0.0 ); // coil inlet air humidity ratio used for warning messages
 	Real64 DataDesInletAirTemp( 0.0 ); // coil inlet air temperature used for warning messages
 	Real64 DataDesOutletAirTemp( 0.0 ); // coil outlet air temperature used for sizing
+	Real64 DataDesOutletAirHumRat( 0.0 ); // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
 	Real64 DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs [W]
 	Real64 DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataAirFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
@@ -199,6 +269,7 @@ namespace DataSizing {
 	Real64 DataAutosizedHeatingCapacity( 0.0 ); // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
+	Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
 	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
@@ -206,52 +277,150 @@ namespace DataSizing {
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
 	Real64 SuppHeatCap( 0.0 ); // the heating capacity of the supplemental heater in a unitary system
 	Real64 UnitaryHeatCap( 0.0 ); // the heating capacity of a unitary system
-	FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
-	FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
-	FArray1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
-	FArray1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
+	Array1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
+	Array1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
+	Array1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
+	Array1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	char SizingFileColSep; // Character to separate columns in sizing outputs
+	int DataDesicDehumNum( 0 ); // index to desiccant dehumidifier
+	bool DataDesicRegCoil( false ); // TRUE if heating coil desiccant regeneration coil
+	bool HRFlowSizingFlag( false ); // True, if it is a heat recovery heat exchanger flow sizing
 
 	// Object Data
-	FArray1D< OARequirementsData > OARequirements;
-	FArray1D< ZoneAirDistributionData > ZoneAirDistribution;
-	FArray1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
-	FArray2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
-	FArray1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
-	FArray2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
-	FArray1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
-	FArray1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
-	FArray1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
-	FArray2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
-	FArray1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
-	FArray1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
-	FArray1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
-	FArray1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
-	FArray1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
-	FArray1D< ZoneEqSizingData > OASysEqSizing; // Data added in unitary system sizing routines
-	FArray1D< PlantSizingData > PlantSizData; // Input data array for plant sizing
-	FArray1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
-	FArray1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
-	FArray1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	Array1D< OARequirementsData > OARequirements;
+	Array1D< ZoneAirDistributionData > ZoneAirDistribution;
+	Array1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
+	Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
+	Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
+	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
+	Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
+	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
+	Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
+	Array2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
+	Array1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
+	Array1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
+	Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
+	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
+	Array1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
+	Array1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
+	Array1D< ZoneEqSizingData > OASysEqSizing; // Data added in unitary system sizing routines
+	Array1D< PlantSizingData > PlantSizData; // Input data array for plant sizing
+	Array1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
+	Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
+	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
 
-	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	// Clears the global data in DataSizing.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumOARequirements = 0;
+		NumZoneAirDistribution = 0;
+		NumZoneSizingInput = 0;
+		NumSysSizInput = 0;
+		NumPltSizInput = 0;
+		CurSysNum = 0;
+		CurOASysNum = 0;
+		CurZoneEqNum = 0;
+		CurBranchNum = 0;
+		CurDuctType = 0;
+		CurLoopNum = 0;
+		CurCondLoopNum = 0;
+		CurEnvirNumSimDay = 0;
+		CurOverallSimDay = 0;
+		NumTimeStepsInAvg = 0;
+		SaveNumPlantComps = 0;
+		DataTotCapCurveIndex = 0;
+		DataPltSizCoolNum = 0;
+		DataPltSizHeatNum = 0;
+		DataWaterLoopNum = 0;
+		DataCoilNum = 0;
+		DataFanOpMode = 0;
+		DataCoilIsSuppHeater = false;
+		DataIsDXCoil = false;
+		DataAutosizable = true;
+		DataEMSOverrideON = false;
+		DataScalableSizingON = false;
+		DataScalableCapSizingON = false;
+		DataSysScalableFlowSizingON = false;
+		DataSysScalableCapSizingON = false;
+		SysSizingRunDone = false;
+		TermUnitSingDuct = false;
+		TermUnitPIU = false;
+		TermUnitIU = false;
+		ZoneEqFanCoil = false;
+		ZoneEqUnitHeater = false;
+		ZoneEqUnitVent = false;
+		ZoneEqVentedSlab = false;
+		ZoneEqDXCoil = false;
+		ZoneCoolingOnlyFan = false;
+		ZoneHeatingOnlyFan = false;
+		ZoneSizingRunDone = false;
+		DataErrorsFound = false;
+		AutoVsHardSizingThreshold = 0.1;
+		AutoVsHardSizingDeltaTempThreshold = 1.5;
+		DataDesInletWaterTemp = 0.0;
+		DataDesInletAirHumRat = 0.0;
+		DataDesInletAirTemp = 0.0;
+		DataDesOutletAirTemp = 0.0;
+		DataDesOutletAirHumRat = 0.0;
+		DataCoolCoilCap = 0.0;
+		DataFlowUsedForSizing = 0.0;
+		DataAirFlowUsedForSizing = 0.0;
+		DataWaterFlowUsedForSizing = 0.0;
+		DataCapacityUsedForSizing = 0.0;
+		DataDesignCoilCapacity = 0.0;
+		DataHeatSizeRatio = 1.0;
+		DataEMSOverride = 0.0;
+		DataBypassFrac = 0.0;
+		DataFracOfAutosizedCoolingAirflow = 1.0;
+		DataFracOfAutosizedHeatingAirflow = 1.0;
+		DataFlowPerCoolingCapacity = 0.0;
+		DataFlowPerHeatingCapacity = 0.0;
+		DataFracOfAutosizedCoolingCapacity = 1.0;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
+		DataAutosizedCoolingCapacity = 0.0;
+		DataAutosizedHeatingCapacity = 0.0;
+		DataConstantUsedForSizing = 0.0;
+		DataFractionUsedForSizing = 0.0;
+		DataNonZoneNonAirloopValue = 0.0;
+		DataZoneNumber = 0;
+		NumZoneHVACSizing = 0;
+		DXCoolCap = 0.0;
+		GlobalHeatSizingFactor = 0.0;
+		GlobalCoolSizingFactor = 0.0;
+		SuppHeatCap = 0.0;
+		UnitaryHeatCap = 0.0;
+		ZoneSizThermSetPtHi.deallocate();
+		ZoneSizThermSetPtLo.deallocate();
+		CoolPeakDateHrMin.deallocate();
+		HeatPeakDateHrMin.deallocate();
+		SizingFileColSep = char();
+
+		OARequirements.deallocate();
+		ZoneAirDistribution.deallocate();
+		ZoneSizingInput.deallocate();
+		ZoneSizing.deallocate();
+		FinalZoneSizing.deallocate();
+		CalcZoneSizing.deallocate();
+		CalcFinalZoneSizing.deallocate();
+		TermUnitFinalZoneSizing.deallocate();
+		SysSizInput.deallocate();
+		SysSizing.deallocate();
+		FinalSysSizing.deallocate();
+		CalcSysSizing.deallocate();
+		SysSizPeakDDNum.deallocate();
+		TermUnitSizing.deallocate();
+		ZoneEqSizing.deallocate();
+		UnitarySysEqSizing.deallocate();
+		OASysEqSizing.deallocate();
+		PlantSizData.deallocate();
+		DesDayWeath.deallocate();
+		CompDesWaterFlow.deallocate();
+		ZoneHVACSizing.deallocate();
+		DataDesicDehumNum = 0;
+		DataDesicRegCoil = false;
+	}
 
 } // DataSizing
 

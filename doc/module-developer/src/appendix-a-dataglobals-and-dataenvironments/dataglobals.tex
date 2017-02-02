@@ -1,0 +1,17 @@
+\section{DataGlobals}\label{dataglobals}
+
+DataGlobals contains parameters, variables, Interface descriptors that could be used by every part of the program.~ For example, this is where the ``MaxNameLength'' (maximum name length (characters) of objects.~ All other pieces of the code that need this will need to
+
+USE DataGlobals
+
+and, if that's the only piece it needs, can say
+
+USE DataGlobals, ONLY: MaxNameLength
+
+Interface specifications for the ShowError routines are here because there are optional parameters in these routines.~ Then,
+
+USE DataGlobals, ONLY: ShowWarningError, ShowFatalError
+
+can be used safely from any routine.~ Constants such as Pi (p), Degrees To Radians, and Number of Seconds in Hour are also stored there.~ Remember that we suggest compiling EnergyPlus in double precision and these constants (as should all constants) are representative of double precision (even if someone were to compile in single precision).
+
+Finally, the interface specifications for the Setup Report Variables is contained in this module.~ The interface allows for a single call for accomplishing that while actually forking to call several different routines based on the type of data being used.

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
@@ -78,7 +124,7 @@ namespace Vectors {
 	Real64
 	AreaPolygon(
 		int const n,
-		FArray1A< Vector > p
+		Array1A< Vector > p
 	)
 	{
 
@@ -111,16 +157,16 @@ namespace Vectors {
 		edge0 = p( 1 ) - p( 0 );
 		edge1 = p( 2 ) - p( 0 );
 
-		edgex = edge0 * edge1;
-		nor = VecNormalize( edge0 * edge1 );
+		edgex = cross( edge0, edge1 );
+		nor = VecNormalize( edgex );
 
 		//  Initialize csum
 		csum = 0.0;
 
 		for ( i = 0; i <= n - 2; ++i ) {
-			csum += p( i ) * p( i + 1 );
+			csum += cross( p( i ), p( i + 1 ) );
 		}
-		csum += p( n - 1 ) * p( 0 );
+		csum += cross( p( n - 1 ), p( 0 ) );
 
 		areap = 0.5 * std::abs( dot( nor, csum ) );
 
@@ -262,14 +308,14 @@ namespace Vectors {
 
 	void
 	DetermineAzimuthAndTilt(
-		FArray1S< Vector > Surf, // Surface Definition
-		int const NSides, // Number of sides to surface
+		Array1D< Vector > const & Surf, // Surface Definition
+		int const EP_UNUSED( NSides ), // Number of sides to surface
 		Real64 & Azimuth, // Outward Normal Azimuth Angle
 		Real64 & Tilt, // Tilt angle of surface
 		Vector & lcsx,
 		Vector & lcsy,
 		Vector & lcsz,
-		Real64 const surfaceArea,
+		Real64 const EP_UNUSED( surfaceArea ),
 		Vector const & NewellSurfaceNormalVector
 	)
 	{
@@ -342,7 +388,7 @@ namespace Vectors {
 
 		lcsx = x3a;
 		lcsz = NewellSurfaceNormalVector;
-		lcsy = lcsz * x3a;
+		lcsy = cross( lcsz, x3a );
 
 		//!!
 
@@ -352,13 +398,13 @@ namespace Vectors {
 		v1 = Surf( 1 ) - Surf( 2 );
 
 		//    Vec3d    v2 = cross(v0,v1);
-		v2 = v0 * v1;
+		v2 = cross( v0, v1 );
 		//    cs3[2] = norm(v2); // z
 		cs3_2 = VecNormalize( v2 );
 		//    cs3[0] = norm(v0); // x
 		cs3_0 = VecNormalize( v0 );
 		//    cs3[1] = cross(cs3[2],cs3[0]); // y
-		cs3_1 = cs3_2 * cs3_0;
+		cs3_1 = cross( cs3_2, cs3_0 );
 		//    Vec3d    z3 = cs3[2];
 		z3 = cs3_2;
 		//    double costheta = dot(z3,Ref_CS[2]);
@@ -369,7 +415,7 @@ namespace Vectors {
 			//    // azimuth
 			//    Vec3d    x2 = cross(Ref_CS[2],z3); // order is important; x2 = x1
 			//    RotAng[0] = ATAN2(dot(x2,Ref_CS[1]),dot(x2,Ref_CS[0]));
-			x2 = ZUnit * z3;
+			x2 = cross( ZUnit, z3 );
 			rotang_0 = std::atan2( dot( x2, YUnit ), dot( x2, XUnit ) );
 
 		} else {
@@ -409,7 +455,7 @@ namespace Vectors {
 
 	void
 	PlaneEquation(
-		FArray1A< Vector > verts, // Structure of the surface
+		Array1A< Vector > verts, // Structure of the surface
 		int const nverts, // Number of vertices in the surface
 		PlaneEq & plane, // Equation of plane from inputs
 		bool & error // returns true for degenerate surface
@@ -448,16 +494,15 @@ namespace Vectors {
 			normal.z += ( u.x - v.x ) * ( u.y + v.y );
 			refpt += u;
 		}
-		// /* normalize the polygon normal to obtain the first
-		//    three coefficients of the plane equation
-		// */
+		// normalize the polygon normal to obtain the first
+		//  three coefficients of the plane equation
 		lenvec = VecLength( normal );
 		error = false;
 		if ( lenvec != 0.0 ) { // should this be >0
 			plane.x = normal.x / lenvec;
 			plane.y = normal.y / lenvec;
 			plane.z = normal.z / lenvec;
-			// /* compute the last coefficient of the plane equation */
+			// compute the last coefficient of the plane equation
 			lenvec *= nverts;
 			plane.w = -dot( refpt, normal ) / lenvec;
 		} else {
@@ -498,7 +543,7 @@ namespace Vectors {
 
 	void
 	CreateNewellAreaVector(
-		FArray1S< Vector > const VList,
+		Array1D< Vector > const & VList,
 		int const NSides,
 		Vector & OutNewellAreaVector
 	)
@@ -548,7 +593,7 @@ namespace Vectors {
 		V1 = VList( 2 ) - VList( 1 );
 		for ( int Vert = 3; Vert <= NSides; ++Vert ) {
 			V2 = VList( Vert ) - VList( 1 );
-			OutNewellAreaVector += V1 * V2;
+			OutNewellAreaVector += cross( V1, V2 );
 			V1 = V2;
 		}
 		//     do vert=1,nsides
@@ -561,7 +606,7 @@ namespace Vectors {
 
 	void
 	CreateNewellSurfaceNormalVector(
-		FArray1S< Vector > const VList,
+		Array1D< Vector > const & VList,
 		int const NSides,
 		Vector & OutNewellSurfaceNormalVector
 	)
@@ -701,7 +746,7 @@ namespace Vectors {
 
 	void
 	CalcCoPlanarNess(
-		FArray1A< Vector > Surf,
+		Array1A< Vector > Surf,
 		int const NSides,
 		bool & IsCoPlanar,
 		Real64 & MaxDist,
@@ -730,7 +775,7 @@ namespace Vectors {
 		// na
 
 		// Argument array dimensioning
-		Surf.dim( {1} );
+		Surf.dim( {1,NSides} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef Boilers_hh_INCLUDED
 #define Boilers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,7 +95,7 @@ namespace Boilers {
 	extern Real64 BoilerOutletTemp; // W - Boiler outlet temperature
 	extern Real64 BoilerPLR; // Boiler operating part-load ratio
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
@@ -68,12 +114,14 @@ namespace Boilers {
 		bool Available; // TRUE if machine available in current time step
 		bool ON; // TRUE: simulate the machine at it's operating part load ratio
 		Real64 NomCap; // W - design nominal capacity of Boiler
+		bool NomCapWasAutoSized; // true if previous was set to autosize input
 		Real64 Effic; // boiler efficiency at design conditions
 		Real64 TempDesBoilerOut; // C - Boiler design outlet temperature
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		Real64 VolFlowRate; // m3/s - Boiler water design volumetric flow rate
+		bool VolFlowRateWasAutoSized; // true if previous was set to autosize input
 		Real64 DesMassFlowRate; // kg/s - Boiler water design mass flow rate
 		Real64 MassFlowRate; // kg/s - Boiler water mass flow rate
 		Real64 SizFac; // sizing factor
@@ -105,12 +153,14 @@ namespace Boilers {
 			Available( false ),
 			ON( false ),
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			Effic( 0.0 ),
 			TempDesBoilerOut( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			VolFlowRate( 0.0 ),
+			VolFlowRateWasAutoSized( false ),
 			DesMassFlowRate( 0.0 ),
 			MassFlowRate( 0.0 ),
 			SizFac( 0.0 ),
@@ -130,81 +180,6 @@ namespace Boilers {
 			CalculatedEffError( 0 ),
 			CalculatedEffIndex( 0 ),
 			IsThisSized( false )
-		{}
-
-		// Member Constructor
-		BoilerSpecs(
-			std::string const & Name, // user identifier
-			int const FuelType, // resource type assignment
-			int const TypeNum, // plant loop type identifier
-			int const LoopNum, // plant loop connection
-			int const LoopSideNum, // plant loop side connection
-			int const BranchNum, // plant loop branch connection
-			int const CompNum, // plant loop component connection
-			bool const Available, // TRUE if machine available in current time step
-			bool const ON, // TRUE: simulate the machine at it's operating part load ratio
-			Real64 const NomCap, // W - design nominal capacity of Boiler
-			Real64 const Effic, // boiler efficiency at design conditions
-			Real64 const TempDesBoilerOut, // C - Boiler design outlet temperature
-			int const FlowMode, // one of 3 modes for componet flow during operation
-			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
-			bool const ModulatedFlowErrDone, // true if setpoint warning issued
-			Real64 const VolFlowRate, // m3/s - Boiler water design volumetric flow rate
-			Real64 const DesMassFlowRate, // kg/s - Boiler water design mass flow rate
-			Real64 const MassFlowRate, // kg/s - Boiler water mass flow rate
-			Real64 const SizFac, // sizing factor
-			int const BoilerInletNodeNum, // Node number at the boiler inlet
-			int const BoilerOutletNodeNum, // Node number at the boiler outlet
-			Real64 const MinPartLoadRat, // Minimum allowed operating part load ratio
-			Real64 const MaxPartLoadRat, // Maximum allowed operating part load ratio
-			Real64 const OptPartLoadRat, // Optimal operating part load ratio
-			Real64 const OperPartLoadRat, // Actual operating part load ratio
-			int const CurveTempMode, // water temp to use in curve, switch between entering and leaving
-			int const EfficiencyCurvePtr, // Index to efficiency curve
-			int const EfficiencyCurveType, // Type of efficiency curve
-			Real64 const TempUpLimitBoilerOut, // C - Boiler outlet maximum temperature limit
-			Real64 const ParasiticElecLoad, // W - Parasitic electric power (e.g. forced draft fan)
-			int const EffCurveOutputError, // efficiency curve output <=0 recurring warning error counter
-			int const EffCurveOutputIndex, // efficiency curve output <=0 recurring warning error message index
-			int const CalculatedEffError, // calculated efficiency >1.1 recurring warning error counter
-			int const CalculatedEffIndex, // calculated efficiency >1.1 recurring warning error message index
-			bool const IsThisSized // TRUE if sizing is done
-		) :
-			Name( Name ),
-			FuelType( FuelType ),
-			TypeNum( TypeNum ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			Available( Available ),
-			ON( ON ),
-			NomCap( NomCap ),
-			Effic( Effic ),
-			TempDesBoilerOut( TempDesBoilerOut ),
-			FlowMode( FlowMode ),
-			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
-			ModulatedFlowErrDone( ModulatedFlowErrDone ),
-			VolFlowRate( VolFlowRate ),
-			DesMassFlowRate( DesMassFlowRate ),
-			MassFlowRate( MassFlowRate ),
-			SizFac( SizFac ),
-			BoilerInletNodeNum( BoilerInletNodeNum ),
-			BoilerOutletNodeNum( BoilerOutletNodeNum ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			OperPartLoadRat( OperPartLoadRat ),
-			CurveTempMode( CurveTempMode ),
-			EfficiencyCurvePtr( EfficiencyCurvePtr ),
-			EfficiencyCurveType( EfficiencyCurveType ),
-			TempUpLimitBoilerOut( TempUpLimitBoilerOut ),
-			ParasiticElecLoad( ParasiticElecLoad ),
-			EffCurveOutputError( EffCurveOutputError ),
-			EffCurveOutputIndex( EffCurveOutputIndex ),
-			CalculatedEffError( CalculatedEffError ),
-			CalculatedEffIndex( CalculatedEffIndex ),
-			IsThisSized( IsThisSized )
 		{}
 
 	};
@@ -237,38 +212,16 @@ namespace Boilers {
 			BoilerPLR( 0.0 )
 		{}
 
-		// Member Constructor
-		ReportVars(
-			Real64 const BoilerLoad, // W - Boiler operating load
-			Real64 const BoilerEnergy, // J - Boiler energy integrated over time
-			Real64 const FuelUsed, // W - Boiler fuel used
-			Real64 const FuelConsumed, // J - Boiler Fuel consumed integrated over time
-			Real64 const BoilerInletTemp, // C - Boiler inlet temperature
-			Real64 const BoilerOutletTemp, // C - Boiler outlet temperature
-			Real64 const Mdot, // kg/s - Boiler mass flow rate
-			Real64 const ParasiticElecPower, // W - Parasitic Electrical Power (e.g. forced draft fan)
-			Real64 const ParasiticElecConsumption, // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-			Real64 const BoilerPLR // Boiler operating part-load ratio
-		) :
-			BoilerLoad( BoilerLoad ),
-			BoilerEnergy( BoilerEnergy ),
-			FuelUsed( FuelUsed ),
-			FuelConsumed( FuelConsumed ),
-			BoilerInletTemp( BoilerInletTemp ),
-			BoilerOutletTemp( BoilerOutletTemp ),
-			Mdot( Mdot ),
-			ParasiticElecPower( ParasiticElecPower ),
-			ParasiticElecConsumption( ParasiticElecConsumption ),
-			BoilerPLR( BoilerPLR )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
-	extern FArray1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
+	extern Array1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
+	extern Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimBoiler(
@@ -315,29 +268,6 @@ namespace Boilers {
 
 	// End of Record Keeping subroutines for the BOILER:HOTWATER Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Boilers
 

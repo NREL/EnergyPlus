@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef SolarCollectors_hh_INCLUDED
 #define SolarCollectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,16 +80,16 @@ namespace SolarCollectors {
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumOfParameters;
 	extern int NumOfCollectors;
 
-	extern FArray1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
-	extern FArray1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
-	extern FArray1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
-	extern FArray1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
+	extern Array1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
+	extern Array1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
+	extern Array1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
+	extern Array1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -71,9 +117,9 @@ namespace SolarCollectors {
 		Real64 AspectRatio; // collector aspect ratio (dimensionless)
 		int NumOfCovers; // number of transparent collector covers
 		Real64 CoverSpacing; // collector cover spacings (m)
-		FArray1D< Real64 > RefractiveIndex; // refractive idex of inner and outer covers (dimensionless)
-		FArray1D< Real64 > ExtCoefTimesThickness; // extinction coefficient times thickness of covers (dimensionless)
-		FArray1D< Real64 > EmissOfCover; // emissivity of inner and outer covers (dimensionless)
+		Array1D< Real64 > RefractiveIndex; // refractive idex of inner and outer covers (dimensionless)
+		Array1D< Real64 > ExtCoefTimesThickness; // extinction coefficient times thickness of covers (dimensionless)
+		Array1D< Real64 > EmissOfCover; // emissivity of inner and outer covers (dimensionless)
 		Real64 EmissOfAbsPlate; // emissivity Of absorber plate (dimensionless)
 		Real64 AbsorOfAbsPlate; // absorptance of the absorber plate (dimensionless)
 
@@ -97,59 +143,6 @@ namespace SolarCollectors {
 			EmissOfCover( 2, 0.0 ),
 			EmissOfAbsPlate( 0.0 ),
 			AbsorOfAbsPlate( 0.0 )
-		{}
-
-		// Member Constructor
-		ParametersData(
-			std::string const & Name, // Name of solar collector parameters
-			Real64 const Area, // Gross area of collector (m2)
-			int const TestFluid, // Test fluid (only WATER for now)
-			Real64 const TestMassFlowRate, // Test volumetric flow rate (m3/s)
-			int const TestType, // Test correlation type (INLET | AVERAGE | OUTLET)
-			Real64 const eff0, // Coefficient 1 of efficiency equation (Y-intercept)
-			Real64 const eff1, // Coefficient 2 of efficiency equation (1st order)
-			Real64 const eff2, // Coefficient 3 of efficiency equation (2nd order)
-			Real64 const iam1, // Coefficient 2 of incident angle modifier (1st order)
-			Real64 const iam2, // Coefficient 3 of incident angle modifier (2nd order)
-			int const ICSType_Num, // ICS collector type
-			Real64 const Volume, // collector water net volume (m3)
-			Real64 const SideHeight, // collector side height (m)
-			Real64 const ThermalMass, // thermal mass of the absorber plate (J/m2C)
-			Real64 const ULossSide, // heat loss conductance for collector side (W/m2C)
-			Real64 const ULossBottom, // heat loss conductance for collector bottom (W/m2C)
-			Real64 const AspectRatio, // collector aspect ratio (dimensionless)
-			int const NumOfCovers, // number of transparent collector covers
-			Real64 const CoverSpacing, // collector cover spacings (m)
-			FArray1< Real64 > const & RefractiveIndex, // refractive idex of inner and outer covers (dimensionless)
-			FArray1< Real64 > const & ExtCoefTimesThickness, // extinction coefficient times thickness of covers (dimensionless)
-			FArray1< Real64 > const & EmissOfCover, // emissivity of inner and outer covers (dimensionless)
-			Real64 const EmissOfAbsPlate, // emissivity Of absorber plate (dimensionless)
-			Real64 const AbsorOfAbsPlate // absorptance of the absorber plate (dimensionless)
-		) :
-			Name( Name ),
-			Area( Area ),
-			TestFluid( TestFluid ),
-			TestMassFlowRate( TestMassFlowRate ),
-			TestType( TestType ),
-			eff0( eff0 ),
-			eff1( eff1 ),
-			eff2( eff2 ),
-			iam1( iam1 ),
-			iam2( iam2 ),
-			ICSType_Num( ICSType_Num ),
-			Volume( Volume ),
-			SideHeight( SideHeight ),
-			ThermalMass( ThermalMass ),
-			ULossSide( ULossSide ),
-			ULossBottom( ULossBottom ),
-			AspectRatio( AspectRatio ),
-			NumOfCovers( NumOfCovers ),
-			CoverSpacing( CoverSpacing ),
-			RefractiveIndex( 2, RefractiveIndex ),
-			ExtCoefTimesThickness( 2, ExtCoefTimesThickness ),
-			EmissOfCover( 2, EmissOfCover ),
-			EmissOfAbsPlate( EmissOfAbsPlate ),
-			AbsorOfAbsPlate( AbsorOfAbsPlate )
 		{}
 
 	};
@@ -210,9 +203,9 @@ namespace SolarCollectors {
 		Real64 TauAlphaSkyDiffuse; // Transmittance-absorptance product sky diffuse radiation
 		Real64 TauAlphaGndDiffuse; // Transmittance-absorptance product grn diffuse radiation
 		Real64 TauAlphaBeam; // Transmittance-absorptance product beam radiation
-		FArray1D< Real64 > CoversAbsSkyDiffuse; // sky diffuse solar absorptance of cover
-		FArray1D< Real64 > CoversAbsGndDiffuse; // ground diffuse solar absorptance of cover
-		FArray1D< Real64 > CoverAbs; // solar rad weighted covers absorptance
+		Array1D< Real64 > CoversAbsSkyDiffuse; // sky diffuse solar absorptance of cover
+		Array1D< Real64 > CoversAbsGndDiffuse; // ground diffuse solar absorptance of cover
+		Array1D< Real64 > CoverAbs; // solar rad weighted covers absorptance
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		// Saved in order to identify the beginning of a new system time
 		Real64 UbLoss; // Over all bottom loss coefficient [W/m2C]
@@ -311,166 +304,11 @@ namespace SolarCollectors {
 			InitICS( false )
 		{}
 
-		// Member Constructor
-		CollectorData(
-			std::string const & Name, // Name of solar collector
-			std::string const & BCType, // Boundary condition Type
-			std::string const & BCName, // Boundary condition Name
-			std::string const & OSCMName, // OtherSideConditionsModel
-			int const VentCavIndex, // index of ventilated cavity object
-			int const ICSType_Num, // ICS collector type number
-			int const TypeNum, // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
-			int const WLoopNum, // Water plant loop index number                      !DSU
-			int const WLoopSideNum, // Water plant loop side index                        !DSU
-			int const WLoopBranchNum, // Water plant loop branch index                      !DSU
-			int const WLoopCompNum, // Water plant loop component index                   !DSU
-			bool const Init, // Flag for initialization:  TRUE means do the init
-			bool const InitSizing, // Flag for initialization of plant sizing
-			int const Parameters, // Parameters object number
-			int const Surface, // Surface object number
-			int const InletNode, // Inlet node
-			Real64 const InletTemp, // Inlet temperature from plant (C)
-			int const OutletNode, // Outlet node
-			Real64 const OutletTemp, // Outlet temperature or stagnation temperature in the collector (C)
-			Real64 const MassFlowRate, // Mass flow rate through the collector (kg/s)
-			Real64 const MassFlowRateMax, // Maximum mass flow rate through the collector (kg/s)
-			Real64 const VolFlowRateMax, // Maximum volumetric flow rate through the collector (m3/s)
-			int const ErrIndex, // Error index for recurring error
-			int const IterErrIndex, // Error index for recurring error (iteration - did not converge)
-			Real64 const IncidentAngleModifier, // Net incident angle modifier
-			Real64 const Efficiency, // Thermal efficiency of solar energy conversion
-			Real64 const Power, // Heat gain or loss to collector fluid (W)
-			Real64 const HeatGain, // Heat gain to collector fluid (W)
-			Real64 const HeatLoss, // Heat loss from collector fluid (W)
-			Real64 const Energy, // Energy gained (or lost) to collector fluid (J)
-			Real64 const HeatRate, // Collector useful Heat gain rate [W]
-			Real64 const HeatEnergy, // Collector useful Heat gain energy [J]
-			Real64 const StoredHeatRate, // net heat gain or loss rate of the collector fluid [W]
-			Real64 const StoredHeatEnergy, // net heat gain or loss energy of the collector fluid [J]
-			Real64 const HeatGainRate, // Collector useful Heat gain rate [W]
-			Real64 const HeatGainEnergy, // Collector useful Heat gain energy (J)
-			Real64 const HeatLossRate, // collector useful heat loss rate [W]
-			Real64 const HeatLossEnergy, // Collector useful Heat loss energy [J]
-			Real64 const SkinHeatLossRate, // collector skin heat loss rate [W]
-			Real64 const CollHeatLossEnergy, // collector skin heat loss energy[J]
-			Real64 const TauAlpha, // Transmittance-absorptance product total radiation
-			Real64 const UTopLoss, // Over all top loss coefficient [W/m2.C]
-			Real64 const TempOfWater, // average temperature of the collector water [C]
-			Real64 const TempOfAbsPlate, // average temperature of the abs plate [C]
-			Real64 const TempOfInnerCover, // temperature of the collector inner cover [C]
-			Real64 const TempOfOuterCover, // temperature of the collector inner cover [C]
-			Real64 const TauAlphaNormal, // Transmittance-absorptance product normal radiation
-			Real64 const TauAlphaSkyDiffuse, // Transmittance-absorptance product sky diffuse radiation
-			Real64 const TauAlphaGndDiffuse, // Transmittance-absorptance product grn diffuse radiation
-			Real64 const TauAlphaBeam, // Transmittance-absorptance product beam radiation
-			FArray1< Real64 > const & CoversAbsSkyDiffuse, // sky diffuse solar absorptance of cover
-			FArray1< Real64 > const & CoversAbsGndDiffuse, // ground diffuse solar absorptance of cover
-			FArray1< Real64 > const & CoverAbs, // solar rad weighted covers absorptance
-			Real64 const TimeElapsed, // Fraction of the current hour that has elapsed (h)
-			Real64 const UbLoss, // Over all bottom loss coefficient [W/m2C]
-			Real64 const UsLoss, // Over all side loss coefficient [W/m2C]
-			Real64 const AreaRatio, // Side area to collector area ratio [-]
-			Real64 const RefSkyDiffInnerCover, // Sky diffuse refl of inner cover (cover 1)
-			Real64 const RefGrnDiffInnerCover, // ground diffuse refl of inner cover (cover 1)
-			Real64 const RefDiffInnerCover, // diffuse reflectance of the inner cover (cover 1) from bottom
-			Real64 const SavedTempOfWater, // water temp carried from time step to time step [C]
-			Real64 const SavedTempOfAbsPlate, // abs plate temp carried from time step to time step [C]
-			Real64 const SavedTempOfInnerCover, // inner cover temp carried from time step to time step [C]
-			Real64 const SavedTempOfOuterCover, // outer cover temp carried from time step to time step [C]
-			Real64 const SavedTempCollectorOSCM, // Temperature of collector back from OSCM at previous time step [C]
-			Real64 const Length, // characteristic length of the abs plate
-			Real64 const TiltR2V, // collector tilt angle from the vertical [degree]
-			Real64 const Tilt, // collector tilt angle from the horizontal [degree]
-			Real64 const CosTilt, // cosine of colector tilt angle [-]
-			Real64 const SinTilt, // sine of 1.8 times colector tilt angle [-]
-			Real64 const SideArea, // weighted collector side area (m2)
-			Real64 const Area, // collector area (m2)
-			Real64 const Volume, // collector net volume (m3)
-			bool const OSCM_ON, // Boundary condition is OSCM
-			bool const InitICS // used to initialize ICS variables only
-		) :
-			Name( Name ),
-			BCType( BCType ),
-			BCName( BCName ),
-			OSCMName( OSCMName ),
-			VentCavIndex( VentCavIndex ),
-			ICSType_Num( ICSType_Num ),
-			TypeNum( TypeNum ),
-			WLoopNum( WLoopNum ),
-			WLoopSideNum( WLoopSideNum ),
-			WLoopBranchNum( WLoopBranchNum ),
-			WLoopCompNum( WLoopCompNum ),
-			Init( Init ),
-			InitSizing( InitSizing ),
-			Parameters( Parameters ),
-			Surface( Surface ),
-			InletNode( InletNode ),
-			InletTemp( InletTemp ),
-			OutletNode( OutletNode ),
-			OutletTemp( OutletTemp ),
-			MassFlowRate( MassFlowRate ),
-			MassFlowRateMax( MassFlowRateMax ),
-			VolFlowRateMax( VolFlowRateMax ),
-			ErrIndex( ErrIndex ),
-			IterErrIndex( IterErrIndex ),
-			IncidentAngleModifier( IncidentAngleModifier ),
-			Efficiency( Efficiency ),
-			Power( Power ),
-			HeatGain( HeatGain ),
-			HeatLoss( HeatLoss ),
-			Energy( Energy ),
-			HeatRate( HeatRate ),
-			HeatEnergy( HeatEnergy ),
-			StoredHeatRate( StoredHeatRate ),
-			StoredHeatEnergy( StoredHeatEnergy ),
-			HeatGainRate( HeatGainRate ),
-			HeatGainEnergy( HeatGainEnergy ),
-			HeatLossRate( HeatLossRate ),
-			HeatLossEnergy( HeatLossEnergy ),
-			SkinHeatLossRate( SkinHeatLossRate ),
-			CollHeatLossEnergy( CollHeatLossEnergy ),
-			TauAlpha( TauAlpha ),
-			UTopLoss( UTopLoss ),
-			TempOfWater( TempOfWater ),
-			TempOfAbsPlate( TempOfAbsPlate ),
-			TempOfInnerCover( TempOfInnerCover ),
-			TempOfOuterCover( TempOfOuterCover ),
-			TauAlphaNormal( TauAlphaNormal ),
-			TauAlphaSkyDiffuse( TauAlphaSkyDiffuse ),
-			TauAlphaGndDiffuse( TauAlphaGndDiffuse ),
-			TauAlphaBeam( TauAlphaBeam ),
-			CoversAbsSkyDiffuse( 2, CoversAbsSkyDiffuse ),
-			CoversAbsGndDiffuse( 2, CoversAbsGndDiffuse ),
-			CoverAbs( 2, CoverAbs ),
-			TimeElapsed( TimeElapsed ),
-			UbLoss( UbLoss ),
-			UsLoss( UsLoss ),
-			AreaRatio( AreaRatio ),
-			RefSkyDiffInnerCover( RefSkyDiffInnerCover ),
-			RefGrnDiffInnerCover( RefGrnDiffInnerCover ),
-			RefDiffInnerCover( RefDiffInnerCover ),
-			SavedTempOfWater( SavedTempOfWater ),
-			SavedTempOfAbsPlate( SavedTempOfAbsPlate ),
-			SavedTempOfInnerCover( SavedTempOfInnerCover ),
-			SavedTempOfOuterCover( SavedTempOfOuterCover ),
-			SavedTempCollectorOSCM( SavedTempCollectorOSCM ),
-			Length( Length ),
-			TiltR2V( TiltR2V ),
-			Tilt( Tilt ),
-			CosTilt( CosTilt ),
-			SinTilt( SinTilt ),
-			SideArea( SideArea ),
-			Area( Area ),
-			Volume( Volume ),
-			OSCM_ON( OSCM_ON ),
-			InitICS( InitICS )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ParametersData > Parameters;
-	extern FArray1D< CollectorData > Collector;
+	extern Array1D< ParametersData > Parameters;
+	extern Array1D< CollectorData > Collector;
 
 	// Functions
 
@@ -573,29 +411,6 @@ namespace SolarCollectors {
 		int const VentModNum,
 		Real64 & TsColl
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SolarCollectors
 

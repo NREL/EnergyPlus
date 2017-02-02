@@ -1,11 +1,57 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <TranspiredCollector.hh>
@@ -85,13 +131,13 @@ namespace TranspiredCollector {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumUTSC( 0 ); // number of transpired collectors in model
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetInputFlag( true ); // First time, input is gotten
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
 
 	// Object Data
-	FArray1D< UTSCDataStruct > UTSC;
+	Array1D< UTSCDataStruct > UTSC;
 
 	// Functions
 
@@ -147,7 +193,7 @@ namespace TranspiredCollector {
 
 		// Find the correct transpired collector with the Component name and/or index
 		if ( CompIndex == 0 ) {
-			UTSCNum = FindItemInList( CompName, UTSC.Name(), NumUTSC );
+			UTSCNum = FindItemInList( CompName, UTSC );
 			if ( UTSCNum == 0 ) {
 				ShowFatalError( "Transpired Collector not found=" + CompName );
 			}
@@ -229,8 +275,6 @@ namespace TranspiredCollector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceData;
 		using DataSurfaces::OSCM;
-		using DataSurfaces::TotOSCM;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using ScheduleManager::GetScheduleIndex;
 		using DataLoopNode::NodeType_Air;
@@ -262,10 +306,10 @@ namespace TranspiredCollector {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_string Alphas; // Alpha items for extensible
+		Array1D_string Alphas; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int Item; // Item to be "gotten"
-		FArray1D< Real64 > Numbers( 11 ); // Numeric items for object
+		Array1D< Real64 > Numbers( 11 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int MaxNumAlphas; // argumenet for call to GetObjectDefMaxArgs
@@ -282,11 +326,11 @@ namespace TranspiredCollector {
 		int SurfID; // local surface "pointer"
 		Real64 TiltRads; // average tilt of collector in radians
 		Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
-		int NumUTSCSplitter;
-		FArray1D_string AlphasSplit; // Alpha items for extensible
+		int NumUTSCSplitter( 0 );
+		Array1D_string AlphasSplit; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int ItemSplit; // Item to be "gotten"
-		FArray1D< Real64 > NumbersSplit( 1 ); // Numeric items for object
+		Array1D< Real64 > NumbersSplit( 1 ); // Numeric items for object
 		int NumAlphasSplit; // Number of Alphas for each GetObjectItem call
 		int NumNumbersSplit; // Number of Numbers for each GetObjectItem call
 		int MaxNumAlphasSplit; // argumenet for call to GetObjectDefMaxArgs
@@ -294,7 +338,7 @@ namespace TranspiredCollector {
 		int IOStatusSplit; // Used in GetObjectItem
 		int NumOASys; // do loop counter
 		int ACountBase; // counter for alhpasSplit
-		FArray1D_bool SplitterNameOK; // check for correct association of
+		Array1D_bool SplitterNameOK; // check for correct association of
 		std::string CurrentModuleObject; // for ease in renaming.
 		std::string CurrentModuleMultiObject; // for ease in renaming.
 
@@ -302,7 +346,7 @@ namespace TranspiredCollector {
 		GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 11 ) {
-			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates " "not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
+			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
 			ErrorsFound = true;
 		}
 		Alphas.allocate( MaxNumAlphas );
@@ -310,7 +354,6 @@ namespace TranspiredCollector {
 		Alphas = "";
 
 		NumUTSC = GetNumObjectsFound( CurrentModuleObject );
-		NumUTSCSplitter = 0; //init
 		CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
 		NumUTSCSplitter = GetNumObjectsFound( CurrentModuleMultiObject );
 
@@ -329,7 +372,7 @@ namespace TranspiredCollector {
 				GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
 
 				if ( MaxNumNumbersSplit != 0 ) {
-					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition " "indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
+					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
 					ErrorsFound = true;
 				}
 				if ( ! allocated( AlphasSplit ) ) AlphasSplit.allocate( MaxNumAlphasSplit );
@@ -368,7 +411,7 @@ namespace TranspiredCollector {
 			} // any UTSC Multisystem present
 
 			UTSC( Item ).OSCMName = Alphas( 2 );
-			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM.Name(), TotOSCM );
+			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM );
 			if ( Found == 0 ) {
 				ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + UTSC( Item ).OSCMName + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
@@ -457,7 +500,7 @@ namespace TranspiredCollector {
 			UTSC( Item ).SurfPtrs.allocate( UTSC( Item ).NumSurfs );
 			UTSC( Item ).SurfPtrs = 0;
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
-				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface.Name(), TotSurfaces );
+				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface );
 				if ( Found == 0 ) {
 					ShowSevereError( "Surface Name not found=" + Alphas( ThisSurf + AlphaOffset ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
@@ -465,22 +508,22 @@ namespace TranspiredCollector {
 				}
 				// check that surface is appropriate, Heat transfer, Sun, Wind,
 				if ( ! Surface( Found ).HeatTransSurf ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not of Heat Transfer type " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not of Heat Transfer type in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( ! Surface( Found ).ExtSolar ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to sun " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to sun in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( ! Surface( Found ).ExtWind ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to wind " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to wind in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( Surface( Found ).ExtBoundCond != OtherSideCondModeledExt ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " does not have OtherSideConditionsModel " "for exterior boundary conditions in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " does not have OtherSideConditionsModel for exterior boundary conditions in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
@@ -501,17 +544,18 @@ namespace TranspiredCollector {
 			// now that we should have all the surfaces, do some preperations and checks.
 
 			// are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
+			Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) );
 //			AvgAzimuth = sum( Surface( UTSC( Item ).SurfPtrs ).Azimuth * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			AvgAzimuth = sum_product_sub( Surface.Azimuth(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			AvgAzimuth = sum_product_sub( Surface, &SurfaceData::Azimuth, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 //			AvgTilt = sum( Surface( UTSC( Item ).SurfPtrs ).Tilt * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			AvgTilt = sum_product_sub( Surface.Tilt(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			AvgTilt = sum_product_sub( Surface, &SurfaceData::Tilt, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
 				SurfID = UTSC( Item ).SurfPtrs( ThisSurf );
 				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15.0 ) {
-					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Azimuth different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Azimuth different from others in the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10.0 ) {
-					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Tilt different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Tilt different from others in the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 
 				//test that there are no windows.  Now allow windows
@@ -530,7 +574,7 @@ namespace TranspiredCollector {
 			//    UTSC(Item)%Centroid%y = SUM(Surface(UTSC(Item)%SurfPtrs)%Centroid%y*Surface(UTSC(Item)%SurfPtrs)%Area) &
 			//                            /SUM(Surface(UTSC(Item)%SurfPtrs)%Area)
 //			UTSC( Item ).Centroid.z = sum( Surface( UTSC( Item ).SurfPtrs ).Centroid.z * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			UTSC( Item ).Centroid.z = sum_product_sub( Surface.ma( &SurfaceData::Centroid ).z(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			UTSC( Item ).Centroid.z = sum_product_sub( Surface, &SurfaceData::Centroid, &Vector::z, Surface, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 			//now handle numbers from input object
 			UTSC( Item ).HoleDia = Numbers( 1 );
@@ -552,7 +596,7 @@ namespace TranspiredCollector {
 			// Fill out data we now know
 			// sum areas of HT surface areas
 //			UTSC( Item ).ProjArea = sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			UTSC( Item ).ProjArea = sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			UTSC( Item ).ProjArea = surfaceArea;
 			if ( UTSC( Item ).ProjArea == 0 ) {
 				ShowSevereError( "Gross area of underlying surfaces is zero in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				continue;
@@ -645,7 +689,7 @@ namespace TranspiredCollector {
 		static bool MyOneTimeFlag( true );
 		int UTSCUnitNum;
 		static bool MySetPointCheckFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int ControlNode;
 		//unused  INTEGER             :: InletNode
 		int SplitBranch;
@@ -714,7 +758,7 @@ namespace TranspiredCollector {
 
 		//inits for each iteration
 //		UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		UTSC( UTSCNum ).InletMDot = sum_sub( Node.MassFlowRate(), UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
+		UTSC( UTSCNum ).InletMDot = sum_sub( Node, &DataLoopNode::NodeData::MassFlowRate, UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
 		UTSC( UTSCNum ).IsOn = false; // intialize then turn on if appropriate
 		UTSC( UTSCNum ).Tplen = 0.0;
 		UTSC( UTSCNum ).Tcoll = 0.0;
@@ -750,13 +794,13 @@ namespace TranspiredCollector {
 		// Using/Aliasing
 		using DataEnvironment::SkyTemp;
 		using DataEnvironment::OutHumRat;
-		using DataEnvironment::SunIsUp;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::IsRain;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
 		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 		using DataHeatBalSurface::TH;
 		using DataHVACGlobals::TimeStepSys;
 		using ConvectionCoefficients::InitExteriorConvectionCoeff;
@@ -767,12 +811,10 @@ namespace TranspiredCollector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const g( 9.81 ); // gravity constant (m/s**2)
 		Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K
 		// (Mills 1999 Heat Transfer)
 		Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K
 		// (Mills 1999 Heat Transfer)
-		Real64 const Pr( 0.71 ); // Prandtl number for air
 		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 		//  REAL(r64), PARAMETER  :: KelvinConv = KelvinConv         ! Conversion from Celsius to Kelvin
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -784,11 +826,11 @@ namespace TranspiredCollector {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 		// following arrays are used to temporarily hold results from multiple underlying surfaces
-		FArray1D< Real64 > HSkyARR;
-		FArray1D< Real64 > HGroundARR;
-		FArray1D< Real64 > HAirARR;
-		FArray1D< Real64 > HPlenARR;
-		FArray1D< Real64 > LocalWindArr;
+		Array1D< Real64 > HSkyARR;
+		Array1D< Real64 > HGroundARR;
+		Array1D< Real64 > HAirARR;
+		Array1D< Real64 > HPlenARR;
+		Array1D< Real64 > LocalWindArr;
 		//  REAL(r64), ALLOCATABLE, DIMENSION(:) :: IscARR
 		//  REAL(r64), ALLOCATABLE, DIMENSION(:) :: TsoARR
 
@@ -849,13 +891,14 @@ namespace TranspiredCollector {
 
 		//Active UTSC calculation
 		// first do common things for both correlations
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
 		if ( ! IsRain ) {
 //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			Tamb = sum_product_sub( Surface.OutDryBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 		} else { // when raining we use wet bulb not drybulb
 //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			Tamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 		}
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
@@ -927,12 +970,12 @@ namespace TranspiredCollector {
 			InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
 			ConstrNum = Surface( SurfPtr ).Construction;
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
-			TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
+			TsoK = TH( 1, 1, SurfPtr ) + KelvinConv;
 			TscollK = UTSC( UTSCNum ).TcollLast + KelvinConv;
 			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow_4( TscollK ) - pow_4( TsoK ) ) / ( TscollK - TsoK );
 		}
 //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		auto Area( array_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+		auto Area( array_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
 		AreaSum = sum( Area );
 		// now figure area-weighted averages from underlying surfaces.
 //		Vwind = sum( LocalWindArr * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -952,9 +995,9 @@ namespace TranspiredCollector {
 		HPlenARR.deallocate();
 
 //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
-//		Tso = sum( TH( ( UTSC( UTSCNum ).SurfPtrs ), 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
+		Isc = sum_product_sub( QRadSWOutIncident, Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
+//		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
+		Tso = sum_product_sub( TH( 1, 1, _ ), Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 
 		if ( Vwind > 5.0 ) {
 			HcWind = 5.62 + 3.9 * ( Vwind - 5.0 ); //McAdams forced convection correlation
@@ -1069,13 +1112,13 @@ namespace TranspiredCollector {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataEnvironment::SunIsUp;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 		using DataHVACGlobals::TimeStepSys;
 		using ConvectionCoefficients::InitExteriorConvectionCoeff;
 
@@ -1105,10 +1148,11 @@ namespace TranspiredCollector {
 		Real64 Twbamb;
 		Real64 OutHumRatAmb;
 
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
 //		Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Tamb = sum_product_sub( Surface.OutDryBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+		Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 //		Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Twbamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+		Twbamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 		OutHumRatAmb = PsyWFnTdbTwbPb( Tamb, Twbamb, OutBaroPress );
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRatAmb );
@@ -1224,9 +1268,9 @@ namespace TranspiredCollector {
 				auto & outNode( Node( OutletNode( io ) ) );
 				auto const & inNode( Node( InletNode( ii ) ) );
 				outNode.MassFlowRate = inNode.MassFlowRate;
-				outNode.Temp         = inNode.Temp;
-				outNode.HumRat       = inNode.HumRat;
-				outNode.Enthalpy     = inNode.Enthalpy;
+				outNode.Temp = inNode.Temp;
+				outNode.HumRat = inNode.HumRat;
+				outNode.Enthalpy = inNode.Enthalpy;
 			}
 		}
 
@@ -1397,31 +1441,6 @@ namespace TranspiredCollector {
 		TsColl = UTSC( UTSCNum ).Tcoll;
 
 	}
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // TranspiredCollector
 

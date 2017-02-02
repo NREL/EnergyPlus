@@ -1,11 +1,57 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <SystemAvailabilityManager.hh>
@@ -78,6 +124,10 @@ namespace SystemAvailabilityManager {
 	int const CycleOnAny( 1 );
 	int const CycleOnControlZone( 2 );
 	int const ZoneFansOnly( 3 );
+	int const CycleOnAnyCoolingOrHeatingZone( 4 );
+	int const CycleOnAnyCoolingZone( 5 );
+	int const CycleOnAnyHeatingZone( 6 );
+	int const CycleOnAnyHeatingZoneFansOnly( 7 );
 
 	// Optimum start parameter definations
 	int const ControlZone( 4 );
@@ -100,7 +150,7 @@ namespace SystemAvailabilityManager {
 	int const HybridVentCtrl_Close( 2 ); // Close windows or doors
 
 	int const NumValidSysAvailManagerTypes( 12 );
-	FArray1D_string const cValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { "AvailabilityManager:Scheduled", "AvailabilityManager:ScheduledOn", "AvailabilityManager:ScheduledOff", "AvailabilityManager:NightCycle", "AvailabilityManager:DifferentialThermostat", "AvailabilityManager:HighTemperatureTurnOff", "AvailabilityManager:HighTemperatureTurnOn", "AvailabilityManager:LowTemperatureTurnOff", "AvailabilityManager:LowTemperatureTurnOn", "AvailabilityManager:NightVentilation", "AvailabilityManager:HybridVentilation", "AvailabilityManager:OptimumStart" } );
+	Array1D_string const cValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { "AvailabilityManager:Scheduled", "AvailabilityManager:ScheduledOn", "AvailabilityManager:ScheduledOff", "AvailabilityManager:NightCycle", "AvailabilityManager:DifferentialThermostat", "AvailabilityManager:HighTemperatureTurnOff", "AvailabilityManager:HighTemperatureTurnOn", "AvailabilityManager:LowTemperatureTurnOff", "AvailabilityManager:LowTemperatureTurnOn", "AvailabilityManager:NightVentilation", "AvailabilityManager:HybridVentilation", "AvailabilityManager:OptimumStart" } );
 	int const SysAvailMgr_Scheduled( 1 );
 	int const SysAvailMgr_ScheduledOn( 2 );
 	int const SysAvailMgr_ScheduledOff( 3 );
@@ -114,7 +164,7 @@ namespace SystemAvailabilityManager {
 	int const SysAvailMgr_HybridVent( 11 );
 
 	int const SysAvailMgr_OptimumStart( 12 );
-	FArray1D_int const ValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { SysAvailMgr_Scheduled, SysAvailMgr_ScheduledOn, SysAvailMgr_ScheduledOff, SysAvailMgr_NightCycle, SysAvailMgr_DiffThermo, SysAvailMgr_HiTempTOff, SysAvailMgr_HiTempTOn, SysAvailMgr_LoTempTOff, SysAvailMgr_LoTempTOn, SysAvailMgr_NightVent, SysAvailMgr_HybridVent, SysAvailMgr_OptimumStart } );
+	Array1D_int const ValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { SysAvailMgr_Scheduled, SysAvailMgr_ScheduledOn, SysAvailMgr_ScheduledOff, SysAvailMgr_NightCycle, SysAvailMgr_DiffThermo, SysAvailMgr_HiTempTOff, SysAvailMgr_HiTempTOn, SysAvailMgr_LoTempTOff, SysAvailMgr_LoTempTOn, SysAvailMgr_NightVent, SysAvailMgr_HybridVent, SysAvailMgr_OptimumStart } );
 	// DERIVED TYPE DEFINITIONS
 
 	//Not used yet
@@ -136,27 +186,79 @@ namespace SystemAvailabilityManager {
 	bool GetAvailMgrInputFlag( true ); // First time, input is "gotten"
 	bool GetHybridInputFlag( true ); // Flag set to make sure you get input once
 	int NumOptStartSysAvailMgrs( 0 );
+	bool BeginOfDayResetFlag( true );
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitSysAvailManagers_MyOneTimeFlag( true );
+		bool CalcNCycSysAvailMgr_OneTimeFlag( true );
+		Array1D< Real64 > OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
+		Array1D< Real64 > OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
+	}
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< DefineSchedSysAvailManager > SchedSysAvailMgrData;
-	FArray1D< DefineSchedOnSysAvailManager > SchedOnSysAvailMgrData;
-	FArray1D< DefineSchedOffSysAvailManager > SchedOffSysAvailMgrData;
-	FArray1D< DefineNightCycSysAvailManager > NCycSysAvailMgrData;
-	FArray1D< DefineDiffTSysAvailManager > DiffTSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > HiTurnOffSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > HiTurnOnSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > LoTurnOffSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > LoTurnOnSysAvailMgrData;
-	FArray1D< DefineNightVentSysAvailManager > NVentSysAvailMgrData;
-	FArray1D< DefineHybridVentSysAvailManager > HybridVentSysAvailMgrData;
-	FArray1D< SysAvailManagerList > SysAvailMgrListData;
-	FArray1D< DefineOptStartSysAvailManager > OptStartSysAvailMgrData;
-	FArray1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffCooling;
-	FArray1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
+	Array1D< DefineSchedSysAvailManager > SchedSysAvailMgrData;
+	Array1D< DefineSchedOnSysAvailManager > SchedOnSysAvailMgrData;
+	Array1D< DefineSchedOffSysAvailManager > SchedOffSysAvailMgrData;
+	Array1D< DefineNightCycSysAvailManager > NCycSysAvailMgrData;
+	Array1D< DefineDiffTSysAvailManager > DiffTSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > HiTurnOffSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > HiTurnOnSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > LoTurnOffSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > LoTurnOnSysAvailMgrData;
+	Array1D< DefineNightVentSysAvailManager > NVentSysAvailMgrData;
+	Array1D< DefineHybridVentSysAvailManager > HybridVentSysAvailMgrData;
+	Array1D< SysAvailManagerList > SysAvailMgrListData;
+	Array1D< DefineOptStartSysAvailManager > OptStartSysAvailMgrData;
+	Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffCooling;
+	Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumSchedSysAvailMgrs = 0 ;
+		NumSchedOnSysAvailMgrs = 0 ;
+		NumSchedOffSysAvailMgrs = 0 ;
+		NumNCycSysAvailMgrs = 0 ;
+		NumDiffTSysAvailMgrs = 0 ;
+		NumHiTurnOffSysAvailMgrs = 0 ;
+		NumHiTurnOnSysAvailMgrs = 0 ;
+		NumLoTurnOffSysAvailMgrs = 0 ;
+		NumLoTurnOnSysAvailMgrs = 0 ;
+		NumNVentSysAvailMgrs = 0 ;
+		NumAvailManagerLists = 0 ;
+		GetAvailListsInput = true ;
+		GetAvailMgrInputFlag = true ;
+		GetHybridInputFlag = true ;
+		InitSysAvailManagers_MyOneTimeFlag = true ;
+		CalcNCycSysAvailMgr_OneTimeFlag = true ;
+		NumOptStartSysAvailMgrs = 0 ;
+		SchedSysAvailMgrData.deallocate();
+		SchedOnSysAvailMgrData.deallocate();
+		SchedOffSysAvailMgrData.deallocate();
+		NCycSysAvailMgrData.deallocate();
+		DiffTSysAvailMgrData.deallocate();
+		HiTurnOffSysAvailMgrData.deallocate();
+		HiTurnOnSysAvailMgrData.deallocate();
+		LoTurnOffSysAvailMgrData.deallocate();
+		LoTurnOnSysAvailMgrData.deallocate();
+		NVentSysAvailMgrData.deallocate();
+		HybridVentSysAvailMgrData.deallocate();
+		SysAvailMgrListData.deallocate();
+		OptStartSysAvailMgrData.deallocate();
+		ASHRAEOptSCoeffCooling.deallocate();
+		ASHRAEOptSCoeffHeating.deallocate();
+		BeginOfDayResetFlag = true;
+		OptStart_AdaTempGradTrdHeat.deallocate();
+		OptStart_AdaTempGradTrdCool.deallocate();
+	}
 
 	void
 	ManageSystemAvailability()
@@ -374,12 +476,12 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -477,7 +579,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SchedSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SchedSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -511,7 +613,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SchedOnSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SchedOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -545,7 +647,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SchedOffSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SchedOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -580,7 +682,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), NCycSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), NCycSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -615,18 +717,117 @@ namespace SystemAvailabilityManager {
 					NCycSysAvailMgrData( SysAvailNum ).CtrlType = CycleOnControlZone;
 				} else if ( SELECT_CASE_var == "CYCLEONANYZONEFANSONLY" ) {
 					NCycSysAvailMgrData( SysAvailNum ).CtrlType = ZoneFansOnly;
+				} else if ( SELECT_CASE_var == "CYCLEONANYCOOLINGORHEATINGZONE" ) {
+					NCycSysAvailMgrData( SysAvailNum ).CtrlType = CycleOnAnyCoolingOrHeatingZone;
+				} else if ( SELECT_CASE_var == "CYCLEONANYCOOLINGZONE" ) {
+					NCycSysAvailMgrData( SysAvailNum ).CtrlType = CycleOnAnyCoolingZone;
+				} else if ( SELECT_CASE_var == "CYCLEONANYHEATINGZONE" ) {
+					NCycSysAvailMgrData( SysAvailNum ).CtrlType = CycleOnAnyHeatingZone;
+				} else if ( SELECT_CASE_var == "CYCLEONANYHEATINGZONEFANSONLY" ) {
+					NCycSysAvailMgrData( SysAvailNum ).CtrlType = CycleOnAnyHeatingZoneFansOnly;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 					ShowSevereError( RoutineName + "incorrect value: " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 					ErrorsFound = true;
 				}}
-				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == CycleOnControlZone ) {
-					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-					NCycSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
-					if ( NCycSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
-						ShowSevereError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
-						ErrorsFound = true;
+
+				// Control zone or zonelist
+				if ( !lAlphaFieldBlanks( 5 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneListName = cAlphaArgs( 5 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
+					if ( ZoneNum > 0 ){
+						NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = 1;
+						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs.allocate( 1 );
+						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( 1 ) = ZoneNum;
+					} else {
+						int ZoneListNum = 0;
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 5 ), ZoneList );
+						if ( ZoneListNum > 0 ){
+							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
+							NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = NumZones;
+							NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs.allocate( NumZones );
+							for ( int ZoneNumInList = 1; ZoneNumInList <= NumZones; ++ZoneNumInList ) {
+								NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
+							}
+						} else {
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+				}
+
+				// Cooling zone or zonelist
+				if ( !lAlphaFieldBlanks( 6 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).CoolingZoneListName = cAlphaArgs( 6 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 6 ), Zone );
+					if ( ZoneNum > 0 ){
+						NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = 1;
+						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs.allocate( 1 );
+						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs( 1 ) = ZoneNum;
+					} else {
+						int ZoneListNum = 0;
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 6 ), ZoneList );
+						if ( ZoneListNum > 0 ){
+							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
+							NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = NumZones;
+							NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs.allocate( NumZones );
+							for ( int ZoneNumInList = 1; ZoneNumInList <= NumZones; ++ZoneNumInList ) {
+								NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
+							}
+						} else {
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+				}
+
+				// Heating zone or zonelist
+				if ( !lAlphaFieldBlanks( 7 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).HeatingZoneListName = cAlphaArgs( 7 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
+					if ( ZoneNum > 0 ){
+						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = 1;
+						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs.allocate( 1 );
+						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs( 1 ) = ZoneNum;
+					} else {
+						int ZoneListNum = 0;
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 7 ), ZoneList );
+						if ( ZoneListNum > 0 ){
+							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
+							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = NumZones;
+							NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs.allocate( NumZones );
+							for ( int ZoneNumInList = 1; ZoneNumInList <= NumZones; ++ZoneNumInList ) {
+								NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
+							}
+						} else {
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+				}
+
+				// HeatZnFan zone or zonelist
+				if ( !lAlphaFieldBlanks( 8 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZoneListName = cAlphaArgs( 8 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 8 ), Zone );
+					if ( ZoneNum > 0 ){
+						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = 1;
+						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs.allocate( 1 );
+						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs( 1 ) = ZoneNum;
+					} else {
+						int ZoneListNum = 0;
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 8 ), ZoneList );
+						if ( ZoneListNum > 0 ){
+							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
+							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = NumZones;
+							NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs.allocate( NumZones );
+							for ( int ZoneNumInList = 1; ZoneNumInList <= NumZones; ++ZoneNumInList ) {
+								NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
+							}
+						} else {
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
+							ErrorsFound = true;
+						}
 					}
 				}
 
@@ -649,7 +850,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), OptStartSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), OptStartSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -688,7 +889,7 @@ namespace SystemAvailabilityManager {
 
 				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
 					OptStartSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-					OptStartSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+					OptStartSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
 					if ( OptStartSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 						ShowSevereError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
@@ -707,7 +908,7 @@ namespace SystemAvailabilityManager {
 							}
 						}
 					}
-					OptStartSysAvailMgrData( SysAvailNum ).NumOfZones = FindItemInList( cAlphaArgs( 6 ), ZoneList.Name(), NumOfZoneLists );
+					OptStartSysAvailMgrData( SysAvailNum ).NumOfZones = FindItemInList( cAlphaArgs( 6 ), ZoneList );
 					if ( OptStartSysAvailMgrData( SysAvailNum ).NumOfZones == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 						ShowSevereError( "not found: " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
@@ -758,7 +959,7 @@ namespace SystemAvailabilityManager {
 				SetupOutputVariable( "Availability Manager Optimum Start Control Status []", OptStartSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name );
 
 				// add
-				SetupOutputVariable( "Availability Manager Optimum Start Hours Before Occupancy []", OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
+				SetupOutputVariable( "Availability Manager Optimum Start Time Before Occupancy [hr]", OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
 
 			}
 
@@ -777,7 +978,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), DiffTSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), DiffTSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -822,7 +1023,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), HiTurnOffSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), HiTurnOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -854,7 +1055,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), HiTurnOnSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), HiTurnOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -886,7 +1087,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), LoTurnOffSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), LoTurnOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -929,7 +1130,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), LoTurnOnSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), LoTurnOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -961,7 +1162,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), NVentSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), NVentSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -993,7 +1194,7 @@ namespace SystemAvailabilityManager {
 				NVentSysAvailMgrData( SysAvailNum ).VentTempLowLim = rNumericArgs( 2 );
 				NVentSysAvailMgrData( SysAvailNum ).VentFlowFrac = rNumericArgs( 3 );
 				NVentSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-				NVentSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+				NVentSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
 				if ( NVentSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 					ShowContinueError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
@@ -1056,12 +1257,12 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int NumAlphas;
 		int NumNumbers;
@@ -1102,7 +1303,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SysAvailMgrListData.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SysAvailMgrListData, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1201,7 +1402,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		Found = 0;
-		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
+		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData );
 
 		if ( Found != 0 ) {
 			PlantAvailMgr( Loop ).NumAvailManagers = SysAvailMgrListData( Found ).NumItems;
@@ -1216,17 +1417,17 @@ namespace SystemAvailabilityManager {
 				PlantAvailMgr( Loop ).AvailManagerNum( Num ) = 0;
 				PlantAvailMgr( Loop ).AvailManagerType( Num ) = SysAvailMgrListData( Found ).AvailManagerType( Num );
 				if ( PlantAvailMgr( Loop ).AvailManagerType( Num ) == 0 ) {
-					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: " "Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\"." );
 					ErrorsFound = true;
 				}
 				if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_DiffThermo && Num != PlantAvailMgr( Loop ).NumAvailManagers ) {
-					ShowWarningError( "GetPlantLoopData/GetPlantAvailabilityManager: " "AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
-					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  " "Any remaining managers will not be used." );
+					ShowWarningError( "GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
+					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList =\"" + AvailabilityListName + "\"." );
 				}
 				if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_NightVent || SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_NightCycle ) {
-					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: " "Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 					ShowContinueError( "...this manager is not used in a Plant Loop." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\"." );
 					ErrorsFound = true;
@@ -1304,7 +1505,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		Found = 0;
-		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
+		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData );
 
 		if ( Found != 0 ) {
 			PriAirSysAvailMgr( Loop ).NumAvailManagers = SysAvailMgrListData( Found ).NumItems;
@@ -1320,13 +1521,13 @@ namespace SystemAvailabilityManager {
 				PriAirSysAvailMgr( Loop ).AvailManagerNum( Num ) = 0;
 				PriAirSysAvailMgr( Loop ).AvailManagerType( Num ) = SysAvailMgrListData( Found ).AvailManagerType( Num );
 				if ( PriAirSysAvailMgr( Loop ).AvailManagerType( Num ) == 0 ) {
-					ShowSevereError( "GetAirPathData/GetAirLoopAvailabilityManager: " "Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+					ShowSevereError( "GetAirPathData/GetAirLoopAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 					ErrorsFound = true;
 				}
 				if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_DiffThermo && Num != PriAirSysAvailMgr( Loop ).NumAvailManagers ) {
-					ShowWarningError( "GetAirPathData/GetAirLoopAvailabilityManager: " "AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
-					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  " "Any remaining managers will not be used." );
+					ShowWarningError( "GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
+					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 				}
 			} //End of Num Loop
@@ -1399,7 +1600,7 @@ namespace SystemAvailabilityManager {
 		if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input ) { // when both air loop and zone eq avail managers are present, zone avail mngrs list name has not been read in first time through here (see end of if block)
 			AvailabilityListName = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerListName;
 			Found = 0;
-			if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
+			if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData );
 			if ( Found != 0 ) {
 				ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).NumAvailManagers = SysAvailMgrListData( Found ).NumItems;
 				CompNumAvailManagers = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).NumAvailManagers;
@@ -1416,13 +1617,13 @@ namespace SystemAvailabilityManager {
 					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerNum( Num ) = 0;
 					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerType( Num ) = SysAvailMgrListData( Found ).AvailManagerType( Num );
 					if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerType( Num ) == 0 ) {
-						ShowSevereError( "GetZoneEqAvailabilityManager: " "Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+						ShowSevereError( "GetZoneEqAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 						ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 						ErrorsFound = true;
 					}
 					if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_DiffThermo && Num != ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).NumAvailManagers ) {
-						ShowWarningError( "GetZoneEqAvailabilityManager: " "AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
-						ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  " "Any remaining managers will not be used." );
+						ShowWarningError( "GetZoneEqAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
+						ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used." );
 						ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 					}
 				} //End of Num Loop
@@ -1471,26 +1672,25 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // One time flag
 		int SysAvailNum; // DO loop indes for Sys Avail Manager objects
-		int ControlledZoneNum; // Index into the ZoneEquipConfig array
 		int ZoneEquipType;
 		int ZoneListNum;
 		int ScanZoneListNum;
 		int ZoneNum;
-		static int NumOfZoneLists( 1 );
 		// One time initializations
 
-		if ( MyOneTimeFlag ) {
+		if ( InitSysAvailManagers_MyOneTimeFlag ) {
 
 			for ( SysAvailNum = 1; SysAvailNum <= NumNCycSysAvailMgrs; ++SysAvailNum ) {
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == CycleOnControlZone ) {
 					// set the controlled zone numbers
-					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-						if ( allocated( ZoneEquipConfig ) ) {
-							if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == NCycSysAvailMgrData( SysAvailNum ).ZoneNum ) {
-								NCycSysAvailMgrData( SysAvailNum ).ControlledZoneNum = ControlledZoneNum;
-								break;
+					for ( int index = 1; index <= NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones; ++index ) {
+						for ( int ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+							if ( allocated( ZoneEquipConfig ) ) {
+								if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( index ) ) {
+									NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( index ) = ControlledZoneNum;
+									break;
+								}
 							}
 						}
 					}
@@ -1501,7 +1701,7 @@ namespace SystemAvailabilityManager {
 				{ auto const SELECT_CASE_var( OptStartSysAvailMgrData( SysAvailNum ).CtrlType );
 				if ( SELECT_CASE_var == ControlZone ) {
 					// set the controlled zone numbers
-					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+					for ( int ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 						if ( allocated( ZoneEquipConfig ) ) {
 							if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == OptStartSysAvailMgrData( SysAvailNum ).ZoneNum ) {
 								OptStartSysAvailMgrData( SysAvailNum ).ControlledZoneNum = ControlledZoneNum;
@@ -1511,7 +1711,7 @@ namespace SystemAvailabilityManager {
 					}
 				} else if ( SELECT_CASE_var == MaximumOfZoneList ) {
 					//a zone list
-					ZoneListNum = FindItemInList( OptStartSysAvailMgrData( SysAvailNum ).ZoneListName, ZoneList.Name(), NumOfZoneLists );
+					ZoneListNum = FindItemInList( OptStartSysAvailMgrData( SysAvailNum ).ZoneListName, ZoneList );
 					if ( ZoneListNum > 0 ) {
 						OptStartSysAvailMgrData( SysAvailNum ).NumOfZones = ZoneList( ZoneListNum ).NumOfZones;
 						if ( ! allocated( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs ) ) {
@@ -1527,7 +1727,7 @@ namespace SystemAvailabilityManager {
 
 			for ( SysAvailNum = 1; SysAvailNum <= NumNVentSysAvailMgrs; ++SysAvailNum ) {
 				// set the controlled zone numbers
-				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+				for ( int ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 					if ( allocated( ZoneEquipConfig ) ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == NVentSysAvailMgrData( SysAvailNum ).ZoneNum ) {
 							NVentSysAvailMgrData( SysAvailNum ).ControlledZoneNum = ControlledZoneNum;
@@ -1537,26 +1737,31 @@ namespace SystemAvailabilityManager {
 				}
 			}
 
-			MyOneTimeFlag = false;
+			InitSysAvailManagers_MyOneTimeFlag = false;
 
 		} // end 1 time initializations
 
 		// initialize individual availability managers to no action (CR 8376 reporting issue)
-		if ( allocated( SchedSysAvailMgrData ) ) SchedSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( SchedOnSysAvailMgrData ) ) SchedOnSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( SchedOffSysAvailMgrData ) ) SchedOffSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( NCycSysAvailMgrData ) ) NCycSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( NVentSysAvailMgrData ) ) NVentSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( DiffTSysAvailMgrData ) ) DiffTSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( HiTurnOffSysAvailMgrData ) ) HiTurnOffSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( HiTurnOnSysAvailMgrData ) ) HiTurnOnSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( LoTurnOffSysAvailMgrData ) ) LoTurnOffSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( LoTurnOnSysAvailMgrData ) ) LoTurnOnSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( OptStartSysAvailMgrData ) ) OptStartSysAvailMgrData.AvailStatus() = NoAction;
+		if ( allocated( SchedSysAvailMgrData ) ) for ( auto & e : SchedSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( SchedOnSysAvailMgrData ) ) for ( auto & e : SchedOnSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( SchedOffSysAvailMgrData ) ) for ( auto & e : SchedOffSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( NCycSysAvailMgrData ) ) for ( auto & e : NCycSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( NVentSysAvailMgrData ) ) for ( auto & e : NVentSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( DiffTSysAvailMgrData ) ) for ( auto & e : DiffTSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( HiTurnOffSysAvailMgrData ) ) for ( auto & e : HiTurnOffSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( HiTurnOnSysAvailMgrData ) ) for ( auto & e : HiTurnOnSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( LoTurnOffSysAvailMgrData ) ) for ( auto & e : LoTurnOffSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( LoTurnOnSysAvailMgrData ) ) for ( auto & e : LoTurnOnSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( OptStartSysAvailMgrData ) ) {
+			for ( auto & e : OptStartSysAvailMgrData ) {
+				e.AvailStatus = NoAction;
+				e.isSimulated = false;
+			}
+		}
 		//  HybridVentSysAvailMgrData%AvailStatus= NoAction
 		for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) { // loop over the zone equipment types
 			if ( allocated( ZoneComp ) ) {
-				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs.AvailStatus() = NoAction;
+				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) for ( auto & e : ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs ) e.AvailStatus = NoAction;
 			}
 		}
 
@@ -1613,7 +1818,7 @@ namespace SystemAvailabilityManager {
 		{ auto const SELECT_CASE_var( SysAvailType );
 		if ( SELECT_CASE_var == SysAvailMgr_Scheduled ) { // 'AvailabilityManager:Scheduled'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, SchedSysAvailMgrData.Name(), NumSchedSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, SchedSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcSchedSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1623,7 +1828,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_ScheduledOn ) { // 'AvailabilityManager:ScheduledOn'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, SchedOnSysAvailMgrData.Name(), NumSchedOnSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, SchedOnSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcSchedOnSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1633,7 +1838,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_ScheduledOff ) { // 'AvailabilityManager:ScheduledOff'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, SchedOffSysAvailMgrData.Name(), NumSchedOffSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, SchedOffSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcSchedOffSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1643,7 +1848,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_NightCycle ) { // 'AvailabilityManager:NightCycle'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, NCycSysAvailMgrData.Name(), NumNCycSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, NCycSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
@@ -1653,7 +1858,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_OptimumStart ) { // 'AvailabilityManager:OptimumStart'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, OptStartSysAvailMgrData.Name(), NumOptStartSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, OptStartSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcOptStartSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
@@ -1663,7 +1868,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_NightVent ) { // 'AvailabilityManager:NightVentilation'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, NVentSysAvailMgrData.Name(), NumNVentSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, NVentSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcNVentSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType );
@@ -1673,7 +1878,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_DiffThermo ) { // 'AvailabilityManager:DifferentialThermostat'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, DiffTSysAvailMgrData.Name(), NumDiffTSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, DiffTSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcDiffTSysAvailMgr( SysAvailNum, PreviousStatus, AvailStatus );
@@ -1683,7 +1888,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_HiTempTOff ) { // 'AvailabilityManager:HighTemperatureTurnOff'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, HiTurnOffSysAvailMgrData.Name(), NumHiTurnOffSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, HiTurnOffSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcHiTurnOffSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1693,7 +1898,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_HiTempTOn ) { // 'AvailabilityManager:HighTemperatureTurnOn'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, HiTurnOnSysAvailMgrData.Name(), NumHiTurnOnSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, HiTurnOnSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcHiTurnOnSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1703,7 +1908,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_LoTempTOff ) { // 'AvailabilityManager:LowTemperatureTurnOff'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, LoTurnOffSysAvailMgrData.Name(), NumLoTurnOffSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, LoTurnOffSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcLoTurnOffSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1713,7 +1918,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_LoTempTOn ) { // 'AvailabilityManager:LowTemperatureTurnOn'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, LoTurnOnSysAvailMgrData.Name(), NumLoTurnOnSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, LoTurnOnSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcLoTurnOnSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1930,16 +2135,15 @@ namespace SystemAvailabilityManager {
 		int CtrldZoneNum;
 		int ZoneNum;
 		Real64 TempTol;
-		static FArray1D_bool ZoneCompNCControlType;
-		static bool OneTimeFlag( true );
+		static Array1D_bool ZoneCompNCControlType;
 
 		TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
 		if ( present( ZoneEquipType ) ) {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
-			if ( OneTimeFlag ) {
+			if (CalcNCycSysAvailMgr_OneTimeFlag) {
 				ZoneCompNCControlType.dimension( NumNCycSysAvailMgrs, true );
-				OneTimeFlag = false;
+				CalcNCycSysAvailMgr_OneTimeFlag = false;
 			}
 		} else {
 			StartTime = PriAirSysAvailMgr( PriAirSysNum ).StartTime;
@@ -1966,7 +2170,7 @@ namespace SystemAvailabilityManager {
 
 				} else if ( SELECT_CASE_var == CycleOnControlZone ) {
 
-					ZoneNum = NCycSysAvailMgrData( SysAvailNum ).ZoneNum;
+					ZoneNum = NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( 1 );
 
 					{ auto const SELECT_CASE_var1( TempControlType( ZoneNum ) ); // select on thermostat control
 
@@ -2008,7 +2212,7 @@ namespace SystemAvailabilityManager {
 					if ( ZoneCompNCControlType( SysAvailNum ) ) {
 						ShowWarningError( "AvailabilityManager:NightCycle = " + NCycSysAvailMgrData( SysAvailNum ).Name + ", is specified for a ZoneHVAC component." );
 						ShowContinueError( "The only valid Control Types for ZoneHVAC components are CycleOnControlZone and StayOff." );
-						ShowContinueError( "Night Cycle operation will not be modeled for ZoneHVAC components that reference this " "manager." );
+						ShowContinueError( "Night Cycle operation will not be modeled for ZoneHVAC components that reference this manager." );
 						ZoneCompNCControlType( SysAvailNum ) = false;
 					}
 					AvailStatus = NoAction;
@@ -2026,7 +2230,7 @@ namespace SystemAvailabilityManager {
 			}
 		} else {
 			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime ) { // if cycled on
-				AvailStatus = CycleOn;
+				AvailStatus = NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == ZoneFansOnly ) AvailStatus = CycleOnZoneFansOnly;
 			} else if ( SimTimeSteps == StopTime ) { // if end of cycle run time, shut down if fan off
 				AvailStatus = NoAction;
@@ -2089,60 +2293,104 @@ namespace SystemAvailabilityManager {
 					} // end loop over zones in system
 
 				} else if ( SELECT_CASE_var == CycleOnControlZone ) {
-
-					ZoneNum = NCycSysAvailMgrData( SysAvailNum ).ZoneNum;
-
-					{ auto const SELECT_CASE_var1( TempControlType( ZoneNum ) ); // select on thermostat control
-
-					if ( SELECT_CASE_var1 == SingleHeatingSetPoint ) {
-						if ( TempTstatAir( ZoneNum ) < TempZoneThermostatSetPoint( ZoneNum ) - TempTol ) {
-							AvailStatus = CycleOn;
-						} else {
-							AvailStatus = NoAction;
-						}
-
-					} else if ( SELECT_CASE_var1 == SingleCoolingSetPoint ) {
-						if ( TempTstatAir( ZoneNum ) > TempZoneThermostatSetPoint( ZoneNum ) + TempTol ) {
-							AvailStatus = CycleOn;
-						} else {
-							AvailStatus = NoAction;
-						}
-
-					} else if ( SELECT_CASE_var1 == SingleHeatCoolSetPoint ) {
-						if ( ( TempTstatAir( ZoneNum ) < TempZoneThermostatSetPoint( ZoneNum ) - TempTol ) || ( TempTstatAir( ZoneNum ) > TempZoneThermostatSetPoint( ZoneNum ) + TempTol ) ) {
-
-							AvailStatus = CycleOn;
-						} else {
-							AvailStatus = NoAction;
-						}
-
-					} else if ( SELECT_CASE_var1 == DualSetPointWithDeadBand ) {
-						if ( ( TempTstatAir( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) - TempTol ) || ( TempTstatAir( ZoneNum ) > ZoneThermostatSetPointHi( ZoneNum ) + TempTol ) ) {
-							AvailStatus = CycleOn;
-						} else {
-							AvailStatus = NoAction;
-						}
-
+					AvailStatus = NoAction;
+					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones, TempTol ) ) AvailStatus = CycleOn;
+					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones, TempTol ) ) AvailStatus = CycleOn;
+				} else if ( SELECT_CASE_var == CycleOnAnyCoolingOrHeatingZone) {
+					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) {
+						AvailStatus = CycleOnZoneFansOnly;
 					} else {
 						AvailStatus = NoAction;
-
-					}} // end select on thermostat control
-
+					}
+				} else if ( SELECT_CASE_var == CycleOnAnyCoolingZone) {
+					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else {
+						AvailStatus = NoAction;
+					}
+				} else if ( SELECT_CASE_var == CycleOnAnyHeatingZone ) {
+					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) {
+						AvailStatus = CycleOnZoneFansOnly;
+					} else {
+						AvailStatus = NoAction;
+					}
+				} else if ( SELECT_CASE_var == CycleOnControlZone ) {
+					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) {
+						AvailStatus = CycleOnZoneFansOnly;
+					} else {
+						AvailStatus = NoAction;
+					}
 				} else {
 					AvailStatus = NoAction;
 
 				}} // end select type of night cycle control
 
-				if ( AvailStatus == CycleOn ) { // reset the start and stop times
+				if ( ( AvailStatus == CycleOn ) || ( AvailStatus == CycleOnZoneFansOnly ) ) { // reset the start and stop times
 					PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
 					PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps + NCycSysAvailMgrData( SysAvailNum ).CyclingTimeSteps;
 					if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == ZoneFansOnly ) AvailStatus = CycleOnZoneFansOnly;
 				}
-
 			}
 		}
 		NCycSysAvailMgrData( SysAvailNum ).AvailStatus = AvailStatus;
+		NCycSysAvailMgrData( SysAvailNum ).PriorAvailStatus = AvailStatus;
 
+	}
+
+	bool
+	CoolingZoneOutOfTolerance(
+		Array1D_int const ZonePtrList, // list of controlled zone pointers
+		int const NumZones, // number of zones in list
+		Real64 const TempTolerance // temperature tolerance
+	)
+	{
+		// Check if any zone temperature is above the cooling setpoint plus tolerance
+		for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
+			int ZoneNum = ZonePtrList( Index );
+			{ auto const tstatType ( DataHeatBalFanSys::TempControlType( ZoneNum ) );
+
+			if ( ( tstatType == SingleCoolingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) + TempTolerance ) {
+					return true; // return on the first zone found 
+				}
+			} else if ( tstatType == DualSetPointWithDeadBand ){
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::ZoneThermostatSetPointHi( ZoneNum ) + TempTolerance ) {
+					return true; // return on the first zone found 
+				}
+			}}
+		}
+		return false;
+	}
+
+	bool
+	HeatingZoneOutOfTolerance(
+		Array1D_int const ZonePtrList, // list of controlled zone pointers
+		int const NumZones, // number of zones in list
+		Real64 const TempTolerance // temperature tolerance
+	)
+	{
+		// Check if any zone temperature is below the heating setpoint less tolerance
+		for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
+			int ZoneNum = ZonePtrList( Index );
+			{ auto const tstatType ( DataHeatBalFanSys::TempControlType( ZoneNum ) );
+
+			if ( ( tstatType == SingleHeatingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) - TempTolerance ) {
+					return true; // return on the first zone found 
+				}
+			} else if ( tstatType == DualSetPointWithDeadBand ){
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::ZoneThermostatSetPointLo( ZoneNum ) - TempTolerance ) {
+					return true; // return on the first zone found 
+				}
+			}}
+		}
+		return false;
 	}
 
 	void
@@ -2150,8 +2398,8 @@ namespace SystemAvailabilityManager {
 		int const SysAvailNum, // number of the current scheduled system availability manager
 		int const PriAirSysNum, // number of the primary air system affected by this Avail. Manager
 		int & AvailStatus, // System status indicator
-		Optional_int_const ZoneEquipType, // Type of ZoneHVAC equipment component
-		Optional_int_const CompNum // Index of ZoneHVAC equipment component
+		Optional_int_const EP_UNUSED( ZoneEquipType ), // Type of ZoneHVAC equipment component
+		Optional_int_const EP_UNUSED( CompNum ) // Index of ZoneHVAC equipment component
 	)
 	{
 
@@ -2168,8 +2416,6 @@ namespace SystemAvailabilityManager {
 		// Sets the AvailStatus indicator according to the
 		// optimum start algorithm
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using namespace DataAirLoop;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -2181,28 +2427,16 @@ namespace SystemAvailabilityManager {
 		using DataEnvironment::DSTIndicator;
 		using DataEnvironment::DayOfYear;
 		using DataEnvironment::DayOfWeekTomorrow;
-		using DataEnvironment::DayOfWeek;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int ScheduleIndex;
-		int DayScheduleIndex;
-		FArray2D< Real64 > DayValues;
-		FArray2D< Real64 > DayValuesTmr;
+		Array2D< Real64 > DayValues;
+		Array2D< Real64 > DayValuesTmr;
 		int JDay;
 		int TmrJDay;
-		int CurDayofWeek;
 		int TmrDayOfWeek;
 		int ZoneNum;
 		Real64 FanStartTime;
@@ -2213,78 +2447,126 @@ namespace SystemAvailabilityManager {
 		int I;
 		int J;
 		Real64 TempDiff;
-		static Real64 TempDiffHi( 0.0 );
-		static Real64 TempDiffLo( 0.0 );
-		//  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: ZoneCompOptStartControlType
-		static bool FirstTimeATGFlag( true );
-		static bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
-		static bool CycleOnFlag( false );
-		static bool OSReportVarFlag( true );
+		Real64 TempDiffHi;
+		Real64 TempDiffLo;
+		bool FirstTimeATGFlag( true );
+		bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
+		bool CycleOnFlag( false );
+		bool OSReportVarFlag( true );
 		int NumPreDays;
 		int NumOfZonesInList;
-		static FArray1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
-		static FArray1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
-		static Real64 AdaTempGradHeat;
-		static Real64 AdaTempGradCool;
-		static Real64 ATGUpdateTime1( 0.0 );
-		static Real64 ATGUpdateTime2( 0.0 );
-		static Real64 ATGUpdateTemp1( 0.0 );
-		static Real64 ATGUpdateTemp2( 0.0 );
-		static bool ATGUpdateFlag1( false );
-		static bool ATGUpdateFlag2( false );
+		Real64 AdaTempGradHeat;
+		Real64 AdaTempGradCool;
+		Real64 ATGUpdateTime1( 0.0 );
+		Real64 ATGUpdateTime2( 0.0 );
+		Real64 ATGUpdateTemp1( 0.0 );
+		Real64 ATGUpdateTemp2( 0.0 );
+		bool ATGUpdateFlag1( false );
+		bool ATGUpdateFlag2( false );
 		int ATGCounter;
 		int ATGWCZoneNumHi;
 		int ATGWCZoneNumLo;
-		static Real64 NumHoursBeforeOccupancy( 0.0 ); // Variable to store the number of hours before occupancy in optimum start period
+		Real64 NumHoursBeforeOccupancy; // Variable to store the number of hours before occupancy in optimum start period
+		bool exitLoop; // exit loop on found data
+
+		auto & OptStartMgr( OptStartSysAvailMgrData( SysAvailNum ) );
+
+		// some avail managers may be used in air loop and plant availability manager lists, if so they only need be simulated once
+		if ( OptStartMgr.isSimulated ) {
+			AvailStatus = OptStartMgr.AvailStatus;
+			return;
+		}
+		OptStartMgr.isSimulated = true;
+
+		// update air loop specific data
+		TempDiffLo = OptStartMgr.TempDiffLo;
+		TempDiffHi = OptStartMgr.TempDiffHi;
+		ATGWCZoneNumLo = OptStartMgr.ATGWCZoneNumLo;
+		ATGWCZoneNumHi = OptStartMgr.ATGWCZoneNumHi;
+		CycleOnFlag = OptStartMgr.CycleOnFlag;
+		ATGUpdateFlag1 = OptStartMgr.ATGUpdateFlag1;
+		ATGUpdateFlag2 = OptStartMgr.ATGUpdateFlag2;
+		NumHoursBeforeOccupancy = OptStartMgr.NumHoursBeforeOccupancy;
+		FirstTimeATGFlag = OptStartMgr.FirstTimeATGFlag;
+		OverNightStartFlag = OptStartMgr.OverNightStartFlag;
+		OSReportVarFlag = OptStartMgr.OSReportVarFlag;
+
+		if ( OptStartMgr.CtrlAlgType == AdaptiveTemperatureGradient ) {
+			NumPreDays = OptStartMgr.NumPreDays;
+			if ( ! allocated(OptStart_AdaTempGradTrdHeat ) ) {
+				OptStart_AdaTempGradTrdHeat.allocate( NumPreDays );
+				OptStart_AdaTempGradTrdCool.allocate( NumPreDays );
+			}
+			if ( ! allocated( OptStartMgr.AdaTempGradTrdHeat ) ) {
+				OptStartMgr.AdaTempGradTrdHeat.allocate( NumPreDays );
+				OptStartMgr.AdaTempGradTrdHeat = 0.0;
+				OptStartMgr.AdaTempGradTrdCool.allocate( NumPreDays );
+				OptStartMgr.AdaTempGradTrdCool = 0.0;
+			}
+			OptStart_AdaTempGradTrdHeat = OptStartMgr.AdaTempGradTrdHeat;
+			OptStart_AdaTempGradTrdCool = OptStartMgr.AdaTempGradTrdCool;
+			AdaTempGradHeat = OptStartMgr.AdaTempGradHeat;
+			AdaTempGradCool = OptStartMgr.AdaTempGradCool;
+			ATGUpdateTime1 = OptStartMgr.ATGUpdateTime1;
+			ATGUpdateTime2 = OptStartMgr.ATGUpdateTime2;
+			ATGUpdateTemp1 = OptStartMgr.ATGUpdateTemp1;
+			ATGUpdateTemp2 = OptStartMgr.ATGUpdateTemp2;
+		}
 
 		// add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
 		if ( KickOffSimulation ) {
 			AvailStatus = NoAction;
 		} else {
-			ScheduleIndex = GetScheduleIndex( OptStartSysAvailMgrData( SysAvailNum ).FanSched );
+			ScheduleIndex = GetScheduleIndex( OptStartMgr.FanSched );
 			JDay = DayOfYear;
 			TmrJDay = JDay + 1;
 			TmrDayOfWeek = DayOfWeekTomorrow;
 
-			DayValues.allocate( 24, NumOfTimeStepInHour );
-			DayValuesTmr.allocate( 24, NumOfTimeStepInHour );
+			DayValues.allocate( NumOfTimeStepInHour, 24 );
+			DayValuesTmr.allocate( NumOfTimeStepInHour, 24 );
 			if ( ! allocated( OptStartData.OptStartFlag ) ) {
 				OptStartData.OptStartFlag.allocate( NumOfZones );
 				OptStartData.OccStartTime.allocate( NumOfZones );
 			}
 			if ( ! allocated( OptStartData.ActualZoneNum ) ) OptStartData.ActualZoneNum.allocate( NumOfZones );
-			OptStartData.OptStartFlag = false;
-			OptStartData.OccStartTime = 99.99; //initialize the zone occupancy start time
+
+			// reset OptStartData once per beginning of day
+			if ( BeginDayFlag ) {
+				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
+				if ( BeginOfDayResetFlag ) {
+					OptStartData.OccStartTime = 22.99; //initialize the zone occupancy start time
+					OptStartData.OptStartFlag = false;
+					BeginOfDayResetFlag = false;
+				}
+			}
+			if ( !BeginDayFlag ) BeginOfDayResetFlag = true;
+
 			GetScheduleValuesForDay( ScheduleIndex, DayValues );
 			GetScheduleValuesForDay( ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek );
 
 			FanStartTime = 0.0;
 			FanStartTimeTmr = 0.0;
-			Loop1: for ( I = 1; I <= 24; ++I ) {
-				Loop2: for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValues( I, J ) > 0.0 ) {
-						FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
-						goto Loop1_exit;
-					}
-					Loop2_loop: ;
+			exitLoop = false;
+			for ( I = 1; I <= 24; ++I ) {
+				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
+					if ( DayValues( J, I ) <= 0.0 ) continue;
+					FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+					exitLoop = true;
+					break;
 				}
-				Loop2_exit: ;
-				Loop1_loop: ;
+				if ( exitLoop ) break;
 			}
-			Loop1_exit: ;
 
-			Loop3: for ( I = 1; I <= 24; ++I ) {
-				Loop4: for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValuesTmr( I, J ) > 0.0 ) {
-						FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
-						goto Loop3_exit;
-					}
-					Loop4_loop: ;
+			exitLoop = false;
+			for ( I = 1; I <= 24; ++I ) {
+				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
+					if ( DayValuesTmr( J, I ) <= 0.0 ) continue;
+					FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+					exitLoop = true;
+					break;
 				}
-				Loop4_exit: ;
-				Loop3_loop: ;
+				if ( exitLoop ) break;
 			}
-			Loop3_exit: ;
 
 			if ( FanStartTimeTmr == 0.0 ) FanStartTimeTmr = 24.0;
 
@@ -2301,18 +2583,14 @@ namespace SystemAvailabilityManager {
 				--FanStartTimeTmr;
 			}
 
-			if ( BeginDayFlag ) {
-				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
-			}
-
-			{ auto const SELECT_CASE_var( OptStartSysAvailMgrData( SysAvailNum ).CtrlAlgType );
+			{ auto const SELECT_CASE_var( OptStartMgr.CtrlAlgType );
 			if ( SELECT_CASE_var == ConstantStartTime ) {
-				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == StayOff ) {
+				if ( OptStartMgr.CtrlType == StayOff ) {
 					AvailStatus = NoAction;
 				} else {
-					DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).ConstStartTime;
-					if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-						DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+					DeltaTime = OptStartMgr.ConstStartTime;
+					if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+						DeltaTime = OptStartMgr.MaxOptStartTime;
 					}
 					PreStartTime = FanStartTime - DeltaTime;
 					if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -2365,8 +2643,8 @@ namespace SystemAvailabilityManager {
 				}
 
 			} else if ( SELECT_CASE_var == ConstantTemperatureGradient ) {
-				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
-					ZoneNum = OptStartSysAvailMgrData( SysAvailNum ).ZoneNum;
+				if ( OptStartMgr.CtrlType == ControlZone ) {
+					ZoneNum = OptStartMgr.ZoneNum;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -2385,9 +2663,9 @@ namespace SystemAvailabilityManager {
 						TempDiff = TempDiffLo;
 						if ( TempDiff < 0.0 ) { //Heating Mode
 							TempDiff = std::abs( TempDiff );
-							DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradHeat;
-							if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+							DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
+							if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+								DeltaTime = OptStartMgr.MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
 							if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2464,9 +2742,9 @@ namespace SystemAvailabilityManager {
 						}
 					} else if ( OccRoomTSetPointCool( ZoneNum ) < 50.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
-						DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2540,8 +2818,9 @@ namespace SystemAvailabilityManager {
 						AvailStatus = NoAction;
 						CycleOnFlag = false;
 					}
-				} else if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == MaximumOfZoneList ) {
-					NumOfZonesInList = OptStartSysAvailMgrData( SysAvailNum ).NumOfZones;
+				} else if ( OptStartMgr.CtrlType == MaximumOfZoneList ) {
+
+					NumOfZonesInList = OptStartMgr.NumOfZones;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -2550,9 +2829,9 @@ namespace SystemAvailabilityManager {
 								TempDiffHi = 0.0;
 								TempDiffLo = 0.0;
 								for ( ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum ) {
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffHi = max( TempDiffHi, TempDiff );
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffLo = min( TempDiffLo, TempDiff );
 								}
 							} else {
@@ -2564,9 +2843,9 @@ namespace SystemAvailabilityManager {
 					if ( ( TempDiffHi < 0.0 && TempDiffLo < 0.0 ) || ( std::abs( TempDiffLo ) > std::abs( TempDiffHi ) && TempDiffLo < 0 ) ) { //Heating Mode
 						TempDiff = TempDiffLo;
 						TempDiff = std::abs( TempDiff );
-						DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradHeat;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2645,9 +2924,9 @@ namespace SystemAvailabilityManager {
 						TempDiffLo = 0.0;
 					} else if ( TempDiffHi < 30.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
-						DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2726,13 +3005,9 @@ namespace SystemAvailabilityManager {
 				}
 
 			} else if ( SELECT_CASE_var == AdaptiveTemperatureGradient ) {
-				NumPreDays = OptStartSysAvailMgrData( SysAvailNum ).NumPreDays;
-				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
-					if ( ! allocated( AdaTempGradTrdHeat ) ) {
-						AdaTempGradTrdHeat.allocate( NumPreDays );
-						AdaTempGradTrdCool.allocate( NumPreDays );
-					}
-					ZoneNum = OptStartSysAvailMgrData( SysAvailNum ).ZoneNum;
+
+				if ( OptStartMgr.CtrlType == ControlZone ) {
+					ZoneNum = OptStartMgr.ZoneNum;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -2749,22 +3024,22 @@ namespace SystemAvailabilityManager {
 					//Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
 					//-----------------------------------------------------------------------------
 					if ( WarmupFlag ) {
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
-						AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
+						OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
-							AdaTempGradHeat += AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - AdaTempGradTrdHeat( 1 ) / NumPreDays;
-							AdaTempGradCool += AdaTempGradTrdCool( NumPreDays ) / NumPreDays - AdaTempGradTrdCool( 1 ) / NumPreDays;
+							AdaTempGradHeat += OptStart_AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdHeat( 1 ) / NumPreDays;
+							AdaTempGradCool += OptStart_AdaTempGradTrdCool( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdCool( 1 ) / NumPreDays;
 							if ( FanStartTime > 0 ) {
 								for ( ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter ) {
-									AdaTempGradTrdHeat( ATGCounter ) = AdaTempGradTrdHeat( ATGCounter + 1 );
-									AdaTempGradTrdCool( ATGCounter ) = AdaTempGradTrdCool( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdHeat( ATGCounter ) = OptStart_AdaTempGradTrdHeat( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdCool( ATGCounter ) = OptStart_AdaTempGradTrdCool( ATGCounter + 1 );
 								}
 							}
 						}
@@ -2778,8 +3053,8 @@ namespace SystemAvailabilityManager {
 						if ( TempDiff < 0.0 ) { //Heating Mode
 							TempDiff = std::abs( TempDiff );
 							DeltaTime = TempDiff / AdaTempGradHeat;
-							if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+							if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+								DeltaTime = OptStartMgr.MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
 							if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -2815,9 +3090,9 @@ namespace SystemAvailabilityManager {
 											ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 											ATGUpdateFlag2 = false;
 											if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 											} else {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 											}
 										}
 									}
@@ -2866,9 +3141,9 @@ namespace SystemAvailabilityManager {
 											ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 											ATGUpdateFlag2 = false;
 											if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 											} else {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 											}
 										}
 									}
@@ -2900,8 +3175,8 @@ namespace SystemAvailabilityManager {
 					} else if ( OccRoomTSetPointCool( ZoneNum ) < 50.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
 						DeltaTime = TempDiff / AdaTempGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -2939,9 +3214,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -2978,9 +3253,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3013,14 +3288,11 @@ namespace SystemAvailabilityManager {
 						AvailStatus = NoAction;
 						CycleOnFlag = false;
 					}
-				} else if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == MaximumOfZoneList ) {
-					if ( ! allocated( AdaTempGradTrdHeat ) ) {
-						AdaTempGradTrdHeat.allocate( NumPreDays );
-						AdaTempGradTrdCool.allocate( NumPreDays );
-					}
-					NumOfZonesInList = OptStartSysAvailMgrData( SysAvailNum ).NumOfZones;
-					ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
-					ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+				} else if ( OptStartMgr.CtrlType == MaximumOfZoneList ) {
+
+					NumOfZonesInList = OptStartMgr.NumOfZones;
+					ATGWCZoneNumHi = OptStartMgr.ZonePtrs( 1 );
+					ATGWCZoneNumLo = OptStartMgr.ZonePtrs( 1 );
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -3028,21 +3300,19 @@ namespace SystemAvailabilityManager {
 							if ( allocated( OccRoomTSetPointHeat ) && allocated( OccRoomTSetPointCool ) ) {
 								TempDiffHi = 0.0;
 								TempDiffLo = 0.0;
+								ATGWCZoneNumHi = OptStartMgr.ZonePtrs( 1 );
+								ATGWCZoneNumLo = OptStartMgr.ZonePtrs( 1 );
 								for ( ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum ) {
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffHi = max( TempDiffHi, TempDiff );
 									//Store the worse case zone number for actual temperature gradient calculation
 									if ( TempDiff == TempDiffHi ) {
-										ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum );
-									} else {
-										ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+										ATGWCZoneNumHi = OptStartMgr.ZonePtrs( ZoneNum );
 									}
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffLo = min( TempDiffLo, TempDiff );
 									if ( TempDiff == TempDiffLo ) {
-										ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum );
-									} else {
-										ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+										ATGWCZoneNumLo = OptStartMgr.ZonePtrs( ZoneNum );
 									}
 								}
 							} else {
@@ -3054,22 +3324,22 @@ namespace SystemAvailabilityManager {
 					//Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
 					//-----------------------------------------------------------------------------
 					if ( WarmupFlag ) {
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
-						AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
+						OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
-							AdaTempGradHeat += AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - AdaTempGradTrdHeat( 1 ) / NumPreDays;
-							AdaTempGradCool += AdaTempGradTrdCool( NumPreDays ) / NumPreDays - AdaTempGradTrdCool( 1 ) / NumPreDays;
+							AdaTempGradHeat += OptStart_AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdHeat( 1 ) / NumPreDays;
+							AdaTempGradCool += OptStart_AdaTempGradTrdCool( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdCool( 1 ) / NumPreDays;
 							if ( FanStartTime > 0 ) {
 								for ( ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter ) {
-									AdaTempGradTrdHeat( ATGCounter ) = AdaTempGradTrdHeat( ATGCounter + 1 );
-									AdaTempGradTrdCool( ATGCounter ) = AdaTempGradTrdCool( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdHeat( ATGCounter ) = OptStart_AdaTempGradTrdHeat( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdCool( ATGCounter ) = OptStart_AdaTempGradTrdCool( ATGCounter + 1 );
 								}
 							}
 						}
@@ -3082,8 +3352,8 @@ namespace SystemAvailabilityManager {
 						TempDiff = TempDiffLo;
 						TempDiff = std::abs( TempDiff );
 						DeltaTime = TempDiff / AdaTempGradHeat;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -3119,9 +3389,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumLo );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 										} else {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3164,9 +3434,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumLo );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 										} else {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3205,8 +3475,8 @@ namespace SystemAvailabilityManager {
 					} else if ( TempDiffHi < 30.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
 						DeltaTime = TempDiff / AdaTempGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -3236,9 +3506,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumHi );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 
 									}
@@ -3287,9 +3557,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumHi );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3332,8 +3602,28 @@ namespace SystemAvailabilityManager {
 			}}
 		}
 
-		OptStartSysAvailMgrData( SysAvailNum ).AvailStatus = AvailStatus;
-		OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
+		OptStartMgr.AvailStatus = AvailStatus;
+		OptStartMgr.NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
+		OptStartMgr.TempDiffLo = TempDiffLo;
+		OptStartMgr.TempDiffHi = TempDiffHi;
+		OptStartMgr.ATGWCZoneNumLo = ATGWCZoneNumLo;
+		OptStartMgr.ATGWCZoneNumHi = ATGWCZoneNumHi;
+		OptStartMgr.CycleOnFlag = CycleOnFlag;
+		OptStartMgr.ATGUpdateFlag1 = ATGUpdateFlag1;
+		OptStartMgr.ATGUpdateFlag2 = ATGUpdateFlag2;
+		OptStartMgr.FirstTimeATGFlag = FirstTimeATGFlag;
+		OptStartMgr.OverNightStartFlag = OverNightStartFlag;
+		OptStartMgr.OSReportVarFlag = OSReportVarFlag;
+		if ( OptStartMgr.CtrlAlgType == AdaptiveTemperatureGradient ) {
+			OptStartMgr.AdaTempGradTrdHeat = OptStart_AdaTempGradTrdHeat;
+			OptStartMgr.AdaTempGradTrdCool = OptStart_AdaTempGradTrdCool;
+			OptStartMgr.AdaTempGradHeat = AdaTempGradHeat;
+			OptStartMgr.AdaTempGradCool = AdaTempGradCool;
+			OptStartMgr.ATGUpdateTime1 = ATGUpdateTime1;
+			OptStartMgr.ATGUpdateTime2 = ATGUpdateTime2;
+			OptStartMgr.ATGUpdateTemp1 = ATGUpdateTemp1;
+			OptStartMgr.ATGUpdateTemp2 = ATGUpdateTemp2;
+		}
 
 	}
 
@@ -3756,7 +4046,6 @@ namespace SystemAvailabilityManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PriAirSysNum; // Primary Air System index
 		int SysAvailNum;
-		int ZoneNum;
 
 		if ( GetHybridInputFlag ) {
 			GetHybridVentilationInputs();
@@ -3874,7 +4163,7 @@ namespace SystemAvailabilityManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HybridVentSysAvailMgrData.AirLoopName(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HybridVentSysAvailMgrData, &DefineHybridVentSysAvailManager::AirLoopName, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3889,7 +4178,7 @@ namespace SystemAvailabilityManager {
 			}
 			HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName = cAlphaArgs( 3 );
 			// Check zone number
-			HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid" );
 				ShowContinueError( "not found: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -4056,7 +4345,7 @@ namespace SystemAvailabilityManager {
 					CurveVal = CurveValue( HybridVentSysAvailMgrData( SysAvailNum ).OpeningFactorFWS, CurveMin );
 					if ( CurveVal < 0.0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-						ShowContinueError( "The minimum value of " + cAlphaFieldNames( 7 ) + " must be greater " "than or equal to 0.0 at the minimum value of wind speed." );
+						ShowContinueError( "The minimum value of " + cAlphaFieldNames( 7 ) + " must be greater than or equal to 0.0 at the minimum value of wind speed." );
 						ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( "Curve output at the minimum wind speed = " + TrimSigDigits( CurveVal, 3 ) );
 						ErrorsFound = true;
@@ -4064,7 +4353,7 @@ namespace SystemAvailabilityManager {
 					CurveVal = CurveValue( HybridVentSysAvailMgrData( SysAvailNum ).OpeningFactorFWS, CurveMax );
 					if ( CurveVal > 1.0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-						ShowContinueError( "The maximum value of " + cAlphaFieldNames( 7 ) + " must be less " "than or equal to 1.0 at the maximum value of wind speed." );
+						ShowContinueError( "The maximum value of " + cAlphaFieldNames( 7 ) + " must be less than or equal to 1.0 at the maximum value of wind speed." );
 						ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( "Curve output at the maximum wind speed = " + TrimSigDigits( CurveVal, 3 ) );
 						ErrorsFound = true;
@@ -4135,7 +4424,7 @@ namespace SystemAvailabilityManager {
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 ) {
 				HybridVentSysAvailMgrData( SysAvailNum ).VentilationName = cAlphaArgs( 10 );
 				if ( TotVentilation > 0 ) {
-					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( cAlphaArgs( 10 ), Ventilation.Name(), TotVentilation );
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( cAlphaArgs( 10 ), Ventilation );
 					HybridVentSysAvailMaster( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
 					SchedMax = GetScheduleMaxValue( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr );
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr <= 0 && int( SchedMax ) == 1 ) {
@@ -4150,7 +4439,7 @@ namespace SystemAvailabilityManager {
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 && HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr > 0 ) {
 				if ( HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum != Ventilation( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr ).ZonePtr ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-					ShowContinueError( "The Zone name specified in the Ventilation " "object " + Zone( Ventilation( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr ).ZonePtr ).Name );
+					ShowContinueError( "The Zone name specified in the Ventilation object " + Zone( Ventilation( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr ).ZonePtr ).Name );
 					ShowContinueError( "is not equal to the " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 					ErrorsFound = true;
 				}
@@ -4281,7 +4570,7 @@ namespace SystemAvailabilityManager {
 			// Ensure the controlled zone is listed and defined in an HVAC Air Loop
 			for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
 				if ( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 && TotVentilation > 0 && HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr == 0 ) {
-					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( HybridVentSysAvailMgrData( SysAvailNum ).VentilationName, Ventilation.Name(), TotVentilation );
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( HybridVentSysAvailMgrData( SysAvailNum ).VentilationName, Ventilation );
 					HybridVentSysAvailMaster( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
 					SchedMax = GetScheduleMaxValue( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr );
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr <= 0 && int( SchedMax ) == 1 ) {
@@ -4313,7 +4602,7 @@ namespace SystemAvailabilityManager {
 							break;
 						}
 					}
-					if ( any( HybridVentSysAvailMgrData.HybridVentMgrConnectedToAirLoop() ) ) {
+					if ( std::any_of( HybridVentSysAvailMgrData.begin(), HybridVentSysAvailMgrData.end(), []( SystemAvailabilityManager::DefineHybridVentSysAvailManager const & e ){ return e.HybridVentMgrConnectedToAirLoop; } ) ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum && HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 ) {
 							for ( HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum ) {
 								if ( ! HybridVentSysAvailMgrData( HybridVentNum ).HybridVentMgrConnectedToAirLoop && ( HybridVentNum != SysAvailNum ) ) {
@@ -4328,7 +4617,7 @@ namespace SystemAvailabilityManager {
 							}
 						}
 					} else {
-						HybridVentSysAvailMgrData.SimHybridVentSysAvailMgr() = true;
+						for ( auto & e : HybridVentSysAvailMgrData ) e.SimHybridVentSysAvailMgr = true;
 					}
 				}
 
@@ -4371,11 +4660,11 @@ namespace SystemAvailabilityManager {
 			HybridVentSysAvailWindModifier( SysAvailNum ) = -1.0;
 		}
 
-		if ( allocated( HybridVentSysAvailMgrData ) ) HybridVentSysAvailMgrData.AvailStatus() = NoAction;
+		if ( allocated( HybridVentSysAvailMgrData ) ) for ( auto & e : HybridVentSysAvailMgrData ) e.AvailStatus = NoAction;
 
 		for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) { // loop over the zone equipment types
 			if ( allocated( ZoneComp ) ) {
-				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs.AvailStatus() = NoAction;
+				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) for ( auto & e : ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs ) e.AvailStatus = NoAction;
 			}
 		}
 
@@ -4555,7 +4844,7 @@ namespace SystemAvailabilityManager {
 					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
 					++HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling." " Natural ventilation is not allowed." );
+						ShowWarningError( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling. Natural ventilation is not allowed." );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
 						ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...", HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
@@ -4577,7 +4866,7 @@ namespace SystemAvailabilityManager {
 				if ( NumHumidityControlZones == 0 ) {
 					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: Dew point control mode is selected, " "but no ZoneControl:Humidistat object=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+						ShowWarningError( "Hybrid ventilation control: Dew point control mode is selected, but no ZoneControl:Humidistat object=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 						ShowContinueError( "The hybrid ventilation control is triggered by outdoor min and max dewpoint only." );
 						ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
 						ShowContinueErrorTimeStamp( "" );
@@ -4605,7 +4894,7 @@ namespace SystemAvailabilityManager {
 				if ( ! found && NumHumidityControlZones > 0 ) {
 					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: The zone for dew point control mode is different from " "the zone for ZoneControl:Humidistat=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+						ShowWarningError( "Hybrid ventilation control: The zone for dew point control mode is different from the zone for ZoneControl:Humidistat=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 						ShowContinueError( "The Zone name for hybrid control is " + Zone( ZoneNum ).Name + ". Humidistat has no impact" );
 						ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
 						ShowContinueErrorTimeStamp( "" );
@@ -4632,7 +4921,7 @@ namespace SystemAvailabilityManager {
 		HybridVentSysAvailVentCtrl( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl;
 		if ( HybridVentSysAvailVentCtrl( SysAvailNum ) < 0 ) {
 			// Fatal error
-			ShowFatalError( "Hybrid ventilation control: the ventilation control status is beyond the range. " "Please check input of control mode schedule" );
+			ShowFatalError( "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule" );
 		}
 
 		if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
@@ -4776,29 +5065,6 @@ namespace SystemAvailabilityManager {
 		return VentControl;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SystemAvailabilityManager
 

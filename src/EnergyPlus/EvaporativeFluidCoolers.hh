@@ -1,10 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef EvaporativeFluidCoolers_hh_INCLUDED
 #define EvaporativeFluidCoolers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -59,7 +103,7 @@ namespace EvaporativeFluidCoolers {
 	// to design air flow rate
 	extern Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE EvaporativeFluidCoolers
 
@@ -84,16 +128,23 @@ namespace EvaporativeFluidCoolers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the evaporative fluid cooler [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; // true if design water rate was autosize on input
 		Real64 DesignSprayWaterFlowRate; // Design spray water flow rate through the evaporative fluid cooler [m3/s]
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the evaporative fluid cooler [kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through evaporative fluid cooler at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if high speed air rate was autosized
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; // true if high fan power was autosize on input
 		Real64 HighSpeedEvapFluidCoolerUA; // UA of evaporative fluid cooler at high fan speed [W/C]
+		bool HighSpeedEvapFluidCoolerUAWasAutoSized; // true if high speed UA was autosized on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through evaporative fluid cooler at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if low speed air rate was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed air flow rate []
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized; // true if low speed fan power set to autosize on input
 		Real64 LowSpeedFanPowerSizingFactor; // Sizing factor for low speed fan power []
 		Real64 LowSpeedEvapFluidCoolerUA; // UA of evaporative fluid cooler at low fan speed [W/C]
+		bool LowSpeedEvapFluidCoolerUAWasAutoSized; //true if low speed UA set to autosize on input
 		Real64 LowSpeedEvapFluidCoolerUASizingFactor; // sizing factor for low speed UA []
 		Real64 DesignEnteringWaterTemp; // Entering water temperature at design conditions
 		Real64 DesignEnteringAirTemp; // Design inlet air dry-bulb temperature (C)
@@ -165,16 +216,23 @@ namespace EvaporativeFluidCoolers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesignSprayWaterFlowRate( 0.0 ),
 			DesWaterMassFlowRate( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			HighSpeedEvapFluidCoolerUA( 0.0 ),
+			HighSpeedEvapFluidCoolerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedEvapFluidCoolerUA( 0.0 ),
+			LowSpeedEvapFluidCoolerUAWasAutoSized( false ),
 			LowSpeedEvapFluidCoolerUASizingFactor( 0.0 ),
 			DesignEnteringWaterTemp( 0.0 ),
 			DesignEnteringAirTemp( 0.0 ),
@@ -223,137 +281,6 @@ namespace EvaporativeFluidCoolers {
 			CompNum( 0 )
 		{}
 
-		// Member Constructor
-		EvapFluidCoolerspecs(
-			std::string const & Name, // User identifier
-			std::string const & EvapFluidCoolerType, // Type of evaporative fluid cooler
-			int const EvapFluidCoolerType_Num,
-			int const PerformanceInputMethod_Num,
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // Simulate the machine at it's operating part load ratio
-			Real64 const DesignWaterFlowRate, // Design water flow rate through the evaporative fluid cooler [m3/s]
-			Real64 const DesignSprayWaterFlowRate, // Design spray water flow rate through the evaporative fluid cooler [m3/s]
-			Real64 const DesWaterMassFlowRate, // Design water flow rate through the evaporative fluid cooler [kg/s]
-			Real64 const HighSpeedAirFlowRate, // Air flow rate through evaporative fluid cooler at high speed [m3/s]
-			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
-			Real64 const HighSpeedEvapFluidCoolerUA, // UA of evaporative fluid cooler at high fan speed [W/C]
-			Real64 const LowSpeedAirFlowRate, // Air flow rate through evaporative fluid cooler at low speed [m3/s]
-			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed air flow rate []
-			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
-			Real64 const LowSpeedFanPowerSizingFactor, // Sizing factor for low speed fan power []
-			Real64 const LowSpeedEvapFluidCoolerUA, // UA of evaporative fluid cooler at low fan speed [W/C]
-			Real64 const LowSpeedEvapFluidCoolerUASizingFactor, // sizing factor for low speed UA []
-			Real64 const DesignEnteringWaterTemp, // Entering water temperature at design conditions
-			Real64 const DesignEnteringAirTemp, // Design inlet air dry-bulb temperature (C)
-			Real64 const DesignEnteringAirWetBulbTemp, // Design inlet air wet-bulb temperature (C)
-			Real64 const EvapFluidCoolerMassFlowRateMultiplier, // Maximum evaporative fluid cooler flow rate is
-			Real64 const HeatRejectCapNomCapSizingRatio, // ratio of actual cap to nominal capacity []
-			Real64 const HighSpeedStandardDesignCapacity, // Standard Design Capacity of the evaporative fluid cooler [W]
-			Real64 const LowSpeedStandardDesignCapacity, // Standard Design Capacity of the evaporative fluid cooler [W]
-			Real64 const LowSpeedStandardDesignCapacitySizingFactor, // sizing factor for low speed capacity []
-			Real64 const HighSpeedUserSpecifiedDesignCapacity, // User specified design capacity [W]
-			Real64 const LowSpeedUserSpecifiedDesignCapacity, // User specified design capacity for at low speed for
-			Real64 const LowSpeedUserSpecifiedDesignCapacitySizingFactor, // sizing factor for low speed user capacity []
-			Real64 const Concentration, // fluid/glycol concentration - percent
-			int const FluidIndex, // Index to Property arrays
-			Real64 const SizFac, // sizing factor
-			int const WaterInletNodeNum, // Node number on the water inlet side of the evaporative fluid cooler
-			int const WaterOutletNodeNum, // Node number on the water outlet side of the evaporative fluid cooler
-			int const OutdoorAirInletNodeNum, // Node number of outdoor air inlet for the evaporative fluid cooler
-			int const BlowDownSchedulePtr, // Pointer to blow down schedule
-			int const HighMassFlowErrorCount, // Counter when mass flow rate is >
-			int const HighMassFlowErrorIndex, // Index for high mass flow recurring error message
-			int const OutletWaterTempErrorCount, // Counter when outlet water temperature is < minimum allowed temperature
-			int const OutletWaterTempErrorIndex, // Index for outlet water temperature recurring error message
-			int const SmallWaterMassFlowErrorCount, // Counter when water mass flow rate is very small
-			int const SmallWaterMassFlowErrorIndex, // Index for very small water mass flow rate recurring error message
-			int const WMFRLessThanMinAvailErrCount, // Counter when water mass flow rate is less than minimum available
-			int const WMFRLessThanMinAvailErrIndex, // Index for water mass flow rate less than minavail recurring message
-			int const WMFRGreaterThanMaxAvailErrCount, // Counter when water mass flow rate is greater than minimum available
-			int const WMFRGreaterThanMaxAvailErrIndex, // Index for water mass flow rate > minavail recurring message
-			int const EvapFluidCoolerAFRRFailedCount, // Counter for air flow rate ratio out of bounds error
-			int const EvapFluidCoolerAFRRFailedIndex, // Index for air flow rate ratio out of bounds error
-			int const CapacityControl, // Type of capacity control for single speed cooling tower:
-			Real64 const BypassFraction, // Fraction of fluid bypass as a ratio of total fluid flow
-			int const EvapLossMode, // sets how evaporative fluid cooler water evaporation is modeled
-			int const BlowdownMode, // sets how evaporative fluid cooler water blowdown is modeled
-			int const SchedIDBlowdown, // index "pointer" to schedule of blowdown in [m3/s]
-			int const WaterTankID, // index "pointer" to WaterStorage structure
-			int const WaterTankDemandARRID, // index "pointer" to demand array inside WaterStorage structure
-			Real64 const UserEvapLossFactor, // simple model [%/Delt C]
-			Real64 const DriftLossFraction,
-			Real64 const ConcentrationRatio, // ratio of solids in blowdown vs make up water
-			bool const SuppliedByWaterSystem,
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			EvapFluidCoolerType( EvapFluidCoolerType ),
-			EvapFluidCoolerType_Num( EvapFluidCoolerType_Num ),
-			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
-			Available( Available ),
-			ON( ON ),
-			DesignWaterFlowRate( DesignWaterFlowRate ),
-			DesignSprayWaterFlowRate( DesignSprayWaterFlowRate ),
-			DesWaterMassFlowRate( DesWaterMassFlowRate ),
-			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
-			HighSpeedFanPower( HighSpeedFanPower ),
-			HighSpeedEvapFluidCoolerUA( HighSpeedEvapFluidCoolerUA ),
-			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
-			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
-			LowSpeedFanPower( LowSpeedFanPower ),
-			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
-			LowSpeedEvapFluidCoolerUA( LowSpeedEvapFluidCoolerUA ),
-			LowSpeedEvapFluidCoolerUASizingFactor( LowSpeedEvapFluidCoolerUASizingFactor ),
-			DesignEnteringWaterTemp( DesignEnteringWaterTemp ),
-			DesignEnteringAirTemp( DesignEnteringAirTemp ),
-			DesignEnteringAirWetBulbTemp( DesignEnteringAirWetBulbTemp ),
-			EvapFluidCoolerMassFlowRateMultiplier( EvapFluidCoolerMassFlowRateMultiplier ),
-			HeatRejectCapNomCapSizingRatio( HeatRejectCapNomCapSizingRatio ),
-			HighSpeedStandardDesignCapacity( HighSpeedStandardDesignCapacity ),
-			LowSpeedStandardDesignCapacity( LowSpeedStandardDesignCapacity ),
-			LowSpeedStandardDesignCapacitySizingFactor( LowSpeedStandardDesignCapacitySizingFactor ),
-			HighSpeedUserSpecifiedDesignCapacity( HighSpeedUserSpecifiedDesignCapacity ),
-			LowSpeedUserSpecifiedDesignCapacity( LowSpeedUserSpecifiedDesignCapacity ),
-			LowSpeedUserSpecifiedDesignCapacitySizingFactor( LowSpeedUserSpecifiedDesignCapacitySizingFactor ),
-			Concentration( Concentration ),
-			FluidIndex( FluidIndex ),
-			SizFac( SizFac ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			OutdoorAirInletNodeNum( OutdoorAirInletNodeNum ),
-			BlowDownSchedulePtr( BlowDownSchedulePtr ),
-			HighMassFlowErrorCount( HighMassFlowErrorCount ),
-			HighMassFlowErrorIndex( HighMassFlowErrorIndex ),
-			OutletWaterTempErrorCount( OutletWaterTempErrorCount ),
-			OutletWaterTempErrorIndex( OutletWaterTempErrorIndex ),
-			SmallWaterMassFlowErrorCount( SmallWaterMassFlowErrorCount ),
-			SmallWaterMassFlowErrorIndex( SmallWaterMassFlowErrorIndex ),
-			WMFRLessThanMinAvailErrCount( WMFRLessThanMinAvailErrCount ),
-			WMFRLessThanMinAvailErrIndex( WMFRLessThanMinAvailErrIndex ),
-			WMFRGreaterThanMaxAvailErrCount( WMFRGreaterThanMaxAvailErrCount ),
-			WMFRGreaterThanMaxAvailErrIndex( WMFRGreaterThanMaxAvailErrIndex ),
-			EvapFluidCoolerAFRRFailedCount( EvapFluidCoolerAFRRFailedCount ),
-			EvapFluidCoolerAFRRFailedIndex( EvapFluidCoolerAFRRFailedIndex ),
-			CapacityControl( CapacityControl ),
-			BypassFraction( BypassFraction ),
-			EvapLossMode( EvapLossMode ),
-			BlowdownMode( BlowdownMode ),
-			SchedIDBlowdown( SchedIDBlowdown ),
-			WaterTankID( WaterTankID ),
-			WaterTankDemandARRID( WaterTankDemandARRID ),
-			UserEvapLossFactor( UserEvapLossFactor ),
-			DriftLossFraction( DriftLossFraction ),
-			ConcentrationRatio( ConcentrationRatio ),
-			SuppliedByWaterSystem( SuppliedByWaterSystem ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
 	};
 
 	struct EvapFluidCoolerInletConds
@@ -373,22 +300,6 @@ namespace EvaporativeFluidCoolers {
 			AirPress( 0.0 ),
 			AirHumRat( 0.0 )
 		{}
-
-		// Member Constructor
-		EvapFluidCoolerInletConds(
-			Real64 const WaterTemp, // Evaporative fluid cooler water inlet temperature (C)
-			Real64 const AirTemp, // Evaporative fluid cooler air inlet dry-bulb temperature (C)
-			Real64 const AirWetBulb, // Evaporative fluid cooler air inlet wet-bulb temperature (C)
-			Real64 const AirPress, // Evaporative fluid cooler air barometric pressure
-			Real64 const AirHumRat // Evaporative fluid cooler air inlet humidity ratio (kg/kg)
-		) :
-			WaterTemp( WaterTemp ),
-			AirTemp( AirTemp ),
-			AirWetBulb( AirWetBulb ),
-			AirPress( AirPress ),
-			AirHumRat( AirHumRat )
-		{}
-
 	};
 
 	struct ReportVars
@@ -440,60 +351,12 @@ namespace EvaporativeFluidCoolers {
 			StarvedMakeUpVol( 0.0 ),
 			BypassFraction( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const InletWaterTemp, // Evaporative fluid cooler inlet water temperature (C)
-			Real64 const OutletWaterTemp, // Evaporative fluid cooler outlet water temperature (C)
-			Real64 const WaterMassFlowRate, // Evaporative fluid cooler water mass flow rate (m3/s)
-			Real64 const Qactual, // Evaporative fluid cooler heat rejection rate (W)
-			Real64 const FanPower, // Evaporative fluid cooler fan power (W)
-			Real64 const FanEnergy, // Evaporative fluid cooler fan energy consumption (J)
-			Real64 const AirFlowRatio, // Air flow ratio through variable speed evaporative fluid cooler
-			Real64 const WaterAmountUsed, // Evaporative fluid cooler make up water usage (m3)
-			Real64 const EvaporationVdot,
-			Real64 const EvaporationVol,
-			Real64 const DriftVdot,
-			Real64 const DriftVol,
-			Real64 const BlowdownVdot,
-			Real64 const BlowdownVol,
-			Real64 const MakeUpVdot,
-			Real64 const MakeUpVol,
-			Real64 const TankSupplyVdot,
-			Real64 const TankSupplyVol,
-			Real64 const StarvedMakeUpVdot,
-			Real64 const StarvedMakeUpVol,
-			Real64 const BypassFraction // Added for fluid bypass
-		) :
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			Qactual( Qactual ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy ),
-			AirFlowRatio( AirFlowRatio ),
-			WaterAmountUsed( WaterAmountUsed ),
-			EvaporationVdot( EvaporationVdot ),
-			EvaporationVol( EvaporationVol ),
-			DriftVdot( DriftVdot ),
-			DriftVol( DriftVol ),
-			BlowdownVdot( BlowdownVdot ),
-			BlowdownVol( BlowdownVol ),
-			MakeUpVdot( MakeUpVdot ),
-			MakeUpVol( MakeUpVol ),
-			TankSupplyVdot( TankSupplyVdot ),
-			TankSupplyVol( TankSupplyVol ),
-			StarvedMakeUpVdot( StarvedMakeUpVdot ),
-			StarvedMakeUpVol( StarvedMakeUpVol ),
-			BypassFraction( BypassFraction )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
-	extern FArray1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
-	extern FArray1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
+	extern Array1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
+	extern Array1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
+	extern Array1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
 
 	// Functions
 
@@ -562,7 +425,7 @@ namespace EvaporativeFluidCoolers {
 	Real64
 	SimpleEvapFluidCoolerUAResidual(
 		Real64 const UA, // UA of evaporative fluid cooler
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design evaporative fluid cooler load [W]
+		Array1< Real64 > const & Par // par(1) = design evaporative fluid cooler load [W]
 	);
 
 	// End of the EvaporativeFluidCoolers Module Simulation Subroutines
@@ -588,29 +451,6 @@ namespace EvaporativeFluidCoolers {
 		bool const RunFlag,
 		int const EvapFluidCoolerNum
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // EvaporativeFluidCoolers
 

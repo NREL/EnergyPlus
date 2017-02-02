@@ -1,0 +1,36 @@
+\section{High Level HVAC Calling Tree (schematic -- not all routines are shown)}\label{high-level-hvac-calling-tree-schematic-not-all-routines-are-shown}
+
+ManageHVAC (in HVACManager)
+
+\begin{itemize}
+\tightlist
+\item
+  ZoneAirUpdate(`PREDICT', . . .) (in HVACManager)
+\end{itemize}
+
+\emph{estimate the zone heating or cooling demand}
+
+\emph{~}
+
+\begin{itemize}
+\item
+  SimHVAC (in HVACManager)
+\item
+  ManageSetPoints (in SetPointManager)
+\item
+  SimSelectedEquipment (in HVACManager)
+\item
+  ManageAirLoops (in SimAirServingZones)
+\item
+  ManageZoneEquipment (in ZoneEquipmentManager)
+\item
+  ManageElectricLoadCenters (in ElectricPowerManager)
+\item
+  ManagePlantLoops (in PlantManager)
+\item
+  ZoneAirUpdate(`CORRECT', . . .) (in HVACManager)
+\end{itemize}
+
+From the amount of heating and cooling actually provided by the HVAC system, calculate the zone temperatures.
+
+Each of the ``Manage'' routines has a different structure, since the simulation to be performed is different in each case.~ We will show schematic calling trees for several of the ``Manage'' routines.

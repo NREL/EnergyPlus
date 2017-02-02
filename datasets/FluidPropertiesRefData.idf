@@ -13,9 +13,7 @@
 !                Property Data for Refrigerant   R11
 !
 ! =============================================================================
-
-!  Version,
-!    8.0;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   FluidProperties:Name,
     R11,                     !- Fluid Name

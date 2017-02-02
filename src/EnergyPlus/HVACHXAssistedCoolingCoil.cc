@@ -1,8 +1,53 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -70,11 +115,11 @@ namespace HVACHXAssistedCoolingCoil {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotalNumHXAssistedCoils( 0 ); // The total number of HXAssistedCoolingCoil compound objects
-	FArray1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
-	FArray1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+	Array1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
+	Array1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
 	// PUBLIC so others can access this information
 	bool GetCoilsInputFlag( true ); // Flag to allow input data to be retrieved from idf on first call to this subroutine
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -96,7 +141,7 @@ namespace HVACHXAssistedCoolingCoil {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< HXAssistedCoilParameters > HXAssistedCoil;
+	Array1D< HXAssistedCoilParameters > HXAssistedCoil;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -168,7 +213,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// Find the correct HXAssistedCoolingCoil number
 		if ( CompIndex == 0 ) {
-			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil );
 			if ( HXAssistedCoilNum == 0 ) {
 				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );
 			}
@@ -250,7 +295,6 @@ namespace HVACHXAssistedCoolingCoil {
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
@@ -296,12 +340,12 @@ namespace HVACHXAssistedCoolingCoil {
 		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
 		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -337,7 +381,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -458,7 +502,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -804,7 +848,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil );
 		} else {
 			HXDXCoilIndex = 0;
 		}
@@ -822,7 +866,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	CheckHXAssistedCoolingCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -874,7 +918,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
 			if ( TotalNumHXAssistedCoils > 0 ) {
-				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil );
 			} else {
 				HXAssistedCoilNum = 0;
 			}
@@ -959,7 +1003,7 @@ namespace HVACHXAssistedCoolingCoil {
 		errFlag = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1058,7 +1102,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1140,7 +1184,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1213,7 +1257,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1285,7 +1329,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1364,7 +1408,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1378,6 +1422,77 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		return NodeNumber;
+
+	}
+
+	std::string
+	GetHXDXCoilType(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad, FSEC
+		//       DATE WRITTEN   September 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and returns the cooling coil type.  If
+		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
+		// is returned as blank
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Return value
+		std::string DXCoilType; // returned type of cooling coil
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
+		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data
+			// Get the HXAssistedCoolingCoil input
+			GetHXAssistedCoolingCoilInput();
+			GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( TotalNumHXAssistedCoils > 0 ) {
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+		} else {
+			WhichCoil = 0;
+		}
+
+		if ( WhichCoil != 0 ) {
+			DXCoilType = HXAssistedCoil( WhichCoil ).CoolingCoilType;
+		} else {
+			ShowSevereError( "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ErrorsFound = true;
+			DXCoilType = "";
+		}
+
+		return DXCoilType;
 
 	}
 
@@ -1436,7 +1551,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		//  HXAssistedCoil(HXAssistedCoilNum)%CoolingCoilName            = AlphArray(7)
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1507,7 +1622,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1579,7 +1694,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1647,7 +1762,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1722,7 +1837,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 
 			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
@@ -1800,7 +1915,6 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
-		static int ErrCount( 0 );
 
 		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data
@@ -1811,7 +1925,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 
 			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
@@ -1890,7 +2004,7 @@ namespace HVACHXAssistedCoolingCoil {
 		Found = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( HXName, HXAssistedCoil.HeatExchangerName(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( HXName, HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1907,31 +2021,6 @@ namespace HVACHXAssistedCoolingCoil {
 
 	//        End of Utility subroutines for the HXAssistedCoil Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACHXAssistedCoolingCoil
 

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -22,54 +22,40 @@
 #include <cstddef>
 #include <ios>
 #include <limits>
-#include <typeinfo>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
 template< class A, class B >
 inline
 bool
-same_type_as( A const & a, B const & b )
+same_type_as( A const &, B const & )
 {
-	return ( typeid( a ) == typeid( b ) );
+	return std::is_same< A, B >::value;
 }
 
 template< class A, class B >
 inline
 bool
-SAME_TYPE_AS( A const & a, B const & b )
+SAME_TYPE_AS( A const &, B const & )
 {
-	return ( typeid( a ) == typeid( b ) );
+	return std::is_same< A, B >::value;
 }
 
 template< class A, class B >
 inline
 bool
-extends_type_of( A const & a, B const & b )
+extends_type_of( A const &, B const & )
 {
-#ifdef OBJEXXFCL_FULL_EXTENDS_TYPE_OF // Full support for dynamic type of b
-	if ( typeid( a ) == typeid( b ) ) { // Simpler than adding double dispatch to all classes
-		return true;
-	} else if ( a.super() ) { // Requires virtual super() returning pointer to super class
-		return extends_type_of( *a.super(), b ); // Recurse up inheritance hierarchy
-	} else {
-		return false;
-	}
-#else // Support for static type of b
-	assert( typeid( b ) == typeid( B ) ); // Check that we are safe using simple support
-#ifdef NDEBUG
-	static_cast< void >( b ); // Suppress unused warning
-#endif
-	return ( dynamic_cast< B const * >( &a ) != nullptr );
-#endif
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 template< class A, class B >
 inline
 bool
-EXTENDS_TYPE_OF( A const & a, B const & b )
+EXTENDS_TYPE_OF( A const &, B const & )
 {
-	return extends_type_of( a, b );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // is_a: Type Test for const Reference Argument
@@ -116,7 +102,6 @@ struct TypeTraits
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -125,7 +110,6 @@ struct TypeTraits
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -134,46 +118,24 @@ struct TypeTraits
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0; // No precision for generic types
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 0; // No minimum width for generic types
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 0; // No minimum width for generic types
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 0; // Field width
+	static int const iwidth = 0; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits char Specialization
 template<>
@@ -183,7 +145,6 @@ struct TypeTraits< char >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -192,7 +153,6 @@ struct TypeTraits< char >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -201,46 +161,24 @@ struct TypeTraits< char >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 1;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 1;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 1; // Field width
+	static int const iwidth = 1; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits signed char Specialization
 template<>
@@ -250,7 +188,6 @@ struct TypeTraits< signed char >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -259,7 +196,6 @@ struct TypeTraits< signed char >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -268,46 +204,24 @@ struct TypeTraits< signed char >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 1;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 1;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 1; // Field width
+	static int const iwidth = 1; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits unsigned char Specialization
 template<>
@@ -317,7 +231,6 @@ struct TypeTraits< unsigned char >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -326,7 +239,6 @@ struct TypeTraits< unsigned char >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -335,46 +247,24 @@ struct TypeTraits< unsigned char >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 1;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 1;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 1; // Field width
+	static int const iwidth = 1; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits bool Specialization
 template<>
@@ -384,7 +274,6 @@ struct TypeTraits< bool >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -393,7 +282,6 @@ struct TypeTraits< bool >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -402,46 +290,24 @@ struct TypeTraits< bool >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 2;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 2;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 2; // Field width
+	static int const iwidth = 2; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits byte Specialization
 template<>
@@ -451,7 +317,6 @@ struct TypeTraits< byte >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -460,7 +325,6 @@ struct TypeTraits< byte >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -469,46 +333,24 @@ struct TypeTraits< byte >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 7;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 7;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 7; // Field width
+	static int const iwidth = 7; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits ubyte Specialization
 template<>
@@ -518,7 +360,6 @@ struct TypeTraits< ubyte >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -527,7 +368,6 @@ struct TypeTraits< ubyte >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -536,46 +376,24 @@ struct TypeTraits< ubyte >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 7;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 7;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 7; // Field width
+	static int const iwidth = 7; // Field width
+	static Size const loc_2_crossover = 300u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits short int Specialization
 template<>
@@ -585,7 +403,6 @@ struct TypeTraits< short int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -594,7 +411,6 @@ struct TypeTraits< short int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -603,46 +419,24 @@ struct TypeTraits< short int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 7;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 7;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 7; // Field width
+	static int const iwidth = 7; // Field width
+	static Size const loc_2_crossover = 275u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits unsigned short int Specialization
 template<>
@@ -652,7 +446,6 @@ struct TypeTraits< unsigned short int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -661,7 +454,6 @@ struct TypeTraits< unsigned short int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -670,46 +462,24 @@ struct TypeTraits< unsigned short int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 7;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 7;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 7; // Field width
+	static int const iwidth = 7; // Field width
+	static Size const loc_2_crossover = 275u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits int Specialization
 template<>
@@ -719,7 +489,6 @@ struct TypeTraits< int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -728,7 +497,6 @@ struct TypeTraits< int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -737,46 +505,24 @@ struct TypeTraits< int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 12;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 12;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 12; // Field width
+	static int const iwidth = 12; // Field width
+	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 11u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits unsigned int Specialization
 template<>
@@ -786,7 +532,6 @@ struct TypeTraits< unsigned int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -795,7 +540,6 @@ struct TypeTraits< unsigned int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -804,46 +548,24 @@ struct TypeTraits< unsigned int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 12;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 12;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 12; // Field width
+	static int const iwidth = 12; // Field width
+	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 11u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits long int Specialization
 template<>
@@ -853,7 +575,6 @@ struct TypeTraits< long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -862,7 +583,6 @@ struct TypeTraits< long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -871,46 +591,24 @@ struct TypeTraits< long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 23; // Field width
+	static int const iwidth = 23; // Field width
+	static Size const loc_2_crossover = 170u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits unsigned long int Specialization
 template<>
@@ -920,7 +618,6 @@ struct TypeTraits< unsigned long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -929,7 +626,6 @@ struct TypeTraits< unsigned long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -938,46 +634,24 @@ struct TypeTraits< unsigned long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 23; // Field width
+	static int const iwidth = 23; // Field width
+	static Size const loc_2_crossover = 170u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits long long int Specialization
 template<>
@@ -987,7 +661,6 @@ struct TypeTraits< long long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -996,7 +669,6 @@ struct TypeTraits< long long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1005,46 +677,24 @@ struct TypeTraits< long long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 23; // Field width
+	static int const iwidth = 23; // Field width
+	static Size const loc_2_crossover = 145u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits unsigned long long int Specialization
 template<>
@@ -1054,7 +704,6 @@ struct TypeTraits< unsigned long long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1063,7 +712,6 @@ struct TypeTraits< unsigned long long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1072,46 +720,24 @@ struct TypeTraits< unsigned long long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 0;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 23; // Big enough for 64-bit LP64 representation
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 0; // Precision
+	static Size const width = 23; // Field width
+	static int const iwidth = 23; // Field width
+	static Size const loc_2_crossover = 145u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits float Specialization
 template<>
@@ -1121,7 +747,6 @@ struct TypeTraits< float >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1130,7 +755,6 @@ struct TypeTraits< float >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1139,46 +763,24 @@ struct TypeTraits< float >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 8;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 15;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 15;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 8; // Precision
+	static Size const width = 15; // Field width
+	static int const iwidth = 15; // Field width
+	static Size const loc_2_crossover = 200u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits double Specialization
 template<>
@@ -1188,7 +790,6 @@ struct TypeTraits< double >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1197,7 +798,6 @@ struct TypeTraits< double >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1206,46 +806,24 @@ struct TypeTraits< double >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 16;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 23;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 23;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 16; // Precision
+	static Size const width = 23; // Field width
+	static int const iwidth = 23; // Field width
+	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits long double Specialization
 template<>
@@ -1255,7 +833,6 @@ struct TypeTraits< long double >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1264,7 +841,6 @@ struct TypeTraits< long double >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1273,46 +849,24 @@ struct TypeTraits< long double >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 33; // Big enough for 128-bit representation
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 42; // Big enough for 128-bit representation
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 42; // Big enough for 128-bit representation
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 33; // Precision
+	static Size const width = 42; // Field width
+	static int const iwidth = 42; // Field width
+	static Size const loc_2_crossover = ( sizeof( traits_type ) >= 16 ? 125u : 150u ); // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = ( sizeof( traits_type ) >= 16 ? 600u : 10u ); // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = ( sizeof( traits_type ) >= 16 ? 400u : 10u ); // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits std::complex< float > Specialization
 template<>
@@ -1323,7 +877,6 @@ struct TypeTraits< std::complex< float > >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1332,7 +885,6 @@ struct TypeTraits< std::complex< float > >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1341,46 +893,24 @@ struct TypeTraits< std::complex< float > >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 8;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 33;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 33;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 8; // Precision
+	static Size const width = 33; // Field width
+	static int const iwidth = 33; // Field width
+	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits std::complex< double > Specialization
 template<>
@@ -1391,7 +921,6 @@ struct TypeTraits< std::complex< double > >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1400,7 +929,6 @@ struct TypeTraits< std::complex< double > >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1409,46 +937,24 @@ struct TypeTraits< std::complex< double > >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 16;
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 49;
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 49;
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 16; // Precision
+	static Size const width = 49; // Field width
+	static int const iwidth = 49; // Field width
+	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 // TypeTraits: Type Traits std::complex< long double > Specialization
 template<>
@@ -1459,7 +965,6 @@ struct TypeTraits< std::complex< long double > >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1468,7 +973,6 @@ struct TypeTraits< std::complex< long double > >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1477,46 +981,24 @@ struct TypeTraits< std::complex< long double > >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
-	// Precision
-	inline
-	static
-	std::streamsize
-	precision()
-	{
-		return 33; // Big enough for 128-bit representation
-	}
-
-	// Field Width
-	inline
-	static
-	Size
-	width()
-	{
-		return 83; // Big enough for 128-bit representation
-	}
-
-	// Field Width
-	inline
-	static
-	int
-	iwidth()
-	{
-		return 83; // Big enough for 128-bit representation
-	}
-
-}; // TypeTraits
+	static std::streamsize const precision = 33; // Precision
+	static Size const width = 83; // Field width
+	static int const iwidth = 83; // Field width
+	static Size const loc_2_crossover = 100u; // Array 2D min/max location crossover
+	static Size const matmul_1_2_crossover = 10u; // Array 1D x 2D multiplication crossover
+	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
+};
 
 } // ObjexxFCL
 

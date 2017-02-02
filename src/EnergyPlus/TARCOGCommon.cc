@@ -1,7 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -132,42 +179,29 @@ namespace TARCOGCommon {
 	void
 	matrixQBalance(
 		int const nlayer,
-		FArray2A< Real64 > a,
-		FArray1A< Real64 > b,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const hcgas,
+		Array2< Real64 > & a,
+		Array1< Real64 > & b,
+		Array1< Real64 > const & scon,
+		Array1< Real64 > const & thick,
+		Array1< Real64 > const & hcgas,
 		Real64 const hcout,
 		Real64 const hcin,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const qv,
+		Array1< Real64 > const & asol,
+		Array1< Real64 > const & qv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
 		Real64 const Gout,
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const rir,
-		FArray1A< Real64 > const emis
+		Array1< Real64 > const & theta,
+		Array1< Real64 > const & tir,
+		Array1< Real64 > const & rir,
+		Array1< Real64 > const & emis
 	)
 	{
 
 		// Using/Aliasing
 		using DataGlobals::StefanBoltzmann;
 		using namespace TARCOGParams;
-
-		// Argument array dimensioning
-		a.dim( 4*nlayer, 4*nlayer );
-		b.dim( 4*nlayer );
-		scon.dim( maxlay );
-		thick.dim( maxlay );
-		hcgas.dim( maxlay1 );
-		asol.dim( maxlay );
-		qv.dim( maxlay1 );
-		theta.dim( maxlay2 );
-		tir.dim( maxlay2 );
-		rir.dim( maxlay2 );
-		emis.dim( maxlay2 );
 
 		// Locals
 		// local variables
@@ -180,7 +214,7 @@ namespace TARCOGCommon {
 		for ( i = 1; i <= 4 * nlayer; ++i ) {
 			b( i ) = 0.0;
 			for ( j = 1; j <= 4 * nlayer; ++j ) {
-				a( i, j ) = 0.0;
+				a( j, i ) = 0.0;
 			}
 		}
 
@@ -198,30 +232,30 @@ namespace TARCOGCommon {
 			back = 2 * i;
 			if ( nlayer != 1 ) {
 				if ( i != 1 ) {
-					a( k, k - 3 ) = -hcgas( i );
-					a( k, k - 1 ) = -1.0;
-					a( k + 1, k - 3 ) = -hcgas( i );
-					a( k + 1, k - 1 ) = -1.0;
-					a( k + 2, k - 1 ) = rir( front );
-					a( k + 3, k - 1 ) = tir( front );
+					a( k - 3, k ) = -hcgas( i );
+					a( k - 1, k ) = -1.0;
+					a( k - 3, k + 1 ) = -hcgas( i );
+					a( k - 1, k + 1 ) = -1.0;
+					a( k - 1, k + 2 ) = rir( front );
+					a( k - 1, k + 3 ) = tir( front );
 				}
 				if ( i != nlayer ) {
-					a( k, k + 4 ) = -hcgas( i + 1 );
-					a( k, k + 6 ) = -1.0;
-					a( k + 2, k + 6 ) = tir( back );
-					a( k + 3, k + 6 ) = rir( back );
+					a( k + 4, k ) = -hcgas( i + 1 );
+					a( k + 6, k ) = -1.0;
+					a( k + 6, k + 2 ) = tir( back );
+					a( k + 6, k + 3 ) = rir( back );
 				}
 			}
 			a( k, k ) = hcgas( i );
-			a( k, k + 1 ) = hcgas( i + 1 );
-			a( k, k + 2 ) = 1.0;
-			a( k, k + 3 ) = 1.0;
-			a( k + 1, k ) = scon( i ) / thick( i ) + hcgas( i );
+			a( k + 1, k ) = hcgas( i + 1 );
+			a( k + 2, k ) = 1.0;
+			a( k + 3, k ) = 1.0;
+			a( k, k + 1 ) = scon( i ) / thick( i ) + hcgas( i );
 			a( k + 1, k + 1 ) = -scon( i ) / thick( i );
-			a( k + 1, k + 2 ) = 1.0;
-			a( k + 2, k ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
+			a( k + 2, k + 1 ) = 1.0;
+			a( k, k + 2 ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
 			a( k + 2, k + 2 ) = -1.0;
-			a( k + 3, k + 1 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
+			a( k + 1, k + 3 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
 			a( k + 3, k + 3 ) = -1.0;
 		}
 
@@ -249,8 +283,8 @@ namespace TARCOGCommon {
 
 	void
 	EquationsSolver(
-		FArray2A< Real64 > a,
-		FArray1A< Real64 > b,
+		Array2< Real64 > & a,
+		Array1< Real64 > & b,
 		int const n,
 		int & nperr,
 		std::string & ErrorMessage
@@ -270,12 +304,8 @@ namespace TARCOGCommon {
 		// Using/Aliasing
 		using namespace TARCOGParams;
 
-		// Argument array dimensioning
-		a.dim( n, n );
-		b.dim( n );
-
 		// Locals
-		FArray1D_int indx( n );
+		Array1D_int indx( n );
 		Real64 d;
 
 		ludcmp( a, n, indx, d, nperr, ErrorMessage );
@@ -289,21 +319,19 @@ namespace TARCOGCommon {
 
 	void
 	ludcmp(
-		FArray2A< Real64 > a,
+		Array2< Real64 > & a,
 		int const n,
-		FArray1A_int indx,
+		Array1_int & indx,
 		Real64 & d,
 		int & nperr,
 		std::string & ErrorMessage
 	)
 	{
 
-		// Argument array dimensioning
-		a.dim( n, n );
-		indx.dim( n );
-
 		// Locals
-		int const NMAX( 500 );
+		static int const NMAX( 500 );
+		static Array1D< Real64 > vv( NMAX );
+
 		Real64 const TINY( 1.0e-20 );
 
 		int i;
@@ -313,13 +341,12 @@ namespace TARCOGCommon {
 		Real64 aamax;
 		Real64 dum;
 		Real64 sum;
-		FArray1D< Real64 > vv( NMAX );
 
 		d = 1.0;
 		for ( i = 1; i <= n; ++i ) {
 			aamax = 0.0;
 			for ( j = 1; j <= n; ++j ) {
-				if ( std::abs( a( i, j ) ) > aamax ) aamax = std::abs( a( i, j ) );
+				if ( std::abs( a( j, i ) ) > aamax ) aamax = std::abs( a( j, i ) );
 			} // j
 			if ( aamax == 0.0 ) {
 				nperr = 13;
@@ -331,19 +358,19 @@ namespace TARCOGCommon {
 
 		for ( j = 1; j <= n; ++j ) {
 			for ( i = 1; i <= j - 1; ++i ) {
-				sum = a( i, j );
+				sum = a( j, i );
 				for ( k = 1; k <= i - 1; ++k ) {
-					sum -= a( i, k ) * a( k, j );
+					sum -= a( k, i ) * a( j, k );
 				} // k
-				a( i, j ) = sum;
+				a( j, i ) = sum;
 			} // i
 			aamax = 0.0;
 			for ( i = j; i <= n; ++i ) {
-				sum = a( i, j );
+				sum = a( j, i );
 				for ( k = 1; k <= j - 1; ++k ) {
-					sum -= a( i, k ) * a( k, j );
+					sum -= a( k, i ) * a( j, k );
 				} // k
-				a( i, j ) = sum;
+				a( j, i ) = sum;
 				dum = vv( i ) * std::abs( sum );
 				if ( dum >= aamax ) {
 					imax = i;
@@ -352,9 +379,9 @@ namespace TARCOGCommon {
 			} // i
 			if ( j != imax ) {
 				for ( k = 1; k <= n; ++k ) {
-					dum = a( imax, k );
-					a( imax, k ) = a( j, k );
-					a( j, k ) = dum;
+					dum = a( k, imax );
+					a( k, imax ) = a( k, j );
+					a( k, j ) = dum;
 				} // k
 				d = -d;
 				vv( imax ) = vv( j );
@@ -364,7 +391,7 @@ namespace TARCOGCommon {
 			if ( j != n ) {
 				dum = 1.0 / a( j, j );
 				for ( i = j + 1; i <= n; ++i ) {
-					a( i, j ) *= dum;
+					a( j, i ) *= dum;
 				} // i
 			}
 		} // j
@@ -373,10 +400,10 @@ namespace TARCOGCommon {
 
 	void
 	lubksb(
-		FArray2A< Real64 > const a,
+		Array2A< Real64 > const a,
 		int const n,
-		FArray1A_int const indx,
-		FArray1A< Real64 > b
+		Array1A_int const indx,
+		Array1A< Real64 > b
 	)
 	{
 		//***********************************************************************
@@ -401,7 +428,7 @@ namespace TARCOGCommon {
 			b( ll ) = b( i );
 			if ( ii != 0 ) {
 				for ( j = ii; j <= i - 1; ++j ) {
-					sum -= a( i, j ) * b( j );
+					sum -= a( j, i ) * b( j );
 				} // j
 			} else if ( sum != 0.0 ) {
 				ii = i;
@@ -412,7 +439,7 @@ namespace TARCOGCommon {
 		for ( i = n; i >= 1; --i ) {
 			sum = b( i );
 			for ( j = i + 1; j <= n; ++j ) {
-				sum -= a( i, j ) * b( j );
+				sum -= a( j, i ) * b( j );
 			} // j
 			b( i ) = sum / a( i, i );
 		} // i
@@ -432,29 +459,6 @@ namespace TARCOGCommon {
 
 		return pos;
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // TARCOGCommon
 

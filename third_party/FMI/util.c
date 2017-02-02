@@ -13,8 +13,8 @@
 ///
 /// This file provides utility functions for fmus
 ///
-/// Copyright (c) 2012, The Regents of the University of California, 
-/// through Lawrence Berkeley National Laboratory 
+/// Copyright (c) 2012, The Regents of the University of California,
+/// through Lawrence Berkeley National Laboratory
 /// subject to receipt of any required approvals from the U.S. Dept. of Energy.
 /// All rights reserved.
 ///////////////////////////////////////////////////////
@@ -57,14 +57,14 @@ int delete(char* tmpPat){
   if(stat(tmpPat,&st) != 0){
     printfError("Folder \"%s\" is not existing.\n", tmpPat);
     return -1;
-  }    
+  }
 
 	cmd = calloc(sizeof(char), strlen(tmpPat) +18);
 	if (cmd == NULL){
 	    printfError("Fail to allocate memory for cmd.\n", tmpPat);
 	    return -1;
 	  }
-  
+
   if (WINDOWS)
   	sprintf(cmd, "rd %s /S/Q", tmpPat); // Command in windows
   else
@@ -72,7 +72,7 @@ int delete(char* tmpPat){
 
 
 	printfDebug("Generated cmd: \"%s\".\n", cmd);
-	if ( system(cmd) != 0 ){	
+	if ( system(cmd) != 0 ){
 	//if(rmdir(tmpPat) != 0)
 	  printError("Fail to delete the temporary files");
 	  free(cmd);
@@ -95,12 +95,12 @@ char *getTmpPath(const char *nam, int length)
   char *tmpPat;
 
   tmpPat = calloc(sizeof(char), length+2);
-  
+
   // Define the temporary folder
   if(strncpy(tmpPat, nam, length) == NULL){
     printError("Fail to allocate memory for temp dir.\n");
     free(tmpPat);
-    return NULL;    
+    return NULL;
   }
   if(WINDOWS) strcat(tmpPat, "\\");
   else strcat(tmpPat, "/");
@@ -122,7 +122,7 @@ void setDebug( )
 //////////////////////////////////////////////////////////////////////////////
 /// Print debug message
 ///
-///\param msg Message to be printed for debugging 
+///\param msg Message to be printed for debugging
 //////////////////////////////////////////////////////////////////////////////
 void printDebug(const char* msg){
   if (debug == 1)
@@ -135,7 +135,7 @@ void printDebug(const char* msg){
 //////////////////////////////////////////////////////////////////////////////
 /// Print formatted debug message
 ///
-///\param str1 Message to be printed for debugging 
+///\param str1 Message to be printed for debugging
 ///\param str2 String variable to be printed for debugging
 //////////////////////////////////////////////////////////////////////////////
 void printfDebug(const char* str1, const char* str2){
@@ -149,7 +149,7 @@ void printfDebug(const char* str1, const char* str2){
 //////////////////////////////////////////////////////////////////////////////
 /// Print formatted debug message with Integer
 ///
-///\param str1 Message to be printed for debugging 
+///\param str1 Message to be printed for debugging
 ///\param integer Integer variable to be printed for debugging
 //////////////////////////////////////////////////////////////////////////////
 void printfIntDebug(const char* str1, const int integer){

@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef DataZoneControls_hh_INCLUDED
 #define DataZoneControls_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -30,12 +76,17 @@ namespace DataZoneControls {
 	extern int NumTempAndHumidityControlledZones; // number of zones with over cool control
 	extern bool AnyOpTempControl; // flag set true if any zones have op temp control
 	extern bool AnyZoneTempAndHumidityControl; // flag set true if any zones have over cool control
-	extern FArray1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
-	extern FArray1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
-	extern FArray1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
+	extern Array1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
+	extern Array1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
+	extern Array1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
 	extern bool GetZoneAirStatsInputFlag; // True when need to get input
 
 	// Types
+
+	// Clears the global data in DataZoneControls.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	struct ZoneTempControls
 	{
@@ -46,9 +97,9 @@ namespace DataZoneControls {
 		std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
 		int CTSchedIndex; // Index for this schedule
 		int NumControlTypes;
-		FArray1D_string ControlType;
-		FArray1D_string ControlTypeName;
-		FArray1D_int ControlTypeSchIndx;
+		Array1D_string ControlType;
+		Array1D_string ControlTypeName;
+		Array1D_int ControlTypeSchIndx;
 		int SchIndx_SingleHeatSetPoint;
 		int SchIndx_SingleCoolSetPoint;
 		int SchIndx_SingleHeatCoolSetPoint;
@@ -105,75 +156,6 @@ namespace DataZoneControls {
 			DehumidifyingSchedIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneTempControls(
-			std::string const & Name, // Name of the thermostat
-			std::string const & ZoneName, // Name of the zone
-			int const ActualZoneNum,
-			std::string const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
-			int const CTSchedIndex, // Index for this schedule
-			int const NumControlTypes,
-			FArray1_string const & ControlType,
-			FArray1_string const & ControlTypeName,
-			FArray1_int const & ControlTypeSchIndx,
-			int const SchIndx_SingleHeatSetPoint,
-			int const SchIndx_SingleCoolSetPoint,
-			int const SchIndx_SingleHeatCoolSetPoint,
-			int const SchIndx_DualSetPointWDeadBand,
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const HeatingResetLimit, // Lowest heating setpoint that can be set by demand manager [C]
-			Real64 const CoolingResetLimit, // Highest cooling setpoint that can be set by demand manager [C]
-			bool const EMSOverrideHeatingSetPointOn, // EMS is calling to override heating setpoint
-			Real64 const EMSOverrideHeatingSetPointValue, // value EMS is directing to use for heating setpoint [C]
-			bool const EMSOverrideCoolingSetPointOn, // EMS is calling to override cooling setpoint
-			Real64 const EMSOverrideCoolingSetPointValue, // value EMS is directing to use for cooling setpoint [C]
-			bool const OperativeTempControl, // flag to indicate whether control based on Operative Temp
-			bool const OpTempCntrlModeScheduled, // flag to indicate if radiative fraction is scheduled,
-			Real64 const FixedRadiativeFraction, // weighting factor for mean radiant temp for Operative temperature
-			int const OpTempRadiativeFractionSched, // index of schedule for when fraction is scheduled
-			Real64 const ZoneOvercoolRange, // Zone overcool temperature range (max), deg C
-			bool const ZoneOvercoolControl, // Flag to indicate whether control is based on overcool
-			bool const OvercoolCntrlModeScheduled, // Flag to indicate if zone overcool range is scheduled
-			Real64 const ZoneOvercoolConstRange, // Overcool Range for Zone Air Setpoint Temperature [deltaC]
-			int const ZoneOvercoolRangeSchedIndex, // Index for Overcool Range Schedule
-			Real64 const ZoneOvercoolControlRatio, // Zone relative humidity shift per dry-bulb temperature overcooling
-			std::string const & DehumidifyingSched, // Name of the schedule to determine the zone dehumidifying setpoint
-			int const DehumidifyingSchedIndex // Index for dehumidifying schedule
-		) :
-			Name( Name ),
-			ZoneName( ZoneName ),
-			ActualZoneNum( ActualZoneNum ),
-			ControlTypeSchedName( ControlTypeSchedName ),
-			CTSchedIndex( CTSchedIndex ),
-			NumControlTypes( NumControlTypes ),
-			ControlType( ControlType ),
-			ControlTypeName( ControlTypeName ),
-			ControlTypeSchIndx( ControlTypeSchIndx ),
-			SchIndx_SingleHeatSetPoint( SchIndx_SingleHeatSetPoint ),
-			SchIndx_SingleCoolSetPoint( SchIndx_SingleCoolSetPoint ),
-			SchIndx_SingleHeatCoolSetPoint( SchIndx_SingleHeatCoolSetPoint ),
-			SchIndx_DualSetPointWDeadBand( SchIndx_DualSetPointWDeadBand ),
-			ManageDemand( ManageDemand ),
-			HeatingResetLimit( HeatingResetLimit ),
-			CoolingResetLimit( CoolingResetLimit ),
-			EMSOverrideHeatingSetPointOn( EMSOverrideHeatingSetPointOn ),
-			EMSOverrideHeatingSetPointValue( EMSOverrideHeatingSetPointValue ),
-			EMSOverrideCoolingSetPointOn( EMSOverrideCoolingSetPointOn ),
-			EMSOverrideCoolingSetPointValue( EMSOverrideCoolingSetPointValue ),
-			OperativeTempControl( OperativeTempControl ),
-			OpTempCntrlModeScheduled( OpTempCntrlModeScheduled ),
-			FixedRadiativeFraction( FixedRadiativeFraction ),
-			OpTempRadiativeFractionSched( OpTempRadiativeFractionSched ),
-			ZoneOvercoolRange( ZoneOvercoolRange ),
-			ZoneOvercoolControl( ZoneOvercoolControl ),
-			OvercoolCntrlModeScheduled( OvercoolCntrlModeScheduled ),
-			ZoneOvercoolConstRange( ZoneOvercoolConstRange ),
-			ZoneOvercoolRangeSchedIndex( ZoneOvercoolRangeSchedIndex ),
-			ZoneOvercoolControlRatio( ZoneOvercoolControlRatio ),
-			DehumidifyingSched( DehumidifyingSched ),
-			DehumidifyingSchedIndex( DehumidifyingSchedIndex )
-		{}
-
 	};
 
 	struct ZoneHumidityControls
@@ -204,35 +186,6 @@ namespace DataZoneControls {
 			EMSOverrideDehumidifySetPointValue( 0.0 )
 		{}
 
-		// Member Constructor
-		ZoneHumidityControls(
-			std::string const & ControlName, // Name of this humidity controller
-			std::string const & ZoneName, // Name of the zone
-			std::string const & HumidifyingSched, // Name of the schedule to determine the zone humidifying setpoint
-			std::string const & DehumidifyingSched, // Name of the schedule to determine the zone dehumidifying setpoint
-			int const ActualZoneNum,
-			int const HumidifyingSchedIndex, // Index for humidifying schedule
-			int const DehumidifyingSchedIndex, // Index for dehumidifying schedule
-			int const ErrorIndex, // Error index when LowRH setpoint > HighRH setpoint
-			bool const EMSOverrideHumidifySetPointOn, // EMS is calling to override humidifying setpoint
-			Real64 const EMSOverrideHumidifySetPointValue, // value EMS is directing to use for humidifying setpoint
-			bool const EMSOverrideDehumidifySetPointOn, // EMS is calling to override dehumidifying setpoint
-			Real64 const EMSOverrideDehumidifySetPointValue // value EMS is directing to use for dehumidifying setpoint
-		) :
-			ControlName( ControlName ),
-			ZoneName( ZoneName ),
-			HumidifyingSched( HumidifyingSched ),
-			DehumidifyingSched( DehumidifyingSched ),
-			ActualZoneNum( ActualZoneNum ),
-			HumidifyingSchedIndex( HumidifyingSchedIndex ),
-			DehumidifyingSchedIndex( DehumidifyingSchedIndex ),
-			ErrorIndex( ErrorIndex ),
-			EMSOverrideHumidifySetPointOn( EMSOverrideHumidifySetPointOn ),
-			EMSOverrideHumidifySetPointValue( EMSOverrideHumidifySetPointValue ),
-			EMSOverrideDehumidifySetPointOn( EMSOverrideDehumidifySetPointOn ),
-			EMSOverrideDehumidifySetPointValue( EMSOverrideDehumidifySetPointValue )
-		{}
-
 	};
 
 	struct ZoneComfortControls
@@ -244,9 +197,9 @@ namespace DataZoneControls {
 		std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
 		int ComfortSchedIndex; // Index for this schedule
 		int NumControlTypes; // Number of control types in ZoneControl:ThermalComfort object
-		FArray1D_string ControlType; // Type of control
-		FArray1D_string ControlTypeName; // Name of control type
-		FArray1D_int ControlTypeSchIndx; // Index to control type schedule
+		Array1D_string ControlType; // Type of control
+		Array1D_string ControlTypeName; // Name of control type
+		Array1D_int ControlTypeSchIndx; // Index to control type schedule
 		int SchIndx_SglHeatSetPointFanger; // Index to fanger single heating setpoint schedule
 		int SchIndx_SglCoolSetPointFanger; // Index to fanger single cooling setpoint schedule
 		int SchIndx_SglHCSetPointFanger; // Index to fanger single heating/cooling setpoint schedule
@@ -316,91 +269,6 @@ namespace DataZoneControls {
 			TdbDualMinErrIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneComfortControls(
-			std::string const & Name, // Name of the thermostat
-			std::string const & ZoneName, // Name of the zone
-			int const ActualZoneNum, // Index number of zone
-			std::string const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
-			int const ComfortSchedIndex, // Index for this schedule
-			int const NumControlTypes, // Number of control types in ZoneControl:ThermalComfort object
-			FArray1_string const & ControlType, // Type of control
-			FArray1_string const & ControlTypeName, // Name of control type
-			FArray1_int const & ControlTypeSchIndx, // Index to control type schedule
-			int const SchIndx_SglHeatSetPointFanger, // Index to fanger single heating setpoint schedule
-			int const SchIndx_SglCoolSetPointFanger, // Index to fanger single cooling setpoint schedule
-			int const SchIndx_SglHCSetPointFanger, // Index to fanger single heating/cooling setpoint schedule
-			int const SchIndx_DualSetPointFanger, // Index to fanger dual setpoint schedule
-			int const SchIndx_SglHeatSetPointPierce, // Index to pierce single heating setpoint schedule
-			int const SchIndx_SglCoolSetPointPierce, // Index to pierce single cooling setpoint schedule
-			int const SchIndx_SglHCSetPointPierce, // Index to pierce single heating/cooling setpoint schedule
-			int const SchIndx_DualSetPointPierce, // Index to pierce dual setpoint schedule
-			int const SchIndx_SglHeatSetPointKSU, // Index to KSU single heating setpoint schedule
-			int const SchIndx_SglCoolSetPointKSU, // Index to KSU single cooling setpoint schedule
-			int const SchIndx_SglHCSetPointKSU, // Index to KSU single heating/cooling setpoint schedule
-			int const SchIndx_DualSetPointKSU, // Index to KSU dual setpoint schedule
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const HeatingResetLimit, // Lowest heating setpoint that can be set by demand manager [C]
-			Real64 const CoolingResetLimit, // Highest cooling setpoint that can be set by demand manager [C]
-			bool const EMSOverrideHeatingSetPointOn, // EMS is calling to override heating setpoint
-			Real64 const EMSOverrideHeatingSetPointValue, // value EMS is directing to use for heating setpoint
-			bool const EMSOverrideCoolingSetPointOn, // EMS is calling to override cooling setpoint
-			Real64 const EMSOverrideCoolingSetPointValue, // value EMS is directing to use for cooling setpoint
-			Real64 const TdbMaxSetPoint, // Maximum dry-bulb temperature setpoint [C]
-			Real64 const TdbMinSetPoint, // Minimum dry-bulb temperature setpoint [C]
-			std::string const & AverageMethodName, // Averaging Method for Zones with Multiple People Objects
-			std::string const & AverageObjectName, // Object Name for Specific Object Average
-			int const AverageMethodNum, // Numerical value for averaging method
-			int const SpecificObjectNum, // People Object number used for Specific people object choice
-			int const PeopleAverageErrIndex, // People average error index
-			int const TdbMaxErrIndex, // Single cooling setpoint error index
-			int const TdbMinErrIndex, // Single heating setpoint error index
-			int const TdbHCErrIndex, // Single heating cooling setpoint error index
-			int const TdbDualMaxErrIndex, // Dual cooling setpoint error index
-			int const TdbDualMinErrIndex // Dual heating setpoint error index
-		) :
-			Name( Name ),
-			ZoneName( ZoneName ),
-			ActualZoneNum( ActualZoneNum ),
-			ControlTypeSchedName( ControlTypeSchedName ),
-			ComfortSchedIndex( ComfortSchedIndex ),
-			NumControlTypes( NumControlTypes ),
-			ControlType( ControlType ),
-			ControlTypeName( ControlTypeName ),
-			ControlTypeSchIndx( ControlTypeSchIndx ),
-			SchIndx_SglHeatSetPointFanger( SchIndx_SglHeatSetPointFanger ),
-			SchIndx_SglCoolSetPointFanger( SchIndx_SglCoolSetPointFanger ),
-			SchIndx_SglHCSetPointFanger( SchIndx_SglHCSetPointFanger ),
-			SchIndx_DualSetPointFanger( SchIndx_DualSetPointFanger ),
-			SchIndx_SglHeatSetPointPierce( SchIndx_SglHeatSetPointPierce ),
-			SchIndx_SglCoolSetPointPierce( SchIndx_SglCoolSetPointPierce ),
-			SchIndx_SglHCSetPointPierce( SchIndx_SglHCSetPointPierce ),
-			SchIndx_DualSetPointPierce( SchIndx_DualSetPointPierce ),
-			SchIndx_SglHeatSetPointKSU( SchIndx_SglHeatSetPointKSU ),
-			SchIndx_SglCoolSetPointKSU( SchIndx_SglCoolSetPointKSU ),
-			SchIndx_SglHCSetPointKSU( SchIndx_SglHCSetPointKSU ),
-			SchIndx_DualSetPointKSU( SchIndx_DualSetPointKSU ),
-			ManageDemand( ManageDemand ),
-			HeatingResetLimit( HeatingResetLimit ),
-			CoolingResetLimit( CoolingResetLimit ),
-			EMSOverrideHeatingSetPointOn( EMSOverrideHeatingSetPointOn ),
-			EMSOverrideHeatingSetPointValue( EMSOverrideHeatingSetPointValue ),
-			EMSOverrideCoolingSetPointOn( EMSOverrideCoolingSetPointOn ),
-			EMSOverrideCoolingSetPointValue( EMSOverrideCoolingSetPointValue ),
-			TdbMaxSetPoint( TdbMaxSetPoint ),
-			TdbMinSetPoint( TdbMinSetPoint ),
-			AverageMethodName( AverageMethodName ),
-			AverageObjectName( AverageObjectName ),
-			AverageMethodNum( AverageMethodNum ),
-			SpecificObjectNum( SpecificObjectNum ),
-			PeopleAverageErrIndex( PeopleAverageErrIndex ),
-			TdbMaxErrIndex( TdbMaxErrIndex ),
-			TdbMinErrIndex( TdbMinErrIndex ),
-			TdbHCErrIndex( TdbHCErrIndex ),
-			TdbDualMaxErrIndex( TdbDualMaxErrIndex ),
-			TdbDualMinErrIndex( TdbDualMinErrIndex )
-		{}
-
 	};
 
 	struct ZoneStagedControls
@@ -417,8 +285,8 @@ namespace DataZoneControls {
 		int NumOfCoolStages; // Number of cooling stages
 		Real64 HeatThroRange; // Heating throttling tempeature range
 		Real64 CoolThroRange; // Cooling throttling tempeature range
-		FArray1D< Real64 > HeatTOffset; // Heating temperature offset
-		FArray1D< Real64 > CoolTOffset; // Cooling temperature offset
+		Array1D< Real64 > HeatTOffset; // Heating temperature offset
+		Array1D< Real64 > CoolTOffset; // Cooling temperature offset
 		Real64 HeatSetPoint; // Heating throttling tempeature range
 		Real64 CoolSetPoint; // Cooling throttling tempeature range
 		int StageErrCount; // Staged setpoint erro count
@@ -437,45 +305,6 @@ namespace DataZoneControls {
 			CoolSetPoint( 0.0 ),
 			StageErrCount( 0 ),
 			StageErrIndex( 0 )
-		{}
-
-		// Member Constructor
-		ZoneStagedControls(
-			std::string const & Name, // Name of the thermostat
-			std::string const & ZoneName, // Name of the zone
-			int const ActualZoneNum, // Index number of zone
-			std::string const & HeatSetBaseSchedName, // Name of the schedule which provides zone heating setpoint base
-			int const HSBchedIndex, // Index for this schedule
-			std::string const & CoolSetBaseSchedName, // Name of the schedule which provides zone cooling setpoint base
-			int const CSBchedIndex, // Index for this schedule
-			int const NumOfHeatStages, // Number of heating stages
-			int const NumOfCoolStages, // Number of cooling stages
-			Real64 const HeatThroRange, // Heating throttling tempeature range
-			Real64 const CoolThroRange, // Cooling throttling tempeature range
-			FArray1< Real64 > const & HeatTOffset, // Heating temperature offset
-			FArray1< Real64 > const & CoolTOffset, // Cooling temperature offset
-			Real64 const HeatSetPoint, // Heating throttling tempeature range
-			Real64 const CoolSetPoint, // Cooling throttling tempeature range
-			int const StageErrCount, // Staged setpoint erro count
-			int const StageErrIndex // Staged setpoint erro index
-		) :
-			Name( Name ),
-			ZoneName( ZoneName ),
-			ActualZoneNum( ActualZoneNum ),
-			HeatSetBaseSchedName( HeatSetBaseSchedName ),
-			HSBchedIndex( HSBchedIndex ),
-			CoolSetBaseSchedName( CoolSetBaseSchedName ),
-			CSBchedIndex( CSBchedIndex ),
-			NumOfHeatStages( NumOfHeatStages ),
-			NumOfCoolStages( NumOfCoolStages ),
-			HeatThroRange( HeatThroRange ),
-			CoolThroRange( CoolThroRange ),
-			HeatTOffset( HeatTOffset ),
-			CoolTOffset( CoolTOffset ),
-			HeatSetPoint( HeatSetPoint ),
-			CoolSetPoint( CoolSetPoint ),
-			StageErrCount( StageErrCount ),
-			StageErrIndex( StageErrIndex )
 		{}
 
 	};
@@ -501,56 +330,16 @@ namespace DataZoneControls {
 			ZoneListActive( false )
 		{}
 
-		// Member Constructor
-		TStatObject(
-			std::string const & Name,
-			int const ZoneOrZoneListPtr,
-			int const NumOfZones,
-			int const TempControlledZoneStartPtr,
-			int const ComfortControlledZoneStartPtr,
-			int const StageControlledZoneStartPtr,
-			bool const ZoneListActive
-		) :
-			Name( Name ),
-			ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
-			NumOfZones( NumOfZones ),
-			TempControlledZoneStartPtr( TempControlledZoneStartPtr ),
-			ComfortControlledZoneStartPtr( ComfortControlledZoneStartPtr ),
-			StageControlledZoneStartPtr( StageControlledZoneStartPtr ),
-			ZoneListActive( ZoneListActive )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ZoneHumidityControls > HumidityControlZone;
-	extern FArray1D< ZoneTempControls > TempControlledZone;
-	extern FArray1D< ZoneComfortControls > ComfortControlledZone;
-	extern FArray1D< TStatObject > TStatObjects;
-	extern FArray1D< TStatObject > ComfortTStatObjects;
-	extern FArray1D< TStatObject > StagedTStatObjects;
-	extern FArray1D< ZoneStagedControls > StageControlledZone;
-
-	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	extern Array1D< ZoneHumidityControls > HumidityControlZone;
+	extern Array1D< ZoneTempControls > TempControlledZone;
+	extern Array1D< ZoneComfortControls > ComfortControlledZone;
+	extern Array1D< TStatObject > TStatObjects;
+	extern Array1D< TStatObject > ComfortTStatObjects;
+	extern Array1D< TStatObject > StagedTStatObjects;
+	extern Array1D< ZoneStagedControls > StageControlledZone;
 
 } // DataZoneControls
 

@@ -10,14 +10,18 @@
 *.o
 *.o-*
 *.obj
+*.optrpt
 *.orig
 *.pdb
-*.rc
 *.res
 *.so
 *.so.*
 *~
 .directory
+.DS_Store
+
+# now that we have python, ignore some things
+*.pyc
 
 # build folder, if the dev chooses to put it there
 #  could also do a wildcard for build-* if we suggest that naming approach
@@ -27,7 +31,19 @@ builds
 Build
 Builds
 
+# by default CLion uses cmake-build-debug as the build folder, so add that as well
+cmake-build-debug
+
 # App-specific project files, for example, for Geany IDE:
 *.geany
 .project
 .cproject
+.idea
+.se
+
+# vim temp file:
+*.swp
+
+# py2app puts things inside dist/ and build/, build/ is already ignored, just add dist/
+dist
+

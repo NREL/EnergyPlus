@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef WindowEquivalentLayer_hh_INCLUDED
 #define WindowEquivalentLayer_hh_INCLUDED
 
@@ -5,11 +51,11 @@
 #include <functional>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2A.hh>
+#include <ObjexxFCL/Array2S.hh>
+#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -43,8 +89,8 @@ namespace WindowEquivalentLayer {
 	extern int const hipTAU_BB0;
 	extern int const hipDIM; // dimension of parameter array
 
-	extern FArray3D< Real64 > CFSDiffAbsTrans;
-	extern FArray1D_bool EQLDiffPropFlag;
+	extern Array3D< Real64 > CFSDiffAbsTrans;
+	extern Array1D_bool EQLDiffPropFlag;
 
 	// MODULE SUBROUTINES:
 	// Initialization routines for module
@@ -54,6 +100,9 @@ namespace WindowEquivalentLayer {
 	// Calculation routines for the module
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	InitEquivalentLayerWindowCalculations();
@@ -78,7 +127,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLWindowOpticalProperty(
 		CFSTY & FS, // fenestration system
 		int const DiffBeamFlag, // isDIFF: calc diffuse properties
-		FArray2A< Real64 > Abs1,
+		Array2A< Real64 > Abs1,
 		Real64 const IncA, // angle of incidence, radians
 		Real64 const VProfA, // inc solar vertical profile angle, radians
 		Real64 const HProfA // inc solar horizontal profile angle, radians
@@ -111,9 +160,9 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	HEMINT(
-		std::function< Real64( Real64 const THETA, int const OPT, FArray1A< Real64 > const ) > F, // property integrand function
+		std::function< Real64( Real64 const THETA, int const OPT, Array1A< Real64 > const ) > F, // property integrand function
 		int const F_Opt, // options passed to F() (hipRHO, hipTAU)
-		FArray1A< Real64 > const F_P // parameters passed to F()
+		Array1A< Real64 > const F_P // parameters passed to F()
 	);
 
 	void
@@ -129,7 +178,7 @@ namespace WindowEquivalentLayer {
 	RB_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	);
 
 	void
@@ -156,7 +205,7 @@ namespace WindowEquivalentLayer {
 	IS_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (1=reflectance, 2=transmittance)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	);
 
 	void
@@ -192,7 +241,7 @@ namespace WindowEquivalentLayer {
 	FM_F(
 		Real64 const THETA, // incidence angle, radians
 		int const Opt, // options (hipRHO, hipTAU)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	);
 
 	void
@@ -476,8 +525,8 @@ namespace WindowEquivalentLayer {
 	void
 	SOLMATS(
 		int const N, // # of active rows in A
-		FArray2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
-		FArray1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
+		Array2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
+		Array1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
 	);
 
 	bool
@@ -490,15 +539,15 @@ namespace WindowEquivalentLayer {
 		Real64 const TRMOUT,
 		Real64 const TRMIN, // indoor / outdoor mean radiant temp, K
 		Real64 const ISOL, // total incident solar, W/m2 (values used for SOURCE derivation)
-		FArray1S< Real64 > const SOURCE, // absorbed solar by layer,  W/m2
+		Array1S< Real64 > const SOURCE, // absorbed solar by layer,  W/m2
 		Real64 const TOL, // convergence tolerance, usually
-		FArray1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
+		Array1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
 		Real64 & QOCFRoom, // returned: open channel heat gain to room, W/m2
-		FArray1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
-		FArray1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-		FArray1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
-		FArray1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
-		FArray1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
+		Array1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
+		Array1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+		Array1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
+		Array1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
+		Array1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
 		Real64 & UCG, // returned: center-glass U-factor, W/m2-K
 		Real64 & SHGC, // returned: center-glass SHGC (Solar Heat Gain Coefficient)
 		Optional_bool_const HCInFlag = _ // If true uses ISO Std 150099 routine for HCIn calc
@@ -526,7 +575,7 @@ namespace WindowEquivalentLayer {
 		Real64 const rhodb,
 		Real64 const taud,
 		Real64 const rhom,
-		FArray2A< Real64 > A
+		Array2A< Real64 > A
 	);
 
 	Real64
@@ -617,52 +666,52 @@ namespace WindowEquivalentLayer {
 	void
 	ASHWAT_Solar(
 		int const NL, // # of layers
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		CFSSWP const & SWP_ROOM, // effective SW (solar) properties of room
 		Real64 const IBEAM, // incident beam insolation (W/m2 aperture)
 		Real64 const IDIFF, // incident diffuse insolation (W/m2 aperture)
 		Real64 const ILIGHTS, // incident diffuse insolation (W/m2 aperture)
-		FArray1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
-		Optional< FArray1S< Real64 > > SourceBD = _ // returned: layer-by-layer flux of absorbed
+		Array1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
+		Optional< Array1S< Real64 > > SourceBD = _ // returned: layer-by-layer flux of absorbed
 	);
 
 	void
 	NETRAD(
 		int const NL, // # of layers, 1=outside .. NL=inside
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		Real64 const RHO_room, // effective solar reflectance of room (at inside)
 		Real64 const ISOL, // incident flux (W/m2)
-		FArray1< Real64 > & QPLUS, // returned: see Edwards paper
-		FArray1< Real64 > & QMINUS // returned: see Edwards paper
+		Array1< Real64 > & QPLUS, // returned: see Edwards paper
+		Array1< Real64 > & QMINUS // returned: see Edwards paper
 	);
 
 	void
 	TDMA_R(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	);
 
 	void
 	TDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	);
 
 	void
 	AUTOTDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int & N
 	);
 
@@ -705,7 +754,7 @@ namespace WindowEquivalentLayer {
 	Specular_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters (none defined)
+		Array1A< Real64 > const P // parameters (none defined)
 	);
 
 	void
@@ -866,7 +915,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLOpticalProperty(
 		int const SurfNum,
 		int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-		FArray2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
+		Array2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
 	);
 
 	void
@@ -884,29 +933,6 @@ namespace WindowEquivalentLayer {
 		Real64 const TSurfIn, // Inside surface temperature
 		Real64 const TAirIn // Zone Air Temperature
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WindowEquivalentLayer
 

@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DataTimings.hh>
 #include <DataErrorTracking.hh>
 #include <DataPrecisionGlobals.hh>
@@ -92,12 +138,19 @@ namespace DataTimings {
 #endif
 
 	// Object Data
-	FArray1D< timings > Timing;
+	Array1D< timings > Timing;
 
 	// Functions
 
 	void
-	epStartTime( std::string const & ctimingElementstring )
+	epStartTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED( ctimingElementstring )
+#endif
+#ifdef EP_Timings
+		std::string const & ctimingElementstring
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -117,10 +170,6 @@ namespace DataTimings {
 		// na
 
 		// USE STATEMENTS:
-#if defined (_OPENMP) && defined(TIMER_OMP_GET_WTIME)
-		// Using/Aliasing
-		using namespace omp_lib; // only here for OMP timer
-#endif
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -135,16 +184,16 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
 
 		// Object Data
-		FArray1D< timings > tempTiming; // used for reallocate.
+		Array1D< timings > tempTiming; // used for reallocate.
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
 		if ( NumTimingElements == 0 ) {
 			MaxTimingElements = 250;
 			Timing.allocate( MaxTimingElements );
@@ -178,9 +227,16 @@ namespace DataTimings {
 
 	void
 	epStopTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED( ctimingElementstring ),
+		Optional_bool_const EP_UNUSED( printit ), // true if it should be printed here.
+		Optional_string_const EP_UNUSED( wprint ) // only needed (and assumed, if printit is true)
+#endif
+#ifdef EP_Timings
 		std::string const & ctimingElementstring,
 		Optional_bool_const printit, // true if it should be printed here.
 		Optional_string_const wprint // only needed (and assumed, if printit is true)
+#endif
 	)
 	{
 
@@ -202,11 +258,6 @@ namespace DataTimings {
 
 		// USE STATEMENTS:
 
-#if defined (_OPENMP) && defined(TIMER_OMP_GET_WTIME)
-		// Using/Aliasing
-		using namespace omp_lib; // only here for OMP timer
-#endif
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -220,14 +271,14 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
-		Real64 stoptime;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
+		Real64 stoptime;
 		found = 0;
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
 			if ( Timing( loop ).Element != ctimingElementstring ) continue;
@@ -279,7 +330,14 @@ namespace DataTimings {
 	}
 
 	void
-	epSummaryTimes( Real64 & TimeUsed_CPUTime )
+	epSummaryTimes(
+#ifdef EP_NO_Timings
+		Real64 & EP_UNUSED( TimeUsed_CPUTime )
+#endif
+#ifdef EP_Timings
+		Real64 & TimeUsed_CPUTime
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -314,14 +372,14 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop;
-		int EchoInputFile;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		int loop;
+		int EchoInputFile;
+		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
@@ -549,7 +607,7 @@ namespace DataTimings {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Int32 > clockvalues( 8 );
+		Array1D< Int32 > clockvalues( 8 );
 		//value(1)   Current year
 		//value(2)   Current month
 		//value(3)   Current day
@@ -559,35 +617,12 @@ namespace DataTimings {
 		//value(7)   Seconds (0-59)
 		//value(8)   Milliseconds (0-999)
 
-		date_and_time_string( _, _, _, clockvalues );
+		date_and_time( _, _, _, clockvalues );
 		calctime = clockvalues( 5 ) * 3600.0 + clockvalues( 6 ) * 60.0 + clockvalues( 7 ) + clockvalues( 8 ) / 1000.0;
 
 		return calctime;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataTimings
 

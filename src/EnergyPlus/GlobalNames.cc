@@ -1,5 +1,48 @@
-// ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
 #include <GlobalNames.hh>
@@ -50,6 +93,7 @@ namespace GlobalNames {
 	int NumBoilers( 0 );
 	int NumBaseboards( 0 );
 	int NumCoils( 0 );
+	int numAirDistUnits( 0 );
 	int CurMaxChillers( 0 );
 	int CurMaxBoilers( 0 );
 	int CurMaxBaseboards( 0 );
@@ -58,10 +102,11 @@ namespace GlobalNames {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
 	// Object Data
-	FArray1D< ComponentNameData > ChillerNames;
-	FArray1D< ComponentNameData > BoilerNames;
-	FArray1D< ComponentNameData > BaseboardNames;
-	FArray1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > ChillerNames;
+	Array1D< ComponentNameData > BoilerNames;
+	Array1D< ComponentNameData > BaseboardNames;
+	Array1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > aDUNames;
 
 	// Functions
 
@@ -111,7 +156,7 @@ namespace GlobalNames {
 
 		ErrorFound = false;
 		int Found = 0;
-		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames.CompName(), NumChillers );
+		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames, &ComponentNameData::CompName, NumChillers );
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
 			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
@@ -177,7 +222,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames.CompName(), NumBaseboards );
+		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames, &ComponentNameData::CompName, NumBaseboards );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
@@ -245,7 +290,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames.CompName(), NumBoilers );
+		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames, &ComponentNameData::CompName, NumBoilers );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
@@ -313,7 +358,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames.CompName(), NumCoils );
+		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames, &ComponentNameData::CompName, NumCoils );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
@@ -334,28 +379,55 @@ namespace GlobalNames {
 
 	}
 
-	//     NOTICE
+	void
+	VerifyUniqueADUName(
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		std::string const & StringToDisplay
+	)
+	{
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
+		ComponentNameData aDUData;
+		ErrorFound = false;
+		int Found = 0;
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
+		if ( numAirDistUnits > 0 ) Found = FindItemInList( NameToVerify, aDUNames, &ComponentNameData::CompName, numAirDistUnits );
 
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + aDUNames( Found ).CompType + "\"" );
+			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
+			ErrorFound = true;
+		} else {
+			++numAirDistUnits;
+			aDUData.CompType = MakeUPPERCase( TypeToVerify );
+			aDUData.CompName = NameToVerify;
+			aDUNames.push_back( aDUData );
+		}
 
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	}
+
+	// Clears the global data in GlobalNames.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumChillers = 0;
+		NumBoilers = 0;
+		NumBaseboards = 0;
+		NumCoils = 0;
+		numAirDistUnits = 0;
+		CurMaxChillers = 0;
+		CurMaxBoilers = 0;
+		CurMaxBaseboards = 0;
+		CurMaxCoils = 0;
+
+		ChillerNames.deallocate();
+		BoilerNames.deallocate();
+		BaseboardNames.deallocate();
+		CoilNames.deallocate();
+		aDUNames.deallocate();
+	}
 
 } // GlobalNames
 

@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -83,17 +129,28 @@ namespace BaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumBaseboards( 0 );
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< BaseboardParams > Baseboard;
-	FArray1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
+	Array1D< BaseboardParams > Baseboard;
+	Array1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumBaseboards = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		SetLoopIndexFlag.deallocate();
+		Baseboard.deallocate();
+		BaseboardParamsNumericFields.deallocate();
+	}
 
 	void
 	SimBaseboard(
@@ -128,17 +185,6 @@ namespace BaseboardRadiator {
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum; // index of unit in baseboard array
@@ -155,7 +201,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard.EquipID(), NumBaseboards );
+			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
 			}
@@ -300,7 +346,7 @@ namespace BaseboardRadiator {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipID(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;
@@ -366,7 +412,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ){
+				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 					if ( !lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -474,7 +520,7 @@ namespace BaseboardRadiator {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 RhoAirStdInit;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -521,7 +567,7 @@ namespace BaseboardRadiator {
 		if ( BeginEnvrnFlag && MyEnvrnFlag( BaseboardNum ) && ! SetLoopIndexFlag( BaseboardNum ) ) {
 			RhoAirStdInit = StdRhoAir;
 			WaterInletNode = Baseboard( BaseboardNum ).WaterInletNode;
-			rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 			Baseboard( BaseboardNum ).WaterMassFlowRateMax = rho * Baseboard( BaseboardNum ).WaterVolFlowRateMax;
 			InitComponentNodes( 0.0, Baseboard( BaseboardNum ).WaterMassFlowRateMax, Baseboard( BaseboardNum ).WaterInletNode, Baseboard( BaseboardNum ).WaterOutletNode, Baseboard( BaseboardNum ).LoopNum, Baseboard( BaseboardNum ).LoopSideNum, Baseboard( BaseboardNum ).BranchNum, Baseboard( BaseboardNum ).CompNum );
 			Node( WaterInletNode ).Temp = 60.0;
@@ -601,24 +647,22 @@ namespace BaseboardRadiator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterInletNode;
-		int PltSizNum; // do loop index for plant sizing
-		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-		Real64 DesCoilLoad;
+		int PltSizHeatNum( 0 ); // index of plant sizing object for 1st heating loop
+		Real64 DesCoilLoad( 0.0 );
 		int SolFla; // Flag of solver
 		Real64 UA0; // lower bound for UA
 		Real64 UA1; // upper bound for UA
 		Real64 UA;
-		FArray1D< Real64 > Par( 2 );
-		bool ErrorsFound; // If errors detected in input
+		Array1D< Real64 > Par( 2 );
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 tmpWaterVolFlowRateMax; // local design plant fluid flow rate
-		bool FlowAutoSize; // Indicator to autosizing water volume flow
-		bool UAAutoSize; // Indicator to autosizing UA
-		Real64 WaterVolFlowRateMaxDes; // Design water volume flow for reproting
-		Real64 WaterVolFlowRateMaxUser; // User hard-sized volume flow for reporting
-		Real64 UADes; // Design UA value for reproting
-		Real64 UAUser; // User hard-sized value for reporting
+		bool FlowAutoSize( false ); // Indicator to autosizing water volume flow
+		bool UAAutoSize( false ); // Indicator to autosizing UA
+		Real64 WaterVolFlowRateMaxDes( 0.0 ); // Design water volume flow for reproting
+		Real64 WaterVolFlowRateMaxUser( 0.0 ); // User hard-sized volume flow for reporting
+		Real64 UADes( 0.0 ); // Design UA value for reproting
+		Real64 UAUser( 0.0 ); // User hard-sized value for reporting
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -628,22 +672,13 @@ namespace BaseboardRadiator {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
 
-		PltSizHeatNum = 0;
-		PltSizNum = 0;
-		DesCoilLoad = 0.0;
-		ErrorsFound = false;
-		FlowAutoSize = false;
-		UAAutoSize = false;
-		WaterVolFlowRateMaxDes = 0.0;
-		WaterVolFlowRateMaxUser = 0.0;
-		UADes = 0.0;
-		UAUser = 0.0;
-
 		// find the appropriate heating Plant Sizing object
 		PltSizHeatNum = PlantLoop( Baseboard( BaseboardNum ).LoopNum ).PlantSizNum;
 
 		if ( PltSizHeatNum > 0 ) {
 
+			DataScalableCapSizingON = false;
+			
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -667,7 +702,7 @@ namespace BaseboardRadiator {
 					ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 
-						if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( CapSizingMethod == HeatingDesignCapacity ) {
 							if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing(CompType, CompName);
 								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
@@ -676,12 +711,12 @@ namespace BaseboardRadiator {
 							}
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 							DataScalableCapSizingON = true;
-						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 							CheckZoneSizing(CompType, CompName);
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
@@ -693,13 +728,14 @@ namespace BaseboardRadiator {
 						}
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0;
 					}
 
 					if ( DesCoilLoad >= SmallLoad ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
-						rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+						Cp = GetSpecificHeatGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, HWInitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 						WaterVolFlowRateMaxDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 					} else {
 						WaterVolFlowRateMaxDes = 0.0;
@@ -743,7 +779,7 @@ namespace BaseboardRadiator {
 					Baseboard( BaseboardNum ).AirInletTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
 					Baseboard( BaseboardNum ).AirInletHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 					WaterInletNode = Baseboard( BaseboardNum ).WaterInletNode;
-					rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 					Node( WaterInletNode ).MassFlowRate = rho * Baseboard( BaseboardNum ).WaterVolFlowRateMax;
 
 					CompType = cCMO_BBRadiator_Water;
@@ -757,7 +793,7 @@ namespace BaseboardRadiator {
 					CapSizingMethod = Baseboard( BaseboardNum ).HeatingCapMethod;
 					ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-						if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( CapSizingMethod == HeatingDesignCapacity ) {
 							if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing(CompType, CompName);
 								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
@@ -766,12 +802,12 @@ namespace BaseboardRadiator {
 							}
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 							DataScalableCapSizingON = true;
-						} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
+						} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
 							CheckZoneSizing(CompType, CompName);
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = Baseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -783,6 +819,7 @@ namespace BaseboardRadiator {
 						}
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					}
@@ -1107,7 +1144,7 @@ namespace BaseboardRadiator {
 	Real64
 	HWBaseboardUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -1151,10 +1188,10 @@ namespace BaseboardRadiator {
 		int BaseboardIndex;
 		Real64 LoadMet;
 
-		BaseboardIndex = int( Par()( 2 ) );
+		BaseboardIndex = int( Par( 2 ) );
 		Baseboard( BaseboardIndex ).UA = UA;
 		SimHWConvective( BaseboardIndex, LoadMet );
-		Residuum = ( Par()( 1 ) - LoadMet ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - LoadMet ) / Par( 1 );
 
 		return Residuum;
 	}
@@ -1163,11 +1200,11 @@ namespace BaseboardRadiator {
 	UpdateBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
 		std::string const & BaseboardName, // component name
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int const LoopNum, // Plant loop index for where called from
-		int const LoopSide, // Plant loop side index for where called from
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
+		int const EP_UNUSED( LoopNum ), // Plant loop index for where called from
+		int const EP_UNUSED( LoopSide ), // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{
@@ -1214,12 +1251,10 @@ namespace BaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum;
-		int InletNodeNum;
-		int OutletNodeNum;
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, Baseboard.EquipID(), NumBaseboards );
+			BaseboardNum = FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
 			}
@@ -1258,25 +1293,6 @@ namespace BaseboardRadiator {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //******************************************************************************************************
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

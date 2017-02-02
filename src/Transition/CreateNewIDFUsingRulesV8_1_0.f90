@@ -1,4 +1,23 @@
-!SUBROUTINE CreateNewIDFUsingRulesV7_0_0(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
+MODULE SetVersion
+
+USE DataStringGlobals
+USE DataVCompareGlobals
+
+PUBLIC
+
+CONTAINS
+
+SUBROUTINE SetThisVersionVariables()
+      VerString='Conversion 8.0 => 8.1'
+      VersionNum=8.1
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-0-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-1-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-0-0-007 to 8-1-0.csv'
+END SUBROUTINE
+
+END MODULE
+
+SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
 
           ! SUBROUTINE INFORMATION:
           !       AUTHOR         Linda Lawrie
@@ -349,7 +368,7 @@
                 if (samestring(OutArgs(8),'autosize')) OutArgs(8)='autocalculate'
                 OutArgs(9)=blank
                 OutArgs(10)=InArgs(9)
-                if (samestring(OutArgs(8),'autosize')) OutArgs(10)='autocalculate'
+                if (samestring(OutArgs(10),'autosize')) OutArgs(10)='autocalculate'
                 OutArgs(11)=blank
                 OutArgs(12)=InArgs(10)
                 OutArgs(13)=blank
@@ -1236,4 +1255,4 @@
 
   RETURN
 
-!END SUBROUTINE CreateNewIDFUsingRules
+END SUBROUTINE CreateNewIDFUsingRules

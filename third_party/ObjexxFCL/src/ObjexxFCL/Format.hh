@@ -5,15 +5,16 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsA.hh>
 #include <ObjexxFCL/TraitsB.hh>
@@ -27,8 +28,9 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
+#include <istream>
 #include <limits>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,7 +40,6 @@ namespace ObjexxFCL {
 // Forward
 class byte;
 class ubyte;
-class Fstring;
 
 // List-Directed Input Entry
 struct EntryFormatLD
@@ -47,14 +48,12 @@ struct EntryFormatLD
 	typedef  std::size_t  Size;
 
 	// Default Constructor
-	inline
 	EntryFormatLD() :
 	 h( false ),
 	 r( 0ul )
 	{}
 
 	// Constructor
-	inline
 	explicit
 	EntryFormatLD( std::string const & str, bool const has = true, Size const rep = 1ul ) :
 	 s( str ),
@@ -63,7 +62,6 @@ struct EntryFormatLD
 	{}
 
 	// Has a Non-Null Entry? (And decrement counter)
-	inline
 	bool
 	has()
 	{
@@ -76,7 +74,6 @@ struct EntryFormatLD
 	}
 
 	// Reset
-	inline
 	void
 	reset()
 	{
@@ -109,7 +106,6 @@ public: // Types
 protected: // Creation
 
 	// Repeat Constructor
-	inline
 	explicit
 	Format( Format * p, Size const r = 1ul ) :
 	 p_( p ),
@@ -119,7 +115,6 @@ protected: // Creation
 	{}
 
 	// Star Constructor
-	inline
 	Format( Format * p, char const star ) :
 	 p_( p ),
 	 r_( -1 ),
@@ -133,7 +128,6 @@ protected: // Creation
 	}
 
 	// Copy Constructor
-	inline
 	Format( Format const & f, Format * p = nullptr ) :
 	 p_( p ? p : f.p_ ),
 	 r_( f.r_ ),
@@ -142,8 +136,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	inline
-	Format( Format && f ) :
+	Format( Format && f ) NOEXCEPT :
 	 p_( f.p_ ),
 	 r_( f.r_ ),
 	 u_( f.u_ ),
@@ -158,7 +151,6 @@ public: // Creation
 	clone( Format * p = nullptr ) const = 0;
 
 	// Destructor
-	inline
 	virtual
 	~Format()
 	{}
@@ -166,7 +158,6 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( Format const & f )
 	{
@@ -181,7 +172,6 @@ protected: // Assignment
 public: // Properties
 
 	// Parent Format
-	inline
 	Format const *
 	p() const
 	{
@@ -189,7 +179,6 @@ public: // Properties
 	}
 
 	// Parent Format
-	inline
 	Format *
 	p()
 	{
@@ -197,7 +186,6 @@ public: // Properties
 	}
 
 	// Repeat Count
-	inline
 	Size
 	r() const
 	{
@@ -205,7 +193,6 @@ public: // Properties
 	}
 
 	// Unlimited Repeat?
-	inline
 	bool
 	u() const
 	{
@@ -213,7 +200,6 @@ public: // Properties
 	}
 
 	// Uses an Argument?
-	inline
 	virtual
 	bool
 	uses_arg() const
@@ -222,7 +208,6 @@ public: // Properties
 	}
 
 	// Uses an Argument?
-	inline
 	bool
 	no_arg() const
 	{
@@ -230,7 +215,6 @@ public: // Properties
 	}
 
 	// Format Group?
-	inline
 	virtual
 	bool
 	is_group() const
@@ -239,7 +223,6 @@ public: // Properties
 	}
 
 	// Format List?
-	inline
 	virtual
 	bool
 	is_list() const
@@ -248,7 +231,6 @@ public: // Properties
 	}
 
 	// FormatLD?
-	inline
 	virtual
 	bool
 	is_FormatLD() const
@@ -257,7 +239,6 @@ public: // Properties
 	}
 
 	// List-Directed?
-	inline
 	virtual
 	bool
 	is_list_directed() const
@@ -266,7 +247,6 @@ public: // Properties
 	}
 
 	// Can Repeat with Given Index?
-	inline
 	bool
 	can_repeat( Size const i ) const
 	{
@@ -274,7 +254,6 @@ public: // Properties
 	}
 
 	// P Scaling State
-	inline
 	virtual
 	int
 	P() const
@@ -284,7 +263,6 @@ public: // Properties
 	}
 
 	// P Scaling State
-	inline
 	virtual
 	int &
 	P()
@@ -294,7 +272,6 @@ public: // Properties
 	}
 
 	// Blank Null?
-	inline
 	bool
 	blank_null() const
 	{
@@ -302,7 +279,6 @@ public: // Properties
 	}
 
 	// Blank Zero?
-	inline
 	virtual
 	bool
 	blank_zero() const
@@ -312,7 +288,6 @@ public: // Properties
 	}
 
 	// Blank Zero?
-	inline
 	virtual
 	bool &
 	blank_zero()
@@ -322,7 +297,6 @@ public: // Properties
 	}
 
 	// Colon Terminated?
-	inline
 	virtual
 	bool
 	colon_terminated() const
@@ -332,7 +306,6 @@ public: // Properties
 	}
 
 	// Colon Terminated?
-	inline
 	virtual
 	bool &
 	colon_terminated()
@@ -342,7 +315,6 @@ public: // Properties
 	}
 
 	// Not Colon Terminated?
-	inline
 	bool
 	not_colon_terminated() const
 	{
@@ -350,7 +322,6 @@ public: // Properties
 	}
 
 	// Slash Terminated?
-	inline
 	virtual
 	bool
 	slash_terminated() const
@@ -360,7 +331,6 @@ public: // Properties
 	}
 
 	// Slash Terminated?
-	inline
 	virtual
 	bool &
 	slash_terminated()
@@ -370,7 +340,6 @@ public: // Properties
 	}
 
 	// Not Slash Terminated?
-	inline
 	bool
 	not_slash_terminated() const
 	{
@@ -378,7 +347,6 @@ public: // Properties
 	}
 
 	// Terminated?
-	inline
 	bool
 	terminated() const
 	{
@@ -386,7 +354,6 @@ public: // Properties
 	}
 
 	// Not Terminated?
-	inline
 	bool
 	not_terminated() const
 	{
@@ -394,7 +361,6 @@ public: // Properties
 	}
 
 	// Non-Advancing?
-	inline
 	virtual
 	bool
 	non_advancing() const
@@ -404,7 +370,6 @@ public: // Properties
 	}
 
 	// Non-Advancing?
-	inline
 	virtual
 	bool &
 	non_advancing()
@@ -414,7 +379,6 @@ public: // Properties
 	}
 
 	// Reverted?
-	inline
 	virtual
 	bool
 	reverted() const
@@ -424,7 +388,6 @@ public: // Properties
 	}
 
 	// Reverted?
-	inline
 	virtual
 	bool &
 	reverted()
@@ -434,7 +397,6 @@ public: // Properties
 	}
 
 	// Revert Count
-	inline
 	virtual
 	Size
 	reverts() const
@@ -444,7 +406,6 @@ public: // Properties
 	}
 
 	// Spacer?
-	inline
 	virtual
 	bool
 	spacer() const
@@ -454,7 +415,6 @@ public: // Properties
 	}
 
 	// Spacer?
-	inline
 	virtual
 	bool &
 	spacer()
@@ -481,7 +441,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	virtual
 	Format &
 	reset()
@@ -493,7 +452,6 @@ public: // Methods
 public: // Input Methods
 
 	// Input without Argument
-	inline
 	std::istream &
 	input( std::istream & stream, std::streampos const poa, std::streampos & por )
 	{
@@ -502,7 +460,6 @@ public: // Input Methods
 	}
 
 	// Input without Argument
-	inline
 	std::istream &
 	input( std::istream & stream, std::streampos & por )
 	{
@@ -512,7 +469,6 @@ public: // Input Methods
 
 	// Input with Argument
 	template< typename T >
-	inline
 	std::istream &
 	input( std::istream & stream, std::streampos const poa, std::streampos & por, T & t )
 	{
@@ -524,7 +480,6 @@ public: // Input Methods
 
 	// Input with Argument
 	template< typename T >
-	inline
 	std::istream &
 	input( std::istream & stream, std::streampos & por, T & t )
 	{
@@ -535,7 +490,6 @@ public: // Input Methods
 	}
 
 	// Input Pad/Position
-	inline
 	void
 	input_pos( std::istream & stream, std::streampos const pos ) // pos == absolute position
 	{
@@ -543,21 +497,18 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
 	{} // Default implementation
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream &, std::streampos & )
 	{} // Default implementation
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, bool & b )
@@ -578,7 +529,6 @@ public: // Input Methods
 	in( std::istream & stream, ubyte & b );
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, short int & i )
@@ -589,7 +539,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, unsigned short int & i )
@@ -600,7 +549,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, int & i )
@@ -611,7 +559,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, unsigned int & i )
@@ -622,7 +569,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, long int & i )
@@ -633,7 +579,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, unsigned long int & i )
@@ -644,7 +589,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, long long int & i )
@@ -655,7 +599,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, unsigned long long int & i )
@@ -666,7 +609,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, float & v )
@@ -677,7 +619,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, double & v )
@@ -688,7 +629,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, long double & v )
@@ -699,7 +639,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, char & c )
@@ -710,7 +649,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	virtual
 	void
 	in( std::istream & stream, std::string & s )
@@ -720,15 +658,9 @@ public: // Input Methods
 		io_err( stream );
 	}
 
-	// Input
-	virtual
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output without Argument
-	inline
 	std::ostream &
 	output_no_arg( std::ostream & stream, std::streampos & pos, std::string const & ter = LF )
 	{
@@ -738,7 +670,6 @@ public: // Output Methods
 
 	// Output a Value
 	template< typename T >
-	inline
 	std::ostream &
 	output_val( std::ostream & stream, std::streampos & pos, T const & t, std::string const & ter = LF )
 	{
@@ -749,7 +680,6 @@ public: // Output Methods
 	}
 
 	// Output Pad/Position
-	inline
 	void
 	output_pos( std::ostream & stream, std::streampos const pos )
 	{
@@ -765,14 +695,12 @@ public: // Output Methods
 	spc_spacer( std::string const & ter );
 
 	// Output
-	inline
 	virtual
 	void
 	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{} // Default implementation
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, bool const, std::string const & )
@@ -781,7 +709,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, byte const &, std::string const & )
@@ -790,7 +717,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, ubyte const &, std::string const & )
@@ -799,7 +725,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, short int const, std::string const & )
@@ -808,7 +733,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, unsigned short int const, std::string const & )
@@ -817,7 +741,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, int const, std::string const & )
@@ -826,7 +749,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, unsigned int const, std::string const & )
@@ -835,7 +757,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, long int const, std::string const & )
@@ -844,7 +765,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, unsigned long int const, std::string const & )
@@ -853,7 +773,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, long long int const, std::string const & )
@@ -862,7 +781,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, unsigned long long int const, std::string const & )
@@ -871,7 +789,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, float const, std::string const & )
@@ -880,7 +797,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, double const, std::string const & )
@@ -889,7 +805,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, long double const, std::string const & )
@@ -898,7 +813,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, char const, std::string const & )
@@ -907,7 +821,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	void
 	out( std::ostream & stream, char const * s, std::string const & ter ) // Non-virtual forwarding wrapper
 	{
@@ -915,7 +828,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	virtual
 	void
 	out( std::ostream & stream, std::string const &, std::string const & )
@@ -923,19 +835,9 @@ public: // Output Methods
 		io_err( stream );
 	}
 
-	// Output
-	inline
-	virtual
-	void
-	out( std::ostream & stream, Fstring const &, std::string const & )
-	{ // Default implementation
-		io_err( stream );
-	}
-
 public: // Static Methods
 
 	// Skip Rest of Line and Line Terminator (Manipulator)
-	inline
 	static
 	std::istream &
 	skip( std::istream & stream )
@@ -951,7 +853,6 @@ public: // Static Methods
 protected: // Properties
 
 	// Active index
-	inline
 	Size
 	i() const
 	{
@@ -959,7 +860,6 @@ protected: // Properties
 	}
 
 	// Active index
-	inline
 	Size &
 	i()
 	{
@@ -973,7 +873,6 @@ protected: // Methods
 	read_ld( std::istream & stream, bool const numeric = false, char const mode = 'C' ); // Use mode = 'F' for reading files that can't be changed to C-style quote escapes
 
 	// Skip Chunk from Stream and Discard
-	inline
 	void
 	skip_chunk( std::istream & stream, Size const w = NOSIZE ) const
 	{
@@ -981,7 +880,6 @@ protected: // Methods
 	}
 
 	// Width to Read
-	inline
 	virtual
 	Size
 	wid( Size const w = NOSIZE ) const
@@ -1006,7 +904,6 @@ protected: // Static Methods
 	read_float( std::istream & stream, Size const w = NOSIZE );
 
 	// string is Blank?
-	inline
 	static
 	bool
 	is_blank( std::string const & s )
@@ -1015,7 +912,6 @@ protected: // Static Methods
 	}
 
 	// Character is a List-Directed Whitespace Separator?
-	inline
 	static
 	bool
 	is_space_ld( char const c )
@@ -1029,7 +925,6 @@ protected: // Static Methods
 
 	// Number of a String
 	template< typename T >
-	inline
 	static
 	T
 	number_of( std::string const & s )
@@ -1042,7 +937,6 @@ protected: // Static Methods
 	}
 
 	// Float String has Exponent?
-	inline
 	static
 	bool
 	has_exponent( std::string const & s )
@@ -1051,7 +945,6 @@ protected: // Static Methods
 	}
 
 	// Pad Output Stream to Output Position
-	inline
 	static
 	void
 	output_pad( std::ostream & stream, std::streampos const pos )
@@ -1066,7 +959,6 @@ protected: // Static Methods
 	}
 
 	// Clear EOF State if No Error
-	inline
 	static
 	void
 	clear_eof( std::istream & stream )
@@ -1075,7 +967,6 @@ protected: // Static Methods
 	}
 
 	// Set Stream Fail Bit for I/O Error
-	inline
 	static
 	void
 #ifndef OBJEXXFCL_IO_RELAX
@@ -1097,7 +988,7 @@ private: // Data
 
 protected: // Static Data
 
-	static Size const NOSIZE = static_cast< Size >( -1 );
+	static Size const NOSIZE;
 	static std::string const LF;
 
 }; // Format
@@ -1109,34 +1000,29 @@ class FormatCombo : public Format
 protected: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatCombo( Format * p, Size const r = 1ul ) :
 	 Format( p, r )
 	{}
 
 	// Constructor
-	inline
 	FormatCombo( Format * p, char const star ) :
 	 Format( p, star )
 	{}
 
 	// Copy Constructor
-	inline
 	FormatCombo( FormatCombo const & f, Format * p = nullptr ) :
 	 Format( f, p )
 	{}
 
 	// Move Constructor
-	inline
-	FormatCombo( FormatCombo && f ) :
+	FormatCombo( FormatCombo && f ) NOEXCEPT :
 	 Format( std::move( f ) )
 	{}
 
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~FormatCombo()
 	{}
@@ -1144,7 +1030,6 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( FormatCombo const & f )
 	{
@@ -1162,7 +1047,6 @@ class FormatList : public FormatCombo
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatList( Format * p, Formats const & formats = Formats() ) :
 	 FormatCombo( p ),
@@ -1170,7 +1054,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	FormatList( FormatList const & f, Format * p = nullptr ) :
 	 FormatCombo( f, p )
 	{
@@ -1178,14 +1061,14 @@ public: // Creation
 	}
 
 	// Move Constructor
-	inline
-	FormatList( FormatList && f ) :
+	FormatList( FormatList && f ) NOEXCEPT :
 	 FormatCombo( std::move( f ) ),
 	 formats_( std::move( f.formats_ ) )
-	{}
+	{
+		f.formats_.clear();
+	}
 
 	// Clone
-	inline
 	FormatList *
 	clone( Format * p = nullptr ) const
 	{
@@ -1193,7 +1076,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatList()
 	{
@@ -1209,7 +1091,6 @@ public: // Assignment
 public: // Properties
 
 	// Format List?
-	inline
 	bool
 	is_list() const
 	{
@@ -1217,7 +1098,6 @@ public: // Properties
 	}
 
 	// Current Format
-	inline
 	Format *
 	current()
 	{
@@ -1225,7 +1105,6 @@ public: // Properties
 	}
 
 	// Next Format
-	inline
 	Format *
 	next()
 	{
@@ -1237,7 +1116,6 @@ public: // Properties
 	next_up();
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -1245,7 +1123,6 @@ public: // Properties
 	}
 
 	// Formats
-	inline
 	Formats const &
 	formats() const
 	{
@@ -1253,7 +1130,6 @@ public: // Properties
 	}
 
 	// Formats
-	inline
 	Formats &
 	formats()
 	{
@@ -1261,7 +1137,6 @@ public: // Properties
 	}
 
 	// Set the Formats
-	inline
 	void
 	formats( Formats & f )
 	{
@@ -1272,7 +1147,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	FormatList &
 	reset()
 	{
@@ -1294,7 +1168,6 @@ class FormatGroup : public FormatCombo
 protected: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatGroup( Format * p, Format * format = nullptr ) :
 	 FormatCombo( p ),
@@ -1302,29 +1175,25 @@ protected: // Creation
 	{}
 
 	// Size Constructor
-	inline
 	FormatGroup( Format * p, Size const r, Format * format = nullptr ) :
 	 FormatCombo( p, r ),
 	 format_( format )
 	{}
 
 	// Star Constructor
-	inline
 	FormatGroup( Format * p, char const star, Format * format = nullptr ) :
 	 FormatCombo( p, star ),
 	 format_( format )
 	{}
 
 	// Copy Constructor
-	inline
 	FormatGroup( FormatGroup const & f, Format * p = nullptr ) :
 	 FormatCombo( f, p ),
 	 format_( f.format() ? f.format()->clone( this ) : nullptr )
 	{}
 
 	// Move Constructor
-	inline
-	FormatGroup( FormatGroup && f ) :
+	FormatGroup( FormatGroup && f ) NOEXCEPT :
 	 FormatCombo( std::move( f ) ),
 	 format_( f.format_ )
 	{
@@ -1334,7 +1203,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~FormatGroup()
 	{
@@ -1350,7 +1218,6 @@ protected: // Assignment
 public: // Properties
 
 	// Format Group?
-	inline
 	bool
 	is_group() const
 	{
@@ -1358,7 +1225,6 @@ public: // Properties
 	}
 
 	// Current Format
-	inline
 	Format *
 	current()
 	{
@@ -1366,7 +1232,6 @@ public: // Properties
 	}
 
 	// Next Format
-	inline
 	Format *
 	next()
 	{
@@ -1378,7 +1243,6 @@ public: // Properties
 	next_up();
 
 	// Format
-	inline
 	Format const *
 	format() const
 	{
@@ -1386,7 +1250,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format *
 	format()
 	{
@@ -1394,7 +1257,6 @@ public: // Properties
 	}
 
 	// Set the Format
-	inline
 	virtual
 	void
 	format( Format * f )
@@ -1406,7 +1268,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	FormatGroup &
 	reset()
 	{
@@ -1432,7 +1293,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatGroupTop( Format * format = nullptr ) :
 	 FormatGroup( nullptr, format ),
@@ -1449,7 +1309,6 @@ public: // Creation
 	{}
 
 	// Size Constructor
-	inline
 	explicit
 	FormatGroupTop( Size const r, Format * format = nullptr ) :
 	 FormatGroup( nullptr, r, format ),
@@ -1466,7 +1325,6 @@ public: // Creation
 	{}
 
 	// Star Constructor
-	inline
 	explicit
 	FormatGroupTop( char const star, Format * format = nullptr ) :
 	 FormatGroup( nullptr, star, format ),
@@ -1483,7 +1341,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	FormatGroupTop( FormatGroupTop const & f, Format * p = nullptr ) :
 	 FormatGroup( f, p ),
 	 P_( 0 ),
@@ -1499,8 +1356,7 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	inline
-	FormatGroupTop( FormatGroupTop && f ) :
+	FormatGroupTop( FormatGroupTop && f ) NOEXCEPT :
 	 FormatGroup( std::move( f ) ),
 	 P_( 0 ),
 	 blank_zero_( false ),
@@ -1517,7 +1373,6 @@ public: // Creation
 	}
 
 	// Clone
-	inline
 	FormatGroupTop *
 	clone( Format * p = nullptr ) const
 	{
@@ -1525,7 +1380,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatGroupTop()
 	{}
@@ -1533,7 +1387,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	FormatGroupTop &
 	operator =( FormatGroupTop const & f )
 	{
@@ -1556,7 +1409,6 @@ public: // Assignment
 public: // Properties
 
 	// List-Directed?
-	inline
 	bool
 	is_list_directed() const
 	{
@@ -1564,7 +1416,6 @@ public: // Properties
 	}
 
 	// P Scaling State
-	inline
 	int
 	P() const
 	{
@@ -1572,7 +1423,6 @@ public: // Properties
 	}
 
 	// P Scaling State
-	inline
 	int &
 	P()
 	{
@@ -1580,7 +1430,6 @@ public: // Properties
 	}
 
 	// Blank Zero?
-	inline
 	bool
 	blank_zero() const
 	{
@@ -1588,7 +1437,6 @@ public: // Properties
 	}
 
 	// Blank Zero?
-	inline
 	bool &
 	blank_zero()
 	{
@@ -1596,7 +1444,6 @@ public: // Properties
 	}
 
 	// Colon Terminated?
-	inline
 	bool
 	colon_terminated() const
 	{
@@ -1604,7 +1451,6 @@ public: // Properties
 	}
 
 	// Colon Terminated?
-	inline
 	bool &
 	colon_terminated()
 	{
@@ -1612,7 +1458,6 @@ public: // Properties
 	}
 
 	// Slash Terminated?
-	inline
 	bool
 	slash_terminated() const
 	{
@@ -1620,7 +1465,6 @@ public: // Properties
 	}
 
 	// Slash Terminated?
-	inline
 	bool &
 	slash_terminated()
 	{
@@ -1628,7 +1472,6 @@ public: // Properties
 	}
 
 	// Non-Advancing?
-	inline
 	bool
 	non_advancing() const
 	{
@@ -1636,7 +1479,6 @@ public: // Properties
 	}
 
 	// Non-Advancing?
-	inline
 	bool &
 	non_advancing()
 	{
@@ -1644,7 +1486,6 @@ public: // Properties
 	}
 
 	// Reverted?
-	inline
 	bool
 	reverted() const
 	{
@@ -1652,7 +1493,6 @@ public: // Properties
 	}
 
 	// Reverted?
-	inline
 	bool &
 	reverted()
 	{
@@ -1660,7 +1500,6 @@ public: // Properties
 	}
 
 	// Revert Count
-	inline
 	Size
 	reverts() const
 	{
@@ -1668,7 +1507,6 @@ public: // Properties
 	}
 
 	// Spacer?
-	inline
 	bool
 	spacer() const
 	{
@@ -1676,7 +1514,6 @@ public: // Properties
 	}
 
 	// Spacer?
-	inline
 	bool &
 	spacer()
 	{
@@ -1684,7 +1521,6 @@ public: // Properties
 	}
 
 	// Next Format: Upward Call
-	inline
 	Format *
 	next_up()
 	{
@@ -1696,7 +1532,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	FormatGroupTop &
 	reset()
 	{
@@ -1742,33 +1577,28 @@ class FormatGroupSub : public FormatGroup
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatGroupSub( Format * p, Format * format = nullptr ) :
 	 FormatGroup( p, format )
 	{}
 
 	// Constructor
-	inline
 	FormatGroupSub( Format * p, Size const r, Format * format = nullptr ) :
 	 FormatGroup( p, r, format )
 	{}
 
 	// Constructor
-	inline
 	FormatGroupSub( Format * p, char const star, Format * format = nullptr ) :
 	 FormatGroup( p, star, format )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatGroupSub( FormatGroupSub const & f, Format * p = nullptr ) :
 	 FormatGroup( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatGroupSub *
 	clone( Format * p = nullptr ) const
 	{
@@ -1776,7 +1606,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatGroupSub()
 	{}
@@ -1790,28 +1619,24 @@ class FormatLeaf : public Format
 protected: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatLeaf( Format * p, Size const r = 1ul ) :
 	 Format( p, r )
 	{}
 
 	// Copy Constructor
-	inline
 	FormatLeaf( FormatLeaf const & f, Format * p = nullptr ) :
 	 Format( f, p )
 	{}
 
 	// Move Constructor
-	inline
-	FormatLeaf( FormatLeaf && f ) :
+	FormatLeaf( FormatLeaf && f ) NOEXCEPT :
 	 Format( std::move( f ) )
 	{}
 
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~FormatLeaf()
 	{}
@@ -1819,7 +1644,6 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( FormatLeaf const & f )
 	{
@@ -1831,7 +1655,6 @@ protected: // Assignment
 public: // Properties
 
 	// Current Format
-	inline
 	Format *
 	current()
 	{
@@ -1843,7 +1666,6 @@ public: // Properties
 	next();
 
 	// Next Format: Upward Call
-	inline
 	Format *
 	next_up()
 	{
@@ -1865,7 +1687,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatString( Format * p, std::string const & s ) :
 	 FormatLeaf( p ),
@@ -1873,7 +1694,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatString( FormatString const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -1881,7 +1701,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatString *
 	clone( Format * p = nullptr ) const
 	{
@@ -1889,7 +1708,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatString()
 	{}
@@ -1897,7 +1715,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
 	{
@@ -1905,7 +1722,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & por )
 	{
@@ -1913,7 +1729,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
@@ -1940,7 +1755,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatChar( Format * p, std::string const & s ) :
 	 FormatLeaf( p ),
@@ -1948,7 +1762,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatChar( FormatChar const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -1956,7 +1769,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatChar *
 	clone( Format * p = nullptr ) const
 	{
@@ -1964,7 +1776,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatChar()
 	{}
@@ -1972,7 +1783,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
 	{
@@ -1980,7 +1790,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & por )
 	{
@@ -1988,7 +1797,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
@@ -2014,21 +1822,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatBN( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatBN( FormatBN const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatBN *
 	clone( Format * p = nullptr ) const
 	{
@@ -2036,7 +1841,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatBN()
 	{}
@@ -2044,7 +1848,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
 	{
@@ -2052,7 +1855,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & )
 	{
@@ -2072,21 +1874,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatBZ( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatBZ( FormatBZ const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatBZ *
 	clone( Format * p = nullptr ) const
 	{
@@ -2094,7 +1893,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatBZ()
 	{}
@@ -2102,7 +1900,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
 	{
@@ -2110,7 +1907,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & )
 	{
@@ -2125,21 +1921,18 @@ class FormatS : public FormatLeaf
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatS( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatS( FormatS const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatS *
 	clone( Format * p = nullptr ) const
 	{
@@ -2147,7 +1940,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatS()
 	{}
@@ -2160,21 +1952,18 @@ class FormatSP : public FormatLeaf
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatSP( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatSP( FormatSP const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatSP *
 	clone( Format * p = nullptr ) const
 	{
@@ -2182,7 +1971,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatSP()
 	{}
@@ -2195,21 +1983,18 @@ class FormatSS : public FormatLeaf
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatSS( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatSS( FormatSS const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatSS *
 	clone( Format * p = nullptr ) const
 	{
@@ -2217,7 +2002,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatSS()
 	{}
@@ -2230,21 +2014,18 @@ class FormatSU : public FormatLeaf
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatSU( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatSU( FormatSU const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatSU *
 	clone( Format * p = nullptr ) const
 	{
@@ -2252,7 +2033,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatSU()
 	{}
@@ -2271,7 +2051,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatX( Format * p, Size const n = 1ul ) :
 	 FormatLeaf( p ),
@@ -2279,7 +2058,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatX( FormatX const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -2287,7 +2065,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatX *
 	clone( Format * p = nullptr ) const
 	{
@@ -2295,7 +2072,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatX()
 	{}
@@ -2303,7 +2079,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
 	{
@@ -2311,7 +2086,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & por )
 	{
@@ -2319,7 +2093,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos & por, std::string const & )
 	{
@@ -2339,7 +2112,6 @@ class FormatR : public FormatLeaf
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatR( Format * p, Size const radix ) :
 	 FormatLeaf( p ),
@@ -2347,7 +2119,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatR( FormatR const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -2355,7 +2126,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatR *
 	clone( Format * p = nullptr ) const
 	{
@@ -2363,7 +2133,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatR()
 	{}
@@ -2386,21 +2155,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatLinefeed( Format * p, Size const r = 1ul ) :
 	 FormatLeaf( p, r )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatLinefeed( FormatLinefeed const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatLinefeed *
 	clone( Format * p = nullptr ) const
 	{
@@ -2408,7 +2174,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatLinefeed()
 	{}
@@ -2416,7 +2181,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, std::streampos const poa, std::streampos & por )
 	{
@@ -2426,7 +2190,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, std::streampos & por )
 	{
@@ -2436,7 +2199,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
@@ -2459,21 +2221,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatColon( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatColon( FormatColon const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatColon *
 	clone( Format * p = nullptr ) const
 	{
@@ -2481,7 +2240,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatColon()
 	{}
@@ -2489,7 +2247,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
 	{
@@ -2497,7 +2254,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & )
 	{
@@ -2505,7 +2261,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{
@@ -2525,21 +2280,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatDollar( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatDollar( FormatDollar const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatDollar *
 	clone( Format * p = nullptr ) const
 	{
@@ -2547,7 +2299,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatDollar()
 	{}
@@ -2555,7 +2306,6 @@ public: // Creation
 public: // Methods
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{
@@ -2576,14 +2326,12 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	FormatT( Format * p, Size const n ) :
 	 FormatLeaf( p ),
 	 n_( n > 0 ? n : 1ul ) // Assure that n_ > 0
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatT( FormatT const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -2591,7 +2339,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatT *
 	clone( Format * p = nullptr ) const
 	{
@@ -2599,7 +2346,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatT()
 	{}
@@ -2607,7 +2353,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
 	{
@@ -2615,7 +2360,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & por )
 	{
@@ -2623,7 +2367,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos & pos, std::string const & )
 	{
@@ -2648,14 +2391,12 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	FormatTL( Format * p, Size const n ) :
 	 FormatLeaf( p ),
 	 n_( n )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatTL( FormatTL const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -2663,7 +2404,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatTL *
 	clone( Format * p = nullptr ) const
 	{
@@ -2671,7 +2411,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatTL()
 	{}
@@ -2679,7 +2418,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
 	{
@@ -2687,7 +2425,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & por )
 	{
@@ -2695,7 +2432,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos & pos, std::string const & )
 	{
@@ -2720,14 +2456,12 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	FormatTR( Format * p, Size const n ) :
 	 FormatLeaf( p ),
 	 n_( n )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatTR( FormatTR const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -2735,7 +2469,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatTR *
 	clone( Format * p = nullptr ) const
 	{
@@ -2743,7 +2476,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatTR()
 	{}
@@ -2751,7 +2483,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
 	{
@@ -2759,7 +2490,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & por )
 	{
@@ -2767,7 +2497,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos & pos, std::string const & )
 	{
@@ -2792,7 +2521,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatA( Format * p, Size const r = 1ul, Size const w = NOSIZE ) :
 	 FormatLeaf( p, r ),
@@ -2800,7 +2528,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatA( FormatA const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -2808,7 +2535,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatA *
 	clone( Format * p = nullptr ) const
 	{
@@ -2816,7 +2542,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatA()
 	{}
@@ -2824,7 +2549,6 @@ public: // Creation
 public: // Properties
 
 	// Uses an Argument?
-	inline
 	bool
 	uses_arg() const
 	{
@@ -2832,7 +2556,6 @@ public: // Properties
 	}
 
 	// Has a Width?
-	inline
 	bool
 	has_w() const
 	{
@@ -2842,7 +2565,6 @@ public: // Properties
 public: // Input Methods
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, bool & b )
 	{
@@ -2851,7 +2573,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, byte & b )
 	{
@@ -2859,7 +2580,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, ubyte & b )
 	{
@@ -2867,7 +2587,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, short int & i )
 	{
@@ -2875,7 +2594,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned short int & i )
 	{
@@ -2883,7 +2601,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, int & i )
 	{
@@ -2891,7 +2608,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned int & i )
 	{
@@ -2899,7 +2615,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long int & i )
 	{
@@ -2907,7 +2622,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long int & i )
 	{
@@ -2915,7 +2629,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long long int & i )
 	{
@@ -2923,7 +2636,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long long int & i )
 	{
@@ -2931,7 +2643,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, float & v )
 	{
@@ -2939,7 +2650,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, double & v )
 	{
@@ -2947,7 +2657,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long double & v )
 	{
@@ -2959,21 +2668,15 @@ public: // Input Methods
 	in( std::istream & stream, char & c );
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, std::string & s )
 	{
 		s = read( stream, w_ ); // Reads the whole record if w_ unspecified since std::string is variable length
 	}
 
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output
-	inline
 	void
 	out( std::ostream & stream, bool const b, std::string const & ter )
 	{
@@ -3072,7 +2775,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	void
 	out( std::ostream & stream, char const c, std::string const & ter )
 	{
@@ -3080,7 +2782,6 @@ public: // Output Methods
 	}
 
 	// Output
-	inline
 	void
 	out( std::ostream & stream, std::string const & s, std::string const & ter )
 	{
@@ -3088,19 +2789,14 @@ public: // Output Methods
 		stream << spc( ter ) << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s;
 	}
 
-	// Output
-	void
-	out( std::ostream & stream, Fstring const &, std::string const & ter );
-
 private: // Methods
 
 	// Read Value from Stream and Reinterpret as Type T
 	template< typename T >
-	inline
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
-		Size const w( TraitsA< T >::w() );
+		Size const w( TraitsA< T >::w );
 		std::string s( read( stream, wid( w ) ) );
 		std::string::size_type const ls( s.length() );
 		if ( ( w > 0ul ) && ( ls < w ) ) s += std::string( w - ls, ' ' ); // Right-pad to width needed by T
@@ -3115,11 +2811,10 @@ private: // Methods
 
 	// Write Type T Value Reinterpreted as String to Stream
 	template< typename T >
-	inline
 	void
 	write_val_reinterpret( std::ostream & stream, T const & t, std::string const & ter )
 	{
-		Size const w( TraitsA< T >::w() );
+		Size const w( TraitsA< T >::w );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
@@ -3129,11 +2824,10 @@ private: // Methods
 	}
 
 	// Write bool Value Reinterpreted as String to Stream: Override to Treat bool as 4 Byte Equivalent of LOGICAL(4)
-	inline
 	void
 	write_val_reinterpret( std::ostream & stream, bool const b, std::string const & ter )
 	{
-		Size const w( TraitsA< bool >::w() );
+		Size const w( TraitsA< bool >::w );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
@@ -3150,7 +2844,6 @@ private: // Methods
 	}
 
 	// Width for I/O
-	inline
 	Size
 	wid( Size const w ) const
 	{
@@ -3175,7 +2868,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatL( Format * p, Size const r = 1ul, Size const w = NOSIZE ) :
 	 FormatLeaf( p, r ),
@@ -3183,7 +2875,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatL( FormatL const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -3191,7 +2882,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatL *
 	clone( Format * p = nullptr ) const
 	{
@@ -3199,7 +2889,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatL()
 	{}
@@ -3207,7 +2896,6 @@ public: // Creation
 public: // Properties
 
 	// Uses an Argument?
-	inline
 	bool
 	uses_arg() const
 	{
@@ -3215,7 +2903,6 @@ public: // Properties
 	}
 
 	// Has a Width?
-	inline
 	bool
 	has_w() const
 	{
@@ -3229,7 +2916,6 @@ public: // Methods
 	in( std::istream & stream, bool & b );
 
 	// Output
-	inline
 	void
 	out( std::ostream & stream, bool const b, std::string const & ter )
 	{
@@ -3239,7 +2925,6 @@ public: // Methods
 private: // Methods
 
 	// Width for I/O
-	inline
 	Size
 	wid( Size const w ) const
 	{
@@ -3263,7 +2948,6 @@ public: // Types
 protected: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatInteger( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatLeaf( p, r ),
@@ -3272,7 +2956,6 @@ protected: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	FormatInteger( FormatInteger const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
 	 w_( f.w_ ),
@@ -3280,8 +2963,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	inline
-	FormatInteger( FormatInteger && f ) :
+	FormatInteger( FormatInteger && f ) NOEXCEPT :
 	 FormatLeaf( std::move( f ) ),
 	 w_( f.w_ ),
 	 m_( f.m_ )
@@ -3290,7 +2972,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~FormatInteger()
 	{}
@@ -3298,7 +2979,6 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( FormatInteger const & f )
 	{
@@ -3312,7 +2992,6 @@ protected: // Assignment
 public: // Properties
 
 	// Uses an Argument?
-	inline
 	bool
 	uses_arg() const
 	{
@@ -3320,7 +2999,6 @@ public: // Properties
 	}
 
 	// Has a Width?
-	inline
 	bool
 	has_w() const
 	{
@@ -3328,15 +3006,13 @@ public: // Properties
 	}
 
 	// Field Width
-	inline
 	Size
 	w() const
 	{
 		return w_;
 	}
 
-	// Min Width
-	inline
+	// Minimum Width
 	Size
 	m() const
 	{
@@ -3346,7 +3022,6 @@ public: // Properties
 public: // Input Methods
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, bool & b )
 	{
@@ -3356,7 +3031,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, byte & b )
 	{
@@ -3364,7 +3038,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, ubyte & b )
 	{
@@ -3372,7 +3045,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, short int & i )
 	{
@@ -3380,7 +3052,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned short int & i )
 	{
@@ -3388,7 +3059,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, int & i )
 	{
@@ -3396,7 +3066,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned int & i )
 	{
@@ -3404,7 +3073,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long int & i )
 	{
@@ -3412,7 +3080,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long int & i )
 	{
@@ -3420,7 +3087,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long long int & i )
 	{
@@ -3428,7 +3094,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long long int & i )
 	{
@@ -3436,7 +3101,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, float & v )
 	{
@@ -3444,7 +3108,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, double & v )
 	{
@@ -3452,7 +3115,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long double & v )
 	{
@@ -3463,27 +3125,24 @@ protected: // Methods
 
 	// Read Integer from Stream
 	template< typename T >
-	inline
 	void
 	read_int( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w ) ) ) );
 		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
 	// Read Integer from Stream and Reinterpret as Type T
 	template< typename T >
-	inline
 	void
 	read_int_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w ) ) ) );
 		read_int_reinterpret( stream, s, t );
 	}
 
 	// Read Integer from String and Reinterpret as Type T
 	template< typename T >
-	inline
 	void
 	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
 	{
@@ -3520,7 +3179,6 @@ protected: // Methods
 	}
 
 	// Width for I/O
-	inline
 	Size
 	wid( Size const w ) const
 	{
@@ -3555,21 +3213,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatI( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatI( FormatI const & f, Format * p = nullptr ) :
 	 FormatInteger( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatI *
 	clone( Format * p = nullptr ) const
 	{
@@ -3577,7 +3232,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatI()
 	{}
@@ -3627,7 +3281,6 @@ public: // Output Methods
 protected: // Methods
 
 	// Can Convert String in Integer Base Format to Integer?
-	inline
 	bool
 	is_int_base( std::string const & s ) const
 	{
@@ -3635,7 +3288,6 @@ protected: // Methods
 	}
 
 	// Convert String in Integer Base Format to Integer
-	inline
 	long int
 	read_int_base( std::istream & stream, std::string const & s ) const
 	{
@@ -3661,21 +3313,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatB( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatB( FormatB const & f, Format * p = nullptr ) :
 	 FormatInteger( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatB *
 	clone( Format * p = nullptr ) const
 	{
@@ -3683,7 +3332,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatB()
 	{}
@@ -3691,7 +3339,6 @@ public: // Creation
 public: // Input Methods
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, bool & b )
 	{
@@ -3701,7 +3348,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, byte & b )
 	{
@@ -3709,7 +3355,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, ubyte & b )
 	{
@@ -3717,7 +3362,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, short int & i )
 	{
@@ -3725,7 +3369,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned short int & i )
 	{
@@ -3733,7 +3376,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, int & i )
 	{
@@ -3741,7 +3383,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned int & i )
 	{
@@ -3749,7 +3390,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long int & i )
 	{
@@ -3757,7 +3397,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long int & i )
 	{
@@ -3765,7 +3404,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long long int & i )
 	{
@@ -3773,7 +3411,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long long int & i )
 	{
@@ -3781,7 +3418,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, float & v )
 	{
@@ -3789,7 +3425,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, double & v )
 	{
@@ -3797,7 +3432,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long double & v )
 	{
@@ -3850,26 +3484,23 @@ protected: // Methods
 
 	// Read Integer Value from Stream
 	template< typename T >
-	inline
 	void
 	read_binary( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w ) ) ) );
 		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
 	// Read Binary from Stream and Reinterpret as Type T
 	template< typename T >
-	inline
 	void
 	read_binary_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w ) ) ) );
 		read_int_reinterpret( stream, s, t );
 	}
 
 	// Can Convert String in Integer Base Format to Integer?
-	inline
 	bool
 	is_int_base( std::string const & s ) const
 	{
@@ -3877,7 +3508,6 @@ protected: // Methods
 	}
 
 	// Convert String in Integer Base Format to Integer
-	inline
 	long int
 	read_int_base( std::istream & stream, std::string const & s ) const
 	{
@@ -3902,21 +3532,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatO( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatO( FormatO const & f, Format * p = nullptr ) :
 	 FormatInteger( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatO *
 	clone( Format * p = nullptr ) const
 	{
@@ -3924,7 +3551,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatO()
 	{}
@@ -3974,7 +3600,6 @@ public: // Output Methods
 protected: // Methods
 
 	// Can Convert String in Integer Base Format to Integer?
-	inline
 	bool
 	is_int_base( std::string const & s ) const
 	{
@@ -3982,7 +3607,6 @@ protected: // Methods
 	}
 
 	// Convert String in Integer Base Format to Integer
-	inline
 	long int
 	read_int_base( std::istream & stream, std::string const & s ) const
 	{
@@ -4007,21 +3631,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatZ( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatZ( FormatZ const & f, Format * p = nullptr ) :
 	 FormatInteger( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatZ *
 	clone( Format * p = nullptr ) const
 	{
@@ -4029,7 +3650,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatZ()
 	{}
@@ -4079,7 +3699,6 @@ public: // Output Methods
 protected: // Methods
 
 	// Can Convert String in Integer Base Format to Integer?
-	inline
 	bool
 	is_int_base( std::string const & s ) const
 	{
@@ -4087,7 +3706,6 @@ protected: // Methods
 	}
 
 	// Convert String in Integer Base Format to Integer
-	inline
 	long int
 	read_int_base( std::istream & stream, std::string const & s ) const
 	{
@@ -4113,7 +3731,6 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatP( Format * p, int k = 1 ) :
 	 FormatLeaf( p ),
@@ -4121,7 +3738,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatP( FormatP const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
@@ -4129,7 +3745,6 @@ public: // Creation
 	{}
 
 	// Clone
-	inline
 	FormatP *
 	clone( Format * p = nullptr ) const
 	{
@@ -4137,7 +3752,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatP()
 	{}
@@ -4145,7 +3759,6 @@ public: // Creation
 public: // Methods
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
 	{
@@ -4153,7 +3766,6 @@ public: // Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream &, std::streampos & )
 	{
@@ -4161,7 +3773,6 @@ public: // Methods
 	}
 
 	// Output
-	inline
 	void
 	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{
@@ -4185,7 +3796,6 @@ public: // Types
 protected: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatFloat( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul ) :
 	 FormatLeaf( p, r ),
@@ -4194,7 +3804,6 @@ protected: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	FormatFloat( FormatFloat const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p ),
 	 w_( f.w_ ),
@@ -4202,8 +3811,7 @@ protected: // Creation
 	{}
 
 	// Move Constructor
-	inline
-	FormatFloat( FormatFloat && f ) :
+	FormatFloat( FormatFloat && f ) NOEXCEPT :
 	 FormatLeaf( std::move( f ) ),
 	 w_( f.w_ ),
 	 d_( f.d_ )
@@ -4212,7 +3820,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~FormatFloat()
 	{}
@@ -4220,7 +3827,6 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( FormatFloat const & f )
 	{
@@ -4234,7 +3840,6 @@ protected: // Assignment
 public: // Properties
 
 	// Uses an Argument?
-	inline
 	bool
 	uses_arg() const
 	{
@@ -4242,7 +3847,6 @@ public: // Properties
 	}
 
 	// Has a Width?
-	inline
 	bool
 	has_w() const
 	{
@@ -4250,7 +3854,6 @@ public: // Properties
 	}
 
 	// Field Width
-	inline
 	Size
 	w() const
 	{
@@ -4258,7 +3861,6 @@ public: // Properties
 	}
 
 	// Field Digits
-	inline
 	Size
 	d() const
 	{
@@ -4268,11 +3870,10 @@ public: // Properties
 public: // Input Methods
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, bool & b )
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w ) ) ) );
 		if ( s.length() > 0 ) {
 			bool ok( is_type< float >( s ) );
 			float const v( val_of< float >( s ) );
@@ -4286,7 +3887,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, int & i )
 	{
@@ -4294,7 +3894,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned int & i )
 	{
@@ -4302,7 +3901,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long int & i )
 	{
@@ -4310,7 +3908,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long int & i )
 	{
@@ -4318,7 +3915,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long long int & i )
 	{
@@ -4326,7 +3922,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long long int & i )
 	{
@@ -4334,7 +3929,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, float & v )
 	{
@@ -4342,7 +3936,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, double & v )
 	{
@@ -4350,7 +3943,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long double & v )
 	{
@@ -4361,11 +3953,10 @@ protected: // Methods
 
 	// Read Value from Stream
 	template< typename T >
-	inline
 	void
 	read_val( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
 			if ( ( d_ > 0ul ) && ( t != T( 0 ) ) && ( ! has( s, '.' ) ) ) t /= static_cast< T >( std::pow( T( 10 ), d_ ) ); // Apply implied decimal point
@@ -4378,11 +3969,10 @@ protected: // Methods
 
 	// Read Value from Stream and Reinterpret as Type T
 	template< typename T >
-	inline
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( s.length() > 0 ) {
 			bool ok( true );
 			if ( sizeof( T ) < sizeof( float ) ) {
@@ -4419,7 +4009,6 @@ protected: // Methods
 	}
 
 	// Width for I/O
-	inline
 	Size
 	wid( Size const w ) const
 	{
@@ -4428,7 +4017,6 @@ protected: // Methods
 
 	// Value of Type F from a String
 	template< typename F >
-	inline
 	F
 	val_of( std::string const & s ) const
 	{
@@ -4456,21 +4044,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatF( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul ) :
 	 FormatFloat( p, r, w, d )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatF( FormatF const & f, Format * p = nullptr ) :
 	 FormatFloat( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatF *
 	clone( Format * p = nullptr ) const
 	{
@@ -4478,7 +4063,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatF()
 	{}
@@ -4506,7 +4090,6 @@ class FormatGED : public FormatFloat
 protected: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatGED( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatFloat( p, r, w, d ),
@@ -4514,15 +4097,13 @@ protected: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	FormatGED( FormatGED const & f, Format * p = nullptr ) :
 	 FormatFloat( f, p ),
 	 e_( f.e_ )
 	{}
 
 	// Move Constructor
-	inline
-	FormatGED( FormatGED && f ) :
+	FormatGED( FormatGED && f ) NOEXCEPT :
 	 FormatFloat( std::move( f ) ),
 	 e_( f.e_ )
 	{}
@@ -4530,7 +4111,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~FormatGED()
 	{}
@@ -4538,7 +4118,6 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( FormatGED const & f )
 	{
@@ -4551,7 +4130,6 @@ protected: // Assignment
 public: // Properties
 
 	// Field Exponent Digits
-	inline
 	Size
 	e() const
 	{
@@ -4576,21 +4154,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatG( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatG( FormatG const & f, Format * p = nullptr ) :
 	 FormatGED( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatG *
 	clone( Format * p = nullptr ) const
 	{
@@ -4598,7 +4173,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatG()
 	{}
@@ -4610,7 +4184,6 @@ public: // Input Methods
 	in( std::istream & stream, bool & b );
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, byte & b )
 	{
@@ -4618,7 +4191,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, ubyte & b )
 	{
@@ -4626,7 +4198,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, short int & i )
 	{
@@ -4634,7 +4205,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned short int & i )
 	{
@@ -4642,7 +4212,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, int & i )
 	{
@@ -4650,7 +4219,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned int & i )
 	{
@@ -4658,7 +4226,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long int & i )
 	{
@@ -4666,7 +4233,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long int & i )
 	{
@@ -4674,7 +4240,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long long int & i )
 	{
@@ -4682,7 +4247,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long long int & i )
 	{
@@ -4694,16 +4258,11 @@ public: // Input Methods
 	in( std::istream & stream, char & c );
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, std::string & s )
 	{
 		s = read( stream, w() ); // Reads the whole record if w() unspecified since std::string is variable length
 	}
-
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
 
 public: // Output Methods
 
@@ -4763,11 +4322,10 @@ protected: // Methods
 
 	// Read Integer from Stream
 	template< typename T >
-	inline
 	void
 	read_int( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
 		} else { // Bad input
@@ -4789,21 +4347,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatE( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatE( FormatE const & f, Format * p = nullptr ) :
 	 FormatGED( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatE *
 	clone( Format * p = nullptr ) const
 	{
@@ -4811,7 +4366,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatE()
 	{}
@@ -4843,21 +4397,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatEN( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatEN( FormatEN const & f, Format * p = nullptr ) :
 	 FormatGED( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatEN *
 	clone( Format * p = nullptr ) const
 	{
@@ -4865,7 +4416,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatEN()
 	{}
@@ -4897,21 +4447,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatES( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatES( FormatES const & f, Format * p = nullptr ) :
 	 FormatGED( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatES *
 	clone( Format * p = nullptr ) const
 	{
@@ -4919,7 +4466,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatES()
 	{}
@@ -4951,21 +4497,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatD( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatD( FormatD const & f, Format * p = nullptr ) :
 	 FormatGED( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatD *
 	clone( Format * p = nullptr ) const
 	{
@@ -4973,7 +4516,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatD()
 	{}
@@ -5006,21 +4548,18 @@ public: // Types
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	FormatLD( Format * p ) :
 	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
-	inline
 	explicit
 	FormatLD( FormatLD const & f, Format * p = nullptr ) :
 	 FormatLeaf( f, p )
 	{}
 
 	// Clone
-	inline
 	FormatLD *
 	clone( Format * p = nullptr ) const
 	{
@@ -5028,7 +4567,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~FormatLD()
 	{}
@@ -5036,7 +4574,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( FormatLD const & f )
 	{
@@ -5049,7 +4586,6 @@ public: // Assignment
 public: // Properties
 
 	// Uses an Argument?
-	inline
 	bool
 	uses_arg() const
 	{
@@ -5057,7 +4593,6 @@ public: // Properties
 	}
 
 	// FormatLD?
-	inline
 	bool
 	is_FormatLD() const
 	{
@@ -5065,7 +4600,6 @@ public: // Properties
 	}
 
 	// List-Directed?
-	inline
 	bool
 	is_list_directed() const
 	{
@@ -5073,7 +4607,6 @@ public: // Properties
 	}
 
 	// Next Format
-	inline
 	Format *
 	next()
 	{
@@ -5097,7 +4630,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	FormatLD &
 	reset()
 	{
@@ -5109,7 +4641,6 @@ public: // Methods
 public: // Input Methods
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, bool & b )
 	{
@@ -5117,7 +4648,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, byte & b )
 	{
@@ -5125,7 +4655,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, ubyte & b )
 	{
@@ -5133,7 +4662,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, short int & i )
 	{
@@ -5141,7 +4669,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned short int & i )
 	{
@@ -5149,7 +4676,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, int & i )
 	{
@@ -5157,7 +4683,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned int & i )
 	{
@@ -5165,7 +4690,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long int & i )
 	{
@@ -5173,7 +4697,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long int & i )
 	{
@@ -5181,7 +4704,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long long int & i )
 	{
@@ -5189,7 +4711,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, unsigned long long int & i )
 	{
@@ -5197,7 +4718,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, float & v )
 	{
@@ -5205,7 +4725,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, double & v )
 	{
@@ -5213,7 +4732,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, long double & v )
 	{
@@ -5221,7 +4739,6 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, char & c )
 	{
@@ -5229,16 +4746,11 @@ public: // Input Methods
 	}
 
 	// Input
-	inline
 	void
 	in( std::istream & stream, std::string & s )
 	{
 		read_string( stream, s );
 	}
-
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
 
 public: // Output Methods
 
@@ -5306,10 +4818,6 @@ public: // Output Methods
 	void
 	out( std::ostream & stream, std::string const & s, std::string const & ter );
 
-	// Output
-	void
-	out( std::ostream & stream, Fstring const & s, std::string const & ter );
-
 protected: // Methods
 
 	// Read Boolean from Stream
@@ -5318,7 +4826,6 @@ protected: // Methods
 
 	// Read Number from Stream
 	template< typename T >
-	inline
 	void
 	read_num( std::istream & stream, T & t )
 	{
@@ -5336,7 +4843,6 @@ protected: // Methods
 
 	// Read Character from Stream
 	template< typename T >
-	inline
 	void
 	read_char( std::istream & stream, T & t )
 	{
@@ -5349,7 +4855,6 @@ protected: // Methods
 
 	// Read String from Stream
 	template< typename T >
-	inline
 	void
 	read_string( std::istream & stream, T & t )
 	{
@@ -5380,7 +4885,6 @@ public: // Types
 private: // Creation
 
 	// Default Constructor
-	inline
 	FormatFactory()
 	{}
 

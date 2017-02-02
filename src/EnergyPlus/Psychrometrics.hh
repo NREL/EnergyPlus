@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef Psychrometrics_hh_INCLUDED
 #define Psychrometrics_hh_INCLUDED
 
@@ -7,9 +53,8 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/bit.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -58,9 +103,9 @@ namespace Psychrometrics {
 	extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
 	extern std::string const blank_string;
 #ifdef EP_psych_stats
-	extern FArray1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
+	extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
-	extern FArray1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
+	extern Array1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
 #ifndef EP_psych_errors
@@ -83,10 +128,10 @@ namespace Psychrometrics {
 	// MODULE VARIABLE DEFINITIONS:
 	extern std::string String;
 	extern bool ReportErrors;
-	extern FArray1D_int iPsyErrIndex; // Number of times error occurred
+	extern Array1D_int iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
-	extern FArray1D< Int64 > NumTimesCalled;
-	extern FArray1D_int NumIterations;
+	extern Array1D< Int64 > NumTimesCalled;
+	extern Array1D_int NumIterations;
 #endif
 
 	// DERIVED TYPE DEFINITIONS
@@ -110,19 +155,6 @@ namespace Psychrometrics {
 			Twb( 0.0 )
 		{}
 
-		// Member Constructor
-		cached_twb_t(
-			Int64 const iTdb,
-			Int64 const iW,
-			Int64 const iPb,
-			Real64 const Twb
-		) :
-			iTdb( iTdb ),
-			iW( iW ),
-			iPb( iPb ),
-			Twb( Twb )
-		{}
-
 	};
 #endif
 
@@ -139,29 +171,23 @@ namespace Psychrometrics {
 			Psat( 0.0 )
 		{}
 
-		// Member Constructor
-		cached_psat_t(
-			Int64 const iTdb,
-			Real64 const Psat
-		) :
-			iTdb( iTdb ),
-			Psat( Psat )
-		{}
-
 	};
 #endif
 
 	// Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
-	extern FArray1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
+	extern Array1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-	extern FArray1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
+	extern Array1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 
 	// Subroutine Specifications for the Module
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	InitializePsychRoutines();
@@ -176,7 +202,7 @@ namespace Psychrometrics {
 		Real64 const tdb, // dry bulb temperature (Celsius)
 		Real64 const dw, // humidity ratio (kgWater/kgDryAir)
 		Real64 const rhoair, // density of air
-		std::string const & CalledFrom // routine this function was called from (error messages) !unused1208
+		std::string const & CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
 	);
 #endif
 
@@ -217,8 +243,25 @@ namespace Psychrometrics {
 
 	inline
 	Real64
+	PsyRhoAirFnPbTdbW_fast(
+		Real64 const pb, // barometric pressure (Pascals)
+		Real64 const tdb, // dry bulb temperature (Celsius)
+		Real64 const dw // humidity ratio (kgWater/kgDryAir)
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dw >= 1.0e-5 );
+		Real64 const rhoair( pb / ( 287.0 * ( tdb + KelvinConv ) * ( 1.0 + 1.6077687 * dw ) ) );
+#ifdef EP_psych_errors
+		if ( rhoair < 0.0 ) PsyRhoAirFnPbTdbW_error( pb, tdb, dw, rhoair );
+#endif
+		return rhoair;
+	}
+
+	inline
+	Real64
 	PsyHfgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -251,7 +294,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -301,6 +344,20 @@ namespace Psychrometrics {
 
 	inline
 	Real64
+	PsyHFnTdbW_fast(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const dW // humidity ratio
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dW >= 1.0e-5 );
+
+		// calculate enthalpy
+		return 1.00484e3 * TDB + dW * ( 2.50094e6 + 1.85895e3 * TDB ); // enthalpy {J/kg}
+	}
+
+	inline
+	Real64
 	PsyCpAirFnWTdb(
 		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
 		Real64 const T // input temperature {Celsius}
@@ -333,6 +390,35 @@ namespace Psychrometrics {
 		// compute heat capacity of air
 		Real64 const w( max( dw, 1.0e-5 ) );
 		Real64 const cpa( ( PsyHFnTdbW( T + 0.1, w ) - PsyHFnTdbW( T, w ) ) * 10.0 ); // result => heat capacity of air {J/kg-C}
+
+		// save values for next call
+		dwSave = dw;
+		Tsave = T;
+		cpaSave = cpa;
+
+		return cpa;
+	}
+
+	inline
+	Real64
+	PsyCpAirFnWTdb_fast(
+		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
+		Real64 const T // input temperature {Celsius}
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dw >= 1.0e-5 );
+
+		// Static locals
+		static Real64 dwSave( -100.0 );
+		static Real64 Tsave( -100.0 );
+		static Real64 cpaSave( -100.0 );
+
+		// check if last call had the same input and if it did just use the saved output
+		if ( ( Tsave == T ) && ( dwSave == dw ) ) return cpaSave;
+
+		// compute heat capacity of air
+		Real64 const cpa( ( PsyHFnTdbW_fast( T + 0.1, dw ) - PsyHFnTdbW_fast( T, dw ) ) * 10.0 ); // result => heat capacity of air {J/kg-C}
 
 		// save values for next call
 		dwSave = dw;
@@ -421,6 +507,19 @@ namespace Psychrometrics {
 
 		Real64 const W( max( dW, 1.0e-5 ) ); // humidity ratio
 		return W * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( W + 0.62198 ) );
+	}
+
+	inline
+	Real64
+	PsyRhovFnTdbWPb_fast(
+		Real64 const Tdb, // dry-bulb temperature {C}
+		Real64 const dW, // humidity ratio
+		Real64 const PB // Barometric Pressure {Pascals}
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dW >= 1.0e-5 );
+		return dW * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( dW + 0.62198 ) );
 	}
 
 #ifdef EP_psych_errors
@@ -1160,7 +1259,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPCW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1176,7 +1275,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPHW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1208,29 +1307,6 @@ namespace Psychrometrics {
 
 		return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2( TB ) + 8.4791863e-06 * pow_3( TB );
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Psychrometrics
 

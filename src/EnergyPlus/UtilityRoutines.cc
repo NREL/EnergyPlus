@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // FMI-Related Headers
 extern "C" {
 #include <FMI/main.h>
@@ -7,11 +53,11 @@ extern "C" {
 // C++ Headers
 #include <cstdlib>
 #include <iostream>
+#include <exception>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -20,6 +66,7 @@ extern "C" {
 #include <UtilityRoutines.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
@@ -44,11 +91,12 @@ extern "C" {
 
 namespace EnergyPlus {
 
+namespace UtilityRoutines {
+	bool outputErrorHeader( true );
+}
+
 void
-AbortEnergyPlus(
-	bool const NoIdf, // Set to true when "noidf" was found
-	bool const NoIDD // Set to true when "noidd" was found
-)
+AbortEnergyPlus()
 {
 
 	// SUBROUTINE INFORMATION:
@@ -115,7 +163,7 @@ AbortEnergyPlus(
 	bool TerminalError;
 	int write_stat;
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->updateSQLiteSimulationRecord( true, false );
 	}
 
@@ -171,31 +219,6 @@ AbortEnergyPlus(
 	NumSevereDuringSizing = RoundSigDigits( TotalSevereErrorsDuringSizing );
 	strip( NumSevereDuringSizing );
 
-	if ( NoIDD ) {
-		DisplayString( "No EnergyPlus Data Dictionary (Energy+.idd) was found.  It is possible " );
-		DisplayString( "you \"double-clicked\"EnergyPlus.exe rather than using one of the methods" );
-		DisplayString( "to run Energyplus as found in the GettingStarted document in the" );
-		DisplayString( "documentation folder.  Using EP-Launch may be best -- " );
-		DisplayString( "it provides extra help for new users." );
-		ShowMessage( "No EnergyPlus Data Dictionary (Energy+.idd) was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
-		ShowMessage( "rather than using one of the methods to run Energyplus as found in the GettingStarted document" );
-		ShowMessage( "in the documentation folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
-	if ( NoIdf ) {
-		DisplayString( "No input file (in.idf) was found.  It is possible you \"double-clicked\"" );
-		DisplayString( "EnergyPlus.exe rather than using one of the methods to run Energyplus" );
-		DisplayString( "as found in the GettingStarted document in the documentation folder." );
-		DisplayString( "Using EP-Launch may be best -- it provides extra help for new users." );
-		ShowMessage( "No input file (in.idf) was found.  It is possible you \"double-clicked\" EnergyPlus.exe rather than" );
-		ShowMessage( "using one of the methods to run Energyplus as found in the GettingStarted document in the documentation" );
-		ShowMessage( "folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
 	// catch up with timings if in middle
 	Time_Finish = epElapsedTime();
 	if ( Time_Finish < Time_Start ) Time_Finish += 24.0 * 3600.0;
@@ -217,9 +240,9 @@ AbortEnergyPlus(
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ DataStringGlobals::outputEndFileName +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -231,7 +254,8 @@ AbortEnergyPlus(
 	// Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
 	// indicating that E+ terminated with an error.
 	if ( NumExternalInterfaces > 0 ) CloseSocket( -1 );
-	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl; std::exit( EXIT_FAILURE );
+	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
+	std::exit( EXIT_FAILURE );
 
 }
 
@@ -266,7 +290,6 @@ CloseMiscOpenFiles()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	int const MaxUnitNumber( 1000 );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -409,7 +432,7 @@ EndEnergyPlus()
 	Real64 Seconds; // Elapsed Time Second Reporting
 	int write_stat;
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->updateSQLiteSimulationRecord( true, true );
 	}
 
@@ -449,9 +472,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -515,7 +538,7 @@ GetNewUnitNumber()
 //	//  Indicate number and value of preconnected units
 //
 //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-//	static FArray1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
+//	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
 //
 //	//  Largest allowed unit number (or a large number, if none)
 //	int const MaxUnitNumber( 1000 );
@@ -829,20 +852,17 @@ ShowFatalError(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static bool NoIdf( false );
-	static bool NoIDD( false );
 
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	DisplayString( "**FATAL:" + ErrorMessage );
-	if ( has( ErrorMessage, "in.idf missing" ) ) NoIdf = true;
-	if ( has( ErrorMessage, "Energy+.idd missing" ) ) NoIDD = true;
+
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
-	AbortEnergyPlus( NoIdf, NoIDD );
+	throw std::runtime_error( ErrorMessage );
 
 }
 
@@ -903,7 +923,7 @@ ShowSevereError(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
 	}
 
@@ -962,7 +982,7 @@ ShowSevereMessage(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 	}
 
@@ -1008,7 +1028,7 @@ ShowContinueError(
 	// na
 
 	ShowErrorMessage( " **   ~~~   ** " + Message, OutUnit1, OutUnit2 );
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->updateSQLiteErrorRecord( Message );
 	}
 
@@ -1074,13 +1094,13 @@ ShowContinueErrorTimeStamp(
 
 	if ( len( Message ) < 50 ) {
 		ShowErrorMessage( " **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	} else {
 		ShowErrorMessage( " **   ~~~   ** " + Message );
 		ShowErrorMessage( " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	}
@@ -1188,7 +1208,7 @@ ShowWarningError(
 	if ( DoingSizing ) ++TotalWarningErrorsDuringSizing;
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
 	}
 
@@ -1243,7 +1263,7 @@ ShowWarningMessage(
 	}
 
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 	}
 
@@ -1567,6 +1587,7 @@ ShowErrorMessage(
 	using DataStringGlobals::IDDVerString;
 	using DataGlobals::DoingInputProcessing;
 	using DataGlobals::CacheIPErrorFile;
+	using DataGlobals::err_stream;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1582,25 +1603,14 @@ ShowErrorMessage(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static int TotalErrors( 0 ); // used to determine when to open standard error output file.
-	static int StandardErrorOutput;
-	int write_stat;
-	static bool ErrFileOpened( false );
 
-	if ( TotalErrors == 0 && ! ErrFileOpened ) {
-		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, "eplusout.err", flags ); write_stat = flags.ios(); }
-		if ( write_stat != 0 ) {
-			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
-		}
-		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
-		ErrFileOpened = true;
+	if ( UtilityRoutines::outputErrorHeader && err_stream ) {
+		*err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+		UtilityRoutines::outputErrorHeader = false;
 	}
 
 	if ( ! DoingInputProcessing ) {
-		++TotalErrors;
-		gio::write( StandardErrorOutput, ErrorFormat ) << ErrorMessage;
+		if ( err_stream ) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
 	} else {
 		gio::write( CacheIPErrorFile, fmtA ) << ErrorMessage;
 	}
@@ -1701,7 +1711,7 @@ ShowRecurringErrors()
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-    using General::strip_trailing_zeros;
+	using General::strip_trailing_zeros;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1732,7 +1742,7 @@ ShowRecurringErrors()
 			// Suppress reporting the count if it is a continue error
 			if ( has_prefix( error.Message, " **   ~~~   ** " ) ) {
 				ShowMessage( error.Message );
-				if ( sqlite && sqlite->writeOutputToSQLite() ) {
+				if ( sqlite ) {
 					sqlite->updateSQLiteErrorRecord( error.Message );
 				}
 			} else {
@@ -1741,7 +1751,7 @@ ShowRecurringErrors()
 				ShowMessage( StatMessageStart + "  This error occurred " + RoundSigDigits( error.Count ) + " total times;" );
 				ShowMessage( StatMessageStart + "  during Warmup " + RoundSigDigits( error.WarmupCount ) + " times;" );
 				ShowMessage( StatMessageStart + "  during Sizing " + RoundSigDigits( error.SizingCount ) + " times." );
-				if ( sqlite && sqlite->writeOutputToSQLite() ) {
+				if ( sqlite ) {
 					if ( has_prefix( error.Message, " ** Warning ** " ) ) {
 						sqlite->createSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
 					} else if ( has_prefix( error.Message, " ** Severe  ** " ) ) {
@@ -1776,24 +1786,5 @@ ShowRecurringErrors()
 	}
 
 }
-
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // EnergyPlus

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <algorithm>
 #include <cassert>
@@ -7,14 +53,16 @@
 #include <fstream>
 #include <ostream>
 #include <string>
+#include <unordered_set>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputProcessor.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobalConstants.hh>
@@ -32,6 +80,8 @@
 #include <SortAndStringUtilities.hh>
 #include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
+#include <milo/dtoa.hpp>
+#include <milo/itoa.hpp>
 
 namespace EnergyPlus {
 
@@ -120,7 +170,7 @@ namespace OutputProcessor {
 	static gio::Fmt DailyStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',A)" );
 	static gio::Fmt MonthlyStampFormat( "(A,',',A,',',i2)" );
 	static gio::Fmt RunPeriodStampFormat( "(A,',',A)" );
-	FArray1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
+	Array1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 	static std::string const BlankString;
 	int const UnitsStringLength( 16 );
 
@@ -143,7 +193,7 @@ namespace OutputProcessor {
 
 	int InstMeterCacheSize( 1000 ); // the maximum size of the instant meter cache used in GetInstantMeterValue
 	int InstMeterCacheSizeInc( 1000 ); // the increment for the instant meter cache used in GetInstantMeterValue
-	FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
+	Array1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
 	int InstMeterCacheLastUsed( 0 ); // the last item in the instant meter cache used
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -171,17 +221,17 @@ namespace OutputProcessor {
 	int NumHoursInDay( 24 );
 	int NumHoursInMonth( 0 );
 	int NumHoursInSim( 0 );
-	FArray1D_int ReportList;
+	Array1D_int ReportList;
 	int NumReportList( 0 );
 	int NumExtraVars( 0 );
-	FArray2D_string FreqNotice( {-1,4}, {1,2} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
+	Array2D_string FreqNotice( {1,2}, {-1,4} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	int NumOfReqVariables( 0 ); // Current number of Requested Report Variables
 
 	int NumVarMeterArrays( 0 ); // Current number of Arrays pointing to meters
 
 	int NumEnergyMeters( 0 ); // Current number of Energy Meters
-	FArray1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
+	Array1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
 
 	int TimeStepStampReportNbr; // TimeStep and Hourly Report number
 	std::string TimeStepStampReportChr; // TimeStep and Hourly Report number (character -- for printing)
@@ -195,29 +245,44 @@ namespace OutputProcessor {
 	int RunPeriodStampReportNbr; // RunPeriod Report number
 	std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	bool TrackingRunPeriodVariables( false ); // Requested RunPeriod Report Variables
-	Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
+	Real64 TimeStepZoneSec; // Seconds from NumTimeStepInHour
 	bool ErrorsLogged( false );
 	bool ProduceVariableDictionary( false );
 
 	int MaxNumSubcategories( 1 );
+	bool isFinalYear( false );
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of OutputProcessor should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		int ReportNumberCounter( 0 ); // The report number is used in output reports as a key.
+		int LHourP( -1 ); // Helps set hours for timestamp output
+		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
+		bool InitFlag( true );
+	}
 
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow
 
 	// Object Data
-	FArray1D< TimeSteps > TimeValue( 2 ); // Pointers to the actual TimeStep variables
-	FArray1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
-	FArray1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
-	FArray1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
+	Array1D< TimeSteps > TimeValue( 2 ); // Pointers to the actual TimeStep variables
+	Array1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
+	Array1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
+	Array1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
 	Reference< RealVariables > RVariable;
 	Reference< IntegerVariables > IVariable;
 	Reference< RealVariables > RVar;
 	Reference< IntegerVariables > IVar;
-	FArray1D< ReqReportVariables > ReqRepVars;
-	FArray1D< MeterArrayType > VarMeterArrays;
-	FArray1D< MeterType > EnergyMeters;
-	FArray1D< EndUseCategoryType > EndUseCategory;
+	Array1D< ReqReportVariables > ReqRepVars;
+	Array1D< MeterArrayType > VarMeterArrays;
+	Array1D< MeterType > EnergyMeters;
+	Array1D< EndUseCategoryType > EndUseCategory;
 
 	// Routines tagged on the end of this module:
 	//  AddToOutputVariableList
@@ -242,6 +307,79 @@ namespace OutputProcessor {
 	//  UpdateMeterReporting
 
 	// Functions
+
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		InstMeterCacheSize = 1000;
+		InstMeterCacheSizeInc = 1000;
+		InstMeterCache.deallocate();
+		InstMeterCacheLastUsed = 0;
+		CurrentReportNumber = 0;
+		NumVariablesForOutput = 0;
+		MaxVariablesForOutput = 0;
+		NumOfRVariable_Setup = 0;
+		NumTotalRVariable = 0;
+		NumOfRVariable_Sum = 0;
+		NumOfRVariable_Meter = 0;
+		NumOfRVariable = 0;
+		MaxRVariable = 0;
+		NumOfIVariable_Setup = 0;
+		NumTotalIVariable = 0;
+		NumOfIVariable_Sum = 0;
+		NumOfIVariable = 0;
+		MaxIVariable = 0;
+		OutputInitialized = false;
+		ProduceReportVDD = ReportVDD_No;
+		OutputFileMeterDetails = 0;
+		NumHoursInDay = 24;
+		NumHoursInMonth = 0;
+		NumHoursInSim = 0;
+		ReportList.deallocate();
+		NumReportList = 0;
+		NumExtraVars = 0;
+		FreqNotice.dimension( {1,2}, {-1,4} );
+		NumOfReqVariables = 0;
+		NumVarMeterArrays = 0;
+		NumEnergyMeters = 0;
+		MeterValue.deallocate();
+		TimeStepStampReportNbr = 0;
+		TimeStepStampReportChr = "";
+		TrackingHourlyVariables = false;
+		DailyStampReportNbr = 0;
+		DailyStampReportChr = "";
+		TrackingDailyVariables = false;
+		MonthlyStampReportNbr = 0;
+		MonthlyStampReportChr = "";
+		TrackingMonthlyVariables = false;
+		RunPeriodStampReportNbr = 0;
+		RunPeriodStampReportChr = "";
+		TrackingRunPeriodVariables = false;
+		TimeStepZoneSec = 0;
+		ErrorsLogged = false;
+		ProduceVariableDictionary = false;
+		MaxNumSubcategories = 1;
+		ReportNumberCounter = 0;
+		LHourP = -1;
+		LStartMin = -1.0;
+		LEndMin = -1.0;
+		GetMeterIndexFirstCall = true ;
+		InitFlag = true;
+		TimeValue.deallocate();
+		RVariableTypes.deallocate();
+		IVariableTypes.deallocate();
+		DDVariableTypes.deallocate();
+		RVariable.deallocate();
+		IVariable.deallocate();
+		RVar.deallocate();
+		IVar.deallocate();
+		ReqRepVars.deallocate();
+		VarMeterArrays.deallocate();
+		EnergyMeters.deallocate();
+		EndUseCategory.deallocate();
+	}
 
 	void
 	InitializeOutput()
@@ -290,18 +428,18 @@ namespace OutputProcessor {
 		// First index is the frequency designation (-1 = each call, etc)
 		// Second index is the variable type (1=Average, 2=Sum)
 		// Note, Meters always report like Average (with min/max, etc) for hourly and above
-		FreqNotice( -1, 1 ) = " !Each Call";
-		FreqNotice( 0, 1 ) = " !TimeStep";
+		FreqNotice( 1, -1 ) = " !Each Call";
+		FreqNotice( 1, 0 ) = " !TimeStep";
 		FreqNotice( 1, 1 ) = " !Hourly";
-		FreqNotice( 2, 1 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 3, 1 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 4, 1 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
-		FreqNotice( -1, 2 ) = " !Each Call";
-		FreqNotice( 0, 2 ) = " !TimeStep";
-		FreqNotice( 1, 2 ) = " !Hourly";
+		FreqNotice( 1, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
+		FreqNotice( 1, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		FreqNotice( 1, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		FreqNotice( 2, -1 ) = " !Each Call";
+		FreqNotice( 2, 0 ) = " !TimeStep";
+		FreqNotice( 2, 1 ) = " !Hourly";
 		FreqNotice( 2, 2 ) = " !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 3, 2 ) = " !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 4, 2 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		FreqNotice( 2, 3 ) = " !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		FreqNotice( 2, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
 
 		ReportList.allocate( 500 );
 		NumReportList = 500;
@@ -343,7 +481,7 @@ namespace OutputProcessor {
 
 		OutputInitialized = true;
 
-		SecondsPerTimeStep = double( MinutesPerTimeStep ) * 60.0;
+		TimeStepZoneSec = double( MinutesPerTimeStep ) * 60.0;
 
 		InitializeMeters();
 
@@ -475,7 +613,7 @@ namespace OutputProcessor {
 
 		if ( NumOfReqVariables > 0 ) {
 			// Do a quick check
-			Item = FindItem( VarName, ReqRepVars( {1,NumOfReqVariables} ).VarName(), NumOfReqVariables );
+			Item = FindItem( VarName, ReqRepVars, &ReqReportVariables::VarName );
 
 			NumExtraVars = 0;
 			ReportList = 0;
@@ -493,7 +631,7 @@ namespace OutputProcessor {
 						ReqRepVars( Loop ).Used = true;
 					}
 					if ( Loop < NumOfReqVariables ) {
-						Pos = FindItem( VarName, ReqRepVars( {Loop + 1,NumOfReqVariables} ).VarName(), NumOfReqVariables - Loop );
+						Pos = FindItem( VarName, ReqRepVars( {Loop+1,NumOfReqVariables} ), &ReqReportVariables::VarName );
 						if ( Pos != 0 ) {
 							MinLook = min( MinLook, Loop + Pos );
 							MaxLook = max( MaxLook, Loop + Pos );
@@ -555,7 +693,7 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		FArray1D_int TmpReportList;
+		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
@@ -632,7 +770,7 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		FArray1D_int TmpReportList;
+		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
@@ -730,12 +868,12 @@ namespace OutputProcessor {
 		int Item;
 		static bool ErrorsFound( false ); // If errors detected in input
 		std::string cCurrentModuleObject;
-		FArray1D_string cAlphaArgs( 4 );
-		FArray1D_string cAlphaFieldNames( 4 );
-		FArray1D_bool lAlphaFieldBlanks( 4 );
-		FArray1D< Real64 > rNumericArgs( 1 );
-		FArray1D_string cNumericFieldNames( 1 );
-		FArray1D_bool lNumericFieldBlanks( 1 );
+		Array1D_string cAlphaArgs( 4 );
+		Array1D_string cAlphaFieldNames( 4 );
+		Array1D_bool lAlphaFieldBlanks( 4 );
+		Array1D< Real64 > rNumericArgs( 1 );
+		Array1D_string cNumericFieldNames( 1 );
+		Array1D_bool lNumericFieldBlanks( 1 );
 
 		// Formats
 		static gio::Fmt Format_800( "('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')" );
@@ -746,7 +884,7 @@ namespace OutputProcessor {
 			DetermineFrequency( cMinReportFrequency, Item ); // Use local variable Item so as not to possibly confuse things
 			MinReportFrequency = max( MinReportFrequency, Item );
 			gio::write( OutputFileInits, Format_800 );
-			gio::write( OutputFileInits, Format_801 ) << FreqNotice( MinReportFrequency, 1 ) << cMinReportFrequency;
+			gio::write( OutputFileInits, Format_801 ) << FreqNotice( 1, MinReportFrequency ) << cMinReportFrequency;
 		}
 
 		cCurrentModuleObject = "Output:Variable";
@@ -839,11 +977,11 @@ namespace OutputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const PossibleFreq( {-1,6}, { "deta", "time", "hour", "dail", "mont", "runp", "envi", "annu" } );
+		static Array1D_string const PossibleFreq( {-1,6}, { "deta", "time", "hour", "dail", "mont", "runp", "envi", "annu" } );
 		//=(/'detail','Timestep','Hourly','Daily','Monthly','RunPeriod','Environment','Annual'/)
-		static FArray1D_string const ExactFreqString( {-1,6}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual" } );
+		static Array1D_string const ExactFreqString( {-1,6}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual" } );
 
-		static FArray1D_int const FreqValues( {-1,6}, { -1, 0, 1, 2, 3, 4, 4, 4 } );
+		static Array1D_int const FreqValues( {-1,6}, { -1, 0, 1, 2, 3, 4, 4, 4 } );
 		// note: runperiod, environment, and annual are synonomous
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1059,8 +1197,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_string ZoneIndexTypes( 3 );
-		static FArray1D_string SystemIndexTypes( 3 );
+		static Array1D_string ZoneIndexTypes( 3 );
+		static Array1D_string SystemIndexTypes( 3 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1185,8 +1323,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string StateVariables( 3 );
-		FArray1D_string NonStateVariables( 4 );
+		static Array1D_string StateVariables( 3 );
+		static Array1D_string NonStateVariables( 4 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1198,6 +1336,7 @@ namespace OutputProcessor {
 			NonStateVariables( 2 ) = "NONSTATE";
 			NonStateVariables( 3 ) = "SUM";
 			NonStateVariables( 4 ) = "SUMMED";
+			Initialized = true;
 		}
 
 		ValidateVariableType = 1;
@@ -1379,9 +1518,9 @@ namespace OutputProcessor {
 		int write_stat;
 
 		OutputFileMeterDetails = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, "eplusout.mtd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "InitializeMeters: Could not open file \"eplusout.mtd\" for output (write)." );
+			ShowFatalError( "InitializeMeters: Could not open file "+DataStringGlobals::outputMtdFileName+" for output (write)." );
 		}
 
 	}
@@ -1491,8 +1630,8 @@ namespace OutputProcessor {
 		bool IsBlank;
 		int fldIndex;
 		bool KeyIsStar;
-		FArray1D_string NamesOfKeys; // Specific key name
-		FArray1D_int IndexesForKeyVar; // Array index
+		Array1D_string NamesOfKeys; // Specific key name
+		Array1D_int IndexesForKeyVar; // Array index
 		std::string UnitsVar; // Units sting, may be blank
 		std::string MeterUnits; // Units sting, may be blank
 		int KeyCount;
@@ -1502,10 +1641,10 @@ namespace OutputProcessor {
 		int iKey;
 		int iKey1;
 		bool MeterCreated;
-		FArray1D_int VarsOnCustomMeter;
+		Array1D_int VarsOnCustomMeter;
 		int MaxVarsOnCustomMeter;
 		int NumVarsOnCustomMeter;
-		FArray1D_int VarsOnSourceMeter;
+		Array1D_int VarsOnSourceMeter;
 		int MaxVarsOnSourceMeter;
 		int NumVarsOnSourceMeter;
 		int iOnMeter;
@@ -1522,7 +1661,15 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = GetNumObjectsFound( cCurrentModuleObject );
 
-		auto const EnergyMeters_Name( EnergyMeters.Name() ); // Member array
+        //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
+		std::unordered_set<std::string> namesOfMeterCustom;
+		namesOfMeterCustom.reserve(NumCustomMeters);
+
+		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
+			GetObjectItem (cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+			namesOfMeterCustom.emplace(MakeUPPERCase(cAlphaArgs(1)));
+		}
+
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
@@ -1530,7 +1677,7 @@ namespace OutputProcessor {
 			MeterCreated = false;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EnergyMeters_Name, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
+			VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -1540,6 +1687,19 @@ namespace OutputProcessor {
 			VarsOnCustomMeter = 0;
 			MaxVarsOnCustomMeter = 1000;
 			NumVarsOnCustomMeter = 0;
+			// check if any fields reference another Meter:Custom
+			int found = 0;
+			for ( fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2 ) {
+				if ( namesOfMeterCustom.find(MakeUPPERCase(cAlphaArgs(fldIndex) ) ) != namesOfMeterCustom.end()) {
+					found = fldIndex;
+					break;
+				}
+			}
+			if ( found != 0 ) {
+				ShowWarningError (cCurrentModuleObject + "=\"" + cAlphaArgs (1) + "\", contains a reference to another " + cCurrentModuleObject + " in field: " + cAlphaFieldNames (found) + "=\"" + cAlphaArgs (found) + "\".");
+				continue;
+			}
+
 			for ( fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2 ) {
 				if ( cAlphaArgs( fldIndex ) == "*" || lAlphaFieldBlanks( fldIndex ) ) {
 					KeyIsStar = true;
@@ -1667,7 +1827,7 @@ namespace OutputProcessor {
 			}
 			if ( NumVarsOnCustomMeter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no items assigned " );
-				ShowContinueError( "...will not be shown with the Meter results" );
+				ShowContinueError( "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom." );
 			}
 
 		}
@@ -1682,7 +1842,7 @@ namespace OutputProcessor {
 			MeterCreated = false;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EnergyMeters_Name, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
+			VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -1695,7 +1855,7 @@ namespace OutputProcessor {
 
 			lbrackPos = index( cAlphaArgs( 3 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
-			WhichMeter = FindItem( cAlphaArgs( 3 ), EnergyMeters.Name(), NumEnergyMeters );
+			WhichMeter = FindItem( cAlphaArgs( 3 ), EnergyMeters );
 			if ( WhichMeter == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ErrorsFound = true;
@@ -2131,7 +2291,7 @@ namespace OutputProcessor {
 		// Make sure this isn't already in the list of meter names
 		int Found;
 		if ( NumEnergyMeters > 0 ) {
-			Found = FindItemInList( Name, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItemInList( Name, EnergyMeters );
 		} else {
 			Found = 0;
 		}
@@ -2196,7 +2356,13 @@ namespace OutputProcessor {
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).DYAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).MNAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).SMAccRptNum );
-		} else {
+			EnergyMeters( NumEnergyMeters ).FinYrSMValue = 0.0;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMaxVal = MaxSetValue;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMaxValDate = 0;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMinVal = MinSetValue;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMinValDate = 0;
+		}
+		else {
 			ShowFatalError( "Requested to Add Meter which was already present=" + Name );
 		}
 		if ( ! ResourceType.empty() ) {
@@ -2274,19 +2440,19 @@ namespace OutputProcessor {
 		VarMeterArrays( NumVarMeterArrays ).NumOnMeters = 0;
 		VarMeterArrays( NumVarMeterArrays ).RepVariable = RepVarNum;
 		VarMeterArrays( NumVarMeterArrays ).OnMeters = 0;
-		int Found = FindItem( ResourceType + ":Facility", EnergyMeters.Name(), NumEnergyMeters );
+		int Found = FindItem( ResourceType + ":Facility", EnergyMeters );
 		if ( Found != 0 ) {
 			++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 		}
 		if ( ! Group.empty() ) {
-			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( ResourceType + ':' + Group, EnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 				VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 			}
 			if ( SameString( Group, "Building" ) ) { // Match to Zone
-				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2296,13 +2462,13 @@ namespace OutputProcessor {
 
 		//!! Following if EndUse is by ResourceType
 		if ( ! EndUse.empty() ) {
-			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 				VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 			}
 			if ( SameString( Group, "Building" ) ) { // Match to Zone
-				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2311,7 +2477,7 @@ namespace OutputProcessor {
 
 			// End use subcategory
 			if ( ! EndUseSub.empty() ) {
-				Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2319,7 +2485,7 @@ namespace OutputProcessor {
 					AddEndUseSubcategory( ResourceType, EndUse, EndUseSub );
 				}
 				if ( SameString( Group, "Building" ) ) { // Match to Zone
-					Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+					Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 					if ( Found != 0 ) {
 						++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 						VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2333,11 +2499,11 @@ namespace OutputProcessor {
 
 	void
 	AttachCustomMeters(
-		std::string const & MtrUnits, // Units for this meter
+		std::string const & EP_UNUSED( MtrUnits ), // Units for this meter
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
 		int const MeterIndex, // Which meter this is
-		bool & ErrorsFound // True if errors in this call
+		bool & EP_UNUSED( ErrorsFound ) // True if errors in this call
 	)
 	{
 
@@ -2421,7 +2587,6 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::FindItem;
-		using DataHeatBalance::Zone;
 		using InputProcessor::SameString;
 
 		// Locals
@@ -2447,7 +2612,7 @@ namespace OutputProcessor {
 
 		if ( ! LocalErrorsFound ) {
 			if ( NumEnergyMeters > 0 ) {
-				Found = FindItem( ResourceType + ":Facility", EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( ResourceType + ":Facility", EnergyMeters );
 			} else {
 				Found = 0;
 			}
@@ -2475,10 +2640,10 @@ namespace OutputProcessor {
 		}}
 
 		if ( ! LocalErrorsFound && ! Group.empty() ) {
-			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( ResourceType + ':' + Group, EnergyMeters );
 			if ( Found == 0 ) AddMeter( ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group );
 			if ( Group == "Building" ) {
-				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found == 0 ) {
 					AddMeter( ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone" );
 				}
@@ -2553,6 +2718,9 @@ namespace OutputProcessor {
 		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
 
+		} else if ( endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS" ) {
+			EndUse = "CoolingPanel";
+
 		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 
@@ -2567,6 +2735,13 @@ namespace OutputProcessor {
 
 		} else if ( endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE" ) {
 			EndUse = "WindTurbine";
+
+		} else if ( endUseMeter == "ELECTRICSTORAGE" ) {
+			EndUse = "ElectricStorage";
+
+		} else if ( endUseMeter == "POWERCONVERSION") {
+
+			EndUse = "PowerConversion";
 
 		} else if ( endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING" ) {
 			EndUse = "HeatRecoveryForCooling";
@@ -2645,11 +2820,11 @@ namespace OutputProcessor {
 
 		//!! Following if we do EndUse by ResourceType
 		if ( ! LocalErrorsFound && ! EndUse.empty() ) {
-			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters );
 			if ( Found == 0 ) AddMeter( EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "" );
 
 			if ( Group == "Building" ) { // Match to Zone
-				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found == 0 ) {
 					AddMeter( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone" );
 				}
@@ -2661,7 +2836,7 @@ namespace OutputProcessor {
 		// End-Use Subcategories
 		if ( ! LocalErrorsFound && ! EndUseSub.empty() ) {
 			MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
-			Found = FindItem( MeterName, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( MeterName, EnergyMeters );
 			if ( Found == 0 ) AddMeter( MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "" );
 		} else if ( LocalErrorsFound ) {
 			ErrorsFound = true;
@@ -2754,9 +2929,9 @@ namespace OutputProcessor {
 	UpdateMeterValues(
 		Real64 const TimeStepValue, // Value of this variable at the current time step.
 		int const NumOnMeters, // Number of meters this variable is "on".
-		FArray1S_int const OnMeters, // Which meters this variable is on (index values)
+		Array1S_int const OnMeters, // Which meters this variable is on (index values)
 		Optional_int_const NumOnCustomMeters, // Number of custom meters this variable is "on".
-		Optional< FArray1S_int const > OnCustomMeters // Which custom meters this variable is on (index values)
+		Optional< Array1S_int const > OnCustomMeters // Which custom meters this variable is on (index values)
 	)
 	{
 
@@ -2869,6 +3044,10 @@ namespace OutputProcessor {
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).MNMaxVal, EnergyMeters( Meter ).MNMaxValDate, EnergyMeters( Meter ).MNMinVal, EnergyMeters( Meter ).MNMinValDate );
 				EnergyMeters( Meter ).SMValue += MeterValue( Meter );
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).SMMaxVal, EnergyMeters( Meter ).SMMaxValDate, EnergyMeters( Meter ).SMMinVal, EnergyMeters( Meter ).SMMinValDate );
+				if ( isFinalYear ){
+					EnergyMeters( Meter ).FinYrSMValue += MeterValue( Meter );
+					SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).FinYrSMMaxVal, EnergyMeters( Meter ).FinYrSMMaxValDate, EnergyMeters( Meter ).FinYrSMMinVal, EnergyMeters( Meter ).FinYrSMMinValDate );
+				}
 			} else {
 				EnergyMeters( Meter ).TSValue = EnergyMeters( EnergyMeters( Meter ).SourceMeter ).TSValue - MeterValue( Meter );
 				EnergyMeters( Meter ).HRValue += EnergyMeters( Meter ).TSValue;
@@ -2879,12 +3058,109 @@ namespace OutputProcessor {
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).MNMaxVal, EnergyMeters( Meter ).MNMaxValDate, EnergyMeters( Meter ).MNMinVal, EnergyMeters( Meter ).MNMinValDate );
 				EnergyMeters( Meter ).SMValue += EnergyMeters( Meter ).TSValue;
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).SMMaxVal, EnergyMeters( Meter ).SMMaxValDate, EnergyMeters( Meter ).SMMinVal, EnergyMeters( Meter ).SMMinValDate );
+				if ( isFinalYear ){
+					EnergyMeters( Meter ).FinYrSMValue += EnergyMeters( Meter ).TSValue;
+					SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).FinYrSMMaxVal, EnergyMeters( Meter ).FinYrSMMaxValDate, EnergyMeters( Meter ).FinYrSMMinVal, EnergyMeters( Meter ).FinYrSMMinValDate );
+				}
 			}
 		}
 
 		MeterValue = 0.0; // Ready for next update
 
 	}
+
+	void
+	ResetAccumulationWhenWarmupComplete()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets the accumulating meter values. Needed after warmup period is over to
+		// reset the totals on meters so that they are not accumulated over the warmup period
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through the meters and reset all accumulating values
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Meter; // Loop Control
+		int Loop; // Loop Variable
+
+		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+			EnergyMeters( Meter ).HRValue = 0.0;
+			EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).HRMaxValDate = 0;
+			EnergyMeters( Meter ).HRMinVal = MinSetValue;
+			EnergyMeters( Meter ).HRMinValDate = 0;
+
+			EnergyMeters( Meter ).DYValue = 0.0;
+			EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).DYMaxValDate = 0;
+			EnergyMeters( Meter ).DYMinVal = MinSetValue;
+			EnergyMeters( Meter ).DYMinValDate = 0;
+
+			EnergyMeters( Meter ).MNValue = 0.0;
+			EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).MNMaxValDate = 0;
+			EnergyMeters( Meter ).MNMinVal = MinSetValue;
+			EnergyMeters( Meter ).MNMinValDate = 0;
+
+			EnergyMeters( Meter ).SMValue = 0.0;
+			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).SMMaxValDate = 0;
+			EnergyMeters( Meter ).SMMinVal = MinSetValue;
+			EnergyMeters( Meter ).SMMinValDate = 0;
+
+			EnergyMeters( Meter ).FinYrSMValue = 0.0;
+			EnergyMeters( Meter ).FinYrSMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).FinYrSMMaxValDate = 0;
+			EnergyMeters( Meter ).FinYrSMMinVal = MinSetValue;
+			EnergyMeters( Meter ).FinYrSMMinValDate = 0;
+
+		}
+
+		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+			RVar >>= RVariableTypes( Loop ).VarPtr;
+			auto & rVar( RVar() );
+			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+				rVar.StoreValue = 0.0;
+				rVar.NumStored = 0;
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+			IVar >>= IVariableTypes( Loop ).VarPtr;
+			auto & iVar( IVar() );
+			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+				iVar.StoreValue = 0;
+				iVar.NumStored = 0;
+			}
+		}
+	}
+
+
+
 
 	void
 	SetMinMax(
@@ -2946,7 +3222,8 @@ namespace OutputProcessor {
 	ReportTSMeters(
 		Real64 const StartMinute, // Start Minute for TimeStep
 		Real64 const EndMinute, // End Minute for TimeStep
-		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+		bool & PrintESOTimeStamp, // True if the ESO Time Stamp also needs to be printed
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
 	)
 	{
 
@@ -3001,8 +3278,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( PrintESOTimeStamp && ! EnergyMeters( Loop ).RptTSFO && ! EnergyMeters( Loop ).RptAccTSFO ) {
@@ -3010,7 +3288,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
@@ -3026,13 +3304,15 @@ namespace OutputProcessor {
 		}
 
 		if ( NumEnergyMeters > 0 ) {
-			EnergyMeters.TSValue() = 0.0;
+			for ( auto & e : EnergyMeters ) e.TSValue = 0.0;
 		}
 
 	}
 
 	void
-	ReportHRMeters()
+	ReportHRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3085,8 +3365,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptHR ) {
@@ -3106,7 +3387,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportDYMeters()
+	ReportDYMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3155,8 +3438,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptDY ) {
@@ -3176,7 +3460,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportMNMeters()
+	ReportMNMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3220,8 +3506,9 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
+				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptMN ) {
@@ -3241,7 +3528,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportSMMeters()
+	ReportSMMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3263,14 +3552,12 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		//using namespace OutputReportPredefined;
 		using DataGlobals::mtr_stream;
-		using DataGlobals::OutputFileDebug; // ,DoingPredefinedAndTabularReporting
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const convertJtoGJ( 1.0 / 1000000000.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3292,8 +3579,9 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
+				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptSM ) {
@@ -3308,9 +3596,11 @@ namespace OutputProcessor {
 		}
 
 		if ( NumEnergyMeters > 0 ) {
-			EnergyMeters.SMValue() = 0.0;
-			EnergyMeters.SMMinVal() = MinSetValue;
-			EnergyMeters.SMMaxVal() = MaxSetValue;
+			for ( auto & e : EnergyMeters ) {
+				e.SMValue = 0.0;
+				e.SMMinVal = MinSetValue;
+				e.SMMaxVal = MaxSetValue;
+			}
 		}
 
 	}
@@ -3359,53 +3649,53 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			int const RT_forIPUnits( EnergyMeters( Loop ).RT_forIPUnits );
 			if ( RT_forIPUnits == RT_IPUnits_Electricity ) {
-				PreDefTableEntry( pdchEMelecannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMelecminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMelecmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMelecannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMelecminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMelecmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Gas ) {
-				PreDefTableEntry( pdchEMgasannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMgasminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMgasmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMgasannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMgasminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMgasmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Cooling ) {
-				PreDefTableEntry( pdchEMcoolannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMcoolminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMcoolmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMcoolannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMcoolminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMcoolmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Water ) {
-				PreDefTableEntry( pdchEMwaterannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMwaterminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMwatermaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMwaterannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue );
+				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMwaterminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMwatermaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherKG ) {
-				PreDefTableEntry( pdchEMotherKGannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
-				PreDefTableEntry( pdchEMotherKGminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
-				PreDefTableEntry( pdchEMotherKGmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherKGannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue );
+				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherKGminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherKGmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherM3 ) {
-				PreDefTableEntry( pdchEMotherM3annual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
-				PreDefTableEntry( pdchEMotherM3minvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
-				PreDefTableEntry( pdchEMotherM3maxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherM3annual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue, 3 );
+				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherM3minvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherM3maxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherL ) {
-				PreDefTableEntry( pdchEMotherLannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
-				PreDefTableEntry( pdchEMotherLminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
-				PreDefTableEntry( pdchEMotherLmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherLannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue, 3 );
+				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherLminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherLmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else {
-				PreDefTableEntry( pdchEMotherJannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMotherJminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
-				PreDefTableEntry( pdchEMotherJmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherJannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMotherJminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMotherJmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			}
 		}
 
@@ -3424,64 +3714,71 @@ namespace OutputProcessor {
 		//   Convert the coded date format into a usable
 		//   string
 
-		// Using/Aliasing
-		using General::DecodeMonDayHrMin;
+		if ( codedDate == 0 ) return "-";
 
-		// Return value
-		std::string StringOut;
-
-		// Locals
-		// ((month*100 + day)*100 + hour)*100 + minute
 		static gio::Fmt DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
+		// ((month*100 + day)*100 + hour)*100 + minute
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)
 		int Hour; // hour in integer format (1-24)
 		int Minute; // minute in integer format (0:59)
-		std::string monthName;
 
-		if ( codedDate != 0 ) {
-			monthName = "";
-			DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
-			--Hour;
-			if ( Minute == 60 ) {
-				++Hour;
-				Minute = 0;
-			}
-			if ( Month == 1 ) {
-				monthName = "JAN";
-			} else if ( Month == 2 ) {
-				monthName = "FEB";
-			} else if ( Month == 3 ) {
-				monthName = "MAR";
-			} else if ( Month == 4 ) {
-				monthName = "APR";
-			} else if ( Month == 5 ) {
-				monthName = "MAY";
-			} else if ( Month == 6 ) {
-				monthName = "JUN";
-			} else if ( Month == 7 ) {
-				monthName = "JUL";
-			} else if ( Month == 8 ) {
-				monthName = "AUG";
-			} else if ( Month == 9 ) {
-				monthName = "SEP";
-			} else if ( Month == 10 ) {
-				monthName = "OCT";
-			} else if ( Month == 11 ) {
-				monthName = "NOV";
-			} else if ( Month == 12 ) {
-				monthName = "DEC";
-			} else {
-				monthName = "***";
-			}
-			gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
-			if ( has( StringOut, "*" ) ) {
-				StringOut = "-";
-			}
-		} else { // codeddate = 0
-			StringOut = "-";
+		General::DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
+
+		if ( Month < 1 || Month > 12 ) return "-";
+		if ( Day < 1 || Day > 31 ) return "-";
+		if ( Hour < 1 || Hour > 24 ) return "-";
+		if ( Minute < 0 || Minute > 60 ) return "-";
+
+		--Hour;
+		if ( Minute == 60 ) {
+			++Hour;
+			Minute = 0;
 		}
+
+		std::string monthName;
+		switch ( Month ) {
+			case 1:
+				monthName = "JAN";
+				break;
+			case 2:
+				monthName = "FEB";
+				break;
+			case 3:
+				monthName = "MAR";
+				break;
+			case 4:
+				monthName = "APR";
+				break;
+			case 5:
+				monthName = "MAY";
+				break;
+			case 6:
+				monthName = "JUN";
+				break;
+			case 7:
+				monthName = "JUL";
+				break;
+			case 8:
+				monthName = "AUG";
+				break;
+			case 9:
+				monthName = "SEP";
+				break;
+			case 10:
+				monthName = "OCT";
+				break;
+			case 11:
+				monthName = "NOV";
+				break;
+			case 12:
+				monthName = "DEC";
+				break;
+		}
+
+		std::string StringOut;
+		gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
 
 		return StringOut;
 	}
@@ -3633,7 +3930,7 @@ namespace OutputProcessor {
 
 	void
 	AddEndUseSubcategory(
-		std::string const & ResourceName,
+		std::string const & EP_UNUSED( ResourceName ),
 		std::string const & EndUseName,
 		std::string const & EndUseSubName
 	)
@@ -3718,6 +4015,7 @@ namespace OutputProcessor {
 		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
 		std::string const & DayOfSimChr, // the number of days simulated so far
+		bool writeToSQL,
 		Optional_int_const Month, // the month of the reporting interval
 		Optional_int_const DayOfMonth, // The day of the reporting interval
 		Optional_int_const Hour, // The hour of the reporting interval
@@ -3773,27 +4071,27 @@ namespace OutputProcessor {
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), StartMinute(), EndMinute(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportHourly ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), 0.0, 60.0, DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, _, _, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportDaily ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, _, _, _, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportMonthly ) {
 			std::sprintf( stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month );
 		} else if ( reportingInterval == ReportSim ) {
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum );
 		} else {
-			if ( sqlite->writeOutputToSQLite() ) {
-				std::ostringstream ss;
-				ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
+			std::ostringstream ss;
+			ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
+			if ( sqlite ) {
 				sqlite->sqliteWriteMessage( ss.str() );
 			}
 		}
@@ -3804,7 +4102,7 @@ namespace OutputProcessor {
 		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
 		int const storeType,
 		int const reportID, // The reporting ID for the data
-		int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
+		int const EP_UNUSED( indexGroupKey ), // The reporting group (e.g., Zone, Plant Loop, etc.)
 		std::string const & indexGroup, // The reporting group (e.g., Zone, Plant Loop, etc.)
 		std::string const & reportIDChr, // The reporting ID for the data
 		std::string const & keyedValue, // The key name for the data
@@ -3849,7 +4147,7 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string FreqString;
 
-		FreqString = FreqNotice( reportingInterval, storeType );
+		FreqString = FreqNotice( storeType, reportingInterval );
 
 		if ( present( ScheduleName ) ) {
 			FreqString += "," + ScheduleName;
@@ -3871,12 +4169,8 @@ namespace OutputProcessor {
 			if ( eso_stream ) *eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			if ( ! present( ScheduleName ) ) {
-				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
-			} else {
-				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
-			}
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
 		}
 
 	}
@@ -3886,7 +4180,7 @@ namespace OutputProcessor {
 		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
 		int const storeType,
 		int const reportID, // The reporting ID in for the variable
-		int const indexGroupKey, // The reporting group for the variable
+		int const EP_UNUSED( indexGroupKey ), // The reporting group for the variable
 		std::string const & indexGroup, // The reporting group for the variable
 		std::string const & reportIDChr, // The reporting ID in for the variable
 		std::string const & meterName, // The variable's meter name
@@ -3934,7 +4228,7 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type lenString;
 
-		std::string const FreqString( FreqNotice( reportingInterval, storeType ) );
+		std::string const FreqString( FreqNotice( storeType, reportingInterval ) );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( ! cumulativeMeterFlag ) {
@@ -4001,16 +4295,12 @@ namespace OutputProcessor {
 
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			static std::string const keyedValueStringCum( "Cumulative " );
-			static std::string const keyedValueStringNon( "" );
-			std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
+		static std::string const keyedValueStringCum( "Cumulative " );
+		static std::string const keyedValueStringNon;
+		std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
 
-			sqlite->createSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
-
-			if ( ! meterFileOnlyFlag ) {
-				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
-			}
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval, true );
 		}
 
 	}
@@ -4100,72 +4390,49 @@ namespace OutputProcessor {
 		// of the UpdateDataandReport subroutine. The code was moved to facilitate
 		// easier maintenance and writing of data to the SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
+		static char s[ 129 ];
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string NumberOut; // Character for producing "number out"
-		std::string MaxOut; // Character for Max out string
-		std::string MinOut; // Character for Min out string
-		Real64 repVal; // The variable's value
+		Real64 repVal( repValue ); // The variable's value
 
-		repVal = repValue;
 		if ( storeType == AveragedVar ) repVal /= numOfItemsStored;
 		if ( repVal == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repVal;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repVal, s );
+			NumberOut = std::string( s );
 		}
 
-		if ( MaxValue == 0.0 ) {
-			MaxOut = "0.0";
-		} else {
-			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip_trailing_zeros( strip( MaxOut ) );
-		}
-
-		if ( minValue == 0.0 ) {
-			MinOut = "0.0";
-		} else {
-			gio::write( MinOut, fmtLD ) << minValue;
-			strip_trailing_zeros( strip( MinOut ) );
-		}
-
-		// Append the min and max strings with date information
-		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
-		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
-
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 		}
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 
 		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			std::string MaxOut; // Character for Max out string
+			std::string MinOut; // Character for Min out string
+
+			if ( MaxValue == 0.0 ) {
+				MaxOut = "0.0";
+			} else {
+				dtoa( MaxValue, s );
+				MaxOut = std::string( s );
+			}
+
+			if ( minValue == 0.0 ) {
+				MinOut = "0.0";
+			} else {
+				dtoa( minValue, s );
+				MinOut = std::string( s );
+			}
+
+			// Append the min and max strings with date information
+			ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
+			ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
+
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
 
 		}
 
@@ -4190,56 +4457,26 @@ namespace OutputProcessor {
 		// This subroutine writes the cumulative meter data to the output files and
 		// SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataGlobals::mtr_stream;
-		using DataGlobals::StdOutputRecordCount;
-		using DataGlobals::StdMeterRecordCount;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static char s[ 129 ];
 		std::string NumberOut; // Character for producing "number out"
 
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repValue, s );
+			NumberOut = std::string( s );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteMeterRecord( reportID, repValue );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
 		}
 
-		if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
-		++StdMeterRecordCount;
+		if ( DataGlobals::mtr_stream ) *DataGlobals::mtr_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+		++DataGlobals::StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
-			if ( sqlite->writeOutputToSQLite() ) {
-				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-			}
-
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
-			++StdOutputRecordCount;
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+			++DataGlobals::StdOutputRecordCount;
 		}
 
 	}
@@ -4275,85 +4512,60 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
 		using DataGlobals::eso_stream;
 		using DataGlobals::mtr_stream;
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
 
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static char s[ 129 ];
 		std::string NumberOut; // Character for producing "number out"
-		std::string MaxOut; // Character for Max out string
-		std::string MinOut; // Character for Min out string
 
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repValue, s );
+			NumberOut = std::string( s );
 		}
 
-		if ( MaxValue == 0.0 ) {
-			MaxOut = "0.0";
-		} else {
-			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip_trailing_zeros( strip( MaxOut ) );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 		}
-
-		if ( minValue == 0.0 ) {
-			MinOut = "0.0";
-		} else {
-			gio::write( MinOut, fmtLD ) << minValue;
-			strip_trailing_zeros( strip( MinOut ) );
-		}
-
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteMeterRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-		}
-
-		// Append the min and max strings with date information
-		//    CALL ProduceMinMaxStringWStartMinute(MinOut, minValueDate, reportingInterval)
-		//    CALL ProduceMinMaxStringWStartMinute(MaxOut, maxValueDate, reportingInterval)
-		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
-		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
+			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 			++StdMeterRecordCount;
-
+			if ( eso_stream && ! meterOnlyFlag ) {
+				*eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+				++StdOutputRecordCount;
+			}
 		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			std::string MaxOut; // Character for Max out string
+			std::string MinOut; // Character for Min out string
+
+			if ( MaxValue == 0.0 ) {
+				MaxOut = "0.0";
+			} else {
+				dtoa( MaxValue, s );
+				MaxOut = std::string( s );
+			}
+
+			if ( minValue == 0.0 ) {
+				MinOut = "0.0";
+			} else {
+				dtoa( minValue, s );
+				MinOut = std::string( s );
+			}
+
+			// Append the min and max strings with date information
+			ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
+			ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
+
+			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
 			++StdMeterRecordCount;
-
-		}
-
-		if ( ! meterOnlyFlag ) {
-			if ( sqlite->writeOutputToSQLite() ) {
-				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-			}
-
-			if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
-				++StdOutputRecordCount;
-			} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			if ( eso_stream && ! meterOnlyFlag ) {
+				*eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
 				++StdOutputRecordCount;
 			}
-
 		}
 
 	}
@@ -4398,125 +4610,107 @@ namespace OutputProcessor {
 	}
 
 	void
-	WriteRealData(
+	WriteNumericData(
 		int const reportID, // The variable's reporting ID
 		std::string const & creportID, // variable ID in characters
 		Real64 const repValue // The variable's value
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Greg Stark
-		//       DATE WRITTEN   July 2008
+		//       AUTHOR         Mark Adams
+		//       DATE WRITTEN   May 2016
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
+		// PURPOSE:
 		// This subroutine writes real data to the output files and
-		// SQL database. It supports the WriteRealVariableOutput subroutine.
+		// SQL database.
+		// This is a refactor of WriteRealData.
+		//
 		// Much of the code here was an included in earlier versions
 		// of the UpdateDataandReport subroutine. The code was moved to facilitate
 		// easier maintenance and writing of data to the SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
+		static char s[ 129 ];
 
-		// REFERENCES:
-		// na
+		if ( DataSystemVariables::UpdateDataDuringWarmupExternalInterface &&
+			! DataSystemVariables::ReportDuringWarmup )
+			return;
 
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-		using DataSystemVariables::ReportDuringWarmup;
-		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
+		dtoa( repValue, s );
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static char s[ 25 ];
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
-
-		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
-
-		if ( repValue == 0.0 ) {
-			std::strcpy( s, "0.0" );
-		} else {
-//			gio::write( NumberOut, fmtLD ) << repValue; //Tuned Replaced by below: This is a hot spot for large output cases: Rounding logic differs so last digits can differ
-//			std::sprintf( s, "%-24.15G", repValue ); // This is simpler and faster but only switches to E format at E-5
-			Real64 const absValue( std::abs( repValue ) );
-			if ( ( 0.1 <= absValue ) && ( absValue <= 1.0e16 ) ) {
-				int const p( static_cast< int >( std::floor( std::log10( absValue ) + 1.0 ) ) );
-				switch ( p ) { // Verbose but fast
-				case 0:
-					std::sprintf( s, "%-19.15f", repValue );
-					break;
-				case 1:
-					std::sprintf( s, "%-19.14f", repValue );
-					break;
-				case 2:
-					std::sprintf( s, "%-19.13f", repValue );
-					break;
-				case 3:
-					std::sprintf( s, "%-19.12f", repValue );
-					break;
-				case 4:
-					std::sprintf( s, "%-19.11f", repValue );
-					break;
-				case 5:
-					std::sprintf( s, "%-19.10f", repValue );
-					break;
-				case 6:
-					std::sprintf( s, "%-19.9f", repValue );
-					break;
-				case 7:
-					std::sprintf( s, "%-19.8f", repValue );
-					break;
-				case 8:
-					std::sprintf( s, "%-19.7f", repValue );
-					break;
-				case 9:
-					std::sprintf( s, "%-19.6f", repValue );
-					break;
-				case 10:
-					std::sprintf( s, "%-19.5f", repValue );
-					break;
-				case 11:
-					std::sprintf( s, "%-19.4f", repValue );
-					break;
-				case 12:
-					std::sprintf( s, "%-19.3f", repValue );
-					break;
-				case 13:
-					std::sprintf( s, "%-19.2f", repValue );
-					break;
-				case 14:
-					std::sprintf( s, "%-19.1f", repValue );
-					break;
-				default:
-					std::sprintf( s, "%-19.0f", repValue );
-					break;
-				}
-			} else {
-				std::sprintf( s, "%-24.15E", repValue );
-			}
-			strip_number( s );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
+		if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+	}
+
+	void
+	WriteNumericData(
+		int const reportID, // The variable's reporting ID
+		std::string const & creportID, // variable ID in characters
+		int32_t const repValue // The variable's value
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Mark Adams
+		//       DATE WRITTEN   May 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE:
+		// This subroutine writes real data to the output files and
+		// SQL database.
+		// This is a refactor of WriteIntegerData.
+		//
+		// Much of the code here was an included in earlier versions
+		// of the UpdateDataandReport subroutine. The code was moved to facilitate
+		// easier maintenance and writing of data to the SQL database.
+
+		static char s[ 129 ];
+
+		i32toa( repValue, s );
+
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
 		}
 
-		if ( eso_stream ) *eso_stream << creportID << ',' << s << NL;
+		if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+
+	}
+
+	void
+	WriteNumericData(
+		int const reportID, // The variable's reporting ID
+		std::string const & creportID, // variable ID in characters
+		int64_t const repValue // The variable's value
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Mark Adams
+		//       DATE WRITTEN   May 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE:
+		// This subroutine writes real data to the output files and
+		// SQL database.
+		// This is a refactor of WriteIntegerData.
+		//
+		// Much of the code here was an included in earlier versions
+		// of the UpdateDataandReport subroutine. The code was moved to facilitate
+		// easier maintenance and writing of data to the SQL database.
+
+		static char s[ 129 ];
+
+		i64toa( repValue, s );
+
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		}
+
+		if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
 
 	}
 
@@ -4656,10 +4850,10 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			rminValue = minValue;
-			rmaxValue = MaxValue;
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
+		rminValue = minValue;
+		rmaxValue = MaxValue;
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
 		}
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
@@ -4667,69 +4861,6 @@ namespace OutputProcessor {
 		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
 			if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
 		}
-
-	}
-
-	void
-	WriteIntegerData(
-		int const reportID, // the reporting ID of the data
-		std::string const & reportIDString, // the reporting ID of the data (character)
-		Optional_int_const IntegerValue, // the value of the data
-		Optional< Real64 const > RealValue // the value of the data
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Greg Stark
-		//       DATE WRITTEN   July 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine writes integer data to the output files and
-		// SQL database. It supports the WriteIntegerVariableOutput subroutine.
-		// Much of the code here was an included in earlier versions
-		// of the UpdateDataandReport subroutine. The code was moved to facilitate
-		// easier maintenance and writing of data to the SQL database.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
-		Real64 repValue( 0.0 ); // for SQLite
-
-		if ( present( IntegerValue ) ) {
-			gio::write( NumberOut, fmtLD ) << IntegerValue;
-			strip( NumberOut );
-			repValue = IntegerValue;
-		}
-		if ( present( RealValue ) ) {
-			repValue = RealValue;
-			if ( RealValue == 0.0 ) {
-				NumberOut = "0.0";
-			} else {
-				gio::write( NumberOut, fmtLD ) << RealValue;
-				strip_trailing_zeros( strip( NumberOut ) );
-			}
-		}
-
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-		}
-
-		if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
 
 	}
 
@@ -4788,13 +4919,13 @@ namespace OutputProcessor {
 		} else if ( has( meterName, "Electricity:HVAC" ) ) {
 			indexGroupKey = 301;
 
-			// InteriorLights:Electricity indices are in the 400s
-		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
-			indexGroupKey = 401;
-
 			// InteriorLights:Electricity:Zone indices are in the 500s
 		} else if ( has( meterName, "InteriorLights:Electricity:Zone" ) ) {
 			indexGroupKey = 501;
+
+			// InteriorLights:Electricity indices are in the 400s
+		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
+			indexGroupKey = 401;
 
 			// Unknown items have negative indices
 		} else {
@@ -5516,14 +5647,16 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	Real64 CurVal; // Current value for real variables
 	Real64 ICurVal; // Current value for integer variables
 	int MDHM; // Month,Day,Hour,Minute
-	bool TimePrint; // True if the time needs to be printed
+	bool TimePrint( true ); // True if the time needs to be printed
 	Real64 StartMinute; // StartMinute for UpdateData call
 	Real64 MinuteNow; // What minute it is now
 	bool ReportNow; // True if this variable should be reported now
 	int CurDayType; // What kind of day it is (weekday (sunday, etc) or holiday)
-	static int LHourP( -1 ); // Helps set hours for timestamp output
-	static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
-	static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static int LHourP( -1 ); // Helps set hours for timestamp output
+	// static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+	// static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	////////////////////////////////////////////////////////////////////////////////////
 	static bool EndTimeStepFlag( false ); // True when it's the end of the Zone Time Step
 	Real64 rxTime; // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
 
@@ -5605,7 +5738,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
 						}
-						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 						LHourP = HourOfDay;
 						LStartMin = StartMinute;
 						LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5613,7 +5746,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 
-				WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Which );
+				WriteNumericData( rVar.ReportID, rVar.ReportIDChr, rVar.Which );
 
 				++StdOutputRecordCount;
 			}
@@ -5669,7 +5802,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
 						}
-						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 						LHourP = HourOfDay;
 						LStartMin = StartMinute;
 						LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5677,7 +5810,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 				// only time integer vars actual report as integer only is "detailed"
-				WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, iVar.Which );
+				WriteNumericData( iVar.ReportID, iVar.ReportIDChr, iVar.Which );
 				++StdOutputRecordCount;
 			}
 		}
@@ -5725,7 +5858,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
 							}
-							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 							LHourP = HourOfDay;
 							LStartMin = StartMinute;
 							LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5733,7 +5866,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
+					WriteNumericData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
 					++StdOutputRecordCount;
 				}
 				rVar.TSValue = 0.0;
@@ -5764,7 +5897,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
 							}
-							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 							LHourP = HourOfDay;
 							LStartMin = StartMinute;
 							LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5772,7 +5905,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.TSValue );
+					WriteNumericData( iVar.ReportID, iVar.ReportIDChr, iVar.TSValue );
 					++StdOutputRecordCount;
 				}
 				iVar.TSValue = 0.0;
@@ -5782,7 +5915,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 		UpdateMeters( MDHM );
 
-		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint );
+		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint, TimePrint );
 
 	} // TimeStep Block
 
@@ -5793,7 +5926,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			if ( HolidayIndex > 0 ) {
 				CurDayType = 7 + HolidayIndex;
 			}
-			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
@@ -5812,7 +5946,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						rVar.Value /= double( rVar.thisTSCount );
 					}
 					if ( rVar.Report && rVar.ReportFreq == ReportHourly && rVar.Stored ) {
-						WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Value );
+						WriteNumericData( rVar.ReportID, rVar.ReportIDChr, rVar.Value );
 						++StdOutputRecordCount;
 						rVar.Stored = false;
 					}
@@ -5838,7 +5972,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						iVar.Value /= double( iVar.thisTSCount );
 					}
 					if ( iVar.Report && iVar.ReportFreq == ReportHourly && iVar.Stored ) {
-						WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.Value );
+						WriteNumericData( iVar.ReportID, iVar.ReportIDChr, iVar.Value );
 						++StdOutputRecordCount;
 						iVar.Stored = false;
 					}
@@ -5852,7 +5986,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone or HVAC)
 
-		ReportHRMeters();
+		ReportHRMeters( TimePrint );
 
 	} // Hour Block
 
@@ -5865,7 +5999,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			if ( HolidayIndex > 0 ) {
 				CurDayType = 7 + HolidayIndex;
 			}
-			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 		NumHoursInMonth += 24;
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
@@ -5884,7 +6019,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index type (Zone or HVAC)
 
-		ReportDYMeters();
+		ReportDYMeters( TimePrint );
 
 	} // Day Block
 
@@ -5894,7 +6029,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
+			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month );
+			TimePrint = false;
 		}
 		NumHoursInSim += NumHoursInMonth;
 		EndMonthFlag = false;
@@ -5914,7 +6050,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone, HVAC)
 
-		ReportMNMeters();
+		ReportMNMeters( TimePrint );
 
 		NumHoursInMonth = 0;
 	} // Month Block
@@ -5922,7 +6058,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
+			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true );
+			TimePrint = false;
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
@@ -5940,7 +6077,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)
 
-		ReportSMMeters();
+		ReportSMMeters( TimePrint );
 
 		NumHoursInSim = 0;
 	}
@@ -5968,7 +6105,7 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// USE STATEMENTS:
-	// na
+	using namespace OutputProcessor;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5983,7 +6120,9 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	static int ReportNumberCounter( 0 );
+	//////////// hoisted into namespace ////////////
+	// static int ReportNumberCounter( 0 );
+	////////////////////////////////////////////////
 
 	++ReportNumberCounter;
 	ReportNumber = ReportNumberCounter;
@@ -6022,7 +6161,7 @@ GenOutputVariablesAuditReport()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static FArray1D_string const ReportFrequency( {-1,4}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "Annual" } );
+	static Array1D_string const ReportFrequency( {-1,4}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "Annual" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -6136,8 +6275,8 @@ UpdateMeterReporting()
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	FArray1D_string Alphas( 2 );
-	FArray1D< Real64 > Numbers( 1 );
+	Array1D_string Alphas( 2 );
+	Array1D< Real64 > Numbers( 1 );
 	int NumAlpha;
 	int NumNumbers;
 	int IOStat;
@@ -6175,7 +6314,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6216,7 +6355,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6258,7 +6397,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6299,7 +6438,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6382,7 +6521,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptTS ) {
@@ -6395,7 +6534,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both "+ DataStringGlobals::outputEsoFileName+ " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccTS ) {
@@ -6410,7 +6549,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptHR ) {
@@ -6424,7 +6563,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccHR ) {
@@ -6440,7 +6579,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+ " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptDY ) {
@@ -6454,7 +6593,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+ " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccDY ) {
@@ -6470,7 +6609,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both "+ DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptMN ) {
@@ -6484,7 +6623,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccMN ) {
@@ -6500,7 +6639,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptSM ) {
@@ -6514,7 +6653,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+" and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccSM ) {
@@ -6576,13 +6715,15 @@ GetMeterIndex( std::string const & MeterName )
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
 	// Valid Meter names because matching case insensitive
-	static FArray1D_string ValidMeterNames;
-	static FArray1D_int iValidMeterNames;
+	static Array1D_string ValidMeterNames;
+	static Array1D_int iValidMeterNames;
 	static int NumValidMeters( 0 );
-	static bool FirstCall( true );
+	//////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
+	// static bool FirstCall( true );
+	////////////////////////////////////////////////
 	int Found;
 
-	if ( FirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
+	if ( GetMeterIndexFirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
 		NumValidMeters = NumEnergyMeters;
 		ValidMeterNames.allocate( NumValidMeters );
 		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
@@ -6590,7 +6731,7 @@ GetMeterIndex( std::string const & MeterName )
 		}
 		iValidMeterNames.allocate( NumValidMeters );
 		SetupAndSort( ValidMeterNames, iValidMeterNames );
-		FirstCall = false;
+		GetMeterIndexFirstCall = false;
 	}
 
 	MeterIndex = FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
@@ -6945,10 +7086,11 @@ GetInternalVariableValue(
 		resultVal = 0.0;
 	} else if ( varType == 1 ) { // Integer
 		if ( keyVarIndex > NumOfIVariable ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index beyond range of array." );
+			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of integer variables = " + General::TrimSigDigits( NumOfIVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
 		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
@@ -6956,10 +7098,11 @@ GetInternalVariableValue(
 		resultVal = double( IVar().Which );
 	} else if ( varType == 2 ) { // real
 		if ( keyVarIndex > NumOfRVariable ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Real variable passed index beyond range of array." );
+			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of real variables = " + General::TrimSigDigits( NumOfRVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
 		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
@@ -7062,7 +7205,7 @@ GetInternalVariableValueExternalInterface(
 
 int
 GetNumMeteredVariables(
-	std::string const & ComponentType, // Given Component Type
+	std::string const & EP_UNUSED( ComponentType ), // Given Component Type
 	std::string const & ComponentName // Given Component Name (user defined)
 )
 {
@@ -7105,7 +7248,6 @@ GetNumMeteredVariables(
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	int Pos;
 
 	NumVariables = 0;
 	for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
@@ -7114,7 +7256,7 @@ GetNumMeteredVariables(
 		if ( ComponentName != RVariableTypes( Loop ).KeyNameOnlyUC ) continue;
 		RVar >>= RVariableTypes( Loop ).VarPtr;
 		if ( RVar().MeterArrayPtr == 0 ) continue;
-		++NumVariables;
+		if ( VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters > 0 ) ++NumVariables;
 	}
 
 	return NumVariables;
@@ -7125,16 +7267,16 @@ void
 GetMeteredVariables(
 	std::string const & ComponentType, // Given Component Type
 	std::string const & ComponentName, // Given Component Name (user defined)
-	FArray1S_int VarIndexes, // Variable Numbers
-	FArray1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
-	FArray1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	FArray1S_string UnitsStrings, // UnitsStrings for each variable
-	FArray1S_int ResourceTypes, // ResourceTypes for each variable
-	Optional< FArray1S_string > EndUses, // EndUses for each variable
-	Optional< FArray1S_string > Groups, // Groups for each variable
-	Optional< FArray1S_string > Names, // Variable Names for each variable
+	Array1S_int VarIndexes, // Variable Numbers
+	Array1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
+	Array1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
+	Array1S_string UnitsStrings, // UnitsStrings for each variable
+	Array1S_int ResourceTypes, // ResourceTypes for each variable
+	Optional< Array1S_string > EndUses, // EndUses for each variable
+	Optional< Array1S_string > Groups, // Groups for each variable
+	Optional< Array1S_string > Names, // Variable Names for each variable
 	Optional_int NumFound, // Number Found
-	Optional< FArray1S_int > VarIDs // Variable Report Numbers
+	Optional< Array1S_int > VarIDs // Variable Report Numbers
 )
 {
 
@@ -7176,7 +7318,6 @@ GetMeteredVariables(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	int Pos;
 	int NumVariables;
 	int MeterPtr;
 	int NumOnMeterPtr;
@@ -7192,36 +7333,40 @@ GetMeteredVariables(
 		if ( RVar().MeterArrayPtr == 0 ) continue;
 		NumOnMeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters;
 		MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( 1 );
-		++NumVariables;
-		VarIndexes( NumVariables ) = Loop;
-		VarTypes( NumVariables ) = 2;
-		IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
-		UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
+		if ( MeterPtr ) {
+			++NumVariables;
+			VarIndexes( NumVariables ) = Loop;
+			VarTypes( NumVariables ) = 2;
+			IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
+			UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
 
-		ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
-		if ( present( Names ) ) {
-			Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
-		}
-		if ( present( EndUses ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
-					EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
-					break;
+			ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
+			if ( present( Names ) ) {
+				Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
+			}
+			if ( present( EndUses ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
+						EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( Groups ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).Group != "" ) {
-					Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
-					break;
+			if ( present( Groups ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).Group != "" ) {
+						Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( VarIDs ) ) {
-			VarIDs()( NumVariables ) = RVar().ReportID;
+			if ( present( VarIDs ) ) {
+				VarIDs()( NumVariables ) = RVar().ReportID;
+			}
+		} else {
+			ShowWarningError( "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"" );
 		}
 	}
 
@@ -7304,9 +7449,11 @@ GetVariableKeyCountandType(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D_int keyVarIndexes; // Array index for specific key name
+	static Array1D_int keyVarIndexes; // Array index for specific key name
 	static int curKeyVarIndexLimit; // current limit for keyVarIndexes
-	static bool InitFlag( true ); // for initting the keyVarIndexes array
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static bool InitFlag( true ); // for initting the keyVarIndexes array
+	////////////////////////////////////////////////////////////////////////////////////
 	int Loop; // Loop counters
 	int Loop2;
 	std::string::size_type Position; // Starting point of search string
@@ -7315,8 +7462,8 @@ GetVariableKeyCountandType(
 	bool Duplicate; // True if keyname is a duplicate
 	std::string VarKeyPlusName; // Full variable name including keyname and units
 	std::string varNameUpper; // varName pushed to all upper case
-	static FArray1D_string varNames; // stored variable names
-	static FArray1D_int ivarNames; // pointers for sorted information
+	static Array1D_string varNames; // stored variable names
+	static Array1D_int ivarNames; // pointers for sorted information
 	static int numVarNames; // number of variable names
 
 	// INITIALIZATIONS
@@ -7452,8 +7599,8 @@ void
 GetVariableKeys(
 	std::string const & varName, // Standard variable name
 	int const varType, // 1=integer, 2=real, 3=meter
-	FArray1S_string keyNames, // Specific key name
-	FArray1S_int keyVarIndexes // Array index for
+	Array1S_string keyNames, // Specific key name
+	Array1S_int keyVarIndexes // Array index for
 )
 {
 
@@ -7628,13 +7775,13 @@ ReportingThisVariable( std::string const & RepVarName )
 	int Found;
 
 	BeingReported = false;
-	Found = FindItem( RepVarName, ReqRepVars.VarName(), NumOfReqVariables );
+	Found = FindItem( RepVarName, ReqRepVars, &ReqReportVariables::VarName );
 	if ( Found > 0 ) {
 		BeingReported = true;
 	}
 
 	if ( ! BeingReported ) { // check meter names too
-		Found = FindItem( RepVarName, EnergyMeters.Name(), NumEnergyMeters );
+		Found = FindItem( RepVarName, EnergyMeters );
 		if ( Found > 0 ) {
 			if ( EnergyMeters( Found ).RptTS || EnergyMeters( Found ).RptHR || EnergyMeters( Found ).RptDY || EnergyMeters( Found ).RptMN || EnergyMeters( Found ).RptSM || EnergyMeters( Found ).RptTSFO || EnergyMeters( Found ).RptHRFO || EnergyMeters( Found ).RptDYFO || EnergyMeters( Found ).RptMNFO || EnergyMeters( Found ).RptSMFO || EnergyMeters( Found ).RptAccTS || EnergyMeters( Found ).RptAccHR || EnergyMeters( Found ).RptAccDY || EnergyMeters( Found ).RptAccMN || EnergyMeters( Found ).RptAccSM || EnergyMeters( Found ).RptAccTSFO || EnergyMeters( Found ).RptAccHRFO || EnergyMeters( Found ).RptAccDYFO || EnergyMeters( Found ).RptAccMNFO || EnergyMeters( Found ).RptAccSMFO ) {
 				BeingReported = true;
@@ -7709,7 +7856,7 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	//             Now for the Pollution Meters
-	static FArray1D_string const PollutionMeters( {1,29}, { "Electricity:Facility", "Diesel:Facility", "DistrictCooling:Facility", "DistrictHeating:Facility", "Gas:Facility", "GASOLINE:Facility", "COAL:Facility", "FuelOil#1:Facility", "FuelOil#2:Facility", "Propane:Facility", "ElectricityProduced:Facility", "Steam:Facility", "CO2:Facility", "CO:Facility", "CH4:Facility", "NOx:Facility", "N2O:Facility", "SO2:Facility", "PM:Facility", "PM10:Facility", "PM2.5:Facility", "NH3:Facility", "NMVOC:Facility", "Hg:Facility", "Pb:Facility", "WaterEnvironmentalFactors:Facility", "Nuclear High:Facility", "Nuclear Low:Facility", "Carbon Equivalent:Facility" } );
+	static Array1D_string const PollutionMeters( {1,29}, { "Electricity:Facility", "Diesel:Facility", "DistrictCooling:Facility", "DistrictHeating:Facility", "Gas:Facility", "GASOLINE:Facility", "COAL:Facility", "FuelOil#1:Facility", "FuelOil#2:Facility", "Propane:Facility", "ElectricityProduced:Facility", "Steam:Facility", "CO2:Facility", "CO:Facility", "CH4:Facility", "NOx:Facility", "N2O:Facility", "SO2:Facility", "PM:Facility", "PM10:Facility", "PM2.5:Facility", "NH3:Facility", "NMVOC:Facility", "Hg:Facility", "Pb:Facility", "WaterEnvironmentalFactors:Facility", "Nuclear High:Facility", "Nuclear Low:Facility", "Carbon Equivalent:Facility" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -7731,7 +7878,7 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		Meter = FindItem( PollutionMeters( Loop ), EnergyMeters.Name(), NumEnergyMeters );
+		Meter = FindItem( PollutionMeters( Loop ), EnergyMeters );
 		if ( Meter > 0 ) { //All the active meters for this run are set, but all are still searched for.
 
 			indexGroupKey = DetermineIndexGroupKeyFromMeterName( EnergyMeters( Meter ).Name );
@@ -7822,8 +7969,6 @@ ProduceRDDMDD()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	int const RealType( 1 );
-	int const IntegerType( 2 );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -7837,7 +7982,6 @@ ProduceRDDMDD()
 	int Item;
 	bool SortByName;
 	int ItemPtr;
-	int write_stat;
 
 	struct VariableTypes
 	{
@@ -7854,21 +7998,6 @@ ProduceRDDMDD()
 			VarPtr( 0 ),
 			IndexType( 0 ),
 			StoreType( 0 )
-		{}
-
-		// Member Constructor
-		VariableTypes(
-			int const RealIntegerType, // Real= 1, Integer=2
-			int const VarPtr, // pointer to real/integer VariableTypes structures
-			int const IndexType,
-			int const StoreType,
-			std::string const & UnitsString
-		) :
-			RealIntegerType( RealIntegerType ),
-			VarPtr( VarPtr ),
-			IndexType( IndexType ),
-			StoreType( StoreType ),
-			UnitsString( UnitsString )
 		{}
 
 	};
@@ -7894,36 +8023,36 @@ ProduceRDDMDD()
 	std::ofstream rdd_stream;
 	std::ofstream mdd_stream;
 	if ( ProduceReportVDD == ReportVDD_Yes ) {
-		rdd_stream.open( "eplusout.rdd" ); // Text mode so we use \n as terminator
+		rdd_stream.open( DataStringGlobals::outputRddFileName ); // Text mode so we use \n as terminator
 		if ( ! rdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );
 		}
 		rdd_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
 		rdd_stream << "Var Type (reported time step),Var Report Type,Variable Name [Units]" << '\n';
-		mdd_stream.open( "eplusout.mdd" );
+		mdd_stream.open( DataStringGlobals::outputMddFileName );
 		if ( ! mdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );
 		}
 		mdd_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
 		mdd_stream << "Var Type (reported time step),Var Report Type,Variable Name [Units]" << '\n';
 	} else if ( ProduceReportVDD == ReportVDD_IDF ) {
-		rdd_stream.open( "eplusout.rdd" ); // Text mode so we use \n as terminator
+		rdd_stream.open( DataStringGlobals::outputRddFileName ); // Text mode so we use \n as terminator
 		if ( ! rdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );
 		}
 		rdd_stream << "! Program Version," << VerString << ',' << IDDVerString << '\n';
 		rdd_stream << "! Output:Variable Objects (applicable to this run)" << '\n';
-		mdd_stream.open( "eplusout.mdd" );
+		mdd_stream.open( DataStringGlobals::outputMddFileName );
 		if ( ! mdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );
 		}
 		mdd_stream << "! Program Version," << VerString << ',' << IDDVerString << '\n';
 		mdd_stream << "! Output:Meter Objects (applicable to this run)" << '\n';
 	}
 
-	FArray1D_string VariableNames( NumVariablesForOutput );
-	VariableNames = DDVariableTypes( {1,NumVariablesForOutput} ).VarNameOnly();
-	FArray1D_int iVariableNames( NumVariablesForOutput );
+	Array1D_string VariableNames( NumVariablesForOutput );
+	for ( int i = 1; i <= NumVariablesForOutput; ++i ) VariableNames( i ) = DDVariableTypes( i ).VarNameOnly;
+	Array1D_int iVariableNames( NumVariablesForOutput );
 
 	if ( SortByName ) {
 		SetupAndSort( VariableNames, iVariableNames );
@@ -8042,7 +8171,7 @@ AddToOutputVariableList(
 
 	int dup = 0;// for duplicate variable name
 	if ( NumVariablesForOutput > 0 ) {
-		dup = FindItemInList( VarName, DDVariableTypes.VarNameOnly(), NumVariablesForOutput );
+		dup = FindItemInList( VarName, DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, NumVariablesForOutput );
 	} else {
 		DDVariableTypes.allocate( LVarAllocInc );
 		MaxVariablesForOutput = LVarAllocInc;
@@ -8082,25 +8211,6 @@ AddToOutputVariableList(
 	}
 
 }
-
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

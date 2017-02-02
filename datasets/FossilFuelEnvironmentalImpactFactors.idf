@@ -1,9 +1,7 @@
 !===============================================================================
 ! FossilFuelEnvironmentalImpactFactors.idf
 !
-
-!  Version,
-!    8.0;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Output:EnvironmentalImpactFactors,
     Monthly;                 !- Reporting Frequency

@@ -1,18 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <AirflowNetworkSolver.hh>
+#include <CommandLineInterface.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -68,6 +115,7 @@ namespace AirflowNetworkSolver {
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyHFnTdbW;
+	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using namespace DataAirflowNetwork;
 
 	// Data
@@ -79,46 +127,46 @@ namespace AirflowNetworkSolver {
 	static std::string const BlankString;
 
 	// Common block AFEDAT
-	FArray1D< Real64 > AFECTL;
-	FArray1D< Real64 > AFLOW2;
-	FArray1D< Real64 > AFLOW;
-	FArray1D< Real64 > PS;
-	FArray1D< Real64 > PW;
+	Array1D< Real64 > AFECTL;
+	Array1D< Real64 > AFLOW2;
+	Array1D< Real64 > AFLOW;
+	Array1D< Real64 > PS;
+	Array1D< Real64 > PW;
 
 	// Common block CONTRL
 	Real64 PB( 0.0 );
 	int LIST( 0 );
 
 	// Common block ZONL
-	FArray1D< Real64 > RHOZ;
-	FArray1D< Real64 > SQRTDZ;
-	FArray1D< Real64 > VISCZ;
-	FArray1D< Real64 > SUMAF;
-	FArray1D< Real64 > TZ; // Temperature [C]
-	FArray1D< Real64 > WZ; // Humidity ratio [kg/kg]
-	FArray1D< Real64 > PZ; // Pressure [Pa]
+	Array1D< Real64 > RHOZ;
+	Array1D< Real64 > SQRTDZ;
+	Array1D< Real64 > VISCZ;
+	Array1D< Real64 > SUMAF;
+	Array1D< Real64 > TZ; // Temperature [C]
+	Array1D< Real64 > WZ; // Humidity ratio [kg/kg]
+	Array1D< Real64 > PZ; // Pressure [Pa]
 
 	// Other array variables
-	FArray1D_int ID;
-	FArray1D_int IK;
-	FArray1D< Real64 > AD;
-	FArray1D< Real64 > AU;
+	Array1D_int ID;
+	Array1D_int IK;
+	Array1D< Real64 > AD;
+	Array1D< Real64 > AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-	FArray1D_int newIK; // noel
-	FArray1D< Real64 > newAU; // noel
+	Array1D_int newIK; // noel
+	Array1D< Real64 > newAU; // noel
 #endif
 
 	//REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-	FArray1D< Real64 > SUMF;
+	Array1D< Real64 > SUMF;
 	int Unit11( 0 );
 	int Unit21( 0 );
 
 	// Large opening variables
-	FArray1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
-	FArray1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
-	FArray1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
-	FArray2D< Real64 > DpL; // Array of stack pressures in link
+	Array1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
+	Array1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
+	Array1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
+	Array2D< Real64 > DpL; // Array of stack pressures in link
 
 	// Functions
 
@@ -210,14 +258,14 @@ namespace AirflowNetworkSolver {
 		DpProf.allocate( n * ( NrInt + 2 ) );
 		RhoProfF.allocate( n * ( NrInt + 2 ) );
 		RhoProfT.allocate( n * ( NrInt + 2 ) );
-		DpL.allocate( 2, AirflowNetworkNumOfLinks );
+		DpL.allocate( AirflowNetworkNumOfLinks, 2 );
 
 		PB = 101325.0;
 		//   LIST = 5
 		LIST = 0;
 		if ( LIST >= 1 ) {
 			Unit21 = GetNewUnitNumber();
-			gio::open( Unit21, "eplusADS.out" );
+			gio::open( Unit21, DataStringGlobals::outputAdsFileName );
 		}
 
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
@@ -242,7 +290,7 @@ namespace AirflowNetworkSolver {
 		// Write an ouput file used for AIRNET input
 		if ( LIST >= 5 ) {
 			Unit11 = GetNewUnitNumber();
-			gio::open( Unit11, "eplusADS.inp" );
+			gio::open( Unit11, DataStringGlobals::eplusADSFileName );
 			for ( i = 1; i <= NetworkNumOfNodes; ++i ) {
 				gio::write( Unit11, Format_901 ) << i << AirflowNetworkNodeData( i ).NodeTypeNum << AirflowNetworkNodeData( i ).NodeHeight << TZ( i ) << PZ( i );
 			}
@@ -471,6 +519,13 @@ namespace AirflowNetworkSolver {
 		static gio::Fmt Format_907( "(,/,' CPU seconds for ',A,F12.3)" );
 
 		// FLOW:
+
+		// Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
+		if ( ( AirflowNetworkSimu.InitFlag == 0 ) || ( PressureSetFlag > 0 && AirflowNetworkFanActivated ) ) {
+			for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
+				if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) PZ( n ) = 0.0;
+			}
+		}
 		// Compute zone air properties.
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
 			RHOZ( n ) = PsyRhoAirFnPbTdbW( StdBaroPress + PZ( n ), TZ( n ), WZ( n ) );
@@ -482,11 +537,6 @@ namespace AirflowNetworkSolver {
 			SQRTDZ( n ) = std::sqrt( RHOZ( n ) );
 			VISCZ( n ) = 1.71432e-5 + 4.828e-8 * TZ( n );
 			if ( LIST >= 2 ) gio::write( Unit21, Format_903 ) << "D,V:" << n << RHOZ( n ) << VISCZ( n );
-		}
-		if ( AirflowNetworkSimu.InitFlag == 0 ) {
-			for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
-				if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) PZ( n ) = 0.0;
-			}
 		}
 		// Compute stack pressures.
 		for ( i = 1; i <= NetworkNumOfLinks; ++i ) {
@@ -517,8 +567,13 @@ namespace AirflowNetworkSolver {
 			if ( LIST >= 1 ) {
 				gio::write( Unit21, Format_901 ) << "Flow: " << i << n << M << AirflowNetworkLinkSimu( i ).DP << AFLOW( i ) << AFLOW2( i );
 			}
-			SUMAF( n ) = SUMAF( n ) - AFLOW( i ) - AFLOW2( i );
-			SUMAF( M ) += AFLOW( i ) + AFLOW2( i );
+			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_HOP ) {
+				SUMAF( n ) = SUMAF( n ) - AFLOW( i );
+				SUMAF( M ) += AFLOW( i );
+			} else {
+				SUMAF( n ) = SUMAF( n ) - AFLOW( i ) - AFLOW2( i );
+				SUMAF( M ) += AFLOW( i ) + AFLOW2( i );
+			}
 		}
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
 			if ( LIST >= 1 ) gio::write( Unit21, Format_903 ) << "Room: " << n << PZ( n ) << SUMAF( n ) << TZ( n );
@@ -536,9 +591,12 @@ namespace AirflowNetworkSolver {
 				AirflowNetworkLinkSimu( i ).FLOW2 = -AFLOW( i );
 			}
 			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_HOP ) {
-				if ( AFLOW2( i ) != 0.0 ) {
+				if ( AFLOW( i ) > 0.0 ) {
 					AirflowNetworkLinkSimu( i ).FLOW = AFLOW( i ) + AFLOW2( i );
 					AirflowNetworkLinkSimu( i ).FLOW2 = AFLOW2( i );
+				} else {
+					AirflowNetworkLinkSimu( i ).FLOW = AFLOW2( i );
+					AirflowNetworkLinkSimu( i ).FLOW2 = -AFLOW( i ) + AFLOW2( i );
 				}
 			}
 			if ( AirflowNetworkLinkageData( i ).DetOpenNum > 0 ) {
@@ -566,9 +624,9 @@ namespace AirflowNetworkSolver {
 
 	void
 	SOLVZP(
-		FArray1A_int IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A_int IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
 		int & ITER // number of iterations
 	)
 	{
@@ -632,14 +690,14 @@ namespace AirflowNetworkSolver {
 		int LFLAG;
 		int CONVG;
 		int ACCEL;
-		FArray1D< Real64 > PCF( NetworkNumOfNodes );
-		FArray1D< Real64 > CEF( NetworkNumOfNodes );
+		Array1D< Real64 > PCF( NetworkNumOfNodes );
+		Array1D< Real64 > CEF( NetworkNumOfNodes );
 		Real64 C;
 		Real64 SSUMF;
 		Real64 SSUMAF;
 		Real64 ACC0;
 		Real64 ACC1;
-		FArray1D< Real64 > CCF( NetworkNumOfNodes );
+		Array1D< Real64 > CCF( NetworkNumOfNodes );
 
 		// Formats
 		static gio::Fmt Format_901( "(A5,I3,2E14.6,0P,F8.4,F24.14)" );
@@ -764,12 +822,12 @@ namespace AirflowNetworkSolver {
 		ShowSevereError( "Too many iterations (SOLVZP) in Airflow Network simulation" );
 		++AirflowNetworkSimu.ExtLargeOpeningErrCount;
 		if ( AirflowNetworkSimu.ExtLargeOpeningErrCount < 2 ) {
-			ShowWarningError( "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, " "Absolute airflow convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem." );
+			ShowWarningError( "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem." );
 			ShowContinueErrorTimeStamp( "" );
 			ShowContinueError( "..Iterations=" + RoundSigDigits( ITER ) + ", Max allowed=" + RoundSigDigits( AirflowNetworkSimu.MaxIteration ) );
 			ShowFatalError( "AirflowNetwork: SOLVER, The previous error causes termination." );
 		} else {
-			ShowRecurringWarningErrorAtEnd( "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork " " simulation continues.", AirflowNetworkSimu.ExtLargeOpeningErrIndex );
+			ShowRecurringWarningErrorAtEnd( "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.", AirflowNetworkSimu.ExtLargeOpeningErrIndex );
 		}
 
 	}
@@ -833,16 +891,14 @@ namespace AirflowNetworkSolver {
 		int JHK1;
 		int newsum;
 		int newh;
-		int Nzeros;
 		int ispan;
 		int thisIK;
 		bool allZero; // noel
-		static bool firstTime( true ); // noel
 #endif
-		FArray1D< Real64 > X( 4 );
+		Array1D< Real64 > X( 4 );
 		Real64 DP;
-		FArray1D< Real64 > F( 2 );
-		FArray1D< Real64 > DF( 2 );
+		Array1D< Real64 > F( 2 );
+		Array1D< Real64 > DF( 2 );
 
 		// Formats
 		static gio::Fmt Format_901( "(A5,3I3,4E16.7)" );
@@ -869,7 +925,7 @@ namespace AirflowNetworkSolver {
 			if ( i > NumOfLinksMultiZone ) {
 				DP = PZ( n ) - PZ( M ) + PS( i ) + PW( i );
 			} else {
-				DP = PZ( n ) - PZ( M ) + DpL( 1, i ) + PW( i );
+				DP = PZ( n ) - PZ( M ) + DpL( i, 1 ) + PW( i );
 			}
 			if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << "PS:" << i << n << M << PS( i ) << PW( i ) << AirflowNetworkLinkSimu( i ).DP;
 			j = AirflowNetworkLinkageData( i ).CompNum;
@@ -908,6 +964,10 @@ namespace AirflowNetworkSolver {
 				AFEHEX( j, LFLAG, DP, i, n, M, F, DF, NF );
 			} else if ( SELECT_CASE_var == CompTypeNum_HOP ) { // Horizontal opening
 				AFEHOP( j, LFLAG, DP, i, n, M, F, DF, NF );
+			} else if ( SELECT_CASE_var == CompTypeNum_OAF ) { // OA supply fan
+				AFEOAF( j, LFLAG, DP, i, n, M, F, DF, NF );
+			} else if ( SELECT_CASE_var == CompTypeNum_REL ) { // Relief fan
+				AFEREL( j, LFLAG, DP, i, n, M, F, DF, NF );
 			} else {
 				continue;
 			}}
@@ -915,9 +975,6 @@ namespace AirflowNetworkSolver {
 			AFLOW( i ) = F( 1 );
 			AFLOW2( i ) = 0.0;
 			if ( AirflowNetworkCompData( j ).CompTypeNum == CompTypeNum_DOP ) {
-				AFLOW2( i ) = F( 2 );
-			}
-			if ( AirflowNetworkCompData( j ).CompTypeNum == CompTypeNum_HOP ) {
 				AFLOW2( i ) = F( 2 );
 			}
 			if ( LIST >= 3 ) gio::write( Unit21, Format_901 ) << " NRi:" << i << n << M << AirflowNetworkLinkSimu( i ).DP << F( 1 ) << DF( 1 );
@@ -991,7 +1048,7 @@ namespace AirflowNetworkSolver {
 			}
 
 			newh = LHK;
-			if ( allZero == true ) {
+			if ( allZero ) {
 				//print*, "allzero n=", n
 				newh = 0;
 			} else {
@@ -1038,8 +1095,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1162,8 +1219,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1223,7 +1280,11 @@ namespace AirflowNetworkSolver {
 
 		// FLOW:
 		// Crack standard condition from given inputs
-		Corr = MultizoneSurfaceData( i ).Factor;
+		if ( i > NetworkNumOfLinks - NumOfLinksIntraZone ) {
+			Corr = 1.0;
+		} else {
+			Corr = MultizoneSurfaceData( i ).Factor;
+		}
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
 		RhozNorm = PsyRhoAirFnPbTdbW( MultizoneSurfaceCrackData( CompNum ).StandardP, MultizoneSurfaceCrackData( CompNum ).StandardT, MultizoneSurfaceCrackData( CompNum ).StandardW );
 		VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneSurfaceCrackData( CompNum ).StandardT;
@@ -1299,8 +1360,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1476,8 +1537,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1648,13 +1709,13 @@ namespace AirflowNetworkSolver {
 	void
 	AFECFR(
 		int const j, // Component number
-		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
-		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const i, // Linkage number
-		int const n, // Node 1 number
-		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		int const EP_UNUSED( LFLAG ), // Initialization flag.If = 1, use laminar relationship
+		Real64 const EP_UNUSED( PDROP ), // Total pressure drop across a component (P1 - P2) [Pa]
+		int const EP_UNUSED( i ), // Linkage number
+		int const EP_UNUSED( n ), // Node 1 number
+		int const EP_UNUSED( M ), // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1772,8 +1833,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1891,7 +1952,6 @@ Label40: ;
 			CY = DisSysCompDetFanData( CompNum ).Coeff( k + 1 ) + CX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 2 ) + CX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 3 ) + CX * DisSysCompDetFanData( CompNum ).Coeff( k + 4 ) ) ) - PRISE;
 			if ( BY * CY == 0.0 ) goto Label90;
 			if ( BY * CY > 0.0 ) goto Label60;
-Label50: ;
 			DX = CX;
 			DY = CY;
 			if ( CY * CCY > 0.0 ) BY *= 0.5;
@@ -1919,23 +1979,20 @@ Label90: ;
 		} else {
 			DF( 1 ) = -1.0 / DPDF;
 		}
-
-Label999: ;
-		return;
 	}
 
 	// The above subroutine is not used. Leave it for the time being and revise later.
 
 	void
 	AFECPF(
-		int const j, // Component number
+		int const EP_UNUSED( j ), // Component number
 		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const i, // Linkage number
-		int const n, // Node 1 number
-		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		int const EP_UNUSED( n ), // Node 1 number
+		int const EP_UNUSED( M ), // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2001,8 +2058,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2088,8 +2145,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2202,8 +2259,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2309,13 +2366,13 @@ Label999: ;
 	void
 	AFECPD(
 		int const j, // Component number
-		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		int const EP_UNUSED( LFLAG ), // Initialization flag.If = 1, use laminar relationship
 		Real64 & PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const i, // Linkage number
+		int const EP_UNUSED( i ), // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2394,8 +2451,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2574,8 +2631,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2762,8 +2819,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2828,7 +2885,11 @@ Label999: ;
 		if ( Node( InletNode ).MassFlowRate > VerySmallMassFlow ) {
 			// Treat the component as an exhaust fan
 			NF = 1;
-			F( 1 ) = Node( InletNode ).MassFlowRate;
+			if ( PressureSetFlag == PressureCtrlExhaust ) {
+				F( 1 ) = ExhaustFanMassFlowRate;
+			} else {
+				F( 1 ) = Node( InletNode ).MassFlowRate;
+			}
 			DF( 1 ) = 0.0;
 			return;
 		} else {
@@ -2907,11 +2968,11 @@ Label999: ;
 		int const j, // Component number
 		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const i, // Linkage number
+		int const EP_UNUSED( i ), // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3080,8 +3141,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3159,7 +3220,7 @@ Label999: ;
 		DH = 4.0 * ( Width * Height ) / 2.0 / ( Width + Height ) * Fact;
 
 		// Check which zone is higher
-
+		NF = 1;
 		if ( Fact == 0.0 ) {
 			GenericCrack( coef, expn, LFLAG, PDROP, n, M, F, DF, NF );
 			return;
@@ -3219,9 +3280,286 @@ Label999: ;
 		DF( 1 ) = dp1fma12 - dp1fma21;
 		F( 2 ) = 0.0;
 		if ( fma12 != 0.0 && fma21 != 0.0 ) {
-			F( 2 ) = fma21;
+			F( 2 ) = BuoFlow;
 		}
 		DF( 2 ) = 0.0;
+
+	}
+
+	void
+	AFEOAF(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const EP_UNUSED( i ), // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	)
+	{
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
+
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		using DataHVACGlobals::VerySmallMassFlow;
+		using DataAirLoop::LoopSystemOnMassFlowrate;
+		using DataAirLoop::LoopSystemOffMassFlowrate;
+		using DataAirLoop::LoopFanOperationMode;
+		using DataAirLoop::LoopOnOffFanPartLoadRatio;
+		using DataHVACGlobals::FanType_SimpleOnOff;
+
+		// Argument array dimensioning
+		F.dim( 2 );
+		DF.dim( 2 );
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const CycFanCycComp( 1 ); // fan cycles with compressor operation
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 expn;
+		Real64 Ctl;
+		Real64 coef;
+		Real64 Corr;
+		Real64 VisAve;
+		Real64 Tave;
+		Real64 RhoCor;
+		int CompNum;
+		int InletNode;
+		Real64 RhozNorm;
+		Real64 VisczNorm;
+		Real64 CDM;
+		Real64 FL;
+		Real64 FT;
+
+		// FLOW:
+		CompNum = AirflowNetworkCompData( j ).TypeNum;
+
+		InletNode = DisSysCompOutdoorAirData( CompNum ).InletNode;
+		if ( Node( InletNode ).MassFlowRate > VerySmallMassFlow ) {
+			// Treat the component as an exhaust fan
+			NF = 1;
+			F( 1 ) = Node( InletNode ).MassFlowRate;
+			DF( 1 ) = 0.0;
+			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
+				F( 1 ) = F( 1 ) / LoopOnOffFanPartLoadRatio;
+			}
+			return;
+		} else {
+			// Treat the component as a surface crack
+			// Crack standard condition from given inputs
+			Corr = 1.0;
+			RhozNorm = PsyRhoAirFnPbTdbW( DisSysCompOutdoorAirData( CompNum ).StandardP, DisSysCompOutdoorAirData( CompNum ).StandardT, DisSysCompOutdoorAirData( CompNum ).StandardW );
+			VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompOutdoorAirData( CompNum ).StandardT;
+
+			expn = DisSysCompOutdoorAirData( CompNum ).FlowExpo;
+			VisAve = ( VISCZ( n ) + VISCZ( M ) ) / 2.0;
+			Tave = ( TZ( n ) + TZ( M ) ) / 2.0;
+			if ( PDROP >= 0.0 ) {
+				coef = DisSysCompOutdoorAirData( CompNum ).FlowCoef / SQRTDZ( n ) * Corr;
+			} else {
+				coef = DisSysCompOutdoorAirData( CompNum ).FlowCoef / SQRTDZ( M ) * Corr;
+			}
+
+			NF = 1;
+			if ( LFLAG == 1 ) {
+				// Initialization by linear relation.
+				if ( PDROP >= 0.0 ) {
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+				} else {
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+				}
+				F( 1 ) = -DF( 1 ) * PDROP;
+			} else {
+				// Standard calculation.
+				if ( PDROP >= 0.0 ) {
+					// Flow in positive direction.
+					// Laminar flow.
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = coef * SQRTDZ( n ) * std::sqrt( PDROP ) * Ctl;
+					} else {
+						FT = coef * SQRTDZ( n ) * std::pow( PDROP, expn ) * Ctl;
+					}
+				} else {
+					// Flow in negative direction.
+					// Laminar flow.
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = -coef * SQRTDZ( M ) * std::sqrt( -PDROP ) * Ctl;
+					} else {
+						FT = -coef * SQRTDZ( M ) * std::pow( -PDROP, expn ) * Ctl;
+					}
+				}
+				// Select laminar or turbulent flow.
+				if ( std::abs( FL ) <= std::abs( FT ) ) {
+					F( 1 ) = FL;
+					DF( 1 ) = CDM;
+				} else {
+					F( 1 ) = FT;
+					DF( 1 ) = FT * expn / PDROP;
+				}
+			}
+		}
+
+	}
+
+	void
+	AFEREL(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const EP_UNUSED( i ), // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	)
+	{
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		using DataHVACGlobals::VerySmallMassFlow;
+
+		// Argument array dimensioning
+		F.dim( 2 );
+		DF.dim( 2 );
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 expn;
+		Real64 Ctl;
+		Real64 coef;
+		Real64 Corr;
+		Real64 VisAve;
+		Real64 Tave;
+		Real64 RhoCor;
+		int CompNum;
+		int OutletNode;
+		Real64 RhozNorm;
+		Real64 VisczNorm;
+		Real64 CDM;
+		Real64 FL;
+		Real64 FT;
+
+		// FLOW:
+		CompNum = AirflowNetworkCompData( j ).TypeNum;
+
+		OutletNode = DisSysCompReliefAirData( CompNum ).OutletNode;
+		if ( Node( OutletNode ).MassFlowRate > VerySmallMassFlow && PressureSetFlag == PressureCtrlRelief ) {
+			// Treat the component as an exhaust fan
+			NF = 1;
+			F( 1 ) = ReliefMassFlowRate;
+			DF( 1 ) = 0.0;
+			return;
+		} else {
+			// Treat the component as a surface crack
+			// Crack standard condition from given inputs
+			Corr = 1.0;
+			RhozNorm = PsyRhoAirFnPbTdbW( DisSysCompReliefAirData( CompNum ).StandardP, DisSysCompReliefAirData( CompNum ).StandardT, DisSysCompReliefAirData( CompNum ).StandardW );
+			VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompReliefAirData( CompNum ).StandardT;
+
+			expn = DisSysCompReliefAirData( CompNum ).FlowExpo;
+			VisAve = ( VISCZ( n ) + VISCZ( M ) ) / 2.0;
+			Tave = ( TZ( n ) + TZ( M ) ) / 2.0;
+			if ( PDROP >= 0.0 ) {
+				coef = DisSysCompReliefAirData( CompNum ).FlowCoef / SQRTDZ( n ) * Corr;
+			} else {
+				coef = DisSysCompReliefAirData( CompNum ).FlowCoef / SQRTDZ( M ) * Corr;
+			}
+
+			NF = 1;
+			if ( LFLAG == 1 ) {
+				// Initialization by linear relation.
+				if ( PDROP >= 0.0 ) {
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+				} else {
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+				}
+				F( 1 ) = -DF( 1 ) * PDROP;
+			} else {
+				// Standard calculation.
+				if ( PDROP >= 0.0 ) {
+					// Flow in positive direction.
+					// Laminar flow.
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = coef * SQRTDZ( n ) * std::sqrt( PDROP ) * Ctl;
+					} else {
+						FT = coef * SQRTDZ( n ) * std::pow( PDROP, expn ) * Ctl;
+					}
+				} else {
+					// Flow in negative direction.
+					// Laminar flow.
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = -coef * SQRTDZ( M ) * std::sqrt( -PDROP ) * Ctl;
+					} else {
+						FT = -coef * SQRTDZ( M ) * std::pow( -PDROP, expn ) * Ctl;
+					}
+				}
+				// Select laminar or turbulent flow.
+				if ( std::abs( FL ) <= std::abs( FT ) ) {
+					F( 1 ) = FL;
+					DF( 1 ) = CDM;
+				} else {
+					F( 1 ) = FT;
+					DF( 1 ) = FT * expn / PDROP;
+				}
+			}
+		}
 
 	}
 
@@ -3233,8 +3571,8 @@ Label999: ;
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3357,10 +3695,10 @@ Label999: ;
 
 	void
 	FACSKY(
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AL, // the lower triangle of [A] before and after factoring
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AL, // the lower triangle of [A] before and after factoring
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	)
@@ -3493,10 +3831,10 @@ Label999: ;
 			if ( AD( k ) - SUMD == 0.0 ) {
 				ShowSevereError( "AirflowNetworkSolver: L-U factorization in Subroutine FACSKY." );
 				ShowContinueError( "The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData( k ).Name + '.' );
-				ShowContinueError( "One possible cause is that this node may not be connected directly, or indirectly via airflow " "network connections " );
-				ShowContinueError( "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:" "SimpleOpening, etc.), to an external" );
+				ShowContinueError( "One possible cause is that this node may not be connected directly, or indirectly via airflow network connections " );
+				ShowContinueError( "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:SimpleOpening, etc.), to an external" );
 				ShowContinueError( "node (AirflowNetwork:MultiZone:Surface)." );
-				ShowContinueError( "Please send your input file and weather file to EnergyPlus support/development team" " for further investigation." );
+				ShowContinueError( "Please send your input file and weather file to EnergyPlus support/development team for further investigation." );
 				ShowFatalError( "Preceding condition causes termination." );
 			}
 			AD( k ) = 1.0 / ( AD( k ) - SUMD );
@@ -3506,11 +3844,11 @@ Label999: ;
 
 	void
 	SLVSKY(
-		FArray1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
-		FArray1A< Real64 > B, // "B" vector (input); "X" vector (output).
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
+		Array1A< Real64 > B, // "B" vector (input); "X" vector (output).
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	)
@@ -3611,11 +3949,11 @@ Label999: ;
 
 	void
 	FILSKY(
-		FArray1A< Real64 > const X, // element array (row-wise sequence)
-		FArray1A_int const LM, // location matrix
-		FArray1A_int const IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const X, // element array (row-wise sequence)
+		Array1A_int const LM, // location matrix
+		Array1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
 		int const FLAG // mode of operation
 	)
 	{
@@ -3692,7 +4030,7 @@ Label999: ;
 	void
 	DUMPVD(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	)
@@ -3719,7 +4057,7 @@ Label999: ;
 		// na
 
 		// Argument array dimensioning
-		V.dim( star );
+		V.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3752,7 +4090,7 @@ Label999: ;
 	void
 	DUMPVR(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	)
@@ -3779,7 +4117,7 @@ Label999: ;
 		// na
 
 		// Argument array dimensioning
-		V.dim( star );
+		V.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3811,13 +4149,13 @@ Label999: ;
 	void
 	AFEDOP(
 		int const j, // Component number
-		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		int const EP_UNUSED( LFLAG ), // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const IL, // Linkage number
-		int const n, // Node 1 number
-		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		int const EP_UNUSED( n ), // Node 1 number
+		int const EP_UNUSED( M ), // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3875,7 +4213,6 @@ Label999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const RealMax( 0.1e+37 );
 		Real64 const RealMin( 1e-37 );
 		static Real64 const sqrt_1_2( std::sqrt( 1.2 ) );
 
@@ -3897,7 +4234,7 @@ Label999: ;
 		Real64 fma21; // massflow in direction "to-from" [kg/s]
 		Real64 dp1fma12; // derivative d fma12 / d Dp [kg/s/Pa]
 		Real64 dp1fma21; // derivative d fma21 / d Dp [kg/s/Pa]
-		FArray1D< Real64 > DpProfNew( NrInt+2 ); // Differential pressure profile for Large Openings, taking into account fixed
+		Array1D< Real64 > DpProfNew( NrInt+2 ); // Differential pressure profile for Large Openings, taking into account fixed
 		// pressures and actual zone pressures at reference height
 		Real64 Fact; // Actual opening factor
 		Real64 DifLim; // Limit for the pressure difference where laminarization takes place [Pa]
@@ -3916,7 +4253,7 @@ Label999: ;
 		Real64 fmasum;
 		Real64 dfmasum;
 		Real64 Prefact;
-		FArray1D< Real64 > EvalHghts( NrInt+2 );
+		Array1D< Real64 > EvalHghts( NrInt+2 );
 		Real64 h2;
 		Real64 h4;
 		Real64 alpha;
@@ -3948,7 +4285,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac2 - MultizoneCompDetOpeningData( CompNum ).HeightFac1 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff2 - MultizoneCompDetOpeningData( CompNum ).DischCoeff1 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -3962,7 +4299,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac3 - MultizoneCompDetOpeningData( CompNum ).HeightFac2 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff3 - MultizoneCompDetOpeningData( CompNum ).DischCoeff2 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -3980,13 +4317,13 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac4 - MultizoneCompDetOpeningData( CompNum ).HeightFac3 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff4 - MultizoneCompDetOpeningData( CompNum ).DischCoeff3 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
 		// calculate DpProfNew
 		for ( i = 1; i <= NrInt + 2; ++i ) {
-			DpProfNew( i ) = PDROP + DpProf( Loc + i ) - DpL( 1, IL );
+			DpProfNew( i ) = PDROP + DpProf( Loc + i ) - DpL( IL, 1 );
 		}
 
 		// Get opening data based on the opening factor
@@ -4029,7 +4366,7 @@ Label999: ;
 					ShowContinueError( "The actual width is set to 1.0E-6 m." );
 					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).WidthErrIndex, ActLw, ActLw );
+					ShowRecurringWarningErrorAtEnd( "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).WidthErrIndex, ActLw, ActLw );
 				}
 				ActLw = 1.0e-6;
 			}
@@ -4040,7 +4377,7 @@ Label999: ;
 					ShowContinueError( "The actual height is set to 1.0E-6 m." );
 					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).HeightErrIndex, ActLh, ActLh );
+					ShowRecurringWarningErrorAtEnd( "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).HeightErrIndex, ActLh, ActLh );
 				}
 				ActLh = 1.0e-6;
 			}
@@ -4275,12 +4612,12 @@ Label999: ;
 		int const il, // Linkage number
 		int const Pprof, // Opening number
 		Real64 const G, // gravitation field strength [N/kg]
-		FArray1A< Real64 > const DpF, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const DpT, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
-		FArray1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
+		Array1A< Real64 > const DpF, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const DpT, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
+		Array1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
 		int const From, // Number of FROM zone
 		int const To, // Number of To zone
 		Real64 const ActLh, // Actual height of opening [m]
@@ -4349,15 +4686,15 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > zF( 2 ); // Startheights of layers in FROM-, TO-zone
-		FArray1D< Real64 > zT( 2 );
-		FArray1D< Real64 > zStF( 2 ); // Startheights of layers within the LO, starting with the actual startheight of the LO.
-		FArray1D< Real64 > zStT( 2 );
+		Array1D< Real64 > zF( 2 ); // Startheights of layers in FROM-, TO-zone
+		Array1D< Real64 > zT( 2 );
+		Array1D< Real64 > zStF( 2 ); // Startheights of layers within the LO, starting with the actual startheight of the LO.
+		Array1D< Real64 > zStT( 2 );
 		// The values in the arrays DpF, DpT, BetaF, BetaT, RhoStF, RhoStT are calculated at these heights.
 		Real64 hghtsFR;
 		Real64 hghtsTR;
-		FArray1D< Real64 > hghtsF( NrInt+2 ); // Heights of evaluation points for pressure and density profiles
-		FArray1D< Real64 > hghtsT( NrInt+2 );
+		Array1D< Real64 > hghtsF( NrInt+2 ); // Heights of evaluation points for pressure and density profiles
+		Array1D< Real64 > hghtsT( NrInt+2 );
 		Real64 Interval; // Distance between two evaluation points
 		Real64 delzF; // Interval between actual evaluation point and startheight of actual layer in FROM-, TO-zone
 		Real64 delzT;
@@ -4519,28 +4856,28 @@ Label999: ;
 		Real64 RhoL1; // Air density [kg/m3]
 		Real64 RhoL2;
 		Real64 Pbz; // Pbarom at entrance level [Pa]
-		FArray2D< Real64 > RhoDrL( 2, NumOfLinksMultiZone ); // dry air density on both sides of the link [kg/m3]
+		Array2D< Real64 > RhoDrL( NumOfLinksMultiZone, 2 ); // dry air density on both sides of the link [kg/m3]
 		Real64 TempL1; // Temp in From and To zone at link level [C]
 		Real64 TempL2;
 		//      REAL(r64) Tout ! outside temperature [C]
 		Real64 Xhl1; // Humidity in From and To zone at link level [kg/kg]
 		Real64 Xhl2;
 		//      REAL(r64) Xhout ! outside humidity [kg/kg]
-		FArray1D< Real64 > Hfl( NumOfLinksMultiZone ); // Own height factor for large (slanted) openings
+		Array1D< Real64 > Hfl( NumOfLinksMultiZone ); // Own height factor for large (slanted) openings
 		int Nl; // number of links
 
-		FArray1D< Real64 > DpF( 2 );
+		Array1D< Real64 > DpF( 2 );
 		Real64 DpP;
-		FArray1D< Real64 > DpT( 2 );
+		Array1D< Real64 > DpT( 2 );
 		Real64 H;
-		FArray1D< Real64 > RhoStF( 2 );
-		FArray1D< Real64 > RhoStT( 2 );
+		Array1D< Real64 > RhoStF( 2 );
+		Array1D< Real64 > RhoStT( 2 );
 		Real64 RhoDrDummi;
-		FArray1D< Real64 > BetaStF( 2 );
-		FArray1D< Real64 > BetaStT( 2 );
+		Array1D< Real64 > BetaStF( 2 );
+		Array1D< Real64 > BetaStT( 2 );
 		Real64 T;
 		Real64 X;
-		FArray1D< Real64 > HSt( 2 );
+		Array1D< Real64 > HSt( 2 );
 		Real64 TzFrom;
 		Real64 XhzFrom;
 		Real64 TzTo;
@@ -4550,7 +4887,7 @@ Label999: ;
 		Real64 Pref;
 		Real64 PzFrom;
 		Real64 PzTo;
-		FArray1D< Real64 > RhoLd( 2 );
+		Array1D< Real64 > RhoLd( 2 );
 		Real64 RhoStd;
 		int From;
 		int To;
@@ -4584,8 +4921,10 @@ Label999: ;
 
 		for ( i = 1; i <= Nl; ++i ) {
 			// Check surface tilt
-			if ( AirflowNetworkLinkageData( i ).DetOpenNum > 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).Tilt < 90 ) {
-				Hfl( i ) = Surface( MultizoneSurfaceData( i ).SurfNum ).SinTilt;
+			if ( i <= Nl - NumOfLinksIntraZone ) { //Revised by L.Gu, on 9 / 29 / 10
+				if ( AirflowNetworkLinkageData( i ).DetOpenNum > 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).Tilt < 90 ) {
+					Hfl( i ) = Surface( MultizoneSurfaceData( i ).SurfNum ).SinTilt;
+				}
 			}
 			// Initialisation
 			From = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -4648,8 +4987,8 @@ Label999: ;
 			}
 
 			// RhoDrL is Rho at link level without pollutant but with humidity
-			RhoDrL( 1, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzFrom, TempL1, Xhl1 );
-			RhoDrL( 2, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzTo, TempL2, Xhl2 );
+			RhoDrL( i, 1 ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzFrom, TempL1, Xhl1 );
+			RhoDrL( i, 2 ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzTo, TempL2, Xhl2 );
 
 			// End initialisation
 
@@ -4658,7 +4997,7 @@ Label999: ;
 			if ( Fromz == 0 ) ilayptr = 1;
 			j = ilayptr;
 			k = 1;
-			LClimb( G, RhoLd( 1 ), AirflowNetworkLinkageData( i ).NodeHeights( 1 ), TempL1, Xhl1, DpF( k ), Toz, PzTo, Pbz, RhoDrL( 1, i ) );
+			LClimb( G, RhoLd( 1 ), AirflowNetworkLinkageData( i ).NodeHeights( 1 ), TempL1, Xhl1, DpF( k ), Toz, PzTo, Pbz, RhoDrL( i, 1 ) );
 			RhoL1 = RhoLd( 1 );
 			// For large openings calculate the stack pressure difference profile and the
 			// density profile within the the top- and the bottom- height of the large opening
@@ -4713,7 +5052,7 @@ Label999: ;
 			j = ilayptr;
 			// Calculate Rho at link height only if we have large openings or layered zones.
 			k = 1;
-			LClimb( G, RhoLd( 2 ), AirflowNetworkLinkageData( i ).NodeHeights( 2 ), TempL2, Xhl2, DpT( k ), Toz, PzTo, Pbz, RhoDrL( 2, i ) );
+			LClimb( G, RhoLd( 2 ), AirflowNetworkLinkageData( i ).NodeHeights( 2 ), TempL2, Xhl2, DpT( k ), Toz, PzTo, Pbz, RhoDrL( i, 2 ) );
 			RhoL2 = RhoLd( 2 );
 
 			// For large openings calculate the stack pressure difference profile and the
@@ -4771,12 +5110,12 @@ Label999: ;
 			// IF AIR FLOWS from "From" to "To"
 			Pref = Pbz + PzFrom + DpF( 1 );
 			DpP = psz( Pref, RhoLd( 1 ), 0.0, 0.0, H, G );
-			DpL( 1, i ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
+			DpL( i, 1 ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
 
 			// IF AIR FLOWS from "To" to "From"
 			Pref = Pbz + PzTo + DpT( 1 );
 			DpP = -psz( Pref, RhoLd( 2 ), 0.0, 0.0, -H, G );
-			DpL( 2, i ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
+			DpL( i, 2 ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
 
 			if ( Ltyp == CompTypeNum_DOP ) {
 				Pprof = OpenNum * ( NrInt + 2 );
@@ -5069,28 +5408,6 @@ Label999: ;
 	}
 
 	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // AirflowNetworkSolver
 

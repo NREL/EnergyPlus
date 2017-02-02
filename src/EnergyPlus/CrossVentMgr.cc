@@ -1,11 +1,56 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <CrossVentMgr.hh>
@@ -81,6 +126,17 @@ namespace CrossVentMgr {
 	Real64 const CrecTemp( 1.385 ); // Correlation constant for the recirculation temperature rise
 	Real64 const CrecFlow1( 0.415 ); // First correlation constant for the recirculation flow rate
 	Real64 const CrecFlow2( 0.466 ); // Second correlation constant for the recirculation flow rate
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this module should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitUCSDCV_MyOneTimeFlag( true );
+		Array1D_bool InitUCSDCV_MyEnvrnFlag;
+	}
+
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -181,22 +237,19 @@ namespace CrossVentMgr {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.dimension( NumOfZones, true );
-			MyOneTimeFlag = false;
+		if ( InitUCSDCV_MyOneTimeFlag ) {
+			InitUCSDCV_MyEnvrnFlag.dimension( NumOfZones, true );
+			InitUCSDCV_MyOneTimeFlag = false;
 		}
 
 		// Do the begin environment initializations
-		if ( BeginEnvrnFlag && MyEnvrnFlag( ZoneNum ) ) {
-			MyEnvrnFlag( ZoneNum ) = false;
+		if ( BeginEnvrnFlag && InitUCSDCV_MyEnvrnFlag( ZoneNum ) ) {
+			InitUCSDCV_MyEnvrnFlag( ZoneNum ) = false;
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( ZoneNum ) = true;
+			InitUCSDCV_MyEnvrnFlag( ZoneNum ) = true;
 		}
 
 	}
@@ -231,7 +284,6 @@ namespace CrossVentMgr {
 		// -
 
 		// Using/Aliasing
-		using DataRoomAirModel::AirModel;
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
@@ -431,15 +483,12 @@ namespace CrossVentMgr {
 		int Ctd; // counter
 		int Ctd2; // counter
 		int OPtr; // counter
-		static Real64 Win; // Inflow aperture width
-		static Real64 Aroom; // Room area cross section
-		static Real64 Wroom; // Room width
 		Real64 Uin; // Inflow air velocity [m/s]
 		Real64 CosPhi; // Angle (in degrees) between the wind and the outward normal of the dominant surface
 		Real64 SurfNorm; // Outward normal of surface
-		Real64 SumToZone; // Sum of velocities through
-		Real64 MaxFlux;
-		int MaxSurf;
+		Real64 SumToZone( 0.0 ); // Sum of velocities through
+		Real64 MaxFlux( 0.0 );
+		int MaxSurf( 0 );
 		Real64 XX;
 		Real64 YY;
 		Real64 ZZ;
@@ -448,41 +497,38 @@ namespace CrossVentMgr {
 		Real64 ZZ_Wall;
 		Real64 ActiveSurfNum;
 		int NSides; // Number of sides in surface
-		static int CompNum( 0 ); // AirflowNetwork Component number
-		static int TypeNum( 0 ); // Airflownetwork Type Number within a component
-		static int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
-		static int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
+		Real64 Wroom; // Room width
+		Real64 Aroom; // Room area cross section
+		int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
+		int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
-		MaxSurf = 0;
-		SumToZone = 0.0;
-		MaxFlux = 0.0;
 		RecInflowRatio( ZoneNum ) = 0.0;
 
 		// Identify the dominant aperture:
-		MaxSurf = AirflowNetworkSurfaceUCSDCV( ZoneNum, 1 );
+		MaxSurf = AirflowNetworkSurfaceUCSDCV( 1, ZoneNum );
 		if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).Zone == ZoneNum ) {
 			// this is a direct airflow network aperture
-			SumToZone = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, 1 ) ).VolFLOW2;
-			MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, 1 ) ).VolFLOW2;
+			SumToZone = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( 1, ZoneNum ) ).VolFLOW2;
+			MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( 1, ZoneNum ) ).VolFLOW2;
 		} else {
 			// this is an indirect airflow network aperture
-			SumToZone = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, 1 ) ).VolFLOW;
-			MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, 1 ) ).VolFLOW;
+			SumToZone = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( 1, ZoneNum ) ).VolFLOW;
+			MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( 1, ZoneNum ) ).VolFLOW;
 		}
 
-		for ( Ctd2 = 2; Ctd2 <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd2 ) {
-			if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).SurfNum ).Zone == ZoneNum ) {
-				if ( AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).VolFLOW2 > MaxFlux ) {
-					MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).VolFLOW2;
-					MaxSurf = AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 );
+		for ( Ctd2 = 2; Ctd2 <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd2 ) {
+			if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).SurfNum ).Zone == ZoneNum ) {
+				if ( AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).VolFLOW2 > MaxFlux ) {
+					MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).VolFLOW2;
+					MaxSurf = AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum );
 				}
-				SumToZone += AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).VolFLOW2;
+				SumToZone += AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).VolFLOW2;
 			} else {
-				if ( AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).VolFLOW > MaxFlux ) {
-					MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).VolFLOW;
-					MaxSurf = AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 );
+				if ( AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).VolFLOW > MaxFlux ) {
+					MaxFlux = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).VolFLOW;
+					MaxSurf = AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum );
 				}
-				SumToZone += AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd2 ) ).VolFLOW;
+				SumToZone += AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd2, ZoneNum ) ).VolFLOW;
 			}
 		}
 
@@ -491,8 +537,11 @@ namespace CrossVentMgr {
 		CosPhi = std::cos( ( WindDir - SurfNorm ) * DegToRadians );
 		if ( CosPhi <= 0 ) {
 			AirModel( ZoneNum ).SimAirModel = false;
-			CVJetRecFlows( ZoneNum, _ ).Ujet() = 0.0;
-			CVJetRecFlows( ZoneNum, _ ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			Urec( ZoneNum ) = 0.0;
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
@@ -513,15 +562,14 @@ namespace CrossVentMgr {
 		}
 
 		// Calculate the opening area for all apertures
-		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd ) {
-			CompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
-			TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
-			if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_DOP ) {
-				CVJetRecFlows( ZoneNum, Ctd ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height * MultizoneSurfaceData( Ctd ).OpenFactor;
-			} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) {
-				CVJetRecFlows( ZoneNum, Ctd ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height;
+		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
+			int cCompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
+			if ( AirflowNetworkCompData( cCompNum ).CompTypeNum == CompTypeNum_DOP ) {
+				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height * MultizoneSurfaceData( Ctd ).OpenFactor;
+			} else if ( AirflowNetworkCompData( cCompNum ).CompTypeNum == CompTypeNum_SCR ) {
+				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height;
 			} else {
-				ShowSevereError( "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced " "in the cross ventilation room air model" );
+				ShowSevereError( "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model" );
 				ShowContinueError( "Surface " + AirflowNetworkLinkageData( Ctd ).Name + " in zone " + Zone( ZoneNum ).Name + " uses leakage component " + AirflowNetworkLinkageData( Ctd ).CompName );
 				ShowContinueError( "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and " );
 				ShowContinueError( "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model" );
@@ -534,16 +582,25 @@ namespace CrossVentMgr {
 		// is a Window or Door it looks for the second base surface).
 		// Dstar is Droom corrected for wind angle
 		Wroom = Zone( ZoneNum ).Volume / Zone( ZoneNum ).FloorArea;
-		if ( ( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides == 3 ) || ( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides == 4 ) ) {
-			XX = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.x;
-			YY = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.y;
-			ZZ = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.z;
+		auto const & baseSurface( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ) );
+		if ( ( baseSurface.Sides == 3 ) || ( baseSurface.Sides == 4 ) ) {
+			XX = baseSurface.Centroid.x;
+			YY = baseSurface.Centroid.y;
+			ZZ = baseSurface.Centroid.z;
 		} else {
 			// If the surface has more than 4 vertex then average the vertex coordinates in X, Y and Z.
-			NSides = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides;
-			XX = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).x() ) / double( NSides );
-			YY = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).y() ) / double( NSides );
-			ZZ = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).z() ) / double( NSides );
+			NSides = baseSurface.Sides;
+			assert( NSides > 0 );
+			XX = YY = ZZ = 0.0;
+			for ( int i = 1; i <= NSides; ++i ) {
+				auto const & v( baseSurface.Vertex( i ) );
+				XX += v.x;
+				YY += v.y;
+				ZZ += v.z;
+			}
+			XX /= double( NSides );
+			YY /= double( NSides );
+			ZZ /= double( NSides );
 		}
 
 		Real64 const Wroom_2( pow_2( Wroom ) );
@@ -554,9 +611,17 @@ namespace CrossVentMgr {
 				ZZ_Wall = Surface( APos_Wall( Ctd ) ).Centroid.z;
 			} else {
 				NSides = Surface( APos_Wall( Ctd ) ).Sides;
-				XX_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).x() ) / double( NSides );
-				YY_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).y() ) / double( NSides );
-				ZZ_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).z() ) / double( NSides );
+				assert( NSides > 0 );
+				XX_Wall = YY_Wall = ZZ_Wall = 0.0;
+				for ( int i = 1; i <= NSides; ++i ) {
+					auto const & v( Surface( APos_Wall( Ctd ) ).Vertex( i ) );
+					XX_Wall += v.x;
+					YY_Wall += v.y;
+					ZZ_Wall += v.z;
+				}
+				XX_Wall /= double( NSides );
+				YY_Wall /= double( NSides );
+				ZZ_Wall /= double( NSides );
 			}
 			auto DroomTemp = std::sqrt( pow_2( XX - XX_Wall ) + pow_2( YY - YY_Wall ) + pow_2( ZZ - ZZ_Wall ) );
 			if ( DroomTemp > Droom( ZoneNum ) ) {
@@ -570,18 +635,18 @@ namespace CrossVentMgr {
 
 		//Populate an array of inflow volume fluxes (Fin) for all apertures in the zone
 		//Calculate inflow velocity (%Uin) for each aperture in the zone
-		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd ) {
+		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			if ( Surface( MultizoneSurfaceData( Ctd ).SurfNum ).Zone == ZoneNum ) {
 				// this is a direct airflow network aperture
-				CVJetRecFlows( ZoneNum, Ctd ).Fin = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd ) ).VolFLOW2;
+				CVJetRecFlows( Ctd, ZoneNum ).Fin = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd, ZoneNum ) ).VolFLOW2;
 			} else {
 				// this is an indirect airflow network aperture
-				CVJetRecFlows( ZoneNum, Ctd ).Fin = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Ctd ) ).VolFLOW;
+				CVJetRecFlows( Ctd, ZoneNum ).Fin = AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Ctd, ZoneNum ) ).VolFLOW;
 			}
-			if ( CVJetRecFlows( ZoneNum, Ctd ).Area != 0 ) {
-				CVJetRecFlows( ZoneNum, Ctd ).Uin = CVJetRecFlows( ZoneNum, Ctd ).Fin / CVJetRecFlows( ZoneNum, Ctd ).Area;
+			if ( CVJetRecFlows( Ctd, ZoneNum ).Area != 0 ) {
+				CVJetRecFlows( Ctd, ZoneNum ).Uin = CVJetRecFlows( Ctd, ZoneNum ).Fin / CVJetRecFlows( Ctd, ZoneNum ).Area;
 			} else {
-				CVJetRecFlows( ZoneNum, Ctd ).Uin = 0.0;
+				CVJetRecFlows( Ctd, ZoneNum ).Uin = 0.0;
 			}
 		}
 
@@ -590,14 +655,14 @@ namespace CrossVentMgr {
 		// Calculate the total area of all active apertures
 		ActiveSurfNum = 0.0;
 		Ain( ZoneNum ) = 0.0;
-		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd ) {
-			if ( CVJetRecFlows( ZoneNum, Ctd ).Uin <= MinUin ) {
-				CVJetRecFlows( ZoneNum, Ctd ).FlowFlag = 0;
+		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
+			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin <= MinUin ) {
+				CVJetRecFlows( Ctd, ZoneNum ).FlowFlag = 0;
 			} else {
-				CVJetRecFlows( ZoneNum, Ctd ).FlowFlag = 1;
+				CVJetRecFlows( Ctd, ZoneNum ).FlowFlag = 1;
 			}
-			ActiveSurfNum += CVJetRecFlows( ZoneNum, Ctd ).FlowFlag;
-			Ain( ZoneNum ) += CVJetRecFlows( ZoneNum, Ctd ).Area * CVJetRecFlows( ZoneNum, Ctd ).FlowFlag;
+			ActiveSurfNum += CVJetRecFlows( Ctd, ZoneNum ).FlowFlag;
+			Ain( ZoneNum ) += CVJetRecFlows( Ctd, ZoneNum ).Area * CVJetRecFlows( Ctd, ZoneNum ).FlowFlag;
 		}
 
 		// Verify if any of the apertures have minimum flow
@@ -619,8 +684,11 @@ namespace CrossVentMgr {
 			Urec( ZoneNum ) = 0.0;
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
-			CVJetRecFlows( ZoneNum, _ ).Ujet() = 0.0;
-			CVJetRecFlows( ZoneNum, _ ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			return;
 		}
 
@@ -628,8 +696,8 @@ namespace CrossVentMgr {
 		// Calculate Qtot, the total volumetric flow rate through all active openings in the zone
 		Uin = 0.0;
 
-		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd ) {
-			Uin += CVJetRecFlows( ZoneNum, Ctd ).Area * CVJetRecFlows( ZoneNum, Ctd ).Uin * CVJetRecFlows( ZoneNum, Ctd ).FlowFlag / Ain( ZoneNum );
+		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
+			Uin += CVJetRecFlows( Ctd, ZoneNum ).Area * CVJetRecFlows( Ctd, ZoneNum ).Uin * CVJetRecFlows( Ctd, ZoneNum ).FlowFlag / Ain( ZoneNum );
 		}
 
 		//Verify if Uin is higher than minimum:
@@ -639,8 +707,11 @@ namespace CrossVentMgr {
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
 			RecInflowRatio( ZoneNum ) = 0.0;
-			CVJetRecFlows( ZoneNum, _ ).Ujet() = 0.0;
-			CVJetRecFlows( ZoneNum, _ ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond > 0 ) {
 				Tin( ZoneNum ) = MAT( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond ).Zone );
 			} else if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
@@ -675,23 +746,26 @@ namespace CrossVentMgr {
 		Urec( ZoneNum ) = 0.0;
 		Qrec( ZoneNum ) = 0.0;
 		Qtot( ZoneNum ) = 0.0;
-		CVJetRecFlows( ZoneNum, _ ).Ujet() = 0.0;
-		CVJetRecFlows( ZoneNum, _ ).Urec() = 0.0;
-		CVJetRecFlows( ZoneNum, _ ).Qrec() = 0.0;
-		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd ) {
-			if ( CVJetRecFlows( ZoneNum, Ctd ).Uin != 0 ) {
-				CVJetRecFlows( ZoneNum, Ctd ).Vjet = CVJetRecFlows( ZoneNum, Ctd ).Uin * std::sqrt( CVJetRecFlows( ZoneNum, Ctd ).Area ) * 6.3 * std::log( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( ZoneNum, Ctd ).Area ) ) ) / Dstar( ZoneNum );
-				CVJetRecFlows( ZoneNum, Ctd ).Yjet = Cjet1 * std::sqrt( CVJetRecFlows( ZoneNum, Ctd ).Area / Aroom ) * CVJetRecFlows( ZoneNum, Ctd ).Vjet / CVJetRecFlows( ZoneNum, Ctd ).Uin + Cjet2;
-				CVJetRecFlows( ZoneNum, Ctd ).Yrec = Crec1 * std::sqrt( CVJetRecFlows( ZoneNum, Ctd ).Area / Aroom ) * CVJetRecFlows( ZoneNum, Ctd ).Vjet / CVJetRecFlows( ZoneNum, Ctd ).Uin + Crec2;
-				CVJetRecFlows( ZoneNum, Ctd ).YQrec = CrecFlow1 * std::sqrt( CVJetRecFlows( ZoneNum, Ctd ).Area * Aroom ) * CVJetRecFlows( ZoneNum, Ctd ).Vjet / CVJetRecFlows( ZoneNum, Ctd ).Uin + CrecFlow2;
-				CVJetRecFlows( ZoneNum, Ctd ).Ujet = CVJetRecFlows( ZoneNum, Ctd ).FlowFlag * CVJetRecFlows( ZoneNum, Ctd ).Yjet / CVJetRecFlows( ZoneNum, Ctd ).Uin;
-				CVJetRecFlows( ZoneNum, Ctd ).Urec = CVJetRecFlows( ZoneNum, Ctd ).FlowFlag * CVJetRecFlows( ZoneNum, Ctd ).Yrec / CVJetRecFlows( ZoneNum, Ctd ).Uin;
-				CVJetRecFlows( ZoneNum, Ctd ).Qrec = CVJetRecFlows( ZoneNum, Ctd ).FlowFlag * CVJetRecFlows( ZoneNum, Ctd ).YQrec / CVJetRecFlows( ZoneNum, Ctd ).Uin;
-				Ujet( ZoneNum ) += CVJetRecFlows( ZoneNum, Ctd ).Area * CVJetRecFlows( ZoneNum, Ctd ).Ujet / Ain( ZoneNum );
-				Urec( ZoneNum ) += CVJetRecFlows( ZoneNum, Ctd ).Area * CVJetRecFlows( ZoneNum, Ctd ).Urec / Ain( ZoneNum );
-				Qrec( ZoneNum ) += CVJetRecFlows( ZoneNum, Ctd ).Qrec;
-				Qtot( ZoneNum ) += CVJetRecFlows( ZoneNum, Ctd ).Fin * CVJetRecFlows( ZoneNum, Ctd ).FlowFlag;
-				Urec( ZoneNum ) += CVJetRecFlows( ZoneNum, Ctd ).Area * CVJetRecFlows( ZoneNum, Ctd ).Urec / Ain( ZoneNum );
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = e.Qrec = 0.0;
+			}
+		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
+			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin != 0 ) {
+				Real64 dstarexp = max( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ), 1.0 );
+				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( dstarexp ) / Dstar( ZoneNum );
+				CVJetRecFlows( Ctd, ZoneNum ).Yjet = Cjet1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Cjet2;
+				CVJetRecFlows( Ctd, ZoneNum ).Yrec = Crec1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Crec2;
+				CVJetRecFlows( Ctd, ZoneNum ).YQrec = CrecFlow1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area * Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + CrecFlow2;
+				CVJetRecFlows( Ctd, ZoneNum ).Ujet = CVJetRecFlows( Ctd, ZoneNum ).FlowFlag * CVJetRecFlows( Ctd, ZoneNum ).Yjet / CVJetRecFlows( Ctd, ZoneNum ).Uin;
+				CVJetRecFlows( Ctd, ZoneNum ).Urec = CVJetRecFlows( Ctd, ZoneNum ).FlowFlag * CVJetRecFlows( Ctd, ZoneNum ).Yrec / CVJetRecFlows( Ctd, ZoneNum ).Uin;
+				CVJetRecFlows( Ctd, ZoneNum ).Qrec = CVJetRecFlows( Ctd, ZoneNum ).FlowFlag * CVJetRecFlows( Ctd, ZoneNum ).YQrec / CVJetRecFlows( Ctd, ZoneNum ).Uin;
+				Ujet( ZoneNum ) += CVJetRecFlows( Ctd, ZoneNum ).Area * CVJetRecFlows( Ctd, ZoneNum ).Ujet / Ain( ZoneNum );
+				Urec( ZoneNum ) += CVJetRecFlows( Ctd, ZoneNum ).Area * CVJetRecFlows( Ctd, ZoneNum ).Urec / Ain( ZoneNum );
+				Qrec( ZoneNum ) += CVJetRecFlows( Ctd, ZoneNum ).Qrec;
+				Qtot( ZoneNum ) += CVJetRecFlows( Ctd, ZoneNum ).Fin * CVJetRecFlows( Ctd, ZoneNum ).FlowFlag;
+				Urec( ZoneNum ) += CVJetRecFlows( Ctd, ZoneNum ).Area * CVJetRecFlows( Ctd, ZoneNum ).Urec / Ain( ZoneNum );
 			}
 		}
 
@@ -787,10 +861,8 @@ namespace CrossVentMgr {
 		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataHVACGlobals::TimeStepSys;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
 
@@ -798,7 +870,6 @@ namespace CrossVentMgr {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Sigma( 10.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -815,7 +886,6 @@ namespace CrossVentMgr {
 		Real64 ZTAveraged;
 
 		int Ctd;
-		Real64 VolOverAin;
 		Real64 MCpT_Total;
 		Real64 L;
 		Real64 ZoneMult; // total zone multiplier
@@ -831,7 +901,7 @@ namespace CrossVentMgr {
 		}
 
 		SumAllInternalConvectionGains( ZoneNum, ConvGains );
-		ConvGains += SumConvHTRadSys( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
+		ConvGains += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
@@ -879,8 +949,10 @@ namespace CrossVentMgr {
 				Urec( ZoneNum ) = 0.0;
 				Qrec( ZoneNum ) = 0.0;
 				RecInflowRatio( ZoneNum ) = 0.0;
-				CVJetRecFlows.Ujet() = 0.0;
-				CVJetRecFlows.Urec() = 0.0;
+				for ( auto & e : CVJetRecFlows ) {
+					e.Ujet = 0.0;
+					e.Urec = 0.0;
+				}
 				for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 					ZTAveraged = MAT( ZoneNum );
 					RoomOutflowTemp( ZoneNum ) = ZTAveraged;
@@ -909,8 +981,10 @@ namespace CrossVentMgr {
 			Urec( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
 			RecInflowRatio( ZoneNum ) = 0.0;
-			CVJetRecFlows.Ujet() = 0.0;
-			CVJetRecFlows.Urec() = 0.0;
+			for ( auto & e : CVJetRecFlows ) {
+				e.Ujet = 0.0;
+				e.Urec = 0.0;
+			}
 			for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 				ZTAveraged = MAT( ZoneNum );
 				RoomOutflowTemp( ZoneNum ) = ZTAveraged;
@@ -935,28 +1009,18 @@ namespace CrossVentMgr {
 
 	}
 
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	// Clears the global data in MixedAir.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		HAT_J =  0.0 ;
+		HA_J =  0.0 ;
+		HAT_R = 0.0 ;
+		HA_R = 0.0 ;
+		InitUCSDCV_MyOneTimeFlag =  true ;
+		InitUCSDCV_MyEnvrnFlag.deallocate();
+	}
 
 } // CrossVentMgr
 

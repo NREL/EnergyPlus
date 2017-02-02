@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,8 +130,8 @@ namespace MicroCHPElectricGenerator {
 
 	// DERIVED TYPE DEFINITIONS
 	bool GetMicroCHPInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
 
@@ -98,7 +144,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlagElectCenter, // simulate Generator when TRUE
@@ -126,7 +172,7 @@ namespace MicroCHPElectricGenerator {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizeCompleted;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -152,7 +198,7 @@ namespace MicroCHPElectricGenerator {
 		//  Call InitMicroCHPNoNormalizeGenerators
 
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MicroCHP.Name(), NumMicroCHPs );
+			GenNum = FindItemInList( GeneratorName, MicroCHP );
 			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -171,7 +217,7 @@ namespace MicroCHPElectricGenerator {
 		if ( MicroCHP( GenNum ).ModelTypeAnnex42 ) { // call the non normalize calc routines (set for future extension to normalize ones)
 
 			InitMicroCHPNoNormalizeGenerators( GenNum, FirstHVACIteration );
-			if ( PlantSizeNotComplete ) return;
+			if ( ! PlantFirstSizeCompleted ) return;
 			CalcMicroCHPNoNormalizeGeneratorModel( GenNum, RunFlagElectCenter, RunFlagPlant, MyElectricLoad, MyThermalLoad, FirstHVACIteration );
 
 			CalcUpdateHeatRecovery( GenNum, FirstHVACIteration );
@@ -228,8 +274,8 @@ namespace MicroCHPElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 25 ); // character string data
-		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
+		Array1D_string AlphArray( 25 ); // character string data
+		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -368,7 +414,7 @@ namespace MicroCHPElectricGenerator {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), MicroCHP.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), MicroCHP, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -378,7 +424,7 @@ namespace MicroCHPElectricGenerator {
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 				MicroCHP( GeneratorNum ).ParamObjName = AlphArray( 2 ); //  A2 Micro CHP Parameter Object Name
 				//find input structure
-				thisParamID = FindItemInList( AlphArray( 2 ), MicroCHPParamInput.Name(), NumMicroCHPParams );
+				thisParamID = FindItemInList( AlphArray( 2 ), MicroCHPParamInput );
 				if ( thisParamID != 0 ) {
 					MicroCHP( GeneratorNum ).A42Model = MicroCHPParamInput( thisParamID ); // entire structure of input data assigned here!
 				} else {
@@ -389,7 +435,7 @@ namespace MicroCHPElectricGenerator {
 
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
 					MicroCHP( GeneratorNum ).ZoneName = AlphArray( 3 ); //  A3 Zone Name
-					MicroCHP( GeneratorNum ).ZoneID = FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone.Name(), NumOfZones );
+					MicroCHP( GeneratorNum ).ZoneID = FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone );
 					if ( MicroCHP( GeneratorNum ).ZoneID == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + AlphArray( 3 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -412,7 +458,7 @@ namespace MicroCHPElectricGenerator {
 				MicroCHP( GeneratorNum ).AirOutletNodeName = AlphArray( 7 ); //  A7 Air Outlet Node Name
 				MicroCHP( GeneratorNum ).AirOutletNodeID = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
-				MicroCHP( GeneratorNum ).FuelSupplyID = FindItemInList( AlphArray( 8 ), FuelSupply.Name(), NumGeneratorFuelSups ); // Fuel Supply ID
+				MicroCHP( GeneratorNum ).FuelSupplyID = FindItemInList( AlphArray( 8 ), FuelSupply ); // Fuel Supply ID
 				if ( MicroCHP( GeneratorNum ).FuelSupplyID == 0 ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -500,7 +546,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	InitMicroCHPNoNormalizeGenerators(
 		int const GeneratorNum, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -520,21 +566,18 @@ namespace MicroCHPElectricGenerator {
 
 		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::HoursInDay;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroCHP;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::SupplySide;
 		using DataPlant::LoopFlowStatus_TakesWhatGets;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::DemandSide;
 		using DataSizing::PlantSizData;
 		using PlantUtilities::SetComponentFlowRate;
@@ -560,8 +603,8 @@ namespace MicroCHPElectricGenerator {
 		static int DynaCntrlNum( 0 );
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
 
 		bool errFlag;
 		Real64 mdot; // local temporary for mass flow rate
@@ -597,7 +640,7 @@ namespace MicroCHPElectricGenerator {
 			MyPlantScanFlag( GeneratorNum ) = false;
 		}
 
-		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantSizesOkayToFinalize ) ) {
+		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
 			rho = GetDensityGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, RoutineName );
 			if ( MicroCHP( GeneratorNum ).A42Model.InternalFlowControl ) { // got a curve
 				MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.0 * CurveValue( MicroCHP( GeneratorNum ).A42Model.WaterFlowCurveID, MicroCHP( GeneratorNum ).A42Model.MaxElecPower, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp );
@@ -731,7 +774,6 @@ namespace MicroCHPElectricGenerator {
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-		using DataGlobals::HoursInDay;
 		using CurveManager::CurveValue;
 		using namespace DataGlobalConstants;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -1339,7 +1381,6 @@ namespace MicroCHPElectricGenerator {
 		// na
 
 		// Using/Aliasing
-		using DataHeatBalance::ZoneIntGain;
 		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals
@@ -1364,10 +1405,12 @@ namespace MicroCHPElectricGenerator {
 		if ( NumMicroCHPs == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			FuelSupply.QskinLoss() = 0.0;
-			MicroCHP.ma( &MicroCHPDataStruct::A42Model ).QdotSkin() = 0.0;
-			MicroCHP.ma( &MicroCHPDataStruct::Report ).SkinLossConvect() = 0.0;
-			MicroCHP.ma( &MicroCHPDataStruct::Report ).SkinLossRadiat() = 0.0;
+			for ( auto & e : FuelSupply ) e.QskinLoss = 0.0;
+			for ( auto & e : MicroCHP ) {
+				e.A42Model.QdotSkin = 0.0;
+				e.Report.SkinLossConvect = 0.0;
+				e.Report.SkinLossRadiat = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 
@@ -1392,7 +1435,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	CalcUpdateHeatRecovery(
 		int const Num, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -1449,12 +1492,12 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyThermalLoad,
+		Real64 & EP_UNUSED( MyThermalLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -1510,7 +1553,7 @@ namespace MicroCHPElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MicroCHP.Name(), NumMicroCHPs );
+			CompNum = FindItemInList( CompName, MicroCHP );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );
 				return;
@@ -1631,7 +1674,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	GetMicroCHPGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

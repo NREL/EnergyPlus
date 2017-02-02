@@ -1,7 +1,53 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -22,21 +68,10 @@ namespace BranchNodeConnections {
 	// MODULE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   May 2005
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// This module encapsulates the connection data necessary for some of the checks
 	// needed in the branch-node data
-
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
 
 	// Using/Aliasing
 	using DataGlobals::OutputFileDebug;
@@ -46,14 +81,6 @@ namespace BranchNodeConnections {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
-	// na
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Functions
 
@@ -161,7 +188,7 @@ namespace BranchNodeConnections {
 				}
 
 				// Check out AirTerminal inlet/outlet nodes
-				Found = FindItemInList( NodeName, AirTerminalNodeConnections.NodeName(), NumOfAirTerminalNodes - 1 );
+				Found = FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
 				if ( Found != 0 ) { // Nodename already used
 					ShowSevereError( RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated." );
 					ShowContinueError( "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType );
@@ -186,6 +213,61 @@ namespace BranchNodeConnections {
 			errFlag = true;
 		}
 
+	}
+
+	void
+	OverrideNodeConnectionType(
+		int const NodeNumber, // Number for this Node
+		std::string const & NodeName, // Name of this Node
+		std::string const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		std::string const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		std::string const & ConnectionType, // Connection Type for this Node (must be valid)
+		int const FluidStream, // Count on Fluid Streams
+		bool const IsParent, // True when node is a parent node
+		bool & errFlag // Will be True if errors already detected or if errors found here
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M. J. Witte
+		//       DATE WRITTEN   June 2016
+
+		// PURPOSE:
+		// This subroutine modifies an existing node connection in the Node Connection data structure.  This
+		// structure is intended to help with HVAC diagramming as well as validation of nodes. This function
+		// is a based on RegisterNodeConnection.
+
+		// Using/Aliasing
+		using InputProcessor::SameString;
+		using InputProcessor::MakeUPPERCase;
+		using InputProcessor::FindItemInList;
+
+		static std::string const RoutineName( "ModifyNodeConnectionType: " );
+
+		if ( ! IsValidConnectionType( ConnectionType ) ) {
+			ShowSevereError( RoutineName + "Invalid ConnectionType=" + ConnectionType );
+			ShowContinueError( "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName );
+			errFlag = true;
+		}
+
+		int Found = 0;
+		for ( int Count = 1; Count <= NumOfNodeConnections; ++Count ) {
+			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
+			if ( ! SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
+			if ( ( NodeConnections( Count ).ObjectIsParent != IsParent )) continue;
+			Found = Count;
+			break;
+		}
+
+		if ( Found > 0 ) {
+			NodeConnections( Found ).ConnectionType = ConnectionType;
+		} else {
+			ShowSevereError( RoutineName + "Existing node connection not found." );
+			ShowContinueError( "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName );
+			errFlag = true;
+		}
 	}
 
 	bool
@@ -269,6 +351,10 @@ namespace BranchNodeConnections {
 		//        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
 		// 6.  Any given node can only be an inlet once in the list of Non-Parent Node Connections
 		// 7.  Any given node can only be an outlet once in the list of Non-Parent Node Connections
+		// 8.  non-parent outlet nodes -- must never be an outlet more than once
+		// 9.  nodes of type OutsideAirReference must be registered as NodeConnectionType_OutsideAir
+		// 10. fluid streams cannot have multiple inlet/outlet nodes on same component
+		// 11. zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
 
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
@@ -303,10 +389,10 @@ namespace BranchNodeConnections {
 		int Object;
 		int StartConnect;
 		int EndConnect;
-		FArray1D_int FluidStreamInletCount;
-		FArray1D_int FluidStreamOutletCount;
-		FArray1D_int NodeObjects;
-		FArray1D_bool FluidStreamCounts;
+		Array1D_int FluidStreamInletCount;
+		Array1D_int FluidStreamOutletCount;
+		Array1D_int NodeObjects;
+		Array1D_bool FluidStreamCounts;
 		int NumObjects;
 		int MaxFluidStream;
 
@@ -482,7 +568,7 @@ namespace BranchNodeConnections {
 			}
 			if ( ! IsValid && ! MatchedAtLeastOne ) {
 				ShowSevereError( "Node Connection Error, Node=\"" + NodeConnections( Loop1 ).NodeName + "\", Inlet node did not find an appropriate matching \"outlet\" node." );
-				ShowContinueError( "If this is an outdoor air inlet node, " "it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object." );
+				ShowContinueError( "If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object." );
 				ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Name=" + NodeConnections( Loop1 ).ObjectName );
 				++ErrorCounter;
 				//      ErrorsFound=.TRUE.
@@ -548,7 +634,7 @@ namespace BranchNodeConnections {
 			}
 			if ( ! IsValid ) {
 				ShowSevereError( "Node Connection Error, Node=\"" + NodeConnections( Loop1 ).NodeName + "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node." );
-				ShowContinueError( "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList " "object in order to set its conditions." );
+				ShowContinueError( "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions." );
 				ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Name=" + NodeConnections( Loop1 ).ObjectName );
 				++ErrorCounter;
 				//      ErrorsFound=.TRUE.
@@ -558,7 +644,7 @@ namespace BranchNodeConnections {
 		// Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
 		//  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
 		if ( NumOfNodeConnections > 0 ) {
-			MaxFluidStream = maxval( NodeConnections.FluidStream() );
+			MaxFluidStream = maxval( NodeConnections, &NodeConnectionDef::FluidStream );
 			FluidStreamInletCount.allocate( MaxFluidStream );
 			FluidStreamOutletCount.allocate( MaxFluidStream );
 			FluidStreamCounts.allocate( MaxFluidStream );
@@ -588,6 +674,7 @@ namespace BranchNodeConnections {
 				FluidStreamOutletCount = 0;
 				FluidStreamCounts = false;
 				Loop1 = NodeObjects( Object );
+				if ( NumOfNodeConnections < 2 ) continue;
 				if ( NodeConnections( Loop1 ).ObjectIsParent ) continue;
 				if ( NodeConnections( Loop1 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Inlet ) ) ++FluidStreamInletCount( NodeConnections( Loop1 ).FluidStream );
 				if ( NodeConnections( Loop1 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Outlet ) ) ++FluidStreamOutletCount( NodeConnections( Loop1 ).FluidStream );
@@ -616,6 +703,25 @@ namespace BranchNodeConnections {
 			FluidStreamOutletCount.deallocate();
 			FluidStreamCounts.deallocate();
 			NodeObjects.deallocate();
+		}
+
+		//Check 11 - zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_ZoneNode ) ) continue;
+			IsValid = true;
+			for ( Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeName == NodeConnections( Loop2 ).NodeName ) {
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_SetPoint ) ) continue;
+					ShowSevereError( "Node Connection Error, Node Name=\"" + NodeConnections( Loop1 ).NodeName + "\", The same zone node appears more than once." );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Object Name=" + NodeConnections( Loop1 ).ObjectName );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop2 ).ObjectType + ", Object Name=" + NodeConnections( Loop2 ).ObjectName );
+					++ErrorCounter;
+					ErrorsFound = true;
+				}
+			}
 		}
 
 		NumNodeConnectionErrors += ErrorCounter;
@@ -1071,13 +1177,13 @@ namespace BranchNodeConnections {
 		std::string const & ComponentName,
 		bool & IsParent,
 		int & NumInlets,
-		FArray1D_string & InletNodeNames,
-		FArray1D_int & InletNodeNums,
-		FArray1D_int & InletFluidStreams,
+		Array1D_string & InletNodeNames,
+		Array1D_int & InletNodeNums,
+		Array1D_int & InletFluidStreams,
 		int & NumOutlets,
-		FArray1D_string & OutletNodeNames,
-		FArray1D_int & OutletNodeNums,
-		FArray1D_int & OutletFluidStreams,
+		Array1D_string & OutletNodeNames,
+		Array1D_int & OutletNodeNums,
+		Array1D_int & OutletFluidStreams,
 		bool & ErrorsFound
 	)
 	{
@@ -1190,12 +1296,12 @@ namespace BranchNodeConnections {
 		std::string const & ComponentType,
 		std::string const & ComponentName,
 		int & NumChildren,
-		FArray1S_string ChildrenCType,
-		FArray1S_string ChildrenCName,
-		FArray1S_string InletNodeName,
-		FArray1S_int InletNodeNum,
-		FArray1S_string OutletNodeName,
-		FArray1S_int OutletNodeNum,
+		Array1S_string ChildrenCType,
+		Array1S_string ChildrenCName,
+		Array1S_string InletNodeName,
+		Array1S_int InletNodeNum,
+		Array1S_string OutletNodeName,
+		Array1S_int OutletNodeNum,
 		bool & ErrorsFound
 	)
 	{
@@ -1233,12 +1339,12 @@ namespace BranchNodeConnections {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string ChildCType;
-		FArray1D_string ChildCName;
-		FArray1D_string ChildInNodeName;
-		FArray1D_string ChildOutNodeName;
-		FArray1D_int ChildInNodeNum;
-		FArray1D_int ChildOutNodeNum;
+		Array1D_string ChildCType;
+		Array1D_string ChildCName;
+		Array1D_string ChildInNodeName;
+		Array1D_string ChildOutNodeName;
+		Array1D_int ChildInNodeNum;
+		Array1D_int ChildOutNodeNum;
 		int Loop;
 		int CountNum;
 		bool ErrInObject;
@@ -1563,7 +1669,7 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	TestInletOutletNodes( bool & ErrorsFound )
+	TestInletOutletNodes( bool & EP_UNUSED( ErrorsFound ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1600,7 +1706,7 @@ namespace BranchNodeConnections {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Count;
 		int Other;
-		FArray1D_bool AlreadyNoted;
+		Array1D_bool AlreadyNoted;
 
 		// Test component sets created by branches
 		AlreadyNoted.dimension( NumCompSets, false );
@@ -1770,7 +1876,7 @@ namespace BranchNodeConnections {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Count;
 		int Other;
-		FArray1D_bool AlreadyNoted;
+		Array1D_bool AlreadyNoted;
 
 		// Test component sets created by branches
 		AlreadyNoted.dimension( NumCompSets, false );
@@ -1849,7 +1955,7 @@ namespace BranchNodeConnections {
 	void
 	GetNodeConnectionType(
 		int const NodeNumber,
-		FArray1D_int & NodeConnectType,
+		Array1D_int & NodeConnectType,
 		bool & errFlag
 	)
 	{
@@ -1889,11 +1995,11 @@ namespace BranchNodeConnections {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NodeConnectIndex;
 		int NumInList;
-		FArray1D_int ListArray;
+		Array1D_int ListArray;
 
 		if ( allocated( NodeConnectType ) ) NodeConnectType.deallocate();
 
-		FindAllNumbersInList( NodeNumber, NodeConnections.NodeNumber(), NumOfNodeConnections, NumInList, ListArray );
+		FindAllNodeNumbersInList( NodeNumber, NodeConnections, NumOfNodeConnections, NumInList, ListArray );
 
 		NodeConnectType.allocate( NumInList );
 
@@ -1913,12 +2019,12 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	FindAllNumbersInList(
+	FindAllNodeNumbersInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1< DataBranchNodeConnections::NodeConnectionDef > const & NodeConnections,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
-		FArray1D_int & AllNumbersInList // Index array to all numbers found
+		Array1D_int & AllNumbersInList // Index array to all numbers found
 	)
 	{
 
@@ -1942,9 +2048,6 @@ namespace BranchNodeConnections {
 		// USE STATEMENTS:
 		// na
 
-		// Argument array dimensioning
-		ListOfItems.dim( star );
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1965,7 +2068,7 @@ namespace BranchNodeConnections {
 		if ( allocated( AllNumbersInList ) ) AllNumbersInList.deallocate();
 
 		for ( Count = 1; Count <= NumItems; ++Count ) {
-			if ( WhichNumber == ListOfItems( Count ) ) {
+			if ( WhichNumber == NodeConnections( Count ).NodeNumber ) {
 				++CountOfItems;
 			}
 		}
@@ -1976,7 +2079,7 @@ namespace BranchNodeConnections {
 			CountOfItems = 0;
 
 			for ( Count = 1; Count <= NumItems; ++Count ) {
-				if ( WhichNumber == ListOfItems( Count ) ) {
+				if ( WhichNumber == NodeConnections( Count ).NodeNumber ) {
 					++CountOfItems;
 					AllNumbersInList( CountOfItems ) = Count;
 				}
@@ -1985,29 +2088,6 @@ namespace BranchNodeConnections {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BranchNodeConnections
 

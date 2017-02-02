@@ -1,12 +1,58 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantLoopSolver.hh>
@@ -60,7 +106,14 @@ namespace PlantLoopSolver {
 	int RefrigIndex( 0 ); // Index denoting refrigerant used (possibly steam)
 
 	static std::string const fluidNameSteam( "STEAM" );
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool EstablishedCompPumpIndeces( false );
+	}
 	// SUBROUTINE SPECIFICATIONS:
 	//PRIVATE EvaluatePumpFlowConditions
 
@@ -69,6 +122,18 @@ namespace PlantLoopSolver {
 	//==================================================================!
 
 	// Functions
+	void
+	clear_state()
+	{
+		InitialDemandToLoopSetPoint = 0.0;
+		CurrentAlterationsToDemand = 0.0;
+		UpdatedDemandToLoopSetPoint = 0.0;
+		LoadToLoopSetPointThatWasntMet = 0.0; // Unmet Demand
+		InitialDemandToLoopSetPointSAVED = 0.0;
+		RefrigIndex = 0 ; // Index denoting refrigerant used (possibly steam)
+		EstablishedCompPumpIndeces = false;
+	}
+
 
 	void
 	PlantHalfLoopSolver(
@@ -109,7 +174,6 @@ namespace PlantLoopSolver {
 		using PlantPressureSystem::SimPressureDropSystem;
 		using DataPlant::DemandSide;
 		using DataPlant::SupplySide;
-		using DataPlant::TotNumLoops;
 		using DataPlant::FlowPumpQuery;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
@@ -189,16 +253,21 @@ namespace PlantLoopSolver {
 		if ( allocated( PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
 
 			//~ Initialize pump values
-			PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMinAvail() = 0.0;
-			PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMaxAvail() = 0.0;
+			for ( auto & e : PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+				e.CurrentMinAvail = 0.0;
+				e.CurrentMaxAvail = 0.0;
+			}
 			PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = FlowPumpQuery;
 
 			//~ Simulate pumps
 			SimulateAllLoopSidePumps( LoopNum, ThisSide );
 
 			//~ Calculate totals
-			TotalPumpMinAvailFlow = sum( PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMinAvail() );
-			TotalPumpMaxAvailFlow = sum( PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMaxAvail() );
+			TotalPumpMinAvailFlow = TotalPumpMaxAvailFlow = 0.0;
+			for ( auto const & e : PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+				TotalPumpMinAvailFlow += e.CurrentMinAvail;
+				TotalPumpMaxAvailFlow += e.CurrentMaxAvail;
+			}
 
 			// Use the pump min/max avail to attempt to constrain the loop side flow
 			ThisLoopSideFlow = BoundValueToWithinTwoValues( ThisLoopSideFlow, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
@@ -378,8 +447,8 @@ namespace PlantLoopSolver {
 		bool EncounteredLRB;
 		bool EncounteredNonLRBAfterLRB;
 
-        // set up a loopside reference
-        auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		// set up a loopside reference
+		auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
 
 		//~ Initialze
 		ValidLoopSide.Valid = true;
@@ -396,7 +465,7 @@ namespace PlantLoopSolver {
 		BranchIndex = 1;
 		for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-            auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+			auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
 
 			{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
@@ -408,7 +477,7 @@ namespace PlantLoopSolver {
 					ValidLoopSide.ErrorPoint.LoopSideNum = LoopSideNum;
 					ValidLoopSide.ErrorPoint.BranchNum = BranchIndex;
 					ValidLoopSide.ErrorPoint.CompNum = CompIndex;
-					ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. " "Load Range Based should be grouped together on each flow path.";
+					ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. Load Range Based should be grouped together on each flow path.";
 					return ValidLoopSide;
 				} else {
 					EncounteredLRB = true;
@@ -455,10 +524,10 @@ namespace PlantLoopSolver {
 					BranchIndex = this_loop_side.TotalBranches;
 				}
 
-                //Now that we have the branch index, let's do the control type check over all the components
+				// Now that we have the branch index, let's do the control type check over all the components
 				for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-                    auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+					auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
 
 					{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
@@ -470,7 +539,7 @@ namespace PlantLoopSolver {
 							ValidLoopSide.ErrorPoint.LoopSideNum = LoopSideNum;
 							ValidLoopSide.ErrorPoint.BranchNum = BranchIndex;
 							ValidLoopSide.ErrorPoint.CompNum = CompIndex;
-							ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. " "Load Range Based should be grouped together on each flow path.";
+							ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. Load Range Based should be grouped together on each flow path.";
 							return ValidLoopSide;
 						} else {
 							EncounteredLRB = true;
@@ -570,8 +639,6 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const ThisSideFlowIndex( 1 );
-		int const OtherSideFlowIndex( 2 );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 		int LoopCounter;
@@ -586,20 +653,20 @@ namespace PlantLoopSolver {
 		Real64 ThisBranchFlowRequestNeedIfOn;
 		Real64 InletBranchRequestNeedAndTurnOn;
 		Real64 InletBranchRequestNeedIfOn;
-//		static FArray2D< Real64 > LoadedConstantSpeedBranchFlowRateSteps; // Values never used
-		static FArray2D< Real64 > NoLoadConstantSpeedBranchFlowRateSteps;
+//		static Array2D< Real64 > LoadedConstantSpeedBranchFlowRateSteps; // Values never used
+		static Array2D< Real64 > NoLoadConstantSpeedBranchFlowRateSteps;
 		int ParallelBranchIndex;
 		Real64 OutletBranchRequestNeedAndTurnOn;
 		Real64 OutletBranchRequestNeedIfOn;
 		bool ThisSideHasPumps;
 		bool OtherSideHasPumps;
-		bool ThisLoopHasCommonPipe;
+		bool ThisLoopHasCommonPipe( false );
 
 		//Tuned Made static: Set before use
-		static FArray1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
-		static FArray1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
-		static FArray1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
-		static FArray1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
+		static Array1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
+		static Array1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
+		static Array1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
+		static Array1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
 
 		static bool AllocatedParallelArray( false );
 		int MaxParallelBranchCount;
@@ -616,8 +683,8 @@ namespace PlantLoopSolver {
 					MaxParallelBranchCount = max( MaxParallelBranchCount, PlantLoop( LoopCounter ).LoopSide( LoopSideCounter ).TotalBranches - 2 );
 				}
 			}
-//			LoadedConstantSpeedBranchFlowRateSteps.allocate( 2, MaxParallelBranchCount );
-			NoLoadConstantSpeedBranchFlowRateSteps.allocate( 2, MaxParallelBranchCount );
+//			LoadedConstantSpeedBranchFlowRateSteps.allocate( MaxParallelBranchCount, 2 );
+			NoLoadConstantSpeedBranchFlowRateSteps.allocate( MaxParallelBranchCount, 2 );
 			AllocatedParallelArray = true;
 		}
 
@@ -841,7 +908,7 @@ namespace PlantLoopSolver {
 //								LoadedConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) = branch_mass_flow;
 								LoadedConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
 							} else {
-								NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) = branch_mass_flow;
+								NoLoadConstantSpeedBranchFlowRateSteps( ParallelBranchIndex, LoopSideCounter ) = branch_mass_flow;
 								NoLoadConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
 							}
 						}
@@ -864,7 +931,7 @@ namespace PlantLoopSolver {
 							} else {
 								continue;
 							}
-							auto const steps( NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) );
+							auto const steps( NoLoadConstantSpeedBranchFlowRateSteps( ParallelBranchIndex, LoopSideCounter ) );
 							if ( steps > 0.0 ) { // add in branches with zero MyLoad  in branch input order until satisfied
 								if ( tmpLoopFlow > AccumFlowSteps ) {
 									if ( tmpLoopFlow <= AccumFlowSteps + steps ) { // found it set requests and exit
@@ -904,7 +971,7 @@ namespace PlantLoopSolver {
 						auto const SELECT_CASE_var( component.TypeOf_Num );
 						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
 							CompIndex = component.CompNum;
-							if ( CompIndex > 0 ){
+							if ( CompIndex > 0 ) {
 								auto & this_pump( PumpEquip( CompIndex ) );
 								this_pump.LoopSolverOverwriteFlag = true;
 							}
@@ -1114,17 +1181,17 @@ namespace PlantLoopSolver {
 		bool LoadDistributionWasPerformed;
 		bool DummyInit;
 		bool const DoNotGetCompSizFac( false );
-		static FArray1D_string const LoopSideNames( 2, { "Demand", "Supply" } );
+		static Array1D_string const LoopSideNames( 2, { "Demand", "Supply" } );
 
 		//~ General variables
-		static FArray1D_int LastComponentSimulated;
+		static Array1D_int LastComponentSimulated;
 		Real64 LoadToLoopSetPoint;
 
 		int curCompOpSchemePtr;
 		int OpSchemePtr;
 
 		// Object Data
-//		static FArray1D< Location > AccessibleBranches; // Set but never used
+//		static Array1D< Location > AccessibleBranches; // Set but never used
 		Location PumpLocation;
 
 		LoadToLoopSetPoint = 0.0; //Autodesk:Init Fix possible use uninitialized
@@ -1143,7 +1210,7 @@ namespace PlantLoopSolver {
 			if ( NumBranchesInRegion > LastComponentSimulated.isize() ) { //Tuned Changed to grow-only strategy
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
-			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated = 0; // Only zero the active elements
+			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated( i ) = 0; // Only zero the active elements
 //			AccessibleBranches.allocate( NumBranchesInRegion );
 
 //			BranchIndex = 0;
@@ -1179,16 +1246,15 @@ namespace PlantLoopSolver {
 			EndingComponent = branch.TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-			   auto & this_comp( branch.Comp( CompCounter ) );
+				auto & this_comp( branch.Comp( CompCounter ) );
+				auto const CurOpSchemeType( this_comp.CurOpSchemeType );
 
-				{ auto const SELECT_CASE_var( this_comp.CurOpSchemeType );
-				if ( SELECT_CASE_var == WSEconOpSchemeType ) { //~ coils
+				switch ( CurOpSchemeType ) {
+				case WSEconOpSchemeType: //~ coils
 					this_comp.MyLoad = UpdatedDemandToLoopSetPoint;
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
-					EncounteredLRBObjDuringPass1 = true;
-					break; // don't do any more components on this branch
-				} else if ( SELECT_CASE_var == PumpOpSchemeType ) { //~ pump
+					break;
+				case PumpOpSchemeType: //~ pump
 					PumpLocation.LoopNum = LoopNum;
 					PumpLocation.LoopSideNum = LoopSideNum;
 					PumpLocation.BranchNum = BranchCounter;
@@ -1198,11 +1264,12 @@ namespace PlantLoopSolver {
 					} else {
 						SimulateAllLoopSidePumps( LoopNum, LoopSideNum, PumpLocation, FlowRequest );
 					}
-
-				} else if ( SELECT_CASE_var == CompSetPtBasedSchemeType ) {
+					break;
+				case CompSetPtBasedSchemeType:
 					ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, LoadToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( SELECT_CASE_var == EMSOpSchemeType ) {
+					break;
+				case EMSOpSchemeType:
 					if ( LoopSideNum == SupplySide ) {
 						curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
 						OpSchemePtr = this_comp.OpScheme( curCompOpSchemePtr ).OpSchemePtr;
@@ -1210,9 +1277,15 @@ namespace PlantLoopSolver {
 					}
 					ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, UpdatedDemandToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else { //demand, , etc.
-					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				}}
+					break;
+				default:
+					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
+						EncounteredLRBObjDuringPass1 = true;
+						goto components_end; // don't do any more components on this branch
+					} else { //demand, , etc.
+						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
+					}
+				}
 
 				// Update loop demand as needed for changes this component may have made
 				UpdateAnyLoopDemandAlterations( LoopNum, LoopSideNum, BranchCounter, CompCounter );
@@ -1221,6 +1294,7 @@ namespace PlantLoopSolver {
 				LastComponentSimulated( BranchIndex ) = CompCounter;
 
 			} //~ CompCounter
+			components_end: ;
 
 			if ( loop.FlowLock == FlowLocked ) {
 				SimPressureDropSystem( LoopNum, FirstHVACIteration, PressureCall_Calc, LoopSideNum, BranchCounter );
@@ -1252,18 +1326,18 @@ namespace PlantLoopSolver {
 			EndingComponent = branch.TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-				{ auto const SELECT_CASE_var( branch.Comp( CompCounter ).CurOpSchemeType );
-				if ( SELECT_CASE_var == NoControlOpSchemeType ) { //~ pipes, for example
+				auto const CurOpSchemeType( branch.Comp( CompCounter ).CurOpSchemeType );
+
+				switch ( CurOpSchemeType ) {
+				case NoControlOpSchemeType: //~ pipes, for example
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( ( SELECT_CASE_var == DemandOpSchemeType ) || ( SELECT_CASE_var == CompSetPtBasedSchemeType ) || ( SELECT_CASE_var == FreeRejectionOpSchemeType ) ) { //~ other control types
+					break;
+				case DemandOpSchemeType:
+				case CompSetPtBasedSchemeType:
+				case FreeRejectionOpSchemeType: //~ other control types
 					EncounteredNonLBObjDuringPass2 = true;
-					break; // don't do anymore components on this branch
-				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
-					if ( ! LoadDistributionWasPerformed ) { //~ Still need to distribute load among load range based components
-						ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, LoadToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
-					}
-					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( SELECT_CASE_var == PumpOpSchemeType ) { //~ pump
+					goto components2_end; // don't do anymore components on this branch
+				case PumpOpSchemeType: //~ pump
 					PumpLocation.LoopNum = LoopNum;
 					PumpLocation.LoopSideNum = LoopSideNum;
 					PumpLocation.BranchNum = BranchCounter;
@@ -1273,12 +1347,21 @@ namespace PlantLoopSolver {
 					} else {
 						SimulateAllLoopSidePumps( LoopNum, LoopSideNum, PumpLocation, FlowRequest );
 					}
-				}}
+					break;
+				default:
+					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
+						if ( ! LoadDistributionWasPerformed ) { //~ Still need to distribute load among load range based components
+							ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, LoadToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
+						}
+						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
+					}
+				}
 
 				//~ If we didn't EXIT early, we must have simulated, so update array
 				LastComponentSimulated( BranchIndex ) = CompCounter;
 
 			} //~ CompCounter
+			components2_end: ;
 
 			//~ If we are locked, go ahead and simulate the pressure components on this branch
 			if ( loop.FlowLock == FlowLocked ) {
@@ -1303,12 +1386,13 @@ namespace PlantLoopSolver {
 			EndingComponent = branch.TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-				{ auto const SELECT_CASE_var( branch.Comp( CompCounter ).CurOpSchemeType );
-				if ( SELECT_CASE_var == DemandOpSchemeType ) { //~ coils
+				auto const CurOpSchemeType( branch.Comp( CompCounter ).CurOpSchemeType );
+
+				switch ( CurOpSchemeType ) {
+				case DemandOpSchemeType: //~ coils
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
-					ShowFatalError( "Encountered Load Based Object after other components, invalid." );
-				} else if ( SELECT_CASE_var == PumpOpSchemeType ) { //~ pump
+					break;
+				case PumpOpSchemeType: //~ pump
 					PumpLocation.LoopNum = LoopNum;
 					PumpLocation.LoopSideNum = LoopSideNum;
 					PumpLocation.BranchNum = BranchCounter;
@@ -1318,9 +1402,14 @@ namespace PlantLoopSolver {
 					} else {
 						SimulateAllLoopSidePumps( LoopNum, LoopSideNum, PumpLocation, FlowRequest );
 					}
-				} else { //~ Typical control equipment
-					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				}}
+					break;
+				default:
+					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
+						ShowFatalError( "Encountered Load Based Object after other components, invalid." );
+					} else { //~ Typical control equipment
+						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
+					}
+				}
 
 				//~ If we didn't EXIT early, we must have simulated, so update array
 				LastComponentSimulated( BranchIndex ) = CompCounter;
@@ -1368,6 +1457,7 @@ namespace PlantLoopSolver {
 		// <description>
 
 		// Using/Aliasing
+		using DataPlant::LoopSidePumpInformation;
 		using DataPlant::PlantLoop;
 		using DataPlant::TotNumLoops;
 		using DataLoopNode::Node;
@@ -1392,8 +1482,9 @@ namespace PlantLoopSolver {
 		int PumpBranchNum;
 		int PumpCompNum;
 		int PumpOutletNode;
-		static bool EstablishedCompPumpIndeces( false );
-
+		/////////// hoisted into namespace
+		//static bool EstablishedCompPumpIndeces( false );
+		//////////////////////////////
 		//~ One time sweep through all loops/loopsides/pumps, assigning indeces to the pl%ls%br%comp%indexinloopsidepumps variable
 		if ( ! EstablishedCompPumpIndeces ) {
 			for ( LoopCounter = 1; LoopCounter <= TotNumLoops; ++LoopCounter ) {
@@ -1431,17 +1522,20 @@ namespace PlantLoopSolver {
 		}
 
 		//~ Now loop through all the pumps and simulate them, keeping track of their status
+		auto & loop_side( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ) );
+		auto & loop_side_branch( loop_side.Branch );
 		for ( PumpCounter = PumpIndexStart; PumpCounter <= PumpIndexEnd; ++PumpCounter ) {
 
 			//~ Set some variables
-			PumpBranchNum = PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).BranchNum;
-			PumpCompNum = PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).CompNum;
-			PumpOutletNode = PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).PumpOutletNode;
+			auto & pump( loop_side.Pumps( PumpCounter ) );
+			PumpBranchNum = pump.BranchNum;
+			PumpCompNum = pump.CompNum;
+			PumpOutletNode = pump.PumpOutletNode;
 
 			AdjustPumpFlowRequestByEMSControls( PumpLoopNum, PumpLoopSideNum, PumpBranchNum, PumpCompNum, FlowToRequest );
 
 			// Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
-			SimPumps( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).PumpName, PumpLoopNum, FlowToRequest, ThisPumpRunning, PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Branch( PumpBranchNum ).PumpIndex, PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).PumpHeatToFluid );
+			SimPumps( pump.PumpName, PumpLoopNum, FlowToRequest, ThisPumpRunning, loop_side_branch( PumpBranchNum ).PumpIndex, pump.PumpHeatToFluid );
 
 			//~ Pull some state information from the pump outlet node
 			ThisPumpFlowRate = Node( PumpOutletNode ).MassFlowRate;
@@ -1449,14 +1543,14 @@ namespace PlantLoopSolver {
 			ThisPumpMaxAvail = Node( PumpOutletNode ).MassFlowRateMaxAvail;
 
 			//~ Now update the data structure
-			PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).CurrentMinAvail = ThisPumpMinAvail;
-			PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).CurrentMaxAvail = ThisPumpMaxAvail;
+			pump.CurrentMinAvail = ThisPumpMinAvail;
+			pump.CurrentMaxAvail = ThisPumpMaxAvail;
 
 		}
 
 		//~ Update the LoopSide pump heat totality here
-		if ( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).TotalPumps > 0 ) {
-			PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).TotalPumpHeat = sum( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps.PumpHeatToFluid() );
+		if ( loop_side.TotalPumps > 0 ) {
+			loop_side.TotalPumpHeat = sum( loop_side.Pumps, &LoopSidePumpInformation::PumpHeatToFluid );
 		}
 
 	}
@@ -1496,7 +1590,7 @@ namespace PlantLoopSolver {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D_int const InitCompArray( 1, 0 );
+		static Array1D_int const InitCompArray( 1, 0 );
 
 		Demand = EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
 
@@ -1518,7 +1612,7 @@ namespace PlantLoopSolver {
 		int const LoopSideNum,
 		int const FirstBranchNum,
 		int const LastBranchNum,
-		FArray1S_int LastComponentSimulated
+		Array1S_int LastComponentSimulated
 	)
 	{
 
@@ -1645,8 +1739,8 @@ namespace PlantLoopSolver {
 					// 4  LoadToHeatingSetPoint  >  LoadToCoolingSetPoint       -->  Not Feasible if LoopSetPointHi >= LoopSetPointLo
 					// First trap bad set-points
 					if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
-						ShowSevereError( "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, " "but the heating-related low setpoint appears to be above the cooling-related high setpoint." );
-						ShowContinueError( "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the" " low setpoint is below the high setpoint." );
+						ShowSevereError( "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, but the heating-related low setpoint appears to be above the cooling-related high setpoint." );
+						ShowContinueError( "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the low setpoint is below the high setpoint." );
 						ShowContinueError( "Occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
 						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 						ShowContinueError( "Loop Heating Low Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
@@ -1661,7 +1755,7 @@ namespace PlantLoopSolver {
 					} else if ( LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0 ) { // deadband includes zero loads
 						LoadToLoopSetPoint = 0.0;
 					} else {
-						ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
+						ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
 						ShowContinueError( "occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
 						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 						ShowContinueError( "Loop Heating Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
@@ -1736,12 +1830,12 @@ namespace PlantLoopSolver {
 		// METHODOLOGY EMPLOYED:
 		// Components will always supply a useful delta T, even if it happens to be zero
 		// For flow rate, make decisions based on the component's current operating scheme type:
-		//  • Demand based: these components will have a flow request on their inlet node
-		//  • Pump: these components will not be included, as they no longer include heat at the pump
-		//  • component setpoint: these components will have a flow request
+		//    Demand based: these components will have a flow request on their inlet node
+		//    Pump: these components will not be included, as they no longer include heat at the pump
+		//    component setpoint: these components will have a flow request
 
 		//    on their outlet node corresponding to their calculated delta T
-		//  • load range based: these components do not 'alter' the load, they reject the load
+		//    load range based: these components do not 'alter' the load, they reject the load
 		//    Therefore they are not included
 
 		// Using/Aliasing
@@ -1866,7 +1960,6 @@ namespace PlantLoopSolver {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_PumpVariableSpeed;
 		using DataPlant::TypeOf_PumpBankVariableSpeed;
-		using DataBranchAirLoopPlant::ControlType_Unknown;
 		using DataBranchAirLoopPlant::ControlType_Active;
 		using DataBranchAirLoopPlant::ControlType_Passive;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
@@ -1879,7 +1972,7 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const LoopSideName( 2, { "Demand", "Supply" } );
+		static Array1D_string const LoopSideName( 2, { "Demand", "Supply" } );
 		int const SplitNum( 1 ); // Only one splitter/mixer combination is allowed
 		int const LoopSideSingleBranch( 1 ); // For readability
 
@@ -2538,7 +2631,7 @@ namespace PlantLoopSolver {
 				//sometimes these coils are children in ZoneHVAC equipment
 				// PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
 
-			} else if ( ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) ) { //zone connected components
+			} else if ( ( SELECT_CASE_var == TypeOf_CoolingPanel_Simple ) || ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) || ( SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal ) ) { //zone connected components
 
 				this_loopside.SimZoneEquipNeeded = true;
 
@@ -2806,7 +2899,6 @@ namespace PlantLoopSolver {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
@@ -2838,7 +2930,7 @@ namespace PlantLoopSolver {
 		if ( ! FirstHVACIteration && ! WarmupFlag ) {
 			if ( std::abs( Node( LoopOutlet ).MassFlowRate - Node( LoopInlet ).MassFlowRate ) > MassFlowTolerance ) {
 				if ( PlantLoop( LoopNum ).MFErrIndex == 0 ) {
-					ShowWarningError( "PlantSupplySide: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. " "Outlet and Inlet differ by more than tolerance." );
+					ShowWarningError( "PlantSupplySide: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance." );
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Loop inlet node=" + NodeID( LoopInlet ) + ", flowrate=" + RoundSigDigits( Node( LoopInlet ).MassFlowRate, 4 ) + " kg/s" );
 					ShowContinueError( "Loop outlet node=" + NodeID( LoopOutlet ) + ", flowrate=" + RoundSigDigits( Node( LoopOutlet ).MassFlowRate, 4 ) + " kg/s" );
@@ -2918,29 +3010,6 @@ namespace PlantLoopSolver {
 	//==================================================================!
 	//==================================================================!
 	//==================================================================!
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantLoopSolver
 

@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef OutputReportPredefined_hh_INCLUDED
 #define OutputReportPredefined_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -80,6 +126,17 @@ namespace OutputReportPredefined {
 	extern int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	extern int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
 
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	extern int pdstDXCoolCoil2;
+	extern int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	extern int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	extern int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	extern int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	extern int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	extern int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	extern int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	extern int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
+
 	// VAV DX Cooling Ratings Details
 	extern int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
 	extern int pdchVAVDXCoolCoilType;
@@ -131,6 +188,7 @@ namespace OutputReportPredefined {
 	extern int pdchOpUfactFilm;
 	extern int pdchOpUfactNoFilm;
 	extern int pdchOpGrArea;
+	extern int pdchOpNetArea;
 	extern int pdchOpAzimuth;
 	extern int pdchOpTilt;
 	extern int pdchOpDir;
@@ -216,8 +274,9 @@ namespace OutputReportPredefined {
 	extern int pdchExLtConsump;
 	extern int pdstDaylight;
 	extern int pdchDyLtZone;
+	extern int pdchDyLtCtrlName;
 	extern int pdchDyLtKind;
-	extern int pdchDyLtCtrl;
+	extern int pdchDyLtCtrlType;
 	extern int pdchDyLtFrac;
 	extern int pdchDyLtWInst;
 	extern int pdchDyLtWCtrl;
@@ -237,6 +296,8 @@ namespace OutputReportPredefined {
 	extern int pdchZnClPkIndHum;
 	extern int pdchZnClPkOATemp;
 	extern int pdchZnClPkOAHum;
+	extern int pdchZnClPkOAMinFlow;
+	extern int pdchZnClPkDOASHeatGain;
 	extern int pdstZoneHtSize;
 	extern int pdchZnHtCalcDesLd;
 	extern int pdchZnHtUserDesLd;
@@ -250,11 +311,23 @@ namespace OutputReportPredefined {
 	extern int pdchZnHtPkIndHum;
 	extern int pdchZnHtPkOATemp;
 	extern int pdchZnHtPkOAHum;
+	extern int pdchZnHtPkOAMinFlow;
+	extern int pdchZnHtPkDOASHeatGain;
 	extern int pdstSystemSize;
 	extern int pdchSysSizCalcClAir;
 	extern int pdchSysSizUserClAir;
 	extern int pdchSysSizCalcHtAir;
 	extern int pdchSysSizUserHtAir;
+	extern int pdstPlantSize;
+	extern int pdchPlantSizCalcVdot;
+	extern int pdchPlantSizMeasVdot;
+	extern int pdchPlantSizPrevVdot;
+//	extern int pdchPlantSizPass;
+	extern int pdchPlantSizCoincYesNo;
+	extern int pdchPlantSizDesDay;
+	extern int pdchPlantSizPkTimeDayOfSim;
+	extern int pdchPlantSizPkTimeHour;
+	extern int pdchPlantSizPkTimeMin;
 
 	//System summary
 	extern int pdrSystem;
@@ -270,6 +343,10 @@ namespace OutputReportPredefined {
 	extern int pdchDCVventMechName;
 	extern int pdchDCVperPerson;
 	extern int pdchDCVperArea;
+	extern int pdchDCVperZone;
+	extern int pdchDCVperACH;
+	extern int pdchDCVMethod;
+	extern int pdchDCVOASchName;
 
 	//added for new DCV
 	extern int pdchDCVZoneADEffCooling;
@@ -382,6 +459,8 @@ namespace OutputReportPredefined {
 	extern int pdstSHGSannual;
 	extern int pdchSHGSAnHvacHt;
 	extern int pdchSHGSAnHvacCl;
+	extern int pdchSHGSAnHvacATUHt;
+	extern int pdchSHGSAnHvacATUCl;
 	extern int pdchSHGSAnSurfHt;
 	extern int pdchSHGSAnSurfCl;
 	extern int pdchSHGSAnPeoplAdd;
@@ -401,6 +480,8 @@ namespace OutputReportPredefined {
 	extern int pdchSHGSClTimePeak;
 	extern int pdchSHGSClHvacHt;
 	extern int pdchSHGSClHvacCl;
+	extern int pdchSHGSClHvacATUHt;
+	extern int pdchSHGSClHvacATUCl;
 	extern int pdchSHGSClSurfHt;
 	extern int pdchSHGSClSurfCl;
 	extern int pdchSHGSClPeoplAdd;
@@ -420,6 +501,8 @@ namespace OutputReportPredefined {
 	extern int pdchSHGSHtTimePeak;
 	extern int pdchSHGSHtHvacHt;
 	extern int pdchSHGSHtHvacCl;
+	extern int pdchSHGSHtHvacATUHt;
+	extern int pdchSHGSHtHvacATUCl;
 	extern int pdchSHGSHtSurfHt;
 	extern int pdchSHGSHtSurfCl;
 	extern int pdchSHGSHtPeoplAdd;
@@ -635,19 +718,6 @@ namespace OutputReportPredefined {
 			show( false )
 		{}
 
-		// Member Constructor
-		reportNameType(
-			std::string const & name,
-			std::string const & namewithspaces, // a "prettier version" than the key value
-			std::string const & abrev,
-			bool const show
-		) :
-			name( name ),
-			namewithspaces( namewithspaces ),
-			abrev( abrev ),
-			show( show )
-		{}
-
 	};
 
 	struct SubTableType
@@ -662,17 +732,6 @@ namespace OutputReportPredefined {
 			indexReportName( 0 )
 		{}
 
-		// Member Constructor
-		SubTableType(
-			std::string const & name,
-			int const indexReportName,
-			std::string const & footnote
-		) :
-			name( name ),
-			indexReportName( indexReportName ),
-			footnote( footnote )
-		{}
-
 	};
 
 	struct ColumnTagType
@@ -684,15 +743,6 @@ namespace OutputReportPredefined {
 		// Default Constructor
 		ColumnTagType() :
 			indexSubTable( 0 )
-		{}
-
-		// Member Constructor
-		ColumnTagType(
-			std::string const & heading,
-			int const indexSubTable
-		) :
-			heading( heading ),
-			indexSubTable( indexSubTable )
 		{}
 
 	};
@@ -719,27 +769,6 @@ namespace OutputReportPredefined {
 			origEntryIsReal( false )
 		{}
 
-		// Member Constructor
-		TableEntryType(
-			std::string const & charEntry,
-			std::string const & objectName,
-			int const indexColumn,
-			int const subTableIndex,
-			int const uniqueObjName,
-			Real64 const origRealEntry,
-			int const significantDigits,
-			bool const origEntryIsReal
-		) :
-			charEntry( charEntry ),
-			objectName( objectName ),
-			indexColumn( indexColumn ),
-			subTableIndex( subTableIndex ),
-			uniqueObjName( uniqueObjName ),
-			origRealEntry( origRealEntry ),
-			significantDigits( significantDigits ),
-			origEntryIsReal( origEntryIsReal )
-		{}
-
 	};
 
 	struct CompSizeTableEntryType
@@ -757,23 +786,6 @@ namespace OutputReportPredefined {
 			valField( 0.0 ),
 			active( false ),
 			written( false )
-		{}
-
-		// Member Constructor
-		CompSizeTableEntryType(
-			std::string const & typeField,
-			std::string const & nameField,
-			std::string const & description,
-			Real64 const valField,
-			bool const active,
-			bool const written
-		) :
-			typeField( typeField ),
-			nameField( nameField ),
-			description( description ),
-			valField( valField ),
-			active( active ),
-			written( written )
 		{}
 
 	};
@@ -794,28 +806,20 @@ namespace OutputReportPredefined {
 			recKind( 0 )
 		{}
 
-		// Member Constructor
-		ShadowRelateType(
-			int const castSurf,
-			int const recSurf,
-			int const recKind
-		) :
-			castSurf( castSurf ),
-			recSurf( recSurf ),
-			recKind( recKind )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< reportNameType > reportName;
-	extern FArray1D< SubTableType > subTable;
-	extern FArray1D< ColumnTagType > columnTag;
-	extern FArray1D< TableEntryType > tableEntry;
-	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	extern FArray1D< ShadowRelateType > ShadowRelate;
+	extern Array1D< reportNameType > reportName;
+	extern Array1D< SubTableType > subTable;
+	extern Array1D< ColumnTagType > columnTag;
+	extern Array1D< TableEntryType > tableEntry;
+	extern Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	extern Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
+	void
+	clear_state();
+
 
 	void
 	SetPredefinedTables();
@@ -841,6 +845,13 @@ namespace OutputReportPredefined {
 		std::string const & objName,
 		int const tableEntryInt
 	);
+
+	std::string
+		RetrievePreDefTableEntry(
+		int const columnIndex,
+		std::string const & objName
+	);
+
 
 	void
 	incrementTableEntry();
@@ -884,29 +895,6 @@ namespace OutputReportPredefined {
 		int const subTableIndex,
 		std::string const & columnHeading
 	);
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportPredefined
 

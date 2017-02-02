@@ -1,4 +1,23 @@
-!SUBROUTINE CreateNewIDFUsingRulesV1_2_0(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
+MODULE SetVersion
+
+USE DataStringGlobals
+USE DataVCompareGlobals
+
+PUBLIC
+
+CONTAINS
+
+SUBROUTINE SetThisVersionVariables()
+      VerString='Conversion 1.1.1 => 1.2'
+      VersionNum=1.0
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V1-1-1-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V1-2-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 1-1-1-012 to 1-2-0.csv'
+END SUBROUTINE
+
+END MODULE
+
+SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
 
 
           ! SUBROUTINE INFORMATION:
@@ -740,4 +759,4 @@
 
   RETURN
 
-!END SUBROUTINE CreateNewIDFUsingRulesV1_2_0
+END SUBROUTINE CreateNewIDFUsingRules

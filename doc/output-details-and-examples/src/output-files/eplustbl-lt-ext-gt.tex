@@ -1,0 +1,3357 @@
+\section{eplustbl.\textless{}ext\textgreater{}}\label{eplustbl.ext}
+
+The eplustbl file contains the tabular output results that are created when using the following objects:
+
+\begin{itemize}
+\item
+  Output:Table:SummaryReports
+\item
+  Output:Table:TimeBins
+\item
+  Output:Table:Monthly
+\item
+  UtilityCost:Tariff
+\item
+  ComponentCost:Line Item
+\end{itemize}
+
+The format and the extension for the file depends on the setting of the ColumnSeparator field of the Output:Table:Style object. The choices of HTML, tab, fixed, comma, and XML result in eplustbl.htm, eplustbl.tab, eplustbl.txt, eplustbl.csv, eplustbl.xml respectively. The HTML version of the report also includes a table of contents that allows easier navigation through the file.
+
+By default the energy units reported in all of the eplustbl files are in Joules (J) but the UnitConversion field of the Output:Table:Style object allows for the values to be reported in MJ, GJ or in kWh. In addition, the Output:Table:Style object can specify for the tables to be in IP units for all fields.
+
+\subsection{Output:Table:SummaryReports}\label{outputtablesummaryreports}
+
+Several predefined reports are available from the Output:Table:SummaryReports object including the following. (spaces are inserted in names for readability; keys are included in the Input Data Dictionary or by just removing the spaces):
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary
+\end{itemize}
+
+Lists all following applicable tables with ``Summary'' in the name.
+
+\begin{itemize}
+\tightlist
+\item
+  All Monthly
+\end{itemize}
+
+Lists all following applicable tables with ``Monthly'' in the name.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary And Monthly
+\end{itemize}
+
+Lists all following applicable tables with both ``Summary'' and ``Monthly'' in the name. This does not include the Zone Component Load Summary report.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary and Sizing Period
+\end{itemize}
+
+Lists the All Summary tables as well as the Zone Component Load report (currently the only Sizing Period report). Please note that the Zone Component Load report does increase the run time because it repeats sizing periods.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary Monthly and Sizing Period
+\end{itemize}
+
+Lists the All Summary tables, the Monthly tables as well as the Zone Component Load report (currently the only Sizing Period report). Please note that the Zone Component Load report does increase the run time because it repeats sizing periods.
+
+\begin{itemize}
+\item
+  Annual Building Utility Performance Summary
+\item
+  Input Verification and Results Summary
+\item
+  Demand End Use Components Summary
+\item
+  Source Energy End Use Components Summary
+\item
+  Climatic Data Summary
+\item
+  Equipment Summary
+\item
+  Envelope Summary
+\item
+  Surface Shadowing Summary
+\item
+  Shading Summary
+\item
+  Lighting Summary
+\item
+  HVAC Sizing Summary
+\item
+  System Summary
+\item
+  Component Sizing Summary
+\item
+  Outdoor Air Summary
+\item
+  Object Count Summary
+\item
+  Component Cost Economics Summary
+\item
+  Energy Meters
+\item
+  Sensible Heat Gain Summary
+\item
+  Standard 62.1 Summary
+\item
+  Zone Component Load Summary
+\item
+  Zone Cooling Summary Monthly
+\item
+  Zone Heating Summary Monthly
+\item
+  Zone Electric Summary Monthly
+\item
+  Space Gains Monthly
+\item
+  Peak Space Gains Monthly
+\item
+  Space Gain Components At Cooling Peak Monthly
+\item
+  Energy Consumption Electricity Natural Gas Monthly
+\item
+  Energy Consumption Electricity Generated Propane Monthly
+\item
+  Energy Consumption Diesel FuelOil Monthly
+\item
+  Energy Consumption District Heating Cooling Monthly
+\item
+  Energy Consumption Coal Gasoline Monthly
+\item
+  End Use Energy Consumption Electricity Monthly
+\item
+  End Use Energy Consumption NaturalGas Monthly
+\item
+  End Use Energy Consumption Diesel Monthly
+\item
+  End Use Energy Consumption FuelOil Monthly
+\item
+  End Use Energy Consumption Coal Monthly
+\item
+  End Use Energy Consumption Propane Monthly
+\item
+  End Use Energy Consumption Gasoline Monthly
+\item
+  Peak Energy End Use Electricity Part1 Monthly
+\item
+  Peak Energy End Use Electricity Part2 Monthly
+\item
+  Electric Components Of Peak Demand Monthly
+\item
+  Peak Energy End Use NaturalGas Monthly
+\item
+  Peak Energy End Use Diesel Monthly
+\item
+  Peak Energy End Use FuelOil Monthly
+\item
+  Peak Energy End Use Coal Monthly
+\item
+  Peak Energy End Use Propane Monthly
+\item
+  Peak Energy End Use Gasoline Monthly
+\item
+  Setpoints Not Met With Temperatures Monthly
+\item
+  Comfort Report Simple55 Monthly
+\item
+  Unglazed Transpired Solar Collector Summary Monthly
+\item
+  Occupant Comfort Data Summary Monthly
+\item
+  Chiller Report Monthly
+\item
+  Tower Report Monthly
+\item
+  Boiler Report Monthly
+\item
+  DX Report Monthly
+\item
+  Window Report Monthly
+\item
+  Window Energy Report Monthly
+\item
+  Window Zone Summary Monthly
+\item
+  Window Energy Zone Summary Monthly
+\item
+  Average Outdoor Conditions Monthly
+\item
+  Outdoor Conditions Maximum DryBulb Monthly
+\item
+  Outdoor Conditions Minimum DryBulb Monthly
+\item
+  Outdoor Conditions Maximum WetBulb Monthly
+\item
+  Outdoor Conditions Maximum DewPoint Monthly
+\item
+  Outdoor Ground Conditions Monthly
+\item
+  WindowAC Report Monthly
+\item
+  Water Heater Report Monthly
+\item
+  Generator Report Monthly
+\item
+  Daylighting Report Monthly
+\item
+  Coil Report Monthly
+\item
+  PlantLoop Demand Report Monthly
+\item
+  Fan Report Monthly
+\item
+  Pump Report Monthly
+\item
+  CondLoop Demand Report Monthly
+\item
+  Zone Temperature Oscillation Report Monthly
+\item
+  AirLoop System Energy And Water Use Monthly
+\item
+  AirLoop System Component Loads Monthly
+\item
+  AirLoop System Component Energy Use Monthly
+\item
+  Mechanical Ventilation Loads Monthly
+\end{itemize}
+
+Each of these reports is made up of several sub-tables of information. Examples of some of the tables are shown below. To enable all of the reports the single All Summary may be specified.
+
+\subsection{Annual Building Utility Performance Summary}\label{annual-building-utility-performance-summary}
+
+The Annual Building Utility Performance Summary report provides an overview of energy consumption in the building for different end uses. The following is an example this report (some columns may be truncated due to page size). The key used to obtain this report is AnnualBuildingUtilityPerformanceSummary.
+
+In the \emph{Comfort and Setpoint Not Met Summary} sub-table, facility hours represents the total number of hours that any single zone did not meet the comfort or setpoint criteria. It is not weighted by number of zones or number of occupants.
+
+The values in the \emph{End Uses} sub-table are from report meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd).
+
+Report: Annual Building Utility Performance Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Values gathered over 8760.00 hours
+
+Site and Source Energy
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Total Energy (GJ) & Energy Per Total Building Area (MJ/m2) & Energy Per Conditioned Building Area (MJ/m2) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total Energy (GJ) & Energy Per Total Building Area (MJ/m2) & Energy Per Conditioned Building Area (MJ/m2) \tabularnewline
+\midrule
+\endhead
+
+Total Site Energy & 194.80 & 210.09 & 210.09 \tabularnewline
+Net Site Energy & 194.80 & 210.09 & 210.09 \tabularnewline
+Total Source Energy & 532.25 & 574.04 & 574.04 \tabularnewline
+Net Source Energy & 532.25 & 574.04 & 574.04 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Source to Site Energy Converstion Factors
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Source= > Site Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Source= > Site Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+Electricity & 3.167 \tabularnewline
+Natural Gas & 1.084 \tabularnewline
+District Cooling & 1.056 \tabularnewline
+District Heating & 3.613 \tabularnewline
+Steam & 0.300 \tabularnewline
+Gasoline & 1.050 \tabularnewline
+Diesel & 1.050 \tabularnewline
+Coal & 1.050 \tabularnewline
+Fuel Oil \#1 & 1.050 \tabularnewline
+Fuel Oil \#2 & 1.050 \tabularnewline
+Propane & 1.050 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Building Area
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Area (m2) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Area (m2) \tabularnewline
+\midrule
+\endhead
+
+Total Building Area & 927.20 \tabularnewline
+Net Conditioned Building Area & 927.20 \tabularnewline
+Unconditioned Building Area & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+End Uses
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Electricity (GJ) & Natural Gas (GJ) & Other Fuel (GJ) & District Cooling (GJ) & District Heating (GJ) & Water (m3) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity (GJ) & Natural Gas (GJ) & Other Fuel (GJ) & District Cooling (GJ) & District Heating (GJ) & Water (m3) \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 40.65 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 18.18 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 81.24 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 47.70 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 7.03 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+Total End Uses & 154.15 & 40.65 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\emph{Note: Natural gas appears to be the principal heating source based on energy usage.}
+
+End Uses By Subcategory
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+~ & Subcategory & Electricity (GJ) & Natural Gas (GJ) & Other Fuel (GJ) & District Cooling (GJ) & District Heating (GJ) & Water (m3) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Subcategory & Electricity (GJ) & Natural Gas (GJ) & Other Fuel (GJ) & District Cooling (GJ) & District Heating (GJ) & Water (m3) \tabularnewline
+\midrule
+\endhead
+
+Heating & General & 0.00 & 40.65 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & General & 18.18 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & GeneralLights & 81.24 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & General & 47.70 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & General & 7.03 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Normalized Metrics
+
+Utility Use Per Conditioned Floor Area
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Electricity Intensity (MJ/m2) & Natural Gas Intensity (MJ/m2) & Other Fuel Intensity (MJ/m2) & District Cooling Intensity (MJ/m2) & District Heating Intensity (MJ/m2) & Water Intensity (m3/m2) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity Intensity (MJ/m2) & Natural Gas Intensity (MJ/m2) & Other Fuel Intensity (MJ/m2) & District Cooling Intensity (MJ/m2) & District Heating Intensity (MJ/m2) & Water Intensity (m3/m2) \tabularnewline
+\midrule
+\endhead
+
+Lighting & 87.62 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+HVAC & 27.19 & 43.84 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Other & 51.44 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total & 166.25 & 43.84 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Utility Use Per Total Floor Area
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Electricity Intensity (MJ/m2) & Natural Gas Intensity (MJ/m2) & Other Fuel Intensity (MJ/m2) & District Cooling Intensity (MJ/m2) & District Heating Intensity (MJ/m2) & Water Intensity (m3/m2) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity Intensity (MJ/m2) & Natural Gas Intensity (MJ/m2) & Other Fuel Intensity (MJ/m2) & District Cooling Intensity (MJ/m2) & District Heating Intensity (MJ/m2) & Water Intensity (m3/m2) \tabularnewline
+\midrule
+\endhead
+
+Lighting & 87.62 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+HVAC & 27.19 & 43.84 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Other & 51.44 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total & 166.25 & 43.84 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Electric Loads Satisfied
+
+\begin{longtable}[c]{>{\raggedright}p{2.9in}>{\raggedright}p{1.5in}>{\raggedright}p{1.59in}}
+\toprule 
+~ & Electricity (GJ) & Percent Electricity (\%) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity (GJ) & Percent Electricity (\%) \tabularnewline
+\midrule
+\endhead
+
+Fuel-Fired Power Generation & 0.00 & 0.00 \tabularnewline
+High Temperature Geothermal* & 0.00 & 0.00 \tabularnewline
+Photovoltaic Power & 0.00 & 0.00 \tabularnewline
+Wind Power* & 0.00 & 0.00 \tabularnewline
+Net Decrease in On-Site Storage & 0.00 & 0.00 \tabularnewline
+Total On-Site Electric Sources & 0.00 & 0.00 \tabularnewline
+~ & ~ & ~ \tabularnewline
+Electricity Coming From Utility & 154.15 & 100.00 \tabularnewline
+Surplus Electricity Going To Utility & 0.00 & 0.00 \tabularnewline
+Net Electricity From Utility & 154.15 & 100.00 \tabularnewline
+~ & ~ & ~ \tabularnewline
+Total On-Site and Utility Electric Sources & 154.15 & 100.00 \tabularnewline
+Total Electricity End Uses & 154.15 & 100.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+On-Site Thermal Sources
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule 
+~ & Heat (GJ) & Percent Heat (\%) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Heat (GJ) & Percent Heat (\%) \tabularnewline
+\midrule
+\endhead
+
+Water-Side Heat Recovery & 0.00 & ~ \tabularnewline
+Air to Air Heat Recovery for Cooling & 0.00 & ~ \tabularnewline
+Air to Air Heat Recovery for Heating & 0.00 & ~ \tabularnewline
+High-Temperature Geothermal* & 0.00 & ~ \tabularnewline
+Solar Water Thermal & 0.00 & ~ \tabularnewline
+Solar Air Thermal & 0.00 & ~ \tabularnewline
+Total On-Site Thermal Sources & 0.00 & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Water Source Summary
+
+\begin{longtable}[c]{>{\raggedright}p{3.0in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Water (m3) & Percent Water (\%) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Water (m3) & Percent Water (\%) \tabularnewline
+\midrule
+\endhead
+
+Rainwater Collection & 0.00 & - \tabularnewline
+Condensate Collection & 0.00 & - \tabularnewline
+Groundwater Well & 0.00 & - \tabularnewline
+Total On Site Water Sources & 0.00 & - \tabularnewline
+- & - & - \tabularnewline
+Initial Storage & 0.00 & - \tabularnewline
+Final Storage & 0.00 & - \tabularnewline
+Change in Storage & 0.00 & - \tabularnewline
+- & - & - \tabularnewline
+Water Supplied by Utility & 0.00 & - \tabularnewline
+- & - & - \tabularnewline
+Total On Site, Change in Storage, and Utility Water Sources & 0.00 & - \tabularnewline
+Total Water End Uses & 0.00 & - \tabularnewline
+\bottomrule
+\end{longtable}
+
+Comfort and Setpoint Not Met Summary
+
+\begin{longtable}[c]{>{\raggedright}p{4.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Facility (Hours) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Facility (Hours) \tabularnewline
+\midrule
+\endhead
+
+Time Set Point Not Met During Occupied Heating & 0.00 \tabularnewline
+Time Set Point Not Met During Occupied Cooling & 406.00 \tabularnewline
+Time Not Comfortable Based on Simple ASHRAE 55-2004 & 1033.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Note 1: An asterisk (*) indicates that the feature is not yet implemented.
+
+\subsection{Input Verification and Results Summary}\label{input-verification-and-results-summary}
+
+The Input Verification and Results Summary report provides a summary of some of the most common input assumptions that are not included in any of the other predefined reports. Directly following is an example of the report. The key used to obtain this report is InputVerificationandResultsSummary.
+
+Report: Input Verification and Results Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+General
+
+\begin{longtable}[c]{>{\raggedright}p{2.04in}>{\raggedright}p{3.94in}}
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endhead
+
+Program Version and Build & EnergyPlus, Version 3.1 \tabularnewline
+Weather & Chicago IL United States TMY2 94846 WMO\#=725340 \tabularnewline
+Latitude (deg) & 41.78 \tabularnewline
+Longitude (deg) & -87.8 \tabularnewline
+Elevation (m) & 190.00 \tabularnewline
+Time Zone & -6.0 \tabularnewline
+North Axis Angle (deg) & 30.00 \tabularnewline
+Hours Simulated (hrs) & 8760.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+ENVELOPE
+
+Window-Wall Ratio
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+~ & Total & North (315 to 45 deg) & East (45 to 135 deg) & South (135 to 225 deg) & West (225 to 315 deg) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total & North (315 to 45 deg) & East (45 to 135 deg) & South (135 to 225 deg) & West (225 to 315 deg) \tabularnewline
+\midrule
+\endhead
+
+Gross Wall Area (m2) & 274.20 & 91.50 & 45.60 & 91.50 & 45.60 \tabularnewline
+Window Opening Area (m2) & 61.65 & 20.85 & 9.12 & 22.56 & 9.12 \tabularnewline
+Window-Wall Ratio (\%) & 22.48 & 22.79 & 20.00 & 24.66 & 20.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Skylight-Roof Ratio
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Total \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total \tabularnewline
+\midrule
+\endhead
+
+Gross Roof Area (m2) & 463.60 \tabularnewline
+Skylight Area (m2) & 0.00 \tabularnewline
+Skylight-Roof Ratio (\%) & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PERFORMANCE
+
+Zone Summary
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}}
+\toprule 
+~ & Area (m2) & Conditioned (Y/N) & Volume (m3) & Multipliers & Gross Wall Area (m2) & Window Glass Area (m2) & Lighting (W/m2) & People (m2/person) & Plug and Process(W/m2) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Area (m2) & Conditioned (Y/N) & Volume (m3) & Multipliers & Gross Wall Area (m2) & Window Glass Area (m2) & Lighting (W/m2) & People (m2/person) & Plug and Process(W/m2) \tabularnewline
+\midrule
+\endhead
+
+PLENUM-1 & 463.60 & Yes & 283.20 & 1.00 & 54.84 & 0.00 & 0.0000 & ~ & 0.0000 \tabularnewline
+SPACE1-1 & 99.16 & Yes & 239.25 & 1.00 & 73.20 & 22.56 & 15.9742 & 9.01 & 10.6495 \tabularnewline
+SPACE2-1 & 42.73 & Yes & 103.31 & 1.00 & 36.48 & 9.12 & 16.0056 & 8.55 & 10.6704 \tabularnewline
+SPACE3-1 & 96.48 & Yes & 239.25 & 1.00 & 73.20 & 20.85 & 16.4179 & 8.77 & 10.9453 \tabularnewline
+SPACE4-1 & 42.73 & Yes & 103.31 & 1.00 & 36.48 & 9.12 & 16.0056 & 8.55 & 10.6704 \tabularnewline
+SPACE5-1 & 182.49 & Yes & 447.68 & 1.00 & 0.00 & 0.00 & 16.2420 & 9.12 & 10.8280 \tabularnewline
+Total & 927.20 & ~ & 1416.00 & ~ & 274.20 & 61.65 & 8.0889 & 17.83 & 5.3926 \tabularnewline
+Conditioned Total & 927.20 & ~ & 1416.00 & ~ & 274.20 & 61.65 & 8.0889 & 17.83 & 5.3926 \tabularnewline
+Unconditioned Total & 0.00 & ~ & 0.00 & ~ & 0.00 & 0.00 & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Demand End Use Components Summary}\label{demand-end-use-components-summary}
+
+The Demand End Use Components Summary report shows the demand breakdown by component end use at the time that the peak demand for each source of energy is set. The time of the peak demand is shown in the first row. The contributions of each end use at the time of the peak demand of the energy source is shown in this report. The key used to obtain this report is DemandEndUseComponentsSummary.
+
+Report: Demand End Use Components Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+End Uses
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Electricity (W) & Natural Gas (W) & Propane (W) & District Cooling (W) & Steam (W) & Water (m3/s) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity (W) & Natural Gas (W) & Propane (W) & District Cooling (W) & Steam (W) & Water (m3/s) \tabularnewline
+\midrule
+\endhead
+
+Time of Peak & 02-JUL-14:00 & 31-DEC-07:15 & - & - & - & - \tabularnewline
+Heating & 0.00 & 81764.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 12342.62 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 7500.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 4000.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 1498.36 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+Total End Uses & 25340.97 & 81764.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+End Uses By Subcategory
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+~ & Subcategory & Electricity (W) & Natural Gas (W) & Propane (W) & District Cooling (W) & Steam (W) & Water (m3/s) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Subcategory & Electricity (W) & Natural Gas (W) & Propane (W) & District Cooling (W) & Steam (W) & Water (m3/s) \tabularnewline
+\midrule
+\endhead
+
+Heating & General & 0.00 & 81764.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & General & 12342.62 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & GeneralLights & 7500.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & General & 4000.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & General & 1498.36 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Source Energy End Use Components Summary}\label{source-energy-end-use-components-summary}
+
+The Source Energy End Use Components Summary report produces a report that includes three tables. These tables display source energy by fuel type that is calculated based on site to source energy factors specified by the user in the EnvironmentalImpactFactors and FuelFactors objects. The last two tables display the source energy in terms of area normalized metrics. Directly following is an example of the three tables. The key used to obtain this report is SourceEnergyEndUseComponentsSummary.
+
+Report: \textbf{Source Energy End Use Components Summary}
+
+For: \textbf{Entire Facility}
+
+Timestamp: \textbf{2011-10-07 20:53:43}
+
+\textbf{Values gathered over 8760.00 hours}
+
+\textbf{Source Energy End Use Components Summary}
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Source Electricity [GJ] & Source Natural Gas [GJ] & Source Other Fuel [GJ] & Source District Cooling [GJ] & Source District Heating [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Source Electricity [GJ] & Source Natural Gas [GJ] & Source Other Fuel [GJ] & Source District Cooling [GJ] & Source District Heating [GJ] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 140.03 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 167.65 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 569.39 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 325.49 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 55.72 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 7.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ &  &  &  &  &  \tabularnewline
+Total Source Energy End Use Components & 1125.82 & 140.03 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Normalized Metrics}
+
+\textbf{Source Energy End Use Components Per Conditioned Floor Area}
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 180.82 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 614.09 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 351.05 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 60.10 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 8.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ &  &  &  &  &  \tabularnewline
+Total Source Energy End Use Components & 1214.22 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Source Energy End Use Components Per Total Floor Area}
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 180.82 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 614.09 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 351.05 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 60.10 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 8.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ &  &  &  &  &  \tabularnewline
+Total Source Energy End Use Components & 1214.22 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Equipment Summary}\label{equipment-summary}
+
+The Equipment Summary report provides a summary of the HVAC related equipment in the building. The central chiller example shows the most common type of chillers, boilers and towers used in EnergyPlus. The remaining subtables cover DX coils, fans and water heating equipment. Not every type of HVAC equipment is represented in this report. Directly following is an example of the report. The key used to obtain this report is EquipmentSummary.
+
+Report: Equipment Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Central Plant
+
+\begin{longtable}[c]{@{}llll@{}}
+\toprule 
+~ & Type & Nominal Capacity (W) & Nominal Efficiency (W/W) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Nominal Capacity (W) & Nominal Efficiency (W/W) \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cooling Coils
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Type & Nominal Total Capacity (W) & Nominal Sensible Capacity (W) & Nominal Latent Capacity (W) & Nominal Sensible Heat Ratio & Nominal Efficiency (W/W) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Nominal Total Capacity (W) & Nominal Sensible Capacity (W) & Nominal Latent Capacity (W) & Nominal Sensible Heat Ratio & Nominal Efficiency (W/W) \tabularnewline
+\midrule
+\endhead
+
+MAIN COOLING COIL 1 & Coil:\-Cooling:\-DX:\-TwoSpeed & 37506.82 & 25504.64 & 12002.18 & 0.68 & 3.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Heating Coils
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Type & Nominal Total Capacity (W) & Nominal Efficiency (W/W) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Nominal Total Capacity (W) & Nominal Efficiency (W/W) \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 ZONE COIL & Coil:Heating:Fuel & 17614.83 & 0.80 \tabularnewline
+SPACE2-1 ZONE COIL & Coil:Heating:Fuel & 14619.82 & 0.80 \tabularnewline
+SPACE3-1 ZONE COIL & Coil:Heating:Fuel & 16093.74 & 0.80 \tabularnewline
+SPACE4-1 ZONE COIL & Coil:Heating:Fuel & 18942.35 & 0.80 \tabularnewline
+SPACE5-1 ZONE COIL & Coil:Heating:Fuel & 19146.73 & 0.80 \tabularnewline
+MAIN HEATING COIL 1 & Coil:Heating:Fuel & 19754.61 & 0.80 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Fans
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+~ & Type & Total Efficiency (W/W) & Delta Pressure (pa) & Max Flow Rate (m3/s) & Rated Power (W) & Motor Heat In Air Fraction & End Use \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Total Efficiency (W/W) & Delta Pressure (pa) & Max Flow Rate (m3/s) & Rated Power (W) & Motor Heat In Air Fraction & End Use \tabularnewline
+\midrule
+\endhead
+
+SUPPLY FAN 1 & Fan:\-Variable\-Volume & 0.70 & 600.00 & 2.27 & 1942.10 & 1.00 & General \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Pumps
+
+\begin{longtable}[c]{@{}llllll@{}}
+\toprule 
+~ & Type & Control & Head (pa) & Power (W) & Motor Efficiency (W/W) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Control & Head (pa) & Power (W) & Motor Efficiency (W/W) \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Service Water Heating
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Type & Storage Volume (m3) & Input(W) & Thermal Efficiency (W/W) & Recovery Efficiency (W/W) & Energy Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Storage Volume (m3) & Input(W) & Thermal Efficiency (W/W) & Recovery Efficiency (W/W) & Energy Factor \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Envelope Summary}\label{envelope-summary}
+
+The Envelope Summary report provides a summary of the elements of the envelope of the building. The first table describes the exterior opaque elements and the second table describes the fenestration elements. Reflectance is defined as one minus the thermal absorptance. Directly following is an example of the report. The key used to obtain this report is EnvelopeSummary.
+
+Report: Envelope Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Opaque Exterior
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}}
+\toprule 
+~ & Construction & Reflectance & U-Factor with Film (W/m2-K) & U-Factor no Film (W/m2-K) & Gross Area (m2) & Azimuth (deg) & Tilt (deg) & Cardinal Direction \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Construction & Reflectance & U-Factor with Film (W/m2-K) & U-Factor no Film (W/m2-K) & Gross Area (m2) & Azimuth (deg) & Tilt (deg) & Cardinal Direction \tabularnewline
+\midrule
+\endhead
+
+WALL-1PF & WALL-1 & 0.22 & 0.384 & 0.41 & 18.30 & 210.00 & 90.00 & S \tabularnewline
+WALL-1PR & WALL-1 & 0.22 & 0.384 & 0.41 & 9.12 & 120.00 & 90.00 & E \tabularnewline
+WALL-1PB & WALL-1 & 0.22 & 0.384 & 0.41 & 18.30 & 30.00 & 90.00 & N \tabularnewline
+WALL-1PL & WALL-1 & 0.22 & 0.384 & 0.41 & 9.12 & 300.00 & 90.00 & W \tabularnewline
+TOP-1 & ROOF-1 & 0.35 & 0.268 & 0.28 & 463.60 & 210.00 & 0.00 & ~ \tabularnewline
+FRONT-1 & WALL-1 & 0.22 & 0.384 & 0.41 & 73.20 & 210.00 & 90.00 & S \tabularnewline
+F1-1 & FLOOR-SLAB-1 & 0.35 & 1.454 & 2.25 & 99.16 & 30.00 & 180.00 & ~ \tabularnewline
+RIGHT-1 & WALL-1 & 0.22 & 0.384 & 0.41 & 36.48 & 120.00 & 90.00 & E \tabularnewline
+F2-1 & FLOOR-SLAB-1 & 0.35 & 1.454 & 2.25 & 42.73 & 300.00 & 180.00 & ~ \tabularnewline
+BACK-1 & WALL-1 & 0.22 & 0.384 & 0.41 & 73.20 & 30.00 & 90.00 & N \tabularnewline
+F3-1 & FLOOR-SLAB-1 & 0.35 & 1.454 & 2.25 & 96.48 & 74.22 & 180.00 & ~ \tabularnewline
+LEFT-1 & WALL-1 & 0.22 & 0.384 & 0.41 & 36.48 & 300.00 & 90.00 & W \tabularnewline
+F4-1 & FLOOR-SLAB-1 & 0.35 & 1.454 & 2.25 & 42.73 & 120.00 & 180.00 & ~ \tabularnewline
+F5-1 & FLOOR-SLAB-1 & 0.35 & 1.454 & 2.25 & 182.49 & 30.00 & 180.00 & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Fenestration
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}}
+\toprule 
+~ & Construction & Area of One Opening (m2) & Area of Openings (m2) & U-Factor & SHGC & Visible Transmittance & Shade Control & Parent Surface & Azimuth (deg) & Cardinal Direction \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Construction & Area of One Opening (m2) & Area of Openings (m2) & U-Factor & SHGC & Visible Transmittance & Shade Control & Parent Surface & Azimuth (deg) & Cardinal Direction \tabularnewline
+\midrule
+\endhead
+
+WF-1 & DBL CLR 3MM/13MM AIR & 16.56 & 16.56 & 2.72 & 0.763 & 0.812 & No & FRONT-1 & 210.00 & S \tabularnewline
+DF-1 & SGL GREY 3MM & 6.00 & 6.00 & 5.89 & 0.708 & 0.611 & No & FRONT-1 & 210.00 & S \tabularnewline
+WR-1 & DBL CLR 3MM/13MM AIR & 9.12 & 9.12 & 2.72 & 0.763 & 0.812 & No & RIGHT-1 & 120.00 & E \tabularnewline
+WB-1 & DBL CLR 3MM/13MM AIR & 16.44 & 16.44 & 2.72 & 0.763 & 0.812 & No & BACK-1 & 30.00 & N \tabularnewline
+DB-1 & SGL GREY 3MM & 4.41 & 4.41 & 5.89 & 0.708 & 0.611 & No & BACK-1 & 30.00 & N \tabularnewline
+WL-1 & DBL CLR 3MM/13MM AIR & 9.12 & 9.12 & 2.72 & 0.763 & 0.812 & No & LEFT-1 & 300.00 & W \tabularnewline
+Total or Average & ~ & ~ & 61.65 & 3.26 & 0.753 & 0.778 & ~ & ~ & ~ & ~ \tabularnewline
+North Total or Average & ~ & ~ & 20.85 & 3.39 & 0.751 & 0.769 & ~ & ~ & ~ & ~ \tabularnewline
+Non-North Total or Average & ~ & ~ & 40.80 & 3.19 & 0.755 & 0.782 & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Surface Shadowing Summary}\label{surface-shadowing-summary}
+
+The Surface Shadowing Summary report summarizes how the surfaces may cast shadows on other surfaces. Directly following is an example of the report. The key used to obtain this report is SurfaceShadowingSummary.
+
+Report: Surface Shadowing Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{4.5in}}
+\toprule 
+~ & Possible Shadow Casters \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Possible Shadow Casters \tabularnewline
+\midrule
+\endhead
+
+FRONT-1 & MAIN SOUTH OVERHANG |Mir-MAIN SOUTH OVERHANG | \tabularnewline
+SOUTH DOOR OVERHANG & Mir-MAIN SOUTH OVERHANG |WALL-1PF |FRONT-1 | \tabularnewline
+WALL-1PF & Mir-MAIN SOUTH OVERHANG |SOUTH DOOR OVERHANG |Mir-SOUTH DOOR OVERHANG | \tabularnewline
+MAIN SOUTH OVERHANG & FRONT-1 | \tabularnewline
+\bottomrule
+\end{longtable}
+
+Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Possible Shadow Casters \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Possible Shadow Casters \tabularnewline
+\midrule
+\endhead
+
+WF-1 & FRONT-1 | \tabularnewline
+DF-1 & FRONT-1 | \tabularnewline
+WR-1 & RIGHT-1 | \tabularnewline
+WB-1 & BACK-1 | \tabularnewline
+DB-1 & BACK-1 | \tabularnewline
+WL-1 & LEFT-1 | \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Shading Summary}\label{shading-summary-000}
+
+The Shading Summary report shows how much of each window is sunlit at different times of the year and also includes a summary of the window controls. Directly following is an example of the report. The key used to obtain this report is ShadingSummary.
+
+Report: Shading Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Sunlit Fraction
+
+{\scriptsize
+\begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+\toprule 
+~ & March 21 9am & March 21 noon & March 21 3pm & June 21 9am & June 21 noon & June 21 3pm & December 21 9am & December 21 noon & December 21 3pm \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & March 21 9am & March 21 noon & March 21 3pm & June 21 9am & June 21 noon & June 21 3pm & December 21 9am & December 21 noon & December 21 3pm \tabularnewline
+\midrule
+\endhead
+
+WF-1 & 0.00 & 0.00 & 0.43 & 0.00 & 0.00 & 0.00 & 0.30 & 0.52 & 0.86 \tabularnewline
+DF-1 & 0.73 & 0.26 & 0.62 & 0.00 & 0.00 & 0.28 & 0.90 & 0.69 & 0.92 \tabularnewline
+WR-1 & 1.00 & 1.00 & 0.00 & 1.00 & 1.00 & 0.00 & 1.00 & 1.00 & 0.00 \tabularnewline
+WB-1 & 0.00 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+DB-1 & 0.00 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+WL-1 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 1.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Window Control
+
+\begin{longtable}[c]{@{}llllll@{}}
+\toprule 
+~ & Name & Type & Shaded Construction & Control & Glare Control \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Name & Type & Shaded Construction & Control & Glare Control \tabularnewline
+\midrule
+\endhead
+
+none & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Lighting Summary}\label{lighting-summary}
+
+The Lighting Summary report provides a description of the interior and exterior lighting systems being simulated. It also provides a summary of daylighting controls. The Interior Lighting table has three columns that are explained below:
+
+Scheduled Hours/Week {[}hr{]} - In the schedule shown, this represents the average weekly sum of hourly values. It is based on a full year even if the simulation is only performed for part of the year. It is not affected by daylighting.
+
+Hours/Week \textgreater{} 1\% {[}hr{]} -- This represents the average hours per week that are above 1\% of the design value.
+
+Full Load Hours/Week {[}hr{]} -- This is based on consumption and hours that the consumption occurred. It is dependent on the run period used. When simulating only a portion of the year, the value depends on which days of the year (the number of weekdays versus weekend days, for example) are simulated. It also indicates the impact of daylighting control. Directly following is an example of the report. The key used to obtain this report is LightingSummary.
+
+Report: Lighting Summary
+
+For: Entire Facility
+
+Timestamp: 2012-09-05 12:10:52
+
+Interior Lighting
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}>{\raggedright}p{0.46in}}
+\toprule 
+ & Zone & Lighting Power Density [W/m2] & Zone Area [m2] & Total Power [W] & End Use Subcategory & Schedule Name & Scheduled Hours/Week [hr] & Hours/Week  >  1\% [hr] & Full Load Hours/Week [hr] & Return Air Fraction & Conditioned (Y/N) & Consumption [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Zone & Lighting Power Density [W/m2] & Zone Area [m2] & Total Power [W] & End Use Subcategory & Schedule Name & Scheduled Hours/Week [hr] & Hours/Week  >  1\% [hr] & Full Load Hours/Week [hr] & Return Air Fraction & Conditioned (Y/N) & Consumption [GJ] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 LIGHTS 1 & SPACE1-1 & 15.9742 & 99.16 & 1584.00 & GeneralLights & LIGHTS-1 & 57.70 & 168.00 & 57.70 & 0.2000 & Y & 17.16 \tabularnewline
+SPACE2-1 LIGHTS 1 & SPACE2-1 & 16.0056 & 42.73 & 684.00 & GeneralLights & HALFPERCENT & 0.60 & 0.00 & 0.59 & 0.2000 & Y & 0.08 \tabularnewline
+SPACE3-1 LIGHTS 1 & SPACE3-1 & 16.4179 & 96.48 & 1584.00 & GeneralLights & ALWAYSON & 168.00 & 168.00 & 168.00 & 0.2000 & Y & 49.95 \tabularnewline
+SPACE4-1 LIGHTS 1 & SPACE4-1 & 16.0056 & 42.73 & 684.00 & GeneralLights & LIGHTS-1 & 57.70 & 168.00 & 57.70 & 0.2000 & Y & 7.41 \tabularnewline
+SPACE5-1 LIGHTS 1 & SPACE5-1 & 16.2420 & 182.49 & 2964.00 & GeneralLights & LIGHTS-1 & 57.70 & 168.00 & 57.70 & 0.2000 & Y & 32.11 \tabularnewline
+Interior Lighting Total & ~ & 16.1777 & 463.60 & 7500.00 & ~ & ~ & ~ & ~ & ~ & ~ & ~ & 106.70 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Daylighting
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+ & Zone & Daylighting Type & Control Type & Fraction Controlled & Lighting Installed in Zone [W] & Lighting Controlled [W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Zone & Daylighting Type & Control Type & Fraction Controlled & Lighting Installed in Zone [W] & Lighting Controlled [W] \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Exterior Lighting
+
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+ & Total Watts & Astronomical Clock/Schedule & Schedule Name & Scheduled Hours/Week [hr] & Hours/Week  >  1\% [hr] & Full Load Hours/Week [hr] & Consumption [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Total Watts & Astronomical Clock/Schedule & Schedule Name & Scheduled Hours/Week [hr] & Hours/Week  >  1\% [hr] & Full Load Hours/Week [hr] & Consumption [GJ] \tabularnewline
+\midrule
+\endhead
+
+Exterior Lighting Total & 0.00 & ~ & ~ & ~ & ~ & ~ & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{HVAC Sizing Summary}\label{hvac-sizing-summary}
+
+The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. The Design Load is the zone sensible load only and it does not include any system effects or ventilation loads. The user specified design load and airflow and the values calculated by the program are shown in the report along with the time of the peak load and the temperature and humidity ratio at the time of the peak during the sizing periods. This information is generated for both the Zone Sensible Cooling and Zone Sensible Heating tables.
+
+Also included is the System Design Air Flow Rates which includes the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, and the user specified air flow rate for heating.
+
+\emph{Note:} values listed as ``calculated'' are the unaltered result of the zone or system sizing calculations, using the design sizing period weather and schedules specified in the input. Values listed as ``user specified'' are either the calculated values modified by global or zone sizing factors or values specified with the \emph{flow/zone} or \emph{flow/system} design air flow method.
+
+Directly following is an example of the report.
+
+The key used to obtain this report is HVACSizingSummary.
+
+Report: \textbf{HVAC Sizing Summary}
+
+For: \textbf{Entire Facility}
+
+** Timestamp: **2011-09-23 15:09:34
+
+\textbf{Zone Sensible Cooling}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}}
+\toprule 
+ & Calculated Design Load [W] & User Design Load [W] & Calculated Design Air Flow [m3/s] & User Design Air Flow [m3/s] & Design Day Name & Date/Time Of Peak & Temperature at Peak [C] & Humidity Ratio at Peak [kgWater/kgAir] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Calculated Design Load [W] & User Design Load [W] & Calculated Design Air Flow [m3/s] & User Design Air Flow [m3/s] & Design Day Name & Date/Time Of Peak & Temperature at Peak [C] & Humidity Ratio at Peak [kgWater/kgAir] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 2647.33 & 2647.33 & 0.223 & 0.223 & CHICAGO\-\_IL\-\_USA ANNUAL COOLING 1\% DESIGN CONDITIONS DB/MCWB & 7/21 15:45:00 & 31.02 & 0.01459 \tabularnewline
+SPACE2-1 & 2234.38 & 2234.38 & 0.188 & 0.188 & CHICAGO\-\_IL\-\_USA ANNUAL COOLING 1\% DESIGN CONDITIONS DB/MCWB & 7/21 10:00:00 & 27.43 & 0.01459 \tabularnewline
+SPACE3-1 & 2506.34 & 2506.34 & 0.211 & 0.211 & CHICAGO\-\_IL\-\_USA ANNUAL COOLING 1\% DESIGN CONDITIONS DB/MCWB & 7/21 15:00:00 & 31.50 & 0.01459 \tabularnewline
+SPACE4-1 & 2464.72 & 2464.72 & 0.207 & 0.207 & CHICAGO\-\_IL\-\_USA ANNUAL COOLING 1\% DESIGN CONDITIONS DB/MCWB & 7/21 17:30:00 & 29.47 & 0.01459 \tabularnewline
+SPACE5-1 & 2628.69 & 2628.69 & 0.221 & 0.221 & CHICAGO\-\_IL\-\_USA ANNUAL COOLING 1\% DESIGN CONDITIONS DB/MCWB & 7/21 15:00:00 & 31.50 & 0.01459 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\textbf{Zone Sensible Heating}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}}
+\toprule 
+ & Calculated Design Load [W] & User Design Load [W] & Calculated Design Air Flow [m3/s] & User Design Air Flow [m3/s] & Design Day Name & Date/Time Of Peak & Temperature at Peak [C] & Humidity Ratio at Peak [kgWater/kgAir] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Calculated Design Load [W] & User Design Load [W] & Calculated Design Air Flow [m3/s] & User Design Air Flow [m3/s] & Design Day Name & Date/Time Of Peak & Temperature at Peak [C] & Humidity Ratio at Peak [kgWater/kgAir] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 3860.76 & 3860.76 & 0.117 & 0.117 & CHICAGO\-\_IL\-\_USA ANNUAL HEATING 99\% DESIGN CONDITIONS DB & 1/21 24:00:00 & -17.30 & 0.00084 \tabularnewline
+SPACE2-1 & 1625.15 & 1625.15 & 0.049 & 0.049 & CHICAGO\-\_IL\-\_USA ANNUAL HEATING 99\% DESIGN CONDITIONS DB & 1/21 24:00:00 & -17.30 & 0.00084 \tabularnewline
+SPACE3-1 & 3753.07 & 3753.07 & 0.113 & 0.113 & CHICAGO\-\_IL\-\_USA ANNUAL HEATING 99\% DESIGN CONDITIONS DB & 1/21 24:00:00 & -17.30 & 0.00084 \tabularnewline
+SPACE4-1 & 1625.15 & 1625.15 & 0.049 & 0.049 & CHICAGO\-\_IL\-\_USA ANNUAL HEATING 99\% DESIGN CONDITIONS DB & 1/21 24:00:00 & -17.30 & 0.00084 \tabularnewline
+SPACE5-1 & 2981.57 & 2981.57 & 0.090 & 0.103 & CHICAGO\-\_IL\-\_USA ANNUAL HEATING 99\% DESIGN CONDITIONS DB & 1/21 24:00:00 & -17.30 & 0.00084 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\textbf{System Design Air Flow Rates}
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
+\toprule 
+ & Calculated cooling [m3/s] & User cooling [m3/s] & Calculated heating [m3/s] & User heating [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Calculated cooling [m3/s] & User cooling [m3/s] & Calculated heating [m3/s] & User heating [m3/s] \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 1.05 & 1.05 & 0.43 & 0.43 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\textbf{Plant Loop Coincident Design Fluid Flow Rate Adjustments}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}>{\raggedright}p{0.66in}}
+\toprule 
+ & Previous Design Volume Flow Rate [m3/s] & Algorithm Volume Flow Rate [m3/s] & Coincident Design Volume Flow Rate [m3/s] & Coincident Size Adjusted & Peak Sizing Period Name & Peak Day into Period & Peak Hour Of Day & Peak Step Start Minute \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Previous Design Volume Flow Rate [m3/s] & Algorithm Volume Flow Rate [m3/s] & Coincident Design Volume Flow Rate [m3/s] & Coincident Size Adjusted & Peak Sizing Period Name & Peak Day into Period & Peak Hour Of Day & Peak Step Start Minute \tabularnewline
+\midrule
+\endhead
+
+COOLSYS1 Sizing Pass 1 & 0.120672 & 0.141525 & 0.141525 & Yes & CHICAGO ANN CLG .4\% CONDNS WB= > MDB HVAC Sizing Pass 1 & 1 & 2 & 30 > \tabularnewline
+HEATSYS1 Sizing Pass 1 & 0.060598 & 0.049054 & 0.049054 & Yes & CHICAGO ANN HTG 99.6\% CONDNS DB HVAC Sizing Pass 1 & 1 & 7 & 20 > \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{System Summary}\label{system-summary}
+
+The System Summary report provides information about some of the primary components in the system including the economizer and demand controlled ventilation. In addition, this report describes when the zone conditions are not comfortable or when set points are not met.
+
+In the \emph{Time Not Comfortable Based on Simple ASHRAE 55-2004} and Time Setpoint Not Met sub-tables, The reported time represents the total number of hours that a given zone did not meet the comfort or setpoint criteria. For the Facility row, this is the total numbers of hours that one or more zones were out of range. The values are not weighted by number of zones or number of occupants.
+
+Directly following is an example of the report. The key used to obtain this report is SystemSummary.
+
+Report: System Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Economizer
+
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+~ & High Limit Shutoff Control & Minimum Outside Air (m3/s) & Maximum Outside Air (m3/s) & Return Air Temp Limit & Return Air Enthalpy Limit & Outside Air Temperature Limit (C) & Outside Air Enthalpy Limit (C) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & High Limit Shutoff Control & Minimum Outside Air (m3/s) & Maximum Outside Air (m3/s) & Return Air Temp Limit & Return Air Enthalpy Limit & Outside Air Temperature Limit (C) & Outside Air Enthalpy Limit (C) \tabularnewline
+\midrule
+\endhead
+
+none & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Demand Controlled Ventilation using VENTILATION:MECHANICAL
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Ventilation:Mechanical Name & Outside Air Per Person(m3/s-person) & Outside Air Per Area (m3/s-m2) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Ventilation:Mechanical Name & Outside Air Per Person(m3/s-person) & Outside Air Per Area (m3/s-m2) \tabularnewline
+\midrule
+\endhead
+
+none & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Time Not Comfortable Based on Simple ASHRAE 55-2004
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Winter Clothes (hr) & Summer Clothes (hr) & Summer or Winter Clothes (hr) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Winter Clothes (hr) & Summer Clothes (hr) & Summer or Winter Clothes (hr) \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 429.00 & 1913.75 & 79.25 \tabularnewline
+SPACE2-1 & 739.25 & 1719.75 & 22.50 \tabularnewline
+SPACE3-1 & 482.00 & 1885.50 & 85.50 \tabularnewline
+SPACE4-1 & 588.25 & 2039.75 & 59.50 \tabularnewline
+SPACE5-1 & 14.75 & 2535.75 & 14.75 \tabularnewline
+PLENUM-1 & 0.00 & 0.00 & 0.00 \tabularnewline
+Facility & 1041.75 & 2564.75 & 97.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Time Setpoint Not Met
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
+\toprule 
+~ & During Heating (hr) & During Cooling (hr) & During Occupied Heating (hr) & During Occupied Cooling (hr) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & During Heating (hr) & During Cooling (hr) & During Occupied Heating (hr) & During Occupied Cooling (hr) \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 321.00 & 45.25 & 35.00 & 45.25 \tabularnewline
+SPACE2-1 & 104.25 & 44.00 & 0.25 & 10.75 \tabularnewline
+SPACE3-1 & 297.50 & 0.75 & 36.25 & 0.75 \tabularnewline
+SPACE4-1 & 77.75 & 27.00 & 0.25 & 0.00 \tabularnewline
+SPACE5-1 & 292.25 & 1.00 & 13.75 & 1.00 \tabularnewline
+PLENUM-1 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Facility & 333.50 & 117.00 & 37.25 & 56.75 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Component Sizing Summary}\label{component-sizing-summary}
+
+The Component Sizing Summary report includes details on many of the HVAC components in the simulation. For each of the components, one or more parameters are shown. Directly following is an example of the report. The key used to obtain this report is ComponentSizingSummary.
+
+Report: Component Sizing Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+SINGLE DUCT:VAV:REHEAT
+
+\begin{longtable}[c]{>{\raggedright}p{1.52in}>{\raggedright}p{2.24in}>{\raggedright}p{2.24in}}
+\toprule 
+~ & Maximum air flow rate [m3/s] & Max Reheat Water Flow [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Maximum air flow rate [m3/s] & Max Reheat Water Flow [m3/s] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 VAV REHEAT & 0.226630 & 0.000059 \tabularnewline
+SPACE2-1 VAV REHEAT & 0.176548 & 0.000046 \tabularnewline
+SPACE3-1 VAV REHEAT & 0.209331 & 0.000054 \tabularnewline
+SPACE4-1 VAV REHEAT & 0.222526 & 0.000058 \tabularnewline
+SPACE5-1 VAV REHEAT & 0.221695 & 0.000057 \tabularnewline
+\bottomrule
+\end{longtable}
+
+COIL:Water:SimpleHeating
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Max Water Flow Rate of Coil [m3/s] & Design Coil Load [W] & UA of the Coil [W/delK] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Max Water Flow Rate of Coil [m3/s] & Design Coil Load [W] & UA of the Coil [W/delK] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 ZONE COIL & 0.000059 & 2698.50 & 66.13 \tabularnewline
+SPACE2-1 ZONE COIL & 0.000046 & 2102.17 & 51.51 \tabularnewline
+SPACE3-1 ZONE COIL & 0.000054 & 2492.52 & 61.08 \tabularnewline
+SPACE4-1 ZONE COIL & 0.000058 & 2649.63 & 64.93 \tabularnewline
+SPACE5-1 ZONE COIL & 0.000057 & 2639.74 & 64.69 \tabularnewline
+OA HEATING COIL 1 & 0.000148 & 6812.27 & 84.72 \tabularnewline
+MAIN HEATING COIL 1 & 0.000075 & 3458.59 & 55.80 \tabularnewline
+\bottomrule
+\end{longtable}
+
+BRANCH
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Maximum Branch Flow Rate [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Maximum Branch Flow Rate [m3/s] \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 MAIN BRANCH & 1.06 \tabularnewline
+\bottomrule
+\end{longtable}
+
+AIR PRIMARY LOOP
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Primary air design volumetric flow rate [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Primary air design volumetric flow rate [m3/s] \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 1.06 \tabularnewline
+\bottomrule
+\end{longtable}
+
+CONTROLLER:OUTSIDE AIR
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{2.25in}>{\raggedright}p{2.25in}}
+\toprule 
+~ & maximum outside air flow rate [m3/s] & minimum outside air flow rate [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & maximum outside air flow rate [m3/s] & minimum outside air flow rate [m3/s] \tabularnewline
+\midrule
+\endhead
+
+OA CONTROLLER 1 & 1.06 & 0.264118 \tabularnewline
+\bottomrule
+\end{longtable}
+
+COIL:Water:Cooling
+
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+~ & Max Water Flow Rate of Coil [m3/s] & Max Air Flow Rate of Coil [m3/s] & Design Air Inlet Temperature [C] & Design Air Outlet Temperature [C] & Design Water Inlet Temperature [C] & Design Air Inlet Humidity Ratio & Design Air Outlet Humidity Ratio \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Max Water Flow Rate of Coil [m3/s] & Max Air Flow Rate of Coil [m3/s] & Design Air Inlet Temperature [C] & Design Air Outlet Temperature [C] & Design Water Inlet Temperature [C] & Design Air Inlet Humidity Ratio & Design Air Outlet Humidity Ratio \tabularnewline
+\midrule
+\endhead
+
+OA COOLING COIL 1 & 0.001145 & 0.264118 & 30.01 & 11.00 & 7.00 & 0.014595 & 0.008000 \tabularnewline
+MAIN COOLING COIL 1 & 0.000916 & 1.06 & 21.55 & 12.80 & 7.00 & 0.009333 & 0.008000 \tabularnewline
+\bottomrule
+\end{longtable}
+
+FAN:SIMPLE:VARIABLEVOLUME
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule 
+~ & Max Flow Rate [m3/s] & Min Flow Rate [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Max Flow Rate [m3/s] & Min Flow Rate [m3/s] \tabularnewline
+\midrule
+\endhead
+
+SUPPLY FAN 1 & 1.06 & 0.353263 \tabularnewline
+\bottomrule
+\end{longtable}
+
+CONTROLLER:SIMPLE
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Max Actuated Flow [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Max Actuated Flow [m3/s] \tabularnewline
+\midrule
+\endhead
+
+OA CC CONTROLLER 1 & 0.001145 \tabularnewline
+OA HC CONTROLLER 1 & 0.000148 \tabularnewline
+CENTRAL COOLING COIL CONTROLLER 1 & 0.000916 \tabularnewline
+CENTRAL HEATING COIL CONTROLLER 1 & 0.000075 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PLANT LOOP
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{2.62in}>{\raggedright}p{1.87in}}
+\toprule 
+~ & Maximum Loop Volumetric Flow Rate [m3/s] & Volume of the plant loop [m3] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Maximum Loop Volumetric Flow Rate [m3/s] & Volume of the plant loop [m3] \tabularnewline
+\midrule
+\endhead
+
+HOT WATER LOOP & 0.000497 & 0.559158 \tabularnewline
+CHILLED WATER LOOP & 0.002061 & 2.32 \tabularnewline
+\bottomrule
+\end{longtable}
+
+BOILER:SIMPLE
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.56in}>{\raggedright}p{2.93in}}
+\toprule 
+~ & Nominal Capacity [W] & Design Boiler Water Flow Rate [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Nominal Capacity [W] & Design Boiler Water Flow Rate [m3/s] \tabularnewline
+\midrule
+\endhead
+
+CENTRAL BOILER & 22853.43 & 0.000497 \tabularnewline
+\bottomrule
+\end{longtable}
+
+CHILLER:ELECTRIC
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}}
+\toprule 
+~ & Nominal Capacity [W] & Design Evaporator Volumetric Water Flow Rate [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Nominal Capacity [W] & Design Evaporator Volumetric Water Flow Rate [m3/s] \tabularnewline
+\midrule
+\endhead
+
+CENTRAL CHILLER & 34468.25 & 0.002061 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PUMP:VARIABLE SPEED
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{2.5in}>{\raggedright}p{2.0in}}
+\toprule 
+~ & Rated Volumetric Flow Rate [m3/s] & Rated Power Consumption [W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Rated Volumetric Flow Rate [m3/s] & Rated Power Consumption [W] \tabularnewline
+\midrule
+\endhead
+
+HW CIRC PUMP & 0.000497 & 126.98 \tabularnewline
+CW CIRC PUMP & 0.002061 & 526.69 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Outdoor Air Summary}\label{outdoor-air-summary}
+
+The Outdoor Air Summary provides information for each zone on the average and minimum ventilation provided.
+
+The reports described so far in this section are displayed when specified in the Output:Table:Predefined object. They are either on or off and are not customizable. The next few types of tabular reports are customizable. You can specify the report variables being used in each one.
+
+Directly following is an example of the report. The key used to obtain this report is OutdoorAirSummary.
+
+Report: Outdoor Air Summary
+
+For: Entire Facility
+
+Timestamp: 2007-10-17 08:54:27
+
+Average Outside Air During Occupied Hours
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 9.50 & 11.00 & 239.25 & 0.365 & 0.050 & 0.000 \tabularnewline
+SPACE2-1 & 4.32 & 5.00 & 103.31 & 0.630 & 0.051 & 0.000 \tabularnewline
+SPACE3-1 & 9.50 & 11.00 & 239.25 & 0.338 & 0.050 & 0.000 \tabularnewline
+SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.708 & 0.051 & 0.000 \tabularnewline
+SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.214 & 0.052 & 0.000 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Minimum Outside Air During Occupied Hours
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 9.50 & 11.00 & 239.25 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE2-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE3-1 & 9.50 & 11.00 & 239.25 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.000 & 0.000 & 0.000 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Climatic Data Summary}\label{climatic-data-summary}
+
+The Climatic Data Summary provides some statistics from the .STAT file concerning the selected weather. The Stat file must be available (it is included with all the weather files on the EnergyPlus website) for the report to be fully produced. Directly following is an example of the report. The key used to obtain this report is ClimaticDataSummary.
+
+Report: Climatic Data Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 13:27:45
+
+SizingPeriod:DesignDay
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Maximum Dry Bulb (C) & Daily Temperature Range (C) & Humidity Value & Humidity Type & Wind Speed (m/s) & Wind Direction \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Maximum Dry Bulb (C) & Daily Temperature Range (C) & Humidity Value & Humidity Type & Wind Speed (m/s) & Wind Direction \tabularnewline
+\midrule
+\endhead
+
+CHICAGO\-\_IL\-\_USA ANNUAL HEATING 99\% DESIGN CONDITIONS DB & -17.30 & 0.00 & -17.30 & WETBULB & 4.90 & 270.00 \tabularnewline
+CHICAGO\-\_IL\-\_USA ANNUAL COOLING 1\% DESIGN CONDITIONS DB/MCWB & 31.50 & 10.70 & 23.00 & WETBULB & 5.30 & 230.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Weather Statistics File
+
+\begin{longtable}[c]{>{\raggedright}p{2.02in}>{\raggedright}p{3.96in}}
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endhead
+
+Reference & USA\_Chicago-OHare\_TMY2 \tabularnewline
+Site:Location & Chicago IL USA \tabularnewline
+Latitude & N 41° 58' \tabularnewline
+Longitude & W 87° 54' \tabularnewline
+Time Zone & GMT -6.0 Hours \tabularnewline
+Elevation & 190m above sea level \tabularnewline
+Standard Pressure at Elevation & 99063Pa \tabularnewline
+Data Source & Release Test \tabularnewline
+WMO Station & 725300 \tabularnewline
+Design Conditions & Climate Design Data 2005 ASHRAE Handbook \tabularnewline
+Heating Design Temperature 99.6\% (C) & -20.6 \tabularnewline
+Heating Design Temperature 99\% (C) & -17.3 \tabularnewline
+Cooling Design Temperature 0.4\% (C) & 33.2 \tabularnewline
+Cooling Design Temperature 1\% (C) & 31.5 \tabularnewline
+Cooling Design Temperature 2\% (C) & 29.9 \tabularnewline
+Maximum Dry Bulb Temperature (C) & 35.6° \tabularnewline
+Maximum Dry Bulb Occurs on & Jul 9 \tabularnewline
+Minimum Dry Bulb Temperature (C) & -22.8° \tabularnewline
+Minimum Dry Bulb Occurs on & Jan 7 \tabularnewline
+Maximum Dew Point Temperature (C) & 25.6 \tabularnewline
+Maximum Dew Point Occurs on & Aug 4 \tabularnewline
+Minimum Dew Point Temperature (C) & -28.9 \tabularnewline
+Minimum Dew Point Occurs on & Dec 31 \tabularnewline
+Heating Degree-Days (base 10°C) & 1745 \tabularnewline
+Cooling Degree-Days (base 18°C) & 464 \tabularnewline
+Köppen Classification & Dfa \tabularnewline
+Köppen Description & Humid continental (hot summer, cold winter, no dry season, lat. 30-60°N) \tabularnewline
+Köppen Recommendation & Unbearably humid periods in summer, but passive cooling is possible \tabularnewline
+ASHRAE Climate Zone & 5A \tabularnewline
+ASHRAE Description & Cool-Humid \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Object Count Summary}\label{object-count-summary}
+
+The object count summary report provides the count on the number of specific objects in the file. Directly following is an example of the report. The key used to obtain this report is ObjectCountSummary.
+
+Report: Object Count Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Surfaces by Class
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule 
+~ & Total & Outdoors \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total & Outdoors \tabularnewline
+\midrule
+\endhead
+
+Wall & 24 & 8 \tabularnewline
+Floor & 10 & 5 \tabularnewline
+Roof & 6 & 1 \tabularnewline
+Internal Mass & 0 & 0 \tabularnewline
+Building Detached Shading & 0 & 0 \tabularnewline
+Fixed Detached Shading & 0 & 0 \tabularnewline
+Window & 6 & 6 \tabularnewline
+Door & 0 & 0 \tabularnewline
+Glass Door & 0 & 0 \tabularnewline
+Shading & 4 & 4 \tabularnewline
+Overhang & 0 & 0 \tabularnewline
+Fin & 0 & 0 \tabularnewline
+Tubular Daylighting Device Dome & 0 & 0 \tabularnewline
+Tubular Daylighting Device Diffuser & 0 & 0 \tabularnewline
+\bottomrule
+\end{longtable}
+
+HVAC
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Count \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Count \tabularnewline
+\midrule
+\endhead
+
+HVAC Air Loops & 1 \tabularnewline
+Conditioned Zones & 6 \tabularnewline
+Unconditioned Zones & 0 \tabularnewline
+Supply Plenums & 0 \tabularnewline
+Return Plenums & 1 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Component Cost Economics Summary}\label{component-cost-economics-summary}
+
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. Directly following is an example of this report.
+
+Report: Component Cost Economics Summary
+
+For: Entire Facility
+
+Timestamp: 2016-01-12 15:47:39
+
+Construction Cost Estimate Summary
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+ & Reference Bldg. & Current Bldg. Model & Difference \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Reference Bldg. & Current Bldg. Model & Difference \tabularnewline
+\midrule
+\endhead
+
+Line Item SubTotal (\$) & 665082.04 & 719946.72 & 54864.68 \tabularnewline
+Misc. Costs (\$) & 928979.09 & 928979.09 & 0 \tabularnewline
+Regional Adjustment (\$) & 216792.31 & 224253.91 & 7461.6 \tabularnewline
+Design Fee (\$) & 108651.21 & 149854.38 & 41203.17 \tabularnewline
+Contractor Fee (\$) & 126759.74 & 131122.58 & 4362.84 \tabularnewline
+Contingency (\$) & 181085.34 & 187317.97 & 6232.63 \tabularnewline
+Permits, Bonds, Insurance (\$) & 0 & 0 & 0 \tabularnewline
+Commissioning (\$) & 9054.27 & 18731.8 & 9677.53 \tabularnewline
+Cost Estimate Total (\$) & 2236404 & 2360206.45 & 123802.44 \tabularnewline
+Cost Per Conditioned Building Area (\$/m2) & 1203.69 & 1270.32 & 66.63 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cost Line Item Details
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & Line No. & Item Name & Quantity. & Units & \$ per Qty. & SubTotal \$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Line No. & Item Name & Quantity. & Units & \$ per Qty. & SubTotal \$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 150.49 & kW (tot cool cap.) & 340 & 51165.73 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1 & Ea. & 8500 & 8500 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 719946.72 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{LEED Summary}\label{leed-summary}
+
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+
+Report: LEED Summary
+
+For: Entire Facility
+
+Timestamp: 2013-03-01 15:24:37
+
+Sec1.1A-General Information
+
+\begin{longtable}[c]{>{\raggedright}p{2.21in}>{\raggedright}p{3.78in}}
+\toprule 
+ & Data \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Data \tabularnewline
+\midrule
+\endhead
+
+Heating Degree Days & 1748 \tabularnewline
+Cooling Degree Days & 506 \tabularnewline
+Climate Zone & 5A \tabularnewline
+Weather File & Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300 \tabularnewline
+HDD and CDD data source & Weather File Stat \tabularnewline
+Total gross floor area [m2] & 927.20 \tabularnewline
+Principal Heating Source & Natural Gas \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-1. Space Usage Type
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
+\toprule 
+ & Space Area [m2] & Regularly Occupied Area [m2] & Unconditioned Area [m2] & Typical Hours/Week in Operation [hr/wk] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Space Area [m2] & Regularly Occupied Area [m2] & Unconditioned Area [m2] & Typical Hours/Week in Operation [hr/wk] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 99.16 & 99.16 & 0.00 & 55.06 \tabularnewline
+SPACE2-1 & 42.73 & 42.73 & 0.00 & 55.06 \tabularnewline
+SPACE3-1 & 96.48 & 96.48 & 0.00 & 55.06 \tabularnewline
+SPACE4-1 & 42.73 & 42.73 & 0.00 & 55.06 \tabularnewline
+SPACE5-1 & 182.49 & 182.49 & 0.00 & 55.06 \tabularnewline
+PLENUM-1 & 463.60 & 463.60 & 0.00 & 0.00 \tabularnewline
+Totals & 927.20 & 927.20 & 0.00 & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-2. Advisory Messages
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Data \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Data \tabularnewline
+\midrule
+\endhead
+
+Number of hours heating loads not met & 0.00 \tabularnewline
+Number of hours cooling loads not met & 10.75 \tabularnewline
+Number of hours not met & 10.75 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-3. Energy Type Summary
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
+\toprule 
+ & Utility Rate & Virtual Rate [\textbackslash\$/unit energy] & Units of Energy & Units of Demand \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Utility Rate & Virtual Rate [\textbackslash\$/unit energy] & Units of Energy & Units of Demand \tabularnewline
+\midrule
+\endhead
+
+Electricity & EXAMPLEA EXAMPLEI-SELL & 0.055 & kWh & kW \tabularnewline
+Natural Gas & EXAMPLEA-GAS & 0.569 & Therm & Therm/Hr \tabularnewline
+Other & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-4/5. Performance Rating Method Compliance
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Energy Use [GJ] & Other Demand [W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Energy Use [GJ] & Other Demand [W] \tabularnewline
+\midrule
+\endhead
+
+Interior Lighting & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Space Heating & 0.00 & 0.00 & 103.92 & 62499.99 & 0.00 & 0.00 \tabularnewline
+Space Cooling & 17.63 & 9523.66 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 1.54 & 319.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans-Interior & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans-Parking Garage & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Service Water Heating & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Receptacle Equipment & 47.70 & 4500.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting (process) & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooking & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Industrial Process & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Elevators and Escalators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total Line & 155.12 & ~ & 274.01 & ~ & 0.00 & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-6. Energy Use Summary
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule 
+ & Process Subtotal [GJ] & Total Energy Use [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Process Subtotal [GJ] & Total Energy Use [GJ] \tabularnewline
+\midrule
+\endhead
+
+Electricity & 47.70 & 155.12 \tabularnewline
+Natural Gas & 0.00 & 274.01 \tabularnewline
+Other & 0.00 & 0.00 \tabularnewline
+Total & 47.70 & 429.13 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-7. Energy Cost Summary
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{2.21in}>{\raggedright}p{2.28in}}
+\toprule 
+ & Process Subtotal [\textbackslash\$] & Total Energy Cost [\textbackslash\$] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Process Subtotal [\textbackslash\$] & Total Energy Cost [\textbackslash\$] \tabularnewline
+\midrule
+\endhead
+
+Electricity & 552.55 & 1796.99 \tabularnewline
+Natural Gas & 0.00 & 1478.58 \tabularnewline
+Other & 0.00 & 0.00 \tabularnewline
+Total & 552.55 & 3275.57 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Process energy cost based on ratio of process to total energy.
+
+L-1. Renewable Energy Source Summary
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule 
+ & Rated Capacity [kW] & Annual Energy Generated [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Rated Capacity [kW] & Annual Energy Generated [GJ] \tabularnewline
+\midrule
+\endhead
+
+Photovoltaic & 0.00 & 0.00 \tabularnewline
+Wind & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-17a. Energy Use Intensity - Electricity
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Electricty [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Electricty [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Interior Lighting & 87.62 \tabularnewline
+Space Heating & 0.00 \tabularnewline
+Space Cooling & 19.02 \tabularnewline
+Fans-Interior & 7.56 \tabularnewline
+Service Water Heating & 0.00 \tabularnewline
+Receptacle Equipment & 51.44 \tabularnewline
+Miscellaneous & 1.66 \tabularnewline
+Subtotal & 167.30 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-17b. Energy Use Intensity - Natural Gas
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Natural Gas [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Natural Gas [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Space Heating & 112.08 \tabularnewline
+Service Water Heating & 0.00 \tabularnewline
+Miscellaneous & 183.45 \tabularnewline
+Subtotal & 295.53 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-17c. Energy Use Intensity - Other
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Other [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Other [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Miscellaneous & 0.00 \tabularnewline
+Subtotal & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+EAp2-18. End Use Percentage
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Percent [\%] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Percent [\%] \tabularnewline
+\midrule
+\endhead
+
+Interior Lighting & 18.93 \tabularnewline
+Space Heating & 24.22 \tabularnewline
+Space Cooling & 4.11 \tabularnewline
+Fans-Interior & 1.63 \tabularnewline
+Service Water Heating & 0.00 \tabularnewline
+Receptacle Equipment & 11.11 \tabularnewline
+Miscellaneous & 39.99 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Initialization Summary}\label{initializatin-summary}
+
+This report is not reproduced here since it is well documented in the section in this document for the eplusout.eio file.
+
+\subsection{Energy Meters}\label{energy-meters}
+
+This report provides the details on all the energy meters generated by the simulation. Directly following is an example of the report. The key used to obtain this report is EnergyMeters.
+
+Report: Energy Meters
+
+For: Entire Facility
+
+Timestamp: 2012-05-01 17:07:24
+
+Annual and Peak Values - Electricity
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}}
+\toprule 
+ & Electricity Annual Value [GJ] & Electricity Minimum Value [W] & Timestamp of Minimum & Electricity Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Electricity Annual Value [GJ] & Electricity Minimum Value [W] & Timestamp of Minimum & Electricity Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+Electricity\-:Facility & 156.68 & 475.00 & 01-APR-00:15 & 20165.58 & 17-JUL-15:00 \tabularnewline
+Electricity\-:Building & 128.94 & 475.00 & 01-JAN-00:15 & 12000.00 & 01-JAN-10:15 \tabularnewline
+Electricity\-:Zone:SPACE1-1 & 27.23 & 100.32 & 01-JAN-00:15 & 2534.40 & 01-JAN-10:15 \tabularnewline
+InteriorLights\-:Electricity & 81.24 & 375.00 & 01-JAN-00:15 & 7500.00 & 01-JAN-10:15 \tabularnewline
+InteriorLights\-:Electricity\-:Zone\-:SPACE1-1 & 17.16 & 79.20 & 01-JAN-00:15 & 1584.00 & 01-JAN-10:15 \tabularnewline
+GeneralLights\-:InteriorLights\-:Electricity & 81.24 & 375.00 & 01-JAN-00:15 & 7500.00 & 01-JAN-10:15 \tabularnewline
+Electricity\-:Zone\-:SPACE2-1 & 11.76 & 43.32 & 01-JAN-00:15 & 1094.40 & 01-JAN-10:15 \tabularnewline
+InteriorLights\-:Electricity\-:Zone\-:SPACE2-1 & 7.41 & 34.20 & 01-JAN-00:15 & 684.00 & 01-JAN-10:15 \tabularnewline
+Electricity\-:Zone\-:SPACE3-1 & 27.23 & 100.32 & 01-JAN-00:15 & 2534.40 & 01-JAN-10:15 \tabularnewline
+InteriorLights\-:Electricity\-:Zone\-:SPACE3-1 & 17.16 & 79.20 & 01-JAN-00:15 & 1584.00 & 01-JAN-10:15 \tabularnewline
+Electricity\-:Zone\-:SPACE4-1 & 11.76 & 43.32 & 01-JAN-00:15 & 1094.40 & 01-JAN-10:15 \tabularnewline
+InteriorLights\-:Electricity\-:Zone\-:SPACE4-1 & 7.41 & 34.20 & 01-JAN-00:15 & 684.00 & 01-JAN-10:15 \tabularnewline
+Electricity\-:Zone\-:SPACE5-1 & 50.96 & 187.72 & 01-JAN-00:15 & 4742.40 & 01-JAN-10:15 \tabularnewline
+InteriorLights\-:Electricity\-:Zone\-:SPACE5-1 & 32.11 & 148.20 & 01-JAN-00:15 & 2964.00 & 01-JAN-10:15 \tabularnewline
+InteriorEquipment\-:Electricity & 47.70 & 100.00 & 01-JAN-00:15 & 4500.00 & 01-JAN-09:15 \tabularnewline
+InteriorEquipment\-:Electricity\-:Zone\-:SPACE1-1 & 10.07 & 21.12 & 01-JAN-00:15 & 950.40 & 01-JAN-09:15 \tabularnewline
+General\-:InteriorEquipment\-:Electricity & 47.70 & 100.00 & 01-JAN-00:15 & 4500.00 & 01-JAN-09:15 \tabularnewline
+InteriorEquipment\-:Electricity\-:Zone\-:SPACE2-1 & 4.35 & 9.12 & 01-JAN-00:15 & 410.40 & 01-JAN-09:15 \tabularnewline
+InteriorEquipment\-:Electricity\-:Zone\-:SPACE3-1 & 10.07 & 21.12 & 01-JAN-00:15 & 950.40 & 01-JAN-09:15 \tabularnewline
+InteriorEquipment\-:Electricity\-:Zone\-:SPACE4-1 & 4.35 & 9.12 & 01-JAN-00:15 & 410.40 & 01-JAN-09:15 \tabularnewline
+InteriorEquipment\-:Electricity\-:Zone\-:SPACE5-1 & 18.85 & 39.52 & 01-JAN-00:15 & 1778.40 & 01-JAN-09:15 \tabularnewline
+ElectricityPurchased\-:Facility & 156.68 & 475.00 & 28-JUN-05:15 & 20165.58 & 17-JUL-15:00 \tabularnewline
+ElectricityPurchased\-:Plant & 156.68 & 475.00 & 28-JUN-05:15 & 20165.58 & 17-JUL-15:00 \tabularnewline
+Cogeneration\-:ElectricityPurchased & 156.68 & 475.00 & 28-JUN-05\-:15 & 20165.58 & 17-JUL-15\-:00 \tabularnewline
+ElectricitySurplusSold\-:Facility & 0.00 & 0.00 & 01-JAN-00\-:15 & 0.00 & 01-JAN-00\-:15 \tabularnewline
+ElectricitySurplusSold\-:Plant & 0.00 & 0.00 & 01-JAN-00\-:15 & 0.00 & 01-JAN-00\-:15 \tabularnewline
+Cogeneration\-:ElectricitySurplusSold & 0.00 & 0.00 & 01-JAN-00\-:15 & 0.00 & 01-JAN-00\-:15 \tabularnewline
+ElectricityNet\-:Facility & 156.68 & 475.00 & 28-JUN-05\-:15 & 20165.58 & 17-JUL-15\-:00 \tabularnewline
+ElectricityNet\-:Plant & 156.68 & 475.00 & 28-JUN-05\-:15 & 20165.58 & 17-JUL-15\-:00 \tabularnewline
+Cogeneration\-:ElectricityNet & 156.68 & 475.00 & 28-JUN-05\-:15 & 20165.58 & 17-JUL-15\-:00 \tabularnewline
+Electricity\-:HVAC & 8.87 & 0.00 & 01-APR-00\-:15 & 655.43 & 17-JUL-15\-:00 \tabularnewline
+Fans\-:Electricity & 8.87 & 0.00 & 01-APR-00\-:15 & 655.43 & 17-JUL-15\-:00 \tabularnewline
+General\-:Fans\-:Electricity & 8.87 & 0.00 & 01-APR-00\-:15 & 655.43 & 17-JUL-15\-:00 \tabularnewline
+Electricity\-:Plant & 18.88 & 0.00 & 01-JAN-00\-:15 & 8053.88 & 19-JUL-16\-:00 \tabularnewline
+Heating\-:Electricity & 0.00 & 0.00 & 01-JAN-00\-:15 & 0.00 & 01-JAN-00\-:15 \tabularnewline
+Boiler Parasitic\-:Heating\-:Electricity & 0.00 & 0.00 & 01-JAN-00\-:15 & 0.00 & 01-JAN-00\-:15 \tabularnewline
+Cooling\-:Electricity & 16.44 & 0.00 & 01-JAN-00\-:15 & 7478.31 & 19-JUL-16\-:00 \tabularnewline
+Pumps\-:Electricity & 2.44 & 0.00 & 01-JAN-00\-:15 & 575.73 & 24-JUL-20\-:00 \tabularnewline
+MYGENERALLIGHTS & 81.24 & 375.00 & 01-JAN-00\-:15 & 7500.00 & 01-JAN-10\-:15 \tabularnewline
+MYBUILDINGELECTRIC & 128.94 & 475.00 & 01-JAN-00\-:15 & 12000.00 & 01-JAN-10\-:15 \tabularnewline
+MYBUILDINGOTHER & 47.70 & 375.00 & 01-JAN-00\-:15 & 7500.00 & 01-JAN-10\-:15 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Annual and Peak Values - Gas
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Gas Annual Value [GJ] & Gas Minimum Value [W] & Timestamp of Minimum & Gas Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Gas Annual Value [GJ] & Gas Minimum Value [W] & Timestamp of Minimum & Gas Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+Gas\-:Facility & 68.82 & 0.00 & 01-JAN-00\-:15 & 42092.68 & 01-FEB-06\-:15 \tabularnewline
+Gas\-:Plant & 68.82 & 0.00 & 01-JAN-00\-:15 & 42092.68 & 01-FEB-06\-:15 \tabularnewline
+Heating\-:Gas & 68.82 & 0.00 & 01-JAN-00\-:15 & 42092.68 & 01-FEB-06\-:15 \tabularnewline
+Boiler\-:Heating\-:Gas & 68.82 & 0.00 & 01-JAN-00\-:15 & 42092.68 & 01-FEB-06\-:15 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Annual and Peak Values - Cooling
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Cooling Annual Value [GJ] & Cooling Minimum Value [W] & Timestamp of Minimum & Cooling Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Cooling Annual Value [GJ] & Cooling Minimum Value [W] & Timestamp of Minimum & Cooling Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+PlantLoopCoolingDemand\-:Facility & 62.41 & 0.00 & 01-JAN-00\-:15 & 27050.46 & 17-JUL-15\-:00 \tabularnewline
+PlantLoopCoolingDemand\-:HVAC & 62.41 & 0.00 & 01-JAN-00\-:15 & 27050.46 & 17-JUL-15\-:00 \tabularnewline
+CoolingCoils\-:PlantLoopCoolingDemand & 62.41 & 0.00 & 01-JAN-00\-:15 & 27050.46 & 17-JUL-15\-:00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Annual and Peak Values - Water
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Annual Value [m3] & Minimum Value [m3/s] & Timestamp of Minimum & Maximum Value [m3/s] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Annual Value [m3] & Minimum Value [m3/s] & Timestamp of Minimum & Maximum Value [m3/s] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other by Weight/Mass
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+  \toprule 
+  & Annual Value [kg] & Minimum Value [kg/s] & Timestamp of Minimum & Maximum Value [kg/s] & Timestamp of Maximum \tabularnewline
+  \midrule
+  \endfirsthead
+
+  \toprule 
+  & Annual Value [kg] & Minimum Value [kg/s] & Timestamp of Minimum & Maximum Value [kg/s] & Timestamp of Maximum \tabularnewline
+  \midrule
+  \endhead
+
+  Carbon Equivalent\-:Facility & 0.00 & 0.000 & 01-JAN-00\-:15 & 0.000 & 01-JAN-00\-:15 \tabularnewline
+  Carbon\-Equivalent\-Emissions\-:Carbon Equivalent & 0.00 & 0.000 & 01-JAN-00\-:15 & 0.000 & 01-JAN-00\-:15 \tabularnewline
+  \bottomrule
+\end{longtable}}
+
+Annual and Peak Values - Other Volumetric
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Annual Value [m3] & Minimum Value [m3/s] & Timestamp of Minimum & Maximum Value [m3/s] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Annual Value [m3] & Minimum Value [m3/s] & Timestamp of Minimum & Maximum Value [m3/s] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other Liquid/Gas
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Annual Value [L] & Minimum Value [L] & Timestamp of Minimum & Maximum Value [L] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Annual Value [L] & Minimum Value [L] & Timestamp of Minimum & Maximum Value [L] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Annual and Peak Values - Other
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Annual Value [GJ] & Minimum Value [W] & Timestamp of Minimum & Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Annual Value [GJ] & Minimum Value [W] & Timestamp of Minimum & Maximum Value [W] & Timestamp of Maximum \tabularnewline
+\midrule
+\endhead
+
+EnergyTransfer\-:Facility & 415.65 & 0.00 & 01-APR-00\-:15 & 102784.74 & 17-JUL-15\-:00 \tabularnewline
+EnergyTransfer\-:Building & 97.60 & 0.00 & 01-APR-00\-:15 & 21488.05 & 28-JAN-06\-:15 \tabularnewline
+EnergyTransfer\-:Zone\-:PLENUM-1 & 22.50 & 0.00 & 01-APR-00\-:15 & 4218.21 & 07-JAN-08\-:15 \tabularnewline
+Heating\-:EnergyTransfer & 42.23 & 0.00 & 19-MAR-15\-:30 & 21488.05 & 28-JAN-06\-:15 \tabularnewline
+Heating\-:EnergyTransfer\-:Zone\-:PLENUM-1 & 19.63 & 0.00 & 16-JAN-21\-:15 & 4218.21 & 07-JAN-08\-:15 \tabularnewline
+Cooling\-:EnergyTransfer & 55.38 & 0.00 & 01-JAN-06\-:15 & 13937.19 & 17-JUL-15\-:00 \tabularnewline
+Cooling\-:EnergyTransfer\-:Zone\-:PLENUM-1 & 2.87 & 0.00 & 01-JAN-00\-:15 & 2539.33 & 18-JUL-15\-:00 \tabularnewline
+EnergyTransfer\-:Zone\-:SPACE1-1 & 17.91 & 0.00 & 01-APR-00\-:15 & 4012.66 & 30-DEC-06\-:15 \tabularnewline
+Heating\-:EnergyTransfer\-:Zone\-:SPACE1-1 & 6.51 & 0.00 & 01-JAN-10\-:15 & 4012.66 & 30-DEC-06\-:15 \tabularnewline
+Cooling\-:EnergyTransfer\-:Zone\-:SPACE1-1 & 11.40 & 0.00 & 01-JAN-00\-:15 & 3138.67 & 27-SEP-16\-:00 \tabularnewline
+EnergyTransfer\-:Zone\-:SPACE2-1 & 10.67 & 0.00 & 01-APR-00\-:15 & 3432.93 & 30-DEC-06\-:15 \tabularnewline
+Heating\-:EnergyTransfer\-:Zone\-:SPACE2-1 & 2.42 & 0.00 & 01-JAN-01\-:30 & 3432.93 & 30-DEC-06\-:15 \tabularnewline
+Cooling\-:EnergyTransfer\-:Zone\-:SPACE2-1 & 8.25 & 0.00 & 01-JAN-00\-:15 & 2460.04 & 06-SEP-10\-:15 \tabularnewline
+EnergyTransfer\-:Zone\-:SPACE3-1 & 16.79 & 0.00 & 01-APR-00\-:15 & 3788.83 & 30-DEC-06\-:15 \tabularnewline
+Heating\-:EnergyTransfer\-:Zone\-:SPACE3-1 & 6.09 & 0.00 & 01-JAN-12\-:00 & 3788.83 & 30-DEC-06\-:15 \tabularnewline
+Cooling\-:EnergyTransfer\-:Zone\-:SPACE3-1 & 10.70 & 0.00 & 01-JAN-00\-:15 & 2807.57 & 19-JUL-11\-:00 \tabularnewline
+EnergyTransfer\-:Zone\-:SPACE4-1 & 9.82 & 0.00 & 01-APR-00\-:15 & 3746.68 & 28-JAN-06\-:15 \tabularnewline
+Heating\-:EnergyTransfer\-:Zone\-:SPACE4-1 & 2.98 & 0.00 & 01-JAN-01\-:30 & 3746.68 & 28-JAN-06\-:15 \tabularnewline
+Cooling\-:EnergyTransfer\-:Zone\-:SPACE4-1 & 6.85 & 0.00 & 01-JAN-00\-:15 & 2281.99 & 25-JUN-17\-:15 \tabularnewline
+EnergyTransfer\-:Zone\-:SPACE5-1 & 19.91 & 0.00 & 01-APR-00\-:15 & 4037.31 & 30-DEC-06\-:15 \tabularnewline
+Heating\-:EnergyTransfer\-:Zone\-:SPACE5-1 & 4.60 & 0.00 & 01-JAN-00\-:15 & 4037.31 & 30-DEC-06\-:15 \tabularnewline
+Cooling\-:EnergyTransfer\-:Zone\-:SPACE5-1 & 15.31 & 0.00 & 01-JAN-06\-:15 & 2611.53 & 17-JUL-15\-:00 \tabularnewline
+EnergyTransfer\-:HVAC & 117.82 & 0.00 & 01-JAN-00\-:15 & 31769.77 & 07-JAN-06\-:15 \tabularnewline
+HeatingCoils\-:EnergyTransfer & 55.41 & 0.00 & 01-JAN-00\-:15 & 31769.77 & 07-JAN-06\-:15 \tabularnewline
+PlantLoop\-Heating\-Demand\-:Facility & 55.41 & 0.00 & 01-JAN-00\-:15 & 31769.77 & 07-JAN-06\-:15 \tabularnewline
+PlantLoop\-Heating\-Demand\-:HVAC & 55.41 & 0.00 & 01-JAN-00\-:15 & 31769.77 & 07-JAN-06\-:15 \tabularnewline
+HeatingCoils\-:PlantLoop\-Heating\-Demand & 55.41 & 0.00 & 01-JAN-00\-:15 & 31769.77 & 07-JAN-06\-:15 \tabularnewline
+CoolingCoils\-:EnergyTransfer & 62.41 & 0.00 & 01-JAN-00\-:15 & 27050.46 & 17-JUL-15\-:00 \tabularnewline
+EnergyTransfer\-:Plant & 200.23 & 0.00 & 01-JAN-00\-:15 & 62116.41 & 19-JUL-16\-:00 \tabularnewline
+Boilers\-:EnergyTransfer & 55.06 & 0.00 & 01-JAN-00\-:15 & 33674.15 & 28-MAR-06\-:15 \tabularnewline
+Chillers\-:EnergyTransfer & 64.37 & 0.00 & 01-JAN-00\-:15 & 27319.05 & 19-JUL-16\-:00 \tabularnewline
+HeatRejection\-:EnergyTransfer & 80.81 & 0.00 & 01-JAN-00\-:15 & 34797.36 & 19-JUL-16\-:00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Sensible Heat Gain Summary}\label{sensible-heat-gain-summary}
+
+This report is more fully described in the Input Output Reference but represents the major heat gain components for each zone as well as the HVAC loads satisfied. Directly following is an example of the report. The key used to obtain this report is SensibleHeatGainSummary.
+
+Report: Sensible Heat Gain Summary
+
+For: Entire Facility
+
+Timestamp: 2011-09-09 08:02:03
+
+Annual Building Sensible Heat Gain Components
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}}
+\toprule 
+ & HVAC Input Sensible Air Heating [GJ] & HVAC Input Sensible Air Cooling [GJ] & HVAC Input Heated Surface Heating [GJ] & HVAC Input Cooled Surface Cooling [GJ] & People Sensible Heat Addition [GJ] & Lights Sensible Heat Addition [GJ] & Equipment Sensible Heat Addition [GJ] & Window Heat Addition [GJ] & Interzone Air Transfer Heat Addition [GJ] & Infiltration Heat Addition [GJ] & Opaque Surface Conduction and Other Heat Addition [GJ] & Equipment Sensible Heat Removal [GJ] & Window Heat Removal [GJ] & Interzone Air Transfer Heat Removal [GJ] & Infiltration Heat Removal [GJ] & Opaque Surface Conduction and Other Heat Removal [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & HVAC Input Sensible Air Heating [GJ] & HVAC Input Sensible Air Cooling [GJ] & HVAC Input Heated Surface Heating [GJ] & HVAC Input Cooled Surface Cooling [GJ] & People Sensible Heat Addition [GJ] & Lights Sensible Heat Addition [GJ] & Equipment Sensible Heat Addition [GJ] & Window Heat Addition [GJ] & Interzone Air Transfer Heat Addition [GJ] & Infiltration Heat Addition [GJ] & Opaque Surface Conduction and Other Heat Addition [GJ] & Equipment Sensible Heat Removal [GJ] & Window Heat Removal [GJ] & Interzone Air Transfer Heat Removal [GJ] & Infiltration Heat Removal [GJ] & Opaque Surface Conduction and Other Heat Removal [GJ] \tabularnewline
+\midrule
+\endhead
+
+SPACE\-1-1 & 0.096 & -0.070 & 0.000 & 0.000 & 0.035 & 0.131 & 0.065 & 0.220 & 0.000 & 0.000 & 0.001 & 0.000 & -0.078 & 0.000 & -0.004 & -0.395 \tabularnewline
+SPACE\-2-1 & 0.051 & -0.038 & 0.000 & 0.000 & 0.014 & 0.056 & 0.028 & 0.173 & 0.000 & 0.000 & 0.001 & 0.000 & -0.029 & 0.000 & -0.002 & -0.253 \tabularnewline
+SPACE\-3-1 & 0.093 & -0.030 & 0.000 & 0.000 & 0.034 & 0.131 & 0.065 & 0.157 & 0.000 & 0.000 & 0.000 & 0.000 & -0.082 & 0.000 & -0.004 & -0.363 \tabularnewline
+SPACE\-4-1 & 0.055 & -0.015 & 0.000 & 0.000 & 0.015 & 0.056 & 0.028 & 0.105 & 0.000 & 0.000 & 0.000 & 0.000 & -0.032 & 0.000 & -0.002 & -0.211 \tabularnewline
+SPACE\-5-1 & 0.032 & -0.072 & 0.000 & 0.000 & 0.073 & 0.244 & 0.121 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & -0.007 & -0.392 \tabularnewline
+PLE\-NUM\--1 & 0.118 & -0.024 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & -0.094 \tabularnewline
+Total Facility & 0.445 & -0.248 & 0.000 & 0.000 & 0.170 & 0.618 & 0.307 & 0.655 & 0.000 & 0.000 & 0.002 & 0.000 & -0.221 & 0.000 & -0.017 & -1.709 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Peak Cooling Sensible Heat Gain Components
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}}
+\toprule 
+ & Time of Peak & HVAC Input Sensible Air Heating [W] & HVAC Input Sensible Air Cooling [W] & HVAC Input Heated Surface Heating [W] & HVAC Input Cooled Surface Cooling [W] & People Sensible Heat Addition [W] & Lights Sensible Heat Addition [W] & Equipment Sensible Heat Addition [W] & Window Heat Addition [W] & Interzone Air Transfer Heat Addition [W] & Infiltration Heat Addition [W] & Opaque Surface Conduction and Other Heat Addition [W] & Equipment Sensible Heat Removal [W] & Window Heat Removal [W] & Interzone Air Transfer Heat Removal [W] & Infiltration Heat Removal [W] & Opaque Surface Conduction and Other Heat Removal [W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Time of Peak & HVAC Input Sensible Air Heating [W] & HVAC Input Sensible Air Cooling [W] & HVAC Input Heated Surface Heating [W] & HVAC Input Cooled Surface Cooling [W] & People Sensible Heat Addition [W] & Lights Sensible Heat Addition [W] & Equipment Sensible Heat Addition [W] & Window Heat Addition [W] & Interzone Air Transfer Heat Addition [W] & Infiltration Heat Addition [W] & Opaque Surface Conduction and Other Heat Addition [W] & Equipment Sensible Heat Removal [W] & Window Heat Removal [W] & Interzone Air Transfer Heat Removal [W] & Infiltration Heat Removal [W] & Opaque Surface Conduction and Other Heat Removal [W] \tabularnewline
+\midrule
+\endhead
+
+SPACE\-1-1 & 14-JAN-15:00 & 0.00 & -3502.16 & 0.00 & 0.00 & 724.60 & 1584.00 & 739.20 & 9347.85 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -8893.49 \tabularnewline
+SPACE\-2-1 & 14-JAN-10:07 & 0.00 & -1738.94 & 0.00 & 0.00 & 345.99 & 684.00 & 410.40 & 4684.27 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -4385.71 \tabularnewline
+SPACE\-3-1 & 14-JAN-14:45 & 0.00 & -1095.49 & 0.00 & 0.00 & 761.13 & 1584.00 & 844.80 & 356.87 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -2451.31 \tabularnewline
+SPACE\-4-1 & 14-JAN-16:00 & 0.00 & -736.19 & 0.00 & 0.00 & 345.95 & 684.00 & 228.00 & 1157.98 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -1679.74 \tabularnewline
+SPACE\-5-1 & 14-JAN-13:35 & 0.00 & -2315.43 & 0.00 & 0.00 & 1135.19 & 2667.60 & 1778.40 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -3265.77 \tabularnewline
+PLE\-NUM-1 & 07-JUL-19:46 & 0.00 & -1579.40 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 1579.40 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total Facility & 14-JAN-15:00 & 0.00 & -7822.86 & 0.00 & 0.00 & 3561.18 & 7500.00 & 3500.00 & 10470.76 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -17209.08 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Peak Heating Sensible Heat Gain Components
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}>{\raggedright}p{0.28in}}
+\toprule 
+ & Time of Peak & HVAC Input Sensible Air Heating [W] & HVAC Input Sensible Air Cooling [W] & HVAC Input Heated Surface Heating [W] & HVAC Input Cooled Surface Cooling [W] & People Sensible Heat Addition [W] & Lights Sensible Heat Addition [W] & Equipment Sensible Heat Addition [W] & Window Heat Addition [W] & Interzone Air Transfer Heat Addition [W] & Infiltration Heat Addition [W] & Opaque Surface Conduction and Other Heat Addition [W] & Equipment Sensible Heat Removal [W] & Window Heat Removal [W] & Interzone Air Transfer Heat Removal [W] & Infiltration Heat Removal [W] & Opaque Surface Conduction and Other Heat Removal [W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Time of Peak & HVAC Input Sensible Air Heating [W] & HVAC Input Sensible Air Cooling [W] & HVAC Input Heated Surface Heating [W] & HVAC Input Cooled Surface Cooling [W] & People Sensible Heat Addition [W] & Lights Sensible Heat Addition [W] & Equipment Sensible Heat Addition [W] & Window Heat Addition [W] & Interzone Air Transfer Heat Addition [W] & Infiltration Heat Addition [W] & Opaque Surface Conduction and Other Heat Addition [W] & Equipment Sensible Heat Removal [W] & Window Heat Removal [W] & Interzone Air Transfer Heat Removal [W] & Infiltration Heat Removal [W] & Opaque Surface Conduction and Other Heat Removal [W] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & 14-JAN-07:00 & 10652.50 & 0.00 & 0.00 & 0.00 & 0.00 & 79.20 & 21.12 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -1551.57 & 0.00 & 0.00 & -9201.25 \tabularnewline
+SPACE2-1 & 14-JAN-07:00 & 7816.55 & 0.00 & 0.00 & 0.00 & 0.00 & 34.20 & 9.12 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -594.65 & 0.00 & 0.00 & -7265.22 \tabularnewline
+SPACE3-1 & 14-JAN-07:00 & 11495.41 & 0.00 & 0.00 & 0.00 & 0.00 & 79.20 & 21.12 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -1539.09 & 0.00 & 0.00 & -10056.64 \tabularnewline
+SPACE4-1 & 14-JAN-07:00 & 8837.62 & 0.00 & 0.00 & 0.00 & 0.00 & 34.20 & 9.12 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -604.20 & 0.00 & 0.00 & -8276.74 \tabularnewline
+SPACE5-1 & 14-JAN-07:00 & 12359.25 & 0.00 & 0.00 & 0.00 & 0.00 & 148.20 & 39.52 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -12546.97 \tabularnewline
+PLENUM-1 & 14-JAN-07:18 & 5275.99 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -5275.99 \tabularnewline
+Total Facility & 14-JAN-07:15 & 55720.39 & 0.00 & 0.00 & 0.00 & 0.00 & 375.00 & 100.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & -4289.51 & 0.00 & 0.00 & -51905.88 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Standard 62.1 Summary}\label{standard-62.1-summary}
+
+This report is more fully described in the Input Output Reference. The Standard 62.1 Summary produces a report that is consistent with many of the outputs needed when doing calculations consistent with ASHRAE Standard 62.1-2010. The report is generated when sizing calculations are specified. The abbreviations used in the report are consistent with the abbreviations used in Appendix A4 of the Standard. Directly following is an example of the report. The key used to obtain this report is Standard62.1Summary.
+
+Report: Standard 62.1 Summary
+
+For: Entire Facility
+
+Timestamp: 2012-04-20 12:00:57
+
+System Ventilation Requirements for Cooling
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}}
+\toprule 
+ & Sum of Zone Primary Air Flow - Vpz-sum [m3/s] & System Population - Ps & Sum of Zone Population - Pz-sum & Occupant Diversity - D & Uncorrected Outdoor Air Intake Airflow - Vou [m3/s] & System Primary Airflow - Vps [m3/s] & Average Outdoor Air Fraction - Xs & System Ventilation Efficiency - Ev & Outdoor Air Intake Flow - Vot [m3/s] & Percent Outdoor Air - \%OA \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Sum of Zone Primary Air Flow - Vpz-sum [m3/s] & System Population - Ps & Sum of Zone Population - Pz-sum & Occupant Diversity - D & Uncorrected Outdoor Air Intake Airflow - Vou [m3/s] & System Primary Airflow - Vps [m3/s] & Average Outdoor Air Fraction - Xs & System Ventilation Efficiency - Ev & Outdoor Air Intake Flow - Vot [m3/s] & Percent Outdoor Air - \%OA \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 1.05 & 52.00 & 52.00 & 1.00 & 0.26 & 1.05 & 0.252 & 1.000 & 0.27 & 0.26 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+System Ventilation Requirements for Heating
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}}
+\toprule 
+ & Sum of Zone Primary Air Flow - Vpz-sum [m3/s] & System Population - Ps & Sum of Zone Population - Pz-sum & Occupant Diversity - D & Uncorrected Outdoor Air Intake Airflow - Vou [m3/s] & System Primary Airflow - Vps [m3/s] & Average Outdoor Air Fraction - Xs & System Ventilation Efficiency - Ev & Outdoor Air Intake Flow Vot [m3/s] & Percent Outdoor Air - \%OA \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Sum of Zone Primary Air Flow - Vpz-sum [m3/s] & System Population - Ps & Sum of Zone Population - Pz-sum & Occupant Diversity - D & Uncorrected Outdoor Air Intake Airflow - Vou [m3/s] & System Primary Airflow - Vps [m3/s] & Average Outdoor Air Fraction - Xs & System Ventilation Efficiency - Ev & Outdoor Air Intake Flow Vot [m3/s] & Percent Outdoor Air - \%OA \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 1.05 & 0.00 & 0.00 & 1.00 & 0.26 & 0.43 & 0.967 & 1.000 & 0.27 & 0.26 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Zone Ventilation Parameters
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}}
+\toprule 
+ & AirLoop Name & People Outdoor Air Rate - Rp [m3/s-person] & Zone Population - Pz & Area Outdoor Air Rate - Ra [m3/s-m2] & Zone Floor Area - Az [m2] & Breathing Zone Outdoor Airflow - Vbz [m3/s] & Cooling Zone Air Distribution Effectiveness - Ez-clg & Cooling Zone Outdoor Airflow - Voz-clg [m3/s] & Heating Zone Air Distribution Effectiveness - Ez-htg & Heating Zone Outdoor Airflow - Voz-htg [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & AirLoop Name & People Outdoor Air Rate - Rp [m3/s-person] & Zone Population - Pz & Area Outdoor Air Rate - Ra [m3/s-m2] & Zone Floor Area - Az [m2] & Breathing Zone Outdoor Airflow - Vbz [m3/s] & Cooling Zone Air Distribution Effectiveness - Ez-clg & Cooling Zone Outdoor Airflow - Voz-clg [m3/s] & Heating Zone Air Distribution Effectiveness - Ez-htg & Heating Zone Outdoor Airflow - Voz-htg [m3/s] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & VAV SYS 1 & 0.002360 & 11.00 & 0.000305 & 99.16 & 0.0562 & 0.900 & 0.0624 & ~ & ~ \tabularnewline
+SPACE2-1 & VAV SYS 1 & 0.002360 & 5.00 & 0.000305 & 42.73 & 0.0248 & 0.900 & 0.0276 & ~ & ~ \tabularnewline
+SPACE3-1 & VAV SYS 1 & 0.002360 & 11.00 & 0.000305 & 96.48 & 0.0554 & 1.000 & 0.0554 & ~ & ~ \tabularnewline
+SPACE4-1 & VAV SYS 1 & 0.002360 & 5.00 & 0.000305 & 42.73 & 0.0248 & 1.000 & 0.0248 & ~ & ~ \tabularnewline
+SPACE5-1 & VAV SYS 1 & 0.002360 & 20.00 & 0.000305 & 182.49 & 0.1029 & 1.000 & 0.1029 & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+System Ventilation Parameters
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+ & People Outdoor Air Rate - Rp [m3/s-person] & Sum of Zone Population - Pz-sum & Area Outdoor Air Rate - Ra [m3/s-m2] & Sum of Zone Floor Area - Az-sum [m2] & Breathing Zone Outdoor Airflow - Vbz [m3/s] & Cooling Zone Outdoor Airflow - Voz-clg [m3/s] & Heating Zone Outdoor Airflow - Voz-htg [m3/s] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & People Outdoor Air Rate - Rp [m3/s-person] & Sum of Zone Population - Pz-sum & Area Outdoor Air Rate - Ra [m3/s-m2] & Sum of Zone Floor Area - Az-sum [m2] & Breathing Zone Outdoor Airflow - Vbz [m3/s] & Cooling Zone Outdoor Airflow - Voz-clg [m3/s] & Heating Zone Outdoor Airflow - Voz-htg [m3/s] \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 0.002360 & 52.00 & 0.000305 & 463.60 & 0.2641 & 0.2731 & 0.0000 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Zone Ventilation Calculations for Cooling Design
+
+{\tiny
+\begin{longtable}[c]{p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}p{0.42in}}
+\toprule 
+ & AirLoop Name & Box Type & Zone Primary Airflow - Vpz [m3/s] & Zone Discharge Airflow - Vdz [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Cooling - Voz-clg [m3/s] & Primary Outdoor Air Fraction - Zpz & Primary Air Fraction - Ep & Secondary Recirculation Fraction- Er & Supply Air Fraction- Fa & Mixed Air Fraction - Fb & Outdoor Air Fraction - Fc & Zone Ventilation Efficiency - Evz \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & AirLoop Name & Box Type & Zone Primary Airflow - Vpz [m3/s] & Zone Discharge Airflow - Vdz [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Cooling - Voz-clg [m3/s] & Primary Outdoor Air Fraction - Zpz & Primary Air Fraction - Ep & Secondary Recirculation Fraction- Er & Supply Air Fraction- Fa & Mixed Air Fraction - Fb & Outdoor Air Fraction - Fc & Zone Ventilation Efficiency - Evz \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 & VAV SYS 1 & AIRTERMINAL\-:SINGLEDUCT\-:VAV\-:REHEAT & 0.22 & 0.22 & 0.08 & 0.0624 & 0.280 & 1.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.900 \tabularnewline
+SPACE2-1 & VAV SYS 1 & AIRTERMINAL\-:SINGLEDUCT\-:VAV\-:REHEAT & 0.19 & 0.19 & 0.03 & 0.0276 & 0.147 & 1.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.900 \tabularnewline
+SPACE3-1 & VAV SYS 1 & AIRTERMINAL\-:SINGLEDUCT\-:VAV\-:REHEAT & 0.21 & 0.21 & 0.07 & 0.0554 & 0.263 & 1.000 & 0.000 & 0.000 & 0.000 & 0.000 & 1.000 \tabularnewline
+SPACE4-1 & VAV SYS 1 & AIRTERMINAL\-:SINGLEDUCT\-:VAV\-:REHEAT & 0.21 & 0.21 & 0.03 & 0.0248 & 0.120 & 1.000 & 0.000 & 0.000 & 0.000 & 0.000 & 1.000 \tabularnewline
+SPACE5-1 & VAV SYS 1 & AIRTERMINAL\-:SINGLEDUCT\-:VAV\-:REHEAT & 0.22 & 0.22 & 0.14 & 0.1029 & 0.465 & 1.000 & 0.000 & 0.000 & 0.000 & 0.000 & 1.000 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+System Ventilation Calculations for Cooling Design
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & Sum of Zone Primary Airflow - Vpz-sum [m3/s] & System Primary Airflow - Vps [m3/s] & Sum of Zone Discharge Airflow - Vdz-sum [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Cooling - Voz-clg [m3/s] & Zone Ventilation Efficiency - Evz-min \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Sum of Zone Primary Airflow - Vpz-sum [m3/s] & System Primary Airflow - Vps [m3/s] & Sum of Zone Discharge Airflow - Vdz-sum [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Cooling - Voz-clg [m3/s] & Zone Ventilation Efficiency - Evz-min \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 1.05 & 1.05 & 1.05 & 0.19 & 0.2731 & 1.000 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Zone Ventilation Calculations for Heating Design
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}}
+\toprule 
+ & AirLoop Name & Box Type & Zone Primary Airflow - Vpz [m3/s] & Zone Discharge Airflow - Vdz [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Heating - Voz-htg [m3/s] & Primary Outdoor Air Fraction - Zpz & Primary Air Fraction - Ep & Secondary Recirculation Fraction- Er & Supply Air Fraction- Fa & Mixed Air Fraction - Fb & Outdoor Air Fraction - Fc & Zone Ventilation Efficiency - Evz \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & AirLoop Name & Box Type & Zone Primary Airflow - Vpz [m3/s] & Zone Discharge Airflow - Vdz [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Heating - Voz-htg [m3/s] & Primary Outdoor Air Fraction - Zpz & Primary Air Fraction - Ep & Secondary Recirculation Fraction- Er & Supply Air Fraction- Fa & Mixed Air Fraction - Fb & Outdoor Air Fraction - Fc & Zone Ventilation Efficiency - Evz \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+System Ventilation Calculations for Heating Design
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & Sum of Zone Primary Airflow - Vpz-sum [m3/s] & System Primary Airflow - Vps [m3/s] & Sum of Zone Discharge Airflow - Vdz-sum [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Heating - Voz-htg [m3/s] & Zone Ventilation Efficiency - Evz-min \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Sum of Zone Primary Airflow - Vpz-sum [m3/s] & System Primary Airflow - Vps [m3/s] & Sum of Zone Discharge Airflow - Vdz-sum [m3/s] & Minimum Zone Primary Airflow - Vpz-min [m3/s] & Zone Outdoor Airflow Heating - Voz-htg [m3/s] & Zone Ventilation Efficiency - Evz-min \tabularnewline
+\midrule
+\endhead
+
+VAV SYS 1 & 1.05 & 1.05 & 1.05 & 0.18+309 & 0.0000 & 1.000 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Zone Component Loads Summary}\label{zone-component-loads-summary}
+
+The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The Sensible-Delayed column of the summary is only an estimate based on a procedure described in the Engineering Reference documentation. An intermediate calculation in this procedure is the decay curves that are shown in the the EIO file when Output:Surfaces:List is set to show DecayCurvesFromZoneComponentLoads. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The key used to obtain this report is ZoneComponentLoadSummary.
+
+Report: ZoneComponentLoadSummary
+
+For: SPACE1-1
+
+Timestamp: 2012-09-21 15:48:46
+
+Estimated Cooling Peak Load Components
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+\midrule
+\endhead
+
+People & 533.03 & 272.38 & ~ & 528.17 & 1333.58 & 30.78 \tabularnewline
+Lights & 15.84 & 1424.81 & 316.80 & ~ & 1757.45 & 40.57 \tabularnewline
+Equipment & 517.44 & 318.36 & ~ & 0.00 & 835.80 & 19.29 \tabularnewline
+Refrigeration & 0.00 & ~ & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Use Equipment & 0.00 & ~ & ~ & ~ & 0.00 & 0.00 \tabularnewline
+HVAC Equipment Losses & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Power Generation Equipment & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Infiltration & 34.65 & ~ & ~ & 69.37 & 104.03 & 2.40 \tabularnewline
+Zone Ventilation & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
+Interzone Mixing & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
+Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Interzone Ceiling & ~ & 132.59 & ~ & ~ & 132.59 & 3.06 \tabularnewline
+Other Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Exterior Wall & ~ & 451.39 & ~ & ~ & 451.39 & 10.42 \tabularnewline
+Interzone Wall & ~ & -511.9 & ~ & ~ & -511.9 & -11.8 \tabularnewline
+Ground Contact Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Other Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Exterior Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Interzone Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Ground Contact Floor & ~ & -1745.4 & ~ & ~ & -1745.4 & -40.3 \tabularnewline
+Other Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Fenestration Conduction & 655.17 & ~ & ~ & ~ & 655.17 & 15.12 \tabularnewline
+Fenestration Solar & - & 1319.55 & ~ & ~ & 1319.55 & 30.46 \tabularnewline
+Opaque Door & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Grand Total & 1756.13 & 1661.76 & 316.80 & 597.54 & 4332.24 & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cooling Peak Conditions
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endhead
+
+Time of Peak Load & 7/21 16:00:00 \tabularnewline
+Outside Dry Bulb Temperature [C] & 30.86 \tabularnewline
+Outside Wet Bulb Temperature [C] & 23.10 \tabularnewline
+Outside Humidity Ratio at Peak [kgWater/kgAir] & 0.01459 \tabularnewline
+Zone Dry Bulb Temperature [C] & 24.00 \tabularnewline
+Zone Relative Humdity [\%] & 47.16 \tabularnewline
+Zone Humidity Ratio at Peak [kgWater/kgAir] & 0.00876 \tabularnewline
+Peak Design Sensible Load [W] & 3187.17 \tabularnewline
+Estimated Instant + Delayed Sensible Load [W] & 3417.89 \tabularnewline
+Difference [W] & -230.7 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Estimated Heating Peak Load Components
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+\midrule
+\endhead
+
+People & 0.00 & 0.00 & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
+Lights & 0.79 & 85.74 & 15.84 & ~ & 102.37 & -3.3 \tabularnewline
+Equipment & 14.78 & 9.37 & ~ & 0.00 & 24.15 & -0.8 \tabularnewline
+Refrigeration & 0.00 & ~ & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Use Equipment & 0.00 & ~ & ~ & ~ & 0.00 & 0.00 \tabularnewline
+HVAC Equipment Losses & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Power Generation Equipment & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Infiltration & -222.8 & ~ & ~ & -93.8 & -316.6 & 10.07 \tabularnewline
+Zone Ventilation & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
+Interzone Mixing & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
+Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Interzone Ceiling & ~ & -1027.9 & ~ & ~ & -1027.9 & 32.70 \tabularnewline
+Other Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Exterior Wall & ~ & -762.5 & ~ & ~ & -762.5 & 24.26 \tabularnewline
+Interzone Wall & ~ & 102.80 & ~ & ~ & 102.80 & -3.3 \tabularnewline
+Ground Contact Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Other Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Exterior Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Interzone Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Ground Contact Floor & ~ & 889.07 & ~ & ~ & 889.07 & -28.3 \tabularnewline
+Other Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Fenestration Conduction & -2155.0 & ~ & ~ & ~ & -2155.0 & 68.55 \tabularnewline
+Fenestration Solar & - & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Opaque Door & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
+Grand Total & -2362.2 & -703.3 & 15.84 & -93.8 & -3143.5 & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Heating Peak Conditions
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endhead
+
+Time of Peak Load & 1/21 20:15:00 \tabularnewline
+Outside Dry Bulb Temperature [C] & -17.3 \tabularnewline
+Outside Wet Bulb Temperature [C] & -19.0 \tabularnewline
+Outside Humidity Ratio at Peak [kgWater/kgAir] & 0.00084 \tabularnewline
+Zone Dry Bulb Temperature [C] & 23.00 \tabularnewline
+Zone Relative Humdity [\%] & 43.89 \tabularnewline
+Zone Humidity Ratio at Peak [kgWater/kgAir] & 0.00766 \tabularnewline
+Peak Design Sensible Load [W] & -3077.1 \tabularnewline
+Estimated Instant + Delayed Sensible Load [W] & -3065.5 \tabularnewline
+Difference [W] & -11.6 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Output:Table:TimeBins}\label{outputtabletimebins}
+
+A TimeBins report shows a grid of the number of hours that specific report variable spend in a range of values. The first table is broken into two parts. The first part is monthly and the second part is for each hour of the day. The columns show the range of values. A second table is provided to show some statistics on the report variable for the entire year including the maximum and minimum. These statistics are helpful in setting the field values for the interval in the Output Table:TimeBins object. Due to this, it is often necessary to run two simulations to fully utilize the TimeBins report with the first run used to find the minimum and maximum of the variable, these values are then used in the TimeBins object and the second run a better table of binned results are displayed.
+
+Report: PURCHASEDCOOLING:FACILITY J per second
+
+For: Meter
+
+Timestamp: 2006-08-30 07:48:55
+
+Values in table are in hours.
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}>{\raggedright}p{0.42in}}
+\toprule 
+~ & ~ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & ~ & ~ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & ~ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & ~ & ~ \tabularnewline
+\midrule
+\endhead
+
+Interval Start & less than & 0. < = & 2000. < = & 4000. < = & 6000. < = & 8000. < = & 10000. < = & 12000. < = & 14000. < = & 16000. < = & 18000. < = & equal to or more than & Row \tabularnewline
+Interval End & 0. & 2000. > & 4000. > & 6000. > & 8000. > & 10000. > & 12000. > & 14000. > & 16000. > & 18000. > & 20000. > & 20000. & Total \tabularnewline
+January & 0.00 & 744.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 744.00 \tabularnewline
+February & 0.00 & 672.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 672.00 \tabularnewline
+March & 0.00 & 744.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 744.00 \tabularnewline
+April & 0.00 & 524.17 & 40.67 & 40.33 & 45.67 & 45.50 & 19.67 & 4.00 & 0.00 & 0.00 & 0.00 & 0.00 & 720.00 \tabularnewline
+May & 0.00 & 480.33 & 44.50 & 55.50 & 41.00 & 53.50 & 38.17 & 20.67 & 10.33 & 0.00 & 0.00 & 0.00 & 744.00 \tabularnewline
+June & 0.00 & 393.50 & 31.83 & 55.33 & 19.83 & 53.00 & 65.83 & 62.83 & 24.00 & 13.83 & 0.00 & 0.00 & 720.00 \tabularnewline
+July & 0.00 & 372.67 & 30.83 & 40.83 & 45.67 & 53.83 & 42.83 & 48.33 & 45.33 & 47.83 & 15.83 & 0.00 & 744.00 \tabularnewline
+August & 0.00 & 373.50 & 24.50 & 37.17 & 44.50 & 64.50 & 56.67 & 50.67 & 52.33 & 35.00 & 5.17 & 0.00 & 744.00 \tabularnewline
+September & 0.00 & 406.33 & 52.00 & 42.50 & 14.83 & 54.50 & 64.67 & 54.50 & 27.17 & 3.50 & 0.00 & 0.00 & 720.00 \tabularnewline
+October & 0.00 & 744.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 744.00 \tabularnewline
+November & 0.00 & 720.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 720.00 \tabularnewline
+December & 0.00 & 744.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 744.00 \tabularnewline
+12:01 to 1:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+1:01 to 2:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+2:01 to 3:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+3:01 to 4:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+4:01 to 5:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+5:01 to 6:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+6:01 to 7:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+7:01 to 8:00 am & 0.00 & 294.33 & 33.83 & 25.00 & 5.17 & 2.17 & 1.67 & 1.17 & 1.00 & 0.67 & 0.00 & 0.00 & 365.00 \tabularnewline
+8:01 to 9:00 am & 0.00 & 238.00 & 14.17 & 16.50 & 17.00 & 40.33 & 29.67 & 9.33 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+9:01 to 10:00 am & 0.00 & 231.83 & 14.50 & 13.00 & 21.83 & 38.83 & 31.83 & 12.00 & 1.17 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+10:01 to 11:00 am & 0.00 & 226.33 & 14.00 & 12.50 & 17.50 & 36.50 & 31.33 & 22.17 & 4.67 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+11:01 to 12:00 pm & 0.00 & 221.33 & 12.17 & 13.00 & 14.50 & 30.67 & 33.50 & 27.83 & 11.00 & 1.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+12:01 to 1:00 pm & 0.00 & 211.00 & 18.00 & 14.00 & 14.00 & 29.17 & 32.33 & 25.67 & 17.67 & 3.17 & 0.00 & 0.00 & 365.00 \tabularnewline
+1:01 to 2:00 pm & 0.00 & 208.00 & 15.00 & 15.33 & 11.00 & 22.17 & 27.83 & 27.50 & 26.83 & 10.83 & 0.50 & 0.00 & 365.00 \tabularnewline
+2:01 to 3:00 pm & 0.00 & 205.33 & 11.83 & 18.17 & 11.00 & 17.50 & 23.17 & 29.50 & 26.17 & 18.17 & 4.17 & 0.00 & 365.00 \tabularnewline
+3:01 to 4:00 pm & 0.00 & 203.00 & 9.50 & 17.67 & 14.00 & 16.17 & 20.67 & 30.17 & 22.00 & 24.83 & 7.00 & 0.00 & 365.00 \tabularnewline
+4:01 to 5:00 pm & 0.00 & 201.17 & 10.83 & 18.83 & 13.67 & 16.33 & 19.50 & 29.67 & 22.83 & 25.17 & 7.00 & 0.00 & 365.00 \tabularnewline
+5:01 to 6:00 pm & 0.00 & 200.00 & 13.50 & 21.33 & 14.83 & 22.17 & 22.67 & 26.00 & 25.83 & 16.33 & 2.33 & 0.00 & 365.00 \tabularnewline
+6:01 to 7:00 pm & 0.00 & 227.33 & 29.17 & 43.17 & 28.33 & 27.50 & 9.50 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+7:01 to 8:00 pm & 0.00 & 235.83 & 27.83 & 43.17 & 28.67 & 25.33 & 4.17 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+8:01 to 9:00 pm & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+9:01 to 10:00 pm & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+10:01 to 11:00 pm & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+11:01 to 12:00 am & 0.00 & 365.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 365.00 \tabularnewline
+Total & 0.00 & 6918.50 & 224.33 & 271.67 & 211.50 & 324.83 & 287.83 & 241.00 & 159.17 & 100.17 & 21.00 & 0.00 & 8760.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Statistics
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Statistic \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Statistic \tabularnewline
+\midrule
+\endhead
+
+Minimum & 0.00 \tabularnewline
+Mean minus two standard deviations & -6496.35 \tabularnewline
+Mean & 1995.71 \tabularnewline
+Mean plus two standard deviations & 10487.78 \tabularnewline
+Maximum & 19476.00 \tabularnewline
+Standard deviation & 4246.03 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Output:Table:Monthly}\label{outputtablemonthly}
+
+Monthly reports are not predefined. Instead each column is defined when using the Output:Table:Monthly object. In that object each column is defined by a variable and how it should be aggregated. The StandardReports.idf file is located in DataSets directory where EnergyPlus is installed and contains a large number of examples of how to use Output:Table:Monthly to get summaries of the performance of different components in the building model. These examples include:
+
+\begin{itemize}
+\item
+  Zone Cooling Summary
+\item
+  Zone Heating Summary
+\item
+  Zone Electric Summary
+\item
+  Space Gains
+\item
+  Peak Space Gains
+\item
+  Space Gain Components at Cooling Peak
+\item
+  Energy Consumption - Electricity \& Natural Gas
+\item
+  Energy Consumption - Electricity Generated \& Propane
+\item
+  Energy Consumption - Diesel \& Fuel Oil
+\item
+  Energy Consumption~ - Purchased Heating \& Cooling
+\item
+  Energy Consumption - Coal \& Gasoline
+\item
+  End-Use Energy Consumption - Electricity
+\item
+  End-Use Energy Consumption - Natural Gas
+\item
+  End-Use Energy Consumption - Diesel
+\item
+  End-Use Energy Consumption - Fuel Oil
+\item
+  End-Use Energy Consumption - Coal
+\item
+  End-Use Energy Consumption - Propane
+\item
+  End-Use Energy Consumption - Gasoline
+\item
+  Peak Energy End-Use - Electricity Part 1
+\item
+  Peak Energy End-Use - Electricity Part 2
+\item
+  Electric Components of Peak Demand
+\item
+  Peak Energy End-Use - Natural Gas
+\item
+  Peak Energy End-Use - Diesel
+\item
+  Peak Energy End-Use - Fuel Oil
+\item
+  Peak Energy End-Use - Coal
+\item
+  Peak Energy End-Use - Propane
+\item
+  Peak Energy End-Use - Gasoline
+\item
+  Setpoints Not Met With Temperatures
+\item
+  Comfort Report - Simple 55
+\item
+  Unglazed Transpired Solar Collector Summary
+\item
+  Occupant Comfort Data Summary
+\item
+  Chiller Report
+\item
+  Tower Report
+\item
+  Boiler Report
+\item
+  DX Report
+\item
+  Window Report
+\item
+  Window Energy Report
+\item
+  Window Zone Summary
+\item
+  Average Outdoor Conditions
+\item
+  Outdoor Conditions Maximum Drybulb
+\item
+  Outdoor Conditions Minimum Drybulb
+\item
+  Outdoor Conditions Maximum Wetbulb
+\item
+  Outdoor Conditions Maximum Dewpoint
+\item
+  Outdoor Ground Conditions
+\item
+  Window AC Report
+\item
+  Water Heater Report
+\item
+  Generator Report
+\item
+  Daylighting Report
+\item
+  Coil Report
+\item
+  Plant Loop Demand Report
+\item
+  Fan Report
+\item
+  Pump Report
+\item
+  Cond Loop Demand Report
+\item
+  Zone Temperature Oscillation Report
+\item
+  Air Loop System Energy and Water Use
+\item
+  Air Loop System Component Loads
+\item
+  Air Loop System Component Energy Use
+\item
+  Mechanical Ventilation Loads
+\end{itemize}
+
+An example of the Zone Cooling Summary monthly report is shown below.
+
+Report: ZONE COOLING SUMMARY
+
+For: SPACE2-1
+
+Timestamp: 2006-08-29 07:21:57
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}>{\raggedright}p{0.54in}}
+\toprule 
+~ & ZONE/SYS SENSIBLE COOLING ENERGY [J] & ZONE/SYS SENSIBLE COOLING RATE \{MAXIMUM\}[W] & ZONE/SYS SENSIBLE COOLING RATE \{TIMESTAMP\} & OUTDOOR DRY BULB \{AT MAX/MIN\} [C] & OUTDOOR WET BULB \{AT MAX/MIN\} [C] & ZONE TOTAL INTERNAL LATENT GAIN [J] & ZONE TOTAL INTERNAL LATENT GAIN \{MAXIMUM\}[W] & ZONE TOTAL INTERNAL LATENT GAIN \{TIMESTAMP\} & OUTDOOR DRY BULB \{AT MAX/MIN\} [C] & OUTDOOR WET BULB \{AT MAX/MIN\} [C] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & ZONE/SYS SENSIBLE COOLING ENERGY [J] & ZONE/SYS SENSIBLE COOLING RATE \{MAXIMUM\}[W] & ZONE/SYS SENSIBLE COOLING RATE \{TIMESTAMP\} & OUTDOOR DRY BULB \{AT MAX/MIN\} [C] & OUTDOOR WET BULB \{AT MAX/MIN\} [C] & ZONE TOTAL INTERNAL LATENT GAIN [J] & ZONE TOTAL INTERNAL LATENT GAIN \{MAXIMUM\}[W] & ZONE TOTAL INTERNAL LATENT GAIN \{TIMESTAMP\} & OUTDOOR DRY BULB \{AT MAX/MIN\} [C] & OUTDOOR WET BULB \{AT MAX/MIN\} [C] \tabularnewline
+\midrule
+\endhead
+
+January & 281755456.00 & 1427.84 & 17-JAN-10:07 & 8.30 & 5.48 & 0.00 & 0.00 & 01-JAN-00:15 & -4.32 & -5.53 \tabularnewline
+February & 306879872.00 & 1440.59 & 28-FEB-10:46 & 11.27 & 6.67 & 0.00 & 0.00 & 01-FEB-00:15 & -3.17 & -4.91 \tabularnewline
+March & 419829728.00 & 1822.13 & 26-MAR-09:14 & 3.90 & -0.20 & 0.00 & 0.00 & 01-MAR-00:15 & -1.40 & -2.84 \tabularnewline
+April & 752874688.00 & 1986.25 & 29-APR-10:22 & 21.10 & 11.44 & 0.00 & 0.00 & 01-APR-00:15 & 17.12 & 10.64 \tabularnewline
+May & 0.100670E+10 & 2163.18 & 22-MAY-09:45 & 25.17 & 15.42 & 0.00 & 0.00 & 01-MAY-00:15 & 3.75 & 1.60 \tabularnewline
+June & 0.100822E+10 & 2129.73 & 28-JUN-09:45 & 28.02 & 22.39 & 0.00 & 0.00 & 01-JUN-00:15 & 17.30 & 14.95 \tabularnewline
+July & 0.120671E+10 & 2312.36 & 08-JUL-09:00 & 31.70 & 23.35 & 0.00 & 0.00 & 01-JUL-00:15 & 15.60 & 12.95 \tabularnewline
+August & 0.109213E+10 & 2352.64 & 02-AUG-09:45 & 27.08 & 20.48 & 0.00 & 0.00 & 01-AUG-00:15 & 17.20 & 15.70 \tabularnewline
+September & 0.100619E+10 & 2453.23 & 06-SEP-10:15 & 28.35 & 20.53 & 0.00 & 0.00 & 01-SEP-00:15 & 16.75 & 15.45 \tabularnewline
+October & 771385600.00 & 2181.25 & 10-OCT-10:16 & 15.25 & 10.12 & 0.00 & 0.00 & 01-OCT-00:15 & 4.88 & 3.31 \tabularnewline
+November & 384831744.00 & 1566.35 & 11-NOV-10:45 & 14.00 & 8.89 & 0.00 & 0.00 & 01-NOV-00:15 & 14.65 & 11.75 \tabularnewline
+December & 246930448.00 & 1306.75 & 11-DEC-10:07 & 5.00 & 1.69 & 0.00 & 0.00 & 01-DEC-00:15 & 1.80 & -0.11 \tabularnewline
+~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+Annual Sum or Average & 0.848444E+10 & ~ & ~ & ~ & ~ & 0.00 & ~ & ~ & ~ & ~ \tabularnewline
+Minimum of Months & 246930448.00 & 1306.75 & ~ & 3.90 & -0.20 & 0.00 & 0.00 & ~ & -4.32 & -5.53 \tabularnewline
+Maximum of Months & 0.120671E+10 & 2453.23 & ~ & 31.70 & 23.35 & 0.00 & 0.00 & ~ & 17.30 & 15.70 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{UtilityCost:Tariff}\label{utilitycosttariff}
+
+The use of UtilityCost:Tariff objects automatically generates two reports related to the calculation of annual utility costs. The first report is a summary across multiple tariffs and is called the Economics Results Summary report and is shown directly below. After that example is an example of the Tariff report which is created for each of the UtilityCost:Tariff Objects defined in the IDF file~ (some columns may be truncated due to page size).
+
+Report: Economics Results Summary Report
+
+For: Entire Facility
+
+Timestamp: 2006-08-29 07:21:57
+
+Annual Cost
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
+\toprule 
+~ & Facility:Electric & Facility:Gas & Other & Total \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Facility:Electric & Facility:Gas & Other & Total \tabularnewline
+\midrule
+\endhead
+
+Cost (\$) & 2269.11 & 612.08 & 0.00 & 2881.19 \tabularnewline
+Cost per Total Building Area (\$/m2) & 2.45 & 0.66 & 0.00 & 3.11 \tabularnewline
+Cost per Net Conditioned Building Area (\textbackslash\$/m2) & 2.45 & 0.66 & 0.00 & 3.11 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Tariff Summary
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+~ & Selected & Qualified & Meter & Group & Annual Cost \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Selected & Qualified & Meter & Group & Annual Cost \tabularnewline
+\midrule
+\endhead
+
+EXAMPLE A & No & Yes & ELECTRICITY\-:FACILITY & (none) & 2359.48 \tabularnewline
+EXAMPLE A-GAS & Yes & Yes & GAS\-:FACILITY & (none) & 612.08 \tabularnewline
+EXAMPLE A WITH VARIABLE MONTHLY CHARGE & No & Yes & ELECTRICITY\-:FACILITY & (none) & 2407.36 \tabularnewline
+EXAMPLE B & No & Yes & ELECTRICITY\-:FACILITY & (none) & 2668.34 \tabularnewline
+EXAMPLE C & No & Yes & ELECTRICITY\-:FACILITY & (none) & 3017.45 \tabularnewline
+EXAMPLE D & Yes & Yes & ELECTRICITY\-:FACILITY & (none) & 2269.11 \tabularnewline
+EXAMPLE D WITH RATCHET & No & Yes & ELECTRICITY\-:FACILITY & (none) & 3745.90 \tabularnewline
+EXAMPLE E & No & Yes & ELECTRICITY\-:FACILITY & (none) & 3766.76 \tabularnewline
+EXAMPLE F & No & Yes & ELECTRICITY\-:FACILITY & (none) & 3512.12 \tabularnewline
+EXAMPLE F MC & No & Yes & ELECTRICITY\-:FACILITY & (none) & 3512.12 \tabularnewline
+EXAMPLE G & No & Yes & ELECTRICITY\-:FACILITY & (none) & 3866.91 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+The following is an example of the Tariff report which is created for each of the UtilityCost:Tariff objects defined in the file.
+
+Report: Tariff Report
+
+For: EXAMPLEA
+
+Timestamp: 2006-08-29 07:21:57
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Parameter \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Parameter \tabularnewline
+\midrule
+\endhead
+
+Meter & ELECTRICITY:FACILITY \tabularnewline
+Selected & No \tabularnewline
+Group & (none) \tabularnewline
+Qualified & Yes \tabularnewline
+Disqualifier & n/a \tabularnewline
+Computation & automatic \tabularnewline
+Units & kWh \tabularnewline
+\bottomrule
+\end{longtable}
+
+Categories
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}}
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endhead
+
+EnergyCharges & 181.84 & 159.97 & 170.98 & 178.85 & 207.28 & 207.97 & 249.10 & 234.09 & 202.57 & 191.20 & 169.19 & 176.34 & 2329.36 & 249.10 \tabularnewline
+DemandCharges & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ServiceCharges & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 2.51 & 30.12 & 2.51 \tabularnewline
+Basis & 184.35 & 162.48 & 173.49 & 181.36 & 209.79 & 210.48 & 251.61 & 236.60 & 205.08 & 193.71 & 171.70 & 178.85 & 2359.48 & 251.61 \tabularnewline
+Adjustment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Surcharge & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Subtotal & 184.35 & 162.48 & 173.49 & 181.36 & 209.79 & 210.48 & 251.61 & 236.60 & 205.08 & 193.71 & 171.70 & 178.85 & 2359.48 & 251.61 \tabularnewline
+Taxes & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total & 184.35 & 162.48 & 173.49 & 181.36 & 209.79 & 210.48 & 251.61 & 236.60 & 205.08 & 193.71 & 171.70 & 178.85 & 2359.48 & 251.61 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Charges
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}>{\raggedright}p{0.37in}}
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max & Category \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max & Category \tabularnewline
+\midrule
+\endhead
+
+FLAT ENERGY CHARGE & 181.84 & 159.97 & 170.98 & 178.85 & 207.28 & 207.97 & 249.10 & 234.09 & 202.57 & 191.20 & 169.19 & 176.34 & 2329.36 & 249.10 & none \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Ratchets
+
+\begin{longtable}[c]{@{}lllllllllllllll@{}}
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endhead
+
+\bottomrule
+\end{longtable}
+
+Qualifies
+
+\begin{longtable}[c]{@{}lllllllllllllll@{}}
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endhead
+
+\bottomrule
+\end{longtable}
+
+Native Variables
+
+{\tiny
+\begin{longtable}[c]{>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}}
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endhead
+
+Total\-Energy & 3285.70 & 2890.52 & 3089.52 & 3231.79 & 3745.42 & 3757.86 & 4501.09 & 4229.79 & 3660.28 & 3454.82 & 3057.13 & 3186.33 & 42090.24 & 4501.09 \tabularnewline
+Total\-Demand & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+Peak\-Energy & 3285.70 & 2890.52 & 3089.52 & 3231.79 & 3745.42 & 3757.86 & 4501.09 & 4229.79 & 3660.28 & 3454.82 & 3057.13 & 3186.33 & 42090.24 & 4501.09 \tabularnewline
+Peak\-Demand & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+Shoulder\-Energy & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Shoulder\-Demand & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+OffPeak\-Energy & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+OffPeak\-Demand & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+MidPeak\-Energy & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+MidPeak\-Demand & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Peak\-Exceeds\-OffPeak & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+OffPeak\-Exceeds\-Peak & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Peak\-Exceeds\-Mid\-Peak & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+Mid\-Peak\-Exceeds\-Peak & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Peak\-Exceeds\-Shoulder & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+Shoulder\-Exceeds\-Peak & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+IsWinter & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 12.00 & 1.00 \tabularnewline
+Is\-Not\-Winter & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Is\-Spring & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Is\-Not\-Spring & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 12.00 & 1.00 \tabularnewline
+Is\-Summer & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Is\-Not\-Summer & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 12.00 & 1.00 \tabularnewline
+Is\-Autumn & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Is\-Not\-Autumn & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 12.00 & 1.00 \tabularnewline
+Peak\-And\-Shoulder\-Energy & 3285.70 & 2890.52 & 3089.52 & 3231.79 & 3745.42 & 3757.86 & 4501.09 & 4229.79 & 3660.28 & 3454.82 & 3057.13 & 3186.33 & 42090.24 & 4501.09 \tabularnewline
+Peak\-And\-Shoulder\-Demand & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+Peak\-And\-Mid\-Peak\-Energy & 3285.70 & 2890.52 & 3089.52 & 3231.79 & 3745.42 & 3757.86 & 4501.09 & 4229.79 & 3660.28 & 3454.82 & 3057.13 & 3186.33 & 42090.24 & 4501.09 \tabularnewline
+Peak\-And\-Mid\-Peak\-Demand & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+Shoulder\-And\-Off\-Peak\-Energy & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Shoulder\-And\-Off\-Peak\-Demand & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Peak\-And\-Off\-Peak\-Energy & 3285.70 & 2890.52 & 3089.52 & 3231.79 & 3745.42 & 3757.86 & 4501.09 & 4229.79 & 3660.28 & 3454.82 & 3057.13 & 3186.33 & 42090.24 & 4501.09 \tabularnewline
+Peak\-And\-Off\-Peak\-Demand & 12.52 & 12.53 & 12.53 & 14.53 & 17.40 & 20.71 & 21.08 & 19.50 & 18.63 & 15.53 & 12.90 & 12.55 & 190.42 & 21.08 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Other Variables
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}>{\raggedright}p{0.4in}}
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug & Sep & Oct & Nov & Dec & Sum & Max \tabularnewline
+\midrule
+\endhead
+
+NotIncluded & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Computation - Automatic FLATENERGYCHARGE FROM TotalEnergy EnergyCharges SUM FLATENERGYCHARGE Basis SUM EnergyCharges DemandCharges ServiceCharges Subtotal SUM Basis Adjustment Surcharge Total SUM Subtotal Taxes
+
+\subsection{Construction Cost Estimate Summary}\label{construction-cost-estimate-summary}
+
+The Construction Cost Estimate Summary report shows the details of a simplified cost estimate of the building along with a comparison with reference building costs entered by the user. An example of the Construction Cost Estimate Summary report is shown below.
+
+Construction Cost Estimate Summary
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Reference Bldg. & Current Bldg. Model & Difference \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Reference Bldg. & Current Bldg. Model & Difference \tabularnewline
+\midrule
+\endhead
+
+Line Item SubTotal (\$) & 665082.04 & 720964.07 & 55882.03 \tabularnewline
+Misc. Costs (\$) & 928979.09 & 928979.09 & 0.00 \tabularnewline
+Regional Adjustment (\$) & 216792.31 & 224392.27 & 7599.96 \tabularnewline
+Design Fee (\$) & 108651.21 & 149946.83 & 41295.63 \tabularnewline
+Contractor Fee (\$) & 126759.74 & 131203.48 & 4443.74 \tabularnewline
+Contigency (\$) & 181085.34 & 187433.54 & 6348.20 \tabularnewline
+Permits, Bonds, Insurance (\$) & 0.00 & 0.00 & 0.00 \tabularnewline
+Commissioning (\$) & 9054.27 & 18743.35 & 9689.09 \tabularnewline
+Cost Estimate Total (\$) & 2236404.00 & 2361662.65 & 125258.65 \tabularnewline
+Cost Per Conditioned Building Area (\$/m2) & 1203.69 & 1271.11 & 67.42 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Cost Line Item Details
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \$ per Qty. & SubTotal \$ \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Line No. & Item Name & Quantity. & Units & \$ per Qty. & SubTotal \$ \tabularnewline
+\midrule
+\endhead
+
+-- & 1 & EXTERIOR WALLS & 627.57 & m2 & 168.64 & 105832.65 \tabularnewline
+-- & 2 & INTERIOR WALLS & 854.18 & m2 & 31.16 & 26616.23 \tabularnewline
+-- & 3 & ROOF & 1857.96 & m2 & 104.69 & 194509.64 \tabularnewline
+-- & 4 & GROUND FLR SLAB & 1857.96 & m2 & 56.06 & 104157.14 \tabularnewline
+-- & 5 & ACOUSTICAL DROP CEILINGS & 1857.96 & m2 & 23.79 & 44200.83 \tabularnewline
+-- & 6 & QUAD HIGH SHGC SUPERWINDOWS & 226.22 & m2 & 687.84 & 155604.96 \tabularnewline
+-- & 7 & QUAD LOW SHGC SUPERWINDOWS & 42.68 & m2 & 687.84 & 29359.55 \tabularnewline
+-- & 8 & CENTRAL CHILLER & 153.48 & kW (tot cool cap.) & 340.00 & 52183.09 \tabularnewline
+-- & 9 & CONTINUOUS AIR BARRIER & 1.00 & Ea. & 8500.00 & 8500.00 \tabularnewline
+Line Item SubTotal & -- & -- & -- & -- & -- & 720964.07 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{XML Tabular Output}\label{xml-tabular-output}
+
+The tables discussed in this section can also be output in an XML format that may be easier for some other programs to extract specific results. An excerpt of the XML file format is shown below. This report presents the same output results as the other tabular report formats but using XML tags.
+
+\textless{}?xml version = ``1.0''?\textgreater{}
+
+\textless{}EnergyPlusTabularReports\textgreater{}
+
+~ \textless{}BuildingName\textgreater{}NONE\textless{}/BuildingName\textgreater{}
+
+~ \textless{}EnvironmentName\textgreater{}Chicago Ohare Intl Ap IL USA TMY3 WMO\# = 725300\textless{}/EnvironmentName\textgreater{}
+
+~ \textless{}WeatherFileLocationTitle\textgreater{}Chicago Ohare Intl Ap IL USA TMY3 WMO\# = 725300\textless{}/WeatherFileLocationTitle\textgreater{}
+
+~ \textless{}ProgramVersion\textgreater{}EnergyPlus, Version 8.0, YMD = 2013.02.18 15:50\textless{}/ProgramVersion\textgreater{}
+
+~ \textless{}SimulationTimestamp\textgreater{}
+
+~~~ \textless{}Date\textgreater{}
+
+~~~~~ 2013-02-18
+
+~~~ \textless{}/Date\textgreater{}
+
+~~~ \textless{}Time\textgreater{}
+
+~~~~~ 15:50:33
+
+~~~ \textless{}/Time\textgreater{}
+
+~ \textless{}/SimulationTimestamp\textgreater{}
+
+\textless{}AnnualBuildingUtilityPerformanceSummary\textgreater{}
+
+~ \textless{}for\textgreater{}Entire Facility\textless{}/for\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}TotalSiteEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}200671.97\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}NetSiteEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}200671.97\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}TotalSourceEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}442504.19\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}316.04\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}316.04\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}NetSourceEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}397810.98\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}284.12\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}284.12\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+\emph{An actual file will be much longer than this example but follows this format.}

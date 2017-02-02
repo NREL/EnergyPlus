@@ -5,18 +5,20 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
+#include <cassert>
 #include <string>
 
 namespace ObjexxFCL {
@@ -29,33 +31,28 @@ class Fmt
 public: // Creation
 
 	// Default Constructor
-	inline
 	Fmt() :
 	 format_( nullptr )
 	{}
 
 	// Copy Constructor
-	inline
 	Fmt( Fmt const & fmt ) :
 	 format_( fmt.format_ ? fmt.format_->clone() : nullptr )
 	{}
 
 	// Move Constructor
-	inline
-	Fmt( Fmt && fmt ) :
-	 format_( fmt.format_ )
+	Fmt( Fmt && fmt ) NOEXCEPT :
+	 format_( fmt.format_ ? &fmt.format_->reset() : nullptr )
 	{
 		fmt.format_ = nullptr;
 	}
 
 	// String Constructor
-	inline
 	Fmt( std::string const & format_string ) :
 	 format_( FormatFactory::create( format_string ) )
 	{}
 
 	// Destructor
-	inline
 	~Fmt()
 	{
 		if ( format_ ) delete format_;
@@ -64,7 +61,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Fmt &
 	operator =( Fmt const & fmt )
 	{
@@ -75,8 +71,18 @@ public: // Assignment
 		return *this;
 	}
 
+	// Move Assignment
+	Fmt &
+	operator =( Fmt && fmt )
+	{
+		assert ( this != &fmt );
+		if ( format_ ) delete format_;
+		format_ = ( fmt.format_ ? &fmt.format_->reset() : nullptr );
+		fmt.format_ = nullptr;
+		return *this;
+	}
+
 	// String Assignment
-	inline
 	Fmt &
 	operator =( std::string const & format_string )
 	{
@@ -88,7 +94,6 @@ public: // Assignment
 public: // Properties
 
 	// Format
-	inline
 	Format const *
 	format() const
 	{
@@ -96,7 +101,6 @@ public: // Properties
 	}
 
 	// Format Clone
-	inline
 	Format *
 	format_clone() const
 	{
@@ -106,7 +110,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	Format *
 	format_reset()
 	{

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // FMI-Related Headers
 extern "C" {
 #include <FMI/main.h>
@@ -10,7 +56,7 @@ extern "C" {
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -91,18 +137,18 @@ namespace ExternalInterface {
 	// which phase an error occured.
 	// (1=initialization, 2=time stepping)
 
-	FArray1D_int keyVarIndexes; // Array index for specific key name
-	FArray1D_int varTypes; // Types of variables in keyVarIndexes
-	FArray1D_int varInd; // Index of ErlVariables for ExternalInterface
+	Array1D_int keyVarIndexes; // Array index for specific key name
+	Array1D_int varTypes; // Types of variables in keyVarIndexes
+	Array1D_int varInd; // Index of ErlVariables for ExternalInterface
 	int socketFD( -1 ); // socket file descriptor
 	bool ErrorsFound( false ); // Set to true if errors are found
 	bool noMoreValues( false ); // Flag, true if no more values
 	// will be sent by the server
 
-	FArray1D_string varKeys; // Keys of report variables used for data exchange
-	FArray1D_string varNames; // Names of report variables used for data exchange
-	FArray1D_int inpVarTypes; // Names of report variables used for data exchange
-	FArray1D_string inpVarNames; // Names of report variables used for data exchange
+	Array1D_string varKeys; // Keys of report variables used for data exchange
+	Array1D_string varNames; // Names of report variables used for data exchange
+	Array1D_int inpVarTypes; // Names of report variables used for data exchange
+	Array1D_string inpVarNames; // Names of report variables used for data exchange
 
 	bool configuredControlPoints( false ); // True if control points have been configured
 	bool useEMS( false ); // Will be set to true if ExternalInterface writes to EMS variables or actuators
@@ -110,9 +156,9 @@ namespace ExternalInterface {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
 
 	// Object Data
-	FArray1D< FMUType > FMU; // Variable Types structure
-	FArray1D< FMUType > FMUTemp; // Variable Types structure
-	FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	Array1D< FMUType > FMU; // Variable Types structure
+	Array1D< FMUType > FMUTemp; // Variable Types structure
+	Array1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
 
 	// Functions
 
@@ -133,7 +179,6 @@ namespace ExternalInterface {
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
-		using DataGlobals::ZoneTSReporting;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -204,8 +249,6 @@ namespace ExternalInterface {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		int Loop; // Loop counter
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		cCurrentModuleObject = "ExternalInterface";
 		NumExternalInterfaces = GetNumObjectsFound( cCurrentModuleObject );
@@ -384,7 +427,7 @@ namespace ExternalInterface {
 	void
 	ParseString(
 		std::string const & str, // The string, with all elements separated by ';'
-		FArray1S_string ele, // The elements
+		Array1S_string ele, // The elements
 		int const nEle // The number of elements
 	)
 	{
@@ -439,7 +482,6 @@ namespace ExternalInterface {
 		using ScheduleManager::GetDayScheduleIndex;
 		using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
 		using RuntimeLanguageProcessor::FindEMSVariable;
-		using DataGlobals::WeathSimReq;
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -449,19 +491,14 @@ namespace ExternalInterface {
 		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j; // loop counters
+		int i; // loop counters
 		std::string xmlStrOut; // xml values in string, separated by ';'
 		std::string xmlStrOutTyp; // xml values in string, separated by ';'
 		std::string xmlStrIn; // xml values in string, separated by ';'
-		std::string xmlStrInTyp; // xml values in string, separated by ';'
 		static int nOutVal; // Number of output values (E+ -> ExternalInterface)
 		static int nInpVar; // Number of input values (ExternalInterface -> E+)
 		int retVal; // Return value of function call, used for error handling
-		int counter( 0 ); // Counter for ErlVariables
 		int mainVersion; // The version number
-		int curNumInpVal; // current number of input values for the InputValType
-		std::string validateErrMsg; // error returned when xml Schema validate failed
-		int errMsgLen; // the length of the error message
 		bool socFileExist; // Set to true if socket configuration
 		// file exists
 		bool simFileExist; // Set to true if simulation configuration
@@ -522,9 +559,9 @@ namespace ExternalInterface {
 
 				// now make the library call
 				if ( haveExternalInterfaceBCVTB ) {
-					retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
+					retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data(), &lenXmlStr);
 				} else if ( haveExternalInterfaceFMUExport ) {
-					retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
+					retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data(), &lenXmlStr);
 				} else {
 					//there should be no else condition at this point, however we'll still assign the error value for completeness
 					retVal = -1;
@@ -659,8 +696,6 @@ namespace ExternalInterface {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const IntegerVar( 1 ); // Integer variable
-		int const RealVar( 2 ); // Real variable
 		static bool FirstCallGetSetDoStep( true ); // Flag to check when External Interface is called first time
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -838,7 +873,8 @@ namespace ExternalInterface {
 
 		// If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
 		if ( useEMS ) {
-			ManageEMS( emsCallFromExternalInterface );
+			bool anyRan;
+			ManageEMS( emsCallFromExternalInterface, anyRan );
 		}
 
 		FirstCallGetSetDoStep = false;
@@ -865,7 +901,9 @@ namespace ExternalInterface {
 		// Instantiate FMUs
 		for ( i = 1; i <= NumFMUObjects; ++i ) {
 			for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
-				FMU( i ).Instance( j ).fmicomponent = fmiEPlusInstantiateSlave( (char*)FMU( i ).Instance( j ).WorkingFolder.c_str(), &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).TimeOut, &FMU( i ).Visible, &FMU( i ).Interactive, &FMU( i ).LoggingOn, &FMU( i ).Instance( j ).Index );
+				FMU(i).Instance(j).fmicomponent = fmiEPlusInstantiateSlave(
+					(char*)FMU(i).Instance(j).WorkingFolder.c_str(), &FMU(i).Instance(j).LenWorkingFolder,
+					&FMU(i).TimeOut, &FMU(i).Visible, &FMU(i).Interactive, &FMU(i).LoggingOn, &FMU(i).Instance(j).Index);
 				// TODO: This is doing a null pointer check; OK?
 				if ( ! FMU( i ).Instance( j ).fmicomponent ) {
 					ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to instantiate" );
@@ -880,7 +918,8 @@ namespace ExternalInterface {
 		int localfmiTrue( fmiTrue );
 		for ( i = 1; i <= NumFMUObjects; ++i ) {
 			for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
-				FMU( i ).Instance( j ).fmistatus = fmiEPlusInitializeSlave( &FMU( i ).Instance( j ).fmicomponent, &tStart, &localfmiTrue, &tStop, &FMU( i ).Instance( j ).Index );
+				FMU( i ).Instance( j ).fmistatus = fmiEPlusInitializeSlave( &FMU( i ).Instance( j ).fmicomponent,
+					&tStart, &localfmiTrue, &tStop, &FMU( i ).Instance( j ).Index );
 				if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
 					ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize" );
 					ShowContinueError( "instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
@@ -914,7 +953,8 @@ namespace ExternalInterface {
 		// Initialize FMUs
 		for ( i = 1; i <= NumFMUObjects; ++i ) {
 			for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
-				FMU( i ).Instance( j ).fmistatus = fmiEPlusInitializeSlave( &FMU( i ).Instance( j ).fmicomponent, &tStart, &localfmiTrue, &tStop, &FMU( i ).Instance( j ).Index );
+				FMU( i ).Instance( j ).fmistatus = fmiEPlusInitializeSlave( &FMU( i ).Instance( j ).fmicomponent,
+					&tStart, &localfmiTrue, &tStop, &FMU( i ).Instance( j ).Index );
 				if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
 					ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize" );
 					ShowContinueError( "instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
@@ -927,7 +967,7 @@ namespace ExternalInterface {
 	}
 
 	void
-	TerminateResetFreeFMUImport()
+	TerminateResetFreeFMUImport(int fmiEndSimulation)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -939,14 +979,14 @@ namespace ExternalInterface {
 		// This routine terminates the FMUs instances
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j, k; // Loop counter
+		int i, j; // Loop counter
 
 		//----Needs to have function that allows to terminates FMU. Was not defined in version 1.0 -- fixme
 		for ( i = 1; i <= NumFMUObjects; ++i ) {
 			for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 				if ( FMU( i ).Instance( j ).fmistatus != fmiFatal ) {
 					// Cleanup slaves
-					FMU( i ).Instance( j ).fmistatus = fmiEPlusFreeSlave( &FMU( i ).Instance( j ).fmicomponent, &FMU( i ).Instance( j ).Index );
+					FMU( i ).Instance( j ).fmistatus = fmiEPlusFreeSlave( &FMU( i ).Instance( j ).fmicomponent, &FMU( i ).Instance( j ).Index, &fmiEndSimulation );
 				}
 				// check if fmiComponent has been freed
 				if ( ! FMU( i ).Instance( j ).fmicomponent ) {
@@ -999,28 +1039,22 @@ namespace ExternalInterface {
 		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		int IOStatus( 0 ); // Used in GetObjectItem
 		int NumFMUInputVariables( 0 ); // Number of FMU input variables
-		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
-		int numKey( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
-		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
-		std::string varUnit; // Units sting, may be blank
 		std::string Name_NEW; // Units sting, may be blank
 		std::string Name_OLD; // Units sting, may be blank
 
-		FArray1D_int keyIndexes( 1 ); // Array index for
-		FArray1D_int varTypes( 1 ); // Array index for
-		FArray1D_string NamesOfKeys( 1 ); // Specific key name
-		int retValue;
+		Array1D_int keyIndexes( 1 ); // Array index for
+		Array1D_int varTypes( 1 ); // Array index for
+		Array1D_string NamesOfKeys( 1 ); // Specific key name
 		int retValfmiVersion;
 		int retValfmiPathLib;
-		FArray1D_string NameListInstances( 5 );
+		Array1D_string NameListInstances( 5 );
 		bool IsNotOK;
 		bool IsBlank;
 		static bool FirstCallIni( true ); // First time, input has been read
 		bool fileExist;
 		std::string tempFullFileName;
-		FArray1D_string strippedFileName; // remove path from entered file name
-		FArray1D_string fullFileName; // entered file name/found
+		Array1D_string strippedFileName; // remove path from entered file name
+		Array1D_string fullFileName; // entered file name/found
 		std::string::size_type pos;
 		int FOUND;
 
@@ -1111,7 +1145,7 @@ namespace ExternalInterface {
 					if ( SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						Name_NEW = cAlphaArgs( 4 );
 						if ( ! SameString( Name_OLD, Name_NEW ) ) {
-							FOUND = FindItem( Name_NEW, checkInstanceName.Name(), NumFMUInputVariables );
+							FOUND = FindItem( Name_NEW, checkInstanceName );
 							if ( FOUND == 0 ) {
 								checkInstanceName( l ).Name = Name_NEW;
 								FMU( i ).NumInstances = j;
@@ -1181,7 +1215,7 @@ namespace ExternalInterface {
 						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
 
 						// make the library call
-						FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
+						FMU(i).Instance(j).Index = model_ID_GUID((char*)FMU(i).Instance(j).Name.c_str(), &workingFolderArr[0], &FMU(i).Instance(j).LenWorkingFolder, &FMU(i).Instance(j).NumInputVariablesInFMU, &FMU(i).Instance(j).NumOutputVariablesInFMU);
 
 						if ( FMU( i ).Instance( j ).Index < 0 ) {
 							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
@@ -1270,7 +1304,7 @@ namespace ExternalInterface {
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
-							VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable.Name(), NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
+							VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
 							if ( IsNotOK ) {
 								ErrorsFound = true;
 								StopExternalInterfaceIfError();
@@ -1283,7 +1317,7 @@ namespace ExternalInterface {
 							int inputVarNameLen( len( FMU( i ).Instance( j ).fmuInputVariable( k ).Name ) );
 
 							// make the library call
-							FMU( i ).Instance( j ).fmuInputVariable( k ).ValueReference = getValueReferenceByNameFMUInputVariables( &inputVarNameArr[0], &inputVarNameLen, &FMU( i ).Instance( j ).Index );
+							FMU(i).Instance(j).fmuInputVariable(k).ValueReference = getValueReferenceByNameFMUInputVariables(&inputVarNameArr[0], &inputVarNameLen, &FMU(i).Instance(j).Index);
 
 							// postprocess args in case they are used later
 							FMU( i ).Instance( j ).fmuInputVariable( k ).Name = getStringFromCharArray( inputVarNameArr );
@@ -1310,8 +1344,8 @@ namespace ExternalInterface {
 
 							// The next call expects an array, but a single item is passed
 							// Therefore create a single item array here first
-							FArray1D_string tempSingleStringA( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey );
-							FArray1D_string tempSingleStringB( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).Name );
+							Array1D_string tempSingleStringA( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey );
+							Array1D_string tempSingleStringB( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).Name );
 
 							// Make the call with arrays
 							GetReportVariableKey( tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes );
@@ -1389,7 +1423,7 @@ namespace ExternalInterface {
 							int lengthVar( len( FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).Name ) );
 
 							// make the library call
-							FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).ValueReference = getValueReferenceByNameFMUOutputVariables( &NameCharArr[0], &lengthVar, &FMU( i ).Instance( j ).Index );
+							FMU(i).Instance(j).fmuOutputVariableSchedule(k).ValueReference = getValueReferenceByNameFMUOutputVariables(&NameCharArr[0], &lengthVar, &FMU(i).Instance(j).Index);
 
 							// postprocess the arguments after the library call in case they are changed and used later
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).Name = getStringFromCharArray( NameCharArr );
@@ -1458,7 +1492,7 @@ namespace ExternalInterface {
 							// get the value reference by using the FMU name and the variable name.
 							auto NameCharArr( getCharArrayFromString( FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name ) );
 							int tempLength( len( FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name ) );
-							FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).ValueReference = getValueReferenceByNameFMUOutputVariables( &NameCharArr[0], &tempLength, &FMU( i ).Instance( j ).Index );
+							FMU(i).Instance(j).fmuOutputVariableVariable(k).ValueReference = getValueReferenceByNameFMUOutputVariables(&NameCharArr[0], &tempLength, &FMU(i).Instance(j).Index);
 							//FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name = getStringFromCharArray( NameCharArr );
 
 							if ( FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).ValueReference == -999 ) {
@@ -1526,7 +1560,7 @@ namespace ExternalInterface {
 							// get the value reference by using the FMU name and the variable name.
 							auto tempNameArr( getCharArrayFromString( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name ) );
 							int tempLength( len( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name ) );
-							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).ValueReference = getValueReferenceByNameFMUOutputVariables( &tempNameArr[0], &tempLength, &FMU( i ).Instance( j ).Index );
+							FMU(i).Instance(j).fmuOutputVariableActuator(k).ValueReference = getValueReferenceByNameFMUOutputVariables(&tempNameArr[0], &tempLength, &FMU(i).Instance(j).Index);
 							//FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = getStringFromCharArray( tempNameArr );
 
 							if ( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).ValueReference == -999 ) {
@@ -1640,8 +1674,8 @@ namespace ExternalInterface {
 			}
 		} else {
 			switch ( Month ) {
-				case  1: simtime =   0  ; break;
-				case  2: simtime =  31  ; break;
+				case  1: simtime =   0; break;
+				case  2: simtime =  31; break;
 				case  3: simtime =  59+1; break;
 				case  4: simtime =  90+1; break;
 				case  5: simtime = 120+1; break;
@@ -1698,47 +1732,18 @@ namespace ExternalInterface {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const IntegerVar( 1 ); // Integer variable
-		int const RealVar( 2 ); // Real variable
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j, k, l; // Loop counter
-		int retVal; // Return value of function call, used for error handling
-		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
-		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
-		int IOStatus( 0 ); // Used in GetObjectItem
-		int NumFMUInputVariables( 0 ); // Number of FMU input variables
+		int i, j, k; // Loop counter
 
-		int NumNumeric; // Number of numbers being input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-		static bool FirstCallFlag( true ); // Flag for first call
 		static bool FirstCallDesignDays( true ); // Flag fo first call during warmup
 		static bool FirstCallWUp( true ); // Flag fo first call during warmup
 		static bool FirstCallTStep( true ); // Flag for first call during time stepping
-		int Count;
+		static int fmiEndSimulation(0); // Flag to indicate end of simulation
 
-		FArray1D_string Alphas( 5 );
-
-		int NumAlpha, NumNumber, IOStat;
-		int Num;
-
-		int curNumInpVal; // current number of input values for the InputValType
-		std::string validateErrMsg; // error returned when xml Schema validate failed
-		int errMsgLen; // the length of the error message
-
-		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
-		int numKey( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
-		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
-		std::string varUnits; // Units sting, may be blank
-		std::string tempChar; // Units sting, may be blank
-
-		int Loop; // Loop counter
-		int NumTSObjects;
-
-		FArray1D_int keyIndexes( 1 ); // Array index for
-		FArray1D_string NamesOfKeys( 1 ); // Specific key name
+		Array1D_string Alphas( 5 );
+		Array1D_int keyIndexes( 1 ); // Array index for
+		Array1D_string NamesOfKeys( 1 ); // Specific key name
 
 		if ( WarmupFlag && ( KindOfSim != ksRunPeriodWeather ) ) { // No data exchange during design days
 			if ( FirstCallDesignDays ) {
@@ -1817,7 +1822,7 @@ namespace ExternalInterface {
 					StopExternalInterfaceIfError();
 
 					// Terminate all FMUs
-					TerminateResetFreeFMUImport();
+					TerminateResetFreeFMUImport(fmiEndSimulation);
 
 					// Reset the communication time step
 					tComm = tStart;
@@ -1871,7 +1876,7 @@ namespace ExternalInterface {
 				tComm = tStart;
 
 				// Terminate all FMUs
-				TerminateResetFreeFMUImport();
+				TerminateResetFreeFMUImport(fmiEndSimulation);
 
 				// Reinstantiate and reinitialize the FMUs
 				InstantiateInitializeFMUImport();
@@ -1916,7 +1921,8 @@ namespace ExternalInterface {
 					tComm += hStep;
 				} else {
 					// Terminate reset and free Slaves
-					TerminateResetFreeFMUImport();
+					fmiEndSimulation = 1;
+					TerminateResetFreeFMUImport(fmiEndSimulation);
 					for ( i = 1; i <= NumFMUObjects; ++i ) {
 						for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 							// Deallocate used objects
@@ -2021,11 +2027,9 @@ namespace ExternalInterface {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const nDblMax( 1024 ); // Maximum number of doubles
-		int const nIntMax( 0 ); // Maximum number of integers
-		int const nBooMax( 0 ); // Maximum number of booleans
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j; // Loop counter
+		int i; // Loop counter
 		int retVal; // Return value from socket
 
 		int flaWri; // flag to write to the socket
@@ -2035,8 +2039,8 @@ namespace ExternalInterface {
 		Real64 curSimTim; // current simulation time
 		Real64 preSimTim; // previous time step's simulation time
 
-		FArray1D< Real64 > dblValWri( nDblMax );
-		FArray1D< Real64 > dblValRea( nDblMax );
+		Array1D< Real64 > dblValWri( nDblMax );
+		Array1D< Real64 > dblValRea( nDblMax );
 		std::string retValCha;
 		bool continueSimulation; // Flag, true if simulation should continue
 		static bool firstCall( true );
@@ -2083,9 +2087,9 @@ namespace ExternalInterface {
 			retVal = 0;
 			flaRea = 0;
 			if ( haveExternalInterfaceBCVTB ) {
-				retVal = exchangedoubleswithsocket( &socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data_, &curSimTim, dblValRea.data_ );
+				retVal = exchangedoubleswithsocket( &socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data(), &curSimTim, dblValRea.data() );
 			} else if ( haveExternalInterfaceFMUExport ) {
-				retVal = exchangedoubleswithsocketFMU( &socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data_, &curSimTim, dblValRea.data_, &FMUExportActivate );
+				retVal = exchangedoubleswithsocketFMU( &socketFD, &flaWri, &flaRea, &nDblWri, &nDblRea, &preSimTim, dblValWri.data(), &curSimTim, dblValRea.data(), &FMUExportActivate );
 			}
 			continueSimulation = true;
 
@@ -2139,7 +2143,8 @@ namespace ExternalInterface {
 
 		// If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
 		if ( useEMS ) {
-			ManageEMS( emsCallFromExternalInterface );
+			bool anyRan;
+			ManageEMS( emsCallFromExternalInterface, anyRan );
 		}
 
 		firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
@@ -2148,11 +2153,11 @@ namespace ExternalInterface {
 
 	void
 	GetReportVariableKey(
-		FArray1S_string const varKeys, // Standard variable name
+		Array1S_string const varKeys, // Standard variable name
 		int const numberOfKeys, // Number of keys=size(varKeys)
-		FArray1S_string const varNames, // Standard variable name
-		FArray1S_int keyVarIndexes, // Array index
-		FArray1S_int varTypes // Types of variables in keyVarIndexes
+		Array1S_string const varNames, // Standard variable name
+		Array1S_int keyVarIndexes, // Array index
+		Array1S_int varTypes // Types of variables in keyVarIndexes
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2173,8 +2178,8 @@ namespace ExternalInterface {
 		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnits; // Units sting, may be blank
-		FArray1D_int keyIndexes; // Array index for
-		FArray1D_string NamesOfKeys; // Specific key name
+		Array1D_int keyIndexes; // Array index for
+		Array1D_string NamesOfKeys; // Specific key name
 		int Loop, iKey; // Loop counters
 
 		// Get pointers for variables to be sent to Ptolemy
@@ -2276,29 +2281,6 @@ namespace ExternalInterface {
 		originalCharArray.push_back('\0');
 		return std::string( &originalCharArray.front() );
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ExternalInterface
 

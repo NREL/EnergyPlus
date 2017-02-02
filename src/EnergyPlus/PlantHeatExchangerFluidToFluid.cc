@@ -1,9 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,27 +138,28 @@ namespace PlantHeatExchangerFluidToFluid {
 	std::string ComponentClassName( "HeatExchanger:FluidToFluid" );
 	int NumberOfPlantFluidHXs( 0 );
 	bool GetInput( true );
-	FArray1D_bool CheckFluidHXs;
+	Array1D_bool CheckFluidHXs;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< HeatExchangerStruct > FluidHX;
+	Array1D< HeatExchangerStruct > FluidHX;
 
 	// Functions
 
 	void
 	SimFluidHeatExchanger(
 		int const LoopNum, // plant loop sim call originated from
-		int const LoopSideNum, // plant loop side sim call originated from
-		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
+		int const EP_UNUSED( LoopSideNum ), // plant loop side sim call originated from
+		std::string const & EP_UNUSED( EquipType ), // type of equipment, 'PlantComponent:UserDefined'
 		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
 		Real64 const MyLoad,
 		Real64 & MaxCap,
 		Real64 & MinCap,
-		Real64 & OptCap
+		Real64 & OptCap,
+		bool const FirstHVACIteration
 	)
 	{
 
@@ -158,7 +204,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( EquipName, FluidHX.Name(), NumberOfPlantFluidHXs );
+			CompNum = FindItemInList( EquipName, FluidHX );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimFluidHeatExchanger: HeatExchanger:FluidToFluid not found" );
 			}
@@ -178,12 +224,12 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		if ( InitLoopEquip ) {
 			InitFluidHeatExchanger( CompNum, LoopNum );
-			SizeFluidHeatExchanger( CompNum );
 			if ( LoopNum == FluidHX( CompNum ).DemandSideLoop.LoopNum ) {
 				MinCap = 0.0;
 				MaxCap = FluidHX( CompNum ).DemandSideLoop.MaxLoad;
 				OptCap = FluidHX( CompNum ).DemandSideLoop.MaxLoad * 0.9;
 			} else if ( LoopNum == FluidHX( CompNum ).SupplySideLoop.LoopNum ) {
+				SizeFluidHeatExchanger( CompNum ); // only call sizing from the loop that sizes are based on
 				MinCap = 0.0;
 				MaxCap = FluidHX( CompNum ).SupplySideLoop.MaxLoad;
 				OptCap = FluidHX( CompNum ).SupplySideLoop.MaxLoad * 0.9;
@@ -195,10 +241,10 @@ namespace PlantHeatExchangerFluidToFluid {
 		// for op scheme led HXs, only call controls if called from Loop Supply Side
 		if ( ( FluidHX( CompNum ).ControlMode == OperationSchemeModulated ) || ( FluidHX( CompNum ).ControlMode == OperationSchemeOnOff ) ) {
 			if ( LoopNum == FluidHX( CompNum ).SupplySideLoop.LoopNum ) {
-				ControlFluidHeatExchanger( CompNum, LoopNum, MyLoad );
+				ControlFluidHeatExchanger( CompNum, LoopNum, MyLoad, FirstHVACIteration );
 			}
 		} else {
-			ControlFluidHeatExchanger( CompNum, LoopNum, MyLoad );
+			ControlFluidHeatExchanger( CompNum, LoopNum, MyLoad, FirstHVACIteration );
 		}
 
 		CalcFluidHeatExchanger( CompNum, Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).MassFlowRate, Node( FluidHX( CompNum ).DemandSideLoop.InletNodeNum ).MassFlowRate );
@@ -246,6 +292,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iTemperatureMinSetPoint;
 		using EMSManager::iTemperatureMaxSetPoint;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -270,12 +317,12 @@ namespace PlantHeatExchangerFluidToFluid {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int CompLoop;
 		bool NodeEMSSetPointMissing;
@@ -303,7 +350,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), FluidHX.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), FluidHX, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -326,11 +373,17 @@ namespace PlantHeatExchangerFluidToFluid {
 				FluidHX( CompLoop ).DemandSideLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Loop Demand Side Plant Nodes" );
 				FluidHX( CompLoop ).DemandSideLoop.DesignVolumeFlowRate = rNumericArgs( 1 );
+				if ( FluidHX( CompLoop ).DemandSideLoop.DesignVolumeFlowRate == AutoSize ) {
+					FluidHX( CompLoop ).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = true;
+				}
 
 				FluidHX( CompLoop ).SupplySideLoop.InletNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 				FluidHX( CompLoop ).SupplySideLoop.OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Loop Supply Side Plant Nodes" );
 				FluidHX( CompLoop ).SupplySideLoop.DesignVolumeFlowRate = rNumericArgs( 2 );
+				if ( FluidHX( CompLoop ).SupplySideLoop.DesignVolumeFlowRate == AutoSize ) {
+					FluidHX( CompLoop ).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
+				}
 
 				if ( SameString( cAlphaArgs( 7 ), "CrossFlowBothUnMixed" ) ) {
 					FluidHX( CompLoop ).HeatExchangeModelType = CrossFlowBothUnMixed;
@@ -354,6 +407,9 @@ namespace PlantHeatExchangerFluidToFluid {
 
 				if ( ! lNumericFieldBlanks( 3 ) ) {
 					FluidHX( CompLoop ).UA = rNumericArgs( 3 );
+					if ( FluidHX( CompLoop ).UA == AutoSize ) {
+						FluidHX( CompLoop ).UAWasAutoSized = true;
+					}
 				} else {
 					if ( FluidHX( CompLoop ).HeatExchangeModelType != Ideal ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -536,7 +592,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	void
 	InitFluidHeatExchanger(
 		int const CompNum,
-		int const LoopNum
+		int const EP_UNUSED( LoopNum )
 	)
 	{
 
@@ -549,36 +605,20 @@ namespace PlantHeatExchangerFluidToFluid {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Initialize heat exchanger model
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::InitConvTemp;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineNameNoColon( "InitFluidHeatExchanger" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag; // environment flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // environment flag
+		static Array1D_bool MyFlag;
 		bool errFlag;
 		static std::string const RoutineName( "InitFluidHeatExchanger: " );
 		Real64 rho;
@@ -671,13 +711,13 @@ namespace PlantHeatExchangerFluidToFluid {
 			MyFlag( CompNum ) = false;
 		} // plant setup
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( CompNum ) && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeFluidHeatExchanger( CompNum );
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
+		if ( BeginEnvrnFlag && MyEnvrnFlag( CompNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
+
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
 			FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax = rho * FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate;
 			InitComponentNodes( FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
 			FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax = rho * FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate;
 			InitComponentNodes( FluidHX( CompNum ).SupplySideLoop.MassFlowRateMin, FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
 			MyEnvrnFlag( CompNum ) = false;
@@ -696,7 +736,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			BranchNum = FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum;
 			LoopCompNum = FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum;
 
-			PlantLoop( LoopNum2 ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( LoopCompNum ).FreeCoolCntrlMinCntrlTemp = Node( FluidHX( CompNum ).SetPointNodeNum ).TempSetPoint;
+			PlantLoop( LoopNum2 ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( LoopCompNum ).FreeCoolCntrlMinCntrlTemp = Node( FluidHX( CompNum ).SetPointNodeNum ).TempSetPoint - FluidHX( CompNum ).TempControlTol;  // issue #5626, include control tolerance
 		}
 
 	}
@@ -720,13 +760,9 @@ namespace PlantHeatExchangerFluidToFluid {
 		// the UA is sized for an effectiveness of 1.0 using sizing temps
 		// the capacity uses the full HX model
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataGlobals::InitConvTemp;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using OutputReportPredefined::pdchMechType;
@@ -734,18 +770,11 @@ namespace PlantHeatExchangerFluidToFluid {
 		using OutputReportPredefined::PreDefTableEntry;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeFluidHeatExchanger" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNumSupSide; // Plant Sizing index for Loop Supply Side
@@ -767,41 +796,57 @@ namespace PlantHeatExchangerFluidToFluid {
 		PltSizNumSupSide = PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).PlantSizNum;
 		PltSizNumDmdSide = PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).PlantSizNum;
 		tmpSupSideDesignVolFlowRate = FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate;
-		if ( FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate == AutoSize ) {
+		if ( FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRateWasAutoSized ) {
 			if ( PltSizNumSupSide > 0 ) {
 				if ( PlantSizData( PltSizNumSupSide ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					tmpSupSideDesignVolFlowRate = PlantSizData( PltSizNumSupSide ).DesVolFlowRate * FluidHX( CompNum ).SizingFactor;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
 				} else {
 					tmpSupSideDesignVolFlowRate = 0.0;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
 				}
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+						"Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+						"Initial Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
+				}
 			} else {
-				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
-				ErrorsFound = true;
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object" );
+					ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
+					ErrorsFound = true;
+				}
 			}
 		}
 		RegisterPlantCompDesignFlow( FluidHX( CompNum ).SupplySideLoop.InletNodeNum, tmpSupSideDesignVolFlowRate );
 
 		// second deal with Loop Demand Side
 		tmpDmdSideDesignVolFlowRate = FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate;
-		if ( FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate == AutoSize ) {
+		if ( FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRateWasAutoSized ) {
 			if ( tmpSupSideDesignVolFlowRate > SmallWaterVolFlow ) {
 				tmpDmdSideDesignVolFlowRate = tmpSupSideDesignVolFlowRate;
-				if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
+				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			} else {
 				tmpDmdSideDesignVolFlowRate = 0.0;
-				if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
+				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			}
-			if ( PlantSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
+			if ( PlantFinalSizesOkayToReport ) {
+				ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+					"Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
+			}
+			if ( PlantFirstSizesOkayToReport ) {
+				ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+					"Initial Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
+			}
 		}
 		RegisterPlantCompDesignFlow( FluidHX( CompNum ).DemandSideLoop.InletNodeNum, tmpDmdSideDesignVolFlowRate );
 
 		// size UA if needed
 		tmpUA = FluidHX( CompNum ).UA;
-		if ( FluidHX( CompNum ).UA == AutoSize ) {
+		if ( FluidHX( CompNum ).UAWasAutoSized ) {
 			// get nominal delta T between two loops
 			if ( PltSizNumSupSide > 0 && PltSizNumDmdSide > 0 ) {
 
@@ -823,31 +868,41 @@ namespace PlantHeatExchangerFluidToFluid {
 				tmpDeltaTSupLoop = PlantSizData( PltSizNumSupSide ).DeltaT;
 				if ( tmpSupSideDesignVolFlowRate >= SmallWaterVolFlow ) {
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
+					Cp = GetSpecificHeatGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 
-					rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 
 					tmpDesCap = Cp * rho * tmpDeltaTSupLoop * tmpSupSideDesignVolFlowRate;
 					tmpUA = tmpDesCap / tmpDeltaTloopToLoop;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
 				} else {
 					tmpUA = 0.0;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
 				}
-				if ( PlantSizesOkayToFinalize ) {
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+						"Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+						"Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+						"Initial Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
+						"Initial Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 			} else {
-				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat " "Exchanger UA requires a loop Sizing:Plant objects for both loops" );
-				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
-				ErrorsFound = true;
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops" );
+					ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
+					ErrorsFound = true;
+				}
 			}
 
 		}
 
 		// size capacities for load range based op schemes
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 
 			if ( PltSizNumSupSide > 0 ) {
 				{ auto const SELECT_CASE_var( PlantSizData( PltSizNumSupSide ).LoopType );
@@ -882,16 +937,16 @@ namespace PlantHeatExchangerFluidToFluid {
 				}
 			}
 
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).FluidIndex, RoutineName );
 			SupSideMdot = FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate * rho;
-			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineName );
 			DmdSideMdot = FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate * rho;
 
 			CalcFluidHeatExchanger( CompNum, SupSideMdot, DmdSideMdot );
 			FluidHX( CompNum ).SupplySideLoop.MaxLoad = std::abs( FluidHX( CompNum ).HeatTransferRate );
 
 		}
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			PreDefTableEntry( pdchMechType, FluidHX( CompNum ).Name, "HeatExchanger:FluidToFluid" );
 			PreDefTableEntry( pdchMechNomCap, FluidHX( CompNum ).Name, FluidHX( CompNum ).SupplySideLoop.MaxLoad );
 		}
@@ -901,8 +956,9 @@ namespace PlantHeatExchangerFluidToFluid {
 	void
 	ControlFluidHeatExchanger(
 		int const CompNum,
-		int const LoopNum,
-		Real64 const MyLoad
+		int const EP_UNUSED( LoopNum ),
+		Real64 const MyLoad,
+		bool FirstHVACIteration
 	)
 	{
 
@@ -1018,7 +1074,12 @@ namespace PlantHeatExchangerFluidToFluid {
 						} else { // not able to cool so turn off
 							mdotSupSide = 0.0;
 							SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-							mdotDmdSide = 0.0;
+							//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+							if ( FirstHVACIteration ) {
+								mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+							} else {
+								mdotDmdSide = 0.0;
+							}
 							SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
 						}
 
@@ -1039,7 +1100,12 @@ namespace PlantHeatExchangerFluidToFluid {
 						} else { // not able to heat so turn off
 							mdotSupSide = 0.0;
 							SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-							mdotDmdSide = 0.0;
+							//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+							if ( FirstHVACIteration ) {
+								mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+							} else {
+								mdotDmdSide = 0.0;
+							}
 							SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 						}
 					}
@@ -1068,7 +1134,12 @@ namespace PlantHeatExchangerFluidToFluid {
 						} else { // not able to cool so turn off
 							mdotSupSide = 0.0;
 							SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-							mdotDmdSide = 0.0;
+							//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+							if ( FirstHVACIteration ) {
+								mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+							} else {
+								mdotDmdSide = 0.0;
+							}
 							SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 						}
 
@@ -1086,7 +1157,12 @@ namespace PlantHeatExchangerFluidToFluid {
 						} else { // not able to heat so turn off
 							mdotSupSide = 0.0;
 							SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-							mdotDmdSide = 0.0;
+							//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+							if ( FirstHVACIteration ) {
+								mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+							} else {
+								mdotDmdSide = 0.0;
+							}
 							SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 						}
 					}
@@ -1117,7 +1193,12 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else { // not able are wanting to heat so turn off
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1135,10 +1216,15 @@ namespace PlantHeatExchangerFluidToFluid {
 						mdotDmdSide = 0.0;
 					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
-				} else { // not able are wanting to heat so turn off
+				} else { // not able or are wanting to heat so turn off
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1157,10 +1243,15 @@ namespace PlantHeatExchangerFluidToFluid {
 						mdotDmdSide = 0.0;
 						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 					}
-				} else { // not able are wanting to cool so turn off
+				} else { // not able or are wanting to cool so turn off
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1181,7 +1272,12 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else { // not able or are wanting to cool so turn off
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1195,7 +1291,8 @@ namespace PlantHeatExchangerFluidToFluid {
 				DeltaTHeating = FluidHX( CompNum ).DemandSideLoop.InletTemp - FluidHX( CompNum ).SupplySideLoop.InletTemp;
 				DeltaTHeatSetPointDemand = SetPointTempLo - FluidHX( CompNum ).DemandSideLoop.InletTemp;
 				DeltaTHeatSetPointSupply = SetPointTempLo - FluidHX( CompNum ).SupplySideLoop.InletTemp;
-				if ( ( DeltaTCooling > FluidHX( CompNum ).TempControlTol ) && ( DeltaTCoolSetPointSupply < ( -1.0 * FluidHX( CompNum ).TempControlTol ) ) && ( DeltaTCoolSetPointDemand > FluidHX( CompNum ).TempControlTol ) ) {
+				if ( ( DeltaTCooling > FluidHX( CompNum ).TempControlTol ) && ( SetPointTempHi < FluidHX( CompNum ).SupplySideLoop.InletTemp ) ) {
+
 					// can and want to cool
 					mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
@@ -1206,7 +1303,7 @@ namespace PlantHeatExchangerFluidToFluid {
 						mdotDmdSide = 0.0;
 						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 					}
-				} else if ( ( DeltaTHeating > FluidHX( CompNum ).TempControlTol ) && ( DeltaTHeatSetPointDemand < ( -1.0 * FluidHX( CompNum ).TempControlTol ) ) && ( DeltaTHeatSetPointSupply > FluidHX( CompNum ).TempControlTol ) ) {
+				} else if ( ( DeltaTHeating > FluidHX( CompNum ).TempControlTol ) && ( SetPointTempLo > FluidHX( CompNum ).SupplySideLoop.InletTemp ) ) {
 					// can and want to heat
 					mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
@@ -1220,7 +1317,12 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else { // not able or don't want conditioning
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1253,7 +1355,12 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else { // not able or don't want conditioning
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1273,7 +1380,12 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else { // not wanting to cool so turn off
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1309,7 +1421,12 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else {
 					mdotSupSide = 0.0;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-					mdotDmdSide = 0.0;
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
 					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
 
@@ -1379,9 +1496,6 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 ExpCheckValue2;
 		Real64 Effectiveness( 0.0 );
 		Real64 HeatTransferRate;
-		Real64 MdotDmdSide;
-		Real64 LeavingTempMinFlow;
-		Real64 LeavingTempFullFlow;
 		int CrossFlowEquation;
 
 		SupSideLoopInletTemp = Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).Temp;
@@ -1479,12 +1593,16 @@ namespace PlantHeatExchangerFluidToFluid {
 							Effectiveness = 1.0;
 						}
 					} else {
-						ExpCheckValue2 = -( 1.0 / CapRatio ) * ( 1.0 - std::exp( -CapRatio * NTU ) );
-						if ( ExpCheckValue2 < EXP_LowerLimit ) {
-							Effectiveness = 1.0;
+						if ( ExpCheckValue1 >= EXP_LowerLimit ){
+							ExpCheckValue2 = -( 1.0 / CapRatio ) * ( 1.0 - std::exp( -CapRatio * NTU ) );
+							if ( ExpCheckValue2 < EXP_LowerLimit ) {
+								Effectiveness = 1.0;
+							} else {
+								Effectiveness = 1.0 - std::exp( ExpCheckValue2 );
+								Effectiveness = min( 1.0, Effectiveness );
+							}
 						} else {
-							Effectiveness = 1.0 - std::exp( -( 1.0 / CapRatio ) * ( 1.0 - std::exp( -CapRatio * NTU ) ) );
-							Effectiveness = min( 1.0, Effectiveness );
+							Effectiveness = 1.0;
 						}
 					}
 				} else {
@@ -1607,7 +1725,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 2 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 2 ); // Parameter array passed to solver
 
 		Real64 LeavingTempMinFlow;
 		Real64 LeavingTempFullFlow;
@@ -1716,7 +1834,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		Optional< FArray1S< Real64 > const > Par // Par(1) = HX index number
+		Array1< Real64 > const & Par // Par(1) = HX index number
 	)
 	{
 
@@ -1763,14 +1881,14 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 SupSideMdot; // mass flow rate of fluid entering from supply side loop
 
 		MdotTrial = DmdSideMassFlowRate;
-		CompNum = int( Par()( 1 ) );
+		CompNum = int( Par( 1 ) );
 		SupSideMdot = Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).MassFlowRate;
 
 		CalcFluidHeatExchanger( CompNum, SupSideMdot, MdotTrial );
 
 		SupSideLoopOutletTemp = FluidHX( CompNum ).SupplySideLoop.OutletTemp;
 
-		Residuum = Par()( 2 ) - SupSideLoopOutletTemp;
+		Residuum = Par( 2 ) - SupSideLoopOutletTemp;
 
 		return Residuum;
 
@@ -1866,29 +1984,6 @@ namespace PlantHeatExchangerFluidToFluid {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantHeatExchangerFluidToFluid
 

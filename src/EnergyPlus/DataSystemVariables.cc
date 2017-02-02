@@ -1,12 +1,60 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DataSystemVariables.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
+#include <FileSystem.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -38,6 +86,7 @@ namespace DataSystemVariables {
 	using DataStringGlobals::altpathChar;
 	using DataStringGlobals::CurrentWorkingFolder;
 	using DataStringGlobals::ProgramPath;
+	using namespace FileSystem;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -62,14 +111,13 @@ namespace DataSystemVariables {
 	std::string const cDisplayZoneAirHeatBalanceOffBalance( "DisplayZoneAirHeatBalanceOffBalance" );
 	std::string const cSortIDD( "SortIDD" );
 	std::string const cReportDuringWarmup( "ReportDuringWarmup" );
+	std::string const cReportDuringHVACSizingSimulation( "REPORTDURINGHVACSIZINGSIMULATION" );
 	std::string const cIgnoreSolarRadiation( "IgnoreSolarRadiation" );
 	std::string const cIgnoreBeamRadiation( "IgnoreBeamRadiation" );
 	std::string const cIgnoreDiffuseRadiation( "IgnoreDiffuseRadiation" );
 	std::string const cSutherlandHodgman( "SutherlandHodgman" );
 	std::string const cMinimalSurfaceVariables( "CreateMinimalSurfaceVariables" );
 	std::string const cMinimalShadowing( "MinimalShadowing" );
-	std::string const cNumThreads( "OMP_NUM_THREADS" );
-	std::string const cepNumThreads( "EP_OMP_NUM_THREADS" );
 	std::string const cNumActiveSims( "cntActv" );
 	std::string const cInputPath1( "epin" ); // EP-Launch setting.  Full path + project name
 	std::string const cInputPath2( "input_path" ); // RunEplus.bat setting.  Full path
@@ -83,6 +131,7 @@ namespace DataSystemVariables {
 	//  each individual HVAC controller with all controller iterations
 
 	std::string const MinReportFrequencyEnvVar( "MINREPORTFREQUENCY" ); // environment var for reporting frequency.
+	std::string const cDisplayInputInAuditEnvVar( "DISPLAYINPUTINAUDIT" ); // environmental variable that enables the echoing of the input file into the audit file
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -106,6 +155,7 @@ namespace DataSystemVariables {
 	bool TraceHVACControllerEnvFlag( false ); // If TRUE generates a trace file for each individual HVAC
 	// controller with all controller iterations
 	bool ReportDuringWarmup( false ); // True when the report outputs even during warmup
+	bool ReportDuringHVACSizingSimulation( false ); // true when reporting outputs during HVAC sizing Simulation
 	bool ReportDetailedWarmupConvergence( false ); // True when the detailed warmup convergence is requested
 	bool UpdateDataDuringWarmupExternalInterface( false ); // variable sets in the external interface.
 	// This update the value during the warmup added for FMI
@@ -185,7 +235,7 @@ namespace DataSystemVariables {
 		std::string::size_type pos;
 
 		if ( firstTime ) {
-			EchoInputFile = FindUnitNumber( "eplusout.audit" );
+			EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 			get_environment_variable( cInputPath1, envinputpath1 );
 			if ( envinputpath1 != blank ) {
 				pos = index( envinputpath1, pathChar, true ); // look backwards for pathChar
@@ -196,22 +246,30 @@ namespace DataSystemVariables {
 			firstTime = false;
 		}
 
+		FileFound = false;
 		CheckedFileName = blank;
 		InputFileName = originalInputFileName;
-		pos = index( InputFileName, altpathChar );
-		while ( pos != std::string::npos ) {
-			InputFileName[ pos ] = pathChar;
-			pos = index( InputFileName, altpathChar );
-		}
+		makeNativePath(InputFileName);
 
 		{ IOFlags flags; gio::inquire( InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (user input)=" + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "found (user input)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (user input)=" + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (user input)=" + getAbsolutePath(InputFileName);
+		}
+
+		// Look relative to input file path
+		{ IOFlags flags; gio::inquire( DataStringGlobals::idfDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
+		if ( FileExist ) {
+			FileFound = true;
+			CheckedFileName = DataStringGlobals::idfDirPathName + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "found (idf)=" + getAbsolutePath(CheckedFileName);
+			return;
+		} else {
+			gio::write(EchoInputFile, fmtA) << "not found (idf)=" + getAbsolutePath(DataStringGlobals::idfDirPathName + InputFileName);
 		}
 
 		// Look relative to input path
@@ -219,10 +277,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = envinputpath1 + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (epin)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (epin)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (epin)=" + envinputpath1 + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (epin)=" + getAbsolutePath(envinputpath1 + InputFileName);
 		}
 
 		// Look relative to input path
@@ -230,10 +288,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = envinputpath2 + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (input_path)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (input_path)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (input_path)=" + envinputpath2 + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (input_path)=" + getAbsolutePath(envinputpath2 + InputFileName);
 		}
 
 		// Look relative to program path
@@ -241,10 +299,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = envprogrampath + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (program_path)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (program_path)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (program_path)=" + envprogrampath + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (program_path)=" + getAbsolutePath(envprogrampath + InputFileName);
 		}
 
 		if ( ! TestAllPaths ) return;
@@ -254,10 +312,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = CurrentWorkingFolder + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (CWF)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (CWF)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (CWF)=" + CurrentWorkingFolder + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (CWF)=" + getAbsolutePath(CurrentWorkingFolder + InputFileName);
 		}
 
 		// Look relative to program path
@@ -265,36 +323,13 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = ProgramPath + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (program path - ini)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (program path - ini)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (program path - ini)=" + ProgramPath + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataSystemVariables
 

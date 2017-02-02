@@ -3083,8 +3083,8 @@ INTEGER, INTENT(IN)   :: possCol
           ! na
 
           ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-INTEGER :: increaseRow
-INTEGER :: increaseCol
+INTEGER :: increaseRow = 0
+INTEGER :: increaseCol = 0
 LOGICAL :: needIncrease
 
 ! first assume that no increase in size is needed
@@ -4198,7 +4198,7 @@ toColor(59)%ObjType = 'Coil:Heating:DX:MultiSpeed' !renamed by script
 toColor(59)%ColorName = 'salmon'
 toColor(60)%ObjType = 'Coil:Heating:Electric' !renamed by script
 toColor(60)%ColorName = 'salmon'
-toColor(61)%ObjType = 'Coil:Heating:Gas' !renamed by script
+toColor(61)%ObjType = 'Coil:Heating:Fuel' !renamed by script
 toColor(61)%ColorName = 'salmon'
 toColor(62)%ObjType = 'Coil:Heating:Steam' !renamed by script
 toColor(62)%ColorName = 'salmon'

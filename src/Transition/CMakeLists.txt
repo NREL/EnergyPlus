@@ -5,10 +5,6 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_2_0.f90" )
-configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_2_0.f90" )
-configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_3_0.f90" )
-configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_3_0.f90" )
 
 # first create a static library of shared stuff
 SET(LIB_SRC
@@ -25,11 +21,6 @@ SET(LIB_SRC
   VCompareUtilityRoutines.f90
 )
 add_library( TransitionLib STATIC ${LIB_SRC} )
-
-# then create all the binaries using just the Transition source that brings in other files
-SET(SRC
-  Transition.f90
-)
 
 list( APPEND VERSIONS 1_0_0 )
 list( APPEND VERSIONS 1_0_1 )
@@ -58,52 +49,83 @@ list( APPEND VERSIONS 8_0_0 )
 list( APPEND VERSIONS 8_1_0 )
 list( APPEND VERSIONS 8_2_0 )
 list( APPEND VERSIONS 8_3_0 )
+list( APPEND VERSIONS 8_4_0 )
+list( APPEND VERSIONS 8_5_0 )
+list( APPEND VERSIONS 8_6_0 )
 
-IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
-  IF( WIN32 )
-    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
-    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
-    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
-  ELSE()
-    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
-    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
-  ENDIF()
-ENDIF()
-
-
-IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
-  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp ")
-  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -libs:static")
-ENDIF()
+if(APPLE)
+  if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbounds-check")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  endif()
+elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
+  if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbounds-check")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  endif()
+else()  # Windows
+  if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbounds-check")
+  else()
+    # Set release flags to be empty
+    set(CMAKE_Fortran_FLAGS_RELEASE "")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /fpp")
+  endif()
+endif()
 
 list( LENGTH VERSIONS VERSIONS_SIZE)
 
 math(EXPR end "${VERSIONS_SIZE} - 1")
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+
 FOREACH( i RANGE 1 ${end} )
 
-math(EXPR ii "${i} - 1")
+  math(EXPR ii "${i} - 1")
 
-LIST(GET VERSIONS ${ii} OLD_VERSION)
-LIST(GET VERSIONS ${i} NEW_VERSION)
+  LIST(GET VERSIONS ${ii} OLD_VERSION)
+  LIST(GET VERSIONS ${i} NEW_VERSION)
 
-STRING( REPLACE _ - OLD-VERSION ${OLD_VERSION} )
-STRING( REPLACE _ - NEW-VERSION ${NEW_VERSION} )
+  # then create all the binaries using just the Transition source and the appropriate version of the main sub
+  SET(SRC
+    Transition.f90
+    CreateNewIDFUsingRulesV${NEW_VERSION}.f90
+  )
 
-SET(LAST_NAME "Transition-V${OLD-VERSION}-to-V${NEW-VERSION}" )
+  STRING( REPLACE _ - OLD-VERSION ${OLD_VERSION} )
+  STRING( REPLACE _ - NEW-VERSION ${NEW_VERSION} )
 
-SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
-ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
-TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
+  SET(LAST_NAME "Transition-V${OLD-VERSION}-to-V${NEW-VERSION}" )
 
-SET_PROPERTY( TARGET "${LAST_NAME}"
-              PROPERTY COMPILE_DEFINITIONS V${NEW_VERSION} )
+  SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
+  ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
+  TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
+
+  if( "${i}" GREATER "22" )
+    install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
+  endif()
 
 ENDFOREACH()
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
-if( APPLE )
-  install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/ )
-endif()
-
+# then install all the support files
+install( FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-1-0-009 to 8-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-2-0 to 8-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-3-0 to 8-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-5-0 to 8-6-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )

@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -91,6 +137,15 @@ namespace BranchInputManager {
 
 	std::string CurrentModuleObject; // for ease in getting objects
 
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetBranchInputOneTimeFlag( true );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
 	//PUBLIC  TestAirPathIntegrity
 	//PRIVATE TestSupplyAirPathIntegrity
@@ -98,13 +153,34 @@ namespace BranchInputManager {
 	//PUBLIC  MyPlantSizingIndex
 
 	// Object Data
-	FArray1D< BranchListData > BranchList; // Branch List data for each Branch List
-	FArray1D< BranchData > Branch; // Branch Data for each Branch
-	FArray1D< ConnectorData > ConnectorLists; // Connector List data for each Connector List
-	FArray1D< SplitterData > Splitters; // Splitter Data for each Splitter
-	FArray1D< MixerData > Mixers; // Mixer Data for each Mixer
+	Array1D< BranchListData > BranchList; // Branch List data for each Branch List
+	Array1D< BranchData > Branch; // Branch Data for each Branch
+	Array1D< ConnectorData > ConnectorLists; // Connector List data for each Connector List
+	Array1D< SplitterData > Splitters; // Splitter Data for each Splitter
+	Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumOfBranchLists = 0; // Number of Branch Lists found in IDF
+		NumOfBranches = 0; // Number of Branches found in IDF
+		NumOfConnectorLists = 0; // Number of Connector Lists found in IDF
+		NumSplitters = 0; // Number of Splitters found in IDF
+		NumMixers = 0; // Number of Mixers found in IDF
+		GetBranchInputFlag = true ; // Flag used to retrieve Input
+		GetBranchListInputFlag = true ; // Flag used to retrieve Input
+		GetSplitterInputFlag = true ; // Flag used to retrieve Input
+		GetMixerInputFlag = true ; // Flag used to retrieve Input
+		GetConnectorListInputFlag = true ; // Flag used to retrieve Input
+		InvalidBranchDefinitions = false ;
+		GetBranchInputOneTimeFlag = true;
+		BranchList.deallocate(); // Branch List data for each Branch List
+		Branch.deallocate(); // Branch Data for each Branch
+		ConnectorLists.deallocate(); // Connector List data for each Connector List
+		Splitters.deallocate(); // Splitter Data for each Splitter
+		Mixers.deallocate(); // Mixer Data for each Mixer
+	}
 
 	void
 	ManageBranchInput()
@@ -165,7 +241,7 @@ namespace BranchInputManager {
 		std::string const & LoopName, // Name of Loop Branch List is on
 		std::string const & BranchListName, // Branch List Name from Input
 		int & NumBranchNames, // Number of Branches for this Branch List
-		FArray1S_string BranchNames, // Names of Branches on this Branch List
+		Array1S_string BranchNames, // Names of Branches on this Branch List
 		std::string const & LoopType // Type of Loop Branch list is on
 	)
 	{
@@ -215,7 +291,7 @@ namespace BranchInputManager {
 		}
 
 		//  Find this BranchList in the master BranchList Names
-		Found = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found = FindItemInList( BranchListName, BranchList );
 		if ( Found == 0 ) {
 			ShowFatalError( "GetBranchList: BranchList Name not found=" + BranchListName );
 		}
@@ -296,7 +372,7 @@ namespace BranchInputManager {
 		}
 
 		//  Find this BranchList in the master BranchList Names
-		Found = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found = FindItemInList( BranchListName, BranchList );
 		if ( Found == 0 ) {
 			ShowFatalError( "NumBranchesInBranchList: BranchList Name not found=" + BranchListName );
 		}
@@ -311,16 +387,15 @@ namespace BranchInputManager {
 	GetBranchData(
 		std::string const & LoopName, // Loop Name of this Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S_string CompType, // Component Type for each item on Branch
-		FArray1S_string CompName, // Component Name for each item on Branch
-		FArray1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
-		FArray1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
-		FArray1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
-		FArray1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
+		Array1S_string CompType, // Component Type for each item on Branch
+		Array1S_string CompName, // Component Name for each item on Branch
+		Array1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
+		Array1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
+		Array1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+		Array1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
 		bool & ErrorsFound
 	)
 	{
@@ -364,13 +439,13 @@ namespace BranchInputManager {
 		int MinCompsAllowed;
 
 		// Object Data
-		static FArray1D< ComponentData > BComponents; // Component data to be returned
+		static Array1D< ComponentData > BComponents; // Component data to be returned
 
 		// NumComps now defined on input
 
 		BComponents.allocate( NumComps );
 
-		GetInternalBranchData( LoopName, BranchName, BranchMaxFlow, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+		GetInternalBranchData( LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 
 		MinCompsAllowed = min( size( CompType ), size( CompName ), size( CompInletNodeNames ), size( CompInletNodeNums ), size( CompOutletNodeNames ), size( CompOutletNodeNums ) );
 		if ( MinCompsAllowed < NumComps ) {
@@ -438,7 +513,7 @@ namespace BranchInputManager {
 			GetBranchInput();
 		}
 
-		Found = FindItemInList( BranchName, Branch.Name(), NumOfBranches );
+		Found = FindItemInList( BranchName, Branch );
 		if ( Found == 0 ) {
 			ShowSevereError( "NumCompsInBranch:  Branch not found=" + BranchName );
 			NumCompsInBranch = 0;
@@ -505,78 +580,18 @@ namespace BranchInputManager {
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + CompName + "\"" );
 		} else {
-			BranchLoop: for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
+			for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
 					if ( SameString( CompType, Branch( BranchNum ).Component( CompNum ).CType ) && SameString( CompName, Branch( BranchNum ).Component( CompNum ).Name ) ) {
 						GetAirBranchIndex = BranchNum;
 						goto BranchLoop_exit;
 					}
 				}
-				BranchLoop_loop: ;
 			}
 			BranchLoop_exit: ;
 		}
 
 		return GetAirBranchIndex;
-	}
-
-	Real64
-	GetBranchFlow( int const BranchNum )
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   April 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns the branch index so that the calling
-		// routine can search for a fan on this branch or use branch flow for sizing.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-		// Return value
-		Real64 GetBranchFlow( 0.0 );
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int NumBranches;
-
-		if ( GetBranchInputFlag ) {
-			GetBranchInputFlag = false;
-			GetBranchInput();
-		}
-
-		NumBranches = size( Branch );
-
-		if ( NumBranches == 0 ) {
-			ShowSevereError( "GetBranchFlow:  Branch index not found = " + TrimSigDigits( BranchNum ) );
-		} else {
-			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
-				GetBranchFlow = Branch( BranchNum ).MaxFlowRate;
-			}
-		}
-
-		return GetBranchFlow;
 	}
 
 	void
@@ -657,97 +672,13 @@ namespace BranchInputManager {
 	}
 
 	void
-	CheckBranchForOASys(
-		std::string const & CompType,
-		std::string const & CompName,
-		bool & OASysFlag,
-		bool & ErrFound
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   August 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns TRUE if the branch contains an OA System
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-		// Locals
-		// na
-
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int CompNum; // loop counter
-		int NumBranches; // number of branches
-		int BranchNum; // loop index
-		int AirBranchIndex( 0 ); // index to branch containing CompType, CompName
-
-		if ( GetBranchInputFlag ) {
-			GetBranchInputFlag = false;
-			GetBranchInput();
-		}
-
-		ErrFound = false;
-		OASysFlag = false;
-		NumBranches = size( Branch );
-
-		BranchLoop: for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
-			for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
-				if ( ! SameString( CompType, Branch( BranchNum ).Component( CompNum ).CType ) && ! SameString( CompName, Branch( BranchNum ).Component( CompNum ).Name ) ) continue;
-				AirBranchIndex = BranchNum;
-				goto BranchLoop_exit;
-			}
-			BranchLoop_loop: ;
-		}
-		BranchLoop_exit: ;
-
-		if ( AirBranchIndex == 0 ) {
-			ShowSevereError( "CheckBranchForOASys:  Branch index not found = " + TrimSigDigits( AirBranchIndex ) );
-			ErrFound = true;
-		} else {
-			if ( AirBranchIndex > 0 && AirBranchIndex <= NumBranches ) {
-				for ( CompNum = 1; CompNum <= Branch( AirBranchIndex ).NumOfComponents; ++CompNum ) {
-					if ( ! SameString( "AirLoopHVAC:OutdoorAirSystem", Branch( AirBranchIndex ).Component( CompNum ).CType ) ) continue;
-					OASysFlag = true;
-					break;
-				}
-			} else {
-				ShowSevereError( "CheckBranchForOASys:  Branch index not found = " + TrimSigDigits( AirBranchIndex ) );
-				ErrFound = true;
-			}
-		}
-
-	}
-
-	void
 	GetInternalBranchData(
 		std::string const & LoopName, // Loop Name for Branch
 		std::string const & BranchName, // Requested Branch Name
-		Real64 & BranchMaxFlow, // Max Flow Rate for Branch
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S< ComponentData > BComponents, // Component data returned
+		Array1S< ComponentData > BComponents, // Component data returned
 		bool & ErrorsFound // True when Loop Name is already assigned and this not same loop
 	)
 	{
@@ -794,16 +725,14 @@ namespace BranchInputManager {
 			GetBranchInputFlag = false;
 		}
 
-		Found = FindItemInList( BranchName, Branch.Name(), NumOfBranches );
+		Found = FindItemInList( BranchName, Branch );
 		if ( Found == 0 ) {
 			ShowSevereError( "GetInternalBranchData:  Branch not found=" + BranchName );
 			ErrorsFound = true;
-			BranchMaxFlow = 0.0;
 			NumComps = 0;
 		} else {
 			if ( Branch( Found ).AssignedLoopName == BlankString ) {
 				Branch( Found ).AssignedLoopName = LoopName;
-				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -817,10 +746,8 @@ namespace BranchInputManager {
 				ShowContinueError( "Branch already assigned to loop=" + Branch( Found ).AssignedLoopName );
 				ShowContinueError( "New attempt to assign to loop=" + LoopName );
 				ErrorsFound = true;
-				BranchMaxFlow = 0.0;
 				NumComps = 0;
 			} else {
-				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
 				PressCurveIndex = Branch( Found ).PressureCurveIndex;
 				NumComps = Branch( Found ).NumOfComponents;
@@ -885,7 +812,7 @@ namespace BranchInputManager {
 
 		NumSplitters = 0;
 		NumMixers = 0;
-		ConnNum = FindItemInList( ConnectorListName, ConnectorLists.Name(), NumOfConnectorLists );
+		ConnNum = FindItemInList( ConnectorListName, ConnectorLists );
 
 		if ( ConnNum > 0 ) {
 			NumSplitters = ConnectorLists( ConnNum ).NumOfSplitters;
@@ -960,7 +887,7 @@ namespace BranchInputManager {
 		}
 
 		if ( not_blank( ConnectorListName ) ) {
-			Count = FindItemInList( ConnectorListName, ConnectorLists.Name(), NumOfConnectorLists );
+			Count = FindItemInList( ConnectorListName, ConnectorLists );
 			if ( Count == 0 ) {
 				ShowFatalError( "GetConnectorList: Connector List not found=" + ConnectorListName );
 			}
@@ -991,8 +918,8 @@ namespace BranchInputManager {
 		std::string & OutletNodeName, // Outlet Node ID
 		int & OutletNodeNum, // Outlet Node Number
 		int & NumInletNodes, // Number of Inlet Nodes
-		FArray1S_string InletNodeNames, // Inlet Node IDs
-		FArray1S_int InletNodeNums, // Inlet Node Numbers
+		Array1S_string InletNodeNames, // Inlet Node IDs
+		Array1S_int InletNodeNums, // Inlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber, // number of the current item in connector list
 		Optional_int MixerNumber // Mixer number for this specific splitter
@@ -1037,7 +964,6 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1047,7 +973,7 @@ namespace BranchInputManager {
 
 		// Object Data
 		ConnectorData Connectoid; // Connector Data
-		FArray1D< ComponentData > BComponents; // Branch Component Data
+		Array1D< ComponentData > BComponents; // Branch Component Data
 
 		if ( GetMixerInputFlag ) {
 			GetMixerInput();
@@ -1056,13 +982,13 @@ namespace BranchInputManager {
 
 		GetConnectorList( ConnectorListName, Connectoid, ConnectorNumber );
 		if ( SameString( Connectoid.ConnectorType( 1 ), cMIXER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Mixers.Name(), NumMixers );
+			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Mixers );
 			if ( present( MixerNumber ) ) ++MixerNumber;
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 1 ) );
 			}
 		} else if ( SameString( Connectoid.ConnectorType( 2 ), cMIXER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Mixers.Name(), NumMixers );
+			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Mixers );
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 2 ) );
 			}
@@ -1091,7 +1017,7 @@ namespace BranchInputManager {
 			GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
-			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
+			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..occurs for Connector:Mixer Name=" + Mixers( Count ).Name );
 				ErrorsFound = true;
@@ -1105,7 +1031,7 @@ namespace BranchInputManager {
 				RegisterNodeConnection( OutletNodeNum, NodeID( OutletNodeNum ), "Connector:Mixer", MixerName, ValidConnectionTypes( NodeConnectionType_Outlet ), 1, ObjectIsNotParent, errFlag );
 
 				if ( NumInletNodes > isize( InletNodeNames ) || NumInletNodes > isize( InletNodeNums ) ) {
-					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of " "Inlet Array." );
+					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of Inlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( InletNodeNames ) ) + ", Mixer statement inlets=" + TrimSigDigits( NumInletNodes ) );
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
@@ -1113,7 +1039,7 @@ namespace BranchInputManager {
 				InletNodeNames = "";
 
 				for ( Loop = 1; Loop <= Mixers( Count ).NumInletBranches; ++Loop ) {
-					GetInternalBranchData( LoopName, Mixers( Count ).InletBranchNames( Loop ), MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+					GetInternalBranchData( LoopName, Mixers( Count ).InletBranchNames( Loop ), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 					if ( NumComps > 0 ) {
 						InletNodeNames( Loop ) = BComponents( NumComps ).OutletNodeName;
 						InletNodeNums( Loop ) = BComponents( NumComps ).OutletNode;
@@ -1140,8 +1066,8 @@ namespace BranchInputManager {
 		std::string & InletNodeName, // Inlet Node ID
 		int & InletNodeNum, // Inlet Node Number
 		int & NumOutletNodes, // Number of Outlet Nodes
-		FArray1S_string OutletNodeNames, // Outlet Node IDs
-		FArray1S_int OutletNodeNums, // Outlet Node Numbers
+		Array1S_string OutletNodeNames, // Outlet Node IDs
+		Array1S_int OutletNodeNums, // Outlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber, // number of the current item in connector list
 		Optional_int SplitterNumber // splitter number for this specific splitter
@@ -1186,7 +1112,6 @@ namespace BranchInputManager {
 		int Count; // Loop Counter
 		int Loop; // Loop Counter
 		int NumComps; // Number of Components on this Branch
-		Real64 MaxFlowRate; // Branch Max Flow Rate
 		int PressCurveType;
 		int PressCurveIndex;
 		bool errFlag; // Error flag from RegisterNodeConnection
@@ -1196,7 +1121,7 @@ namespace BranchInputManager {
 
 		// Object Data
 		ConnectorData Connectoid; // Connector Data
-		FArray1D< ComponentData > BComponents; // Branch Component Data
+		Array1D< ComponentData > BComponents; // Branch Component Data
 
 		if ( GetSplitterInputFlag ) {
 			GetSplitterInput();
@@ -1209,13 +1134,13 @@ namespace BranchInputManager {
 		}
 		GetConnectorList( ConnectorListName, Connectoid, ConnectorNumber );
 		if ( SameString( Connectoid.ConnectorType( 1 ), cSPLITTER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Splitters.Name(), NumSplitters );
+			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Splitters );
 			if ( present( SplitterNumber ) ) ++SplitterNumber;
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 1 ) );
 			}
 		} else if ( SameString( Connectoid.ConnectorType( 2 ), cSPLITTER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Splitters.Name(), NumSplitters );
+			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Splitters );
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 2 ) );
 			}
@@ -1244,7 +1169,7 @@ namespace BranchInputManager {
 			GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
-			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
+			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..occurs for Splitter Name=" + Splitters( Count ).Name );
 				ErrorsFound = true;
@@ -1258,7 +1183,7 @@ namespace BranchInputManager {
 				RegisterNodeConnection( InletNodeNum, NodeID( InletNodeNum ), "Connector:Splitter", SplitterName, ValidConnectionTypes( NodeConnectionType_Inlet ), 1, ObjectIsNotParent, errFlag );
 
 				if ( NumOutletNodes > isize( OutletNodeNames ) || NumOutletNodes > isize( OutletNodeNums ) ) {
-					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of " "Outlet Array." );
+					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of Outlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( OutletNodeNames ) ) + ", Splitter statement outlets=" + TrimSigDigits( NumOutletNodes ) );
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
@@ -1266,7 +1191,7 @@ namespace BranchInputManager {
 				OutletNodeNames = "";
 
 				for ( Loop = 1; Loop <= Splitters( Count ).NumOutletBranches; ++Loop ) {
-					GetInternalBranchData( LoopName, Splitters( Count ).OutletBranchNames( Loop ), MaxFlowRate, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
+					GetInternalBranchData( LoopName, Splitters( Count ).OutletBranchNames( Loop ), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound );
 					if ( NumComps > 0 ) {
 						OutletNodeNames( Loop ) = BComponents( 1 ).InletNodeName;
 						OutletNodeNums( Loop ) = BComponents( 1 ).InletNode;
@@ -1331,12 +1256,12 @@ namespace BranchInputManager {
 			GetBranchListInput();
 		}
 
-		Found1 = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found1 = FindItemInList( BranchListName, BranchList );
 		if ( Found1 == 0 ) {
 			ShowSevereError( "GetFirstBranchInletNodeName: BranchList=\"" + BranchListName + "\", not a valid BranchList Name" );
 			InletNodeName = "Invalid Node Name";
 		} else {
-			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( 1 ), Branch.Name(), NumOfBranches );
+			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( 1 ), Branch );
 			if ( Found2 == 0 ) {
 				ShowSevereError( "GetFirstBranchInletNodeName: BranchList=\"" + BranchListName + "\", Branch=\"" + BranchList( Found1 ).BranchNames( 1 ) + "\" not a valid Branch Name" );
 				InletNodeName = "Invalid Node Name";
@@ -1396,12 +1321,12 @@ namespace BranchInputManager {
 			GetBranchListInput();
 		}
 
-		Found1 = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found1 = FindItemInList( BranchListName, BranchList );
 		if ( Found1 == 0 ) {
 			ShowSevereError( "GetLastBranchOutletNodeName: BranchList=\"" + BranchListName + "\", not a valid BranchList Name" );
 			OutletNodeName = "Invalid Node Name";
 		} else {
-			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( BranchList( Found1 ).NumOfBranchNames ), Branch.Name(), NumOfBranches );
+			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( BranchList( Found1 ).NumOfBranchNames ), Branch );
 			if ( Found2 == 0 ) {
 				ShowSevereError( "GetLastBranchOutletNodeName: BranchList=\"" + BranchListName + "\", Branch=\"" + BranchList( Found1 ).BranchNames( BranchList( Found1 ).NumOfBranchNames ) + "\" not a valid Branch Name" );
 				OutletNodeName = "Invalid Node Name";
@@ -1411,88 +1336,6 @@ namespace BranchInputManager {
 		}
 
 		return OutletNodeName;
-
-	}
-
-	void
-	CheckSystemBranchFlow(
-		std::string const & SystemType, // type of air loop equipment
-		std::string const & SystemName, // name of air loop equipment
-		Real64 & BranchFlow, // branch volumetric flow rate [m3/s]
-		Real64 const BranchFanFlow, // branch flow rate [m3/s]
-		bool & ErrFound // logical error flag
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Raustad, FSEC
-		//       DATE WRITTEN   August 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is used to check the branch flow rate with respect to system flow rate
-
-		// METHODOLOGY EMPLOYED:
-		// Obtains branch and branch fan flow rate.
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataSizing;
-		using DataHVACGlobals::SmallAirVolFlow;
-		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int BranchNum; // Index to branch on air loop
-		int SizeBranch; // size of branch list
-		bool OASysFlag; // TRUE when outdoor air system exists
-		std::string BranchName; // name of air loop branch
-
-		if ( GetBranchInputFlag ) {
-			GetBranchInputFlag = false;
-			GetBranchInput();
-		}
-
-		SizeBranch = size( Branch );
-		BranchNum = GetAirBranchIndex( SystemType, SystemName );
-		BranchName = "";
-		BranchFlow = 0.0;
-		ErrFound = false;
-		OASysFlag = false;
-
-		if ( BranchNum > 0 && BranchNum <= SizeBranch ) {
-			BranchFlow = Branch( BranchNum ).MaxFlowRate;
-			BranchName = Branch( BranchNum ).Name;
-		} else {
-			ErrFound = true;
-			ShowSevereError( "CheckSystemBranchFlow: Branch index not found = " + TrimSigDigits( BranchNum ) );
-			ShowContinueError( "Branch search for system type and name = " + SystemType + " \"" + SystemName + "\"" );
-		}
-
-		if ( BranchFanFlow > 0.0 && ! ErrFound ) {
-			if ( BranchFlow != AutoSize ) {
-				CheckBranchForOASys( SystemType, SystemName, OASysFlag, ErrFound );
-				if ( std::abs( BranchFlow - BranchFanFlow ) > SmallAirVolFlow && OASysFlag ) {
-					ShowWarningError( "Branch maximum flow rate differs from system flow rate." );
-					ShowContinueError( "Branch = " + BranchName + " has volume flow rate = " + TrimSigDigits( BranchFlow, 6 ) + " m3/s." );
-					ShowContinueError( "System = " + SystemType + " \"" + SystemName + "\" has volume flow rate = " + TrimSigDigits( BranchFanFlow, 6 ) + " m3/s." );
-					ShowContinueError( "A branch flow rate that is different from the system flow rate can cause" " discrepancies with outdoor air control." );
-				}
-			}
-		}
 
 	}
 
@@ -1513,7 +1356,7 @@ namespace BranchInputManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the following IDD structure:
 		// Branch,
-		//         \extensible:5 Just duplicate last 5 fields and \ comments (changing numbering, please)
+		//         \extensible:4 Just duplicate last 4 fields and \ comments (changing numbering, please)
 		//         \memo List components on the branch in simulation and connection order
 		//         \memo Note: this should NOT include splitters or mixers which define
 		//         \memo endpoints of branches
@@ -1536,17 +1379,6 @@ namespace BranchInputManager {
 		//         \required-field
 		//    A6, \field Component 1 Outlet Node Name
 		//         \required-field
-		//    A7, \field Component 1 Branch Control Type
-		//         \required-field
-		//        \type choice
-		//        \key Active
-		//        \key Passive
-		//        \key SeriesActive
-		//        \key Bypass
-		//        \note for ACTIVE, Component tries to set branch flow and turns off branch if the component is off
-		//        \note for PASSIVE, Component does not try to set branch flow
-		//        \note for SERIESACTIVE, component is active but does not turn off branch when the component is off
-		//        \note for BYPASS,  Component designates a loop bypass
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -1555,9 +1387,6 @@ namespace BranchInputManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
-		using CurveManager::GetPressureCurveTypeAndIndex;
-		using General::RoundSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1573,37 +1402,31 @@ namespace BranchInputManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Set for first time call
-		int Count; // Loop Counter
+		//////////// hoisted into namespace changed GetBranchInputOneTimeFlag////////////
+		// static bool GetInputFlag( true ); // Set for first time call
+		////////////////////////////////////////////////
 		int BCount; // Actual Num of Branches
-		int Comp; // Loop Counter
-		int Loop; // Loop Counter
-		int NumNodes; // Number of Nodes from NodeInputManager
-		FArray1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)
 		bool ErrFound; // Flag for error detection
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		int NumInComps; // Number of components actually verified (no SPLITTER or MIXER allowed)
 		int NumAlphas; // Used to retrieve names from IDF
-		FArray1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)
 		int NumNumbers; // Used to retrieve numbers from IDF
-		FArray1D< Real64 > Numbers; // Used to retrieve numbers from IDF
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lNumericBlanks;
-		FArray1D_bool lAlphaBlanks;
+		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
 		int IOStat; // Could be used in the Get Routines, not currently checked
 		int NumParams;
-		int ConnectionType; // Used to pass variable node connection type to GetNodeNums
-		int PressureCurveType;
-		int PressureCurveIndex;
 
-		if ( GetInputFlag ) {
+		if ( GetBranchInputOneTimeFlag ) {
 			CurrentModuleObject = "Branch";
 			NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
 			if ( NumOfBranches > 0 ) {
 				Branch.allocate( NumOfBranches );
-				Branch.AssignedLoopName() = "";
+				for ( auto & e : Branch ) e.AssignedLoopName.clear();
 				ErrFound = false;
 				GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 				NodeNums.dimension( NumParams, 0 );
@@ -1615,11 +1438,12 @@ namespace BranchInputManager {
 				lAlphaBlanks.dimension( NumAlphas, true );
 				lNumericBlanks.dimension( NumNumbers, true );
 				BCount = 0;
-				for ( Count = 1; Count <= NumOfBranches; ++Count ) {
+				for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
+
 					GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Branch.Name(), BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrFound = true;
 						if ( IsBlank ) {
@@ -1629,98 +1453,9 @@ namespace BranchInputManager {
 						}
 					}
 					++BCount;
-					Branch( BCount ).Name = Alphas( 1 );
-					Branch( BCount ).MaxFlowRate = Numbers( 1 );
-					GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
-					if ( PressureCurveType == PressureCurve_Error ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-						ShowContinueError( "..Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
-						ShowContinueError( "This curve could not be found in the input deck.  Ensure that this curve has been entered" );
-						ShowContinueError( " as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}" );
-						ShowContinueError( "This error could be caused by a misspelled curve name" );
-						ErrFound = true;
-					}
-					Branch( BCount ).PressureCurveType = PressureCurveType;
-					Branch( BCount ).PressureCurveIndex = PressureCurveIndex;
-					Branch( BCount ).NumOfComponents = ( NumAlphas - 2 ) / 5;
-					if ( Branch( BCount ).NumOfComponents * 5 != ( NumAlphas - 2 ) ) ++Branch( BCount ).NumOfComponents;
-					NumInComps = Branch( BCount ).NumOfComponents;
-					Branch( BCount ).Component.allocate( Branch( BCount ).NumOfComponents );
-					Comp = 1;
-					for ( Loop = 3; Loop <= NumAlphas; Loop += 5 ) {
-						if ( SameString( Alphas( Loop ), cSPLITTER ) || SameString( Alphas( Loop ), cMIXER ) ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject );
-							ErrFound = true;
-							continue;
-						}
-						if ( Comp > NumInComps ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "...Number of Arguments indicate [" + RoundSigDigits( NumInComps ) + "], but count of fields indicates [" + RoundSigDigits( Comp ) + ']' );
-							ShowContinueError( "...examine " + CurrentModuleObject + " carefully." );
-							continue;
-						}
-						Branch( BCount ).Component( Comp ).CType = Alphas( Loop );
-						Branch( BCount ).Component( Comp ).Name = Alphas( Loop + 1 );
-						ValidateComponent( Alphas( Loop ), Alphas( Loop + 1 ), IsNotOK, CurrentModuleObject );
-						if ( IsNotOK ) {
-							ShowContinueError( "Occurs on " + CurrentModuleObject + '=' + Alphas( 1 ) );
-							ErrFound = true;
-						}
-						Branch( BCount ).Component( Comp ).InletNodeName = Alphas( Loop + 2 );
-						// If first component on branch, then inlet node is inlet to branch, otherwise node is internal
-						if ( Loop == 3 ) {
-							ConnectionType = NodeConnectionType_Inlet;
-						} else {
-							ConnectionType = NodeConnectionType_Internal;
-						}
-						if ( ! lAlphaBlanks( Loop + 2 ) ) {
-							GetNodeNums( Branch( BCount ).Component( Comp ).InletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 2 ) );
-							if ( NumNodes > 1 ) {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-								ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
-								ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-								ErrFound = true;
-							} else {
-								Branch( BCount ).Component( Comp ).InletNode = NodeNums( 1 );
-							}
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "blank required field: " + cAlphaFields( Loop + 2 ) );
-							ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-							ErrFound = true;
-						}
-						Branch( BCount ).Component( Comp ).OutletNodeName = Alphas( Loop + 3 );
-						// If last component on branch, then outlet node is outlet from branch, otherwise node is internal
-						if ( Loop == NumAlphas - 4 ) {
-							ConnectionType = NodeConnectionType_Outlet;
-						} else {
-							ConnectionType = NodeConnectionType_Internal;
-						}
-						if ( ! lAlphaBlanks( Loop + 3 ) ) {
-							GetNodeNums( Branch( BCount ).Component( Comp ).OutletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 3 ) );
-							if ( NumNodes > 1 ) {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-								ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
-								ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-								ErrFound = true;
-							} else {
-								Branch( BCount ).Component( Comp ).OutletNode = NodeNums( 1 );
-							}
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
-							ShowContinueError( "blank required field: " + cAlphaFields( Loop + 3 ) );
-							ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
-							ErrFound = true;
-						}
 
-						if ( ! lAlphaBlanks( Loop ) && ! lAlphaBlanks( Loop + 1 ) && ! lAlphaBlanks( Loop + 2 ) && ! lAlphaBlanks( Loop + 3 ) ) SetUpCompSets( CurrentModuleObject, Branch( BCount ).Name, Alphas( Loop ), Alphas( Loop + 1 ), Alphas( Loop + 2 ), Alphas( Loop + 3 ) ); //no blanks in required field set
+					GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
 
-						//            deprecated control type, was using (Alphas(Loop+4))
-
-						++Comp;
-					}
-					Branch( BCount ).NumOfComponents = NumInComps;
 				}
 
 				NumOfBranches = BCount;
@@ -1736,9 +1471,127 @@ namespace BranchInputManager {
 					InvalidBranchDefinitions = true;
 				}
 				TestInletOutletNodes( ErrFound );
-				GetInputFlag = false;
+				GetBranchInputOneTimeFlag = false;
 			}
 		}
+
+	}
+
+	void
+	GetSingleBranchInput(
+		std::string const RoutineName,
+		int const BCount,
+		Array1D_string &Alphas,
+		Array1D_string &cAlphaFields,
+		int const NumAlphas,
+		Array1D_int &NodeNums,
+		Array1D_bool &lAlphaBlanks
+	)
+	{
+		// Using
+		using InputProcessor::SameString;
+		using CurveManager::GetPressureCurveTypeAndIndex;
+		using General::RoundSigDigits;
+
+		// Locals
+		int PressureCurveType;
+		int PressureCurveIndex;
+		bool ErrFound; // Flag for error detection
+		int Comp; // Loop Counter
+		bool IsNotOK; // Flag to verify name
+		int NumInComps; // Number of components actually verified (no SPLITTER or MIXER allowed)
+		int ConnectionType; // Used to pass variable node connection type to GetNodeNums
+		int NumNodes; // Number of Nodes from NodeInputManager
+
+		Branch( BCount ).Name = Alphas( 1 );
+		GetPressureCurveTypeAndIndex( Alphas( 2 ), PressureCurveType, PressureCurveIndex );
+		if ( PressureCurveType == PressureCurve_Error ) {
+			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+			ShowContinueError( "..Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
+			ShowContinueError( "This curve could not be found in the input deck.  Ensure that this curve has been entered" );
+			ShowContinueError( " as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}" );
+			ShowContinueError( "This error could be caused by a misspelled curve name" );
+			ErrFound = true;
+		}
+		Branch( BCount ).PressureCurveType = PressureCurveType;
+		Branch( BCount ).PressureCurveIndex = PressureCurveIndex;
+		Branch( BCount ).NumOfComponents = ( NumAlphas - 2 ) / 4;
+		if ( Branch( BCount ).NumOfComponents * 4 != ( NumAlphas - 2 ) ) ++Branch( BCount ).NumOfComponents;
+		NumInComps = Branch( BCount ).NumOfComponents;
+		Branch( BCount ).Component.allocate( Branch( BCount ).NumOfComponents );
+		Comp = 1;
+		for ( int Loop = 3; Loop <= NumAlphas; Loop += 4 ) {
+			if ( SameString( Alphas( Loop ), cSPLITTER ) || SameString( Alphas( Loop ), cMIXER ) ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject );
+				ErrFound = true;
+				continue;
+			}
+			if ( Comp > NumInComps ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "...Number of Arguments indicate [" + RoundSigDigits( NumInComps ) + "], but count of fields indicates [" + RoundSigDigits( Comp ) + ']' );
+				ShowContinueError( "...examine " + CurrentModuleObject + " carefully." );
+				continue;
+			}
+			Branch( BCount ).Component( Comp ).CType = Alphas( Loop );
+			Branch( BCount ).Component( Comp ).Name = Alphas( Loop + 1 );
+			ValidateComponent( Alphas( Loop ), Alphas( Loop + 1 ), IsNotOK, CurrentModuleObject );
+			if ( IsNotOK ) {
+				ShowContinueError( "Occurs on " + CurrentModuleObject + '=' + Alphas( 1 ) );
+				ErrFound = true;
+			}
+			Branch( BCount ).Component( Comp ).InletNodeName = Alphas( Loop + 2 );
+			// If first component on branch, then inlet node is inlet to branch, otherwise node is internal
+			if ( Loop == 3 ) {
+				ConnectionType = NodeConnectionType_Inlet;
+			} else {
+				ConnectionType = NodeConnectionType_Internal;
+			}
+			if ( ! lAlphaBlanks( Loop + 2 ) ) {
+				GetNodeNums( Branch( BCount ).Component( Comp ).InletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 2 ) );
+				if ( NumNodes > 1 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+					ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
+					ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+					ErrFound = true;
+				} else {
+					Branch( BCount ).Component( Comp ).InletNode = NodeNums( 1 );
+				}
+			} else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "blank required field: " + cAlphaFields( Loop + 2 ) );
+				ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+				ErrFound = true;
+			}
+			Branch( BCount ).Component( Comp ).OutletNodeName = Alphas( Loop + 3 );
+			// If last component on branch, then outlet node is outlet from branch, otherwise node is internal
+			if ( Loop == NumAlphas - 3 ) {
+				ConnectionType = NodeConnectionType_Outlet;
+			} else {
+				ConnectionType = NodeConnectionType_Internal;
+			}
+			if ( ! lAlphaBlanks( Loop + 3 ) ) {
+				GetNodeNums( Branch( BCount ).Component( Comp ).OutletNodeName, NumNodes, NodeNums, ErrFound, NodeType_Unknown, CurrentModuleObject, Branch( BCount ).Name, ConnectionType, 1, ObjectIsParent, _, cAlphaFields( Loop + 3 ) );
+				if ( NumNodes > 1 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+					ShowContinueError( "..invalid " + cAlphaFields( Loop + 2 ) + "=\"" + Branch( BCount ).Component( Comp ).InletNodeName + "\" must be a single node - appears to be a list." );
+					ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+					ErrFound = true;
+				} else {
+					Branch( BCount ).Component( Comp ).OutletNode = NodeNums( 1 );
+				}
+			} else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
+				ShowContinueError( "blank required field: " + cAlphaFields( Loop + 3 ) );
+				ShowContinueError( "Occurs on " + cAlphaFields( Loop ) + "=\"" + Alphas( Loop ) + "\", " + cAlphaFields( Loop + 1 ) + "=\"" + Alphas( Loop + 1 ) + "\"." );
+				ErrFound = true;
+			}
+
+			if ( ! lAlphaBlanks( Loop ) && ! lAlphaBlanks( Loop + 1 ) && ! lAlphaBlanks( Loop + 2 ) && ! lAlphaBlanks( Loop + 3 ) ) SetUpCompSets( CurrentModuleObject, Branch( BCount ).Name, Alphas( Loop ), Alphas( Loop + 1 ), Alphas( Loop + 2 ), Alphas( Loop + 3 ) ); //no blanks in required field set
+
+			++Comp;
+		}
+		Branch( BCount ).NumOfComponents = NumInComps;
 
 	}
 
@@ -1804,13 +1657,13 @@ namespace BranchInputManager {
 		bool IsNotOK; // Flag for "VerifyName" routine
 		bool IsBlank; // Flag for "blank" name
 		int NumAlphas; // Used to retrieve Branch list from IDF
-		FArray1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_string Alphas; // Used to retrieve names from IDF
 		int NumNumbers;
-		FArray1D< Real64 > Numbers; // Not used in this object
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lNumericBlanks;
-		FArray1D_bool lAlphaBlanks;
+		Array1D< Real64 > Numbers; // Not used in this object
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
 		int IOStat; // Could be used in the Get Routines, not currently checked
 		int NumParams;
 		std::string TestName;
@@ -1819,8 +1672,10 @@ namespace BranchInputManager {
 		CurrentModuleObject = "BranchList";
 		NumOfBranchLists = GetNumObjectsFound( CurrentModuleObject );
 		BranchList.allocate( NumOfBranchLists );
-		BranchList.LoopName() = "";
-		BranchList.LoopType_s() = ""; //Autodesk LoopType is the name of both int and string member arrays so we use the _s to disambiguate
+		for ( auto & e : BranchList ) {
+			e.LoopName.clear();
+			e.LoopType.clear();
+		}
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -1835,10 +1690,11 @@ namespace BranchInputManager {
 		}
 		BCount = 0;
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
+			CurrentModuleObject = "BranchList";
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), BranchList.Name(), BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), BranchList, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrFound = true;
 				continue;
@@ -1859,7 +1715,7 @@ namespace BranchInputManager {
 						GetBranchInput();
 					}
 					if ( ! BranchList( BCount ).BranchNames( Loop ).empty() ) {
-						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch.Name(), NumOfBranches );
+						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch );
 						if ( Found == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + BranchList( BCount ).Name + "\", invalid data." );
 							ShowContinueError( "..invalid Branch Name not found=\"" + BranchList( BCount ).BranchNames( Loop ) + "\"." );
@@ -1952,13 +1808,13 @@ namespace BranchInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Count; // Loop Counter
 		int NumAlphas; // Used to retrieve names from IDF
-		FArray1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_string Alphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
-		FArray1D< Real64 > Numbers; // Used to retrieve numbers from IDF
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lNumericBlanks;
-		FArray1D_bool lAlphaBlanks;
+		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
 		int IOStat; // Could be used in the Get Routines, not currently checked
 		int NumParams;
 		int NumConnectors;
@@ -1966,7 +1822,7 @@ namespace BranchInputManager {
 		int Arg;
 		int SplitNum;
 		int MixerNum;
-		FArray1D_string BranchNames;
+		Array1D_string BranchNames;
 		int NumBranchNames;
 		bool ErrorsFound;
 		int Loop;
@@ -1984,7 +1840,7 @@ namespace BranchInputManager {
 		ConnectorLists.allocate( NumOfConnectorLists );
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		if ( NumAlphas != 5 || NumNumbers != 0 ) {
-			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. " "Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
+			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
 		}
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -2050,7 +1906,7 @@ namespace BranchInputManager {
 				if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), cSPLITTER ) ) {
 					CurSplitter = true;
 					CurMixer = false;
-					SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Splitters.Name(), NumSplitters );
+					SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Splitters );
 					// Following code sets up branch names to be matched from Splitter/Mixer data structure
 					if ( SplitNum == 0 ) {
 						ShowSevereError( "Invalid Connector:Splitter(none)=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", referenced by " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
@@ -2062,7 +1918,7 @@ namespace BranchInputManager {
 				} else if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), cMIXER ) ) {
 					CurSplitter = true;
 					CurMixer = false;
-					MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Mixers.Name(), NumMixers );
+					MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Mixers );
 					if ( MixerNum == 0 ) {
 						ShowSevereError( "Invalid Connector:Mixer(none)=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", referenced by " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
 						ErrorsFound = true;
@@ -2079,9 +1935,9 @@ namespace BranchInputManager {
 					if ( CurSplitter && ! SameString( ConnectorLists( Count ).ConnectorType( Loop1 ), cMIXER ) ) continue;
 					if ( ConnectorLists( Count ).ConnectorMatchNo( Loop1 ) != 0 ) continue;
 					{ auto const SELECT_CASE_var( CurSplitter );
-					if ( SELECT_CASE_var == true ) {
+					if ( SELECT_CASE_var ) {
 						// Current "item" is a splitter, candidate is a mixer.
-						MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Mixers.Name(), NumMixers );
+						MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Mixers );
 						if ( MixerNum == 0 ) continue;
 						if ( Mixers( MixerNum ).NumInletBranches != NumBranchNames ) continue;
 						MatchFound = true;
@@ -2096,9 +1952,9 @@ namespace BranchInputManager {
 							ConnectorLists( Count ).ConnectorMatchNo( Loop1 ) = MixerNum;
 							ConnectorLists( Count ).ConnectorMatchNo( Loop ) = SplitNum;
 						}
-					} else if ( SELECT_CASE_var == false ) {
+					} else {
 						// Current "item" is a splitter, candidate is a mixer.
-						SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Splitters.Name(), NumSplitters );
+						SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Splitters );
 						if ( SplitNum == 0 ) continue;
 						if ( Splitters( SplitNum ).NumOutletBranches != NumBranchNames ) continue;
 						MatchFound = true;
@@ -2128,9 +1984,9 @@ namespace BranchInputManager {
 				ShowSevereError( "For " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
 				ShowContinueError( "...Item=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", Type=" + ConnectorLists( Count ).ConnectorType( Loop ) + " was not matched." );
 				if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), "Connector:Splitter" ) ) {
-					ShowContinueError( "The BranchList for this Connector:Splitter does not match the BranchList" " for its corresponding Connector:Mixer." );
+					ShowContinueError( "The BranchList for this Connector:Splitter does not match the BranchList for its corresponding Connector:Mixer." );
 				} else {
-					ShowContinueError( "The BranchList for this Connector:Mixer does not match the BranchList" " for its corresponding Connector:Splitter." );
+					ShowContinueError( "The BranchList for this Connector:Mixer does not match the BranchList for its corresponding Connector:Splitter." );
 				}
 				ErrorsFound = true;
 			}
@@ -2198,13 +2054,13 @@ namespace BranchInputManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Used to retrieve names from IDF
-		FArray1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_string Alphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
-		FArray1D< Real64 > Numbers; // Used to retrieve numbers from IDF
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lNumericBlanks;
-		FArray1D_bool lAlphaBlanks;
+		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
 		int IOStat; // Could be used in the Get Routines, not currently checked
 		int NumParams;
 		int Loop;
@@ -2255,13 +2111,13 @@ namespace BranchInputManager {
 			GetBranchInputFlag = false;
 		}
 		for ( Count = 1; Count <= NumSplitters; ++Count ) {
-			Found = FindItemInList( Splitters( Count ).InletBranchName, Branch.Name(), NumOfBranches );
+			Found = FindItemInList( Splitters( Count ).InletBranchName, Branch );
 			if ( Found == 0 ) {
 				ShowSevereError( "GetSplitterInput: Invalid Branch=" + Splitters( Count ).InletBranchName + ", referenced as Inlet Branch to " + CurrentModuleObject + '=' + Splitters( Count ).Name );
 				ErrorsFound = true;
 			}
 			for ( Loop = 1; Loop <= Splitters( Count ).NumOutletBranches; ++Loop ) {
-				Found = FindItemInList( Splitters( Count ).OutletBranchNames( Loop ), Branch.Name(), NumOfBranches );
+				Found = FindItemInList( Splitters( Count ).OutletBranchNames( Loop ), Branch );
 				if ( Found == 0 ) {
 					ShowSevereError( "GetSplitterInput: Invalid Branch=" + Splitters( Count ).OutletBranchNames( Loop ) + ", referenced as Outlet Branch # " + TrimSigDigits( Loop ) + " to " + CurrentModuleObject + '=' + Splitters( Count ).Name );
 					ErrorsFound = true;
@@ -2431,13 +2287,13 @@ namespace BranchInputManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Used to retrieve names from IDF
-		FArray1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_string Alphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
-		FArray1D< Real64 > Numbers; // Used to retrieve numbers from IDF
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lNumericBlanks;
-		FArray1D_bool lAlphaBlanks;
+		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
 		int IOStat; // Could be used in the Get Routines, not currently checked
 		int NumParams;
 		int Loop;
@@ -2490,13 +2346,13 @@ namespace BranchInputManager {
 			GetBranchInputFlag = false;
 		}
 		for ( Count = 1; Count <= NumMixers; ++Count ) {
-			Found = FindItemInList( Mixers( Count ).OutletBranchName, Branch.Name(), NumOfBranches );
+			Found = FindItemInList( Mixers( Count ).OutletBranchName, Branch );
 			if ( Found == 0 ) {
 				ShowSevereError( "GetMixerInput: Invalid Branch=" + Mixers( Count ).OutletBranchName + ", referenced as Outlet Branch in " + CurrentModuleObject + '=' + Mixers( Count ).Name );
 				ErrorsFound = true;
 			}
 			for ( Loop = 1; Loop <= Mixers( Count ).NumInletBranches; ++Loop ) {
-				Found = FindItemInList( Mixers( Count ).InletBranchNames( Loop ), Branch.Name(), NumOfBranches );
+				Found = FindItemInList( Mixers( Count ).InletBranchNames( Loop ), Branch );
 				if ( Found == 0 ) {
 					ShowSevereError( "GetMixerInput: Invalid Branch=" + Mixers( Count ).InletBranchNames( Loop ) + ", referenced as Inlet Branch # " + TrimSigDigits( Loop ) + " in " + CurrentModuleObject + '=' + Mixers( Count ).Name );
 					ErrorsFound = true;
@@ -2654,9 +2510,9 @@ namespace BranchInputManager {
 		int Num;
 		int NumPlantLoops;
 		int NumParams;
-		FArray1D_string Alphas;
+		Array1D_string Alphas;
 		int NumAlphas;
-		FArray1D< Real64 > Numbers;
+		Array1D< Real64 > Numbers;
 		int NumNumbers;
 		int IOStat;
 
@@ -2738,9 +2594,9 @@ namespace BranchInputManager {
 		int Num;
 		int NumCondLoops;
 		int NumParams;
-		FArray1D_string Alphas;
+		Array1D_string Alphas;
 		int NumAlphas;
-		FArray1D< Real64 > Numbers;
+		Array1D< Real64 > Numbers;
 		int NumNumbers;
 		int IOStat;
 
@@ -2822,9 +2678,9 @@ namespace BranchInputManager {
 		int Num;
 		int NumAirLoops;
 		int NumParams;
-		FArray1D_string Alphas;
+		Array1D_string Alphas;
 		int NumAlphas;
-		FArray1D< Real64 > Numbers;
+		Array1D< Real64 > Numbers;
 		int NumNumbers;
 		int IOStat;
 
@@ -3074,7 +2930,7 @@ namespace BranchInputManager {
 		std::string BranchLoopName; // Loop Name which Branch is part of
 		std::string BranchLoopType; // Loop Type which Branch is part of
 		int NumErr; // Error Counter
-		FArray1D_bool BranchReported;
+		Array1D_bool BranchReported;
 		int BCount;
 		int Found;
 		std::string ChrOut;
@@ -3086,9 +2942,9 @@ namespace BranchInputManager {
 		int BranchFluidType;
 		bool MixedFluidTypesOnBranchList;
 		int InitialBranchFluidNode;
-		FArray1D_int BranchFluidNodes;
-		FArray1D_int FoundBranches;
-		FArray1D_int BranchPtrs;
+		Array1D_int BranchFluidNodes;
+		Array1D_int FoundBranches;
+		Array1D_int BranchPtrs;
 		int NumNodesOnBranchList;
 		int NumFluidNodes;
 		std::string OriginalBranchFluidType;
@@ -3100,26 +2956,17 @@ namespace BranchInputManager {
 		{
 			// Members
 			int NumNodes;
-			FArray1D_string UniqueNodeNames;
+			Array1D_string UniqueNodeNames;
 
 			// Default Constructor
 			BranchUniqueNodes() :
 				NumNodes( 0 )
 			{}
 
-			// Member Constructor
-			BranchUniqueNodes(
-				int const NumNodes,
-				FArray1_string const & UniqueNodeNames
-			) :
-				NumNodes( NumNodes ),
-				UniqueNodeNames( UniqueNodeNames )
-			{}
-
 		};
 
 		// Object Data
-		FArray1D< BranchUniqueNodes > BranchNodes;
+		Array1D< BranchUniqueNodes > BranchNodes;
 
 		// Formats
 		static gio::Fmt Format_700( "('! <#Branch Lists>,<Number of Branch Lists>')" );
@@ -3138,15 +2985,15 @@ namespace BranchInputManager {
 
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_700 );
-		gio::write( ChrOut, fmtLD  ) << NumOfBranchLists;
+		gio::write( ChrOut, fmtLD ) << NumOfBranchLists;
 		gio::write( OutputFileBNDetails, Format_701 ) << " #Branch Lists," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_702 );
 		gio::write( OutputFileBNDetails, Format_704 );
 
 		for ( BCount = 1; BCount <= NumOfBranchLists; ++BCount ) {
 
-			gio::write( ChrOut, fmtLD  ) << BCount;
-			gio::write( ChrOut1, fmtLD  ) << BranchList( BCount ).NumOfBranchNames;
+			gio::write( ChrOut, fmtLD ) << BCount;
+			gio::write( ChrOut1, fmtLD ) << BranchList( BCount ).NumOfBranchNames;
 			gio::write( OutputFileBNDetails, Format_701 ) << " Branch List," + stripped( ChrOut ) + ',' + BranchList( BCount ).Name + ',' + BranchList( BCount ).LoopName + ',' + BranchList( BCount ).LoopType + ',' + stripped( ChrOut1 );
 
 			IsAirBranch = false;
@@ -3158,7 +3005,7 @@ namespace BranchInputManager {
 			BranchPtrs.allocate( BranchList( BCount ).NumOfBranchNames + 2 );
 			BranchPtrs = 0;
 			for ( Count = 1; Count <= BranchList( BCount ).NumOfBranchNames; ++Count ) {
-				Found = FindItemInList( BranchList( BCount ).BranchNames( Count ), Branch.Name(), NumOfBranches );
+				Found = FindItemInList( BranchList( BCount ).BranchNames( Count ), Branch );
 				if ( Found > 0 ) {
 					NumNodesOnBranchList += Branch( Found ).NumOfComponents * 2;
 					FoundBranches( Count ) = Found;
@@ -3180,7 +3027,7 @@ namespace BranchInputManager {
 
 				Found = FoundBranches( Count );
 				if ( Found == 0 ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << "   Branch," + ChrOut + ',' + BranchList( BCount ).BranchNames( Count ) + "(not found)," "**Unknown**,**Unknown**,**Unknown**,**Unknown**";
+					gio::write( OutputFileBNDetails, Format_701 ) << "   Branch," + ChrOut + ',' + BranchList( BCount ).BranchNames( Count ) + "(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**";
 					continue;
 				}
 				BranchReported( Found ) = true;
@@ -3240,10 +3087,6 @@ namespace BranchInputManager {
 					}
 				}
 				Branch( Found ).FluidType = BranchFluidType;
-				if ( IsAirBranch && Branch( Found ).MaxFlowRate == 0.0 ) {
-					ShowSevereError( "Branch=" + Branch( Found ).Name + " is an air branch with zero max flow rate." );
-					ErrFound = true;
-				}
 				BranchOutletNodeName = MatchNodeName;
 				if ( Branch( Found ).AssignedLoopName == BlankString ) {
 					BranchLoopName = "**Unknown**";
@@ -3312,7 +3155,7 @@ namespace BranchInputManager {
 					Found = FindItemInList( BranchNodes( Count ).UniqueNodeNames( Loop2 ), BranchNodes( Loop ).UniqueNodeNames, BranchNodes( Loop ).NumNodes );
 					if ( Found != 0 ) {
 						ShowSevereError( "Non-unique node name found, name=" + BranchNodes( Count ).UniqueNodeNames( Loop2 ) );
-						ShowContinueError( "..1st occurence in Branch=" + Branch( Count ).Name );
+						ShowContinueError( "..1st occurrence in Branch=" + Branch( Count ).Name );
 						ShowContinueError( "..duplicate occurrence in Branch=" + Branch( Loop ).Name );
 						ErrFound = true;
 					}
@@ -3385,29 +3228,6 @@ namespace BranchInputManager {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BranchInputManager
 

@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -38,18 +84,12 @@ namespace WaterUse {
 	//       MODIFIED       Brent Griffith, plant upgrade
 	//       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-
-	// METHODOLOGY EMPLOYED:
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::NumOfZones;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	int const HeatRecoveryHXIdeal( 1 );
 	int const HeatRecoveryHXCounterFlow( 2 );
@@ -61,28 +101,29 @@ namespace WaterUse {
 
 	static std::string const BlankString;
 
-	// DERIVED TYPE DEFINITIONS:
-
-	// MODULE VARIABLE TYPE DECLARATIONS:
-
 	// MODULE VARIABLE DECLARATIONS:
 	int NumWaterEquipment( 0 );
 	int NumWaterConnections( 0 );
-	//INTEGER :: MaxIterationsErrorCount =0
 	bool GetWaterUseInputFlag( true );
 
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool CheckPlantLoop;
-
-	// SUBROUTINE SPECIFICATIONS:
+	Array1D_bool CheckEquipName;
+	Array1D_bool CheckPlantLoop;
 
 	// Object Data
-	FArray1D< WaterEquipmentType > WaterEquipment;
-	FArray1D< WaterConnectionsType > WaterConnections;
+	Array1D< WaterEquipmentType > WaterEquipment;
+	Array1D< WaterConnectionsType > WaterConnections;
 
-	// MODULE SUBROUTINES:
-
-	// Functions
+	void
+	clear_state()
+	{
+		NumWaterEquipment = 0;
+		NumWaterConnections = 0;
+		GetWaterUseInputFlag = true;
+		CheckEquipName.deallocate();
+		CheckPlantLoop.deallocate();
+		WaterEquipment.deallocate();
+		WaterConnections.deallocate();
+	}
 
 	void
 	SimulateWaterUse( bool const FirstHVACIteration )
@@ -126,17 +167,19 @@ namespace WaterUse {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			MaxIterationsErrorCount = 0;
 			if ( NumWaterEquipment > 0 ) {
-				WaterEquipment.SensibleRate() = 0.0;
-				WaterEquipment.SensibleEnergy() = 0.0;
-				WaterEquipment.LatentRate() = 0.0;
-				WaterEquipment.LatentEnergy() = 0.0;
-				WaterEquipment.MixedTemp() = 0.0;
-				WaterEquipment.TotalMassFlowRate() = 0.0;
-				WaterEquipment.DrainTemp() = 0.0;
+				for ( auto & e : WaterEquipment ) {
+					e.SensibleRate = 0.0;
+					e.SensibleEnergy = 0.0;
+					e.LatentRate = 0.0;
+					e.LatentEnergy = 0.0;
+					e.MixedTemp = 0.0;
+					e.TotalMassFlowRate = 0.0;
+					e.DrainTemp = 0.0;
+				}
 			}
 
 			if ( NumWaterConnections > 0 ) {
-				WaterConnections.TotalMassFlowRate() = 0.0;
+				for ( auto & e : WaterConnections ) e.TotalMassFlowRate = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -195,7 +238,7 @@ namespace WaterUse {
 
 	void
 	SimulateWaterUseConnection(
-		int const EquipTypeNum,
+		int const EP_UNUSED( EquipTypeNum ),
 		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
@@ -241,7 +284,7 @@ namespace WaterUse {
 		}
 
 		if ( CompIndex == 0 ) {
-			WaterConnNum = FindItemInList( CompName, WaterConnections.Name(), NumWaterConnections );
+			WaterConnNum = FindItemInList( CompName, WaterConnections );
 			if ( WaterConnNum == 0 ) {
 				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
 			}
@@ -272,7 +315,7 @@ namespace WaterUse {
 			}
 
 			if ( NumWaterConnections > 0 ) {
-				WaterConnections.TotalMassFlowRate() = 0.0;
+				for ( auto & e : WaterConnections ) e.TotalMassFlowRate = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -374,7 +417,7 @@ namespace WaterUse {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterEquipment.Name(), WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), WaterEquipment, WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -430,7 +473,7 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 6 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
-					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone.Name(), NumOfZones );
+					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone );
 
 					if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
@@ -476,7 +519,7 @@ namespace WaterUse {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterConnections.Name(), WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), WaterConnections, WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -560,7 +603,7 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).WaterEquipment.allocate( NumAlphas - 9 );
 
 				for ( AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum ) {
-					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment.Name(), NumWaterEquipment );
+					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
 
 					if ( WaterEquipNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
@@ -601,12 +644,12 @@ namespace WaterUse {
 				for ( WaterEquipNum = 1; WaterEquipNum <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++WaterEquipNum ) {
 					thisWaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( WaterEquipNum );
 					if ( WaterEquipment( thisWaterEquipNum ).Zone > 0 ) {
-						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( InitConvTemp ) * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).ListMultiplier;
+						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( DataGlobals::InitConvTemp ) * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).ListMultiplier;
 					} else { // can't have multipliers
-						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( InitConvTemp );
+						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 					}
 				}
-				RegisterPlantCompDesignFlow( WaterConnections( WaterConnNum ).InletNode, WaterConnections( WaterConnNum ).PeakMassFlowRate / RhoH2O( InitConvTemp ) );
+				RegisterPlantCompDesignFlow( WaterConnections( WaterConnNum ).InletNode, WaterConnections( WaterConnNum ).PeakMassFlowRate / RhoH2O( DataGlobals::InitConvTemp ) );
 			}
 		}
 
@@ -799,7 +842,7 @@ namespace WaterUse {
 			}
 		}
 
-		WaterEquipment( WaterEquipNum ).TotalMassFlowRate = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * RhoH2O( InitConvTemp );
+		WaterEquipment( WaterEquipNum ).TotalMassFlowRate = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 
 		// Calculate hot and cold water mixing at the tap
 		if ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate > 0.0 ) {
@@ -897,7 +940,7 @@ namespace WaterUse {
 				WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
 				WaterEquipment( WaterEquipNum ).SensibleEnergy = 0.0;
 			} else {
-				WaterEquipment( WaterEquipNum ).SensibleRate = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).SensibleFracSchedule ) * WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).MixedTemp - ZoneMAT );
+				WaterEquipment( WaterEquipNum ).SensibleRate = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).SensibleFracSchedule ) * WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).MixedTemp - ZoneMAT );
 				WaterEquipment( WaterEquipNum ).SensibleEnergy = WaterEquipment( WaterEquipNum ).SensibleRate * TimeStepSys * SecInHour;
 			}
 
@@ -925,7 +968,7 @@ namespace WaterUse {
 			if ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate == 0.0 ) {
 				WaterEquipment( WaterEquipNum ).DrainTemp = WaterEquipment( WaterEquipNum ).MixedTemp;
 			} else {
-				WaterEquipment( WaterEquipNum ).DrainTemp = ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( InitConvTemp ) * WaterEquipment( WaterEquipNum ).MixedTemp - WaterEquipment( WaterEquipNum ).SensibleRate - WaterEquipment( WaterEquipNum ).LatentRate ) / ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate * CPHW( InitConvTemp ) );
+				WaterEquipment( WaterEquipNum ).DrainTemp = ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * WaterEquipment( WaterEquipNum ).MixedTemp - WaterEquipment( WaterEquipNum ).SensibleRate - WaterEquipment( WaterEquipNum ).LatentRate ) / ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate * CPHW( DataGlobals::InitConvTemp ) );
 			}
 		}
 
@@ -946,7 +989,6 @@ namespace WaterUse {
 		// METHODOLOGY EMPLOYED:
 
 		// Using/Aliasing
-		using DataGlobals::SysSizingCalc;
 		using DataGlobals::DoingSizing;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataLoopNode::Node;
@@ -965,7 +1007,7 @@ namespace WaterUse {
 		int InletNode;
 		int OutletNode;
 		static bool MyOneTimeFlag( true ); // one time flag                    !DSU
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) { //DSU
@@ -1140,14 +1182,14 @@ namespace WaterUse {
 
 		if ( WaterConnections( WaterConnNum ).SupplyTankNum > 0 ) {
 			// Set the demand request for supply water from water storage tank
-			WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
+			WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 			WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).VdotRequestDemand( WaterConnections( WaterConnNum ).TankDemandID ) = WaterConnections( WaterConnNum ).ColdVolFlowRate;
 
 			// Check if cold flow rate should be starved by restricted flow from tank
 			// Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
 			// But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
 			WaterConnections( WaterConnNum ).TankVolFlowRate = WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).VdotAvailDemand( WaterConnections( WaterConnNum ).TankDemandID );
-			WaterConnections( WaterConnNum ).TankMassFlowRate = WaterConnections( WaterConnNum ).TankVolFlowRate * RhoH2O( InitConvTemp );
+			WaterConnections( WaterConnNum ).TankMassFlowRate = WaterConnections( WaterConnNum ).TankVolFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 		}
 
 	}
@@ -1197,7 +1239,7 @@ namespace WaterUse {
 			WaterConnections( WaterConnNum ).DrainTemp = WaterConnections( WaterConnNum ).HotTemp;
 		}
 
-		WaterConnections( WaterConnNum ).DrainVolFlowRate = WaterConnections( WaterConnNum ).DrainMassFlowRate * RhoH2O( InitConvTemp );
+		WaterConnections( WaterConnNum ).DrainVolFlowRate = WaterConnections( WaterConnNum ).DrainMassFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 
 	}
 
@@ -1256,8 +1298,8 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).RecoveryMassFlowRate = WaterConnections( WaterConnNum ).TotalMassFlowRate;
 			}}
 
-			HXCapacityRate = CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).RecoveryMassFlowRate;
-			DrainCapacityRate = CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).DrainMassFlowRate;
+			HXCapacityRate = CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).RecoveryMassFlowRate;
+			DrainCapacityRate = CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).DrainMassFlowRate;
 			MinCapacityRate = min( DrainCapacityRate, HXCapacityRate );
 
 			{ auto const SELECT_CASE_var( WaterConnections( WaterConnNum ).HeatRecoveryHX );
@@ -1282,9 +1324,9 @@ namespace WaterUse {
 
 			WaterConnections( WaterConnNum ).RecoveryRate = WaterConnections( WaterConnNum ).Effectiveness * MinCapacityRate * ( WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).ColdSupplyTemp );
 
-			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp + WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
+			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp + WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
 
-			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
+			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
 
 			if ( WaterConnections( WaterConnNum ).RecoveryTankNum > 0 ) {
 				WaterStorage( WaterConnections( WaterConnNum ).RecoveryTankNum ).VdotAvailSupply( WaterConnections( WaterConnNum ).TankSupplyID ) = WaterConnections( WaterConnNum ).DrainVolFlowRate;
@@ -1387,8 +1429,8 @@ namespace WaterUse {
 
 		// FLOW:
 		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
+			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
+			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 			WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).ColdVolFlowRate + WaterEquipment( WaterEquipNum ).HotVolFlowRate;
 
 			WaterEquipment( WaterEquipNum ).ColdVolume = WaterEquipment( WaterEquipNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
@@ -1396,9 +1438,9 @@ namespace WaterUse {
 			WaterEquipment( WaterEquipNum ).TotalVolume = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
 
 			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
 			} else {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
 			}
 
 			WaterEquipment( WaterEquipNum ).Energy = WaterEquipment( WaterEquipNum ).Power * TimeStepSys * SecInHour;
@@ -1437,8 +1479,8 @@ namespace WaterUse {
 		// FLOW:
 		for ( Loop = 1; Loop <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++Loop ) {
 			WaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( Loop );
-			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
+			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
+			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 			WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).ColdVolFlowRate + WaterEquipment( WaterEquipNum ).HotVolFlowRate;
 
 			WaterEquipment( WaterEquipNum ).ColdVolume = WaterEquipment( WaterEquipNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
@@ -1446,23 +1488,23 @@ namespace WaterUse {
 			WaterEquipment( WaterEquipNum ).TotalVolume = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
 
 			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
 			} else {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
 			}
 
 			WaterEquipment( WaterEquipNum ).Energy = WaterEquipment( WaterEquipNum ).Power * TimeStepSys * SecInHour;
 		}
 
-		WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-		WaterConnections( WaterConnNum ).HotVolFlowRate = WaterConnections( WaterConnNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
+		WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
+		WaterConnections( WaterConnNum ).HotVolFlowRate = WaterConnections( WaterConnNum ).HotMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 		WaterConnections( WaterConnNum ).TotalVolFlowRate = WaterConnections( WaterConnNum ).ColdVolFlowRate + WaterConnections( WaterConnNum ).HotVolFlowRate;
 
 		WaterConnections( WaterConnNum ).ColdVolume = WaterConnections( WaterConnNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
 		WaterConnections( WaterConnNum ).HotVolume = WaterConnections( WaterConnNum ).HotVolFlowRate * TimeStepSys * SecInHour;
 		WaterConnections( WaterConnNum ).TotalVolume = WaterConnections( WaterConnNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
 
-		WaterConnections( WaterConnNum ).Power = WaterConnections( WaterConnNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterConnections( WaterConnNum ).HotTemp - WaterConnections( WaterConnNum ).ReturnTemp );
+		WaterConnections( WaterConnNum ).Power = WaterConnections( WaterConnNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterConnections( WaterConnNum ).HotTemp - WaterConnections( WaterConnNum ).ReturnTemp );
 		WaterConnections( WaterConnNum ).Energy = WaterConnections( WaterConnNum ).Power * TimeStepSys * SecInHour;
 
 		WaterConnections( WaterConnNum ).RecoveryEnergy = WaterConnections( WaterConnNum ).RecoveryRate * TimeStepSys * SecInHour;
@@ -1486,7 +1528,6 @@ namespace WaterUse {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::Zone;
 
 		// Locals
@@ -1499,20 +1540,22 @@ namespace WaterUse {
 		if ( NumWaterEquipment == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			WaterEquipment.SensibleRate() = 0.0;
-			WaterEquipment.SensibleEnergy() = 0.0;
-			WaterEquipment.SensibleRateNoMultiplier() = 0.0;
-			WaterEquipment.LatentRate() = 0.0;
-			WaterEquipment.LatentEnergy() = 0.0;
-			WaterEquipment.LatentRateNoMultiplier() = 0.0;
-			WaterEquipment.MixedTemp() = 0.0;
-			WaterEquipment.TotalMassFlowRate() = 0.0;
-			WaterEquipment.DrainTemp() = 0.0;
-			WaterEquipment.ColdVolFlowRate() = 0.0;
-			WaterEquipment.HotVolFlowRate() = 0.0;
-			WaterEquipment.TotalVolFlowRate() = 0.0;
-			WaterEquipment.ColdMassFlowRate() = 0.0;
-			WaterEquipment.HotMassFlowRate() = 0.0;
+			for ( auto & e : WaterEquipment ) {
+				e.SensibleRate = 0.0;
+				e.SensibleEnergy = 0.0;
+				e.SensibleRateNoMultiplier = 0.0;
+				e.LatentRate = 0.0;
+				e.LatentEnergy = 0.0;
+				e.LatentRateNoMultiplier = 0.0;
+				e.MixedTemp = 0.0;
+				e.TotalMassFlowRate = 0.0;
+				e.DrainTemp = 0.0;
+				e.ColdVolFlowRate = 0.0;
+				e.HotVolFlowRate = 0.0;
+				e.TotalVolFlowRate = 0.0;
+				e.ColdMassFlowRate = 0.0;
+				e.HotMassFlowRate = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 
@@ -1534,29 +1577,6 @@ namespace WaterUse {
 		//  ENDIF
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WaterUse
 

@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -77,13 +123,13 @@ namespace BoilerSteam {
 	Real64 BoilerMassFlowMinAvail( 0.0 ); // kg/s - Boiler mass flow rate
 	static std::string const FluidNameSteam( "STEAM" );
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
 	// Object Data
-	FArray1D< BoilerSpecs > Boiler; // dimension to number of machines
-	FArray1D< ReportVars > BoilerReport;
+	Array1D< BoilerSpecs > Boiler; // dimension to number of machines
+	Array1D< ReportVars > BoilerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -92,8 +138,24 @@ namespace BoilerSteam {
 	// Functions
 
 	void
+	clear_state()
+	{
+		FuelUsed = 0.0;
+		BoilerLoad = 0.0;
+		BoilerMassFlowRate = 0.0;
+		BoilerOutletTemp = 0.0;
+		BoilerMaxPress = 0.0;
+		NumBoilers = 0;
+		BoilerMassFlowMaxAvail = 0.0;
+		BoilerMassFlowMinAvail = 0.0;
+		CheckEquipName.deallocate();
+		Boiler.deallocate();
+		BoilerReport.deallocate();
+	}
+
+	void
 	SimSteamBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
@@ -146,7 +208,7 @@ namespace BoilerSteam {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler.Name(), NumBoilers );
+			BoilerNum = FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -166,9 +228,7 @@ namespace BoilerSteam {
 
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
-			Boiler( BoilerNum ).IsThisSized = false;
 			InitBoiler( BoilerNum );
-			Boiler( BoilerNum ).IsThisSized = true;
 			SizeBoiler( BoilerNum );
 			MinCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MinPartLoadRat;
 			MaxCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MaxPartLoadRat;
@@ -216,6 +276,7 @@ namespace BoilerSteam {
 		using FluidProperties::FindRefrigerant;
 		using GlobalNames::VerifyUniqueBoilerName;
 		using General::RoundSigDigits;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// PARAMETERS
@@ -231,7 +292,7 @@ namespace BoilerSteam {
 		int SteamFluidIndex; // Fluid Index for Steam
 		static bool ErrorsFound( false );
 		bool errFlag;
-		FArray1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
+		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		SteamFluidIndex = 0;
 		cCurrentModuleObject = "Boiler:Steam";
@@ -258,7 +319,7 @@ namespace BoilerSteam {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Boiler.Name(), BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Boiler, BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -325,6 +386,9 @@ namespace BoilerSteam {
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );
+			if ( Boiler( BoilerNum ).NomCap == AutoSize ) {
+				Boiler( BoilerNum ).NomCapWasAutoSized = true;
+			}
 			Boiler( BoilerNum ).MinPartLoadRat = rNumericArgs( 5 );
 			Boiler( BoilerNum ).MaxPartLoadRat = rNumericArgs( 6 );
 			Boiler( BoilerNum ).OptPartLoadRat = rNumericArgs( 7 );
@@ -359,7 +423,7 @@ namespace BoilerSteam {
 				SteamFluidIndex = FindRefrigerant( "Steam" );
 				if ( SteamFluidIndex == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
-					ShowContinueError( "Steam Properties not found; " "Steam Fluid Properties must be included in the input file." );
+					ShowContinueError( "Steam Properties not found; Steam Fluid Properties must be included in the input file." );
 					ErrorsFound = true;
 				}
 			}
@@ -418,8 +482,7 @@ namespace BoilerSteam {
 		using DataPlant::TypeOf_Boiler_Steam;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::InitComponentNodes;
@@ -441,8 +504,8 @@ namespace BoilerSteam {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool FatalError;
 		Real64 TempUpLimitBoilerOut; // C - Boiler outlet maximum temperature limit
 		Real64 EnthSteamOutWet;
@@ -477,8 +540,7 @@ namespace BoilerSteam {
 		BoilerInletNode = Boiler( BoilerNum ).BoilerInletNodeNum;
 		BoilerOutletNode = Boiler( BoilerNum ).BoilerOutletNodeNum;
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( BoilerNum ) && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeBoiler( BoilerNum );
+		if ( BeginEnvrnFlag && MyEnvrnFlag( BoilerNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
 
 			//BoilerOutletTemp     = Node(BoilerOutletNode)%TempSetPoint
 			//TempUpLimitBoilerOut =Boiler(BoilerNum)%TempUpLimitBoilerOut
@@ -507,7 +569,7 @@ namespace BoilerSteam {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! Boiler( BoilerNum ).MissingSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint for Boiler:Steam = " + Boiler( BoilerNum ).Name );
-						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler," " use a SetpointManager" );
+						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager" );
 						ShowContinueError( " The overall loop setpoint will be assumed for this boiler. The simulation continues ..." );
 						Boiler( BoilerNum ).MissingSetPointErrDone = true;
 					}
@@ -576,7 +638,9 @@ namespace BoilerSteam {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
@@ -596,8 +660,8 @@ namespace BoilerSteam {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 SteamDensity;
 		Real64 EnthSteamOutWet;
 		Real64 EnthSteamOutDry;
@@ -606,21 +670,13 @@ namespace BoilerSteam {
 		Real64 CpWater; // Heat capacity of condensed steam
 		std::string equipName;
 		Real64 tmpNomCap; // local nominal capacity cooling power
-		bool IsAutoSize; // Indicator to autosize for reporting
-		Real64 NomCapUser; // Hardsized nominal capacity for reporting
+		Real64 NomCapUser( 0.0 ); // Hardsized nominal capacity for reporting
 
-		PltSizNum = 0;
-		ErrorsFound = false;
-		IsAutoSize = false;
 		tmpNomCap = Boiler( BoilerNum ).NomCap;
-		NomCapUser = 0.0;
 
 		// Find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( Boiler( BoilerNum ).LoopNum ).PlantSizNum;
 
-		if ( Boiler( BoilerNum ).NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				SizingTemp = Boiler( BoilerNum ).TempUpLimitBoilerOut;
@@ -630,23 +686,28 @@ namespace BoilerSteam {
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 				CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 				tmpNomCap = ( CpWater * SteamDensity * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate + PlantSizData( PltSizNum ).DesVolFlowRate * SteamDensity * LatentEnthSteam );
-				if ( ! IsAutoSize ) tmpNomCap = Boiler( BoilerNum ).NomCap;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap =tmpNomCap
+				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;
 			} else {
-				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) {
 					Boiler( BoilerNum ).NomCap = tmpNomCap;
-					if ( ! Boiler( BoilerNum ).IsThisSized ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
+							"Design Size Nominal Capacity [W]", tmpNomCap );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
+							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
 					if ( Boiler( BoilerNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = Boiler( BoilerNum ).NomCap;
-						if ( ! Boiler( BoilerNum ).IsThisSized ) {
-							ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
+								"Design Size Nominal Capacity [W]", tmpNomCap,
+								"User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizePump: Potential issue with equipment sizing for " + Boiler( BoilerNum ).Name );
@@ -662,23 +723,22 @@ namespace BoilerSteam {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( Boiler( BoilerNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler:Steam object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! Boiler( BoilerNum ).IsThisSized ) {
-					if ( Boiler( BoilerNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, "User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
-					}
-				}
+			}
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && Boiler( BoilerNum ).NomCap > 0.0
+					&& PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
+						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}
 		}
 
 		//  model has no volume flow rate, may need something else for steam loop sizing DSU??
 		//DSU?      CALL RegisterPlantCompDesignFlow(Boiler(BoilerNum)%BoilerInletNodeNum,Boiler(BoilerNum)%VolFlowRate)
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
 			equipName = Boiler( BoilerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "Boiler:Steam" );
@@ -752,7 +812,7 @@ namespace BoilerSteam {
 		Real64 EnthSteamOutWet;
 		Real64 LatentEnthSteam;
 		Real64 QualitySteam;
-		FArray1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
+		Array1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
 		Real64 CpWater; // Heat capacity of condensed steam
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number
@@ -953,7 +1013,7 @@ namespace BoilerSteam {
 		Real64 const MyLoad, // boiler operating load
 		bool const RunFlag, // boiler on when TRUE
 		int const Num, // boiler number
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1036,29 +1096,6 @@ namespace BoilerSteam {
 	}
 
 	// End of Record Keeping subroutines for the BOILER:STEAM Module
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BoilerSteam
 

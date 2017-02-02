@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef DemandManager_hh_INCLUDED
 #define DemandManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -20,6 +66,7 @@ namespace DemandManager {
 	extern int const ManagerTypeLights;
 	extern int const ManagerTypeElecEquip;
 	extern int const ManagerTypeThermostats;
+	extern int const ManagerTypeVentilation;
 
 	extern int const ManagerPrioritySequential;
 	extern int const ManagerPriorityOptimal;
@@ -51,8 +98,12 @@ namespace DemandManager {
 
 	// SUBROUTINE SPECIFICATIONS:
 
-	// Types
+	// Clears the global data in DemandManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
+	// Types
 	struct DemandManagerListData
 	{
 		// Members
@@ -64,10 +115,10 @@ namespace DemandManager {
 		Real64 BillingPeriod; // Current billing period value
 		int PeakSchedule; // Schedule index for billing month periods
 		int AveragingWindow; // Number of timesteps for averaging demand window
-		FArray1D< Real64 > History; // Demand window history
+		Array1D< Real64 > History; // Demand window history
 		int ManagerPriority; // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
 		int NumOfManager; // Number of DEMAND MANAGERs
-		FArray1D_int Manager; // Indexes for DEMAND MANAGERs
+		Array1D_int Manager; // Indexes for DEMAND MANAGERs
 		Real64 MeterDemand; // Meter demand at this timestep
 		Real64 AverageDemand; // Current demand over the demand window
 		Real64 PeakDemand; // Peak demand in the billing month so far
@@ -97,51 +148,6 @@ namespace DemandManager {
 			OverLimitDuration( 0.0 )
 		{}
 
-		// Member Constructor
-		DemandManagerListData(
-			std::string const & Name, // Name of DEMAND MANAGER LIST
-			int const Meter, // Index to meter to demand limit
-			int const LimitSchedule, // Schedule index for demand limit
-			Real64 const SafetyFraction, // Multiplier applied to demand limit schedule
-			int const BillingSchedule, // Schedule index for billing month periods
-			Real64 const BillingPeriod, // Current billing period value
-			int const PeakSchedule, // Schedule index for billing month periods
-			int const AveragingWindow, // Number of timesteps for averaging demand window
-			FArray1< Real64 > const & History, // Demand window history
-			int const ManagerPriority, // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
-			int const NumOfManager, // Number of DEMAND MANAGERs
-			FArray1_int const & Manager, // Indexes for DEMAND MANAGERs
-			Real64 const MeterDemand, // Meter demand at this timestep
-			Real64 const AverageDemand, // Current demand over the demand window
-			Real64 const PeakDemand, // Peak demand in the billing month so far
-			Real64 const ScheduledLimit, // Scheduled demand limit
-			Real64 const DemandLimit, // Scheduled demand limit * Safety Fraction
-			Real64 const AvoidedDemand, // Demand avoided by active DEMAND MANAGERs
-			Real64 const OverLimit, // Amount that demand limit is exceeded
-			Real64 const OverLimitDuration // Number of hours that demand limit is exceeded
-		) :
-			Name( Name ),
-			Meter( Meter ),
-			LimitSchedule( LimitSchedule ),
-			SafetyFraction( SafetyFraction ),
-			BillingSchedule( BillingSchedule ),
-			BillingPeriod( BillingPeriod ),
-			PeakSchedule( PeakSchedule ),
-			AveragingWindow( AveragingWindow ),
-			History( History ),
-			ManagerPriority( ManagerPriority ),
-			NumOfManager( NumOfManager ),
-			Manager( Manager ),
-			MeterDemand( MeterDemand ),
-			AverageDemand( AverageDemand ),
-			PeakDemand( PeakDemand ),
-			ScheduledLimit( ScheduledLimit ),
-			DemandLimit( DemandLimit ),
-			AvoidedDemand( AvoidedDemand ),
-			OverLimit( OverLimit ),
-			OverLimitDuration( OverLimitDuration )
-		{}
-
 	};
 
 	struct DemandManagerData
@@ -167,7 +173,11 @@ namespace DemandManager {
 		Real64 UpperLimit; // Not used for demand limit
 		// Highest cooling setpoint for thermostats
 		int NumOfLoads; // Number of load objects
-		FArray1D_int Load; // Pointers to load objects
+		Array1D_int Load; // Pointers to load objects
+
+		// Additional fields related to DemandManager:Ventilation
+		Real64 FixedRate; // m3 per person
+		Real64 ReductionRatio; // % of reduction
 
 		// Default Constructor
 		DemandManagerData() :
@@ -187,57 +197,16 @@ namespace DemandManager {
 			RotatedLoadNum( 0 ),
 			LowerLimit( 0.0 ),
 			UpperLimit( 0.0 ),
-			NumOfLoads( 0 )
-		{}
-
-		// Member Constructor
-		DemandManagerData(
-			std::string const & Name, // Name of DEMAND MANAGER
-			int const Type, // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
-			int const DemandManagerList, // Reference to parent DEMAND MANAGER LIST for error checking
-			bool const CanReduceDemand, // Flag to indicate whether manager can reduce demand
-			int const AvailSchedule, // Schedule index pointer for Availability Schedule
-			bool const Available, // Availability flag
-			bool const Activate, // Flag to activate the manager
-			bool const Active, // Flag to indicate that the manager is active
-			int const LimitControl,
-			int const SelectionControl,
-			int const LimitDuration, // Minimum duration of demand manager activity (min)
-			int const ElapsedTime, // Elapsed time for the demand manager activity (min)
-			int const RotationDuration, // Rotation duration (min)
-			int const ElapsedRotationTime, // Elapsed time for the current rotation (min)
-			int const RotatedLoadNum, // Index for rotated load
-			Real64 const LowerLimit, // Lowest demand limit as fraction of design level
-			Real64 const UpperLimit, // Not used for demand limit
-			int const NumOfLoads, // Number of load objects
-			FArray1_int const & Load // Pointers to load objects
-		) :
-			Name( Name ),
-			Type( Type ),
-			DemandManagerList( DemandManagerList ),
-			CanReduceDemand( CanReduceDemand ),
-			AvailSchedule( AvailSchedule ),
-			Available( Available ),
-			Activate( Activate ),
-			Active( Active ),
-			LimitControl( LimitControl ),
-			SelectionControl( SelectionControl ),
-			LimitDuration( LimitDuration ),
-			ElapsedTime( ElapsedTime ),
-			RotationDuration( RotationDuration ),
-			ElapsedRotationTime( ElapsedRotationTime ),
-			RotatedLoadNum( RotatedLoadNum ),
-			LowerLimit( LowerLimit ),
-			UpperLimit( UpperLimit ),
-			NumOfLoads( NumOfLoads ),
-			Load( Load )
+			NumOfLoads( 0 ),
+			FixedRate( 0.0 ),
+			ReductionRatio( 0.0 )
 		{}
 
 	};
 
 	// Object Data
-	extern FArray1D< DemandManagerListData > DemandManagerList;
-	extern FArray1D< DemandManagerData > DemandMgr;
+	extern Array1D< DemandManagerListData > DemandManagerList;
+	extern Array1D< DemandManagerData > DemandMgr;
 
 	// Functions
 
@@ -280,29 +249,6 @@ namespace DemandManager {
 
 	void
 	InitDemandManagers();
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DemandManager
 

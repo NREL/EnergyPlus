@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef PhotovoltaicThermalCollectors_hh_INCLUDED
 #define PhotovoltaicThermalCollectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,7 +80,7 @@ namespace PhotovoltaicThermalCollectors {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern int NumPVT; // count of all types of PVT in input file
 	extern int NumSimplePVTPerform; // count of simple PVT performance objects in input file
 
@@ -70,28 +116,6 @@ namespace PhotovoltaicThermalCollectors {
 			LastCollectorTemp( 0.0 ),
 			CollectorTemp( 0.0 )
 		{}
-
-		// Member Constructor
-		SimplePVTModelStruct(
-			std::string const & Name,
-			Real64 const ThermalActiveFract, // fraction of surface area with active thermal collection
-			int const ThermEfficMode, // setting for how therm effic is determined
-			Real64 const ThermEffic, // fixed or current Therm efficiency
-			int const ThermEffSchedNum, // pointer to schedule for therm effic (if any)
-			Real64 const SurfEmissivity, // surface emittance in long wave IR
-			Real64 const LastCollectorTemp, // store previous temperature
-			Real64 const CollectorTemp // average solar collector temp.
-		) :
-			Name( Name ),
-			ThermalActiveFract( ThermalActiveFract ),
-			ThermEfficMode( ThermEfficMode ),
-			ThermEffic( ThermEffic ),
-			ThermEffSchedNum( ThermEffSchedNum ),
-			SurfEmissivity( SurfEmissivity ),
-			LastCollectorTemp( LastCollectorTemp ),
-			CollectorTemp( CollectorTemp )
-		{}
-
 	};
 
 	struct PVTReportStruct
@@ -119,30 +143,6 @@ namespace PhotovoltaicThermalCollectors {
 			ToutletWorkFluid( 0.0 ),
 			BypassStatus( 0.0 )
 		{}
-
-		// Member Constructor
-		PVTReportStruct(
-			Real64 const ThermEfficiency, // Thermal efficiency of solar energy conversion
-			Real64 const ThermPower, // Heat gain or loss to collector fluid (W)
-			Real64 const ThermHeatGain, // Heat gain to collector fluid (W)
-			Real64 const ThermHeatLoss, // Heat loss from collector fluid (W)
-			Real64 const ThermEnergy, // Energy gained (or lost) to collector fluid (J)
-			Real64 const MdotWorkFluid, // working fluid mass flow rate (kg/s)
-			Real64 const TinletWorkFluid, // working fluid inlet temp (C)
-			Real64 const ToutletWorkFluid, // working fluid outlet temp (C)
-			Real64 const BypassStatus // 0 = no bypass, 1=full bypass
-		) :
-			ThermEfficiency( ThermEfficiency ),
-			ThermPower( ThermPower ),
-			ThermHeatGain( ThermHeatGain ),
-			ThermHeatLoss( ThermHeatLoss ),
-			ThermEnergy( ThermEnergy ),
-			MdotWorkFluid( MdotWorkFluid ),
-			TinletWorkFluid( TinletWorkFluid ),
-			ToutletWorkFluid( ToutletWorkFluid ),
-			BypassStatus( BypassStatus )
-		{}
-
 	};
 
 	struct PVTCollectorStruct
@@ -172,6 +172,7 @@ namespace PhotovoltaicThermalCollectors {
 		int HVACInletNodeNum;
 		int HVACOutletNodeNum;
 		Real64 DesignVolFlowRate;
+		bool DesignVolFlowRateWasAutoSized; // true if design volume flow rate was autosize on input
 		Real64 MaxMassFlowRate;
 		Real64 MassFlowRate; // DSU
 		Real64 AreaCol;
@@ -198,6 +199,7 @@ namespace PhotovoltaicThermalCollectors {
 			HVACInletNodeNum( 0 ),
 			HVACOutletNodeNum( 0 ),
 			DesignVolFlowRate( 0.0 ),
+			DesignVolFlowRateWasAutoSized( false ),
 			MaxMassFlowRate( 0.0 ),
 			MassFlowRate( 0.0 ),
 			AreaCol( 0.0 ),
@@ -205,72 +207,10 @@ namespace PhotovoltaicThermalCollectors {
 			CoolingUseful( false ),
 			HeatingUseful( false )
 		{}
-
-		// Member Constructor
-		PVTCollectorStruct(
-			std::string const & Name, // Name of PVT collector
-			int const TypeNum, // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
-			int const WLoopNum, // Water plant loop index number                      !DSU
-			int const WLoopSideNum, // Water plant loop side index                        !DSU
-			int const WLoopBranchNum, // Water plant loop branch index                      !DSU
-			int const WLoopCompNum, // Water plant loop component index                   !DSU
-			bool const EnvrnInit, // manage begin environmen inits
-			bool const SizingInit, // manage when sizing is complete
-			std::string const & PVTModelName, // Name of PVT performance object
-			int const PVTModelType, // model type indicator, only simple avail now
-			int const SurfNum, // surface index
-			std::string const & PVname, // named Generator:Photovoltaic object
-			int const PVnum, // PV index
-			bool const PVfound, // init, need to delay get input until PV gotten
-			SimplePVTModelStruct const & Simple, // performance data structure.
-			int const WorkingFluidType,
-			int const PlantInletNodeNum,
-			int const PlantOutletNodeNum,
-			int const HVACInletNodeNum,
-			int const HVACOutletNodeNum,
-			Real64 const DesignVolFlowRate,
-			Real64 const MaxMassFlowRate,
-			Real64 const MassFlowRate, // DSU
-			Real64 const AreaCol,
-			bool const BypassDamperOff,
-			bool const CoolingUseful,
-			bool const HeatingUseful,
-			PVTReportStruct const & Report
-		) :
-			Name( Name ),
-			TypeNum( TypeNum ),
-			WLoopNum( WLoopNum ),
-			WLoopSideNum( WLoopSideNum ),
-			WLoopBranchNum( WLoopBranchNum ),
-			WLoopCompNum( WLoopCompNum ),
-			EnvrnInit( EnvrnInit ),
-			SizingInit( SizingInit ),
-			PVTModelName( PVTModelName ),
-			PVTModelType( PVTModelType ),
-			SurfNum( SurfNum ),
-			PVname( PVname ),
-			PVnum( PVnum ),
-			PVfound( PVfound ),
-			Simple( Simple ),
-			WorkingFluidType( WorkingFluidType ),
-			PlantInletNodeNum( PlantInletNodeNum ),
-			PlantOutletNodeNum( PlantOutletNodeNum ),
-			HVACInletNodeNum( HVACInletNodeNum ),
-			HVACOutletNodeNum( HVACOutletNodeNum ),
-			DesignVolFlowRate( DesignVolFlowRate ),
-			MaxMassFlowRate( MaxMassFlowRate ),
-			MassFlowRate( MassFlowRate ),
-			AreaCol( AreaCol ),
-			BypassDamperOff( BypassDamperOff ),
-			CoolingUseful( CoolingUseful ),
-			HeatingUseful( HeatingUseful ),
-			Report( Report )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< PVTCollectorStruct > PVT;
+	extern Array1D< PVTCollectorStruct > PVT;
 
 	// Functions
 
@@ -313,29 +253,6 @@ namespace PhotovoltaicThermalCollectors {
 
 	//=====================  Utility/Other routines for module.
 	// Insert as appropriate
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PhotovoltaicThermalCollectors
 

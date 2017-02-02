@@ -1,0 +1,683 @@
+! WaterHeaterHeatPumpWrappedCondenser.idf
+!
+! Basic file description:
+! This input file illustrates WATER USE EQUIPMENT objects connected to a WATER HEATER:STRATIFIED object in a simple
+! plant loop for domestic hot water.
+!
+! Location:                Miami, FL
+!
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7 degC
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2 degC MWB=25.3 degC
+!
+! Run:      1 short run period.
+! Building: None.
+! System:   None.
+! Plant:    Plant loop with one WaterHeater:Stratified object with heat pump water heating connected to two water use equipment
+
+  Version,8.6;
+
+  Building,
+    Water Heater DHW Plant Loop Example,  !- Name
+    0.0,                     !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,60;
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+  Site:Location,
+    Miami Intl Ap FL USA WMO=722020,  !- Name
+    25.82,                   !- Latitude {deg}
+    -80.30,                  !- Longitude {deg}
+    -5.00,                   !- Time Zone {hr}
+    11.00;                   !- Elevation {m}
+
+ ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
+ ! Coldest Month=January
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7 degC
+
+  SizingPeriod:DesignDay,
+    Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    8.7,                     !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    8.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    101217.,                 !- Barometric Pressure {Pa}
+    3.8,                     !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
+ ! Hottest Month=July
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2 degC MWB=25.3 degC
+
+  SizingPeriod:DesignDay,
+    Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    33.2,                    !- Maximum Dry-Bulb Temperature {C}
+    6.7,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    25.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    101217.,                 !- Barometric Pressure {Pa}
+    4.5,                     !- Wind Speed {m/s}
+    140,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  RunPeriod,
+    April,                   !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    4,                       !- End Month
+    3,                       !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  SimulationControl,
+    NO,                      !- Do Zone Sizing Calculation
+    NO,                      !- Do System Sizing Calculation
+    NO,                      !- Do Plant Sizing Calculation
+    NO,                      !- Run Simulation for Sizing Periods
+    YES;                     !- Run Simulation for Weather File Run Periods
+
+  Site:WaterMainsTemperature,
+    CORRELATION,             !- Calculation Method
+    ,                        !- Temperature Schedule Name
+    9.69,                    !- Annual Average Outdoor Air Temperature {C}
+    28.1;                    !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  Schedule:Compact,
+    Always On,               !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,1;          !- Field 3
+
+  Schedule:Compact,
+    Ambient Temp Schedule,   !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,22.0;       !- Field 3
+
+  Schedule:Compact,
+    Hot Water Set Point Temp Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,43.89;      !- Field 3
+
+  Schedule:Compact,
+    Sinks and Showers Temp Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,40.56;      !- Field 3
+
+!***PLANT DHW LOOP***
+
+  Sizing:Plant,
+    DHW Loop,                !- Plant or Condenser Loop Name
+    HEATING,                 !- Loop Type
+    82.,                     !- Design Loop Exit Temperature {C}
+    11;                      !- Loop Design Temperature Difference {deltaC}
+
+  PlantLoop,
+    DHW Loop,                !- Name
+    WATER,                   !- Fluid Type
+    ,                        !- User Defined Fluid Type
+    DHW Loop Operation,      !- Plant Equipment Operation Scheme Name
+    Water Heater Use Loop Outlet Node,  !- Loop Temperature Setpoint Node Name
+    100,                     !- Maximum Loop Temperature {C}
+    3,                       !- Minimum Loop Temperature {C}
+    AUTOSIZE,                !- Maximum Loop Flow Rate {m3/s}
+    0,                       !- Minimum Loop Flow Rate {m3/s}
+    AUTOSIZE,                !- Plant Loop Volume {m3}
+    Water Heater Use Loop Inlet Node,  !- Plant Side Inlet Node Name
+    Water Heater Use Loop Outlet Node,  !- Plant Side Outlet Node Name
+    Water Heater Use Branches,  !- Plant Side Branch List Name
+    Water Heater Use Connectors,  !- Plant Side Connector List Name
+    Demand Inlet Node,       !- Demand Side Inlet Node Name
+    Demand Outlet Node,      !- Demand Side Outlet Node Name
+    Demand Branches,         !- Demand Side Branch List Name
+    Demand Connectors,       !- Demand Side Connector List Name
+    OPTIMAL;                 !- Load Distribution Scheme
+
+  PlantEquipmentOperationSchemes,
+    DHW Loop Operation,      !- Name
+    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
+    DHW Control Scheme,      !- Control Scheme 1 Name
+    Always On;               !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:HeatingLoad,
+    DHW Control Scheme,      !- Name
+    0,                       !- Load Range 1 Lower Limit {W}
+    10000000,                !- Load Range 1 Upper Limit {W}
+    DHW Plant Equipment;     !- Range 1 Equipment List Name
+
+  PlantEquipmentList,
+    DHW Plant Equipment,     !- Name
+    WaterHeater:HeatPump:WrappedCondenser,  !- Equipment 1 Object Type
+    PlantHeatPumpWaterHeater;!- Equipment 1 Name
+
+  SetpointManager:Scheduled,
+    DHW Loop Set Point Manager,  !- Name
+    Temperature,             !- Control Variable
+    Hot Water Set Point Temp Schedule,  !- Schedule Name
+    Water Heater Use Loop Outlet Node;  !- Setpoint Node or NodeList Name
+
+!***PLANT DHW LOOP: WATER HEATER SIDE***
+
+  BranchList,
+    Water Heater Use Branches,  !- Name
+    Water Heater Use Inlet Branch,  !- Branch 1 Name
+    Water Heater Use Branch, !- Branch 2 Name
+    Water Heater Use Outlet Branch;  !- Branch 3 Name
+
+  ConnectorList,
+    Water Heater Use Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Water Heater Use Splitter,  !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Water Heater Use Mixer;  !- Connector 2 Name
+
+  Connector:Splitter,
+    Water Heater Use Splitter,  !- Name
+    Water Heater Use Inlet Branch,  !- Inlet Branch Name
+    Water Heater Use Branch; !- Outlet Branch 1 Name
+
+  Connector:Mixer,
+    Water Heater Use Mixer,  !- Name
+    Water Heater Use Outlet Branch,  !- Outlet Branch Name
+    Water Heater Use Branch; !- Inlet Branch 1 Name
+
+  Branch,
+    Water Heater Use Inlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:VariableSpeed,      !- Component 1 Object Type
+    DHW Pump,                !- Component 1 Name
+    Water Heater Use Loop Inlet Node,  !- Component 1 Inlet Node Name
+    DHW Pump Outlet Node;    !- Component 1 Outlet Node Name
+
+! No pumping energy; water mains pressure only
+
+  Pump:VariableSpeed,
+    DHW Pump,                !- Name
+    Water Heater Use Loop Inlet Node,  !- Inlet Node Name
+    DHW Pump Outlet Node,    !- Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    0,                       !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
+    1.0,                     !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    0,                       !- Coefficient 1 of the Part Load Performance Curve
+    1,                       !- Coefficient 2 of the Part Load Performance Curve
+    0,                       !- Coefficient 3 of the Part Load Performance Curve
+    0,                       !- Coefficient 4 of the Part Load Performance Curve
+    0,                       !- Design Minimum Flow Rate {m3/s}
+    INTERMITTENT;            !- Pump Control Type
+
+  Branch,
+    Water Heater Use Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    WaterHeater:HeatPump:WrappedCondenser,  !- Component 1 Object Type
+    PlantHeatPumpWaterHeater,!- Component 1 Name
+    Water Heater Use Inlet Node,  !- Component 1 Inlet Node Name
+    Water Heater Use Outlet Node;  !- Component 1 Outlet Node Name
+
+  WaterHeater:HeatPump:WrappedCondenser,
+    PlantHeatPumpWaterHeater,!- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
+    3.89,                    !- Dead Band Temperature Difference {deltaC}
+    0.0664166667,            !- Condenser Bottom Location {m}
+    0.8634166667,            !- Condenser Top Location {m}
+    0.2279,                  !- Evaporator Air Flow Rate {m3/s}
+    OutdoorAirOnly,          !- Inlet Air Configuration
+    ,                        !- Air Inlet Node Name
+    ,                        !- Air Outlet Node Name
+    HPPlantAirInletNode,     !- Outdoor Air Node Name
+    HPPlantFanAirOutletNode, !- Exhaust Air Node Name
+    ,                        !- Inlet Air Temperature Schedule Name
+    ,                        !- Inlet Air Humidity Schedule Name
+    ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,  !- Tank Object Type
+    Water Heater Tank,       !- Tank Name
+    Water Heater Use Inlet Node,  !- Tank Use Side Inlet Node Name
+    Water Heater Use Outlet Node,  !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Wrapped,  !- DX Coil Object Type
+    HPWHPlantDXCoil,         !- DX Coil Name
+    7.2,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    48.89,                   !- Maximum Inlet Air Temperature for Compressor Operation {C}
+    Outdoors,                !- Compressor Location
+    ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
+    HPWHPlantFan,            !- Fan Name
+    DrawThrough,             !- Fan Placement
+    0,                       !- On Cycle Parasitic Electric Load {W}
+    0,                       !- Off Cycle Parasitic Electric Load {W}
+    ,                        !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    MutuallyExclusive,       !- Tank Element Control Logic
+    1.262,                   !- Control Sensor 1 Height In Stratified Tank {m}
+    0.75,                    !- Control Sensor 1 Weight {dimensionless}
+    0.464;                   !- Control Sensor 2 Height In Stratified Tank {m}
+
+  WaterHeater:Stratified,
+    Water Heater Tank,       !- Name
+    Water Heater,            !- End-Use Subcategory
+    0.287691,                !- Tank Volume {m3}
+    1.594,                   !- Tank Height {m}
+    VerticalCylinder,        !- Tank Shape
+    ,                        !- Tank Perimeter {m}
+    100,                     !- Maximum Temperature Limit {C}
+    MasterSlave,             !- Heater Priority Control
+    Hot Water Set Point Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name
+    18.5,                    !- Heater 1 Deadband Temperature Difference {deltaC}
+    4500,                    !- Heater 1 Capacity {W}
+    1.129,                   !- Heater 1 Height {m}
+    Hot Water Set Point Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name
+    18.5,                    !- Heater 2 Deadband Temperature Difference {deltaC}
+    0,                       !- Heater 2 Capacity {W}
+    0.266,                   !- Heater 2 Height {m}
+    Electricity,             !- Heater Fuel Type
+    1,                       !- Heater Thermal Efficiency
+    8.3,                     !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    1,                       !- Off Cycle Parasitic Height {m}
+    8.3,                     !- On Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    1,                       !- On Cycle Parasitic Height {m}
+    Schedule,                !- Ambient Temperature Indicator
+    Ambient Temp Schedule,   !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    0.7878,                  !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}
+    1,                       !- Skin Loss Fraction to Zone
+    ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
+    1,                       !- Off Cycle Flue Loss Fraction to Zone
+    ,                        !- Peak Use Flow Rate {m3/s}
+    ,                        !- Use Flow Rate Fraction Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    Water Heater Use Inlet Node,  !- Use Side Inlet Node Name
+    Water Heater Use Outlet Node,  !- Use Side Outlet Node Name
+    1,                       !- Use Side Effectiveness
+    0,                       !- Use Side Inlet Height {m}
+    autocalculate,           !- Use Side Outlet Height {m}
+    ,                        !- Source Side Inlet Node Name
+    ,                        !- Source Side Outlet Node Name
+    ,                        !- Source Side Effectiveness
+    ,                        !- Source Side Inlet Height {m}
+    ,                        !- Source Side Outlet Height {m}
+    Fixed,                   !- Inlet Mode
+    autosize,                !- Use Side Design Flow Rate {m3/s}
+    autosize,                !- Source Side Design Flow Rate {m3/s}
+    1.5,                     !- Indirect Water Heating Recovery Time {hr}
+    12;                      !- Number of Nodes
+
+  Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    HPWHPlantDXCoil,         !- Name
+    2349.6,                  !- Rated Heating Capacity {W}
+    2.4,                     !- Rated COP {W/W}
+    0.981,                   !- Rated Sensible Heat Ratio
+    19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+    13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+    48.89,                   !- Rated Condenser Water Temperature {C}
+    0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    Yes,                     !- Evaporator Fan Power Included in Rated COP
+    HPPlantAirInletNode,     !- Evaporator Air Inlet Node Name
+    HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
+    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
+    HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
+    ,                        !- Heating COP Function of Air Flow Fraction Curve Name
+    HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
+
+  Curve:Biquadratic,
+    HPWH-Htg-Cap-fT,         !- Name
+    0.563,                   !- Coefficient1 Constant
+    0.0437,                  !- Coefficient2 x
+    0.000039,                !- Coefficient3 x**2
+    0.0055,                  !- Coefficient4 y
+    -.000148,                !- Coefficient5 y**2
+    -.000145,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0;                       !- Minimum Curve Output
+
+  Curve:Biquadratic,
+    HPWH-Htg-COP-fT,         !- Name
+    1.1332,                  !- Coefficient1 Constant
+    0.063,                   !- Coefficient2 x
+    -.0000979,               !- Coefficient3 x**2
+    -.00972,                 !- Coefficient4 y
+    -.0000214,               !- Coefficient5 y**2
+    -.000686,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100;                     !- Maximum Value of y
+
+  Curve:Quadratic,
+    HPWH-COP-fPLR,           !- Name
+    1,                       !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1;                       !- Maximum Value of x
+
+  Fan:OnOff,
+    HPWHPlantFan,            !- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    0.1722,                  !- Fan Total Efficiency
+    65,                      !- Pressure Rise {Pa}
+    0.2279,                  !- Maximum Flow Rate {m3/s}
+    1,                       !- Motor Efficiency
+    0,                       !- Motor In Airstream Fraction
+    HPPlantAirOutletNode,    !- Air Inlet Node Name
+    HPPlantFanAirOutletNode; !- Air Outlet Node Name
+
+  OutdoorAir:Node,
+    HPPlantAirInletNode;     !- Name
+
+  Schedule:Compact,
+    PlantHPWHSch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    PlantHPWHTempSch,        !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,48.89;      !- Field 3
+
+  Branch,
+    Water Heater Use Outlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Water Heater Use Outlet Pipe,  !- Component 1 Name
+    Water Heater Use Outlet Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    Water Heater Use Loop Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Water Heater Use Outlet Pipe,  !- Name
+    Water Heater Use Outlet Pipe Inlet Node,  !- Inlet Node Name
+    Water Heater Use Loop Outlet Node;  !- Outlet Node Name
+
+!***PLANT DHW LOOP: DOMESTIC HOT WATER SIDE***
+
+  BranchList,
+    Demand Branches,         !- Name
+    Demand Inlet Branch,     !- Branch 1 Name
+    Domestic Hot Water Branch,  !- Branch 2 Name
+    Demand Outlet Branch;    !- Branch 3 Name
+
+  ConnectorList,
+    Demand Connectors,       !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Demand Splitter,         !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Demand Mixer;            !- Connector 2 Name
+
+  Connector:Splitter,
+    Demand Splitter,         !- Name
+    Demand Inlet Branch,     !- Inlet Branch Name
+    Domestic Hot Water Branch;  !- Outlet Branch 1 Name
+
+  Connector:Mixer,
+    Demand Mixer,            !- Name
+    Demand Outlet Branch,    !- Outlet Branch Name
+    Domestic Hot Water Branch;  !- Inlet Branch 1 Name
+
+  Branch,
+    Demand Inlet Branch,     !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Demand Inlet Pipe,       !- Component 1 Name
+    Demand Inlet Node,       !- Component 1 Inlet Node Name
+    Demand Pipe-DHW Node;    !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Demand Inlet Pipe,       !- Name
+    Demand Inlet Node,       !- Inlet Node Name
+    Demand Pipe-DHW Node;    !- Outlet Node Name
+
+  Branch,
+    Domestic Hot Water Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    WaterUse:Connections,    !- Component 1 Object Type
+    Domestic Hot Water,      !- Component 1 Name
+    Domestic Hot Water Inlet Node,  !- Component 1 Inlet Node Name
+    Domestic Hot Water Outlet Node;  !- Component 1 Outlet Node Name
+
+  WaterUse:Connections,
+    Domestic Hot Water,      !- Name
+    Domestic Hot Water Inlet Node,  !- Inlet Node Name
+    Domestic Hot Water Outlet Node,  !- Outlet Node Name
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Reclamation Water Storage Tank Name
+    ,                        !- Hot Water Supply Temperature Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    NONE,                    !- Drain Water Heat Exchanger Type
+    ,                        !- Drain Water Heat Exchanger Destination
+    ,                        !- Drain Water Heat Exchanger U-Factor Times Area {W/K}
+    Sinks,                   !- Water Use Equipment 1 Name
+    Showers;                 !- Water Use Equipment 2 Name
+
+! Sinks at 2.5 GPM
+
+  WaterUse:Equipment,
+    Sinks,                   !- Name
+    Sinks,                   !- End-Use Subcategory
+    0.000158,                !- Peak Flow Rate {m3/s}
+    Sinks Flow Schedule,     !- Flow Rate Fraction Schedule Name
+    Sinks and Showers Temp Schedule;  !- Target Temperature Schedule Name
+
+  Schedule:Compact,
+    Sinks Flow Schedule,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 1:00,0.003,       !- Field 3
+    UNTIL: 2:00,0.001,       !- Field 5
+    UNTIL: 3:00,0,           !- Field 7
+    UNTIL: 4:00,0,           !- Field 9
+    UNTIL: 5:00,0.001,       !- Field 11
+    UNTIL: 6:00,0.028,       !- Field 13
+    UNTIL: 7:00,0.105,       !- Field 15
+    UNTIL: 8:00,0.1,         !- Field 17
+    UNTIL: 9:00,0.081,       !- Field 19
+    UNTIL: 10:00,0.059,      !- Field 21
+    UNTIL: 11:00,0.051,      !- Field 23
+    UNTIL: 12:00,0.037,      !- Field 25
+    UNTIL: 13:00,0.031,      !- Field 27
+    UNTIL: 14:00,0.026,      !- Field 29
+    UNTIL: 15:00,0.023,      !- Field 31
+    UNTIL: 16:00,0.033,      !- Field 33
+    UNTIL: 17:00,0.041,      !- Field 35
+    UNTIL: 18:00,0.063,      !- Field 37
+    UNTIL: 19:00,0.075,      !- Field 39
+    UNTIL: 20:00,0.066,      !- Field 41
+    UNTIL: 21:00,0.059,      !- Field 43
+    UNTIL: 22:00,0.046,      !- Field 45
+    UNTIL: 23:00,0.046,      !- Field 47
+    UNTIL: 24:00,0.025;      !- Field 49
+
+! Showers at 2.5 GPM
+
+  WaterUse:Equipment,
+    Showers,                 !- Name
+    Showers,                 !- End-Use Subcategory
+    0.000205,                !- Peak Flow Rate {m3/s}
+    Showers Flow Schedule,   !- Flow Rate Fraction Schedule Name
+    Sinks and Showers Temp Schedule;  !- Target Temperature Schedule Name
+
+  Schedule:Compact,
+    Showers Flow Schedule,   !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 3:00,0,           !- Field 3
+    UNTIL: 5:00,0.2,         !- Field 5
+    UNTIL: 7:00,0,           !- Field 7
+    UNTIL: 7:10,1.0,         !- Field 9
+    UNTIL: 10:00,0,          !- Field 11
+    UNTIL: 10:30,0.3,        !- Field 13
+    UNTIL: 13:00,0,          !- Field 15
+    UNTIL: 13:10,0.5,        !- Field 17
+    UNTIL: 16:00,0,          !- Field 19
+    UNTIL: 22:00,0.1,        !- Field 21
+    UNTIL: 24:00,0;          !- Field 23
+
+  Branch,
+    Demand Outlet Branch,    !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Demand Outlet Pipe,      !- Component 1 Name
+    Demand DHW-Pipe Node,    !- Component 1 Inlet Node Name
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Demand Outlet Pipe,      !- Name
+    Demand DHW-Pipe Node,    !- Inlet Node Name
+    Demand Outlet Node;      !- Outlet Node Name
+
+  Output:VariableDictionary,IDF;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+  Output:Variable,*,Site Mains Water Temperature,timestep;
+
+  Output:Variable,*,Water Use Equipment Mixed Water Temperature,timestep;
+
+  Output:Variable,*,Water Use Connections Hot Water Volume Flow Rate,timestep;
+
+  Output:Variable,*,Water Use Connections Total Volume Flow Rate,timestep;
+
+  Output:Variable,*,Water Heater Tank Temperature,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 1,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 2,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 3,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 4,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 5,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 6,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 7,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 8,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 9,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 10,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 11,timestep;
+
+  Output:Variable,*,Water Heater Temperature Node 12,timestep;
+
+  Output:Variable,*,Water Heater Use Side Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Water Heater Heat Loss Rate,timestep;
+
+  Output:Variable,*,Water Heater Heating Rate,timestep;
+
+  Output:Variable,*,Water Heater Cycle On Count,timestep;
+
+  Output:Variable,*,Water Heater Heater 1 Cycle On Count,timestep;
+
+  Output:Variable,*,Water Heater Heater 2 Cycle On Count,timestep;
+
+  Output:Variable,*,Water Heater Runtime Fraction,timestep;
+
+  Output:Variable,*,Water Heater Heater 1 Runtime Fraction,timestep;
+
+  Output:Variable,*,Water Heater Heater 2 Runtime Fraction,timestep;
+
+  Output:Variable,*,Water Heater Electric Power,timestep;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,timestep;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,timestep;
+
+  Output:Variable,*,Cooling Coil Water Heating Electric Power,timestep;
+
+  Output:Variable,*,Cooling Coil Total Water Heating Rate,timestep;
+
+  Output:Variable,*,Water Heater Source Side Mass Flow Rate,timestep;
+
+  Output:Variable,*,Water Heater Source Side Inlet Temperature,timestep;
+
+  Output:Variable,*,Water Heater Source Side Outlet Temperature,timestep;
+
+  Output:Variable,*,Water Heater Source Side Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
+

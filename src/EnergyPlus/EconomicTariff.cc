@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -32,22 +78,13 @@ namespace EconomicTariff {
 	// MODULE INFORMATION:
 	//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 	//    DATE WRITTEN   May 2004
-	//    MODIFIED       na
-	//    RE-ENGINEERED  na
-	// PURPOSE OF THIS MODULE:
+
 	//    Compute utility bills for a building based on energy
 	//    use estimate.
-	// METHODOLOGY EMPLOYED:
-	// REFERENCES:
-	//    None.
-	// OTHER NOTES:
-
-	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace InputProcessor;
 	using ScheduleManager::GetScheduleIndex;
 
-	// Data
 	//ECONOMCIS:TARIFF enumerated lists
 
 	int const kindUnknown( 0 );
@@ -71,8 +108,8 @@ namespace EconomicTariff {
 	int const conversionMCF( 6 ); // thousand cubic feet
 	int const conversionCCF( 7 ); // hundred cubic feet
 
-	FArray1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
-	FArray1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	Array1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	Array1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
 
 	int const demandWindowQuarter( 1 );
 	int const demandWindowHalf( 2 );
@@ -80,7 +117,7 @@ namespace EconomicTariff {
 	int const demandWindowDay( 4 );
 	int const demandWindowWeek( 5 );
 
-	FArray1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
+	Array1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
 
 	int const buyFromUtility( 1 );
 	int const sellToUtility( 2 );
@@ -217,7 +254,7 @@ namespace EconomicTariff {
 	int sizeEconVar( 0 );
 
 	// holds the outbound connections for each variable
-	FArray1D_int operand; // sized to sizeOperand
+	Array1D_int operand; // sized to sizeOperand
 	int numOperand( 0 );
 	int sizeOperand( 0 );
 
@@ -234,8 +271,8 @@ namespace EconomicTariff {
 	int numComputation( 0 );
 
 	//list of pointers to variable, 0 end of line, negative indicate operations
-	FArray1D_int steps;
-	FArray1D_int stepsCopy;
+	Array1D_int steps;
+	Array1D_int stepsCopy;
 	int numSteps( 0 );
 	int sizeSteps( 0 );
 
@@ -247,14 +284,24 @@ namespace EconomicTariff {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< EconVarType > econVar;
-	FArray1D< TariffType > tariff;
-	FArray1D< QualifyType > qualify;
-	FArray1D< ChargeSimpleType > chargeSimple;
-	FArray1D< ChargeBlockType > chargeBlock;
-	FArray1D< RatchetType > ratchet;
-	FArray1D< ComputationType > computation;
-	FArray1D< StackType > stack;
+	Array1D< EconVarType > econVar;
+	Array1D< TariffType > tariff;
+	Array1D< QualifyType > qualify;
+	Array1D< ChargeSimpleType > chargeSimple;
+	Array1D< ChargeBlockType > chargeBlock;
+	Array1D< RatchetType > ratchet;
+	Array1D< ComputationType > computation;
+	Array1D< StackType > stack;
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool Update_GetInput( true );
+		int addOperand_prevVarMe( 0 );
+	}
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -267,54 +314,26 @@ namespace EconomicTariff {
 	void
 	UpdateUtilityBills()
 	{
-
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   September 2003
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Single routine used to call all get input
 		//    routines for economics.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
 		using DataGlobals::DoOutputReporting;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
 		using OutputReportTabular::AddTOCEntry;
+		using OutputReportTabular::displayEconomicResultSummary;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+		bool ErrorsFound( false );
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Locals
-		static bool GetInput( true );
-		static bool ErrorsFound( false );
-
-		if ( GetInput ) {
+		if ( Update_GetInput ) {
 			GetInputEconomicsTariff( ErrorsFound );
 			// do rest of GetInput only if at least one tariff is defined.
 			GetInputEconomicsCurrencyType( ErrorsFound );
 			if ( numTariff >= 1 ) {
-				if ( ! ErrorsFound ) AddTOCEntry( "Economics Results Summary Report", "Entire Facility" );
+				if ( !ErrorsFound && displayEconomicResultSummary ) AddTOCEntry( "Economics Results Summary Report", "Entire Facility" );
 				CreateCategoryNativeVariables();
 				GetInputEconomicsQualify( ErrorsFound );
 				GetInputEconomicsChargeSimple( ErrorsFound );
@@ -324,7 +343,7 @@ namespace EconomicTariff {
 				GetInputEconomicsComputation( ErrorsFound );
 				CreateDefaultComputation();
 			}
-			GetInput = false;
+			Update_GetInput = false;
 			if ( ErrorsFound ) ShowFatalError( "UpdateUtilityBills: Preceding errors cause termination." );
 		}
 		if ( DoOutputReporting && ( KindOfSim == ksRunPeriodWeather ) ) {
@@ -343,43 +362,20 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsTariff( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Tariff" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using DataGlobals::NumOfTimeStepInHour;
 		using OutputReportTabular::AddTOCEntry;
+		using OutputReportTabular::displayTariffReport;
 		using OutputProcessor::EnergyMeters;
-		using OutputProcessor::NumEnergyMeters;
 		using DataGlobalConstants::AssignResourceTypeNum;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsTariff: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsTariff: " );
 		int iInObj; // loop index variable for reading in objects
 		int jObj; // loop index for objects
 		int NumAlphas; // Number of elements in the alpha array
@@ -395,8 +391,8 @@ namespace EconomicTariff {
 		int AvgSumVar;
 		int StepTypeVar;
 		std::string UnitsVar; // Units sting, may be blank
-		FArray1D_string NamesOfKeys; // Specific key name
-		FArray1D_int IndexesForKeyVar; // Array index
+		Array1D_string NamesOfKeys; // Specific key name
+		Array1D_int IndexesForKeyVar; // Array index
 		int jFld;
 		std::string CurrentModuleObject; // for ease in renaming.
 
@@ -628,7 +624,7 @@ namespace EconomicTariff {
 					if ( ! ( SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 						ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the buyFromUtility option." );
-						ShowContinueError( "Usually the Electricity:Facility meter or the " "ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
+						ShowContinueError( "Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
 					}
 				}
 			}
@@ -643,7 +639,9 @@ namespace EconomicTariff {
 			tariff( iInObj ).isSelected = false;
 			tariff( iInObj ).totalAnnualCost = 0.0;
 			//now create the Table Of Contents entries for an HTML file
-			AddTOCEntry( "Tariff Report", tariff( iInObj ).tariffName );
+			if ( displayTariffReport ){
+				AddTOCEntry( "Tariff Report", tariff( iInObj ).tariffName );
+			}
 			//associate the resource number with each tariff
 			if ( tariff( iInObj ).reportMeterIndx >= 1 ) {
 				tariff( iInObj ).resourceNum = AssignResourceTypeNum( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType );
@@ -654,36 +652,13 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsQualify( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Qualify" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsQualify: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "GetInputEconomicsQualify: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -747,37 +722,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsChargeSimple( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Charge:Simple" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsChargeSimple: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsChargeSimple: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -814,7 +766,7 @@ namespace EconomicTariff {
 					if ( tariff( chargeSimple( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
+						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff." );
 					}
 				}
 			}
@@ -829,37 +781,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsChargeBlock( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Charge:Block" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsChargeBlock: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsChargeBlock: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -900,7 +829,7 @@ namespace EconomicTariff {
 					if ( tariff( chargeBlock( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
+						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff." );
 					}
 				}
 			}
@@ -940,37 +869,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsRatchet( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Ratchet" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsRatchet: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName( "GetInputEconomicsRatchet: " );
 		int iInObj; // loop index variable for reading in objects
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -1016,36 +922,14 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsVariable( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Variable" objects.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsVariable: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "GetInputEconomicsVariable: " );
 
 		int numEconVarObj;
 		int tariffPt;
@@ -1105,37 +989,15 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsComputation( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Read the input file for "Economics:Computation" objects.
 		//    This object is only used for very complex rates.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetInputEconomicsComputation: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "GetInputEconomicsComputation: " );
 
 		int tariffPt;
 		int iInObj; // loop index variable for reading in objects
@@ -1152,10 +1014,12 @@ namespace EconomicTariff {
 		numComputation = GetNumObjectsFound( CurrentModuleObject );
 		computation.allocate( numTariff ); //not the number of Computations but the number of tariffs
 		//set default values for computation
-		computation.computeName() = "";
-		computation.firstStep() = 0;
-		computation.lastStep() = -1;
-		computation.isUserDef() = false;
+		for ( auto & e : computation ) {
+			e.computeName.clear();
+			e.firstStep = 0;
+			e.lastStep = -1;
+			e.isUserDef = false;
+		}
 		for ( iInObj = 1; iInObj <= numComputation; ++iInObj ) {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
@@ -1198,40 +1062,18 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsCurrencyType( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Sets the type of currency (U.S. Dollar, Euro, Yen, etc.. )
 		//   This is a "unique" object.
 
-		// METHODOLOGY EMPLOYED:
-		//   Uses get input structure similar to other objects
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataCostEstimate;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		std::string const CurrentModuleObject( "CurrencyType" );
+		std::string const RoutineName( "GetInputEconomicsCurrencyType: " );
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const CurrentModuleObject( "CurrencyType" );
-		static std::string const RoutineName( "GetInputEconomicsCurrencyType: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumCurrencyType;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
@@ -1271,38 +1113,16 @@ namespace EconomicTariff {
 		int const fromTariff
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Converts a single line in the ECONOMICS:COMPUTE
 		//   command into tokens for computation
 
-		// METHODOLOGY EMPLOYED:
 		//   Scan the line from the end of the line to the front of the
 		//   line and search for operators and variables. All items
 		//   are put into the step array.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string word;
 		std::string::size_type endOfWord;
 		int token;
@@ -1342,39 +1162,16 @@ namespace EconomicTariff {
 		std::string & aWord
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Returns the last substring of the line of text to the
 		//   left of the endOfSubStrg pointer. A substring is
 		//   delimitted by spaces.  Quotes are not significant
 		//   (they are treated just like any other non-space character)
 
-		// METHODOLOGY EMPLOYED:
 		//   Scan the string from the end.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool isInWord;
 		bool isSpace;
 		std::string::size_type iString;
@@ -1439,37 +1236,18 @@ namespace EconomicTariff {
 	void
 	initializeMonetaryUnit()
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Sets the type of monetary unit array.
 
-		// METHODOLOGY EMPLOYED:
 		//   Uses get input structure similar to other objects
 		//   The monetaryUnitSymbols.xls spreadsheet helps create the code for this routine
 
-		// REFERENCES:
 		//   www.xe.com/symbols.php
 
-		// Using/Aliasing
 		using namespace DataCostEstimate;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		numMonetaryUnit = 111;
 		monetaryUnit.allocate( numMonetaryUnit );
 		monetaryUnit( 1 ).code = "USD";
@@ -1815,39 +1593,14 @@ namespace EconomicTariff {
 		std::string const & nameOfReferingObj
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Find the index for the season string provided or else
 		//    raise a warning.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int LookUpSeason;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( SameString( nameOfSeason, "Summer" ) ) {
 			LookUpSeason = seasonSummer;
 		} else if ( SameString( nameOfSeason, "Winter" ) ) {
@@ -1874,39 +1627,13 @@ namespace EconomicTariff {
 		std::string const & nameOfCurObj
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Find the index for the tariff string provided or else
 		//    raise a warning.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int FindTariffIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 		int found;
 
@@ -1936,36 +1663,12 @@ namespace EconomicTariff {
 		std::string const & curobjName
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   March 2007
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Issue a warning if the variable name (usually the object name) is
 		//   one of the names of native variables
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool throwError;
 
 		throwError = false;
@@ -2037,40 +1740,16 @@ namespace EconomicTariff {
 		int const tariffPt
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   If the string is not numeric, check if it is a valid string to use as
 		//   a variable name. Check if name has been used before and if not create
 		//   the variable using the string as its name.
 		//   Return the index of the variable.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int AssignVariablePt;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string inNoSpaces;
 		int found;
 		int iVar;
@@ -2123,35 +1802,13 @@ namespace EconomicTariff {
 	void
 	incrementEconVar()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Increment the Increase the size of the
 
-		// METHODOLOGY EMPLOYED:
+		int const sizeIncrement( 100 );
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static int sizeIncrement( 100 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( ! allocated( econVar ) ) {
 			econVar.allocate( sizeIncrement );
 			sizeEconVar = sizeIncrement;
@@ -2186,36 +1843,14 @@ namespace EconomicTariff {
 	void
 	incrementSteps()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Increment the step array counter and if
 		//   necessary increase the size of the array.
 
-		// METHODOLOGY EMPLOYED:
+		int const sizeIncrement( 100 );
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static int sizeIncrement( 100 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( ! allocated( steps ) ) {
 			steps.allocate( sizeIncrement );
 			sizeSteps = sizeIncrement;
@@ -2234,39 +1869,12 @@ namespace EconomicTariff {
 	std::string
 	RemoveSpaces( std::string const & StringIn )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Return the string with all spaces removed.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		std::string StringOut;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		bool foundSpaces = false;
 		for ( std::string::size_type iString = 0; iString < len( StringIn ); ++iString ) {
 			if ( StringIn[ iString ] != ' ' ) {
@@ -2285,37 +1893,12 @@ namespace EconomicTariff {
 	void
 	CreateCategoryNativeVariables()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    For each tariff create variables that are used for the
 		//    categories (i.e., EnergyCharges).
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
@@ -2379,38 +1962,11 @@ namespace EconomicTariff {
 	int
 	lookupOperator( std::string const & opString )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		int lookupOperator;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( SameString( opString, "Sum" ) ) {
 			lookupOperator = opSUM;
 		} else if ( SameString( opString, "MULTIPLY" ) ) {
@@ -2532,11 +2088,9 @@ namespace EconomicTariff {
 	void
 	CreateDefaultComputation()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
+
 		// PURPOSE OF THIS SUBROUTINE:
 		//    For most tariffs defined in EnergyPlus no specific
 		//    ECONOMICS:COMPUTATION will be entered. In that case,
@@ -2588,27 +2142,7 @@ namespace EconomicTariff {
 		//    depends on and a list of entries that are dependant on that
 		//    line.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataGlobals::OutputFileInits;
 		using OutputReportTabular::IntToStr;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int iTariff;
 		int iVar;
@@ -2824,7 +2358,7 @@ namespace EconomicTariff {
 					}
 				}
 				if ( remainingVarFlag ) {
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
 					ShowContinueError( "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on." );
 					for ( iVar = 1; iVar <= numEconVar; ++iVar ) {
 						if ( econVar( iVar ).tariffIndx == iTariff ) {
@@ -2842,7 +2376,7 @@ namespace EconomicTariff {
 				if ( computation( iTariff ).firstStep >= computation( iTariff ).lastStep ) {
 					computation( iTariff ).firstStep = 0;
 					computation( iTariff ).lastStep = -1;
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
 				}
 			}
 		}
@@ -2854,38 +2388,13 @@ namespace EconomicTariff {
 		int const varOperand
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Used by CreateDefaultComputation to create the dependancy
 		//   relationship in the EconVar array
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int sizeIncrement( 100 );
-		static int prevVarMe( 0 );
+		int const sizeIncrement( 100 );
 
 		if ( varOperand != 0 ) {
 			//increment the numOperand and allocate/reallocate the array
@@ -2906,9 +2415,9 @@ namespace EconomicTariff {
 			econVar( varMe ).lastOperand = numOperand;
 			//if it is the first time addOperand was called with the varMe value
 			//then set the first pointer as well
-			if ( varMe != prevVarMe ) {
+			if ( varMe != addOperand_prevVarMe ) {
 				econVar( varMe ).firstOperand = numOperand;
-				prevVarMe = varMe;
+				addOperand_prevVarMe = varMe;
 			}
 		}
 	}
@@ -2919,38 +2428,13 @@ namespace EconomicTariff {
 		int const curPointer
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Used by CreateDefaultComputation to create the "equation"
 		//   for the categories that are summations of ECONOMICS:CHARGES:BLOCK
 		//   and ECONOMICS:CHARGES:SIMPLE
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int kObj;
 
 		econVar( curPointer ).Operator = opSUM;
@@ -2982,47 +2466,17 @@ namespace EconomicTariff {
 	void
 	GatherForEconomics()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Gathers the data each timestep and updates the arrays
 		//   holding the data that will be used by the tariff
 		//   calculation.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::TimeStepZone;
+		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::Month;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int iTariff;
 		Real64 curInstantValue;
@@ -3049,7 +2503,7 @@ namespace EconomicTariff {
 				// remember the demand is still energy over a period of time divided by the
 				// length of time. This gathers the energy also.
 				tariff( iTariff ).collectEnergy += curInstantValue;
-				tariff( iTariff ).collectTime += ( TimeStepZone * SecInHour );
+				tariff( iTariff ).collectTime += TimeStepZoneSec;
 				//added *SecInHour when adding RTP support August 2008
 				if ( tariff( iTariff ).collectTime >= tariff( iTariff ).demWinTime * SecInHour ) {
 					//get current value that has been converted into desired units
@@ -3081,9 +2535,9 @@ namespace EconomicTariff {
 					}
 					if ( isGood ) {
 						tariff( iTariff ).seasonForMonth( curMonth ) = curSeason;
-						tariff( iTariff ).gatherEnergy( curPeriod, curMonth ) += curEnergy;
-						if ( tariff( iTariff ).gatherDemand( curPeriod, curMonth ) < curDemand ) {
-							tariff( iTariff ).gatherDemand( curPeriod, curMonth ) = curDemand;
+						tariff( iTariff ).gatherEnergy( curMonth, curPeriod ) += curEnergy;
+						if ( tariff( iTariff ).gatherDemand( curMonth, curPeriod ) < curDemand ) {
+							tariff( iTariff ).gatherDemand( curMonth, curPeriod ) = curDemand;
 						}
 					} else {
 						ShowWarningError( "UtilityCost:Tariff: While gathering for: " + tariff( iTariff ).tariffName );
@@ -3129,39 +2583,14 @@ namespace EconomicTariff {
 		int const maxThreshold
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//   Simple function to check if an integer is equal to or between
 		//   two other values.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Return value
 		bool isWithinRange;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( maxThreshold < minThreshold ) {
 			ShowWarningError( "UtilityCost: Invalid thresholds in IsWithinRange routine." );
 		}
@@ -3184,51 +2613,24 @@ namespace EconomicTariff {
 	void
 	ComputeTariff()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Perform the calculation steps to compute the monthly
 		//    utility bills for the user entered tariffs.
 		//    The list of steps for the tariff computation are in order
 		//    for stack based computation (reverse polish notation)
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
 		using OutputReportTabular::WriteTabularFiles;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
-
 		// values used in specific operations
-		FArray1D< Real64 > a( MaxNumMonths );
+		Array1D< Real64 > a( MaxNumMonths );
 		int aPt;
-		FArray1D< Real64 > b( MaxNumMonths );
+		Array1D< Real64 > b( MaxNumMonths );
 		int bPt;
-		FArray1D< Real64 > c( MaxNumMonths );
+		Array1D< Real64 > c( MaxNumMonths );
 		int cPt;
-		FArray1D< Real64 > d( MaxNumMonths );
+		Array1D< Real64 > d( MaxNumMonths );
 
 		int iTariff;
 		int jStep;
@@ -3298,7 +2700,7 @@ namespace EconomicTariff {
 						pushStack( abs( a ), noVar );
 					} else if ( SELECT_CASE_var == opINTEGER ) {
 						popStack( a, aPt );
-						pushStack( FArray1D_double( FArray1D_int( a ) ), noVar );
+						pushStack( Array1D_double( Array1D_int( a ) ), noVar );
 					} else if ( SELECT_CASE_var == opSIGN ) {
 						popStack( a, aPt );
 						pushStack( sign( 1.0, a ), noVar );
@@ -3589,17 +2991,13 @@ namespace EconomicTariff {
 
 	void
 	pushStack(
-		FArray1A< Real64 > const monthlyArray,
+		Array1A< Real64 > const monthlyArray,
 		int const variablePointer
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    A stack is used in the evaluation of the tariff since
 		//    the variables and operators are in a reverse polish
 		//    notation order. The stack operates on a last-in
@@ -3607,32 +3005,12 @@ namespace EconomicTariff {
 		//    to the variable and the twelve monthly values.
 		//    This routine puts an item on the top of the stack.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::IntToStr;
 
-		// Argument array dimensioning
 		monthlyArray.dim( MaxNumMonths );
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > curMonthlyArray( MaxNumMonths );
-		static int sizeIncrement( 50 );
+		Array1D< Real64 > curMonthlyArray( MaxNumMonths );
+		int const sizeIncrement( 50 );
 
 		curMonthlyArray = monthlyArray;
 		if ( ! allocated( stack ) ) {
@@ -3684,17 +3062,13 @@ namespace EconomicTariff {
 
 	void
 	popStack(
-		FArray1A< Real64 > monthlyArray,
+		Array1A< Real64 > monthlyArray,
 		int & variablePointer
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    A stack is used in the evaluation of the tariff since
 		//    the variables and operators are in a reverse polish
 		//    notation order. The stack operates on a last-in
@@ -3703,29 +3077,7 @@ namespace EconomicTariff {
 		//    This routine returns the item on the top of the stack
 		//    and removes it from the stack.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Argument array dimensioning
 		monthlyArray.dim( MaxNumMonths );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( topOfStack >= 1 ) {
 			variablePointer = stack( topOfStack ).varPt;
@@ -3742,40 +3094,15 @@ namespace EconomicTariff {
 	void
 	evaluateChargeSimple( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
 		int indexInChg;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > costPer( MaxNumMonths );
-		FArray1D< Real64 > resultChg( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > costPer( MaxNumMonths );
+		Array1D< Real64 > resultChg( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		indexInChg = econVar( usingVariable ).index;
@@ -3823,46 +3150,21 @@ namespace EconomicTariff {
 	void
 	evaluateChargeBlock( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
 		int indexInChg;
 		int iBlk;
 		int jMonth;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > blkSzMult( MaxNumMonths );
-		FArray1D< Real64 > remainVals( MaxNumMonths );
-		FArray1D< Real64 > resultChg( MaxNumMonths );
-		FArray1D< Real64 > amountForBlk( MaxNumMonths );
-		FArray1D< Real64 > curBlkSz( MaxNumMonths );
-		FArray1D< Real64 > curBlkCost( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > blkSzMult( MaxNumMonths );
+		Array1D< Real64 > remainVals( MaxNumMonths );
+		Array1D< Real64 > resultChg( MaxNumMonths );
+		Array1D< Real64 > amountForBlk( MaxNumMonths );
+		Array1D< Real64 > curBlkSz( MaxNumMonths );
+		Array1D< Real64 > curBlkCost( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 		bool flagAllZero;
 
 		curTariff = econVar( usingVariable ).tariffIndx;
@@ -3959,50 +3261,24 @@ namespace EconomicTariff {
 	void
 	evaluateRatchet( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int curTariff;
 		int indexInChg;
-		FArray1D< Real64 > baselineVals( MaxNumMonths );
-		FArray1D< Real64 > adjustmentVals( MaxNumMonths );
-		FArray1D< Real64 > multiplierVals( MaxNumMonths );
-		FArray1D< Real64 > offsetVals( MaxNumMonths );
-		FArray1D< Real64 > seasonFromMask( MaxNumMonths );
-		FArray1D< Real64 > seasonToMask( MaxNumMonths );
+		Array1D< Real64 > baselineVals( MaxNumMonths );
+		Array1D< Real64 > adjustmentVals( MaxNumMonths );
+		Array1D< Real64 > multiplierVals( MaxNumMonths );
+		Array1D< Real64 > offsetVals( MaxNumMonths );
+		Array1D< Real64 > seasonFromMask( MaxNumMonths );
+		Array1D< Real64 > seasonToMask( MaxNumMonths );
 		bool isMonthly( false );
-		FArray1D< Real64 > adjSeasonal( MaxNumMonths );
-		FArray1D< Real64 > adjPeak( MaxNumMonths );
-		FArray1D< Real64 > maxAdjBase( MaxNumMonths );
+		Array1D< Real64 > adjSeasonal( MaxNumMonths );
+		Array1D< Real64 > adjPeak( MaxNumMonths );
+		Array1D< Real64 > maxAdjBase( MaxNumMonths );
 		Real64 maximumVal;
 		int iMonth;
-		FArray1D< Real64 > finalResult( MaxNumMonths );
+		Array1D< Real64 > finalResult( MaxNumMonths );
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		indexInChg = econVar( usingVariable ).index;
@@ -4109,41 +3385,15 @@ namespace EconomicTariff {
 	void
 	evaluateQualify( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int curTariff;
 		int indexInQual;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > thresholdVals( MaxNumMonths );
-		FArray1D_int monthsQualify( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > thresholdVals( MaxNumMonths );
+		Array1D_int monthsQualify( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 		bool curIsMaximum;
 		bool curIsConsecutive;
 		int curNumberOfMonths;
@@ -4277,38 +3527,12 @@ namespace EconomicTariff {
 	void
 	addMonthlyCharge( int const usingVariable )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Include the monthly charges in the calculations
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
-		//INTEGER :: iMonth
-		//INTEGER :: curTotalEnergy
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		//check the tariff - make sure they match
@@ -4334,35 +3558,11 @@ namespace EconomicTariff {
 	void
 	checkMinimumMonthlyCharge( int const curTariff )
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   August 2008
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Check if the total is as big as the minimum monthly charge
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iMonth;
 		int totalVar;
 		int minMonVar;
@@ -4388,40 +3588,16 @@ namespace EconomicTariff {
 	void
 	setNativeVariables()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Set up the "built in" i.e. native variables that hold
 		//    the energy and demand from the simulation.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 		int jPeriod;
 		int kMonth;
-		FArray1D< Real64 > monthVal( MaxNumMonths );
+		Array1D< Real64 > monthVal( MaxNumMonths );
 		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
 
 		bigNumber = huge( bigNumber );
@@ -4430,7 +3606,7 @@ namespace EconomicTariff {
 			monthVal = 0.0;
 			for ( jPeriod = 1; jPeriod <= countPeriod; ++jPeriod ) {
 				for ( kMonth = 1; kMonth <= MaxNumMonths; ++kMonth ) {
-					monthVal( kMonth ) += tariff( iTariff ).gatherEnergy( jPeriod, kMonth );
+					monthVal( kMonth ) += tariff( iTariff ).gatherEnergy( kMonth, jPeriod );
 				}
 			}
 			econVar( tariff( iTariff ).nativeTotalEnergy ).values = monthVal;
@@ -4438,8 +3614,8 @@ namespace EconomicTariff {
 			monthVal = -bigNumber;
 			for ( jPeriod = 1; jPeriod <= countPeriod; ++jPeriod ) {
 				for ( kMonth = 1; kMonth <= MaxNumMonths; ++kMonth ) {
-					if ( tariff( iTariff ).gatherDemand( jPeriod, kMonth ) > monthVal( kMonth ) ) {
-						monthVal( kMonth ) = tariff( iTariff ).gatherDemand( jPeriod, kMonth );
+					if ( tariff( iTariff ).gatherDemand( kMonth, jPeriod ) > monthVal( kMonth ) ) {
+						monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, jPeriod );
 					}
 				}
 			}
@@ -4452,58 +3628,58 @@ namespace EconomicTariff {
 			econVar( tariff( iTariff ).nativeTotalDemand ).values = monthVal;
 			for ( kMonth = 1; kMonth <= MaxNumMonths; ++kMonth ) {
 				//nativePeakEnergy
-				econVar( tariff( iTariff ).nativePeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak );
 				//nativePeakDemand
-				econVar( tariff( iTariff ).nativePeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				//nativeShoulderEnergy
-				econVar( tariff( iTariff ).nativeShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodShoulder, kMonth );
+				econVar( tariff( iTariff ).nativeShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodShoulder );
 				//nativeShoulderDemand
-				econVar( tariff( iTariff ).nativeShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+				econVar( tariff( iTariff ).nativeShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				//nativeOffPeakEnergy
-				econVar( tariff( iTariff ).nativeOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativeOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
 				//nativeOffPeakDemand
-				econVar( tariff( iTariff ).nativeOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativeOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				//nativeMidPeakEnergy
-				econVar( tariff( iTariff ).nativeMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodMidPeak, kMonth );
+				econVar( tariff( iTariff ).nativeMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodMidPeak );
 				//nativeMidPeakDemand
-				econVar( tariff( iTariff ).nativeMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodMidPeak, kMonth );
+				econVar( tariff( iTariff ).nativeMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				//nativePeakExceedsOffPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativePeakExceedsOffPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativePeakExceedsOffPeak ).values( kMonth ) = 0.0;
 				}
 				//nativeOffPeakExceedsPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativeOffPeakExceedsPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativeOffPeakExceedsPeak ).values( kMonth ) = 0.0;
 				}
 				//nativePeakExceedsMidPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodMidPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativePeakExceedsMidPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativePeakExceedsOffPeak ).values( kMonth ) = 0.0;
 				}
 				//nativeMidPeakExceedsPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodMidPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativeMidPeakExceedsPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativeMidPeakExceedsPeak ).values( kMonth ) = 0.0;
 				}
 				//nativePeakExceedsShoulder
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativePeakExceedsShoulder ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativePeakExceedsShoulder ).values( kMonth ) = 0.0;
 				}
 				//nativeShoulderExceedsPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth ) - tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) - tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativeShoulderExceedsPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
@@ -4546,36 +3722,36 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).nativeIsNotAutumn ).values( kMonth ) = 1.0;
 				}
 				//nativePeakAndShoulderEnergy
-				econVar( tariff( iTariff ).nativePeakAndShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth ) + tariff( iTariff ).gatherEnergy( periodShoulder, kMonth );
+				econVar( tariff( iTariff ).nativePeakAndShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodShoulder );
 				//nativePeakAndShoulderDemand
-				if ( tariff( iTariff ).gatherDemand( periodPeak, kMonth ) > tariff( iTariff ).gatherDemand( periodShoulder, kMonth ) ) {
-					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) ) {
+					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				} else {
-					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				}
 				//nativePeakAndMidPeakEnergy
-				econVar( tariff( iTariff ).nativePeakAndMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth ) + tariff( iTariff ).gatherEnergy( periodMidPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakAndMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodMidPeak );
 				//nativePeakAndMidPeakDemand
-				if ( tariff( iTariff ).gatherDemand( periodPeak, kMonth ) > tariff( iTariff ).gatherDemand( periodMidPeak, kMonth ) ) {
-					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodMidPeak ) ) {
+					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				} else {
-					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodMidPeak, kMonth );
+					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				}
 				//nativeShoulderAndOffPeakEnergy
-				econVar( tariff( iTariff ).nativeShoulderAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodShoulder, kMonth ) + tariff( iTariff ).gatherEnergy( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativeShoulderAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodShoulder ) + tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
 				//nativeShoulderAndOffPeakDemand
-				if ( tariff( iTariff ).gatherDemand( periodShoulder, kMonth ) > tariff( iTariff ).gatherDemand( periodOffPeak, kMonth ) ) {
-					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) > tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) ) {
+					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				} else {
-					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				}
 				//nativePeakAndOffPeakEnergy
-				econVar( tariff( iTariff ).nativePeakAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth ) + tariff( iTariff ).gatherEnergy( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
 				//nativePeakAndOffPeakDemand
-				if ( tariff( iTariff ).gatherDemand( periodPeak, kMonth ) > tariff( iTariff ).gatherDemand( periodOffPeak, kMonth ) ) {
-					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) ) {
+					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				} else {
-					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				}
 				//nativeRealTimePriceCosts
 				econVar( tariff( iTariff ).nativeRealTimePriceCosts ).values( kMonth ) = tariff( iTariff ).RTPcost( kMonth );
@@ -4594,74 +3770,71 @@ namespace EconomicTariff {
 	void
 	LEEDtariffReporting()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   October 2012
-		//    MODIFIED
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Write the economic results for LEED reporting
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace OutputReportPredefined;
 
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int elecFacilMeter;
 		int gasFacilMeter;
+		int distCoolFacilMeter;
+		int distHeatFacilMeter;
 		Real64 elecTotalEne;
 		Real64 gasTotalEne;
+		Real64 distCoolTotalEne;
+		Real64 distHeatTotalEne;
 		Real64 otherTotalEne;
 		Real64 elecTotalCost;
 		Real64 gasTotalCost;
 		Real64 otherTotalCost;
+		Real64 distCoolTotalCost;
+		Real64 distHeatTotalCost;
 		Real64 allTotalCost;
 		std::string elecTariffNames;
 		std::string gasTariffNames;
+		std::string distCoolTariffNames;
+		std::string distHeatTariffNames;
 		std::string othrTariffNames;
 		int elecUnits;
 		int gasUnits;
+		int distCoolUnits;
+		int distHeatUnits;
 		int othrUnits;
 		int gasDemWindowUnits;
+		int distCoolDemWindowUnits;
+		int distHeatDemWindowUnits;
 		int othrDemWindowUnits;
 		int iTariff;
 
 		if ( numTariff > 0 ) {
 			elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
 			gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
+			distCoolFacilMeter = GetMeterIndex( "DISTRICTCOOLING:FACILITY" );
+			distHeatFacilMeter = GetMeterIndex( "DISTRICTHEATING:FACILITY" );
 			elecTotalEne = 0.0;
 			gasTotalEne = 0.0;
+			distCoolTotalEne = 0.0;
+			distHeatTotalEne = 0.0;
 			otherTotalEne = 0.0;
 			elecTotalCost = 0.0;
 			gasTotalCost = 0.0;
+			distCoolTotalCost = 0.0;
+			distHeatTotalCost = 0.0;
 			otherTotalCost = 0.0;
 			allTotalCost = 0.0;
 			elecUnits = 0;
 			gasUnits = 0;
+			distCoolUnits = 0;
+			distHeatUnits = 0;
 			othrUnits = 0;
 			gasDemWindowUnits = 0;
 			othrDemWindowUnits = 0;
 			elecTariffNames = "";
 			gasTariffNames = "";
+			distCoolTariffNames = "";
+			distHeatTariffNames = "";
 			othrTariffNames = "";
 			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 				if ( tariff( iTariff ).isSelected ) {
@@ -4677,6 +3850,18 @@ namespace EconomicTariff {
 						gasTariffNames += ' ' + tariff( iTariff ).tariffName;
 						gasUnits = tariff( iTariff ).convChoice;
 						gasDemWindowUnits = tariff( iTariff ).demandWindow;
+					} else if ( tariff( iTariff ).reportMeterIndx == distCoolFacilMeter ) {
+						if ( tariff( iTariff ).totalAnnualEnergy > distCoolTotalEne ) distCoolTotalEne = tariff( iTariff ).totalAnnualEnergy;
+						distCoolTotalCost += tariff( iTariff ).totalAnnualCost;
+						distCoolTariffNames += ' ' + tariff( iTariff ).tariffName;
+						distCoolUnits = tariff( iTariff ).convChoice;
+						distCoolDemWindowUnits = tariff( iTariff ).demandWindow;
+					} else if ( tariff( iTariff ).reportMeterIndx == distHeatFacilMeter ) {
+						if ( tariff( iTariff ).totalAnnualEnergy > distHeatTotalEne ) distHeatTotalEne = tariff( iTariff ).totalAnnualEnergy;
+						distHeatTotalCost += tariff( iTariff ).totalAnnualCost;
+						distHeatTariffNames += ' ' + tariff( iTariff ).tariffName;
+						distHeatUnits = tariff( iTariff ).convChoice;
+						distHeatDemWindowUnits = tariff( iTariff ).demandWindow;
 					} else {
 						if ( tariff( iTariff ).totalAnnualEnergy > otherTotalEne ) otherTotalEne = tariff( iTariff ).totalAnnualEnergy;
 						otherTotalCost += tariff( iTariff ).totalAnnualCost;
@@ -4689,6 +3874,8 @@ namespace EconomicTariff {
 			//names of the rates
 			PreDefTableEntry( pdchLeedEtsRtNm, "Electricity", elecTariffNames );
 			PreDefTableEntry( pdchLeedEtsRtNm, "Natural Gas", gasTariffNames );
+			if ( distCoolTotalEne != 0 ) PreDefTableEntry( pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames );
+			if ( distHeatTotalEne != 0 ) PreDefTableEntry( pdchLeedEtsRtNm, "District Heating", distHeatTariffNames );
 			PreDefTableEntry( pdchLeedEtsRtNm, "Other", othrTariffNames );
 			//virtual rate
 			if ( elecTotalEne != 0 ) PreDefTableEntry( pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3 );
@@ -4705,32 +3892,35 @@ namespace EconomicTariff {
 			PreDefTableEntry( pdchLeedEcsTotal, "Electricity", elecTotalCost, 2 );
 			PreDefTableEntry( pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2 );
 			PreDefTableEntry( pdchLeedEcsTotal, "Other", otherTotalCost, 2 );
+			// show district energy if used
+			if ( distCoolTotalEne != 0 ) {
+				PreDefTableEntry( pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3 );
+				PreDefTableEntry( pdchLeedEtsEneUnt, "District Cooling", convEneStrings( distCoolUnits ) );
+				PreDefTableEntry( pdchLeedEtsDemUnt, "District Cooling", convDemStrings( distCoolUnits ) + demWindowStrings( distCoolDemWindowUnits ) );
+				PreDefTableEntry( pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2 );
+			}
+			if ( distHeatTotalEne != 0 ) {
+				PreDefTableEntry( pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3 );
+				PreDefTableEntry( pdchLeedEtsEneUnt, "District Heating", convEneStrings( distHeatUnits ) );
+				PreDefTableEntry( pdchLeedEtsDemUnt, "District Heating", convDemStrings( distHeatUnits ) + demWindowStrings( distHeatDemWindowUnits ) );
+				PreDefTableEntry( pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2 );
+			}
 			// save the total costs for later to compute process fraction
 			LEEDelecCostTotal = elecTotalCost;
 			LEEDgasCostTotal = gasTotalCost;
-			LEEDothrCostTotal = otherTotalCost;
-			PreDefTableEntry( pdchLeedEcsTotal, "Total", elecTotalCost + gasTotalCost + otherTotalCost, 2 );
+			LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
+			PreDefTableEntry( pdchLeedEcsTotal, "Total", elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost, 2 );
 		}
 	}
 
 	void
 	WriteTabularTariffReports()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
 		//    MODIFIED       January 2010, Kyle Benne
 		//                   Added SQLite output
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
@@ -4743,28 +3933,14 @@ namespace EconomicTariff {
 		using OutputReportTabular::ConvertIP;
 		using OutputReportTabular::unitsStyle;
 		using OutputReportTabular::unitsStyleInchPound;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		using OutputReportTabular::displayTariffReport;
+		using OutputReportTabular::displayEconomicResultSummary;
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		//other local variables
 		int elecFacilMeter;
 		int gasFacilMeter;
@@ -4778,10 +3954,10 @@ namespace EconomicTariff {
 		int iTariff;
 		int kVar;
 		int lStep;
-		static std::string SIunit;
-		static int unitConvIndex( 0 );
-		static Real64 perAreaUnitConv( 0.0 );
-		static std::string perAreaUnitName;
+		std::string SIunit;
+		int unitConvIndex( 0 );
+		Real64 perAreaUnitConv( 0.0 );
+		std::string perAreaUnitName;
 
 		// compute floor area if no ABUPS
 		if ( buildingConditionedFloorArea == 0.0 ) {
@@ -4799,342 +3975,352 @@ namespace EconomicTariff {
 		}
 
 		if ( numTariff > 0 ) {
-			DisplayString( "Writing Tariff Reports" );
-			econVar.isReported() = false;
-			//CALL selectTariff moved to the end of computeTariff.
-			showWarningsBasedOnTotal();
-			//---------------------------------
-			// Economics Results Summary Report
-			//---------------------------------
-			WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", 1 );
-			elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
-			gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
-			//---- Annual Summary
-			rowHead.allocate( 3 );
-			columnHead.allocate( 4 );
-			columnWidth.allocate( 4 );
-			tableBody.allocate( 3, 4 );
-			tableBody = "";
-			columnHead( 1 ) = "Electric";
-			columnHead( 2 ) = "Gas";
-			columnHead( 3 ) = "Other";
-			columnHead( 4 ) = "Total";
-			rowHead( 1 ) = "Cost [~~$~~]";
-			rowHead( 2 ) = "Cost per Total Building Area " + perAreaUnitName;
-			rowHead( 3 ) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
-			elecTotalCost = 0.0;
-			gasTotalCost = 0.0;
-			otherTotalCost = 0.0;
-			allTotalCost = 0.0;
-			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				if ( tariff( iTariff ).isSelected ) {
-					allTotalCost += tariff( iTariff ).totalAnnualCost;
-					if ( tariff( iTariff ).kindElectricMtr >= kindMeterElecSimple ) {
-						elecTotalCost += tariff( iTariff ).totalAnnualCost;
-					} else if ( tariff( iTariff ).reportMeterIndx == gasFacilMeter ) {
-						gasTotalCost += tariff( iTariff ).totalAnnualCost;
-					} else {
-						otherTotalCost += tariff( iTariff ).totalAnnualCost;
-						// removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+			if ( displayEconomicResultSummary ) {
+				DisplayString( "Writing Tariff Reports" );
+				for ( auto & e : econVar ) e.isReported = false;
+				//CALL selectTariff moved to the end of computeTariff.
+				showWarningsBasedOnTotal();
+				//---------------------------------
+				// Economics Results Summary Report
+				//---------------------------------
+				WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", 1 );
+				elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
+				gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
+				//---- Annual Summary
+				rowHead.allocate( 3 );
+				columnHead.allocate( 4 );
+				columnWidth.allocate( 4 );
+				tableBody.allocate( 4, 3 );
+				tableBody = "";
+				columnHead( 1 ) = "Electric";
+				columnHead( 2 ) = "Gas";
+				columnHead( 3 ) = "Other";
+				columnHead( 4 ) = "Total";
+				rowHead( 1 ) = "Cost [~~$~~]";
+				rowHead( 2 ) = "Cost per Total Building Area " + perAreaUnitName;
+				rowHead( 3 ) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
+				elecTotalCost = 0.0;
+				gasTotalCost = 0.0;
+				otherTotalCost = 0.0;
+				allTotalCost = 0.0;
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					if ( tariff( iTariff ).isSelected ) {
+						allTotalCost += tariff( iTariff ).totalAnnualCost;
+						if ( tariff( iTariff ).kindElectricMtr >= kindMeterElecSimple ) {
+							elecTotalCost += tariff( iTariff ).totalAnnualCost;
+						} else if ( tariff( iTariff ).reportMeterIndx == gasFacilMeter ) {
+							gasTotalCost += tariff( iTariff ).totalAnnualCost;
+						} else {
+							otherTotalCost += tariff( iTariff ).totalAnnualCost;
+							// removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+						}
 					}
 				}
-			}
-			tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
-			tableBody( 1, 2 ) = RealToStr( gasTotalCost, 2 );
-			tableBody( 1, 3 ) = RealToStr( otherTotalCost, 2 );
-			tableBody( 1, 4 ) = RealToStr( allTotalCost, 2 );
-			if ( buildingGrossFloorArea > 0.0 ) {
-				tableBody( 2, 1 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 3 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 4 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-			}
-			if ( buildingConditionedFloorArea > 0.0 ) {
-				tableBody( 3, 1 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 2 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 4 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-			}
-			columnWidth = 14; //array assignment - same for all columns
-			WriteSubtitle( "Annual Cost" );
-			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-			//---- Tariff Summary
-			rowHead.allocate( numTariff );
-			columnHead.allocate( 6 );
-			columnWidth.allocate( 6 );
-			tableBody.allocate( numTariff, 6 );
-			tableBody = "";
-			columnHead( 1 ) = "Selected";
-			columnHead( 2 ) = "Qualified";
-			columnHead( 3 ) = "Meter";
-			columnHead( 4 ) = "Buy or Sell";
-			columnHead( 5 ) = "Group";
-			columnHead( 6 ) = "Annual Cost (~~$~~)";
-			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				rowHead( iTariff ) = tariff( iTariff ).tariffName;
-				if ( tariff( iTariff ).isSelected ) {
-					tableBody( iTariff, 1 ) = "Yes";
-				} else {
-					tableBody( iTariff, 1 ) = "No";
+				tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
+				tableBody( 2, 1 ) = RealToStr( gasTotalCost, 2 );
+				tableBody( 3, 1 ) = RealToStr( otherTotalCost, 2 );
+				tableBody( 4, 1 ) = RealToStr( allTotalCost, 2 );
+				if ( buildingGrossFloorArea > 0.0 ) {
+					tableBody( 1, 2 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 3, 2 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 4, 2 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
 				}
-				if ( tariff( iTariff ).isQualified ) {
-					tableBody( iTariff, 2 ) = "Yes";
-				} else {
-					tableBody( iTariff, 2 ) = "No";
+				if ( buildingConditionedFloorArea > 0.0 ) {
+					tableBody( 1, 3 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 2, 3 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 4, 3 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
 				}
-				tableBody( iTariff, 3 ) = tariff( iTariff ).reportMeter;
-				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
-				if ( SELECT_CASE_var == buyFromUtility ) {
-					tableBody( iTariff, 4 ) = "Buy";
-				} else if ( SELECT_CASE_var == sellToUtility ) {
-					tableBody( iTariff, 4 ) = "Sell";
-				} else if ( SELECT_CASE_var == netMetering ) {
-					tableBody( iTariff, 4 ) = "Net";
-				}}
-				if ( tariff( iTariff ).groupName == "" ) {
-					tableBody( iTariff, 5 ) = "(none)";
-				} else {
-					tableBody( iTariff, 5 ) = tariff( iTariff ).groupName;
-				}
-				tableBody( iTariff, 6 ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
-			}
-			columnWidth = 14; //array assignment - same for all columns
-			WriteSubtitle( "Tariff Summary" );
-			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-			//---------------------------------
-			// Tariff Report
-			//---------------------------------
-			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				WriteReportHeaders( "Tariff Report", tariff( iTariff ).tariffName, 1 );
-				rowHead.allocate( 7 );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				tableBody.allocate( 7, 1 );
-				tableBody = "";
-				columnHead( 1 ) = "Parameter";
-				rowHead( 1 ) = "Meter";
-				rowHead( 2 ) = "Selected";
-				rowHead( 3 ) = "Group";
-				rowHead( 4 ) = "Qualified";
-				rowHead( 5 ) = "Disqualifier";
-				rowHead( 6 ) = "Computation";
-				rowHead( 7 ) = "Units";
-				tableBody( 1, 1 ) = tariff( iTariff ).reportMeter;
-				if ( tariff( iTariff ).isSelected ) {
-					tableBody( 2, 1 ) = "Yes";
-				} else {
-					tableBody( 2, 1 ) = "No";
-				}
-				if ( tariff( iTariff ).groupName == "" ) {
-					tableBody( 3, 1 ) = "(none)";
-				} else {
-					tableBody( 3, 1 ) = tariff( iTariff ).groupName;
-				}
-				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 4, 1 ) = "Yes";
-				} else {
-					tableBody( 4, 1 ) = "No";
-				}
-				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 5, 1 ) = "n/a";
-				} else {
-					tableBody( 5, 1 ) = econVar( tariff( iTariff ).ptDisqualifier ).name;
-				}
-				if ( computation( iTariff ).isUserDef ) {
-					tableBody( 6, 1 ) = computation( iTariff ).computeName;
-				} else {
-					tableBody( 6, 1 ) = "automatic";
-				}
-				{ auto const SELECT_CASE_var( tariff( iTariff ).convChoice );
-				if ( SELECT_CASE_var == conversionUSERDEF ) {
-					tableBody( 7, 1 ) = "User Defined";
-				} else if ( SELECT_CASE_var == conversionKWH ) {
-					tableBody( 7, 1 ) = "kWh";
-				} else if ( SELECT_CASE_var == conversionTHERM ) {
-					tableBody( 7, 1 ) = "Therm";
-				} else if ( SELECT_CASE_var == conversionMMBTU ) {
-					tableBody( 7, 1 ) = "MMBtu";
-				} else if ( SELECT_CASE_var == conversionMJ ) {
-					tableBody( 7, 1 ) = "MJ";
-				} else if ( SELECT_CASE_var == conversionKBTU ) {
-					tableBody( 7, 1 ) = "kBtu";
-				} else if ( SELECT_CASE_var == conversionMCF ) {
-					tableBody( 7, 1 ) = "MCF";
-				} else if ( SELECT_CASE_var == conversionCCF ) {
-					tableBody( 7, 1 ) = "CCF";
-				}}
 				columnWidth = 14; //array assignment - same for all columns
-				WriteSubtitle( "General" );
+				WriteSubtitle( "Annual Cost" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
 				tableBody.deallocate();
-				//---- Categories
-				econVar.activeNow() = false;
-				econVar( tariff( iTariff ).ptEnergyCharges ).activeNow = true;
-				econVar( tariff( iTariff ).ptDemandCharges ).activeNow = true;
-				econVar( tariff( iTariff ).ptServiceCharges ).activeNow = true;
-				econVar( tariff( iTariff ).ptBasis ).activeNow = true;
-				econVar( tariff( iTariff ).ptAdjustment ).activeNow = true;
-				econVar( tariff( iTariff ).ptSurcharge ).activeNow = true;
-				econVar( tariff( iTariff ).ptSubtotal ).activeNow = true;
-				econVar( tariff( iTariff ).ptTaxes ).activeNow = true;
-				econVar( tariff( iTariff ).ptTotal ).activeNow = true;
-				ReportEconomicVariable( "Categories", false, true, tariff( iTariff ).tariffName );
-				//---- Charges
-				econVar.activeNow() = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( ( econVar( kVar ).kindOfObj == kindChargeSimple ) || ( econVar( kVar ).kindOfObj == kindChargeBlock ) ) {
-							econVar( kVar ).activeNow = true;
-						}
+				//---- Tariff Summary
+				rowHead.allocate( numTariff );
+				columnHead.allocate( 6 );
+				columnWidth.allocate( 6 );
+				tableBody.allocate( 6, numTariff );
+				tableBody = "";
+				columnHead( 1 ) = "Selected";
+				columnHead( 2 ) = "Qualified";
+				columnHead( 3 ) = "Meter";
+				columnHead( 4 ) = "Buy or Sell";
+				columnHead( 5 ) = "Group";
+				columnHead( 6 ) = "Annual Cost (~~$~~)";
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					rowHead( iTariff ) = tariff( iTariff ).tariffName;
+					if ( tariff( iTariff ).isSelected ) {
+						tableBody( 1, iTariff ) = "Yes";
+					} else {
+						tableBody( 1, iTariff ) = "No";
 					}
-				}
-				ReportEconomicVariable( "Charges", true, true, tariff( iTariff ).tariffName );
-				//---- Sources for Charges
-				econVar.activeNow() = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						indexInChg = econVar( kVar ).index;
-						if ( econVar( kVar ).kindOfObj == kindChargeSimple ) {
-							if ( chargeSimple( indexInChg ).sourcePt > 0 ) {
-								econVar( chargeSimple( indexInChg ).sourcePt ).activeNow = true;
-							}
-						} else if ( econVar( kVar ).kindOfObj == kindChargeBlock ) {
-							if ( chargeBlock( indexInChg ).sourcePt > 0 ) {
-								econVar( chargeBlock( indexInChg ).sourcePt ).activeNow = true;
-							}
-						}
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 2, iTariff ) = "Yes";
+					} else {
+						tableBody( 2, iTariff ) = "No";
 					}
-				}
-				ReportEconomicVariable( "Corresponding Sources for Charges", false, false, tariff( iTariff ).tariffName );
-				//---- Rachets
-				econVar.activeNow() = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( econVar( kVar ).kindOfObj == kindRatchet ) {
-							econVar( kVar ).activeNow = true;
-						}
-					}
-				}
-				ReportEconomicVariable( "Ratchets", false, false, tariff( iTariff ).tariffName );
-				//---- Qualifies
-				econVar.activeNow() = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( econVar( kVar ).kindOfObj == kindQualify ) {
-							econVar( kVar ).activeNow = true;
-						}
-					}
-				}
-				ReportEconomicVariable( "Qualifies", false, false, tariff( iTariff ).tariffName );
-				//---- Native Variables
-				econVar.activeNow() = false;
-				for ( kVar = tariff( iTariff ).firstNative; kVar <= tariff( iTariff ).lastNative; ++kVar ) {
-					econVar( kVar ).activeNow = true;
-				}
-				ReportEconomicVariable( "Native Variables", false, false, tariff( iTariff ).tariffName );
-				//---- Other Variables
-				econVar.activeNow() = false;
-				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
-					if ( econVar( kVar ).tariffIndx == iTariff ) {
-						if ( ! econVar( kVar ).isReported ) {
-							econVar( kVar ).activeNow = true;
-						}
-					}
-				}
-				ReportEconomicVariable( "Other Variables", false, false, tariff( iTariff ).tariffName );
-				//---- Computation
-				if ( computation( iTariff ).isUserDef ) {
-					WriteTextLine( "Computation -  User Defined", true );
-				} else {
-					WriteTextLine( "Computation -  Automatic", true );
-				}
-				outString = "";
-				for ( lStep = computation( iTariff ).firstStep; lStep <= computation( iTariff ).lastStep; ++lStep ) {
-					curStep = steps( lStep );
-					{ auto const SELECT_CASE_var( curStep );
-					if ( SELECT_CASE_var == 0 ) { //end of line
-						WriteTextLine( rstrip( outString ) );
-						outString = "";
-					} else if ( ( SELECT_CASE_var >= 1 ) ) { //all positive values are a reference to an econVar
-						outString = econVar( curStep ).name + ' ' + outString;
-					} else if ( SELECT_CASE_var == opSUM ) {
-						outString = "SUM " + outString;
-					} else if ( SELECT_CASE_var == opMULTIPLY ) {
-						outString = "MULTIPLY " + outString;
-					} else if ( SELECT_CASE_var == opSUBTRACT ) {
-						outString = "SUBTRACT " + outString;
-					} else if ( SELECT_CASE_var == opDIVIDE ) {
-						outString = "DIVIDE " + outString;
-					} else if ( SELECT_CASE_var == opABSOLUTE ) {
-						outString = "ABSOLUTE " + outString;
-					} else if ( SELECT_CASE_var == opINTEGER ) {
-						outString = "INTEGER " + outString;
-					} else if ( SELECT_CASE_var == opSIGN ) {
-						outString = "SIGN " + outString;
-					} else if ( SELECT_CASE_var == opROUND ) {
-						outString = "ROUND " + outString;
-					} else if ( SELECT_CASE_var == opMAXIMUM ) {
-						outString = "MAXIMUM " + outString;
-					} else if ( SELECT_CASE_var == opMINIMUM ) {
-						outString = "MINIMUM " + outString;
-					} else if ( SELECT_CASE_var == opEXCEEDS ) {
-						outString = "EXCEEDS " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMINIMUM ) {
-						outString = "ANNUALMINIMUM " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMAXIMUM ) {
-						outString = "ANNUALMAXIMUM " + outString;
-					} else if ( SELECT_CASE_var == opANNUALSUM ) {
-						outString = "ANNUALSUM " + outString;
-					} else if ( SELECT_CASE_var == opANNUALAVERAGE ) {
-						outString = "ANNUALAVERAGE " + outString;
-					} else if ( SELECT_CASE_var == opANNUALOR ) {
-						outString = "ANNUALOR " + outString;
-					} else if ( SELECT_CASE_var == opANNUALAND ) {
-						outString = "ANNUALAND " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMAXIMUMZERO ) {
-						outString = "ANNUALMAXIMUMZERO " + outString;
-					} else if ( SELECT_CASE_var == opANNUALMINIMUMZERO ) {
-						outString = "ANNUALMINIMUMZERO " + outString;
-					} else if ( SELECT_CASE_var == opIF ) {
-						outString = "IF " + outString;
-					} else if ( SELECT_CASE_var == opGREATERTHAN ) {
-						outString = "GREATERTHAN " + outString;
-					} else if ( SELECT_CASE_var == opGREATEREQUAL ) {
-						outString = "GREATEREQUAL " + outString;
-					} else if ( SELECT_CASE_var == opLESSTHAN ) {
-						outString = "LESSTHAN " + outString;
-					} else if ( SELECT_CASE_var == opLESSEQUAL ) {
-						outString = "LESSEQUAL " + outString;
-					} else if ( SELECT_CASE_var == opEQUAL ) {
-						outString = "EQUAL " + outString;
-					} else if ( SELECT_CASE_var == opNOTEQUAL ) {
-						outString = "NOTEQUAL " + outString;
-					} else if ( SELECT_CASE_var == opAND ) {
-						outString = "AND " + outString;
-					} else if ( SELECT_CASE_var == opOR ) {
-						outString = "OR " + outString;
-					} else if ( SELECT_CASE_var == opNOT ) {
-						outString = "NOT " + outString;
-					} else if ( SELECT_CASE_var == opADD ) {
-						outString = "ADD " + outString;
-					} else if ( SELECT_CASE_var == opNOOP ) { //should clear the outString when done debugging
-						//outString = ''
-						outString = "FROM " + outString;
+					tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
+					{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
+					if ( SELECT_CASE_var == buyFromUtility ) {
+						tableBody( 4, iTariff ) = "Buy";
+					} else if ( SELECT_CASE_var == sellToUtility ) {
+						tableBody( 4, iTariff ) = "Sell";
+					} else if ( SELECT_CASE_var == netMetering ) {
+						tableBody( 4, iTariff ) = "Net";
 					}}
+					if ( tariff( iTariff ).groupName == "" ) {
+						tableBody( 5, iTariff ) = "(none)";
+					} else {
+						tableBody( 5, iTariff ) = tariff( iTariff ).groupName;
+					}
+					tableBody( 6, iTariff ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
+				}
+				columnWidth = 14; //array assignment - same for all columns
+				WriteSubtitle( "Tariff Summary" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+				}
+				columnHead.deallocate();
+				rowHead.deallocate();
+				columnWidth.deallocate();
+				tableBody.deallocate();
+			}
+			//---------------------------------
+			// Tariff Report
+			//---------------------------------
+			if ( displayTariffReport ) {
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					WriteReportHeaders( "Tariff Report", tariff( iTariff ).tariffName, 1 );
+					rowHead.allocate( 7 );
+					columnHead.allocate( 1 );
+					columnWidth.allocate( 1 );
+					tableBody.allocate( 1, 7 );
+					tableBody = "";
+					columnHead( 1 ) = "Parameter";
+					rowHead( 1 ) = "Meter";
+					rowHead( 2 ) = "Selected";
+					rowHead( 3 ) = "Group";
+					rowHead( 4 ) = "Qualified";
+					rowHead( 5 ) = "Disqualifier";
+					rowHead( 6 ) = "Computation";
+					rowHead( 7 ) = "Units";
+					tableBody( 1, 1 ) = tariff( iTariff ).reportMeter;
+					if ( tariff( iTariff ).isSelected ) {
+						tableBody( 1, 2 ) = "Yes";
+					} else {
+						tableBody( 1, 2 ) = "No";
+					}
+					if ( tariff( iTariff ).groupName == "" ) {
+						tableBody( 1, 3 ) = "(none)";
+					} else {
+						tableBody( 1, 3 ) = tariff( iTariff ).groupName;
+					}
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 1, 4 ) = "Yes";
+					} else {
+						tableBody( 1, 4 ) = "No";
+					}
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 1, 5 ) = "n/a";
+					} else {
+						tableBody( 1, 5 ) = econVar( tariff( iTariff ).ptDisqualifier ).name;
+					}
+					if ( computation( iTariff ).isUserDef ) {
+						tableBody( 1, 6 ) = computation( iTariff ).computeName;
+					} else {
+						tableBody( 1, 6 ) = "automatic";
+					}
+					{ auto const SELECT_CASE_var( tariff( iTariff ).convChoice );
+					if ( SELECT_CASE_var == conversionUSERDEF ) {
+						tableBody( 1, 7 ) = "User Defined";
+					} else if ( SELECT_CASE_var == conversionKWH ) {
+						tableBody( 1, 7 ) = "kWh";
+					} else if ( SELECT_CASE_var == conversionTHERM ) {
+						tableBody( 1, 7 ) = "Therm";
+					} else if ( SELECT_CASE_var == conversionMMBTU ) {
+						tableBody( 1, 7 ) = "MMBtu";
+					} else if ( SELECT_CASE_var == conversionMJ ) {
+						tableBody( 1, 7 ) = "MJ";
+					} else if ( SELECT_CASE_var == conversionKBTU ) {
+						tableBody( 1, 7 ) = "kBtu";
+					} else if ( SELECT_CASE_var == conversionMCF ) {
+						tableBody( 1, 7 ) = "MCF";
+					} else if ( SELECT_CASE_var == conversionCCF ) {
+						tableBody( 1, 7 ) = "CCF";
+					}}
+					columnWidth = 14; //array assignment - same for all columns
+					WriteSubtitle( "General" );
+					WriteTable( tableBody, rowHead, columnHead, columnWidth );
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+					}
+					columnHead.deallocate();
+					rowHead.deallocate();
+					columnWidth.deallocate();
+					tableBody.deallocate();
+					//---- Categories
+					for ( auto & e : econVar ) e.activeNow = false;
+					econVar( tariff( iTariff ).ptEnergyCharges ).activeNow = true;
+					econVar( tariff( iTariff ).ptDemandCharges ).activeNow = true;
+					econVar( tariff( iTariff ).ptServiceCharges ).activeNow = true;
+					econVar( tariff( iTariff ).ptBasis ).activeNow = true;
+					econVar( tariff( iTariff ).ptAdjustment ).activeNow = true;
+					econVar( tariff( iTariff ).ptSurcharge ).activeNow = true;
+					econVar( tariff( iTariff ).ptSubtotal ).activeNow = true;
+					econVar( tariff( iTariff ).ptTaxes ).activeNow = true;
+					econVar( tariff( iTariff ).ptTotal ).activeNow = true;
+					ReportEconomicVariable( "Categories", false, true, tariff( iTariff ).tariffName );
+					//---- Charges
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( ( econVar( kVar ).kindOfObj == kindChargeSimple ) || ( econVar( kVar ).kindOfObj == kindChargeBlock ) ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Charges", true, true, tariff( iTariff ).tariffName );
+					//---- Sources for Charges
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							indexInChg = econVar( kVar ).index;
+							if ( econVar( kVar ).kindOfObj == kindChargeSimple ) {
+								if ( chargeSimple( indexInChg ).sourcePt > 0 ) {
+									econVar( chargeSimple( indexInChg ).sourcePt ).activeNow = true;
+								}
+							} else if ( econVar( kVar ).kindOfObj == kindChargeBlock ) {
+								if ( chargeBlock( indexInChg ).sourcePt > 0 ) {
+									econVar( chargeBlock( indexInChg ).sourcePt ).activeNow = true;
+								}
+							}
+						}
+					}
+					ReportEconomicVariable( "Corresponding Sources for Charges", false, false, tariff( iTariff ).tariffName );
+					//---- Rachets
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( econVar( kVar ).kindOfObj == kindRatchet ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Ratchets", false, false, tariff( iTariff ).tariffName );
+					//---- Qualifies
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( econVar( kVar ).kindOfObj == kindQualify ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Qualifies", false, false, tariff( iTariff ).tariffName );
+					//---- Native Variables
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = tariff( iTariff ).firstNative; kVar <= tariff( iTariff ).lastNative; ++kVar ) {
+						econVar( kVar ).activeNow = true;
+					}
+					ReportEconomicVariable( "Native Variables", false, false, tariff( iTariff ).tariffName );
+					//---- Other Variables
+					for ( auto & e : econVar ) e.activeNow = false;
+					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
+						if ( econVar( kVar ).tariffIndx == iTariff ) {
+							if ( ! econVar( kVar ).isReported ) {
+								econVar( kVar ).activeNow = true;
+							}
+						}
+					}
+					ReportEconomicVariable( "Other Variables", false, false, tariff( iTariff ).tariffName );
+					//---- Computation
+					if ( computation( iTariff ).isUserDef ) {
+						WriteTextLine( "Computation -  User Defined", true );
+					} else {
+						WriteTextLine( "Computation -  Automatic", true );
+					}
+					outString = "";
+					for ( lStep = computation( iTariff ).firstStep; lStep <= computation( iTariff ).lastStep; ++lStep ) {
+						curStep = steps( lStep );
+						{ auto const SELECT_CASE_var( curStep );
+						if ( SELECT_CASE_var == 0 ) { //end of line
+							WriteTextLine( rstrip( outString ) );
+							outString = "";
+						} else if ( ( SELECT_CASE_var >= 1 ) ) { //all positive values are a reference to an econVar
+							outString = econVar( curStep ).name + ' ' + outString;
+						} else if ( SELECT_CASE_var == opSUM ) {
+							outString = "SUM " + outString;
+						} else if ( SELECT_CASE_var == opMULTIPLY ) {
+							outString = "MULTIPLY " + outString;
+						} else if ( SELECT_CASE_var == opSUBTRACT ) {
+							outString = "SUBTRACT " + outString;
+						} else if ( SELECT_CASE_var == opDIVIDE ) {
+							outString = "DIVIDE " + outString;
+						} else if ( SELECT_CASE_var == opABSOLUTE ) {
+							outString = "ABSOLUTE " + outString;
+						} else if ( SELECT_CASE_var == opINTEGER ) {
+							outString = "INTEGER " + outString;
+						} else if ( SELECT_CASE_var == opSIGN ) {
+							outString = "SIGN " + outString;
+						} else if ( SELECT_CASE_var == opROUND ) {
+							outString = "ROUND " + outString;
+						} else if ( SELECT_CASE_var == opMAXIMUM ) {
+							outString = "MAXIMUM " + outString;
+						} else if ( SELECT_CASE_var == opMINIMUM ) {
+							outString = "MINIMUM " + outString;
+						} else if ( SELECT_CASE_var == opEXCEEDS ) {
+							outString = "EXCEEDS " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMINIMUM ) {
+							outString = "ANNUALMINIMUM " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMAXIMUM ) {
+							outString = "ANNUALMAXIMUM " + outString;
+						} else if ( SELECT_CASE_var == opANNUALSUM ) {
+							outString = "ANNUALSUM " + outString;
+						} else if ( SELECT_CASE_var == opANNUALAVERAGE ) {
+							outString = "ANNUALAVERAGE " + outString;
+						} else if ( SELECT_CASE_var == opANNUALOR ) {
+							outString = "ANNUALOR " + outString;
+						} else if ( SELECT_CASE_var == opANNUALAND ) {
+							outString = "ANNUALAND " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMAXIMUMZERO ) {
+							outString = "ANNUALMAXIMUMZERO " + outString;
+						} else if ( SELECT_CASE_var == opANNUALMINIMUMZERO ) {
+							outString = "ANNUALMINIMUMZERO " + outString;
+						} else if ( SELECT_CASE_var == opIF ) {
+							outString = "IF " + outString;
+						} else if ( SELECT_CASE_var == opGREATERTHAN ) {
+							outString = "GREATERTHAN " + outString;
+						} else if ( SELECT_CASE_var == opGREATEREQUAL ) {
+							outString = "GREATEREQUAL " + outString;
+						} else if ( SELECT_CASE_var == opLESSTHAN ) {
+							outString = "LESSTHAN " + outString;
+						} else if ( SELECT_CASE_var == opLESSEQUAL ) {
+							outString = "LESSEQUAL " + outString;
+						} else if ( SELECT_CASE_var == opEQUAL ) {
+							outString = "EQUAL " + outString;
+						} else if ( SELECT_CASE_var == opNOTEQUAL ) {
+							outString = "NOTEQUAL " + outString;
+						} else if ( SELECT_CASE_var == opAND ) {
+							outString = "AND " + outString;
+						} else if ( SELECT_CASE_var == opOR ) {
+							outString = "OR " + outString;
+						} else if ( SELECT_CASE_var == opNOT ) {
+							outString = "NOT " + outString;
+						} else if ( SELECT_CASE_var == opADD ) {
+							outString = "ADD " + outString;
+						} else if ( SELECT_CASE_var == opNOOP ) { //should clear the outString when done debugging
+							//outString = ''
+							outString = "FROM " + outString;
+						}}
+					}
 				}
 			}
 		}
@@ -5143,35 +4329,11 @@ namespace EconomicTariff {
 	void
 	showWarningsBasedOnTotal()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Get the annual maximum and sum for the econVariable.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 
 		if ( numTariff > 0 ) {
@@ -5179,12 +4341,12 @@ namespace EconomicTariff {
 				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
 				if ( SELECT_CASE_var == buyFromUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost < 0 ) {
-						ShowWarningError( "UtilityCost:Tariff: " "A negative annual total cost when buying electricity from a utility is unusual. " );
+						ShowWarningError( "UtilityCost:Tariff: A negative annual total cost when buying electricity from a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				} else if ( SELECT_CASE_var == sellToUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost > 0 ) {
-						ShowWarningError( "UtilityCost:Tariff: " "A positive annual total cost when selling electricity to a utility is unusual. " );
+						ShowWarningError( "UtilityCost:Tariff: A positive annual total cost when selling electricity to a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				}}
@@ -5199,35 +4361,11 @@ namespace EconomicTariff {
 		Real64 & maxResult
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Get the annual maximum and sum for the econVariable.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 sumVal;
 		Real64 maximumVal( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
 		Real64 curVal;
@@ -5254,47 +4392,23 @@ namespace EconomicTariff {
 		std::string const & forString
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
 		//    MODIFIED       January 2010, Kyle Benne
 		//                   Added sqlite output
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    Report all econVar that show as activeNow
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
 		using OutputReportTabular::RealToStr;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// The majority of the input is the econVar array
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		Real64 sumVal;
 		Real64 maximumVal;
 		Real64 curVal;
@@ -5317,12 +4431,12 @@ namespace EconomicTariff {
 			rowHead.allocate( cntOfVar );
 			columnHead.allocate( 15 );
 			columnWidth.allocate( 15 );
-			tableBody.allocate( cntOfVar, 15 );
+			tableBody.allocate( 15, cntOfVar );
 		} else {
 			rowHead.allocate( cntOfVar );
 			columnHead.allocate( 14 );
 			columnWidth.allocate( 14 );
-			tableBody.allocate( cntOfVar, 14 );
+			tableBody.allocate( 14, cntOfVar );
 		}
 		// column names
 		columnHead( 1 ) = "Jan";
@@ -5362,14 +4476,14 @@ namespace EconomicTariff {
 				for ( jMonth = 1; jMonth <= 12; ++jMonth ) { //note not all months get printed out if more than 12 are used.- need to fix this later
 					curVal = econVar( iVar ).values( jMonth );
 					if ( ( curVal > 0 ) && ( curVal < 1 ) ) {
-						tableBody( nCntOfVar, jMonth ) = RealToStr( curVal, 4 );
+						tableBody( jMonth, nCntOfVar ) = RealToStr( curVal, 4 );
 					} else {
-						tableBody( nCntOfVar, jMonth ) = RealToStr( curVal, 2 );
+						tableBody( jMonth, nCntOfVar ) = RealToStr( curVal, 2 );
 					}
 				}
 				getMaxAndSum( iVar, sumVal, maximumVal );
-				tableBody( nCntOfVar, 13 ) = RealToStr( sumVal, 2 );
-				tableBody( nCntOfVar, 14 ) = RealToStr( maximumVal, 2 );
+				tableBody( 13, nCntOfVar ) = RealToStr( sumVal, 2 );
+				tableBody( 14, nCntOfVar ) = RealToStr( maximumVal, 2 );
 				if ( includeCategory ) {
 					//first find category
 					curCategory = 0;
@@ -5389,25 +4503,25 @@ namespace EconomicTariff {
 					}
 					{ auto const SELECT_CASE_var( curCategory );
 					if ( SELECT_CASE_var == catEnergyCharges ) {
-						tableBody( nCntOfVar, 15 ) = "EnergyCharges";
+						tableBody( 15, nCntOfVar ) = "EnergyCharges";
 					} else if ( SELECT_CASE_var == catDemandCharges ) {
-						tableBody( nCntOfVar, 15 ) = "DemandCharges";
+						tableBody( 15, nCntOfVar ) = "DemandCharges";
 					} else if ( SELECT_CASE_var == catServiceCharges ) {
-						tableBody( nCntOfVar, 15 ) = "ServiceCharges";
+						tableBody( 15, nCntOfVar ) = "ServiceCharges";
 					} else if ( SELECT_CASE_var == catBasis ) {
-						tableBody( nCntOfVar, 15 ) = "Basis";
+						tableBody( 15, nCntOfVar ) = "Basis";
 					} else if ( SELECT_CASE_var == catAdjustment ) {
-						tableBody( nCntOfVar, 15 ) = "Adjustment";
+						tableBody( 15, nCntOfVar ) = "Adjustment";
 					} else if ( SELECT_CASE_var == catSurcharge ) {
-						tableBody( nCntOfVar, 15 ) = "Surcharge";
+						tableBody( 15, nCntOfVar ) = "Surcharge";
 					} else if ( SELECT_CASE_var == catSubtotal ) {
-						tableBody( nCntOfVar, 15 ) = "Subtotal";
+						tableBody( 15, nCntOfVar ) = "Subtotal";
 					} else if ( SELECT_CASE_var == catTaxes ) {
-						tableBody( nCntOfVar, 15 ) = "Taxes";
+						tableBody( 15, nCntOfVar ) = "Taxes";
 					} else if ( SELECT_CASE_var == catTotal ) {
-						tableBody( nCntOfVar, 15 ) = "Total";
+						tableBody( 15, nCntOfVar ) = "Total";
 					} else {
-						tableBody( nCntOfVar, 15 ) = "none";
+						tableBody( 15, nCntOfVar ) = "none";
 					}}
 				}
 				econVar( iVar ).isReported = true;
@@ -5416,7 +4530,9 @@ namespace EconomicTariff {
 		columnWidth = 14; //array assignment - same for all columns
 		WriteSubtitle( titleString );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		if ( sqlite ) {
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		}
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();
@@ -5427,13 +4543,9 @@ namespace EconomicTariff {
 	void
 	selectTariff()
 	{
-		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
-		//    MODIFIED       na
-		//    RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		//    To select tariffs for each combination of meter and
 		//    group.  If multipler tariffs have the same meter and
 		//    group, then select the one with the lowest cost.
@@ -5442,29 +4554,8 @@ namespace EconomicTariff {
 		//    Multiple meters are used but buy + sell might be more or
 		//    less expensive than netmeter.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using OutputProcessor::EnergyMeters;
-		using OutputProcessor::NumEnergyMeters;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int totalVarPt;
 		int totEneVarPt;
 		Real64 annualTotal;
@@ -5474,8 +4565,8 @@ namespace EconomicTariff {
 		int kTariff;
 		int lMin;
 		int mGroup;
-		FArray1D_int groupIndex; // index number (in tariff) for the group name
-		FArray1D_int MinTariffIndex; // tariff index for the Minimum value
+		Array1D_int groupIndex; // index number (in tariff) for the group name
+		Array1D_int MinTariffIndex; // tariff index for the Minimum value
 		int numMins;
 		int curMinTariffIndex;
 		bool isFound;
@@ -5663,44 +4754,17 @@ namespace EconomicTariff {
 	void
 	GetMonthlyCostForResource(
 		int const inResourceNumber,
-		FArray1A< Real64 > outMonthlyCosts
+		Array1A< Real64 > outMonthlyCosts
 	)
 	{
-
-		// FUNCTION INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   May 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
 		//  Return the total annual cost for a given resource number.
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 
 		// Argument array dimensioning
 		outMonthlyCosts.dim( 12 );
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int iTariff;
 		int jMonth;
 		int totalVarPt;
@@ -5718,28 +4782,38 @@ namespace EconomicTariff {
 		}
 	}
 
-	//     NOTICE
+	void
+	clear_state()
+	{
+		numEconVar = 0;
+		sizeEconVar = 0;
+		operand.deallocate();
+		numOperand = 0;
+		sizeOperand = 0;
+		numTariff = 0;
+		numQualify = 0;
+		numChargeSimple = 0;
+		numChargeBlock = 0;
+		numRatchet = 0;
+		numComputation = 0;
+		steps.deallocate();
+		stepsCopy.deallocate();
+		numSteps = 0;
+		sizeSteps = 0;
+		topOfStack = 0;
+		sizeStack = 0;
+		econVar.deallocate();
+		tariff.deallocate();
+		qualify.deallocate();
+		chargeSimple.deallocate();
+		chargeBlock.deallocate();
+		ratchet.deallocate();
+		computation.deallocate();
+		stack.deallocate();
+		Update_GetInput = true;
+		addOperand_prevVarMe = 0;
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	}
 
 } // EconomicTariff
 

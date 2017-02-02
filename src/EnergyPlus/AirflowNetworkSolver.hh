@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef AirflowNetworkSolver_hh_INCLUDED
 #define AirflowNetworkSolver_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -22,46 +68,46 @@ namespace AirflowNetworkSolver {
 	extern int const NrInt; // Number of intervals for a large opening
 
 	// Common block AFEDAT
-	extern FArray1D< Real64 > AFECTL;
-	extern FArray1D< Real64 > AFLOW2;
-	extern FArray1D< Real64 > AFLOW;
-	extern FArray1D< Real64 > PS;
-	extern FArray1D< Real64 > PW;
+	extern Array1D< Real64 > AFECTL;
+	extern Array1D< Real64 > AFLOW2;
+	extern Array1D< Real64 > AFLOW;
+	extern Array1D< Real64 > PS;
+	extern Array1D< Real64 > PW;
 
 	// Common block CONTRL
 	extern Real64 PB;
 	extern int LIST;
 
 	// Common block ZONL
-	extern FArray1D< Real64 > RHOZ;
-	extern FArray1D< Real64 > SQRTDZ;
-	extern FArray1D< Real64 > VISCZ;
-	extern FArray1D< Real64 > SUMAF;
-	extern FArray1D< Real64 > TZ; // Temperature [C]
-	extern FArray1D< Real64 > WZ; // Humidity ratio [kg/kg]
-	extern FArray1D< Real64 > PZ; // Pressure [Pa]
+	extern Array1D< Real64 > RHOZ;
+	extern Array1D< Real64 > SQRTDZ;
+	extern Array1D< Real64 > VISCZ;
+	extern Array1D< Real64 > SUMAF;
+	extern Array1D< Real64 > TZ; // Temperature [C]
+	extern Array1D< Real64 > WZ; // Humidity ratio [kg/kg]
+	extern Array1D< Real64 > PZ; // Pressure [Pa]
 
 	// Other array variables
-	extern FArray1D_int ID;
-	extern FArray1D_int IK;
-	extern FArray1D< Real64 > AD;
-	extern FArray1D< Real64 > AU;
+	extern Array1D_int ID;
+	extern Array1D_int IK;
+	extern Array1D< Real64 > AD;
+	extern Array1D< Real64 > AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-	extern FArray1D_int newIK; // noel
-	extern FArray1D< Real64 > newAU; // noel
+	extern Array1D_int newIK; // noel
+	extern Array1D< Real64 > newAU; // noel
 #endif
 
 	//REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-	extern FArray1D< Real64 > SUMF;
+	extern Array1D< Real64 > SUMF;
 	extern int Unit11;
 	extern int Unit21;
 
 	// Large opening variables
-	extern FArray1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
-	extern FArray1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
-	extern FArray1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
-	extern FArray2D< Real64 > DpL; // Array of stack pressures in link
+	extern Array1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
+	extern Array1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
+	extern Array1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
+	extern Array2D< Real64 > DpL; // Array of stack pressures in link
 
 	// Functions
 
@@ -79,9 +125,9 @@ namespace AirflowNetworkSolver {
 
 	void
 	SOLVZP(
-		FArray1A_int IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A_int IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
 		int & ITER // number of iterations
 	);
 
@@ -99,8 +145,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -112,8 +158,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -125,8 +171,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -138,8 +184,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -151,8 +197,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -164,8 +210,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -179,8 +225,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -194,8 +240,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -207,8 +253,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -220,8 +266,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -233,8 +279,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -246,8 +292,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -259,8 +305,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -272,8 +318,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -285,8 +331,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -298,8 +344,34 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	);
+
+	void
+	AFEOAF(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const i, // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	);
+
+	void
+	AFEREL(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const i, // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -311,46 +383,46 @@ namespace AirflowNetworkSolver {
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
 	void
 	FACSKY(
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AL, // the lower triangle of [A] before and after factoring
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AL, // the lower triangle of [A] before and after factoring
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	);
 
 	void
 	SLVSKY(
-		FArray1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
-		FArray1A< Real64 > B, // "B" vector (input); "X" vector (output).
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
+		Array1A< Real64 > B, // "B" vector (input); "X" vector (output).
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	);
 
 	void
 	FILSKY(
-		FArray1A< Real64 > const X, // element array (row-wise sequence)
-		FArray1A_int const LM, // location matrix
-		FArray1A_int const IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const X, // element array (row-wise sequence)
+		Array1A_int const LM, // location matrix
+		Array1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
 		int const FLAG // mode of operation
 	);
 
 	void
 	DUMPVD(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	);
@@ -358,7 +430,7 @@ namespace AirflowNetworkSolver {
 	void
 	DUMPVR(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	);
@@ -371,8 +443,8 @@ namespace AirflowNetworkSolver {
 		int const IL, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -381,12 +453,12 @@ namespace AirflowNetworkSolver {
 		int const il, // Linkage number
 		int const Pprof, // Opening number
 		Real64 const G, // gravitation field strength [N/kg]
-		FArray1A< Real64 > const DpF, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const DpT, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
-		FArray1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
+		Array1A< Real64 > const DpF, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const DpT, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
+		Array1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
 		int const From, // Number of FROM zone
 		int const To, // Number of To zone
 		Real64 const ActLh, // Actual height of opening [m]
@@ -421,28 +493,6 @@ namespace AirflowNetworkSolver {
 	);
 
 	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // AirflowNetworkSolver
 

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -42,7 +42,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	DimensionSlice() :
 	 m_( 1 ),
 	 k_( 0 ),
@@ -50,7 +49,6 @@ public: // Creation
 	{}
 
 	// Index Slice + Multiplier Constructor
-	inline
 	DimensionSlice( IndexSlice const & slice, std::int64_t const multiplier = 1 ) :
 	 m_( slice.s() * multiplier ),
 	 k_( slice.l() * multiplier - m_ ),
@@ -61,7 +59,6 @@ public: // Creation
 	}
 
 	// Index Slice + Multiplier Constructor
-	inline
 	DimensionSlice( IndexSlice const & slice, size_type const multiplier ) :
 	 m_( slice.s() * multiplier ),
 	 k_( slice.l() * multiplier - m_ ),
@@ -73,7 +70,6 @@ public: // Creation
 
 	// Index Slice + Multiplier Constructor
 	template< typename M >
-	inline
 	DimensionSlice( IndexSlice const & slice, M const multiplier ) :
 	 m_( slice.s() * multiplier ),
 	 k_( slice.l() * multiplier - m_ ),
@@ -84,10 +80,8 @@ public: // Creation
 	}
 
 	// Index Range + Index Slice + Multiplier Constructor
-	inline
 	DimensionSlice( IndexRange const & range, IndexSlice slice, std::int64_t const multiplier = 1 )
 	{
-		assert( range.initialized() );
 		slice.lud( range.l(), range.u() );
 		assert( slice.initialized() );
 		assert( slice.empty() || range.contains( slice.l(), slice.last() ) );
@@ -98,10 +92,8 @@ public: // Creation
 	}
 
 	// Index Range + Index Slice + Multiplier Constructor
-	inline
 	DimensionSlice( IndexRange const & range, IndexSlice slice, size_type const multiplier )
 	{
-		assert( range.initialized() );
 		slice.lud( range.l(), range.u() );
 		assert( slice.initialized() );
 		assert( slice.empty() || range.contains( slice.l(), slice.last() ) );
@@ -113,10 +105,8 @@ public: // Creation
 
 	// Index Range + Index Slice + Multiplier Constructor
 	template< typename M >
-	inline
 	DimensionSlice( IndexRange const & range, IndexSlice slice, M const multiplier )
 	{
-		assert( range.initialized() );
 		slice.lud( range.l(), range.u() );
 		assert( slice.initialized() );
 		assert( slice.empty() || range.contains( slice.l(), slice.last() ) );
@@ -127,7 +117,6 @@ public: // Creation
 	}
 
 	// Upper Index + Index Slice + Multiplier Constructor
-	inline
 	DimensionSlice( int const u, IndexSlice slice, std::int64_t const multiplier = 1 )
 	{
 		assert( u >= 0 );
@@ -141,7 +130,6 @@ public: // Creation
 	}
 
 	// Upper Index + Index Slice + Multiplier Constructor
-	inline
 	DimensionSlice( int const u, IndexSlice slice, size_type const multiplier )
 	{
 		assert( u >= 0 );
@@ -156,7 +144,6 @@ public: // Creation
 
 	// Upper Index + Index Slice + Multiplier Constructor
 	template< typename M >
-	inline
 	DimensionSlice( int const u, IndexSlice slice, M const multiplier )
 	{
 		assert( u >= 0 );
@@ -170,10 +157,9 @@ public: // Creation
 	}
 
 	// Index Range + Multiplier Full Range Constructor
-	inline
 	DimensionSlice( IndexRange const & range, size_type const multiplier = 1 )
 	{
-		assert( range.initialized() && range.bounded() );
+		assert( range.bounded() );
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() ) );
 		m_ = multiplier;
 		k_ = ( range.l() - 1 ) * multiplier;
@@ -181,14 +167,12 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~DimensionSlice()
 	{}
 
 public: // Inspector
 
 	// Multiplier
-	inline
 	std::int64_t
 	m() const
 	{
@@ -196,7 +180,6 @@ public: // Inspector
 	}
 
 	// Constant
-	inline
 	std::int64_t
 	k() const
 	{
@@ -204,7 +187,6 @@ public: // Inspector
 	}
 
 	// Upper Index
-	inline
 	int
 	u() const
 	{
@@ -212,7 +194,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	size_type
 	z() const
 	{
@@ -220,7 +201,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -230,7 +210,6 @@ public: // Inspector
 public: // Modifier
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -242,7 +221,6 @@ public: // Modifier
 protected: // Static Methods
 
 	// Is Index in Range of [1,u]
-	inline
 	static
 	bool
 	in_range( int const u, int const i )
@@ -257,9 +235,6 @@ private: // Data
 	int u_; // Upper index
 
 }; // DimensionSlice
-
-// Types
-typedef  DimensionSlice  DSlice;
 
 } // ObjexxFCL
 

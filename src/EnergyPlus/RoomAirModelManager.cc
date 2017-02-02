@@ -1,12 +1,59 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
+#include <limits>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <RoomAirModelManager.hh>
@@ -17,18 +64,23 @@
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
+#include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataRoomAirModel.hh>
 #include <DataSurfaces.hh>
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
 #include <DisplacementVentMgr.hh>
+#include <Fans.hh>
 #include <General.hh>
+#include <InternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <MundtSimMgr.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <RoomAirModelAirflowNetwork.hh>
 #include <RoomAirModelUserTempPattern.hh>
 #include <ScheduleManager.hh>
 #include <UFADManager.hh>
@@ -71,12 +123,20 @@ namespace RoomAirModelManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	bool GetUCSDDVDataFlag( true ); // UCSD
+	bool GetAirModelData( true ); // Used to "get" all air model data
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetUCSDDVDataFlag = true;
+		GetAirModelData = true;
+	}
 
 	void
 	ManageAirModel( int & ZoneNum )
@@ -104,6 +164,7 @@ namespace RoomAirModelManager {
 		using CrossVentMgr::ManageUCSDCVModel;
 		using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
 		using UFADManager::ManageUCSDUFModels;
+		using RoomAirModelAirflowNetwork::SimRoomAirModelAirflowNetwork;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -118,7 +179,7 @@ namespace RoomAirModelManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetAirModelData( true ); // Used to "get" all air model data
+//		static bool GetAirModelData( true ); // Used to "get" all air model data
 
 		// FLOW:
 		if ( GetAirModelData ) {
@@ -158,6 +219,10 @@ namespace RoomAirModelManager {
 		} else if ( SELECT_CASE_var == RoomAirModel_UCSDUFE ) { // UCSD UFAD exterior zone model
 			// simulate room airflow using the UCSDUFE model
 			ManageUCSDUFModels( ZoneNum, RoomAirModel_UCSDUFE );
+
+		} else if ( SELECT_CASE_var == RoomAirModel_AirflowNetwork ) { // RoomAirflowNetwork zone model
+			// simulate room airflow using the AirflowNetwork - based model
+			SimRoomAirModelAirflowNetwork( ZoneNum );
 
 		} else { // mixing air model
 			// do nothing
@@ -213,6 +278,9 @@ namespace RoomAirModelManager {
 		// get mundt model controls for all zones
 		GetMundtData( ErrorsFound );
 
+		// get airflow network model info for all zones
+		GetRoomAirflowNetworkData( ErrorsFound );
+
 		// get UCSDDV model controls for all zones
 		GetDisplacementVentData( ErrorsFound );
 
@@ -262,12 +330,12 @@ namespace RoomAirModelManager {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using namespace DataIPShortCuts;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::SurfaceClass_IntMass;
 		using DataHeatBalance::Zone;
 		using ScheduleManager::GetScheduleIndex;
 		using RoomAirModelUserTempPattern::FigureNDheightInZone;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::EquipConfiguration;
 		using DataErrorTracking::TotalWarningErrors;
 		using DataErrorTracking::TotalRoomAirPatternTooLow;
 		using DataErrorTracking::TotalRoomAirPatternTooHigh;
@@ -332,8 +400,7 @@ namespace RoomAirModelManager {
 
 			GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//first get zone ID
-			ZoneNum = 0;
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum == 0 ) { //throw error
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 				ShowContinueError( "Invalid-not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -540,7 +607,7 @@ namespace RoomAirModelManager {
 			for ( i = 1; i <= NumPairs; ++i ) {
 				RoomAirPattern( thisPattern ).MapPatrn.SurfName( i ) = cAlphaArgs( i + 1 );
 				RoomAirPattern( thisPattern ).MapPatrn.DeltaTai( i ) = rNumericArgs( i + 4 );
-				found = FindItemInList( cAlphaArgs( i + 1 ), Surface.Name(), TotSurfaces );
+				found = FindItemInList( cAlphaArgs( i + 1 ), Surface );
 				if ( found != 0 ) {
 					RoomAirPattern( thisPattern ).MapPatrn.SurfID( i ) = found;
 				} else {
@@ -554,12 +621,12 @@ namespace RoomAirModelManager {
 		}
 
 		if ( TotalRoomAirPatternTooLow > 0 ) {
-			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooLow ) + " problem(s) in non-dimensional height calculations, " "too low surface height(s) in relation to floor height of zone(s)." );
+			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooLow ) + " problem(s) in non-dimensional height calculations, too low surface height(s) in relation to floor height of zone(s)." );
 			ShowContinueError( "...Use OutputDiagnostics,DisplayExtraWarnings; to see details." );
 			TotalWarningErrors += TotalRoomAirPatternTooLow;
 		}
 		if ( TotalRoomAirPatternTooHigh > 0 ) {
-			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooHigh ) + " problem(s) in non-dimensional height calculations, " "too high surface height(s) in relation to ceiling height of zone(s)." );
+			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooHigh ) + " problem(s) in non-dimensional height calculations, too high surface height(s) in relation to ceiling height of zone(s)." );
 			ShowContinueError( "...Use OutputDiagnostics,DisplayExtraWarnings; to see details." );
 			TotalWarningErrors += TotalRoomAirPatternTooHigh;
 		}
@@ -571,7 +638,7 @@ namespace RoomAirModelManager {
 		for ( i = 1; i <= NumOfZones; ++i ) {
 			if ( AirPatternZoneInfo( i ).IsUsed ) {
 				// first get return and exhaust air node index
-				found = FindItemInList( AirPatternZoneInfo( i ).ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones );
+				found = FindItemInList( AirPatternZoneInfo( i ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( found != 0 ) {
 
 					AirPatternZoneInfo( i ).ReturnAirNodeID = ZoneEquipConfig( found ).ReturnAirNode;
@@ -679,7 +746,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), AirNode.Name(), AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), AirNode, AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -687,7 +754,7 @@ namespace RoomAirModelManager {
 			AirNode( AirNodeNum ).Name = cAlphaArgs( 1 );
 
 			AirNode( AirNodeNum ).ZoneName = cAlphaArgs( 3 ); // Zone name
-			AirNode( AirNodeNum ).ZonePtr = FindItemInList( AirNode( AirNodeNum ).ZoneName, Zone.Name(), NumOfZones );
+			AirNode( AirNodeNum ).ZonePtr = FindItemInList( AirNode( AirNodeNum ).ZoneName, Zone );
 			if ( AirNode( AirNodeNum ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -746,7 +813,7 @@ namespace RoomAirModelManager {
 				if ( nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" || nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4" ) {
 					// terminate the program due to a severe error in the specified input
 					ShowSevereError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid air node specification." );
-					ShowContinueError( "Mundt Room Air Model: No surface names specified.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
+					ShowContinueError( "Mundt Room Air Model: No surface names specified.  Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
 					ErrorsFound = true;
 				} else {
 				}}
@@ -761,7 +828,7 @@ namespace RoomAirModelManager {
 				{ auto const nodeType( cAlphaArgs( 2 ) );
 				if ( nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" || nodeType == "PLUME3" ) {
 					ShowWarningError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid linkage" );
-					ShowContinueError( "Mundt Room Air Model: No surface names needed.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
+					ShowContinueError( "Mundt Room Air Model: No surface names needed.  Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
 					SurfNeeded = false;
 				} else {
 				}}
@@ -887,15 +954,15 @@ namespace RoomAirModelManager {
 		}
 
 		if ( NumOfMundtContrl == 0 ) {
-			ShowWarningError( "No " + cCurrentModuleObject + " objects found, program assumes no convection " " or infiltration gains near floors" );
+			ShowWarningError( "No " + cCurrentModuleObject + " objects found, program assumes no convection or infiltration gains near floors" );
 			return;
 		}
 
 		// this zone uses Mundt model so get Mundt Model Control
 		// loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
-		Mundt_Control_Loop: for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
+		for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
 			GetObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -911,9 +978,7 @@ namespace RoomAirModelManager {
 			}
 			ConvectiveFloorSplit( ZoneNum ) = rNumericArgs( 1 );
 			InfiltratFloorSplit( ZoneNum ) = rNumericArgs( 2 );
-			Mundt_Control_Loop_loop: ;
 		}
-		Mundt_Control_Loop_exit: ;
 
 	}
 
@@ -943,7 +1008,6 @@ namespace RoomAirModelManager {
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-		using DataSurfaces::TotSurfaces;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -976,7 +1040,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDDV( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDDV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDDV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneUCSDDV( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1040,7 +1104,6 @@ namespace RoomAirModelManager {
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
 
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::Surface;
 		using namespace DataAirflowNetwork;
 		using DataHeatBalance::TotPeople;
@@ -1083,7 +1146,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDCV( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDCV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDCV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneUCSDCV( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1125,13 +1188,13 @@ namespace RoomAirModelManager {
 						if ( lAlphaFieldBlanks( 3 ) ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + cAlphaArgs( 1 ) );
+							ShowContinueError( "Airflow region used for thermal comfort evaluation is required for Zone=" + cAlphaArgs( 1 ) );
 							ShowContinueError( "Field is blank, please choose Jet or Recirculation." );
 							ErrorsFound = true;
 						} else {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + cAlphaArgs( 1 ) );
+							ShowContinueError( "Airflow region used for thermal comfort evaluation is required for Zone=" + cAlphaArgs( 1 ) );
 							ShowContinueError( "Please choose Jet or Recirculation." );
 							ErrorsFound = true;
 						}
@@ -1144,7 +1207,7 @@ namespace RoomAirModelManager {
 
 			// Following depend on valid zone
 
-			Loop2 = FindItemInList( Zone( ZoneUCSDCV( Loop ).ZonePtr ).Name, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+			Loop2 = FindItemInList( Zone( ZoneUCSDCV( Loop ).ZonePtr ).Name, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 			if ( Loop2 == 0 ) {
 				ShowSevereError( "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "AirflowNetwork airflow model must be active in this zone" );
@@ -1163,7 +1226,7 @@ namespace RoomAirModelManager {
 							AirModel( ThisZone ).AirModelType = RoomAirModel_Mixing;
 							ShowWarningError( "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowWarningError( "Roomair model will not be applied for Zone=" + cAlphaArgs( 1 ) + '.' );
-							ShowContinueError( "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, " "value was=" + RoundSigDigits( MultizoneSurfaceCrackData( TypeNum ).FlowExpo, 2 ) );
+							ShowContinueError( "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was=" + RoundSigDigits( MultizoneSurfaceCrackData( TypeNum ).FlowExpo, 2 ) );
 						}
 					}
 				}
@@ -1199,7 +1262,6 @@ namespace RoomAirModelManager {
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-		using DataSurfaces::TotSurfaces;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1239,7 +1301,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDUI( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDUI( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDUI( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			ZoneUFPtr( ZoneUCSDUI( Loop ).ZonePtr ) = Loop;
 			if ( ZoneUCSDUI( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
@@ -1298,7 +1360,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDUE( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDUE( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDUE( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			ZoneUFPtr( ZoneUCSDUE( Loop ).ZonePtr ) = Loop;
 			if ( ZoneUCSDUE( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
@@ -1352,6 +1414,456 @@ namespace RoomAirModelManager {
 			ZoneUCSDUE( Loop ).E_Kc = rNumericArgs( 13 );
 		}
 
+	}
+
+	void
+	GetRoomAirflowNetworkData( bool & ErrorsFound ) // True if errors found during this get input routine
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Brent Griffith
+		//       DATE WRITTEN   November 2009
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		//  Get RoomAirflowNetwork data for all zones at once
+
+		// METHODOLOGY EMPLOYED:
+		// Use input processor to get input from idf file
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
+		using namespace DataIPShortCuts;
+		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZoneIntGainDeviceTypes;
+		using DataHeatBalance::NumZoneIntGainDeviceTypes;
+		using ScheduleManager::GetScheduleIndex;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceClass_IntMass;
+		using General::RoundSigDigits;
+		using InternalHeatGains::GetInternalGainDeviceIndex;
+		using DataHVACGlobals::NumZoneHVACTerminalTypes;
+		using DataHVACGlobals::ZoneHVACTerminalTypes;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop;  // local do loop index
+		int NumAlphas;
+		int NumNumbers;
+		int status;
+		int ZoneNum;
+		int thisAirNodeinZone;
+		int AlphaArgNum;
+		int AirCntrlNodeNum;
+		int TotNumOfRAFNNodeSurfLists;
+		int TotNumOfRAFNNodeGainsLists;
+		int TotNumOfRAFNNodeHVACLists;
+		bool IntGainError;
+		int RAFNNodeNum;
+		bool foundList;
+		int NumSurfsThisNode;
+		int NumOfSurfs;
+		int SurfCount;
+		int SurfFirst;
+		int ListSurfNum;
+		int SurfNum;
+		int numGains;
+		int gainsLoop;
+		int TypeNum;
+		int numEquip;
+		int EquipLoop;
+		int TotNumEquip;
+		bool IntEquipError;
+		Real64 SumFraction;
+		std::string Name;
+		int GainNum;
+		int RAFNNum;
+
+		cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
+		NumOfRoomAirflowNetControl = GetNumObjectsFound( cCurrentModuleObject );
+		if ( NumOfRoomAirflowNetControl == 0 ) return;
+		if ( NumOfRoomAirflowNetControl > NumOfZones ) {
+			ShowSevereError( "Too many " + cCurrentModuleObject + " objects in input file" );
+			ShowContinueError( "There cannot be more " + cCurrentModuleObject + " objects than number of zones." );
+			ErrorsFound = true;
+		}
+
+		if ( !allocated( RoomAirflowNetworkZoneInfo ) ) {
+			RoomAirflowNetworkZoneInfo.allocate( NumOfZones );
+		}
+
+		for ( Loop = 1; Loop <= NumOfRoomAirflowNetControl; ++Loop ) {
+			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
+			if ( ZoneNum == 0 ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Not a valid zone name." );
+				ErrorsFound = true;
+				continue;
+			}
+			if ( AirModel( ZoneNum ).AirModelType != RoomAirModel_AirflowNetwork ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: Zone specified='" + cAlphaArgs( 1 ) + "', Air Model type is not AirflowNetwork." );
+				ShowContinueError( "Air Model Type for zone =" + ChAirModel( AirModel( ZoneNum ).AirModelType ) );
+				ErrorsFound = true;
+				continue;
+			}
+			RoomAirflowNetworkZoneInfo( ZoneNum ).ZoneID = ZoneNum;
+			RoomAirflowNetworkZoneInfo( ZoneNum ).RAFNNum = Loop;
+			RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed = true;
+			RoomAirflowNetworkZoneInfo( ZoneNum ).Name = cAlphaArgs( 1 );
+			RoomAirflowNetworkZoneInfo( ZoneNum ).ZoneName = cAlphaArgs( 2 ); // Zone Name
+
+			RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes = ( NumAlphas - 3 );
+
+			if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node.allocate( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			}
+			else {
+				ShowSevereError( "GetRoomAirflowNetworkData: Incomplete input in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ErrorsFound = true;
+			}
+
+			for ( thisAirNodeinZone = 1; thisAirNodeinZone <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++thisAirNodeinZone ) {
+				AlphaArgNum = thisAirNodeinZone + 3;
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( thisAirNodeinZone ).Name = cAlphaArgs( AlphaArgNum );
+			}
+			// control point node
+			AirCntrlNodeNum = FindItemInList( cAlphaArgs( 3 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			if ( AirCntrlNodeNum == 0 ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Not a valid RoomAir:Node:AirflowNetwork name for this zone." );
+				ErrorsFound = true;
+				continue;
+			}
+			else {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID = AirCntrlNodeNum;
+			}
+			RoomAirflowNetworkZoneInfo( ZoneNum ).totNumSurfs = Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1;
+		} // loop thru NumOfRoomAirflowNetControl
+
+		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
+		TotNumOfRoomAFNNodes = GetNumObjectsFound( cCurrentModuleObject );
+		for ( Loop = 1; Loop <= TotNumOfRoomAFNNodes; ++Loop ) {
+			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _,
+				lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
+			if ( ZoneNum == 0 ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Not a valid zone name." );
+				ErrorsFound = true;
+				continue;
+			}
+
+			RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			if ( RAFNNodeNum == 0 ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Not a valid RoomAir:Node:AirflowNetwork name." );
+				ErrorsFound = true;
+				continue;
+			}
+
+			RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).ZoneVolumeFraction = rNumericArgs( 1 );
+			if ( !lAlphaFieldBlanks( 3 ) ) {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).NodeSurfListName = cAlphaArgs( 3 );
+			}
+			else {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HasSurfacesAssigned = false;
+			}
+			if ( !lAlphaFieldBlanks( 4 ) ) {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).NodeIntGainsListName = cAlphaArgs( 4 );
+			}
+			else {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HasIntGainsAssigned = false;
+			}
+			if ( !lAlphaFieldBlanks( 5 ) ) {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).NodeHVACListName = cAlphaArgs( 5 );
+			}
+			else {
+				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HasHVACAssigned = false;
+			}
+
+		} // loop thru TotNumOfRoomAFNNodes
+
+		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList";
+		TotNumOfRAFNNodeSurfLists = GetNumObjectsFound( cCurrentModuleObject );
+		for ( Loop = 1; Loop <= TotNumOfRAFNNodeSurfLists; ++Loop ) {
+			foundList = false;
+			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				// find surface list
+				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
+					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, &RoomAirflowNetworkAirNodeNestedStruct::NodeSurfListName, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+				} else {
+					RAFNNodeNum = 0;
+				}
+				if ( RAFNNodeNum > 0 ) { // found it
+					foundList = true;
+					NumSurfsThisNode = NumAlphas - 1;
+					NumOfSurfs = Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1;
+					if ( allocated( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).SurfMask ) ) {
+						// throw error found twice
+						ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+						ShowContinueError( "Duplicate RoomAir:Node:AirflowNetwork:AdjacentSurfaceList name." );
+						ErrorsFound = true;
+					}
+					else {
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).SurfMask.allocate( RoomAirflowNetworkZoneInfo( ZoneNum ).totNumSurfs );
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).SurfMask = false; // init
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HasSurfacesAssigned = true;
+						// relate surfaces to this air node and check to see whether surface names are specified correctly or not
+						SurfCount = 0;
+						SurfFirst = Zone( ZoneNum ).SurfaceFirst - 1;
+						for ( ListSurfNum = 2; ListSurfNum <= NumAlphas; ++ListSurfNum ) {
+							for ( SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum ) {
+								// IF( cAlphaArgs( ListSurfNum ) == Surface( SurfFirst + SurfNum ).Name ) THEN
+								if ( SameString( cAlphaArgs( ListSurfNum ), Surface( SurfFirst + SurfNum ).Name ) ) {
+									RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).SurfMask( SurfNum ) = true;
+									SurfCount = SurfCount + 1;
+								}
+							}
+						}
+						if ( NumSurfsThisNode != SurfCount ) {
+							ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+							ShowContinueError( "Some surface names were not found in the zone" );
+							ErrorsFound = true;
+						}
+					}
+					break;
+				}
+			} // loop over zones
+			if ( !foundList ) { // throw error
+				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Did not find a RoomAir:Node:AirflowNetwork object that references this object" );
+				ErrorsFound = true;
+			}
+		} // loop thru TotNumOfRAFNNodeSurfLists
+
+		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:InternalGains";
+		TotNumOfRAFNNodeGainsLists = GetNumObjectsFound( cCurrentModuleObject );
+		for ( Loop = 1; Loop <= TotNumOfRAFNNodeGainsLists; ++Loop ) {
+			foundList = false;
+			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			if ( mod( ( NumAlphas + NumNumbers - 1 ), 3 ) != 0 ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Extensible field set are not evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumAlphas + NumNumbers - 1 ) );
+				ErrorsFound = true;
+				break;
+			}
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				// find surface list
+				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
+					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, &RoomAirflowNetworkAirNodeNestedStruct::NodeIntGainsListName, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+				} else {
+					RAFNNodeNum = 0;
+				}
+				if ( RAFNNodeNum > 0 ) { // found it
+					foundList = true;
+					numGains = ( NumAlphas + NumNumbers - 1 ) / 3;
+					if ( allocated( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain ) ) {
+						ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+						ShowContinueError( "Duplicate " + cCurrentModuleObject + " name." );
+						ErrorsFound = true;
+					}
+					else {
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain.allocate( numGains );
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGainsDeviceIndices.allocate( numGains );
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGainsFractions.allocate( numGains );
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HasIntGainsAssigned = true;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).NumIntGains = numGains;
+						for ( gainsLoop = 1; gainsLoop <= numGains; ++gainsLoop ) {
+							TypeNum = FindItemInList( cAlphaArgs( gainsLoop * 2 ), ZoneIntGainDeviceTypes, NumZoneIntGainDeviceTypes );
+							if ( TypeNum > 0 ) {
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).TypeOfNum = TypeNum;
+							}
+							else {
+								ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( gainsLoop * 2 ) + " = " + cAlphaArgs( gainsLoop * 2 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+								ShowContinueError( "incorrect type of internal gain" );
+								ErrorsFound = true;
+							}
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).Name = cAlphaArgs( gainsLoop * 2 + 1 );
+
+							// verify type and name and get pointer to device in internal gains structure array
+							IntGainError = false;
+							GetInternalGainDeviceIndex( ZoneNum, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).TypeOfNum,
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).Name, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGainsDeviceIndices( gainsLoop ), IntGainError );
+							if ( IntGainError ) {
+								ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( gainsLoop * 2 + 1 ) + " = " + cAlphaArgs( gainsLoop * 2 + 1 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+								ShowContinueError( "Internal gain did not match correctly" );
+								ErrorsFound = true;
+							}
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGainsFractions( gainsLoop ) = rNumericArgs( gainsLoop );
+						}
+
+					}
+
+				}
+			}
+		} // loop thru TotNumOfRAFNNodeGainsLists
+
+
+		// Get data of HVAC equipment
+		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
+		TotNumOfRAFNNodeHVACLists = GetNumObjectsFound( cCurrentModuleObject );
+		for ( Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop ) {
+			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			if ( mod( ( NumAlphas + NumNumbers - 1 ), 4 ) != 0 ) {
+				ShowSevereError( "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
+				ShowContinueError( "Extensible field set are not evenly divisable by 4. Number of data entries = " + RoundSigDigits( NumAlphas + NumNumbers - 1 ) );
+				ErrorsFound = true;
+				break;
+			}
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				// find surface list
+				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
+					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, &RoomAirflowNetworkAirNodeNestedStruct::NodeHVACListName, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+				} else {
+					RAFNNodeNum = 0;
+				}
+				if ( RAFNNodeNum > 0 ) { // found it
+					foundList = true;
+					numEquip = ( NumAlphas + NumNumbers - 1 ) / 4;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).NumHVACs = numEquip;
+					if ( allocated( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC ) ) {
+						ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
+						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+						ShowContinueError( "Duplicate " + cCurrentModuleObject + " name." );
+						ErrorsFound = true;
+					}
+					else {
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC.allocate( numEquip );
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HasHVACAssigned = true;
+						for ( EquipLoop = 1; EquipLoop <= numEquip; ++EquipLoop ) {
+							TypeNum = FindItemInList( cAlphaArgs( 2 + ( EquipLoop - 1 ) * 2 ), ZoneHVACTerminalTypes, NumZoneHVACTerminalTypes );
+							if ( TypeNum > 0 ) {
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).TypeOfNum = TypeNum;
+							}
+							else {
+								ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 + ( EquipLoop - 1 ) * 2 ) + " = " + cAlphaArgs( 2 + ( EquipLoop - 1 ) * 2 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+								ShowContinueError( "incorrect type of HVACEquipment" );
+								ErrorsFound = true;
+							}
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ObjectTypeName = cAlphaArgs( 2 + ( EquipLoop - 1 ) * 2 );
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).Name = cAlphaArgs( 3 + ( EquipLoop - 1 ) * 2 );
+
+							// verify type and name and get pointer to device in HVAC equipment type and name structure array
+							TotNumEquip = GetNumObjectsFound( ZoneHVACTerminalTypes( TypeNum ) );
+							if ( TotNumEquip == 0 ) {
+								ShowSevereError( "GetRoomAirflowNetworkData: No such " + cAlphaFieldNames( 2 + ( EquipLoop - 1 ) * 2 ) + " = " + cAlphaArgs( 2 + ( EquipLoop - 1 ) * 2 ) );
+								ShowContinueError( "is available in the input file in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+								ErrorsFound = true;
+							}
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).SupplyFraction = rNumericArgs( 1 + ( EquipLoop - 1 ) * 2 );
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ReturnFraction = rNumericArgs( 2 + ( EquipLoop - 1 ) * 2 );
+
+							IntEquipError = CheckEquipName( ZoneNum, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ObjectTypeName,
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).Name,
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).SupplyNodeName, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ReturnNodeName,
+								TotNumEquip, TypeNum );
+
+							if ( !IntEquipError ) {
+								ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 3 + ( EquipLoop - 1 ) * 2 ) + " = " + cAlphaArgs( 2 + ( EquipLoop - 1 ) * 2 ) );
+								ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+								ShowContinueError( "Internal gain did not match correctly" );
+								ErrorsFound = true;
+							}
+							//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							//TYPE RoomAirflowNetworkHVACStruct
+							//INTEGER::EquipConfigIndex = 0
+
+						}
+
+					}
+				}
+
+			}
+		}  // loop thru TotNumOfRAFNNodeHVACLists
+
+		// do some checks on input data
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
+				// Check zone volume fraction
+				SumFraction = 0.0;
+				for ( RAFNNodeNum = 1; RAFNNodeNum <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++RAFNNodeNum ) {
+					SumFraction = SumFraction + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).ZoneVolumeFraction;
+				}
+				if ( std::abs( SumFraction - 1.0 ) > 0.001 ) {
+					ShowSevereError( "GetRoomAirflowNetworkData: Invalid, zone volume fractions do not sum to 1.0" );
+					ShowContinueError( "Entered in RoomAir:Node:AirflowNetwork with Zone Name = " + Zone( ZoneNum ).Name );
+					ShowContinueError( "The Fraction of Zone Air Volume values across all the nodes needs to sum to 1.0." );
+					ShowContinueError( "The sum of fractions entered = " + RoundSigDigits( SumFraction, 3 ) );
+					ErrorsFound = true;
+				}
+				// Check internal gain fraction
+				for ( RAFNNodeNum = 1; RAFNNodeNum <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++RAFNNodeNum ) {
+					for ( gainsLoop = 1; gainsLoop <= RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).NumIntGains; ++gainsLoop ) {
+						if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).FractionCheck ) continue;
+						SumFraction = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGainsFractions( gainsLoop );
+						TypeNum = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).TypeOfNum;
+						Name = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).Name;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).IntGain( gainsLoop ).FractionCheck = true;
+						for ( RAFNNum = 1; RAFNNum <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++RAFNNum ) {
+							for ( GainNum = 1; GainNum <= RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNum ).NumIntGains; ++GainNum ) {
+								if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNum ).IntGain( GainNum ).FractionCheck ) continue;
+								if ( TypeNum == RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNum ).IntGain( GainNum ).TypeOfNum &&
+									SameString( Name, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNum ).IntGain( GainNum ).Name ) ) {
+									SumFraction += RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNum ).IntGainsFractions( GainNum );
+									RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNum ).IntGain( GainNum ).FractionCheck = true;
+								}
+							}
+						}
+						if ( std::abs( SumFraction - 1.0 ) > 0.001 ) {
+							ShowSevereError( "GetRoomAirflowNetworkData: Invalid, internal gain fractions do not sum to 1.0" );
+							ShowContinueError( "Entered in RoomAir:Node:AirflowNetwork with Zone Name = " + Zone( ZoneNum ).Name + ", Intrnal gain name = " + Name );
+							ShowContinueError( "The Fraction of internal gain across all the nodes needs to sum to 1.0." );
+							ShowContinueError( "The sum of fractions entered = " + RoundSigDigits( SumFraction, 3 ) );
+							ErrorsFound = true;
+						}
+					}
+				}
+			}
+		}
+
+		if ( !ErrorsFound ) {
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed ) {
+					if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
+						for ( Loop = 1; Loop <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++Loop ) {
+							SetupOutputVariable( "RoomAirflowNetwork Node Temperature [C]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).AirTemp, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).HumRat, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Relative Humidity [%]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).RelHumidity, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void
@@ -1428,9 +1940,9 @@ namespace RoomAirModelManager {
 		static Real64 Z2Zone( 0.0 ); // Auxiliary variables
 		static Real64 CeilingHeightDiffMax( 0.1 ); // Maximum difference between wall height and ceiling height
 		bool SetZoneAux;
-		FArray1D_int AuxSurf;
+		Array1D_int AuxSurf;
 		int MaxSurf;
-		FArray2D_int AuxAirflowNetworkSurf;
+		Array2D_int AuxAirflowNetworkSurf;
 		Real64 WidthFactMax;
 		Real64 HeightFactMax;
 		Real64 WidthFact;
@@ -1441,7 +1953,7 @@ namespace RoomAirModelManager {
 		int AirflowNetworkSurfPtr;
 		int NSides;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		static int CompNum( 0 ); // AirflowNetwork Component number
 		static int TypeNum( 0 ); // Airflownetwork Type Number within a component
@@ -1512,8 +2024,13 @@ namespace RoomAirModelManager {
 				for ( SurfNum = Zone( ZNum ).SurfaceFirst; SurfNum <= Zone( ZNum ).SurfaceLast; ++SurfNum ) {
 					if ( Surface( SurfNum ).Class != SurfaceClass_IntMass ) {
 						// Recalculate lowest and highest height for the zone
-						Z1Zone = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-						Z2Zone = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+						Z1Zone = std::numeric_limits< Real64 >::max();
+						Z2Zone = std::numeric_limits< Real64 >::lowest();
+						for ( int i = 1, u = Surface( SurfNum ).Sides; i <= u; ++i ) {
+							Real64 const z_i( Surface( SurfNum ).Vertex( i ).z );
+							Z1Zone = std::min( Z1Zone, z_i );
+							Z2Zone = std::max( Z2Zone, z_i );
+						}
 					}
 
 					if ( SetZoneAux ) {
@@ -1607,12 +2124,12 @@ namespace RoomAirModelManager {
 			}
 
 			if ( ! allocated( AirflowNetworkSurfaceUCSDCV ) ) {
-				AirflowNetworkSurfaceUCSDCV.allocate( NumOfZones, {0,MaxSurf} );
+				AirflowNetworkSurfaceUCSDCV.allocate( {0,MaxSurf}, NumOfZones );
 			}
 			if ( ! allocated( CVJetRecFlows ) ) {
-				CVJetRecFlows.allocate( NumOfZones, {0,MaxSurf} );
+				CVJetRecFlows.allocate( {0,MaxSurf}, NumOfZones );
 			}
-			AuxAirflowNetworkSurf.allocate( NumOfZones, {0,MaxSurf} );
+			AuxAirflowNetworkSurf.allocate( {0,MaxSurf}, NumOfZones );
 			// Width and Height for airflow network surfaces
 			if ( ! allocated( SurfParametersCVDV ) ) {
 				SurfParametersCVDV.allocate( NumOfLinksMultiZone );
@@ -1622,13 +2139,14 @@ namespace RoomAirModelManager {
 			// Organize surfaces in vector AirflowNetworkSurfaceUCSDCV(Zone, surface indexes)
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				// the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
-				AirflowNetworkSurfaceUCSDCV( Loop, 0 ) = AuxSurf( Loop );
+				AirflowNetworkSurfaceUCSDCV( 0, Loop ) = AuxSurf( Loop );
 				if ( AuxSurf( Loop ) != 0 ) {
+					Real64 const ceilingHeight( ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 ) );
 					SurfNum = 1;
 					for ( Loop2 = 1; Loop2 <= NumOfLinksMultiZone; ++Loop2 ) {
 						if ( Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Zone == Loop ) {
 							// SurfNum has the reference surface number relative to AirflowNetworkSurfaceData
-							AirflowNetworkSurfaceUCSDCV( Loop, SurfNum ) = Loop2;
+							AirflowNetworkSurfaceUCSDCV( SurfNum, Loop ) = Loop2;
 							// calculate the surface width and height
 							CompNum = AirflowNetworkLinkageData( Loop2 ).CompNum;
 							TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
@@ -1670,13 +2188,25 @@ namespace RoomAirModelManager {
 							if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_DOP ) {
 								AirflowNetworkSurfPtr = MultizoneSurfaceData( Loop2 ).SurfNum;
 								NSides = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Sides;
-								SurfParametersCVDV( Loop2 ).Zmin = minval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
-								SurfParametersCVDV( Loop2 ).Zmax = maxval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
+								Real64 z_min( std::numeric_limits< Real64 >::max() ), z_max( std::numeric_limits< Real64 >::lowest() );
+								for ( int i = 1; i <= NSides; ++i ) {
+									Real64 const z_i( Surface( AirflowNetworkSurfPtr ).Vertex( i ).z );
+									z_min = std::min( z_min, z_i );
+									z_max = std::max( z_max, z_i );
+								}
+								SurfParametersCVDV( Loop2 ).Zmin = z_min - ceilingHeight;
+								SurfParametersCVDV( Loop2 ).Zmax = z_max - ceilingHeight;
 							} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) { // surface type = CRACK
 								AirflowNetworkSurfPtr = MultizoneSurfaceData( Loop2 ).SurfNum;
 								NSides = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Sides;
-								SurfParametersCVDV( Loop2 ).Zmin = minval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
-								SurfParametersCVDV( Loop2 ).Zmax = maxval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
+								Real64 z_min( std::numeric_limits< Real64 >::max() ), z_max( std::numeric_limits< Real64 >::lowest() );
+								for ( int i = 1; i <= NSides; ++i ) {
+									Real64 const z_i( Surface( AirflowNetworkSurfPtr ).Vertex( i ).z );
+									z_min = std::min( z_min, z_i );
+									z_max = std::max( z_max, z_i );
+								}
+								SurfParametersCVDV( Loop2 ).Zmin = z_min - ceilingHeight;
+								SurfParametersCVDV( Loop2 ).Zmax = z_max - ceilingHeight;
 							}
 
 							++SurfNum;
@@ -1685,7 +2215,7 @@ namespace RoomAirModelManager {
 							NodeNum1 = MultizoneSurfaceData( Loop2 ).NodeNums( 1 );
 							NodeNum2 = MultizoneSurfaceData( Loop2 ).NodeNums( 2 );
 							if ( ( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum == Loop && AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum > 0 ) || ( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum > 0 && AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum == Loop ) ) {
-								AirflowNetworkSurfaceUCSDCV( Loop, SurfNum ) = Loop2;
+								AirflowNetworkSurfaceUCSDCV( SurfNum, Loop ) = Loop2;
 								++SurfNum;
 							}
 						}
@@ -1976,11 +2506,11 @@ namespace RoomAirModelManager {
 					SetupOutputVariable( "Room Air Zone Room Length [m]", Dstar( Loop ), "Zone", "Average", Zone( Loop ).Name );
 					SetupOutputVariable( "Room Air Zone Is Mixing Status []", ZoneCVisMixing( Loop ), "Zone", "State", Zone( Loop ).Name );
 					SetupOutputVariable( "Room Air Zone Is Recirculating Status []", ZoneCVhasREC( Loop ), "Zone", "State", Zone( Loop ).Name );
-					for ( i = 1; i <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++i ) {
+					for ( i = 1; i <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++i ) {
 						N = AirflowNetworkLinkageData( i ).CompNum;
 						if ( AirflowNetworkCompData( N ).CompTypeNum == CompTypeNum_DOP ) {
 							SurfNum = MultizoneSurfaceData( i ).SurfNum;
-							SetupOutputVariable( "Room Air Window Jet Region Average Air Velocity [m/s]", CVJetRecFlows( Loop, i ).Ujet, "Zone", "Average", MultizoneSurfaceData( i ).SurfName );
+							SetupOutputVariable( "Room Air Window Jet Region Average Air Velocity [m/s]", CVJetRecFlows( i, Loop ).Ujet, "Zone", "Average", MultizoneSurfaceData( i ).SurfName );
 						}
 					}
 				}
@@ -2117,29 +2647,358 @@ namespace RoomAirModelManager {
 
 	}
 
+	void
+	GetRAFNNodeNum(
+		std::string const & RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
+		int & ZoneNum, // The zone number associate with the node name
+		int & RAFNNodeNum, // RoomAir:Node:AirflowNetwork Number
+		bool & Errorfound // true if an error is found
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   November 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given RoomAirNode name and returns the Zone number and RoomAir node
+		// number. If incorrect name is given, errorsfound is returned as true and value is returned
+		// as zero.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int I;  // Zone index
+
+		//Obtains and Allocates RoomAirSettings : AirflowNetwork
+		if ( GetAirModelData ) {
+			GetAirModelDatas();
+			GetAirModelData = false;
+		}
+
+		Errorfound = false;
+		RAFNNodeNum = 0;
+		for ( I = 1; I <= NumOfZones; ++I ) {
+			if ( RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes > 0 ) {
+				RAFNNodeNum = FindItemInList( RAFNNodeName, RoomAirflowNetworkZoneInfo( I ).Node, RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes );
+				if ( RAFNNodeNum > 0 ) {
+					ZoneNum = I;
+					break;
+				}
+			}
+		}
+
+		if ( RAFNNodeNum == 0 ) {
+			Errorfound = true;
+			ShowSevereError( "Could not find RoomAir:Node:AirflowNetwork number with AirflowNetwork:IntraZone:Node Name='" + RAFNNodeName );
+		}
+	}
+
+
+	bool
+	CheckEquipName(
+		int ZoneNum,  // Zone number
+		std::string const & EquipType, // Equipment type
+		std::string const & EquipName, // Equipment Name
+		std::string & SupplyNodeName, // Supply node name
+		std::string & ReturnNodeName, // Return node name
+		int TotNumEquip, // equipment type number
+		int TypeNum // Supply air node number
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   March 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given RoomAirNode name and returns the Zone number and RoomAir node
+		// number.If incorrect name is given, errorsfound is returned as true and value is returned
+		// as zero.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using DataRoomAirModel::AirNode;
+		using DataRoomAirModel::TotNumOfAirNodes;
+		using DataLoopNode::NodeID;
+		using namespace DataIPShortCuts;
+		using Fans::GetFanOutletNode;
+		using DataZoneEquipment::ZoneEquipConfig;
+
+		// Return value
+		bool EquipFind; // True if an error is found
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int NumAlphas;
+		int NumNumbers;
+		int I;
+		int Status;                // Used in GetObjectItem
+		int MaxNums = 0;           // Maximum number of numeric input fields
+		int MaxAlphas = 0;         // Maximum number of alpha input fields
+		int TotalArgs = 0;         // Total number of alpha and numeric arguments(max) for a
+		Array1D_string Alphas;    // Alpha input items for object
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		bool errorfound;
+
+		NumAlphas = 1;
+		NumNumbers = 1;
+		EquipFind = false;
+
+		SupplyNodeName = "";
+
+		if ( TypeNum == 0 ) return EquipFind;
+
+		GetObjectDefMaxArgs( EquipType, TotalArgs, NumAlphas, NumNumbers );
+
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
+
+		if ( MaxNums > NumNumbers ) {
+			Numbers.allocate( MaxNums );
+			Numbers = 0.0;
+		} else if ( !allocated( Numbers ) ) {
+			Numbers.allocate( MaxNums );
+		}
+
+		if ( MaxAlphas > NumAlphas ) {
+			Alphas.allocate( MaxAlphas );
+			Alphas = "";
+		} else if ( !allocated( Alphas ) ) {
+			Alphas.allocate( NumAlphas );
+		}
+
+		for ( I = 1; I <= TotNumEquip; ++I ) {
+			GetObjectItem( EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+			if ( SameString( Alphas( 1 ), EquipName ) ) {
+				EquipFind = true;
+				break;
+			}
+		}
+
+		if ( TypeNum == 1 ) {  // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = ""; // Zone return node
+		} else if ( TypeNum == 2 ) {  // ZoneHVAC : EnergyRecoveryVentilator
+			I = GetFanOutletNode( "Fan:OnOff", Alphas( 4 ), errorfound );
+			if ( errorfound ) {
+
+			}
+			SupplyNodeName = NodeID( I ); // ?????
+			ReturnNodeName = ""; // Zone exhaust node
+		} else if ( TypeNum == 3 ) {  // ZoneHVAC : FourPipeFanCoil
+			SupplyNodeName = Alphas( 6 );
+			ReturnNodeName = Alphas( 5 );
+		} else if ( TypeNum == 4 ) {  // ZoneHVAC : OutdoorAirUnit
+			SupplyNodeName = Alphas( 13 );
+			ReturnNodeName = Alphas( 14 );
+		} else if ( TypeNum == 5 ) {  // ZoneHVAC : PackagedTerminalAirConditioner
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = Alphas( 3 );
+		} else if ( TypeNum == 6 ) {  // ZoneHVAC : PackagedTerminalHeatPump
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = Alphas( 3 );
+		} else if ( TypeNum == 7 ) {  // ZoneHVAC : UnitHeater
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = Alphas( 3 );
+		} else if ( TypeNum == 8 ) {  // ZoneHVAC : UnitVentilator
+			SupplyNodeName = Alphas( 7 );
+			ReturnNodeName = Alphas( 6 );
+		} else if ( TypeNum == 9 ) {  // ZoneHVAC : VentilatedSlab
+			SupplyNodeName = Alphas( 20 );
+			ReturnNodeName = Alphas( 18 );
+		} else if ( TypeNum == 10 ) {  // ZoneHVAC : WaterToAirHeatPump
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = Alphas( 3 );
+		} else if ( TypeNum == 11 ) {  // ZoneHVAC : WindowAirConditioner
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = Alphas( 3 );
+		} else if ( TypeNum == 12 ) {  // ZoneHVAC : Baseboard : RadiantConvective : Electric
+			SupplyNodeName = ""; // convection only
+		} else if ( TypeNum == 13 ) {  // ZoneHVAC : Baseboard : RadiantConvective : Water
+			SupplyNodeName = "";
+		} else if ( TypeNum == 14 ) {  // ZoneHVAC : Baseboard : RadiantConvective : Steam
+			SupplyNodeName = "";
+		} else if ( TypeNum == 15 ) {  // ZoneHVAC : Baseboard : Convective : Electric
+			SupplyNodeName = "";
+		} else if ( TypeNum == 16 ) {  // ZoneHVAC : Baseboard : Convective : Water
+			SupplyNodeName = "";
+		} else if ( TypeNum == 17 ) {  // ZoneHVAC : HighTemperatureRadiant
+			SupplyNodeName = "";
+		} else if ( TypeNum == 18 ) {  // ZoneHVAC : Dehumidifier : DX
+			SupplyNodeName = Alphas( 4 );
+			ReturnNodeName = Alphas( 3 );
+		} else if ( TypeNum == 19 ) {  // ZoneHVAC : IdealLoadsAirSystem
+			SupplyNodeName = Alphas( 3 );
+			ReturnNodeName = Alphas( 4 );
+		} else if ( TypeNum == 20 ) {  // ZoneHVAC : RefrigerationChillerSet
+			SupplyNodeName = Alphas( 5 );
+			ReturnNodeName = Alphas( 4 );
+		} else if ( TypeNum == 21 ) {  // Fan : ZoneExhaust
+			SupplyNodeName = ""; // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
+		} else if ( TypeNum == 22 ) {  // WaterHeater : HeatPump
+			SupplyNodeName = Alphas( 8 );
+			ReturnNodeName = Alphas( 7 );
+		} else if ( TypeNum == 23 ) {  // AirTerminal : SingleDuct : Uncontrolled
+			SupplyNodeName = Alphas( 3 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 24 ) {  // AirTerminal : DualDuct : ConstantVolume
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 25 ) {  // AirTerminal : DualDuct : VAV
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 26 ) {  // AirTerminal : SingleDuct : ConstantVolume : Reheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 27 ) {  // AirTerminal : SingleDuct : VAV : Reheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 28 ) {  // AirTerminal : SingleDuct : VAV : NoReheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 29 ) {  // AirTerminal : SingleDuct : SeriesPIU : Reheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 30 ) {  // AirTerminal : SingleDuct : ParallelPIU : Reheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 31 ) {  // AirTerminal : SingleDuct : ConstantVolume : FourPipeInduction
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 32 ) {  // AirTerminal : SingleDuct : VAV : Reheat : VariableSpeedFan
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 33 ) {  // AirTerminal : SingleDuct : VAV : HeatAndCool : Reheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 34 ) {  // AirTerminal : SingleDuct : VAV : HeatAndCool : NoReheat
+			SupplyNodeName = Alphas( 1 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 35 ) {  // AirTerminal : SingleDuct : ConstantVolume : CooledBeam
+			SupplyNodeName = Alphas( 5 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 36 ) {  // AirTerminal : DualDuct : VAV : OutdoorAir
+			SupplyNodeName = Alphas( 3 );
+			if ( allocated( ZoneEquipConfig ) ) {
+				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
+			} else {
+				ReturnNodeName = "";
+			}
+		} else if ( TypeNum == 37 ) {  // AirLoopHVACReturnAir
+			SupplyNodeName = Alphas( 4 ); //
+			ReturnNodeName = ""; //
+		}
+
+		// Need to find a better to handle allocate and deallocate
+		if ( MaxAlphas > NumAlphas ) {
+			Alphas.deallocate();
+		}
+		if ( MaxNums > NumNumbers ) {
+			Numbers.deallocate();
+		}
+
+		return EquipFind;
+
+	}
+
+
 	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RoomAirModelManager
 

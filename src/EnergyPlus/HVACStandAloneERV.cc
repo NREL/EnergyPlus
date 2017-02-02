@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,8 +139,8 @@ namespace HVACStandAloneERV {
 
 	int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
 
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 	bool GetERVInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -112,9 +158,19 @@ namespace HVACStandAloneERV {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< StandAloneERVData > StandAloneERV;
+	Array1D< StandAloneERVData > StandAloneERV;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumStandAloneERVs = 0;
+		GetERVInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		StandAloneERV.deallocate();
+	}
 
 	void
 	SimStandAloneERV(
@@ -171,7 +227,7 @@ namespace HVACStandAloneERV {
 
 		// Find the correct Stand Alone ERV unit index
 		if ( CompIndex == 0 ) {
-			StandAloneERVNum = FindItem( CompName, StandAloneERV.Name(), NumStandAloneERVs );
+			StandAloneERVNum = FindItem( CompName, StandAloneERV );
 			if ( StandAloneERVNum == 0 ) {
 				ShowFatalError( "SimStandAloneERV: Unit not found=" + CompName );
 			}
@@ -227,11 +283,10 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
-		using MixedAir::SetOAControllerData;
+		using MixedAir::OAController;
 		using MixedAir::CheckOAControllerName;
 		using DataHeatBalance::Zone;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ERVStandAlone_Num;
 		using DataZoneControls::HumidityControlZone;
 		using DataZoneControls::NumHumidityControlZones;
 		using Fans::GetFanAvailSchPtr;
@@ -244,9 +299,7 @@ namespace HVACStandAloneERV {
 		auto & GetGenericSupplyAirFlowRate( HeatRecovery::GetSupplyAirFlowRate );
 		using HeatRecovery::GetHeatExchangerObjectTypeNum;
 		auto & GetHXSupplyInletNode( HeatRecovery::GetSupplyInletNode );
-		auto & GetHXSupplyOutletNode( HeatRecovery::GetSupplyOutletNode );
 		auto & GetHXSecondaryInletNode( HeatRecovery::GetSecondaryInletNode );
-		auto & GetHXSecondaryOutletNode( HeatRecovery::GetSecondaryOutletNode );
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
@@ -268,12 +321,12 @@ namespace HVACStandAloneERV {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StandAloneERVIndex; // loop index
 		int StandAloneERVNum; // current Stand Alone ERV number
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
 		std::string CompSetSupplyFanInlet;
 		std::string CompSetSupplyFanOutlet;
 		std::string CompSetExhaustFanInlet;
@@ -290,7 +343,6 @@ namespace HVACStandAloneERV {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		int OutAirNum; // total number of CONTROLLER:OUTSIDE AIR objects
 		int NumERVCtrlrs; // total number of CONTROLLER:STAND ALONE ERV objects
 		int ERVControllerNum; // index to ERV controller
 		int WhichERV; // used in controller GetInput
@@ -343,7 +395,7 @@ namespace HVACStandAloneERV {
 			StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), StandAloneERV.Name(), StandAloneERVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), StandAloneERV, StandAloneERVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -361,7 +413,7 @@ namespace HVACStandAloneERV {
 				}
 			}
 
-			VerifyName( Alphas( 3 ), StandAloneERV.HeatExchangerName(), StandAloneERVNum - 1, IsNotOK, IsBlank, "HeatExchanger:AirToAir:SensibleAndLatent" );
+			VerifyName( Alphas( 3 ), StandAloneERV, &StandAloneERVData::HeatExchangerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "HeatExchanger:AirToAir:SensibleAndLatent" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 3 ) = "xxxxx";
@@ -380,9 +432,10 @@ namespace HVACStandAloneERV {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
 				ErrorsFound = true;
 			}
+			StandAloneERV( StandAloneERVNum ).DesignHXVolFlowRate = HXSupAirFlowRate;
 
 			StandAloneERV( StandAloneERVNum ).SupplyAirFanName = Alphas( 4 );
-			VerifyName( Alphas( 4 ), StandAloneERV.SupplyAirFanName(), StandAloneERVNum - 1, IsNotOK, IsBlank, "Fan:OnOff" );
+			VerifyName( Alphas( 4 ), StandAloneERV, &StandAloneERVData::SupplyAirFanName, StandAloneERVNum - 1, IsNotOK, IsBlank, "Fan:OnOff" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 4 ) = "xxxxx";
@@ -415,7 +468,7 @@ namespace HVACStandAloneERV {
 			StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = SAFanVolFlowRate;
 
 			StandAloneERV( StandAloneERVNum ).ExhaustAirFanName = Alphas( 5 );
-			VerifyName( Alphas( 5 ), StandAloneERV.ExhaustAirFanName(), StandAloneERVNum - 1, IsNotOK, IsBlank, "Fan:OnOff Name" );
+			VerifyName( Alphas( 5 ), StandAloneERV, &StandAloneERVData::ExhaustAirFanName, StandAloneERVNum - 1, IsNotOK, IsBlank, "Fan:OnOff Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 5 ) = "xxxxx";
@@ -509,7 +562,7 @@ namespace HVACStandAloneERV {
 			if ( ZoneInletNodeFound && ZoneExhaustNodeFound ) {
 				if ( ZoneInletCZN != ZoneExhaustCZN ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
-					ShowContinueError( "... Node name of supply air outlet node and exhasut air inlet node must appear in the same " "ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "... Node name of supply air outlet node and exhasut air inlet node must appear in the same ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "... Supply air outlet node = " + NodeID( StandAloneERV( StandAloneERVNum ).SupplyAirOutletNode ) );
 					ShowContinueError( "... ZoneHVAC:EquipmentConnections Zone Name = " + ZoneEquipConfig( ZoneInletCZN ).ZoneName );
 					ShowContinueError( "... Exhaust air inlet node = " + NodeID( StandAloneERV( StandAloneERVNum ).ExhaustAirInletNode ) );
@@ -525,15 +578,18 @@ namespace HVACStandAloneERV {
 				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 			} else {
 				// Verify controller name in Stand Alone ERV object matches name of valid controller object
-				VerifyName( Alphas( 6 ), StandAloneERV.ControllerName(), StandAloneERVNum - 1, IsNotOK, IsBlank, "ZoneHVAC:EnergyRecoveryVentilator:Controller Name" );
+				VerifyName( Alphas( 6 ), StandAloneERV, &StandAloneERVData::ControllerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "ZoneHVAC:EnergyRecoveryVentilator:Controller Name" );
+				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = true;
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 6 ) = "xxxxx";
+					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 				}
 
 				if ( GetObjectItemNum( "ZoneHVAC:EnergyRecoveryVentilator:Controller", StandAloneERV( StandAloneERVNum ).ControllerName ) <= 0 ) {
-					ShowSevereError( CurrentModuleObject + " controller " "type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas( 6 ) );
+					ShowSevereError( CurrentModuleObject + " controller type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas( 6 ) );
 					ErrorsFound = true;
+					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 				}
 			}
 
@@ -561,12 +617,12 @@ namespace HVACStandAloneERV {
 
 			if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow == AutoSize && HXSupAirFlowRate != AutoSize ) {
 				ShowSevereError( CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
-				ShowContinueError( "... When autosizing ERV " + cNumericFields( 1 ) + ", nominal supply air flow rate for heat " "exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
+				ShowContinueError( "... When autosizing ERV " + cNumericFields( 1 ) + ", nominal supply air flow rate for heat exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
 			}
 
 			if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow == AutoSize && HXSupAirFlowRate != AutoSize ) {
 				ShowSevereError( CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
-				ShowContinueError( "... When autosizing ERV " + cNumericFields( 2 ) + ", nominal supply air flow rate for heat " "exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
+				ShowContinueError( "... When autosizing ERV " + cNumericFields( 2 ) + ", nominal supply air flow rate for heat exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
 			}
 
 			// Compare the ERV SA flow rates to SA fan object.
@@ -574,7 +630,7 @@ namespace HVACStandAloneERV {
 				if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow > SAFanVolFlowRate ) {
 					ShowWarningError( CurrentModuleObject + " = " + StandAloneERV( StandAloneERVNum ).Name + " has a " + cNumericFields( 1 ) + " > Max Volume Flow Rate defined in the associated fan object, should be <=" );
 					ShowContinueError( "... Entered value=" + RoundSigDigits( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow, 2 ) + "... Fan [" + cFanTypes( SAFanTypeNum ) + " \"" + StandAloneERV( StandAloneERVNum ).SupplyAirFanName + "\"] Max Value = " + RoundSigDigits( SAFanVolFlowRate, 2 ) );
-					ShowContinueError( " The ERV " + cNumericFields( 1 ) + " is reset to the" " supply air fan flow rate and the simulation continues." );
+					ShowContinueError( " The ERV " + cNumericFields( 1 ) + " is reset to the supply air fan flow rate and the simulation continues." );
 					StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow = SAFanVolFlowRate;
 				}
 			}
@@ -603,7 +659,7 @@ namespace HVACStandAloneERV {
 				if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow > EAFanVolFlowRate ) {
 					ShowWarningError( CurrentModuleObject + " = " + StandAloneERV( StandAloneERVNum ).Name + " has an " + cNumericFields( 2 ) + " > Max Volume Flow Rate defined in the associated fan object, should be <=" );
 					ShowContinueError( "... Entered value=" + RoundSigDigits( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow, 2 ) + "... Fan [" + cFanTypes( EAFanTypeNum ) + ':' + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName + "] Max Value = " + RoundSigDigits( EAFanVolFlowRate, 2 ) );
-					ShowContinueError( " The ERV " + cNumericFields( 2 ) + " is reset to the" " exhaust air fan flow rate and the simulation continues." );
+					ShowContinueError( " The ERV " + cNumericFields( 2 ) + " is reset to the exhaust air fan flow rate and the simulation continues." );
 					StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow = EAFanVolFlowRate;
 				}
 			}
@@ -645,24 +701,24 @@ namespace HVACStandAloneERV {
 
 			// Verify HX name in Stand Alone ERV object matches name of valid HX object
 			if ( GetObjectItemNum( "HeatExchanger:AirToAir:SensibleAndLatent", StandAloneERV( StandAloneERVNum ).HeatExchangerName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " heat exchanger " "type HeatExchanger:AirToAir:SensibleAndLatent not found = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
+				ShowSevereError( CurrentModuleObject + " heat exchanger type HeatExchanger:AirToAir:SensibleAndLatent not found = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
 				ErrorsFound = true;
 			}
 			// Verify supply air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " supply fan " "type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
+				ShowSevereError( CurrentModuleObject + " supply fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
 				ErrorsFound = true;
 			}
 
 			// Verify exhaust air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " exhaust fan " "type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
+				ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
 				ErrorsFound = true;
 			}
 
 		}
 
-		OutAirNum = GetNumObjectsFound( "Controller:OutdoorAir" );
+		int OutAirNum = 0;
 		CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
 		NumERVCtrlrs = GetNumObjectsFound( CurrentModuleObject );
 
@@ -671,17 +727,19 @@ namespace HVACStandAloneERV {
 
 			IsNotOK = false;
 			IsBlank = false;
-			CheckOAControllerName( Alphas( 1 ), OutAirNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			CheckOAControllerName( Alphas( 1 ), ERVControllerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 
 			++OutAirNum;
-			SetOAControllerData( OutAirNum, ErrorsFound, Alphas( 1 ) );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, CurrentModuleObject );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, ControllerStandAloneERV );
-			WhichERV = FindItemInList( Alphas( 1 ), StandAloneERV.ControllerName(), NumStandAloneERVs );
+			auto & thisOAController( OAController( OutAirNum ) );
+
+			thisOAController.Name = Alphas( 1 );
+			thisOAController.ControllerType = CurrentModuleObject;
+			thisOAController.ControllerType_Num = ControllerStandAloneERV;
+			WhichERV = FindItemInList( Alphas( 1 ), StandAloneERV, &StandAloneERVData::ControllerName );
 			if ( WhichERV != 0 ) {
 				AirFlowRate = StandAloneERV( WhichERV ).SupplyAirVolFlow;
 				StandAloneERV( WhichERV ).ControllerIndex = OutAirNum;
@@ -690,31 +748,31 @@ namespace HVACStandAloneERV {
 				ErrorsFound = true;
 				AirFlowRate = -1000.0;
 			}
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
+			thisOAController.MaxOA = AirFlowRate;
+			thisOAController.MinOA = AirFlowRate;
 			//    OAController(OutAirNum)%TempLim = Numbers(1)
 			if ( lNumericBlanks( 1 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, BlankNumeric );
+				thisOAController.TempLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, Numbers( 1 ) );
+				thisOAController.TempLim = Numbers( 1 );
 			}
 			//    OAController(OutAirNum)%TempLowLim = Numbers(2)
 			if ( lNumericBlanks( 2 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, BlankNumeric );
+				thisOAController.TempLowLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, Numbers( 2 ) );
+				thisOAController.TempLowLim = Numbers( 2 );
 			}
 			//    OAController(OutAirNum)%EnthLim = Numbers(3)
 			if ( lNumericBlanks( 3 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, BlankNumeric );
+				thisOAController.EnthLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, Numbers( 3 ) );
+				thisOAController.EnthLim = Numbers( 3 );
 			}
 			//    OAController(OutAirNum)%DPTempLim = Numbers(4)
 			if ( lNumericBlanks( 4 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, BlankNumeric );
+				thisOAController.DPTempLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, Numbers( 4 ) );
+				thisOAController.DPTempLim = Numbers( 4 );
 			}
 
 			if ( WhichERV != 0 ) {
@@ -722,20 +780,20 @@ namespace HVACStandAloneERV {
 			} else {
 				NodeNumber = 0;
 			}
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, NodeNumber );
+			thisOAController.OANode = NodeNumber;
 			// set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
 			// with the assumption that equipment is bypassed....(moved from module MixedAir)
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, NodeNumber );
+			thisOAController.InletNode = NodeNumber;
 
 			if ( WhichERV != 0 ) {
 				NodeNumber = StandAloneERV( WhichERV ).ExhaustAirInletNode;
 			} else {
 				NodeNumber = 0;
 			}
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, NodeNumber );
+			thisOAController.RetNode = NodeNumber;
 
 			if ( ! lAlphaBlanks( 2 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, GetCurveIndex( Alphas( 2 ) ) );
+				thisOAController.EnthalpyCurvePtr = GetCurveIndex( Alphas( 2 ) );
 				if ( GetCurveIndex( Alphas( 2 ) ) == 0 ) {
 					ShowSevereError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "..." + cAlphaFields( 2 ) + " not found:" + Alphas( 2 ) );
@@ -758,65 +816,65 @@ namespace HVACStandAloneERV {
 
 			// Changed by AMIT for new implementation of the controller:outside air
 			if ( Alphas( 3 ) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "EXHAUSTAIRENTHALPYLIMIT" ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "DIFFERENTIALDRYBULBANDENTHALPY" );
+				thisOAController.Econo = MixedAir::DifferentialDryBulbAndEnthalpy;
 			} else if ( Alphas( 3 ) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "NOEXHAUSTAIRENTHALPYLIMIT" ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "DIFFERENTIALDRYBULB" );
+				thisOAController.Econo = MixedAir::DifferentialDryBulb;
 			} else if ( Alphas( 3 ) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "EXHAUSTAIRENTHALPYLIMIT" ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "DIFFERENTIALENTHALPY" );
+				thisOAController.Econo = MixedAir::DifferentialEnthalpy;
 			} else if ( Alphas( 3 ) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "NOEXHAUSTAIRENTHALPYLIMIT" ) {
 				if ( ( ! lNumericBlanks( 1 ) ) || ( ! lNumericBlanks( 3 ) ) || ( ! lNumericBlanks( 4 ) ) || ( ! lAlphaBlanks( 2 ) ) ) {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else if ( ( ! lAlphaBlanks( 3 ) ) && ( ! lAlphaBlanks( 4 ) ) ) {
 				if ( ( lNumericBlanks( 1 ) ) && ( lNumericBlanks( 3 ) ) && ( lNumericBlanks( 4 ) ) && lAlphaBlanks( 2 ) ) {
 					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "... Invalid " + cAlphaFields( 3 ) + cAlphaFields( 4 ) + " = " + Alphas( 3 ) + Alphas( 4 ) );
 					ShowContinueError( "... Assumed NO EXHAUST AIR TEMP LIMIT and NO EXHAUST AIR ENTHALPY LIMIT." );
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+					thisOAController.Econo = MixedAir::NoEconomizer;
 				} else {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else if ( ( lAlphaBlanks( 3 ) ) && ( ! lAlphaBlanks( 4 ) ) ) {
 				if ( ( lNumericBlanks( 1 ) ) && ( lNumericBlanks( 3 ) ) && ( lNumericBlanks( 4 ) ) && lAlphaBlanks( 2 ) ) {
 					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "... Invalid " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
 					ShowContinueError( "... Assumed  NO EXHAUST AIR ENTHALPY LIMIT." );
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+					thisOAController.Econo = MixedAir::NoEconomizer;
 				} else {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else if ( ( ! lAlphaBlanks( 3 ) ) && ( lAlphaBlanks( 4 ) ) ) {
 				if ( ( lNumericBlanks( 1 ) ) && ( lNumericBlanks( 3 ) ) && ( lNumericBlanks( 4 ) ) && lAlphaBlanks( 2 ) ) {
 					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "... Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 					ShowContinueError( "... Assumed NO EXHAUST AIR TEMP LIMIT " );
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+					thisOAController.Econo = MixedAir::NoEconomizer;
 				} else {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else { //NO Economizer
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+				thisOAController.Econo = MixedAir::NoEconomizer;
 			}
 
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, false );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, "MINIMUMFLOWWITHBYPASS" );
+			thisOAController.FixedMin = false;
+			thisOAController.EconBypass = true;
 
-			//   Initialize to zero in case high humidity control is NOT used and a schedule is entered
-			HighRHOARatio = 0.0;
+			//   Initialize to one in case high humidity control is NOT used
+			HighRHOARatio = 1.0;
 			//   READ Modify Air Flow Data
 			//   High humidity control option is YES, read in additional data
 			if ( SameString( Alphas( 6 ), "Yes" ) ) {
 
-				HStatZoneNum = FindItemInList( Alphas( 7 ), Zone.Name(), NumOfZones );
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HStatZoneNum );
+				HStatZoneNum = FindItemInList( Alphas( 7 ), Zone );
+				thisOAController.HumidistatZoneNum = HStatZoneNum;
 
 				// Get the node number for the zone with the humidistat
 				if ( HStatZoneNum > 0 ) {
@@ -825,7 +883,7 @@ namespace HVACStandAloneERV {
 					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum != HStatZoneNum ) continue;
 						//         Find the controlled zone number for the specified humidistat location
-						SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, ZoneEquipConfig( ControlledZoneNum ).ZoneNode );
+						thisOAController.NodeNumofHumidistatZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 						ZoneNodeFound = true;
 						break; // found zone node
 					}
@@ -855,10 +913,28 @@ namespace HVACStandAloneERV {
 					ErrorsFound = true;
 				}
 
-				if ( SameString( Alphas( 8 ), "Yes" ) ) {
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, false );
+				if ( Numbers( 5 ) <= 0.0 && NumNumbers > 4 ) {
+
+					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
+					ShowContinueError( "... " + cNumericFields( 5 ) + " must be greater than 0." );
+					ShowContinueError( "... " + cNumericFields( 5 ) + " is reset to 1 and the simulation continues." );
+
+					HighRHOARatio = 1.0;
+
+				} else if ( NumNumbers > 4 ) {
+
+					HighRHOARatio = Numbers( 5 );
+
 				} else {
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, true );
+
+					HighRHOARatio = 1.0;
+
+				}
+
+				if ( SameString( Alphas( 8 ), "Yes" ) ) {
+					thisOAController.ModifyDuringHighOAMoisture = false;
+				} else {
+					thisOAController.ModifyDuringHighOAMoisture = true;
 				}
 
 			} else if ( ! SameString( Alphas( 6 ), "No" ) && NumAlphas > 4 && ( ! lAlphaBlanks( 5 ) ) ) {
@@ -867,31 +943,13 @@ namespace HVACStandAloneERV {
 				ShowContinueError( "... " + cAlphaFields( 6 ) + " is assumed to be \"No\" and the simulation continues." );
 			} // IF(SameString(Alphas(6),'Yes'))THEN
 
-			if ( Numbers( 5 ) <= 0.0 && NumNumbers > 4 ) {
-
-				ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
-				ShowContinueError( "... " + cNumericFields( 5 ) + " must be greater than 0." );
-				ShowContinueError( "... " + cNumericFields( 5 ) + " is reset to 1 and the simulation continues." );
-
-				HighRHOARatio = 1.0;
-
-			} else if ( NumNumbers > 4 ) {
-
-				HighRHOARatio = Numbers( 5 );
-
-			} else {
-
-				HighRHOARatio = 1.0;
-
-			}
-
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HighRHOARatio );
+			thisOAController.HighRHOAFlowRatio = HighRHOARatio;
 			if ( WhichERV != 0 ) {
 				StandAloneERV( WhichERV ).HighRHOAFlowRatio = HighRHOARatio;
 			}
 
 			//   Check for a time of day outside air schedule
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, GetScheduleIndex( Alphas( 5 ) ) );
+			thisOAController.EconomizerOASchedPtr = GetScheduleIndex( Alphas( 5 ) );
 
 			if ( WhichERV != 0 ) {
 				StandAloneERV( WhichERV ).EconomizerOASchedPtr = GetScheduleIndex( Alphas( 5 ) );
@@ -905,11 +963,11 @@ namespace HVACStandAloneERV {
 						if ( StandAloneERV( WhichERV ).SupplyAirVolFlow * HighRHOARatio > SAFanVolFlowRate ) {
 							ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 							ShowContinueError( "... A " + cNumericFields( 5 ) + " was entered as " + RoundSigDigits( HighRHOARatio, 4 ) );
-							ShowContinueError( "... This flow ratio results in a Supply Air Volume Flow Rate through the ERV which is " "greater than the Max Volume specified in the supply air fan object." );
+							ShowContinueError( "... This flow ratio results in a Supply Air Volume Flow Rate through the ERV which is greater than the Max Volume specified in the supply air fan object." );
 							ShowContinueError( "... Associated fan object = " + cFanTypes( SAFanTypeNum ) + " \"" + StandAloneERV( WhichERV ).SupplyAirFanName + "\"" );
 							ShowContinueError( "... Modified value                   = " + RoundSigDigits( StandAloneERV( WhichERV ).SupplyAirVolFlow * HighRHOARatio, 2 ) );
 							ShowContinueError( " ... Supply Fan Max Volume Flow Rate = " + RoundSigDigits( SAFanVolFlowRate, 2 ) );
-							ShowContinueError( "... The ERV supply air fan will limit the air flow through the ERV" " and the simulation continues." );
+							ShowContinueError( "... The ERV supply air fan will limit the air flow through the ERV and the simulation continues." );
 						}
 					}
 				} else {
@@ -925,11 +983,11 @@ namespace HVACStandAloneERV {
 						if ( StandAloneERV( WhichERV ).ExhaustAirVolFlow * HighRHOARatio > EAFanVolFlowRate ) {
 							ShowWarningError( "ZoneHVAC:EnergyRecoveryVentilator:Controller \"" + Alphas( 1 ) + "\"" );
 							ShowContinueError( "... A " + cNumericFields( 5 ) + " was entered as " + RoundSigDigits( HighRHOARatio, 4 ) );
-							ShowContinueError( "... This flow ratio results in an Exhaust Air Volume Flow Rate through the ERV which is " "greater than the Max Volume specified in the exhaust air fan object." );
+							ShowContinueError( "... This flow ratio results in an Exhaust Air Volume Flow Rate through the ERV which is greater than the Max Volume specified in the exhaust air fan object." );
 							ShowContinueError( "... Associated fan object = " + cFanTypes( EAFanTypeNum ) + " \"" + StandAloneERV( WhichERV ).ExhaustAirFanName + "\"" );
 							ShowContinueError( "... Modified value                    = " + RoundSigDigits( StandAloneERV( WhichERV ).ExhaustAirVolFlow * HighRHOARatio, 2 ) );
 							ShowContinueError( " ... Exhaust Fan Max Volume Flow Rate = " + RoundSigDigits( EAFanVolFlowRate, 2 ) );
-							ShowContinueError( "... The ERV exhaust air fan will limit the air flow through the ERV" " and the simulation continues." );
+							ShowContinueError( "... The ERV exhaust air fan will limit the air flow through the ERV and the simulation continues." );
 						}
 					}
 				} else {
@@ -1003,10 +1061,10 @@ namespace HVACStandAloneERV {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ERVStandAlone_Num;
 		using MixedAir::SimOAController;
-		using DataAirLoop::OAControllerInfo;
+		using MixedAir::OAController;
 
 		// Locals
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MySizeFlag;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1025,8 +1083,8 @@ namespace HVACStandAloneERV {
 		int SupInletNode; // supply air inlet node number for Stand Alone ERV 'StandAloneERVNum'
 		Real64 RhoAir; // air density at SupInNode, standard conditions (dry air @ 20C,actual elevation pressure)
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
 
@@ -1115,7 +1173,7 @@ namespace HVACStandAloneERV {
 
 			if ( GetCurrentScheduleValue( StandAloneERV( StandAloneERVNum ).SupplyAirFanSchPtr ) > 0 || ( ZoneCompTurnFansOn && ! ZoneCompTurnFansOff ) ) {
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					if ( OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
+					if ( OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
 						Node( SupInletNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignSAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxSupAirMassFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
 					} else {
 						Node( SupInletNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignSAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxSupAirMassFlow );
@@ -1131,7 +1189,7 @@ namespace HVACStandAloneERV {
 
 			if ( GetCurrentScheduleValue( StandAloneERV( StandAloneERVNum ).ExhaustAirFanSchPtr ) > 0 ) {
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					if ( OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
+					if ( OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
 						Node( ExhInNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignEAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxExhAirMassFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
 					} else {
 						Node( ExhInNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignEAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxExhAirMassFlow );
@@ -1178,8 +1236,8 @@ namespace HVACStandAloneERV {
 		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using DataSizing::CurZoneEqNum;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::AutoVsHardSizingThreshold;
+		using DataSizing::ZoneEqSizing;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
@@ -1188,9 +1246,10 @@ namespace HVACStandAloneERV {
 		using ScheduleManager::GetScheduleMaxValue;
 		using HeatRecovery::SetHeatExchangerData;
 		using Fans::SetFanData;
-		using MixedAir::SetOAControllerData;
+		using MixedAir::OAController;
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
+		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1206,8 +1265,9 @@ namespace HVACStandAloneERV {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // Index to zone object
-		int ActualZoneNum; // Actual zone node number
+		int ActualZoneNum; // Actual zone number
 		std::string ZoneName; // Name of zone
+		Real64 ZoneMult; // Zone multiplier
 		int PeopleNum; // Index to people object
 		Real64 NumberOfPeople; // Maximum number of people in zone
 		int PeopleSchPtr; // Pointer to people schedule
@@ -1223,6 +1283,8 @@ namespace HVACStandAloneERV {
 		Real64 ExhaustAirVolFlowUser; // Hardsized exhaust air flow for reporting
 		Real64 DesignEAFanVolFlowRateDes; // Autosized exhaust fan flow for reporting
 		Real64 DesignEAFanVolFlowRateUser; // Hardsized exhaust fan flow for reporting
+		Real64 DesignHXVolFlowRateDes; // Autosized heat exchanger flow for reporting
+		Real64 DesignHXVolFlowRateUser; // Hardsized heat exchanger flow for reporting
 
 		IsAutoSize = false;
 		SupplyAirVolFlowDes = 0.0;
@@ -1233,6 +1295,8 @@ namespace HVACStandAloneERV {
 		ExhaustAirVolFlowUser = 0.0;
 		DesignEAFanVolFlowRateDes = 0.0;
 		DesignEAFanVolFlowRateUser = 0.0;
+		DesignHXVolFlowRateDes = 0.0;
+		DesignHXVolFlowRateUser = 0.0;
 
 		if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
@@ -1244,12 +1308,13 @@ namespace HVACStandAloneERV {
 			//      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
 			ZoneName = ZoneEquipConfig( CurZoneEqNum ).ZoneName;
 			ActualZoneNum = ZoneEquipConfig( CurZoneEqNum ).ActualZoneNum;
+			ZoneMult = Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier;
 			FloorArea = 0.0;
-			if ( SameString( ZoneName, Zone( CurZoneEqNum ).Name ) ) {
-				FloorArea = Zone( CurZoneEqNum ).FloorArea;
+			if ( SameString( ZoneName, Zone( ActualZoneNum ).Name ) ) {
+				FloorArea = Zone( ActualZoneNum ).FloorArea;
 			} else {
 				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-					if ( ! SameString( ZoneName, Zone( CurZoneEqNum ).Name ) ) continue;
+					if ( !SameString( ZoneName, Zone( ZoneNum ).Name ) ) continue;
 					FloorArea = Zone( ZoneNum ).FloorArea;
 					break;
 				}
@@ -1258,48 +1323,25 @@ namespace HVACStandAloneERV {
 			MaxPeopleSch = 0.0;
 			for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
 				if ( ActualZoneNum != People( PeopleNum ).ZonePtr ) continue;
-				NumberOfPeople = People( PeopleNum ).NumberOfPeople;
 				PeopleSchPtr = People( PeopleNum ).NumberOfPeoplePtr;
 				MaxPeopleSch = GetScheduleMaxValue( PeopleSchPtr );
-				break;
+				NumberOfPeople = NumberOfPeople + ( People( PeopleNum ).NumberOfPeople * MaxPeopleSch );
 			}
-			SupplyAirVolFlowDes = FloorArea * StandAloneERV( StandAloneERVNum ).AirVolFlowPerFloorArea + MaxPeopleSch * NumberOfPeople * StandAloneERV( StandAloneERVNum ).AirVolFlowPerOccupant;
+			SupplyAirVolFlowDes = FloorArea * StandAloneERV( StandAloneERVNum ).AirVolFlowPerFloorArea + NumberOfPeople * StandAloneERV( StandAloneERVNum ).AirVolFlowPerOccupant;
+			SupplyAirVolFlowDes = ZoneMult * SupplyAirVolFlowDes;
 
 			if ( SupplyAirVolFlowDes < SmallAirVolFlow ) {
 				SupplyAirVolFlowDes = 0.0;
 			}
 
+			// Size ERV supply flow rate
 			if ( IsAutoSize ) {
 				StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow = SupplyAirVolFlowDes;
 				ReportSizingOutput( "ZoneHVAC:EnergyRecoveryVentilator", StandAloneERV( StandAloneERVNum ).Name, "Design Size Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes );
 
-				SetHeatExchangerData( StandAloneERV( StandAloneERVNum ).HeatExchangerIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).HeatExchangerName, SupplyAirVolFlowDes );
-
-				ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes );
-
-				SetFanData( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).SupplyAirFanName, StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, 0.0 );
-
-				StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
-
-				ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-
-				//      ERV fan type must be Fan:OnOff, min flow rate is assumed 0. Do not report min flow sizing.
-				//      CALL ReportSizingOutput(TRIM(cFanTypes(StandAloneERV(StandAloneERVNum)%SupplyAirFanType_Num)), &
-				//                              StandAloneERV(StandAloneERVNum)%SupplyAirFanName, &
-				//                               'Min Flow Rate [m3/s]', 0.0)
-
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					SetOAControllerData( StandAloneERV( StandAloneERVNum ).ControllerIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-
-					//        MaxOA is not an input for CONTROLLER:STAND ALONE ERV, do not report sizing
-					//        CALL ReportSizingOutput('ZoneHVAC:EnergyRecoveryVentilator:Controller',StandAloneERV(StandAloneERVNum)%ControllerName,&
-					//                                'maximum outside air flow rate [m3/s]',StandAloneERV(StandAloneERVNum)%SupplyAirVolFlow)
-
-					SetOAControllerData( StandAloneERV( StandAloneERVNum ).ControllerIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, SupplyAirVolFlowDes );
-
-					//        MinOA is not an input for CONTROLLER:STAND ALONE ERV, do not report sizing
-					//        CALL ReportSizingOutput('ZoneHVAC:EnergyRecoveryVentilator:Controller',StandAloneERV(StandAloneERVNum)%ControllerName,&
-					//                                'minimum outside air flow rate [m3/s]',StandAloneERV(StandAloneERVNum)%SupplyAirVolFlow)
+					OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).MaxOA = SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
+					OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MinOA = SupplyAirVolFlowDes;
 				}
 			} else {
 				if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow > 0.0 && SupplyAirVolFlowDes > 0.0 ) {
@@ -1315,51 +1357,33 @@ namespace HVACStandAloneERV {
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
 						}
-
-						ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes, "User-Specified Supply Air Flow Rate [m3/s]", SupplyAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( SupplyAirVolFlowDes - SupplyAirVolFlowUser ) / SupplyAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ) + ' ' + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
-								ShowContinueError( "User-Specified Supply Air Flow Rate of " + RoundSigDigits( SupplyAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate of " + RoundSigDigits( SupplyAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-
-						ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, "User-Specified Maximum Supply Air Flow Rate [m3/s]", SupplyAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( SupplyAirVolFlowDes - SupplyAirVolFlowUser ) / SupplyAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
-								ShowContinueError( "User-Specified Maximum Supply Air Flow Rate of " + RoundSigDigits( SupplyAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Supply Air Flow Rate of " + RoundSigDigits( SupplyAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
 					}
 				}
 			}
 		}
 
+		// Set Zone equipment sizing data for autosizing the fans and heat exchanger
+		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
+		ZoneEqSizing( CurZoneEqNum ).OAVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
+		ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
+
+		// Check supply fan flow rate or set flow rate if autosized in fan object
 		IsAutoSize = false;
 		if ( StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
-		SetFanData( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).SupplyAirFanName, StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, 0.0 );
 		DesignSAFanVolFlowRateDes = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
 		if ( IsAutoSize ) {
 			StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = DesignSAFanVolFlowRateDes;
-			ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Supply Air Flow Rate [m3/s]", DesignSAFanVolFlowRateDes );
 		} else {
 			if ( StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate > 0.0 && DesignSAFanVolFlowRateDes > 0.0 ) {
 				DesignSAFanVolFlowRateUser = StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate;
-				ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Supply Air Flow Rate [m3/s]", DesignSAFanVolFlowRateDes, "User-Specified Maximum Supply Air Flow Rate [m3/s]", DesignSAFanVolFlowRateUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( DesignSAFanVolFlowRateDes - DesignSAFanVolFlowRateUser ) / DesignSAFanVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
-						ShowContinueError( "User-Specified Maximum Supply Air Flow Rate of " + RoundSigDigits( DesignSAFanVolFlowRateUser, 5 ) + " [m3/s]" );
-						ShowContinueError( "differs from Design Size Maximum Supply Air Flow Rate of " + RoundSigDigits( DesignSAFanVolFlowRateDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "User-Specified Supply Fan Maximum Flow Rate of " + RoundSigDigits( DesignSAFanVolFlowRateUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from the ERV Supply Air Flow Rate of " + RoundSigDigits( DesignSAFanVolFlowRateDes, 5 ) + " [m3/s]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -1367,6 +1391,46 @@ namespace HVACStandAloneERV {
 			}
 		}
 
+		// simulate the fan to size using the flow rate specified above
+		// (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;)
+		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
+			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
+		}		
+		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
+			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
+		}			
+
+		// now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
+		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
+
+		// Check heat exchanger flow rate or set flow rate if autosized in heat exchanger object
+		IsAutoSize = false;
+		if ( StandAloneERV( StandAloneERVNum ).DesignHXVolFlowRate == AutoSize ) {
+			IsAutoSize = true;
+		}
+		DesignHXVolFlowRateDes = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
+		if ( IsAutoSize ) {
+			StandAloneERV( StandAloneERVNum ).DesignHXVolFlowRate = DesignHXVolFlowRateDes;
+			SetHeatExchangerData( StandAloneERV( StandAloneERVNum ).HeatExchangerIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).HeatExchangerName, DesignHXVolFlowRateDes );
+			ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Nominal Supply Air Flow Rate [m3/s]", DesignHXVolFlowRateDes );
+		} else {
+			if ( StandAloneERV( StandAloneERVNum ).DesignHXVolFlowRate > 0.0 && DesignHXVolFlowRateDes > 0.0 ) {
+				DesignHXVolFlowRateUser = StandAloneERV( StandAloneERVNum ).DesignHXVolFlowRate;
+				ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Nominal Supply Air Flow Rate [m3/s]", DesignHXVolFlowRateDes, "User-Specified Nominal Supply Air Flow Rate [m3/s]", DesignHXVolFlowRateUser );
+				if ( DisplayExtraWarnings ) {
+					if ( ( std::abs( DesignHXVolFlowRateDes - DesignHXVolFlowRateUser ) / DesignHXVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
+						ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ) + ' ' + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
+						ShowContinueError( "User-Specified Heat Exchanger Nominal Supply Air Flow Rate of " + RoundSigDigits( DesignHXVolFlowRateUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from the ERV Supply Air Flow Rate of " + RoundSigDigits( DesignHXVolFlowRateDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+					}
+				}
+
+			}
+		}
+
+		// Size ERV exhaust flow rate
 		IsAutoSize = false;
 		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
@@ -1374,30 +1438,7 @@ namespace HVACStandAloneERV {
 
 		if ( CurZoneEqNum > 0 ) {
 
-			//      Sizing objects are not required for stand alone ERV
-			//      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
-			ZoneName = ZoneEquipConfig( CurZoneEqNum ).ZoneName;
-			ActualZoneNum = ZoneEquipConfig( CurZoneEqNum ).ActualZoneNum;
-			FloorArea = 0.0;
-			if ( SameString( ZoneName, Zone( CurZoneEqNum ).Name ) ) {
-				FloorArea = Zone( CurZoneEqNum ).FloorArea;
-			} else {
-				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-					if ( ! SameString( ZoneName, Zone( CurZoneEqNum ).Name ) ) continue;
-					FloorArea = Zone( ZoneNum ).FloorArea;
-					break;
-				}
-			}
-			NumberOfPeople = 0.0;
-			MaxPeopleSch = 0.0;
-			for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
-				if ( ActualZoneNum != People( PeopleNum ).ZonePtr ) continue;
-				NumberOfPeople = People( PeopleNum ).NumberOfPeople;
-				PeopleSchPtr = People( PeopleNum ).NumberOfPeoplePtr;
-				MaxPeopleSch = GetScheduleMaxValue( PeopleSchPtr );
-				break;
-			}
-			ExhaustAirVolFlowDes = FloorArea * StandAloneERV( StandAloneERVNum ).AirVolFlowPerFloorArea + MaxPeopleSch * NumberOfPeople * StandAloneERV( StandAloneERVNum ).AirVolFlowPerOccupant;
+			ExhaustAirVolFlowDes = SupplyAirVolFlowDes;
 
 			if ( ExhaustAirVolFlowDes < SmallAirVolFlow ) {
 				ExhaustAirVolFlowDes = 0.0;
@@ -1413,18 +1454,6 @@ namespace HVACStandAloneERV {
 
 				ReportSizingOutput( "ZoneHVAC:EnergyRecoveryVentilator", StandAloneERV( StandAloneERVNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes );
 
-				SetHeatExchangerData( StandAloneERV( StandAloneERVNum ).HeatExchangerIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).HeatExchangerName, _, ExhaustAirVolFlowDes );
-
-				ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes );
-
-				SetFanData( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, 0.0 );
-
-				ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-
-				//      ERV fan type must be Fan:OnOff, min flow rate is assumed 0. Do not report min flow sizing.
-				//      CALL ReportSizingOutput(TRIM(cFanTypes(StandAloneERV(StandAloneERVNum)%ExhaustAirFanType_Num)), &
-				//                              StandAloneERV(StandAloneERVNum)%ExhaustAirFanName, &
-				//                               'Min Flow Rate [m3/s]', 0.0)
 			} else {
 				if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow > 0.0 && ExhaustAirVolFlowDes > 0.0 ) {
 					ExhaustAirVolFlowUser = StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow;
@@ -1439,50 +1468,26 @@ namespace HVACStandAloneERV {
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
 					}
-
-					ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes, "User-Specified Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowUser );
-					if ( DisplayExtraWarnings ) {
-						if ( ( std::abs( ExhaustAirVolFlowDes - ExhaustAirVolFlowUser ) / ExhaustAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ) + ' ' + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
-							ShowContinueError( "User-Specified Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowUser, 5 ) + " [m3/s]" );
-							ShowContinueError( "differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowDes, 5 ) + " [m3/s]" );
-							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-						}
-					}
-
-					ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowUser );
-					if ( DisplayExtraWarnings ) {
-						if ( ( std::abs( ExhaustAirVolFlowDes - ExhaustAirVolFlowUser ) / ExhaustAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
-							ShowContinueError( "User-Specified Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowUser, 5 ) + " [m3/s]" );
-							ShowContinueError( "differs from Design Size Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowDes, 5 ) + " [m3/s]" );
-							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-						}
-					}
 				}
 			}
 		}
 
+		// Check exhaust fan flow rate or set flow rate if autosized in fan object
 		IsAutoSize = false;
 		if ( StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
-		SetFanData( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, 0.0 );
 		DesignEAFanVolFlowRateDes = StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
 		if ( IsAutoSize ) {
 			StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate = DesignEAFanVolFlowRateDes;
-			ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", DesignEAFanVolFlowRateDes );
 		} else {
 			if ( StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate > 0.0 && DesignEAFanVolFlowRateDes > 0.0 ) {
 				DesignEAFanVolFlowRateUser = StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate;
-				ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", DesignEAFanVolFlowRateDes, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", DesignEAFanVolFlowRateUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( DesignEAFanVolFlowRateDes - DesignEAFanVolFlowRateUser ) / DesignEAFanVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
-						ShowContinueError( "User-Specified Maximum Exhaust Air Flow Rate of " + RoundSigDigits( DesignEAFanVolFlowRateUser, 5 ) + " [m3/s]" );
-						ShowContinueError( "differs from Design Size Maximum Exhaust Air Flow Rate of " + RoundSigDigits( DesignEAFanVolFlowRateDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "User-Specified Exhaust Fan Maximum Air Flow Rate of " + RoundSigDigits( DesignEAFanVolFlowRateUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from the ERV Exhaust Air Flow Rate of " + RoundSigDigits( DesignEAFanVolFlowRateDes, 5 ) + " [m3/s]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -1523,7 +1528,7 @@ namespace HVACStandAloneERV {
 		using Psychrometrics::PsyHFnTdbW;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using General::RoundSigDigits;
-		using DataAirLoop::OAControllerInfo;
+		using MixedAir::OAController;
 		using DataHeatBalance::ZoneAirMassFlow;
 
 		// Locals
@@ -1566,8 +1571,8 @@ namespace HVACStandAloneERV {
 
 		// Get stand alone ERV's controller economizer and high humidity control status
 		if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-			EconomizerFlag = OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).EconoActive;
-			HighHumCtrlFlag = OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive;
+			EconomizerFlag = OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).EconoActive;
+			HighHumCtrlFlag = OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive;
 		} else {
 			EconomizerFlag = false;
 			HighHumCtrlFlag = false;
@@ -1773,7 +1778,7 @@ namespace HVACStandAloneERV {
 		}
 
 		if ( SameString( ERVType, "ZoneHVAC:EnergyRecoveryVentilator" ) ) {
-			WhichERV = FindItem( ERVCtrlName, StandAloneERV.ControllerName(), NumStandAloneERVs );
+			WhichERV = FindItem( ERVCtrlName, StandAloneERV, &StandAloneERVData::ControllerName );
 			if ( WhichERV != 0 ) {
 				AirFlowRate = StandAloneERV( WhichERV ).SupplyAirVolFlow;
 			}
@@ -1821,7 +1826,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1844,7 +1849,7 @@ namespace HVACStandAloneERV {
 		}
 
 		if ( SameString( ERVType, "ZoneHVAC:EnergyRecoveryVentilator" ) ) {
-			WhichERV = FindItem( ERVCtrlName, StandAloneERV.ControllerName(), NumStandAloneERVs );
+			WhichERV = FindItem( ERVCtrlName, StandAloneERV, &StandAloneERVData::ControllerName );
 			if ( WhichERV != 0 ) {
 				AirInletNode = StandAloneERV( WhichERV ).SupplyAirInletNode;
 			}
@@ -1892,7 +1897,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1915,7 +1920,7 @@ namespace HVACStandAloneERV {
 		}
 
 		if ( SameString( ERVType, "ZoneHVAC:EnergyRecoveryVentilator" ) ) {
-			WhichERV = FindItem( ERVCtrlName, StandAloneERV.ControllerName(), NumStandAloneERVs );
+			WhichERV = FindItem( ERVCtrlName, StandAloneERV, &StandAloneERVData::ControllerName );
 			if ( WhichERV != 0 ) {
 				AirInletNode = StandAloneERV( WhichERV ).ExhaustAirInletNode;
 			}
@@ -2088,29 +2093,6 @@ namespace HVACStandAloneERV {
 		return GetStandAloneERVReturnAirNode;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACStandAloneERV
 

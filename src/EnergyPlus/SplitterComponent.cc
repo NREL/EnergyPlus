@@ -1,8 +1,51 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
 
 // EnergyPlus Headers
 #include <SplitterComponent.hh>
@@ -56,7 +99,7 @@ namespace SplitterComponent {
 	bool GetSplitterInputFlag( true );
 	// Public because Used by SimAirServingZones and the Direct Air Unit
 	int NumSplitters( 0 ); // The Number of Splitters found in the Input
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -72,12 +115,20 @@ namespace SplitterComponent {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< SplitterConditions > SplitterCond;
+	Array1D< SplitterConditions > SplitterCond;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		GetSplitterInputFlag = true ;
+		NumSplitters = 0;
+		CheckEquipName.deallocate();
+		SplitterCond.deallocate();
+	}
 
 	void
 	SimAirLoopSplitter(
@@ -134,7 +185,7 @@ namespace SplitterComponent {
 
 		// Find the correct SplitterNumber
 		if ( CompIndex == 0 ) {
-			SplitterNum = FindItemInList( CompName, SplitterCond.SplitterName(), NumSplitters );
+			SplitterNum = FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
 			if ( SplitterNum == 0 ) {
 				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
 			}
@@ -224,12 +275,12 @@ namespace SplitterComponent {
 		int OutNodeNum1;
 		int OutNodeNum2;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// RESET THE GETINPUT FLAG
 		GetSplitterInputFlag = false;
@@ -250,11 +301,11 @@ namespace SplitterComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
-			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SplitterCond.SplitterName(), SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SplitterCond, &SplitterConditions::SplitterName, SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -665,7 +716,7 @@ namespace SplitterComponent {
 	// *****************************************************************************
 
 	void
-	ReportSplitter( int const SplitterNum )
+	ReportSplitter( int const EP_UNUSED( SplitterNum ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -758,7 +809,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond.SplitterName(), NumSplitters );
+			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -777,7 +828,7 @@ namespace SplitterComponent {
 
 	}
 
-	FArray1D_int
+	Array1D_int
 	GetSplitterNodeNumbers(
 		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters
@@ -806,7 +857,7 @@ namespace SplitterComponent {
 		using InputProcessor::FindItemInList;
 
 		// Return value
-		FArray1D_int SplitterNodeNumbers;
+		Array1D_int SplitterNodeNumbers;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -831,7 +882,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond.SplitterName(), NumSplitters );
+			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -856,29 +907,6 @@ namespace SplitterComponent {
 
 	//        End of Reporting subroutines for the Splitter Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SplitterComponent
 

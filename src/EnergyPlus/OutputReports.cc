@@ -1,14 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputReports.hh>
 #include <DataDaylighting.hh>
 #include <DataErrorTracking.hh>
@@ -230,9 +277,9 @@ LinesOut( std::string const & option )
 	optiondone = true;
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.sln", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputSlnFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "LinesOut: Could not open file \"eplusout.sln\" for output (write)." );
+		ShowFatalError( "LinesOut: Could not open file "+ DataStringGlobals::outputSlnFileName +" for output (write)." );
 	}
 
 	if ( option != "IDF" ) {
@@ -301,7 +348,6 @@ DXFOut(
 	using DataDaylighting::ZoneDaylight;
 	using DataDaylighting::TotIllumMaps;
 	using DataDaylighting::IllumMapCalc;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;
@@ -320,24 +366,24 @@ DXFOut(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D< Real64 > StemX( 4, -10.0 );
-	static FArray1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
-	static FArray1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
-	static FArray1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
-	static FArray1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide1X( 4, -10.5 );
-	static FArray1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
-	static FArray1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide3X( 4, -9.5 );
-	static FArray1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > StemX( 4, -10.0 );
+	static Array1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
+	static Array1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
+	static Array1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
+	static Array1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide1X( 4, -10.5 );
+	static Array1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
+	static Array1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide3X( 4, -9.5 );
+	static Array1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
 	//  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
@@ -366,7 +412,7 @@ DXFOut(
 	int mapnum;
 
 	// Object Data
-	FArray1D< dTriangle > mytriangles;
+	Array1D< dTriangle > mytriangles;
 
 	// Formats
 	static gio::Fmt Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
@@ -420,9 +466,9 @@ DXFOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOut: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOut: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -712,7 +758,7 @@ DXFOut(
 					}
 					gio::write( unit, Format_717 ) << TempZoneName;
 				} else {
-					if ( Surface( surf ).Shape == RectangularOverhang ) {
+					if ( Surface( surf ).Shape == SurfaceShape::RectangularOverhang ) {
 						ntri = Triangulate( Surface( surf ).Sides, Surface( surf ).Vertex, mytriangles, Surface( surf ).Azimuth, Surface( surf ).Tilt, Surface( surf ).Name, SurfaceClass_Overhang );
 					} else {
 						ntri = Triangulate( Surface( surf ).Sides, Surface( surf ).Vertex, mytriangles, Surface( surf ).Azimuth, Surface( surf ).Tilt, Surface( surf ).Name, SurfaceClass_Fin );
@@ -750,7 +796,7 @@ DXFOut(
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -772,7 +818,7 @@ DXFOut(
 			if ( IllumMapCalc( mapnum ).Zone != zones ) continue;
 			for ( refpt = 1; refpt <= IllumMapCalc( mapnum ).TotalMapRefPoints; ++refpt ) {
 				gio::write( unit, Format_710 ) << Zone( zones ).Name + ":MapRefPt:" + TrimSigDigits( refpt );
-				gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( refpt, 1 ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( refpt, 2 ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( refpt, 3 ) << 0.05;
+				gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( 1, refpt ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( 2, refpt ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( 3, refpt ) << 0.05;
 			}
 		}
 	}
@@ -791,9 +837,9 @@ DXFOut(
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -831,7 +877,6 @@ DXFOutLines( std::string const & ColorScheme )
 	using namespace DataSurfaces;
 	using namespace DataSurfaceColors;
 	using DataDaylighting::ZoneDaylight;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using General::TrimSigDigits;
@@ -849,24 +894,24 @@ DXFOutLines( std::string const & ColorScheme )
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D< Real64 > StemX( 4, -10.0 );
-	static FArray1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
-	static FArray1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
-	static FArray1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
-	static FArray1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide1X( 4, -10.5 );
-	static FArray1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
-	static FArray1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide3X( 4, -9.5 );
-	static FArray1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > StemX( 4, -10.0 );
+	static Array1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
+	static Array1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
+	static Array1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
+	static Array1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide1X( 4, -10.5 );
+	static Array1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
+	static Array1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide3X( 4, -9.5 );
+	static Array1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
 	//  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
@@ -913,9 +958,9 @@ DXFOutLines( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutLines: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOutLines: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -924,7 +969,7 @@ DXFOutLines( std::string const & ColorScheme )
 
 	gio::write( unit, Format_708 ) << "Program Version" << "," << VerString;
 
-	gio::write( unit, Format_708 ) << "DXF using Lines" << " " << " ";
+	gio::write( unit, Format_708 ) << "DXF using Lines" << ' ' << ' ';
 
 	if ( ColorScheme == "" ) {
 		gio::write( unit, Format_708 ) << "Color Scheme" << "," << "Default";
@@ -1198,7 +1243,7 @@ DXFOutLines( std::string const & ColorScheme )
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1217,9 +1262,9 @@ DXFOutLines( std::string const & ColorScheme )
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1257,7 +1302,6 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	using namespace DataSurfaces;
 	using namespace DataSurfaceColors;
 	using DataDaylighting::ZoneDaylight;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using General::TrimSigDigits;
@@ -1275,24 +1319,24 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D< Real64 > StemX( 4, -10.0 );
-	static FArray1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
-	static FArray1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
-	static FArray1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
-	static FArray1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide1X( 4, -10.5 );
-	static FArray1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
-	static FArray1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide3X( 4, -9.5 );
-	static FArray1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > StemX( 4, -10.0 );
+	static Array1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
+	static Array1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
+	static Array1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
+	static Array1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide1X( 4, -10.5 );
+	static Array1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
+	static Array1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide3X( 4, -9.5 );
+	static Array1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
 	//  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
@@ -1340,9 +1384,9 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutWireFrame: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOutWireFrame: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -1351,7 +1395,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 
 	gio::write( unit, Format_708 ) << "Program Version" << "," << VerString;
 
-	gio::write( unit, Format_708 ) << "DXF using Wireframe" << " " << " ";
+	gio::write( unit, Format_708 ) << "DXF using Wireframe" << ' ' << ' ';
 
 	if ( ColorScheme == "" ) {
 		gio::write( unit, Format_708 ) << "Color Scheme" << "," << "Default";
@@ -1598,7 +1642,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1617,9 +1661,9 @@ DXFOutWireFrame( std::string const & ColorScheme )
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1666,7 +1710,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static FArray1D_string const ConvCoeffCalcs( {1,9}, { "ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm" } );
+	static Array1D_string const ConvCoeffCalcs( {1,9}, { "ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -1692,18 +1736,20 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	std::string SolarDiffusing;
 	int fd;
 	std::string AlgoName;
-	bool isWithConvCoefValid;
 
 	// Formats
-	static gio::Fmt Format_700( "('! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
-	static gio::Fmt Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_700( "('! <Zone Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_700b( "('! <Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_701( "('! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_701b( "('! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_701c( "('! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
 	static gio::Fmt Format_7012( "(',#Sides')" );
-	static gio::Fmt Format_702( "('! <Units>,,,,')" );
+	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
 	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
 	static gio::Fmt Format_7022( "(',')" );
 	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
-	static gio::Fmt Format_704( "(A,'_Surface,',A,',',A,',',A,',',A)" );
+	static gio::Fmt Format_704( "(A,' Surface,',A,',',A,',',A,',',A)" );
 	static gio::Fmt Format_7041( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','),A)" );
 	static gio::Fmt Format_7042( "(',',A)" );
 	static gio::Fmt Format_7044( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','))" );
@@ -1727,14 +1773,25 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	//!!!    Write Header lines for report
 	if ( RptType == 10 ) { // Details only
 		gio::write( unit, Format_700 );
+		gio::write( unit, Format_700b);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
 		gio::write( unit, Format_7011 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		gio::write(unit, Format_7011);
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
 		gio::write( unit, Format_7021 );
 	} else if ( RptType == 11 ) { // Details with Vertices
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
 		gio::write( unit, Format_710 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700b, flags); }
+		gio::write(unit, Format_710);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		gio::write(unit, Format_7011);
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7011, flags ); }
 		gio::write( unit, Format_707 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
@@ -1743,7 +1800,13 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	} else { // Vertices only
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
 		gio::write( unit, Format_710 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700b, flags); }
+		gio::write(unit, Format_710);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		gio::write(unit, Format_7011);
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7012, flags ); }
 		gio::write( unit, Format_707 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
@@ -1755,7 +1818,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 		if ( Surface( surf ).Zone != 0 ) break;
 	}
 	if ( ( surf - 1 ) > 0 ) {
-		gio::write( unit, Format_703 ) << "Shading_Surfaces" << "Number of Shading Surfaces" << surf - 1;
+		gio::write( unit, Format_703 ) << "Shading Surfaces" << "Number of Shading Surfaces" << surf - 1;
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != 0 ) break;
 			AlgoName = "None";
@@ -1770,7 +1833,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << " " << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
 				gio::write( unit, Format_7061 ) << TrimSigDigits( Surface( surf ).Sides );
 			} else if ( RptType == 1 ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7042, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
@@ -1784,7 +1847,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << " " << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7061, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
 			}
 			if ( RptType == 10 ) continue;
@@ -1801,7 +1864,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	}
 
 	for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-		gio::write( unit, Format_703 ) << "Zone_Surfaces" << Zone( ZoneNum ).Name << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 );
+		gio::write( unit, Format_703 ) << "Zone Surfaces" << Zone( ZoneNum ).Name << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 );
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != ZoneNum ) continue;
 			SolarDiffusing = "";
@@ -2087,7 +2150,7 @@ CostInfoOut()
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
-	FArray1D_bool uniqueSurf;
+	Array1D_bool uniqueSurf;
 	int write_stat;
 
 	// Formats
@@ -2115,9 +2178,9 @@ CostInfoOut()
 
 	unit = GetNewUnitNumber();
 	// .sci = surface cost info
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.sci", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputSciFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "CostInfoOut: Could not open file \"eplusout.sci\" for output (write)." );
+		ShowFatalError( "CostInfoOut: Could not open file "+DataStringGlobals::outputSciFileName+" for output (write)." );
 	}
 	gio::write( unit, fmtLD ) << TotSurfaces << int( count( uniqueSurf ) );
 	gio::write( unit, fmtLD ) << "data for surfaces useful for cost information";
@@ -2168,7 +2231,6 @@ VRMLOut(
 	using DataHeatBalance::Zone;
 	using namespace DataSurfaces;
 	using DataDaylighting::ZoneDaylight;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;
@@ -2177,7 +2239,7 @@ VRMLOut(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static FArray1D_string const colorstring( 7, { "WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE" } );
+	static Array1D_string const colorstring( 7, { "WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -2212,7 +2274,7 @@ VRMLOut(
 	int write_stat;
 
 	// Object Data
-	FArray1D< dTriangle > mytriangles;
+	Array1D< dTriangle > mytriangles;
 
 	// Formats
 	static gio::Fmt Format_702( "('#VRML V2.0 utf8')" );
@@ -2244,9 +2306,9 @@ VRMLOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.wrl", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputWrlFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "VRMLOut: Could not open file \"eplusout.wrl\" for output (write)." );
+		ShowFatalError( "VRMLOut: Could not open file "+ DataStringGlobals::outputWrlFileName +" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Beginning
@@ -2313,7 +2375,7 @@ VRMLOut(
 			for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 				gio::write( csidenumber, fmtLD ) << vert - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 			}
 			gio::write( unit, Format_805 );
@@ -2323,15 +2385,15 @@ VRMLOut(
 				vv0 = mytriangles( svert ).vv0;
 				gio::write( csidenumber, fmtLD ) << vv0 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				vv1 = mytriangles( svert ).vv1;
 				gio::write( csidenumber, fmtLD ) << vv1 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				vv2 = mytriangles( svert ).vv2;
 				gio::write( csidenumber, fmtLD ) << vv2 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				gio::write( unit, Format_804 ) << " -1";
 			}
 			gio::write( unit, Format_805 );
@@ -2372,7 +2434,7 @@ VRMLOut(
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					gio::write( csidenumber, fmtLD ) << vert - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2382,15 +2444,15 @@ VRMLOut(
 					vv0 = mytriangles( svert ).vv0;
 					gio::write( csidenumber, fmtLD ) << vv0 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv1 = mytriangles( svert ).vv1;
 					gio::write( csidenumber, fmtLD ) << vv1 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv2 = mytriangles( svert ).vv2;
 					gio::write( csidenumber, fmtLD ) << vv2 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2414,7 +2476,7 @@ VRMLOut(
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					gio::write( csidenumber, fmtLD ) << vert - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2424,15 +2486,15 @@ VRMLOut(
 					vv0 = mytriangles( svert ).vv0;
 					gio::write( csidenumber, fmtLD ) << vv0 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv1 = mytriangles( svert ).vv1;
 					gio::write( csidenumber, fmtLD ) << vv1 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv2 = mytriangles( svert ).vv2;
 					gio::write( csidenumber, fmtLD ) << vv2 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2446,25 +2508,6 @@ VRMLOut(
 	gio::close( unit );
 
 }
-
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

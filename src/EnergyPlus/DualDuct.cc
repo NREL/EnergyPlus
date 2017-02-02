@@ -1,9 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -53,29 +99,19 @@ namespace DualDuct {
 	// METHODOLOGY EMPLOYED:
 	// Needs description, as appropriate.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using namespace DataSizing;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const DualDuct_ConstantVolume( 1 );
 	int const DualDuct_VariableVolume( 2 );
@@ -94,10 +130,8 @@ namespace DualDuct {
 
 	static std::string const BlankString;
 
-	// DERIVED TYPE DEFINITIONS
-
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	int NumDampers( 0 ); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
 	int NumDualDuctConstVolDampers;
@@ -106,32 +140,14 @@ namespace DualDuct {
 	Real64 MassFlowSetToler;
 	bool GetDualDuctInputFlag( true ); // Flag set to make sure you get input once
 
-	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Update routine to check convergence and update nodes
-
-	// Reporting routines for module
-
 	// Object Data
-	FArray1D< DamperDesignParams > Damper;
-	FArray1D< DamperFlowConditions > DamperInlet;
-	FArray1D< DamperFlowConditions > DamperHotAirInlet;
-	FArray1D< DamperFlowConditions > DamperColdAirInlet;
-	FArray1D< DamperFlowConditions > DamperOutlet;
-	FArray1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
-	FArray1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
-
-	// MODULE SUBROUTINES:
-	//*************************************************************************
-
-	// Functions
+	Array1D< DamperDesignParams > Damper;
+	Array1D< DamperFlowConditions > DamperInlet;
+	Array1D< DamperFlowConditions > DamperHotAirInlet;
+	Array1D< DamperFlowConditions > DamperColdAirInlet;
+	Array1D< DamperFlowConditions > DamperOutlet;
+	Array1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
+	Array1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
 	void
 	SimulateDualDuct(
@@ -189,7 +205,7 @@ namespace DualDuct {
 
 		// Find the correct DamperNumber with the AirLoop & CompNum from AirLoop Derived Type
 		if ( CompIndex == 0 ) {
-			DamperNum = FindItemInList( CompName, Damper.DamperName(), NumDampers );
+			DamperNum = FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
 			if ( DamperNum == 0 ) {
 				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
 			}
@@ -297,13 +313,12 @@ namespace DualDuct {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		int ZoneNum; // Index to actual zone number
-		static FArray1D< Real64 > NumArray( 2, 0.0 );
-		static FArray1D_string AlphArray( 7 );
-		static FArray1D_string cAlphaFields( 7 ); // Alpha field names
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names
-		static FArray1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
-		static FArray1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
+		static Array1D< Real64 > NumArray( 2, 0.0 );
+		static Array1D_string AlphArray( 7 );
+		static Array1D_string cAlphaFields( 7 ); // Alpha field names
+		static Array1D_string cNumericFields( 2 ); // Numeric field names
+		static Array1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
+		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
@@ -339,7 +354,7 @@ namespace DualDuct {
 				DamperNum = DamperIndex;
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper.DamperName(), DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -406,7 +421,7 @@ namespace DualDuct {
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper.DamperName(), DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -452,7 +467,7 @@ namespace DualDuct {
 				}
 
 				if ( ! lAlphaBlanks( 6 ) ) {
-					Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements.Name(), NumOARequirements );
+					Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
 					if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 						ShowContinueError( "Occurs in " + cCMO_DDVariableVolume + " = " + Damper( DamperNum ).DamperName );
@@ -480,7 +495,7 @@ namespace DualDuct {
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper.DamperName(), DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -544,7 +559,7 @@ namespace DualDuct {
 						}
 					}
 				}
-				Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements.Name(), NumOARequirements );
+				Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
 				if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCMO_DDVarVolOA + " = " + Damper( DamperNum ).DamperName );
@@ -687,9 +702,9 @@ namespace DualDuct {
 		int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
 		int OutNode;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyAirLoopFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyAirLoopFlag;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
 		Real64 PeopleFlow; // local sum variable, m3/s
@@ -778,7 +793,10 @@ namespace DualDuct {
 				PeopleFlow = 0.0;
 				for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
 					if ( People( Loop ).ZonePtr != Damper( DamperNum ).ActualZoneNum ) continue;
-					PeopleFlow += People( Loop ).NumberOfPeople * OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowPerPerson;
+					int damperOAFlowMethod = OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowMethod;
+					if ( damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax ) {
+						PeopleFlow += People( Loop ).NumberOfPeople * OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowPerPerson;
+					}
 				}
 				Damper( DamperNum ).OAPerPersonByDesignLevel = PeopleFlow;
 
@@ -1682,7 +1700,6 @@ namespace DualDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // Index to air loop
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
@@ -1700,8 +1717,7 @@ namespace DualDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat );
-				OAMassFlow = OAVolumeFlowRate * RhoAir;
+				OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction
 				SAMassFlow = OAMassFlow / AirLoopOAFrac;
@@ -1755,7 +1771,6 @@ namespace DualDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		bool UseOccSchFlag; // TRUE = use actual occupancy, FALSE = use total zone people
 		bool PerPersonNotSet;
@@ -1781,9 +1796,7 @@ namespace DualDuct {
 
 		OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet );
 
-		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, RoutineName );
-
-		OAMassFlow = OAVolumeFlowRate * RhoAir;
+		OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 		if ( present( MaxOAVolFlow ) ) {
 			OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true );
@@ -1869,8 +1882,7 @@ namespace DualDuct {
 			if ( Contaminant.GenericContamSimulation ) {
 				if ( Node( OutletNode ).MassFlowRate > 0.0) {
 					Node( OutletNode ).GenContam = ( Node( HotInletNode ).GenContam * Node( HotInletNode ).MassFlowRate + Node( ColdInletNode ).GenContam * Node( ColdInletNode ).MassFlowRate ) / Node( OutletNode ).MassFlowRate;
-				}
-				else {
+				} else {
 					Node( OutletNode ).GenContam = max( Node( HotInletNode ).GenContam, Node( ColdInletNode ).GenContam );
 				}
 			}
@@ -1896,15 +1908,14 @@ namespace DualDuct {
 			Node( OutletNode ).Press = Node( OAInletNode ).Press;
 
 			if ( Damper( DamperNum ).RecircIsUsed ) {
-				if ( Node( OutletNode ).MassFlowRate > 0.0 ){
+				if ( Node( OutletNode ).MassFlowRate > 0.0 ) {
 					if ( Contaminant.CO2Simulation ) {
 						Node( OutletNode ).CO2 = ( Node( OAInletNode ).CO2 * Node( OAInletNode ).MassFlowRate + Node( RAInletNode ).CO2 * Node( RAInletNode ).MassFlowRate ) / Node( OutletNode ).MassFlowRate;
 					}
 					if ( Contaminant.GenericContamSimulation ) {
 						Node( OutletNode ).GenContam = ( Node( OAInletNode ).GenContam * Node( OAInletNode ).MassFlowRate + Node( RAInletNode ).GenContam * Node( RAInletNode ).MassFlowRate ) / Node( OutletNode ).MassFlowRate;
 					}
-				}
-				else {
+				} else {
 					if ( Contaminant.CO2Simulation ) {
 						Node( OutletNode ).CO2 = max( Node( OAInletNode ).CO2, Node( RAInletNode ).CO2 );
 					}
@@ -1933,7 +1944,7 @@ namespace DualDuct {
 	// *****************************************************************************
 
 	void
-	ReportDualDuct( int const DamperNum ) // unused1208
+	ReportDualDuct( int const EP_UNUSED( DamperNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2097,7 +2108,7 @@ namespace DualDuct {
 
 	void
 	GetDualDuctOutdoorAirRecircUse(
-		std::string const & CompTypeName,
+		std::string const & EP_UNUSED( CompTypeName ),
 		std::string const & CompName,
 		bool & RecircIsUsed
 	)
@@ -2138,16 +2149,16 @@ namespace DualDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER :: DamperNum
 		static bool FirstTimeOnly( true );
-		static FArray1D_bool RecircIsUsedARR;
-		static FArray1D_string DamperNamesARR;
+		static Array1D_bool RecircIsUsedARR;
+		static Array1D_string DamperNamesARR;
 		int DamperIndex; // Loop index to Damper that you are currently loading input into
 		std::string CurrentModuleObject; // for ease in getting objects
-		static FArray1D< Real64 > NumArray( 2, 0.0 );
-		static FArray1D_string AlphArray( 7 );
-		static FArray1D_string cAlphaFields( 7 ); // Alpha field names
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names
-		static FArray1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
-		static FArray1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
+		static Array1D< Real64 > NumArray( 2, 0.0 );
+		static Array1D_string AlphArray( 7 );
+		static Array1D_string cAlphaFields( 7 ); // Alpha field names
+		static Array1D_string cNumericFields( 2 ); // Numeric field names
+		static Array1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
+		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
@@ -2190,29 +2201,6 @@ namespace DualDuct {
 
 	//        End of Reporting subroutines for the Damper Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DualDuct
 

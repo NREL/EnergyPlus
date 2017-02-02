@@ -1,12 +1,58 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -31,7 +77,9 @@
 #include <DataZoneEquipment.hh>
 #include <FanCoilUnits.hh>
 #include <HVACStandAloneERV.hh>
+#include <HVACVariableRefrigerantFlow.hh>
 #include <InputProcessor.hh>
+#include <OutdoorAirUnit.hh>
 #include <OutputProcessor.hh>
 #include <PackagedTerminalHeatPump.hh>
 #include <Psychrometrics.hh>
@@ -91,79 +139,80 @@ namespace SystemReports {
 
 	// MODULE VARIABLE DECLARATIONS:
 	//Ventilation Report Variables
-	FArray1D< Real64 > MaxCoolingLoadMetByVent;
-	FArray1D< Real64 > MaxCoolingLoadAddedByVent;
-	FArray1D< Real64 > MaxOvercoolingByVent;
-	FArray1D< Real64 > MaxHeatingLoadMetByVent;
-	FArray1D< Real64 > MaxHeatingLoadAddedByVent;
-	FArray1D< Real64 > MaxOverheatingByVent;
-	FArray1D< Real64 > MaxNoLoadHeatingByVent;
-	FArray1D< Real64 > MaxNoLoadCoolingByVent;
+	Array1D< Real64 > MaxCoolingLoadMetByVent;
+	Array1D< Real64 > MaxCoolingLoadAddedByVent;
+	Array1D< Real64 > MaxOvercoolingByVent;
+	Array1D< Real64 > MaxHeatingLoadMetByVent;
+	Array1D< Real64 > MaxHeatingLoadAddedByVent;
+	Array1D< Real64 > MaxOverheatingByVent;
+	Array1D< Real64 > MaxNoLoadHeatingByVent;
+	Array1D< Real64 > MaxNoLoadCoolingByVent;
 
-	FArray1D< Real64 > RemMaxCoolingLoadMetByVent;
-	FArray1D< Real64 > RemMaxCoolingLoadAddedByVent;
-	FArray1D< Real64 > RemMaxOvercoolingByVent;
-	FArray1D< Real64 > RemMaxHeatingLoadMetByVent;
-	FArray1D< Real64 > RemMaxHeatingLoadAddedByVent;
-	FArray1D< Real64 > RemMaxOverheatingByVent;
-	FArray1D< Real64 > RemMaxNoLoadHeatingByVent;
-	FArray1D< Real64 > RemMaxNoLoadCoolingByVent;
+	Array1D< Real64 > RemMaxCoolingLoadMetByVent;
+	Array1D< Real64 > RemMaxCoolingLoadAddedByVent;
+	Array1D< Real64 > RemMaxOvercoolingByVent;
+	Array1D< Real64 > RemMaxHeatingLoadMetByVent;
+	Array1D< Real64 > RemMaxHeatingLoadAddedByVent;
+	Array1D< Real64 > RemMaxOverheatingByVent;
+	Array1D< Real64 > RemMaxNoLoadHeatingByVent;
+	Array1D< Real64 > RemMaxNoLoadCoolingByVent;
 
-	FArray1D< Real64 > LastMaxCoolingLoadMetByVent;
-	FArray1D< Real64 > LastMaxCoolingLoadAddedByVent;
-	FArray1D< Real64 > LastMaxOvercoolingByVent;
-	FArray1D< Real64 > LastMaxHeatingLoadMetByVent;
-	FArray1D< Real64 > LastMaxHeatingLoadAddedByVent;
-	FArray1D< Real64 > LastMaxOverheatingByVent;
-	FArray1D< Real64 > LastMaxNoLoadHeatingByVent;
-	FArray1D< Real64 > LastMaxNoLoadCoolingByVent;
+	Array1D< Real64 > LastMaxCoolingLoadMetByVent;
+	Array1D< Real64 > LastMaxCoolingLoadAddedByVent;
+	Array1D< Real64 > LastMaxOvercoolingByVent;
+	Array1D< Real64 > LastMaxHeatingLoadMetByVent;
+	Array1D< Real64 > LastMaxHeatingLoadAddedByVent;
+	Array1D< Real64 > LastMaxOverheatingByVent;
+	Array1D< Real64 > LastMaxNoLoadHeatingByVent;
+	Array1D< Real64 > LastMaxNoLoadCoolingByVent;
 
-	FArray1D< Real64 > SysTotZoneLoadHTNG;
-	FArray1D< Real64 > SysTotZoneLoadCLNG;
-	FArray1D< Real64 > SysOALoadHTNG;
-	FArray1D< Real64 > SysOALoadCLNG;
-	FArray1D< Real64 > SysTotHTNG;
-	FArray1D< Real64 > SysTotCLNG;
+	Array1D< Real64 > SysTotZoneLoadHTNG;
+	Array1D< Real64 > SysTotZoneLoadCLNG;
+	Array1D< Real64 > SysOALoadHTNG;
+	Array1D< Real64 > SysOALoadCLNG;
+	Array1D< Real64 > SysTotHTNG;
+	Array1D< Real64 > SysTotCLNG;
 
-	FArray1D< Real64 > SysTotH2OHOT;
-	FArray1D< Real64 > SysTotH2OCOLD;
-	FArray1D< Real64 > SysTotElec;
-	FArray1D< Real64 > SysTotGas;
-	FArray1D< Real64 > SysTotSteam;
+	Array1D< Real64 > SysTotH2OHOT;
+	Array1D< Real64 > SysTotH2OCOLD;
+	Array1D< Real64 > SysTotElec;
+	Array1D< Real64 > SysTotGas;
+	Array1D< Real64 > SysTotSteam;
 
-	FArray1D< Real64 > SysHumidHTNG;
-	FArray1D< Real64 > SysHumidElec;
-	FArray1D< Real64 > SysEvapCLNG;
-	FArray1D< Real64 > SysEvapElec;
-	FArray1D< Real64 > SysHeatExHTNG;
-	FArray1D< Real64 > SysHeatExCLNG;
-	FArray1D< Real64 > DesDehumidCLNG;
-	FArray1D< Real64 > DesDehumidElec;
-	FArray1D< Real64 > SysSolarCollectHeating;
-	FArray1D< Real64 > SysSolarCollectCooling;
-	FArray1D< Real64 > SysUserDefinedTerminalHeating;
-	FArray1D< Real64 > SysUserDefinedTerminalCooling;
+	Array1D< Real64 > SysHumidHTNG;
+	Array1D< Real64 > SysHumidElec;
+	Array1D< Real64 > SysHumidGas;
+	Array1D< Real64 > SysEvapCLNG;
+	Array1D< Real64 > SysEvapElec;
+	Array1D< Real64 > SysHeatExHTNG;
+	Array1D< Real64 > SysHeatExCLNG;
+	Array1D< Real64 > DesDehumidCLNG;
+	Array1D< Real64 > DesDehumidElec;
+	Array1D< Real64 > SysSolarCollectHeating;
+	Array1D< Real64 > SysSolarCollectCooling;
+	Array1D< Real64 > SysUserDefinedTerminalHeating;
+	Array1D< Real64 > SysUserDefinedTerminalCooling;
 
-	FArray1D< Real64 > SysFANCompHTNG;
-	FArray1D< Real64 > SysFANCompElec;
-	FArray1D< Real64 > SysCCCompCLNG;
-	FArray1D< Real64 > SysCCCompH2OCOLD;
-	FArray1D< Real64 > SysCCCompElec;
-	FArray1D< Real64 > SysHCCompH2OHOT;
-	FArray1D< Real64 > SysHCCompElec;
-	FArray1D< Real64 > SysHCCompElecRes;
-	FArray1D< Real64 > SysHCCompHTNG;
-	FArray1D< Real64 > SysHCCompGas;
-	FArray1D< Real64 > SysHCCompSteam;
-	FArray1D< Real64 > SysDomesticH20;
+	Array1D< Real64 > SysFANCompHTNG;
+	Array1D< Real64 > SysFANCompElec;
+	Array1D< Real64 > SysCCCompCLNG;
+	Array1D< Real64 > SysCCCompH2OCOLD;
+	Array1D< Real64 > SysCCCompElec;
+	Array1D< Real64 > SysHCCompH2OHOT;
+	Array1D< Real64 > SysHCCompElec;
+	Array1D< Real64 > SysHCCompElecRes;
+	Array1D< Real64 > SysHCCompHTNG;
+	Array1D< Real64 > SysHCCompGas;
+	Array1D< Real64 > SysHCCompSteam;
+	Array1D< Real64 > SysDomesticH20;
 
-	FArray1D< Real64 > ZoneOAMassFlow; // zone mech vent mass flow rate {kg/s}
-	FArray1D< Real64 > ZoneOAMass; // zone mech vent total mass for time {kg}
-	FArray1D< Real64 > ZoneOAVolFlowStdRho; // zone mech vent volume flow rate at standard density {m3/s}
-	FArray1D< Real64 > ZoneOAVolStdRho; // zone mech vent total volume OA at standard density {m3/s}
-	FArray1D< Real64 > ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
-	FArray1D< Real64 > ZoneOAVolCrntRho; // zone mech vent total volume OA at current density {m3/s}
-	FArray1D< Real64 > ZoneMechACH; // zone mech vent air changes per hour {ACH}
+	Array1D< Real64 > ZoneOAMassFlow; // zone mech vent mass flow rate {kg/s}
+	Array1D< Real64 > ZoneOAMass; // zone mech vent total mass for time {kg}
+	Array1D< Real64 > ZoneOAVolFlowStdRho; // zone mech vent volume flow rate at standard density {m3/s}
+	Array1D< Real64 > ZoneOAVolStdRho; // zone mech vent total volume OA at standard density {m3/s}
+	Array1D< Real64 > ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
+	Array1D< Real64 > ZoneOAVolCrntRho; // zone mech vent total volume OA at current density {m3/s}
+	Array1D< Real64 > ZoneMechACH; // zone mech vent air changes per hour {ACH}
 
 	bool AirLoopLoadsReportEnabled( true );
 	bool VentLoadsReportEnabled( true );
@@ -174,15 +223,15 @@ namespace SystemReports {
 	int MaxCompArraySize( 500 );
 	int DBFlag( 0 );
 
-	FArray1D_int SetBackCounter;
-	FArray1D_int HeatCoolFlag;
-	FArray1D_int FirstHeatCoolFlag;
-	FArray1D_int FirstHeatCoolHour;
-	FArray1D_int LastHeatCoolFlag;
-	FArray1D_int LastHeatCoolHour;
-	FArray1D_bool AirLoopCalcDone;
-	FArray1D_bool NoLoadFlag;
-	FArray1D_bool UnmetLoadFlag;
+	Array1D_int SetBackCounter;
+	Array1D_int HeatCoolFlag;
+	Array1D_int FirstHeatCoolFlag;
+	Array1D_int FirstHeatCoolHour;
+	Array1D_int LastHeatCoolFlag;
+	Array1D_int LastHeatCoolHour;
+	Array1D_bool AirLoopCalcDone;
+	Array1D_bool NoLoadFlag;
+	Array1D_bool UnmetLoadFlag;
 
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
@@ -194,7 +243,7 @@ namespace SystemReports {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< SummarizeLoads > Vent;
+	Array1D< SummarizeLoads > Vent;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -222,25 +271,15 @@ namespace SystemReports {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
-		using DataEnvironment::OutHumRat;
-		using SplitterComponent::SplitterCond;
-		using SplitterComponent::NumSplitters;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneSupplyPlenums;
-		using DataConvergParams::HVACFlowRateToler;
 		using namespace DataGlobalConstants;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const TypeComp( 1 );
-		int const TypeSubComp( 2 );
-		int const TypeSubSubComp( 3 );
 		int const EnergyTransfer( 1 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -291,7 +330,7 @@ namespace SystemReports {
 		std::string CompName;
 		bool MatchFound;
 		static bool OneTimeFlag( true ); // Flag set to make sure you initialize reports one time
-		bool ConnectionFlag;
+		bool ConnectionFlag( false );
 
 		if ( ! VentReportStructureCreated ) return;
 
@@ -304,7 +343,7 @@ namespace SystemReports {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList.Name(), NumOfZones );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
 					for ( CompNum = 1; CompNum <= ZoneEquipList( ListNum ).NumOfEquipTypes; ++CompNum ) {
@@ -418,7 +457,7 @@ namespace SystemReports {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList.Name(), NumOfZones );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
@@ -776,13 +815,15 @@ namespace SystemReports {
 					for ( PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum ) {
 						for ( BranchNum = 1; BranchNum <= VentRepPlantSupplySide( PlantLoopNum ).TotalBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								CompType = VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-								CompName = VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
+								{ auto & thisVentRepComp( VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+								CompType = thisVentRepComp.TypeOf;
+								CompName = thisVentRepComp.Name;
 								FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-								VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.LoopType = MatchLoopType;
-								VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.LoopNum = MatchLoop;
-								VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.BranchNum = MatchBranch;
-								VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.CompNum = MatchComp;
+								thisVentRepComp.ConnectPlant.LoopType = MatchLoopType;
+								thisVentRepComp.ConnectPlant.LoopNum = MatchLoop;
+								thisVentRepComp.ConnectPlant.BranchNum = MatchBranch;
+								thisVentRepComp.ConnectPlant.CompNum = MatchComp;
+								}
 							}
 						}
 					}
@@ -790,13 +831,15 @@ namespace SystemReports {
 					for ( PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum ) {
 						for ( BranchNum = 1; BranchNum <= VentRepCondSupplySide( PlantLoopNum ).TotalBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								CompType = VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-								CompName = VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
+								{ auto & thisVentRepComp( VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+								CompType = thisVentRepComp.TypeOf;
+								CompName = thisVentRepComp.Name;
 								FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-								VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.LoopType = MatchLoopType;
-								VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.LoopNum = MatchLoop;
-								VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.BranchNum = MatchBranch;
-								VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).ConnectPlant.CompNum = MatchComp;
+								thisVentRepComp.ConnectPlant.LoopType = MatchLoopType;
+								thisVentRepComp.ConnectPlant.LoopNum = MatchLoop;
+								thisVentRepComp.ConnectPlant.BranchNum = MatchBranch;
+								thisVentRepComp.ConnectPlant.CompNum = MatchComp;
+								}
 							}
 						}
 					}
@@ -846,6 +889,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -864,6 +909,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -882,6 +929,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -899,6 +948,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -917,6 +968,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -935,6 +988,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -951,24 +1006,32 @@ namespace SystemReports {
 
 		// On every iteration, load the air loop energy data
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-			for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-						VarType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType;
-						VarIndex = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex;
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+			auto & pas = PrimaryAirSystem( AirLoopNum );
+			for ( BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum ) {
+				auto & pasBranch = pas.Branch( BranchNum );
+				for ( CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum ) {
+					auto & pasBranchComp = pasBranch.Comp( CompNum );
+					for ( VarNum = 1; VarNum <= pasBranchComp.NumMeteredVars; ++VarNum ) {
+						auto & pasBranchCompMeter = pasBranchComp.MeteredVar( VarNum );
+						VarType = pasBranchCompMeter.ReportVarType;
+						VarIndex = pasBranchCompMeter.ReportVarIndex;
+						pasBranchCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 					}
-					for ( SubCompNum = 1; SubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
-						for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumMeteredVars; ++VarNum ) {
-							VarType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarType;
-							VarIndex = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex;
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+					for ( SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum ) {
+						auto & pasBranchSubComp = pasBranchComp.SubComp( SubCompNum );
+						for ( VarNum = 1; VarNum <= pasBranchSubComp.NumMeteredVars; ++VarNum ) {
+							auto & pasBranchSubCompMeter = pasBranchSubComp.MeteredVar( VarNum );
+							VarType = pasBranchSubCompMeter.ReportVarType;
+							VarIndex = pasBranchSubCompMeter.ReportVarIndex;
+							pasBranchSubCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 						}
-						for ( SubSubCompNum = 1; SubSubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumSubSubComps; ++SubSubCompNum ) {
-							for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NumMeteredVars; ++VarNum ) {
-								VarType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarType;
-								VarIndex = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarIndex;
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+						for ( SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum ) {
+							auto & pasBranchSubSubComp = pasBranchSubComp.SubSubComp( SubSubCompNum );
+							for ( VarNum = 1; VarNum <= pasBranchSubSubComp.NumMeteredVars; ++VarNum ) {
+								auto & pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar( VarNum );
+								VarType = pasBranchSubSubCompMeter.ReportVarType;
+								VarIndex = pasBranchSubSubCompMeter.ReportVarIndex;
+								pasBranchSubSubCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 							}
 						}
 					}
@@ -979,76 +1042,91 @@ namespace SystemReports {
 		// On every iteration, load the zone equipment energy data
 		for ( ListNum = 1; ListNum <= NumOfZones; ++ListNum ) {
 			if ( ! ZoneEquipConfig( ListNum ).IsControlled ) continue;
-			for ( CompNum = 1; CompNum <= ZoneEquipList( ListNum ).NumOfEquipTypes; ++CompNum ) {
-				for ( VarNum = 1; VarNum <= ZoneEquipList( ListNum ).EquipData( CompNum ).NumMeteredVars; ++VarNum ) {
-					VarType = ZoneEquipList( ListNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarType;
-					VarIndex = ZoneEquipList( ListNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarIndex;
-					ZoneEquipList( ListNum ).EquipData( CompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+			auto & zel = ZoneEquipList( ListNum );
+			for ( CompNum = 1; CompNum <= zel.NumOfEquipTypes; ++CompNum ) {
+				auto & zelEquipData = zel.EquipData( CompNum );
+				for ( VarNum = 1; VarNum <= zelEquipData.NumMeteredVars; ++VarNum ) {
+					auto & zelEquipDataMeter = zelEquipData.MeteredVar( VarNum );
+					VarType = zelEquipDataMeter.ReportVarType;
+					VarIndex = zelEquipDataMeter.ReportVarIndex;
+					zelEquipDataMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 				}
-				for ( SubCompNum = 1; SubCompNum <= ZoneEquipList( ListNum ).EquipData( CompNum ).NumSubEquip; ++SubCompNum ) {
-					for ( VarNum = 1; VarNum <= ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).NumMeteredVars; ++VarNum ) {
-						VarType = ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarType;
-						VarIndex = ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex;
-						ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+				for ( SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum ) {
+					auto & zelSubEquipData = zelEquipData.SubEquipData( SubCompNum );
+					for ( VarNum = 1; VarNum <= zelSubEquipData.NumMeteredVars; ++VarNum ) {
+						auto & zelSubEquipDataMeter = zelSubEquipData.MeteredVar( VarNum );
+						VarType = zelSubEquipDataMeter.ReportVarType;
+						VarIndex = zelSubEquipDataMeter.ReportVarIndex;
+						zelSubEquipDataMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 					}
-					for ( SubSubCompNum = 1; SubSubCompNum <= ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).NumSubSubEquip; ++SubSubCompNum ) {
-						for ( VarNum = 1; VarNum <= ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).NumMeteredVars; ++VarNum ) {
-							VarType = ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarType;
-							VarIndex = ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarIndex;
-							ZoneEquipList( ListNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex ); //Sankar Corrected zone array
+					for ( SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum ) {
+						auto & zelSubSubEquipData = zelSubEquipData.SubSubEquipData( SubSubCompNum );
+						for ( VarNum = 1; VarNum <= zelSubSubEquipData.NumMeteredVars; ++VarNum ) {
+							auto & zelSubSubEquipDataMeter = zelSubSubEquipData.MeteredVar( VarNum );
+							VarType = zelSubSubEquipDataMeter.ReportVarType;
+							VarIndex = zelSubSubEquipDataMeter.ReportVarIndex;
+							zelSubSubEquipDataMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex ); //Sankar Corrected zone array
 						}
 					}
 				}
 			}
 		}
 
-		// On every iteration, load the Plant Supply Side Data
+		// On every iteration, load the Plant Supply Side Data and load the Plant Demand Side Data
 		for ( PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum ) {
-			for ( BranchNum = 1; BranchNum <= VentRepPlantSupplySide( PlantLoopNum ).TotalBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					for ( VarNum = 1; VarNum <= VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-						VarType = VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType;
-						VarIndex = VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex;
-						VentRepPlantSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+			auto & vrpss = VentRepPlantSupplySide( PlantLoopNum );
+			for ( BranchNum = 1; BranchNum <= vrpss.TotalBranches; ++BranchNum ) {
+				auto & vrpssBranch = vrpss.Branch( BranchNum );
+				for ( CompNum = 1; CompNum <= vrpssBranch.TotalComponents; ++CompNum ) {
+					auto & vrpssBranchComp = vrpssBranch.Comp( CompNum );
+					for ( VarNum = 1; VarNum <= vrpssBranchComp.NumMeteredVars; ++VarNum ) {
+						auto & vrpssBranchCompMeter = vrpssBranchComp.MeteredVar( VarNum );
+						VarType = vrpssBranchCompMeter.ReportVarType;
+						VarIndex = vrpssBranchCompMeter.ReportVarIndex;
+						vrpssBranchCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+					}
+				}
+			}
+			auto & vrpds = VentRepPlantDemandSide( PlantLoopNum );
+			for ( BranchNum = 1; BranchNum <= vrpds.TotalBranches; ++BranchNum ) {
+				auto & vrpdsBranch = vrpds.Branch( BranchNum );
+				for ( CompNum = 1; CompNum <= vrpdsBranch.TotalComponents; ++CompNum ) {
+					auto & vrpdsBranchComp = vrpdsBranch.Comp( CompNum );
+					for ( VarNum = 1; VarNum <= vrpdsBranchComp.NumMeteredVars; ++VarNum ) {
+						auto & vrpdsBranchCompMeter = vrpdsBranchComp.MeteredVar( VarNum );
+						VarType = vrpdsBranchCompMeter.ReportVarType;
+						VarIndex = vrpdsBranchCompMeter.ReportVarIndex;
+						vrpdsBranchCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 					}
 				}
 			}
 		}
 
-		// On every iteration, load the Plant Demand Side Data
-		for ( PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum ) {
-			for ( BranchNum = 1; BranchNum <= VentRepPlantDemandSide( PlantLoopNum ).TotalBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= VentRepPlantDemandSide( PlantLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					for ( VarNum = 1; VarNum <= VentRepPlantDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-						VarType = VentRepPlantDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType;
-						VarIndex = VentRepPlantDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex;
-						VentRepPlantDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
-					}
-				}
-			}
-		}
-
-		// On every iteration, load the Condenser Supply Side Data
+		// On every iteration, load the Condenser Supply Side Data and load the Condenser Demand Side Data
 		for ( PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum ) {
-			for ( BranchNum = 1; BranchNum <= VentRepCondSupplySide( PlantLoopNum ).TotalBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					for ( VarNum = 1; VarNum <= VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-						VarType = VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType;
-						VarIndex = VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex;
-						VentRepCondSupplySide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+			auto & vrcss = VentRepCondSupplySide( PlantLoopNum );
+			for ( BranchNum = 1; BranchNum <= vrcss.TotalBranches; ++BranchNum ) {
+				auto & vrcssBranch = vrcss.Branch( BranchNum );
+				for ( CompNum = 1; CompNum <= vrcssBranch.TotalComponents; ++CompNum ) {
+					auto & vrcssBranchComp = vrcssBranch.Comp( CompNum );
+					for ( VarNum = 1; VarNum <= vrcssBranchComp.NumMeteredVars; ++VarNum ) {
+						auto & vrcssBranchCompMeter = vrcssBranchComp.MeteredVar( VarNum );
+						VarType = vrcssBranchCompMeter.ReportVarType;
+						VarIndex = vrcssBranchCompMeter.ReportVarIndex;
+						vrcssBranchCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 					}
 				}
 			}
-		}
-
-		// On every iteration, load the Condenser Demand Side Data
-		for ( PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum ) {
-			for ( BranchNum = 1; BranchNum <= VentRepCondDemandSide( PlantLoopNum ).TotalBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= VentRepCondDemandSide( PlantLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					for ( VarNum = 1; VarNum <= VentRepCondDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-						VarType = VentRepCondDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType;
-						VarIndex = VentRepCondDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex;
-						VentRepCondDemandSide( PlantLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
+			auto & vrcds = VentRepCondSupplySide( PlantLoopNum );
+			for ( BranchNum = 1; BranchNum <= vrcds.TotalBranches; ++BranchNum ) {
+				auto & vrcdsBranch = vrcds.Branch( BranchNum );
+				for ( CompNum = 1; CompNum <= vrcdsBranch.TotalComponents; ++CompNum ) {
+					auto & vrcdsBranchComp = vrcdsBranch.Comp( CompNum );
+					for ( VarNum = 1; VarNum <= vrcdsBranchComp.NumMeteredVars; ++VarNum ) {
+						auto & vrcdsBranchCompMeter = vrcdsBranchComp.MeteredVar( VarNum );
+						VarType = vrcdsBranchCompMeter.ReportVarType;
+						VarIndex = vrcdsBranchCompMeter.ReportVarIndex;
+						vrcdsBranchCompMeter.CurMeterReading = GetInternalVariableValue( VarType, VarIndex );
 					}
 				}
 			}
@@ -1089,10 +1167,6 @@ namespace SystemReports {
 		// SUBROUTINE ARGUMENT DEFINITIONS
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const TypeComp( 1 );
-		int const TypeSubComp( 2 );
-		int const TypeSubSubComp( 3 );
-		int const EnergyTransfer( 1 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1124,19 +1198,10 @@ namespace SystemReports {
 				LoopType( 0 )
 			{}
 
-			// Member Constructor
-			IdentifyLoop(
-				int const LoopNum,
-				int const LoopType
-			) :
-				LoopNum( LoopNum ),
-				LoopType( LoopType )
-			{}
-
 		};
 
 		// Object Data
-		static FArray1D< IdentifyLoop > LoopStack;
+		static Array1D< IdentifyLoop > LoopStack;
 
 		return; //Autodesk:? Is this routine now an intentional NOOP?
 
@@ -1146,8 +1211,10 @@ namespace SystemReports {
 
 			OneTimeFlag = false;
 		}
-		LoopStack.LoopNum() = 0;
-		LoopStack.LoopType() = 0;
+		for ( auto & e : LoopStack ) {
+			e.LoopNum = 0;
+			e.LoopType = 0;
+		}
 
 		ConnectionFlag = false;
 		//    countloop=0
@@ -1162,11 +1229,12 @@ namespace SystemReports {
 			if ( LoopType == 1 ) {
 				for ( BranchNum = 1; BranchNum <= VentRepPlantSupplySide( LoopNum ).TotalBranches; ++BranchNum ) {
 					for ( SupplySideCompNum = 1; SupplySideCompNum <= VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents; ++SupplySideCompNum ) {
-						DemandSideLoopType = VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.LoopType;
-						DemandSideLoopNum = VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.LoopNum;
-						DemandSideBranchNum = VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.BranchNum;
-						DemandSideCompNum = VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.CompNum;
-
+						{ auto & thisVentRepComp( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ) );
+						DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
+						DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
+						DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
+						DemandSideCompNum = thisVentRepComp.ConnectPlant.CompNum;
+						}
 						//If the connection is valid load the connection array
 						if ( DemandSideLoopType == 1 || DemandSideLoopType == 2 ) {
 							ConnectionFlag = true;
@@ -1204,11 +1272,12 @@ namespace SystemReports {
 			} else if ( LoopType == 2 ) {
 				for ( BranchNum = 1; BranchNum <= VentRepCondSupplySide( LoopNum ).TotalBranches; ++BranchNum ) {
 					for ( SupplySideCompNum = 1; SupplySideCompNum <= VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents; ++SupplySideCompNum ) {
-						DemandSideLoopType = VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.LoopType;
-						DemandSideLoopNum = VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.LoopNum;
-						DemandSideBranchNum = VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.BranchNum;
-						DemandSideCompNum = VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ).ConnectPlant.CompNum;
-
+						{ auto & thisVentRepComp( VentRepCondSupplySide( LoopNum ).Branch( BranchNum ).Comp( SupplySideCompNum ) );
+						DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
+						DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
+						DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
+						DemandSideCompNum = thisVentRepComp.ConnectPlant.CompNum;
+						}
 						//If the connection is valid load the connection array
 						if ( DemandSideLoopType == 1 || DemandSideLoopType == 2 ) {
 							ConnectionFlag = true;
@@ -1299,14 +1368,16 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			ZoneCompToPlant.allocate( ArrayLimit );
-			ZoneCompToPlant.ZoneEqListNum() = 0;
-			ZoneCompToPlant.ZoneEqCompNum() = 0;
-			ZoneCompToPlant.PlantLoopType() = 0;
-			ZoneCompToPlant.PlantLoopNum() = 0;
-			ZoneCompToPlant.PlantLoopBranch() = 0;
-			ZoneCompToPlant.PlantLoopComp() = 0;
-			ZoneCompToPlant.FirstDemandSidePtr() = 0;
-			ZoneCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : ZoneCompToPlant ) {
+				e.ZoneEqListNum = 0;
+				e.ZoneEqCompNum = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1382,15 +1453,17 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			ZoneSubCompToPlant.allocate( ArrayLimit );
-			ZoneSubCompToPlant.ZoneEqListNum() = 0;
-			ZoneSubCompToPlant.ZoneEqCompNum() = 0;
-			ZoneSubCompToPlant.ZoneEqSubCompNum() = 0;
-			ZoneSubCompToPlant.PlantLoopType() = 0;
-			ZoneSubCompToPlant.PlantLoopNum() = 0;
-			ZoneSubCompToPlant.PlantLoopBranch() = 0;
-			ZoneSubCompToPlant.PlantLoopComp() = 0;
-			ZoneSubCompToPlant.FirstDemandSidePtr() = 0;
-			ZoneSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : ZoneSubCompToPlant ) {
+				e.ZoneEqListNum = 0;
+				e.ZoneEqCompNum = 0;
+				e.ZoneEqSubCompNum = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1469,16 +1542,18 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			ZoneSubSubCompToPlant.allocate( ArrayLimit );
-			ZoneSubSubCompToPlant.ZoneEqListNum() = 0;
-			ZoneSubSubCompToPlant.ZoneEqCompNum() = 0;
-			ZoneSubSubCompToPlant.ZoneEqSubCompNum() = 0;
-			ZoneSubSubCompToPlant.ZoneEqSubSubCompNum() = 0;
-			ZoneSubSubCompToPlant.PlantLoopType() = 0;
-			ZoneSubSubCompToPlant.PlantLoopNum() = 0;
-			ZoneSubSubCompToPlant.PlantLoopBranch() = 0;
-			ZoneSubSubCompToPlant.PlantLoopComp() = 0;
-			ZoneSubSubCompToPlant.FirstDemandSidePtr() = 0;
-			ZoneSubSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : ZoneSubSubCompToPlant ) {
+				e.ZoneEqListNum = 0;
+				e.ZoneEqCompNum = 0;
+				e.ZoneEqSubCompNum = 0;
+				e.ZoneEqSubSubCompNum = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1558,15 +1633,17 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			AirSysCompToPlant.allocate( ArrayLimit );
-			AirSysCompToPlant.AirLoopNum() = 0;
-			AirSysCompToPlant.AirLoopBranch() = 0;
-			AirSysCompToPlant.AirLoopComp() = 0;
-			AirSysCompToPlant.PlantLoopType() = 0;
-			AirSysCompToPlant.PlantLoopNum() = 0;
-			AirSysCompToPlant.PlantLoopBranch() = 0;
-			AirSysCompToPlant.PlantLoopComp() = 0;
-			AirSysCompToPlant.FirstDemandSidePtr() = 0;
-			AirSysCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : AirSysCompToPlant ) {
+				e.AirLoopNum = 0;
+				e.AirLoopBranch = 0;
+				e.AirLoopComp = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1645,16 +1722,18 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			AirSysSubCompToPlant.allocate( ArrayLimit );
-			AirSysSubCompToPlant.AirLoopNum() = 0;
-			AirSysSubCompToPlant.AirLoopBranch() = 0;
-			AirSysSubCompToPlant.AirLoopComp() = 0;
-			AirSysSubCompToPlant.AirLoopSubComp() = 0;
-			AirSysSubCompToPlant.PlantLoopType() = 0;
-			AirSysSubCompToPlant.PlantLoopNum() = 0;
-			AirSysSubCompToPlant.PlantLoopBranch() = 0;
-			AirSysSubCompToPlant.PlantLoopComp() = 0;
-			AirSysSubCompToPlant.FirstDemandSidePtr() = 0;
-			AirSysSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : AirSysSubCompToPlant ) {
+				e.AirLoopNum = 0;
+				e.AirLoopBranch = 0;
+				e.AirLoopComp = 0;
+				e.AirLoopSubComp = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1736,17 +1815,19 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			AirSysSubSubCompToPlant.allocate( ArrayLimit );
-			AirSysSubSubCompToPlant.AirLoopNum() = 0;
-			AirSysSubSubCompToPlant.AirLoopBranch() = 0;
-			AirSysSubSubCompToPlant.AirLoopComp() = 0;
-			AirSysSubSubCompToPlant.AirLoopSubComp() = 0;
-			AirSysSubSubCompToPlant.AirLoopSubSubComp() = 0;
-			AirSysSubSubCompToPlant.PlantLoopType() = 0;
-			AirSysSubSubCompToPlant.PlantLoopNum() = 0;
-			AirSysSubSubCompToPlant.PlantLoopBranch() = 0;
-			AirSysSubSubCompToPlant.PlantLoopComp() = 0;
-			AirSysSubSubCompToPlant.FirstDemandSidePtr() = 0;
-			AirSysSubSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : AirSysSubSubCompToPlant ) {
+				e.AirLoopNum = 0;
+				e.AirLoopBranch = 0;
+				e.AirLoopComp = 0;
+				e.AirLoopSubComp = 0;
+				e.AirLoopSubSubComp = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1845,6 +1926,7 @@ namespace SystemReports {
 
 		SysHumidHTNG.allocate( NumPrimaryAirSys );
 		SysHumidElec.allocate( NumPrimaryAirSys );
+		SysHumidGas.allocate( NumPrimaryAirSys );
 		DesDehumidCLNG.allocate( NumPrimaryAirSys );
 		DesDehumidElec.allocate( NumPrimaryAirSys );
 		SysEvapCLNG.allocate( NumPrimaryAirSys );
@@ -1943,6 +2025,7 @@ namespace SystemReports {
 		SysHCCompGas = 0.0;
 		SysHCCompSteam = 0.0;
 		SysHumidElec = 0.0;
+		SysHumidGas = 0.0;
 		DesDehumidElec = 0.0;
 		SysEvapElec = 0.0;
 
@@ -2011,6 +2094,8 @@ namespace SystemReports {
 				SetupOutputVariable( "Air System Heating Coil Steam Energy [J]", SysHCCompSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				SetupOutputVariable( "Air System Humidifier Electric Energy [J]", SysHumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+
+				SetupOutputVariable( "Air System Humidifier Gas Energy [J]", SysHumidGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				SetupOutputVariable( "Air System Evaporative Cooler Electric Energy [J]", SysEvapElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
@@ -2116,27 +2201,27 @@ namespace SystemReports {
 		int PlantLoopNum;
 
 		//Dimension GetChildrenData arrays
-		FArray1D_string SubCompTypes;
-		FArray1D_string SubCompNames;
-		FArray1D_string InletNodeNames;
-		FArray1D_int InletNodeNumbers;
-		FArray1D_int InletFluidStreams;
-		FArray1D_string OutletNodeNames;
-		FArray1D_int OutletNodeNumbers;
-		FArray1D_int OutletFluidStreams;
+		Array1D_string SubCompTypes;
+		Array1D_string SubCompNames;
+		Array1D_string InletNodeNames;
+		Array1D_int InletNodeNumbers;
+		Array1D_int InletFluidStreams;
+		Array1D_string OutletNodeNames;
+		Array1D_int OutletNodeNumbers;
+		Array1D_int OutletFluidStreams;
 		int NumChildren;
 		int NumGrandChildren;
 		bool IsParent;
 
 		//Dimension GetMeteredVariables arrays
-		FArray1D_int VarIndexes; // Variable Numbers
-		FArray1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
-		FArray1D_int IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
-		FArray1D_string UnitsStrings; // UnitsStrings for each variable
-		FArray1D_int ResourceTypes; // ResourceTypes for each variable
-		FArray1D_string EndUses; // EndUses for each variable
-		FArray1D_string Groups; // Groups for each variable
-		FArray1D_string Names; // Variable Names for each variable
+		Array1D_int VarIndexes; // Variable Numbers
+		Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
+		Array1D_int IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
+		Array1D_string UnitsStrings; // UnitsStrings for each variable
+		Array1D_int ResourceTypes; // ResourceTypes for each variable
+		Array1D_string EndUses; // EndUses for each variable
+		Array1D_string Groups; // Groups for each variable
+		Array1D_string Names; // Variable Names for each variable
 		int NumFound; // Number Found
 		int NumVariables;
 		int NumLeft; // Counter for deeper components
@@ -2170,12 +2255,14 @@ namespace SystemReports {
 						GetChildrenData( TypeOfComp, NameOfComp, NumChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 						for ( SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum ) {
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf = SubCompTypes( SubCompNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name = SubCompNames( SubCompNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNameIn = InletNodeNames( SubCompNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNameOut = OutletNodeNames( SubCompNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNumIn = InletNodeNumbers( SubCompNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNumOut = OutletNodeNumbers( SubCompNum );
+							{ auto & thisSubComponent( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ) );
+							thisSubComponent.TypeOf = SubCompTypes( SubCompNum );
+							thisSubComponent.Name = SubCompNames( SubCompNum );
+							thisSubComponent.NodeNameIn = InletNodeNames( SubCompNum );
+							thisSubComponent.NodeNameOut = OutletNodeNames( SubCompNum );
+							thisSubComponent.NodeNumIn = InletNodeNumbers( SubCompNum );
+							thisSubComponent.NodeNumOut = OutletNodeNumbers( SubCompNum );
+							}
 						}
 
 						SubCompTypes.deallocate();
@@ -2208,16 +2295,17 @@ namespace SystemReports {
 							GetChildrenData( TypeOfComp, NameOfComp, NumGrandChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 							for ( SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum ) {
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf = SubCompTypes( SubSubCompNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name = SubCompNames( SubSubCompNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNameIn = InletNodeNames( SubSubCompNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNameOut = OutletNodeNames( SubSubCompNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumIn = InletNodeNumbers( SubSubCompNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumOut = OutletNodeNumbers( SubSubCompNum );
+								{ auto & thisSubSubComponent( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ) );
+								thisSubSubComponent.TypeOf = SubCompTypes( SubSubCompNum );
+								thisSubSubComponent.Name = SubCompNames( SubSubCompNum );
+								thisSubSubComponent.NodeNameIn = InletNodeNames( SubSubCompNum );
+								thisSubSubComponent.NodeNameOut = OutletNodeNames( SubSubCompNum );
+								thisSubSubComponent.NodeNumIn = InletNodeNumbers( SubSubCompNum );
+								thisSubSubComponent.NodeNumOut = OutletNodeNumbers( SubSubCompNum );
 								NumLeft = GetNumChildren( SubCompTypes( SubSubCompNum ), SubCompNames( SubSubCompNum ) );
 								if ( NumLeft > 0 ) {
 									ShowSevereError( "Hanging Children for component=" + SubCompTypes( SubSubCompNum ) + ':' + SubCompNames( SubSubCompNum ) );
-								}
+								}}
 							}
 
 							SubCompTypes.deallocate();
@@ -2242,60 +2330,11 @@ namespace SystemReports {
 			for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 					// Get complete list of components for complex branches
-					TypeOfComp = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					NameOfComp = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
+					{ auto & thisComp( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+					TypeOfComp = thisComp.TypeOf;
+					NameOfComp = thisComp.Name;
 					NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-					VarIndexes.allocate( NumVariables );
-					VarTypes.allocate( NumVariables );
-					IndexTypes.allocate( NumVariables );
-					UnitsStrings.allocate( NumVariables );
-					ResourceTypes.allocate( NumVariables );
-					EndUses.allocate( NumVariables );
-					Groups.allocate( NumVariables );
-					Names.allocate( NumVariables );
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar.allocate( NumVariables );
-
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars = NumVariables;
-					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
-					ModeFlagOn = true;
-					for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-						if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
-							for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
-							}
-							ModeFlagOn = false;
-						} else if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
-							for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
-							}
-							ModeFlagOn = false;
-						} else if ( ModeFlagOn ) {
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
-						}
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
-					}
-
-					VarIndexes.deallocate();
-					VarTypes.deallocate();
-					IndexTypes.deallocate();
-					UnitsStrings.deallocate();
-					ResourceTypes.deallocate();
-					EndUses.deallocate();
-					Groups.deallocate();
-					Names.deallocate();
-
-					for ( SubCompNum = 1; SubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
-						// Get complete list of components for complex branches
-						TypeOfComp = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
-						NameOfComp = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
-						NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+					if ( NumVariables > 0 ) {
 						VarIndexes.allocate( NumVariables );
 						VarTypes.allocate( NumVariables );
 						IndexTypes.allocate( NumVariables );
@@ -2304,33 +2343,35 @@ namespace SystemReports {
 						EndUses.allocate( NumVariables );
 						Groups.allocate( NumVariables );
 						Names.allocate( NumVariables );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
+						thisComp.MeteredVar.allocate( NumVariables );
 
+						thisComp.NumMeteredVars = NumVariables;
 						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
-
 						ModeFlagOn = true;
 						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-							if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+							{ auto & thisVar( thisComp.MeteredVar( VarNum ) );
+							thisVar.ReportVarName = Names( VarNum );
+							thisVar.ReportVarUnits = UnitsStrings( VarNum );
+							thisVar.ReportVarIndex = VarIndexes( VarNum );
+							thisVar.ReportVarIndexType = IndexTypes( VarNum );
+							thisVar.ReportVarType = VarTypes( VarNum );
+							thisVar.ResourceType = ResourceTypes( VarNum );
+							thisVar.EndUse = EndUses( VarNum );
+							if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
 								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+									thisComp.MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
 								}
 								ModeFlagOn = false;
-							} else if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+							} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
 								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+									thisComp.MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
 								}
 								ModeFlagOn = false;
 							} else if ( ModeFlagOn ) {
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
+								thisVar.EndUse_CompMode = NoHeatNoCool;
 							}
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
+							thisVar.Group = Groups( VarNum );
+							}
 						}
 
 						VarIndexes.deallocate();
@@ -2341,14 +2382,13 @@ namespace SystemReports {
 						EndUses.deallocate();
 						Groups.deallocate();
 						Names.deallocate();
-
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumMeteredVars = NumVariables;
-
-						for ( SubSubCompNum = 1; SubSubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumSubSubComps; ++SubSubCompNum ) {
-							// Get complete list of components for complex branches
-							TypeOfComp = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf;
-							NameOfComp = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name;
-							NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+					}
+					for ( SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum ) {
+						// Get complete list of components for complex branches
+						TypeOfComp = thisComp.SubComp( SubCompNum ).TypeOf;
+						NameOfComp = thisComp.SubComp( SubCompNum ).Name;
+						NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+						if ( NumVariables > 0 ) {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
@@ -2357,33 +2397,35 @@ namespace SystemReports {
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar.allocate( NumVariables );
+							thisComp.SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
 
 							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-								if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+								{ auto & thisVar( thisComp.SubComp( SubCompNum ).MeteredVar( VarNum ) );
+								thisVar.ReportVarName = Names( VarNum );
+								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarIndex = VarIndexes( VarNum );
+								thisVar.ReportVarIndexType = IndexTypes( VarNum );
+								thisVar.ReportVarType = VarTypes( VarNum );
+								thisVar.ResourceType = ResourceTypes( VarNum );
+								thisVar.EndUse = EndUses( VarNum );
+								if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
 									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-										PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+										thisComp.SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
 									}
 									ModeFlagOn = false;
-								} else if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+								} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
 									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-										PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+										thisComp.SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
 									}
 									ModeFlagOn = false;
 								} else if ( ModeFlagOn ) {
-									PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
+									thisVar.EndUse_CompMode = NoHeatNoCool;
 								}
-								PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
+								thisVar.Group = Groups( VarNum );
+								}
 							}
 
 							VarIndexes.deallocate();
@@ -2394,10 +2436,67 @@ namespace SystemReports {
 							EndUses.deallocate();
 							Groups.deallocate();
 							Names.deallocate();
-
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NumMeteredVars = NumVariables;
 						}
-					}
+
+						thisComp.SubComp( SubCompNum ).NumMeteredVars = NumVariables;
+
+						for ( SubSubCompNum = 1; SubSubCompNum <= thisComp.SubComp( SubCompNum ).NumSubSubComps; ++SubSubCompNum ) {
+							// Get complete list of components for complex branches
+							TypeOfComp = thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf;
+							NameOfComp = thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name;
+							NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+							if ( NumVariables > 0 ) {
+								VarIndexes.allocate( NumVariables );
+								VarTypes.allocate( NumVariables );
+								IndexTypes.allocate( NumVariables );
+								UnitsStrings.allocate( NumVariables );
+								ResourceTypes.allocate( NumVariables );
+								EndUses.allocate( NumVariables );
+								Groups.allocate( NumVariables );
+								Names.allocate( NumVariables );
+								thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar.allocate( NumVariables );
+
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+
+								ModeFlagOn = true;
+								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
+									{ auto & thisVar( thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ) );
+									thisVar.ReportVarName = Names( VarNum );
+									thisVar.ReportVarUnits = UnitsStrings( VarNum );
+									thisVar.ReportVarIndex = VarIndexes( VarNum );
+									thisVar.ReportVarIndexType = IndexTypes( VarNum );
+									thisVar.ReportVarType = VarTypes( VarNum );
+									thisVar.ResourceType = ResourceTypes( VarNum );
+									thisVar.EndUse = EndUses( VarNum );
+									if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+										for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+											thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+										}
+										ModeFlagOn = false;
+									} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+										for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+											thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+										}
+										ModeFlagOn = false;
+									} else if ( ModeFlagOn ) {
+										thisVar.EndUse_CompMode = NoHeatNoCool;
+									}
+									thisVar.Group = Groups( VarNum );
+									}
+								}
+
+								VarIndexes.deallocate();
+								VarTypes.deallocate();
+								IndexTypes.deallocate();
+								UnitsStrings.deallocate();
+								ResourceTypes.deallocate();
+								EndUses.deallocate();
+								Groups.deallocate();
+								Names.deallocate();
+							}
+							thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NumMeteredVars = NumVariables;
+						}
+					}}
 
 				}
 			}
@@ -2411,73 +2510,78 @@ namespace SystemReports {
 				TypeOfComp = ZoneEquipList( CtrlZoneNum ).EquipType( CompNum );
 				NameOfComp = ZoneEquipList( CtrlZoneNum ).EquipName( CompNum );
 				GetComponentData( TypeOfComp, NameOfComp, IsParent, NumInlets, InletNodeNames, InletNodeNumbers, InletFluidStreams, NumOutlets, OutletNodeNames, OutletNodeNumbers, OutletFluidStreams, ErrorsFound );
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).TypeOf = TypeOfComp;
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).Name = NameOfComp;
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).OutletNodeNums.allocate( NumOutlets );
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).NumOutlets = NumOutlets;
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).OutletNodeNums = OutletNodeNumbers;
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).InletNodeNums.allocate( NumInlets );
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).NumInlets = NumInlets;
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).InletNodeNums = InletNodeNumbers;
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).Parent = IsParent;
+				{ auto & thisEquipData( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ) );
+				thisEquipData.TypeOf = TypeOfComp;
+				thisEquipData.Name = NameOfComp;
+				thisEquipData.OutletNodeNums.allocate( NumOutlets );
+				thisEquipData.NumOutlets = NumOutlets;
+				thisEquipData.OutletNodeNums = OutletNodeNumbers;
+				thisEquipData.InletNodeNums.allocate( NumInlets );
+				thisEquipData.NumInlets = NumInlets;
+				thisEquipData.InletNodeNums = InletNodeNumbers;
+				thisEquipData.Parent = IsParent;
 				NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).NumMeteredVars = NumVariables;
-				InletNodeNames.deallocate();
-				InletNodeNumbers.deallocate();
-				InletFluidStreams.deallocate();
-				OutletNodeNames.deallocate();
-				OutletNodeNumbers.deallocate();
-				OutletFluidStreams.deallocate();
+				thisEquipData.NumMeteredVars = NumVariables;
+				if ( NumVariables > 0 ) {
+					InletNodeNames.deallocate();
+					InletNodeNumbers.deallocate();
+					InletFluidStreams.deallocate();
+					OutletNodeNames.deallocate();
+					OutletNodeNumbers.deallocate();
+					OutletFluidStreams.deallocate();
 
-				VarIndexes.allocate( NumVariables );
-				VarTypes.allocate( NumVariables );
-				IndexTypes.allocate( NumVariables );
-				UnitsStrings.allocate( NumVariables );
-				ResourceTypes.allocate( NumVariables );
-				EndUses.allocate( NumVariables );
-				Groups.allocate( NumVariables );
-				Names.allocate( NumVariables );
-				ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar.allocate( NumVariables );
+					VarIndexes.allocate( NumVariables );
+					VarTypes.allocate( NumVariables );
+					IndexTypes.allocate( NumVariables );
+					UnitsStrings.allocate( NumVariables );
+					ResourceTypes.allocate( NumVariables );
+					EndUses.allocate( NumVariables );
+					Groups.allocate( NumVariables );
+					Names.allocate( NumVariables );
+					thisEquipData.MeteredVar.allocate( NumVariables );
 
-				GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 
-				ModeFlagOn = true;
-				for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-					if ( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
-						for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+					ModeFlagOn = true;
+					for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
+						{ auto & thisVar( thisEquipData.MeteredVar( VarNum ) );
+						thisVar.ReportVarName = Names( VarNum );
+						thisVar.ReportVarUnits = UnitsStrings( VarNum );
+						thisVar.ReportVarIndex = VarIndexes( VarNum );
+						thisVar.ReportVarIndexType = IndexTypes( VarNum );
+						thisVar.ReportVarType = VarTypes( VarNum );
+						thisVar.ResourceType = ResourceTypes( VarNum );
+						thisVar.EndUse = EndUses( VarNum );
+						if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+							for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+								thisEquipData.MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+							}
+							ModeFlagOn = false;
+						} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+							for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+								thisEquipData.MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+							}
+							ModeFlagOn = false;
+						} else if ( ModeFlagOn ) {
+							thisVar.EndUse_CompMode = NoHeatNoCool;
 						}
-						ModeFlagOn = false;
-					} else if ( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
-						for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+						thisVar.Group = Groups( VarNum );
 						}
-						ModeFlagOn = false;
-					} else if ( ModeFlagOn ) {
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
 					}
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
-				}
 
-				VarIndexes.deallocate();
-				VarTypes.deallocate();
-				IndexTypes.deallocate();
-				UnitsStrings.deallocate();
-				ResourceTypes.deallocate();
-				EndUses.deallocate();
-				Groups.deallocate();
-				Names.deallocate();
+					VarIndexes.deallocate();
+					VarTypes.deallocate();
+					IndexTypes.deallocate();
+					UnitsStrings.deallocate();
+					ResourceTypes.deallocate();
+					EndUses.deallocate();
+					Groups.deallocate();
+					Names.deallocate();
+				}
 
 				if ( IsParentObject( TypeOfComp, NameOfComp ) ) {
 					NumChildren = GetNumChildren( TypeOfComp, NameOfComp );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).NumSubEquip = NumChildren;
+					thisEquipData.NumSubEquip = NumChildren;
 
 					SubCompTypes.allocate( NumChildren );
 					SubCompNames.allocate( NumChildren );
@@ -2485,15 +2589,15 @@ namespace SystemReports {
 					InletNodeNumbers.allocate( NumChildren );
 					OutletNodeNames.allocate( NumChildren );
 					OutletNodeNumbers.allocate( NumChildren );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData.allocate( NumChildren );
+					thisEquipData.SubEquipData.allocate( NumChildren );
 
 					GetChildrenData( TypeOfComp, NameOfComp, NumChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 					for ( SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum ) {
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).TypeOf = SubCompTypes( SubCompNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).Name = SubCompNames( SubCompNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).OutletNodeNum = OutletNodeNumbers( SubCompNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).InletNodeNum = InletNodeNumbers( SubCompNum );
+						thisEquipData.SubEquipData( SubCompNum ).TypeOf = SubCompTypes( SubCompNum );
+						thisEquipData.SubEquipData( SubCompNum ).Name = SubCompNames( SubCompNum );
+						thisEquipData.SubEquipData( SubCompNum ).OutletNodeNum = OutletNodeNumbers( SubCompNum );
+						thisEquipData.SubEquipData( SubCompNum ).InletNodeNum = InletNodeNumbers( SubCompNum );
 					}
 
 					SubCompTypes.deallocate();
@@ -2507,26 +2611,26 @@ namespace SystemReports {
 				}
 
 				for ( SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum ) {
-					TypeOfComp = ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).TypeOf;
-					NameOfComp = ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).Name;
+					TypeOfComp = thisEquipData.SubEquipData( SubCompNum ).TypeOf;
+					NameOfComp = thisEquipData.SubEquipData( SubCompNum ).Name;
 					if ( IsParentObject( TypeOfComp, NameOfComp ) ) {
 						NumGrandChildren = GetNumChildren( TypeOfComp, NameOfComp );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).NumSubSubEquip = NumGrandChildren;
+						thisEquipData.SubEquipData( SubCompNum ).NumSubSubEquip = NumGrandChildren;
 						SubCompTypes.allocate( NumGrandChildren );
 						SubCompNames.allocate( NumGrandChildren );
 						InletNodeNames.allocate( NumGrandChildren );
 						InletNodeNumbers.allocate( NumGrandChildren );
 						OutletNodeNames.allocate( NumGrandChildren );
 						OutletNodeNumbers.allocate( NumGrandChildren );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData.allocate( NumGrandChildren );
+						thisEquipData.SubEquipData( SubCompNum ).SubSubEquipData.allocate( NumGrandChildren );
 						//Sankar added the array number for EquipData
 						GetChildrenData( TypeOfComp, NameOfComp, NumGrandChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 						for ( SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum ) {
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).TypeOf = SubCompTypes( SubSubCompNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).Name = SubCompNames( SubSubCompNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).OutletNodeNum = OutletNodeNumbers( SubSubCompNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).InletNodeNum = InletNodeNumbers( SubSubCompNum );
+							thisEquipData.SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).TypeOf = SubCompTypes( SubSubCompNum );
+							thisEquipData.SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).Name = SubCompNames( SubSubCompNum );
+							thisEquipData.SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).OutletNodeNum = OutletNodeNumbers( SubSubCompNum );
+							thisEquipData.SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).InletNodeNum = InletNodeNumbers( SubSubCompNum );
 						}
 						SubCompTypes.deallocate();
 						SubCompNames.deallocate();
@@ -2537,7 +2641,7 @@ namespace SystemReports {
 					} else {
 						NumGrandChildren = 0;
 					}
-				}
+				}}
 			}
 		}
 
@@ -2545,63 +2649,13 @@ namespace SystemReports {
 			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 			for ( CompNum = 1; CompNum <= ZoneEquipList( CtrlZoneNum ).NumOfEquipTypes; ++CompNum ) {
 				for ( SubCompNum = 1; SubCompNum <= ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).NumSubEquip; ++SubCompNum ) {
-					TypeOfComp = ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).TypeOf;
-					NameOfComp = ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).Name;
+					{ auto & thisSubEquipData( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ) );
+					TypeOfComp = thisSubEquipData.TypeOf;
+					NameOfComp = thisSubEquipData.Name;
 
 					NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).NumMeteredVars = NumVariables; //Sankar added this line
-					VarIndexes.allocate( NumVariables );
-					VarTypes.allocate( NumVariables );
-					IndexTypes.allocate( NumVariables );
-					UnitsStrings.allocate( NumVariables );
-					ResourceTypes.allocate( NumVariables );
-					EndUses.allocate( NumVariables );
-					Groups.allocate( NumVariables );
-					Names.allocate( NumVariables );
-					ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar.allocate( NumVariables );
-
-					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
-
-					ModeFlagOn = true;
-					for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-						if ( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
-							for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-								ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
-							}
-							ModeFlagOn = false;
-						} else if ( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
-							for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-								ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
-							}
-							ModeFlagOn = false;
-						} else if ( ModeFlagOn ) {
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
-						}
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
-					}
-
-					VarIndexes.deallocate();
-					VarTypes.deallocate();
-					IndexTypes.deallocate();
-					UnitsStrings.deallocate();
-					ResourceTypes.deallocate();
-					EndUses.deallocate();
-					Groups.deallocate();
-					Names.deallocate();
-
-					for ( SubSubCompNum = 1; SubSubCompNum <= ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).NumSubSubEquip; ++SubSubCompNum ) {
-						TypeOfComp = ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).TypeOf;
-						NameOfComp = ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).Name;
-
-						NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).NumMeteredVars = NumVariables; //Sankar added this line
+					thisSubEquipData.NumMeteredVars = NumVariables; //Sankar added this line
+					if ( NumVariables > 0 ) {
 						VarIndexes.allocate( NumVariables );
 						VarTypes.allocate( NumVariables );
 						IndexTypes.allocate( NumVariables );
@@ -2610,33 +2664,35 @@ namespace SystemReports {
 						EndUses.allocate( NumVariables );
 						Groups.allocate( NumVariables );
 						Names.allocate( NumVariables );
-						ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar.allocate( NumVariables );
+						thisSubEquipData.MeteredVar.allocate( NumVariables );
 
 						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 						ModeFlagOn = true;
 						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-							if ( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+							{ auto & thisVar( thisSubEquipData.MeteredVar( VarNum ) );
+							thisVar.ReportVarName = Names( VarNum );
+							thisVar.ReportVarUnits = UnitsStrings( VarNum );
+							thisVar.ReportVarIndex = VarIndexes( VarNum );
+							thisVar.ReportVarIndexType = IndexTypes( VarNum );
+							thisVar.ReportVarType = VarTypes( VarNum );
+							thisVar.ResourceType = ResourceTypes( VarNum );
+							thisVar.EndUse = EndUses( VarNum );
+							if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
 								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+									thisSubEquipData.MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
 								}
 								ModeFlagOn = false;
-							} else if ( ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+							} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
 								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+									thisSubEquipData.MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
 								}
 								ModeFlagOn = false;
 							} else if ( ModeFlagOn ) {
-								ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
+								thisVar.EndUse_CompMode = NoHeatNoCool;
 							}
-							ZoneEquipList( CtrlZoneNum ).EquipData( CompNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
+							thisVar.Group = Groups( VarNum );
+							}
 						}
 
 						VarIndexes.deallocate();
@@ -2647,8 +2703,64 @@ namespace SystemReports {
 						EndUses.deallocate();
 						Groups.deallocate();
 						Names.deallocate();
-
 					}
+
+					for ( SubSubCompNum = 1; SubSubCompNum <= thisSubEquipData.NumSubSubEquip; ++SubSubCompNum ) {
+						TypeOfComp = thisSubEquipData.SubSubEquipData( SubSubCompNum ).TypeOf;
+						NameOfComp = thisSubEquipData.SubSubEquipData( SubSubCompNum ).Name;
+
+						NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+						thisSubEquipData.SubSubEquipData( SubSubCompNum ).NumMeteredVars = NumVariables; //Sankar added this line
+						if ( NumVariables > 0 ) {
+							VarIndexes.allocate( NumVariables );
+							VarTypes.allocate( NumVariables );
+							IndexTypes.allocate( NumVariables );
+							UnitsStrings.allocate( NumVariables );
+							ResourceTypes.allocate( NumVariables );
+							EndUses.allocate( NumVariables );
+							Groups.allocate( NumVariables );
+							Names.allocate( NumVariables );
+							thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar.allocate( NumVariables );
+
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+
+							ModeFlagOn = true;
+							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
+								{ auto & thisVar( thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ) );
+								thisVar.ReportVarName = Names( VarNum );
+								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarIndex = VarIndexes( VarNum );
+								thisVar.ReportVarIndexType = IndexTypes( VarNum );
+								thisVar.ReportVarType = VarTypes( VarNum );
+								thisVar.ResourceType = ResourceTypes( VarNum );
+								thisVar.EndUse = EndUses( VarNum );
+								if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+										thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+									}
+									ModeFlagOn = false;
+								} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+										thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+									}
+									ModeFlagOn = false;
+								} else if ( ModeFlagOn ) {
+									thisVar.EndUse_CompMode = NoHeatNoCool;
+								}
+								thisVar.Group = Groups( VarNum );
+								}
+							}
+
+							VarIndexes.deallocate();
+							VarTypes.deallocate();
+							IndexTypes.deallocate();
+							UnitsStrings.deallocate();
+							ResourceTypes.deallocate();
+							EndUses.deallocate();
+							Groups.deallocate();
+							Names.deallocate();
+						}
+					}}
 				}
 			}
 		}
@@ -2693,12 +2805,13 @@ namespace SystemReports {
 
 				for ( BranchNum = 1; BranchNum <= ThisReportData.TotalBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= ThisReportData.Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).TypeOf;
-						NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).Name;
+						{ auto & thisComp( ThisReportData.Branch( BranchNum ).Comp( CompNum ) );
+						TypeOfComp = thisComp.TypeOf;
+						NameOfComp = thisComp.Name;
 						// Get complete list of components for complex branches
 						if ( IsParentObject( TypeOfComp, NameOfComp ) ) {
 
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).Parent = true;
+							thisComp.Parent = true;
 							NumChildren = GetNumChildren( TypeOfComp, NameOfComp );
 
 							SubCompTypes.allocate( NumChildren );
@@ -2707,17 +2820,17 @@ namespace SystemReports {
 							InletNodeNumbers.allocate( NumChildren );
 							OutletNodeNames.allocate( NumChildren );
 							OutletNodeNumbers.allocate( NumChildren );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp.allocate( NumChildren );
+							thisComp.SubComp.allocate( NumChildren );
 
 							GetChildrenData( TypeOfComp, NameOfComp, NumChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 							for ( SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum ) {
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf = SubCompTypes( SubCompNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name = SubCompNames( SubCompNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNameIn = InletNodeNames( SubCompNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNameOut = OutletNodeNames( SubCompNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNumIn = InletNodeNumbers( SubCompNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNumOut = OutletNodeNumbers( SubCompNum );
+								thisComp.SubComp( SubCompNum ).TypeOf = SubCompTypes( SubCompNum );
+								thisComp.SubComp( SubCompNum ).Name = SubCompNames( SubCompNum );
+								thisComp.SubComp( SubCompNum ).NodeNameIn = InletNodeNames( SubCompNum );
+								thisComp.SubComp( SubCompNum ).NodeNameOut = OutletNodeNames( SubCompNum );
+								thisComp.SubComp( SubCompNum ).NodeNumIn = InletNodeNumbers( SubCompNum );
+								thisComp.SubComp( SubCompNum ).NodeNumOut = OutletNodeNumbers( SubCompNum );
 							}
 
 							SubCompTypes.deallocate();
@@ -2729,14 +2842,14 @@ namespace SystemReports {
 
 						} else {
 							NumChildren = 0;
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).Parent = false;
+							thisComp.Parent = false;
 						}
-						ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumSubComps = NumChildren;
+						thisComp.NumSubComps = NumChildren;
 
 						//check for 'grandchildren'
 						for ( SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum ) {
-							TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
-							NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
+							TypeOfComp = thisComp.SubComp( SubCompNum ).TypeOf;
+							NameOfComp = thisComp.SubComp( SubCompNum ).Name;
 							if ( IsParentObject( TypeOfComp, NameOfComp ) ) {
 								NumGrandChildren = GetNumChildren( TypeOfComp, NameOfComp );
 								SubCompTypes.allocate( NumGrandChildren );
@@ -2745,17 +2858,19 @@ namespace SystemReports {
 								InletNodeNumbers.allocate( NumGrandChildren );
 								OutletNodeNames.allocate( NumGrandChildren );
 								OutletNodeNumbers.allocate( NumGrandChildren );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp.allocate( NumGrandChildren );
+								thisComp.SubComp( SubCompNum ).SubSubComp.allocate( NumGrandChildren );
 
 								GetChildrenData( TypeOfComp, NameOfComp, NumGrandChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 								for ( SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf = SubCompTypes( SubSubCompNum );
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name = SubCompNames( SubSubCompNum );
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNameIn = InletNodeNames( SubSubCompNum );
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNameOut = OutletNodeNames( SubSubCompNum );
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumIn = InletNodeNumbers( SubSubCompNum );
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumOut = OutletNodeNumbers( SubSubCompNum );
+									{ auto & thisSubSubComp( thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ) );
+									thisSubSubComp.TypeOf = SubCompTypes( SubSubCompNum );
+									thisSubSubComp.Name = SubCompNames( SubSubCompNum );
+									thisSubSubComp.NodeNameIn = InletNodeNames( SubSubCompNum );
+									thisSubSubComp.NodeNameOut = OutletNodeNames( SubSubCompNum );
+									thisSubSubComp.NodeNumIn = InletNodeNumbers( SubSubCompNum );
+									thisSubSubComp.NodeNumOut = OutletNodeNumbers( SubSubCompNum );
+									}
 								}
 
 								SubCompTypes.deallocate();
@@ -2766,12 +2881,12 @@ namespace SystemReports {
 								OutletNodeNumbers.deallocate();
 							} else {
 								NumGrandChildren = 0;
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Parent = false;
+								thisComp.SubComp( SubCompNum ).Parent = false;
 							}
 
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumSubSubComps = NumGrandChildren;
+							thisComp.SubComp( SubCompNum ).NumSubSubComps = NumGrandChildren;
 
-						}
+						}}
 					}
 				}
 			}
@@ -2810,61 +2925,11 @@ namespace SystemReports {
 				for ( BranchNum = 1; BranchNum <= ThisReportData.TotalBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= ThisReportData.Branch( BranchNum ).TotalComponents; ++CompNum ) {
 						// Get complete list of components for complex branches
-						TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).TypeOf;
-						NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).Name;
+						{ auto & thisComp( ThisReportData.Branch( BranchNum ).Comp( CompNum ) );
+						TypeOfComp = thisComp.TypeOf;
+						NameOfComp = thisComp.Name;
 						NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-						VarIndexes.allocate( NumVariables );
-						VarTypes.allocate( NumVariables );
-						IndexTypes.allocate( NumVariables );
-						UnitsStrings.allocate( NumVariables );
-						ResourceTypes.allocate( NumVariables );
-						EndUses.allocate( NumVariables );
-						Groups.allocate( NumVariables );
-						Names.allocate( NumVariables );
-						ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar.allocate( NumVariables );
-
-						ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumMeteredVars = NumVariables;
-						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
-
-						ModeFlagOn = true;
-						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-							if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
-								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
-								}
-								ModeFlagOn = false;
-							} else if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
-								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
-								}
-								ModeFlagOn = false;
-							} else if ( ModeFlagOn ) {
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
-							}
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
-						}
-
-						VarIndexes.deallocate();
-						VarTypes.deallocate();
-						IndexTypes.deallocate();
-						UnitsStrings.deallocate();
-						ResourceTypes.deallocate();
-						EndUses.deallocate();
-						Groups.deallocate();
-						Names.deallocate();
-
-						for ( SubCompNum = 1; SubCompNum <= ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
-							// Get complete list of components for complex branches
-							TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
-							NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
-							NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+						if ( NumVariables > 0 ) {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
@@ -2873,33 +2938,36 @@ namespace SystemReports {
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
+							thisComp.MeteredVar.allocate( NumVariables );
 
+							thisComp.NumMeteredVars = NumVariables;
 							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-								if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+								{ auto & thisVar( thisComp.MeteredVar( VarNum ) );
+								thisVar.ReportVarName = Names( VarNum );
+								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarIndex = VarIndexes( VarNum );
+								thisVar.ReportVarIndexType = IndexTypes( VarNum );
+								thisVar.ReportVarType = VarTypes( VarNum );
+								thisVar.ResourceType = ResourceTypes( VarNum );
+								thisVar.EndUse = EndUses( VarNum );
+								if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
 									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-										ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+										thisComp.MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
 									}
 									ModeFlagOn = false;
-								} else if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+								} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
 									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-										ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+										thisComp.MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
 									}
 									ModeFlagOn = false;
 								} else if ( ModeFlagOn ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
+									thisVar.EndUse_CompMode = NoHeatNoCool;
 								}
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
+								thisVar.Group = Groups( VarNum );
+								}
 							}
 
 							VarIndexes.deallocate();
@@ -2910,9 +2978,63 @@ namespace SystemReports {
 							EndUses.deallocate();
 							Groups.deallocate();
 							Names.deallocate();
-
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumMeteredVars = NumVariables;
 						}
+						for ( SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum ) {
+							// Get complete list of components for complex branches
+							TypeOfComp = thisComp.SubComp( SubCompNum ).TypeOf;
+							NameOfComp = thisComp.SubComp( SubCompNum ).Name;
+							NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+							if ( NumVariables > 0 ) {
+								VarIndexes.allocate( NumVariables );
+								VarTypes.allocate( NumVariables );
+								IndexTypes.allocate( NumVariables );
+								UnitsStrings.allocate( NumVariables );
+								ResourceTypes.allocate( NumVariables );
+								EndUses.allocate( NumVariables );
+								Groups.allocate( NumVariables );
+								Names.allocate( NumVariables );
+								thisComp.SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
+
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+
+								ModeFlagOn = true;
+								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
+									{ auto & thisVar( thisComp.SubComp( SubCompNum ).MeteredVar( VarNum ) );
+									thisVar.ReportVarName = Names( VarNum );
+									thisVar.ReportVarUnits = UnitsStrings( VarNum );
+									thisVar.ReportVarIndex = VarIndexes( VarNum );
+									thisVar.ReportVarIndexType = IndexTypes( VarNum );
+									thisVar.ReportVarType = VarTypes( VarNum );
+									thisVar.ResourceType = ResourceTypes( VarNum );
+									thisVar.EndUse = EndUses( VarNum );
+									if ( thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+										for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+											thisComp.SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+										}
+										ModeFlagOn = false;
+									} else if ( thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+										for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+											thisComp.SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+										}
+										ModeFlagOn = false;
+									} else if ( ModeFlagOn ) {
+										thisVar.EndUse_CompMode = NoHeatNoCool;
+									}
+									thisVar.Group = Groups( VarNum );
+									}
+								}
+
+								VarIndexes.deallocate();
+								VarTypes.deallocate();
+								IndexTypes.deallocate();
+								UnitsStrings.deallocate();
+								ResourceTypes.deallocate();
+								EndUses.deallocate();
+								Groups.deallocate();
+								Names.deallocate();
+							}
+							thisComp.SubComp( SubCompNum ).NumMeteredVars = NumVariables;
+						}}
 					}
 				}
 			}
@@ -2948,7 +3070,6 @@ namespace SystemReports {
 		using namespace DataZoneEnergyDemands;
 		using Psychrometrics::PsyHFnTdbW;
 		using namespace DataGlobalConstants;
-		using DataEnvironment::OutDryBulbTemp;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2964,8 +3085,6 @@ namespace SystemReports {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string CompType;
-		std::string CompName;
 		int Idx; // loop counter
 		int nodes; // loop counter
 		int CtrlZoneNum; // ZONE counter
@@ -3036,70 +3155,73 @@ namespace SystemReports {
 		SysHCCompGas = 0.0;
 		SysHCCompSteam = 0.0;
 		SysHumidElec = 0.0;
+		SysHumidGas = 0.0;
 		DesDehumidElec = 0.0;
 		SysEvapElec = 0.0;
 
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-			for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
-				if ( Node( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumOut ).MassFlowRate <= 0.0 ) continue;
-				for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
-					CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					InletNodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-					OutletNodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+			auto const & pas = PrimaryAirSystem( AirLoopNum );
+			for ( BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum ) {
+				auto const & pasBranch = pas.Branch( BranchNum );
+				if ( Node( pasBranch.NodeNumOut ).MassFlowRate <= 0.0 ) continue;
+				for ( CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum ) {
+					auto const & pasBranchComp = pasBranch.Comp( CompNum );
+					InletNodeNum = pasBranchComp.NodeNumIn;
+					OutletNodeNum = pasBranchComp.NodeNumOut;
 					if ( InletNodeNum <= 0 || OutletNodeNum <= 0 ) continue;
 					CompLoad = Node( OutletNodeNum ).MassFlowRate * ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) - PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) );
 					CompLoad *= TimeStepSys * SecInHour;
 					CompEnergyUse = 0.0;
 					EnergyType = iRT_None;
 					CompLoadFlag = true;
-					CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+					CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 					CompLoadFlag = false;
-					for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-						CompMode = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse_CompMode;
-						CompEnergyUse = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).CurMeterReading;
-						EnergyType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ResourceType;
-						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+					for ( VarNum = 1; VarNum <= pasBranchComp.NumMeteredVars; ++VarNum ) {
+						auto const & pasBranchCompMeter = pasBranchComp.MeteredVar( VarNum );
+						CompMode = pasBranchCompMeter.EndUse_CompMode;
+						CompEnergyUse = pasBranchCompMeter.CurMeterReading;
+						EnergyType = pasBranchCompMeter.ResourceType;
+						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 					}
 
-					for ( SubCompNum = 1; SubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
-						CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
-						CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
-						InletNodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNumIn;
+					for ( SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum ) {
+						auto const & pasBranchSubComp = pasBranchComp.SubComp( SubCompNum );
+						InletNodeNum = pasBranchSubComp.NodeNumIn;
+						OutletNodeNum = pasBranchSubComp.NodeNumOut;
 						if ( InletNodeNum <= 0 || OutletNodeNum <= 0 ) continue;
-						OutletNodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NodeNumOut;
 						CompLoad = Node( OutletNodeNum ).MassFlowRate * ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) - PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) );
 						CompLoad *= TimeStepSys * SecInHour;
 						CompEnergyUse = 0.0;
 						EnergyType = iRT_None;
 						CompLoadFlag = true;
-						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 						CompLoadFlag = false;
-						for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumMeteredVars; ++VarNum ) {
-							CompMode = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode;
-							CompEnergyUse = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).CurMeterReading;
-							EnergyType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ResourceType;
-							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+						for ( VarNum = 1; VarNum <= pasBranchSubComp.NumMeteredVars; ++VarNum ) {
+							auto const & pasBranchSubCompMeter = pasBranchSubComp.MeteredVar( VarNum );
+							CompMode = pasBranchSubCompMeter.EndUse_CompMode;
+							CompEnergyUse = pasBranchSubCompMeter.CurMeterReading;
+							EnergyType = pasBranchSubCompMeter.ResourceType;
+							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 						}
 
-						for ( SubSubCompNum = 1; SubSubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumSubSubComps; ++SubSubCompNum ) {
-							CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name;
-							CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf;
-							InletNodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumIn;
-							OutletNodeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NodeNumOut;
+						for ( SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum ) {
+							auto const & pasBranchSubSubComp = pasBranchSubComp.SubSubComp( SubSubCompNum );
+							InletNodeNum = pasBranchSubSubComp.NodeNumIn;
+							OutletNodeNum = pasBranchSubSubComp.NodeNumOut;
 							if ( InletNodeNum <= 0 || OutletNodeNum <= 0 ) continue;
 							CompLoad = Node( OutletNodeNum ).MassFlowRate * ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) - PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) );
 							CompLoad *= TimeStepSys * SecInHour;
 							CompEnergyUse = 0.0;
 							EnergyType = iRT_None;
 							CompLoadFlag = true;
-							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 							CompLoadFlag = false;
-							for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NumMeteredVars; ++VarNum ) {
-								CompMode = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).EndUse_CompMode;
-								CompEnergyUse = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).CurMeterReading;
-								EnergyType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ResourceType;
-								CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+							for ( VarNum = 1; VarNum <= pasBranchSubSubComp.NumMeteredVars; ++VarNum ) {
+								auto const & pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar( VarNum );
+								CompMode = pasBranchSubSubCompMeter.EndUse_CompMode;
+								CompEnergyUse = pasBranchSubSubCompMeter.CurMeterReading;
+								EnergyType = pasBranchSubSubCompMeter.ResourceType;
+								CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 							}
 
 						}
@@ -3109,17 +3231,18 @@ namespace SystemReports {
 		}
 
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
-			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+			auto const & zecCtrlZone = ZoneEquipConfig( CtrlZoneNum );
+			if ( ! zecCtrlZone.IsControlled ) continue;
 
 			//retrieve the zone load for each zone
-			ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+			ActualZoneNum = zecCtrlZone.ActualZoneNum;
 			ZoneLoad = ZoneSysEnergyDemand( ActualZoneNum ).TotalOutputRequired;
 
 			//if system operating in deadband reset zone load
 			if ( DeadBandOrSetback( ActualZoneNum ) ) ZoneLoad = 0.0;
 
 			// retrieve air loop indexes
-			AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
+			AirLoopNum = zecCtrlZone.AirLoopNum;
 			if ( AirLoopNum == 0 ) continue;
 
 			//Zone cooling load
@@ -3132,96 +3255,96 @@ namespace SystemReports {
 			}
 
 			//loop over the zone supply air path inlet nodes
-			for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
-				AirDistCoolInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode, 0 );
-				AirDistHeatInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode, 0 );
+			for ( ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInletNodes; ++ZoneInNum ) {
+				auto const & zecCtrlZoneCool = zecCtrlZone.AirDistUnitCool( ZoneInNum );
+				auto const & zecCtrlZoneHeat = zecCtrlZone.AirDistUnitHeat( ZoneInNum );
+
+				AirDistCoolInletNodeNum = max( zecCtrlZoneCool.InNode, 0 );
+				AirDistHeatInletNodeNum = max( zecCtrlZoneHeat.InNode, 0 );
 
 				// Set for cooling or heating path
 				if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum == 0 ) {
-					ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 );
+					ADUCoolFlowrate = max( Node( zecCtrlZoneCool.InNode ).MassFlowRate, 0.0 );
 				} else if ( AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum == 0 ) {
-					ADUHeatFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 );
+					ADUHeatFlowrate = max( Node( zecCtrlZoneHeat.InNode ).MassFlowRate, 0.0 );
 				} else {
 					ADUCoolFlowrate = 0.0;
 					ADUHeatFlowrate = 0.0;
 				}
 
-				for ( Idx = 1; Idx <= 2; ++Idx ) {
-					EquipListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
+				EquipListNum = zecCtrlZone.EquipListIndex;
+				auto const & zel = ZoneEquipList( EquipListNum );
 
+				for ( Idx = 1; Idx <= 2; ++Idx ) {
 					if ( Idx == 1 ) {
-						ADUCoolNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).AirDistUnitIndex, 0 );
+						ADUCoolNum = max( zecCtrlZoneCool.AirDistUnitIndex, 0 );
 						if ( ADUCoolNum == 0 ) continue;
 						ADUNum = ADUCoolNum;
 					} else { //(Idx =2)THEN
-						ADUHeatNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).AirDistUnitIndex, 0 );
+						ADUHeatNum = max( zecCtrlZoneHeat.AirDistUnitIndex, 0 );
 						if ( ADUHeatNum == 0 ) continue;
 						ADUNum = ADUHeatNum;
 					}
 
+					auto const & zelEquipData = zel.EquipData( ADUNum );
+
 					CompLoad = 0.0;
-					if ( ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumInlets > 0 ) {
-						for ( nodes = 1; nodes <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumInlets; ++nodes ) {
-							InletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).InletNodeNums( Idx );
+					if ( zelEquipData.NumInlets > 0 ) {
+						for ( nodes = 1; nodes <= zelEquipData.NumInlets; ++nodes ) {
+							InletNodeNum = zelEquipData.InletNodeNums( Idx );
 							CompLoad += ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) * Node( InletNodeNum ).MassFlowRate );
 						}
-						for ( nodes = 1; nodes <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumOutlets; ++nodes ) {
-							OutletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).OutletNodeNums( Idx );
+						for ( nodes = 1; nodes <= zelEquipData.NumOutlets; ++nodes ) {
+							OutletNodeNum = zelEquipData.OutletNodeNums( Idx );
 							CompLoad -= ( PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) * Node( OutletNodeNum ).MassFlowRate );
 						}
 					}
 					CompLoad *= TimeStepSys * SecInHour;
-					CompName = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).Name;
-					CompType = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).TypeOf;
 					CompEnergyUse = 0.0;
 					EnergyType = iRT_None;
 					CompLoadFlag = true;
-					CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+					CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 					CompLoadFlag = false;
-					for ( VarNum = 1; VarNum <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumMeteredVars; ++VarNum ) {
-						CompEnergyUse = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).MeteredVar( VarNum ).CurMeterReading;
-						EnergyType = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).MeteredVar( VarNum ).ResourceType;
-						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+					for ( VarNum = 1; VarNum <= zelEquipData.NumMeteredVars; ++VarNum ) {
+						CompEnergyUse = zelEquipData.MeteredVar( VarNum ).CurMeterReading;
+						EnergyType = zelEquipData.MeteredVar( VarNum ).ResourceType;
+						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 					}
 
-					for ( SubCompNum = 1; SubCompNum <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).NumSubEquip; ++SubCompNum ) {
-						CompName = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).Name;
-						CompType = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).TypeOf;
-						InletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).InletNodeNum;
-						OutletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).OutletNodeNum;
+					for ( SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum ) {
+						auto const & zelSubEquipData = zelEquipData.SubEquipData( SubCompNum );
+						InletNodeNum = zelSubEquipData.InletNodeNum;
+						OutletNodeNum = zelSubEquipData.OutletNodeNum;
 						if ( InletNodeNum <= 0 || OutletNodeNum <= 0 ) continue;
 						CompLoad = Node( InletNodeNum ).MassFlowRate * ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) - PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) );
 						CompLoad *= TimeStepSys * SecInHour;
 						CompEnergyUse = 0.0;
 						EnergyType = iRT_None;
 						CompLoadFlag = true;
-						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+						CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 						CompLoadFlag = false;
-						for ( VarNum = 1; VarNum <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).NumMeteredVars; ++VarNum ) {
-							CompEnergyUse = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).CurMeterReading;
-							CompMode = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode;
-							EnergyType = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).MeteredVar( VarNum ).ResourceType;
-							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+						for ( VarNum = 1; VarNum <= zelSubEquipData.NumMeteredVars; ++VarNum ) {
+							CompEnergyUse = zelSubEquipData.MeteredVar( VarNum ).CurMeterReading;
+							EnergyType = zelSubEquipData.MeteredVar( VarNum ).ResourceType;
+							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 						}
 
-						for ( SubSubCompNum = 1; SubSubCompNum <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).NumSubSubEquip; ++SubSubCompNum ) {
-							CompName = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).Name;
-							CompType = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).TypeOf;
-							InletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).InletNodeNum;
-							OutletNodeNum = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).OutletNodeNum;
+						for ( SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum ) {
+							auto const & zelSubSubEquipData = zelSubEquipData.SubSubEquipData( SubSubCompNum );
+							InletNodeNum = zelSubSubEquipData.InletNodeNum;
+							OutletNodeNum = zelSubSubEquipData.OutletNodeNum;
 							if ( InletNodeNum <= 0 || OutletNodeNum <= 0 ) continue;
 							CompLoad = Node( InletNodeNum ).MassFlowRate * ( PsyHFnTdbW( Node( InletNodeNum ).Temp, Node( InletNodeNum ).HumRat ) - PsyHFnTdbW( Node( OutletNodeNum ).Temp, Node( OutletNodeNum ).HumRat ) );
 							CompLoad *= TimeStepSys * SecInHour;
 							CompEnergyUse = 0.0;
 							EnergyType = iRT_None;
 							CompLoadFlag = true;
-							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+							CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 							CompLoadFlag = false;
-							for ( VarNum = 1; VarNum <= ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).NumMeteredVars; ++VarNum ) {
-								CompEnergyUse = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).CurMeterReading;
-								CompMode = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).EndUse_CompMode;
-								EnergyType = ZoneEquipList( EquipListNum ).EquipData( ADUNum ).SubEquipData( SubCompNum ).SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ).ResourceType;
-								CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, CompType, EnergyType, CompLoad, CompEnergyUse );
+							for ( VarNum = 1; VarNum <= zelSubSubEquipData.NumMeteredVars; ++VarNum ) {
+								CompEnergyUse = zelSubSubEquipData.MeteredVar( VarNum ).CurMeterReading;
+								EnergyType = zelSubSubEquipData.MeteredVar( VarNum ).ResourceType;
+								CalcSystemEnergyUse( CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse );
 							}
 						} //SubSubCompNum
 					} //SubCompNum
@@ -3233,60 +3356,12 @@ namespace SystemReports {
 			SysTotHTNG( AirLoopNum ) = SysFANCompHTNG( AirLoopNum ) + SysHCCompHTNG( AirLoopNum ) + SysHeatExHTNG( AirLoopNum ) + SysHumidHTNG( AirLoopNum ) + SysSolarCollectHeating( AirLoopNum ) + SysUserDefinedTerminalHeating( AirLoopNum );
 			SysTotCLNG( AirLoopNum ) = SysCCCompCLNG( AirLoopNum ) + SysHeatExCLNG( AirLoopNum ) + SysEvapCLNG( AirLoopNum ) + DesDehumidCLNG( AirLoopNum ) + SysSolarCollectCooling( AirLoopNum ) + SysUserDefinedTerminalCooling( AirLoopNum );
 			SysTotElec( AirLoopNum ) = SysFANCompElec( AirLoopNum ) + SysHCCompElec( AirLoopNum ) + SysCCCompElec( AirLoopNum ) + SysHCCompElecRes( AirLoopNum ) + SysHumidElec( AirLoopNum ) + DesDehumidElec( AirLoopNum ) + SysEvapElec( AirLoopNum );
-			SysTotGas( AirLoopNum ) = SysHCCompGas( AirLoopNum );
+			SysTotGas( AirLoopNum ) = SysHCCompGas( AirLoopNum ) + SysHumidGas( AirLoopNum );
 			SysTotSteam( AirLoopNum ) = SysHCCompSteam( AirLoopNum );
 			SysTotH2OCOLD( AirLoopNum ) = SysCCCompH2OCOLD( AirLoopNum );
 			SysTotH2OHOT( AirLoopNum ) = SysHCCompH2OHOT( AirLoopNum );
 		}
 
-	}
-
-	bool
-	index_in_sorted_string_vector(
-		std::vector< std::string > const & v,
-		std::string const & s,
-		std::vector< std::string >::size_type & i
-	)
-	{
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Stuart Mentzer
-		//       DATE WRITTEN   June 2014
-		//       MODIFIED
-		//       RE-ENGINEERED
-
-		// PURPOSE OF THIS FUNCTION:
-		// Find a string in a sorted vector of strings
-		// std::lower_bound can do this but is slower
-
-		// METHODOLOGY EMPLOYED:
-		// Binary search
-
-		assert( std::is_sorted( v.begin(), v.end() ) );
-		typedef  std::vector< std::string >::size_type  size_type;
-		size_type const v_size( v.size() );
-		if ( v_size == 0 ) { // Empty
-			i = 1u;
-			return false;
-		} else if ( s < v[ 0 ] ) { // Less than all
-			i = v_size;
-			return false;
-		} else if ( s > v[ v_size - 1 ] ) { // Greater than all
-			i = v_size;
-			return false;
-		} else {
-			size_type beg( 0 ), mid, end( v_size );
-			while ( beg + 1 < end ) {
-				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2
-				( s >= v[ mid ] ? beg : end ) = mid;
-			} // Invariant: v[beg] <= s < v[end] (if end < v.size())
-			if ( s == v[ beg ] ) {
-				i = beg;
-				return true;
-			} else {
-				i = v_size;
-				return false;
-			}
-		}
 	}
 
 	void
@@ -3318,7 +3393,6 @@ namespace SystemReports {
 		using namespace DataZoneEnergyDemands;
 		using namespace DataGlobalConstants;
 		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3326,8 +3400,8 @@ namespace SystemReports {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		//Tuned String comparisons were a big performance hit
-		// ComponentTypes and component_strings must remain in sync and sorted
-		enum ComponentTypes : std::vector< std::string >::size_type { // Using older enum style to avoid the name scoping cruft
+		// ComponentTypes and component_strings must remain in sync
+		enum ComponentTypes { // Using older enum style to avoid the name scoping cruft
 			AIRLOOPHVAC_OUTDOORAIRSYSTEM,
 			AIRLOOPHVAC_UNITARY_FURNACE_HEATCOOL,
 			AIRLOOPHVAC_UNITARY_FURNACE_HEATONLY,
@@ -3345,12 +3419,12 @@ namespace SystemReports {
 			AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_OUTDOORAIR,
 			AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_RECIRCULATEDAIR,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_COOLEDBEAM,
+			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT,
-			AIRTERMINAL_SINGLEDUCT_INLETSIDEMIXER,
+			AIRTERMINAL_SINGLEDUCT_MIXER,
 			AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT,
 			AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT,
-			AIRTERMINAL_SINGLEDUCT_SUPPLYSIDEMIXER,
 			AIRTERMINAL_SINGLEDUCT_UNCONTROLLED,
 			AIRTERMINAL_SINGLEDUCT_USERDEFINED,
 			AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT,
@@ -3364,6 +3438,7 @@ namespace SystemReports {
 			COIL_COOLING_DX_TWOSPEED,
 			COIL_COOLING_DX_TWOSTAGEWITHHUMIDITYCONTROLMODE,
 			COIL_COOLING_DX_VARIABLESPEED,
+			COIL_INTEGRATED_DX_VARIABLESPEED,
 			COIL_COOLING_WATER,
 			COIL_COOLING_WATER_DETAILEDGEOMETRY,
 			COIL_COOLING_WATERTOAIRHEATPUMP_EQUATIONFIT,
@@ -3382,6 +3457,7 @@ namespace SystemReports {
 			COIL_HEATING_WATERTOAIRHEATPUMP_EQUATIONFIT,
 			COIL_HEATING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION,
 			COIL_HEATING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT,
+			COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED,
 			COIL_USERDEFINED,
 			COILSYSTEM_COOLING_DX,
 			COILSYSTEM_COOLING_DX_HEATEXCHANGERASSISTED,
@@ -3403,6 +3479,7 @@ namespace SystemReports {
 			HEATEXCHANGER_AIRTOAIR_SENSIBLEANDLATENT,
 			HEATEXCHANGER_DESICCANT_BALANCEDFLOW,
 			HUMIDIFIER_STEAM_ELECTRIC,
+			HUMIDIFIER_STEAM_GAS,
 			OUTDOORAIR_MIXER,
 			SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL,
 			SOLARCOLLECTOR_UNGLAZEDTRANSPIRED,
@@ -3411,92 +3488,92 @@ namespace SystemReports {
 			Unknown_ComponentType
 		};
 
-		static std::vector< std::string > const component_strings = { // Must be sorted!
-			"AIRLOOPHVAC:OUTDOORAIRSYSTEM",
-			"AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
-			"AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
-			"AIRLOOPHVAC:UNITARYHEATCOOL",
-			"AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS",
-			"AIRLOOPHVAC:UNITARYHEATONLY",
-			"AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
-			"AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED",
-			"AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
-			"AIRLOOPHVAC:UNITARYSYSTEM",
-			"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL",
-			"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT",
-			"AIRTERMINAL:DUALDUCT:VAV:COOL",
-			"AIRTERMINAL:DUALDUCT:VAV:HEAT",
-			"AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR",
-			"AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR",
-			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
-			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION",
-			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
-			"AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
-			"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
-			"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
-			"AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER",
-			"AIRTERMINAL:SINGLEDUCT:UNCONTROLLED",
-			"AIRTERMINAL:SINGLEDUCT:USERDEFINED",
-			"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",
-			"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",
-			"AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
-			"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
-			"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",
-			"COIL:COOLING:DX:MULTISPEED",
-			"COIL:COOLING:DX:SINGLESPEED",
-			"COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
-			"COIL:COOLING:DX:TWOSPEED",
-			"COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE",
-			"COIL:COOLING:DX:VARIABLESPEED",
-			"COIL:COOLING:WATER",
-			"COIL:COOLING:WATER:DETAILEDGEOMETRY",
-			"COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT",
-			"COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
-			"COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
-			"COIL:HEATING:DESUPERHEATER",
-			"COIL:HEATING:DX:MULTISPEED",
-			"COIL:HEATING:DX:SINGLESPEED",
-			"COIL:HEATING:DX:VARIABLESPEED",
-			"COIL:HEATING:ELECTRIC",
-			"COIL:HEATING:ELECTRIC:MULTISTAGE",
-			"COIL:HEATING:GAS",
-			"COIL:HEATING:GAS:MULTISTAGE",
-			"COIL:HEATING:STEAM",
-			"COIL:HEATING:WATER",
-			"COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT",
-			"COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
-			"COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
-			"COIL:USERDEFINED",
-			"COILSYSTEM:COOLING:DX",
-			"COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED",
-			"COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
-			"COILSYSTEM:HEATING:DX",
-			"DEHUMIDIFIER:DESICCANT:NOFANS",
-			"DEHUMIDIFIER:DESICCANT:SYSTEM",
-			"DUCT",
-			"EVAPORATIVECOOLER:DIRECT:CELDEKPAD",
-			"EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL",
-			"EVAPORATIVECOOLER:INDIRECT:CELDEKPAD",
-			"EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL",
-			"EVAPORATIVECOOLER:INDIRECT:WETCOIL",
-			"FAN:COMPONENTMODEL",
-			"FAN:CONSTANTVOLUME",
-			"FAN:ONOFF",
-			"FAN:VARIABLEVOLUME",
-			"HEATEXCHANGER:AIRTOAIR:FLATPLATE",
-			"HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
-			"HEATEXCHANGER:DESICCANT:BALANCEDFLOW",
-			"HUMIDIFIER:STEAM:ELECTRIC",
-			"OUTDOORAIR:MIXER",
-			"SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
-			"SOLARCOLLECTOR:UNGLAZEDTRANSPIRED",
-			"ZONEHVAC:AIRDISTRIBUTIONUNIT"
+		static std::unordered_map< std::string, ComponentTypes > const component_map = {
+			{ "AIRLOOPHVAC:OUTDOORAIRSYSTEM", AIRLOOPHVAC_OUTDOORAIRSYSTEM },
+			{ "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL", AIRLOOPHVAC_UNITARY_FURNACE_HEATCOOL },
+			{ "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY", AIRLOOPHVAC_UNITARY_FURNACE_HEATONLY },
+			{ "AIRLOOPHVAC:UNITARYHEATCOOL", AIRLOOPHVAC_UNITARYHEATCOOL },
+			{ "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS", AIRLOOPHVAC_UNITARYHEATCOOL_VAVCHANGEOVERBYPASS },
+			{ "AIRLOOPHVAC:UNITARYHEATONLY", AIRLOOPHVAC_UNITARYHEATONLY },
+			{ "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR", AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR },
+			{ "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED", AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED },
+			{ "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR", AIRLOOPHVAC_UNITARYHEATPUMP_WATERTOAIR },
+			{ "AIRLOOPHVAC:UNITARYSYSTEM", AIRLOOPHVAC_UNITARYSYSTEM },
+			{ "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL", AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_COOL },
+			{ "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT", AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_HEAT },
+			{ "AIRTERMINAL:DUALDUCT:VAV:COOL", AIRTERMINAL_DUALDUCT_VAV_COOL },
+			{ "AIRTERMINAL:DUALDUCT:VAV:HEAT", AIRTERMINAL_DUALDUCT_VAV_HEAT },
+			{ "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR", AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_OUTDOORAIR },
+			{ "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR", AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_RECIRCULATEDAIR },
+			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_COOLEDBEAM },
+			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM },
+			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION },
+			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:MIXER", AIRTERMINAL_SINGLEDUCT_MIXER },
+			{ "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED", AIRTERMINAL_SINGLEDUCT_UNCONTROLLED },
+			{ "AIRTERMINAL:SINGLEDUCT:USERDEFINED", AIRTERMINAL_SINGLEDUCT_USERDEFINED },
+			{ "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT", AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT", AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT", AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT", AIRTERMINAL_SINGLEDUCT_VAV_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN", AIRTERMINAL_SINGLEDUCT_VAV_REHEAT_VARIABLESPEEDFAN },
+			{ "COIL:COOLING:DX:MULTISPEED", COIL_COOLING_DX_MULTISPEED },
+			{ "COIL:COOLING:DX:SINGLESPEED", COIL_COOLING_DX_SINGLESPEED },
+			{ "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE },
+			{ "COIL:COOLING:DX:TWOSPEED", COIL_COOLING_DX_TWOSPEED },
+			{ "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE", COIL_COOLING_DX_TWOSTAGEWITHHUMIDITYCONTROLMODE },
+			{ "COIL:COOLING:DX:VARIABLESPEED", COIL_COOLING_DX_VARIABLESPEED },
+			{ "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", COIL_INTEGRATED_DX_VARIABLESPEED },
+			{ "COIL:COOLING:WATER", COIL_COOLING_WATER },
+			{ "COIL:COOLING:WATER:DETAILEDGEOMETRY", COIL_COOLING_WATER_DETAILEDGEOMETRY },
+			{ "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT", COIL_COOLING_WATERTOAIRHEATPUMP_EQUATIONFIT },
+			{ "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION", COIL_COOLING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION },
+			{ "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", COIL_COOLING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT },
+			{ "COIL:HEATING:DESUPERHEATER", COIL_HEATING_DESUPERHEATER },
+			{ "COIL:HEATING:DX:MULTISPEED", COIL_HEATING_DX_MULTISPEED },
+			{ "COIL:HEATING:DX:SINGLESPEED", COIL_HEATING_DX_SINGLESPEED },
+			{ "COIL:HEATING:DX:VARIABLESPEED", COIL_HEATING_DX_VARIABLESPEED },
+			{ "COIL:HEATING:ELECTRIC", COIL_HEATING_ELECTRIC },
+			{ "COIL:HEATING:ELECTRIC:MULTISTAGE", COIL_HEATING_ELECTRIC_MULTISTAGE },
+			{ "COIL:HEATING:FUEL", COIL_HEATING_GAS },
+			{ "COIL:HEATING:GAS:MULTISTAGE", COIL_HEATING_GAS_MULTISTAGE },
+			{ "COIL:HEATING:STEAM", COIL_HEATING_STEAM },
+			{ "COIL:HEATING:WATER", COIL_HEATING_WATER },
+			{ "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT", COIL_HEATING_WATERTOAIRHEATPUMP_EQUATIONFIT },
+			{ "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION", COIL_HEATING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION },
+			{ "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", COIL_HEATING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT },
+			{ "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED },
+			{ "COIL:USERDEFINED", COIL_USERDEFINED },
+			{ "COILSYSTEM:COOLING:DX", COILSYSTEM_COOLING_DX },
+			{ "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED", COILSYSTEM_COOLING_DX_HEATEXCHANGERASSISTED },
+			{ "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED", COILSYSTEM_COOLING_WATER_HEATEXCHANGERASSISTED },
+			{ "COILSYSTEM:HEATING:DX", COILSYSTEM_HEATING_DX },
+			{ "DEHUMIDIFIER:DESICCANT:NOFANS", DEHUMIDIFIER_DESICCANT_NOFANS },
+			{ "DEHUMIDIFIER:DESICCANT:SYSTEM", DEHUMIDIFIER_DESICCANT_SYSTEM },
+			{ "DUCT", DUCT },
+			{ "EVAPORATIVECOOLER:DIRECT:CELDEKPAD", EVAPORATIVECOOLER_DIRECT_CELDEKPAD },
+			{ "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL", EVAPORATIVECOOLER_DIRECT_RESEARCHSPECIAL },
+			{ "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD", EVAPORATIVECOOLER_INDIRECT_CELDEKPAD },
+			{ "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL", EVAPORATIVECOOLER_INDIRECT_RESEARCHSPECIAL },
+			{ "EVAPORATIVECOOLER:INDIRECT:WETCOIL", EVAPORATIVECOOLER_INDIRECT_WETCOIL },
+			{ "FAN:COMPONENTMODEL", FAN_COMPONENTMODEL },
+			{ "FAN:CONSTANTVOLUME", FAN_CONSTANTVOLUME },
+			{ "FAN:ONOFF", FAN_ONOFF },
+			{ "FAN:VARIABLEVOLUME", FAN_VARIABLEVOLUME },
+			{ "HEATEXCHANGER:AIRTOAIR:FLATPLATE", HEATEXCHANGER_AIRTOAIR_FLATPLATE },
+			{ "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT", HEATEXCHANGER_AIRTOAIR_SENSIBLEANDLATENT },
+			{ "HEATEXCHANGER:DESICCANT:BALANCEDFLOW", HEATEXCHANGER_DESICCANT_BALANCEDFLOW },
+			{ "HUMIDIFIER:STEAM:ELECTRIC", HUMIDIFIER_STEAM_ELECTRIC },
+			{ "HUMIDIFIER:STEAM:GAS", HUMIDIFIER_STEAM_GAS },
+			{ "OUTDOORAIR:MIXER", OUTDOORAIR_MIXER },
+			{ "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL", SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL },
+			{ "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED", SOLARCOLLECTOR_UNGLAZEDTRANSPIRED },
+			{ "ZONEHVAC:AIRDISTRIBUTIONUNIT", ZONEHVAC_AIRDISTRIBUTIONUNIT }
 		};
-		assert( std::is_sorted( component_strings.begin(), component_strings.end() ) );
-		assert( component_strings.size() == n_ComponentTypes );
+		assert( component_map.size() == n_ComponentTypes );
 
-		Real64 const SmallLoad( 0.1 ); // (W)
-		Real64 const KJperJ( 0.001 ); // kilojoules per joules
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3518,19 +3595,10 @@ namespace SystemReports {
 				CompErrIndex( 0 )
 			{}
 
-			// Member Constructor
-			CompTypeError(
-				std::string const & CompType,
-				int const CompErrIndex
-			) :
-				CompType( CompType ),
-				CompErrIndex( CompErrIndex )
-			{}
-
 		};
 
 		// Object Data
-		static FArray1D< CompTypeError > CompTypeErrors( 100 );
+		static Array1D< CompTypeError > CompTypeErrors( 100 );
 
 		if ( ! AirLoopLoadsReportEnabled ) return;
 
@@ -3540,10 +3608,12 @@ namespace SystemReports {
 		//    cEnergyType=cRT_ValidTypes(EnergyType-ResourceTypeInitialOffset)
 
 		// Find enum for the component type string
-		std::vector< std::string >::size_type iCompType;
-		ComponentTypes comp_type( Unknown_ComponentType );
-		if ( index_in_sorted_string_vector( component_strings, CompType, iCompType ) ) {
-			comp_type = static_cast< ComponentTypes >( iCompType );
+		ComponentTypes comp_type;
+		auto const it = component_map.find( CompType );
+		if ( it != component_map.end() ) {
+			comp_type = it->second;
+		} else {
+			comp_type = Unknown_ComponentType;
 		}
 
 		switch( comp_type ) {
@@ -3559,14 +3629,9 @@ namespace SystemReports {
 		case OUTDOORAIR_MIXER: // Outdoor Air Mixer
 			//No energy transfers to account for
 			break;
-		case AIRTERMINAL_SINGLEDUCT_INLETSIDEMIXER:
+		case AIRTERMINAL_SINGLEDUCT_MIXER:
 			//No energy transfers to account for
 
-			break;
-		case AIRTERMINAL_SINGLEDUCT_SUPPLYSIDEMIXER:
-			//No energy transfers to account for
-
-			// Fan Types for the air sys simulation
 			break;
 		case FAN_CONSTANTVOLUME:
 		case FAN_VARIABLEVOLUME:
@@ -3591,6 +3656,7 @@ namespace SystemReports {
 		case COIL_COOLING_WATER_DETAILEDGEOMETRY:
 		case COIL_COOLING_WATER:
 		case COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE:
+		case COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED:
 
 			if ( CompLoadFlag ) SysCCCompCLNG( AirLoopNum ) += std::abs( CompLoad );
 			if ( ( EnergyType == iRT_PlantLoopCoolingDemand ) || ( EnergyType == iRT_DistrictCooling ) ) {
@@ -3631,7 +3697,6 @@ namespace SystemReports {
 			if ( CompLoadFlag ) SysHCCompHTNG( AirLoopNum ) += std::abs( CompLoad );
 			if ( EnergyType == iRT_Electricity ) {
 				SysHCCompElecRes( AirLoopNum ) += CompEnergy;
-			} else {
 			}
 
 			break;
@@ -3697,12 +3762,15 @@ namespace SystemReports {
 
 			// Humidifier Types for the air system simulation
 			break;
+		case HUMIDIFIER_STEAM_GAS:
 		case HUMIDIFIER_STEAM_ELECTRIC:
 			if ( CompLoadFlag ) SysHumidHTNG( AirLoopNum ) += std::abs( CompLoad );
 			if ( EnergyType == iRT_Water ) {
 				SysDomesticH20( AirLoopNum ) += std::abs( CompEnergy );
 			} else if ( EnergyType == iRT_Electricity ) {
 				SysHumidElec( AirLoopNum ) += CompEnergy;
+			} else if ( ( EnergyType == iRT_Natural_Gas ) || ( EnergyType == iRT_Propane ) ) {
+				SysHumidGas( AirLoopNum ) += CompEnergy;
 			}
 
 			// Evap Cooler Types for the air system simulation
@@ -3760,6 +3828,7 @@ namespace SystemReports {
 		case AIRTERMINAL_SINGLEDUCT_VAV_REHEAT:
 		case AIRTERMINAL_SINGLEDUCT_VAV_REHEAT_VARIABLESPEEDFAN:
 		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_COOLEDBEAM:
+		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM:
 		case ZONEHVAC_AIRDISTRIBUTIONUNIT:
 			//All energy transfers accounted for in component models
 
@@ -3815,10 +3884,13 @@ namespace SystemReports {
 			// Recurring warning for unaccounted equipment types
 			// (should never happen, when this does happen enter appropriate equipment CASE statement above)
 			break;
+		case COIL_INTEGRATED_DX_VARIABLESPEED:
+			//All energy transfers accounted for in component models
+			break;
 		default:
 			found = 0;
 			if ( NumCompTypes > 0 ) {
-				found = FindItemInList( CompType, CompTypeErrors.CompType(), NumCompTypes );
+				found = FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
 			}
 			if ( found == 0 ) {
 				CompTypeErrors( ++NumCompTypes ).CompType = CompType;
@@ -3859,15 +3931,20 @@ namespace SystemReports {
 		using DataHeatBalance::ZonePreDefRep;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZoneAirHumRatAvg;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
-		using DataEnvironment::OutAirDensity;
 		using DataEnvironment::OutBaroPress;
 
 		using WindowAC::GetWindowACOutAirNode;
 		using WindowAC::GetWindowACMixedAirNode;
 		using WindowAC::GetWindowACZoneInletAirNode;
 		using WindowAC::GetWindowACReturnAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUOutAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode;
+		using OutdoorAirUnit::GetOutdoorAirUnitOutAirNode;
+		using OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode;
+		using OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitOutAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitMixedAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode;
@@ -3895,7 +3972,6 @@ namespace SystemReports {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallLoad( 0.1 ); // (W)
-		Real64 const KJperJ( 0.001 ); // kilojoules per joules
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3908,36 +3984,37 @@ namespace SystemReports {
 		int ZoneInNum; // counter for zone air distribution inlets
 		int ReturnAirNode; // node number for return node on primary air loop
 		int MixedAirNode; // mixed air node number (right after the mixing box) on primary air loop
-		int AirLoopNum;
-		int AirDistCoolInletNodeNum;
-		int AirDistHeatInletNodeNum;
+		int AirLoopNum; // index to AirloopHVAC
+		int AirDistCoolInletNodeNum; // Air distribution unit inlet node number
+		int AirDistHeatInletNodeNum; // Air distribution unit outlet node number
 
-		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side)
-		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side)
-		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system
-		Real64 ADUCoolFlowrate;
-		Real64 ADUHeatFlowrate;
-		Real64 AirSysTotalMixFlowRate; // Mixed air flow
-		Real64 AirSysOutAirFlow; // outside air flow rate for zone from primary air system
+		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
+		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
+		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system [J]
+		Real64 ADUCoolFlowrate; // Air distribution unit cooling air mass flow rate [kg/s]
+		Real64 ADUHeatFlowrate; // Air distribution unit heating air mass flow rate [kg/s]
+		Real64 AirSysTotalMixFlowRate; // Mixed air mass flow rate [kg/s]
+		Real64 AirSysOutAirFlow; // outside air flow rate for zone from primary air system [kg/s]
 
-		Real64 ZFAUEnthReturnAir; // Zone forced Air unit enthalpy of the return air
-		Real64 ZFAUTempMixedAir; // Zone forced Air unit dry-bulb temperature of the mixed air
-		Real64 ZFAUHumRatMixedAir; // Zone forced Air unit humidity ratio of the mixed air
-		Real64 ZFAUEnthMixedAir; // Zone forced Air unit enthalpy of the mixed air
-		Real64 ZFAUFlowRate;
-		Real64 ZFAUZoneVentLoad; // ventilation load attributed to a particular zone from zone forced air units
+		Real64 ZFAUEnthReturnAir; // Zone forced Air unit enthalpy of the return air [kJ/kgK]
+		Real64 ZFAUTempMixedAir; // Zone forced Air unit dry-bulb temperature of the mixed air [C]
+		Real64 ZFAUHumRatMixedAir; // Zone forced Air unit humidity ratio of the mixed air [kg/kg]
+		Real64 ZFAUEnthMixedAir; // Zone forced Air unit enthalpy of the mixed air [kJ/kgK]
+		Real64 ZFAUEnthOutdoorAir; // Zone forced Air unit enthalpy of the outdoor air [kJ/kgK]
+		Real64 ZFAUFlowRate; // Zone forced Air unit air mass flow rate [kg/s]
+		Real64 ZFAUZoneVentLoad; // ventilation load attributed to a particular zone from zone forced air units [J]
 		Real64 ZFAUOutAirFlow; // outside air flow rate for zone from zone forced air units.
-		int ZoneInletAirNode;
+		int ZoneInletAirNode; // Zone forced Air unit zone inlet node number
 
 		Real64 ZoneVentLoad; // ventilation load attributed to a particular zone
 		Real64 ZoneLoad; // ventilation load attributed to a particular zone
-		Real64 OutAirFlow; // Total outside air flow
+		Real64 OutAirFlow; // Total outside air mass flow from zone equipment and air loop equipment [kg/s]
 		Real64 ZoneFlowFrac; // fraction of mixed air flowing to a zone
-		Real64 ZoneVolume; // Volume of zone
-		Real64 currentZoneAirDensity; // current zone air density (outside barometric pressure)
+		Real64 ZoneVolume; // Volume of zone [m3]
+		Real64 currentZoneAirDensity; // current zone air density (outside barometric pressure) [kg/m3]
 
-		int ActualZoneNum;
-		int OutAirNode;
+		int ActualZoneNum; // Zone forced Air zone number
+		int OutAirNode; // Zone forced Air unit outdoor air node number
 		int thisZoneEquipNum; // loop counter
 
 		//  CALL GetComponentEnergyUse
@@ -3975,7 +4052,6 @@ namespace SystemReports {
 			ZFAUOutAirFlow = 0.0;
 			OutAirFlow = 0.0;
 			ZoneFlowFrac = 0.0;
-			ZoneVolume = 0.0;
 
 			//retrieve the zone load for each zone
 			ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
@@ -3996,6 +4072,7 @@ namespace SystemReports {
 			for ( thisZoneEquipNum = 1; thisZoneEquipNum <= ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).NumOfEquipTypes; ++thisZoneEquipNum ) {
 				{ auto const SELECT_CASE_var( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipType_Num( thisZoneEquipNum ) );
 				// case statement to cover all possible zone forced air units that could have outside air
+
 				if ( SELECT_CASE_var == WindowAC_Num ) { // Window Air Conditioner
 					OutAirNode = GetWindowACOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
 					if ( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
@@ -4004,6 +4081,23 @@ namespace SystemReports {
 					if ( ZoneInletAirNode > 0 ) ZFAUFlowRate = max( Node( ZoneInletAirNode ).MassFlowRate, 0.0 );
 					MixedAirNode = GetWindowACMixedAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
 					ReturnAirNode = GetWindowACReturnAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if ( ( MixedAirNode > 0 ) && ( ReturnAirNode > 0 ) ) {
+						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode ).HumRat );
+						ZFAUEnthReturnAir = PsyHFnTdbW( Node( ReturnAirNode ).Temp, Node( ReturnAirNode ).HumRat );
+						//Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+						ZFAUZoneVentLoad += (ZFAUFlowRate)* ( ZFAUEnthMixedAir - ZFAUEnthReturnAir ) * TimeStepSys * SecInHour; //*KJperJ
+					} else {
+						ZFAUZoneVentLoad += 0.0;
+					}
+
+				} else if ( SELECT_CASE_var == VRFTerminalUnit_Num ) {
+					OutAirNode = GetVRFTUOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if ( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
+
+					ZoneInletAirNode = GetVRFTUZoneInletAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if ( ZoneInletAirNode > 0 ) ZFAUFlowRate = max( Node( ZoneInletAirNode ).MassFlowRate, 0.0 );
+					MixedAirNode = GetVRFTUMixedAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					ReturnAirNode = GetVRFTUReturnAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
 					if ( ( MixedAirNode > 0 ) && ( ReturnAirNode > 0 ) ) {
 						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode ).HumRat );
 						ZFAUEnthReturnAir = PsyHFnTdbW( Node( ReturnAirNode ).Temp, Node( ReturnAirNode ).HumRat );
@@ -4063,6 +4157,7 @@ namespace SystemReports {
 					} else {
 						ZFAUZoneVentLoad += 0.0;
 					}
+
 				} else if ( SELECT_CASE_var == PurchasedAir_Num ) {
 					ZFAUOutAirFlow += GetPurchasedAirOutAirMassFlow( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
 					ZoneInletAirNode = GetPurchasedAirZoneInletAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
@@ -4078,6 +4173,7 @@ namespace SystemReports {
 					} else {
 						ZFAUZoneVentLoad += 0.0;
 					}
+
 				} else if ( SELECT_CASE_var == ERVStandAlone_Num ) {
 					OutAirNode = GetStandAloneERVOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
 					if ( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
@@ -4094,6 +4190,42 @@ namespace SystemReports {
 					} else {
 						ZFAUZoneVentLoad += 0.0;
 					}
+
+				} else if ( SELECT_CASE_var == ZoneUnitarySystem_Num ) {
+					// add accounting for OA when unitary system is used as zone equipment
+
+				} else if ( SELECT_CASE_var == OutdoorAirUnit_Num ) {
+					OutAirNode = GetOutdoorAirUnitOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if ( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
+
+					ZoneInletAirNode = GetOutdoorAirUnitZoneInletNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if ( ZoneInletAirNode > 0 ) ZFAUFlowRate = max( Node( ZoneInletAirNode ).MassFlowRate, 0.0 );
+					ReturnAirNode = GetOutdoorAirUnitReturnAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if ( ( OutAirNode > 0 ) && ( ReturnAirNode > 0 ) ) {
+						//						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode ).HumRat );
+						ZFAUEnthReturnAir = PsyHFnTdbW( Node( ReturnAirNode ).Temp, Node( ReturnAirNode ).HumRat );
+						ZFAUEnthOutdoorAir = PsyHFnTdbW( Node( OutAirNode ).Temp, Node( OutAirNode ).HumRat );
+						//Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+						ZFAUZoneVentLoad += ( ZFAUFlowRate )* ( ZFAUEnthOutdoorAir - ZFAUEnthReturnAir ) * TimeStepSys * SecInHour; //*KJperJ
+					} else {
+						ZFAUZoneVentLoad += 0.0;
+					}
+
+				} else if ( SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
+					//	ZoneHVAC:EvaporativeCoolerUnit ?????
+					SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num || SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == DirectAir_Num ||
+					SELECT_CASE_var == BBWaterConvective_Num || SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
+					//	not sure how HeatExchanger:* could be used as zone equipment ?????
+					SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||
+					// HPWaterHeater can be used as zone equipment
+					SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num ||
+					SELECT_CASE_var == BBSteam_Num || SELECT_CASE_var == BBElectric_Num || SELECT_CASE_var == RefrigerationAirChillerSet_Num ||
+					SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num || SELECT_CASE_var == CoolingPanel_Num ) {
+					// do nothing, OA not included
+
+				} else {
+
+					ShowFatalError( "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing" );
 
 				}}
 
@@ -4271,7 +4403,6 @@ namespace SystemReports {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const EnergyTrans( 1 );
-		int const PrimaryAirLoop( 1 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4294,48 +4425,51 @@ namespace SystemReports {
 		int Idx;
 
 		for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-			for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumMeteredVars; ++VarNum ) {
-				if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ResourceType == iRT_EnergyTransfer ) {
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).EnergyTransComp = EnergyTrans;
-					CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-					CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name;
+			{ auto & thisComp( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+			for ( VarNum = 1; VarNum <= thisComp.NumMeteredVars; ++VarNum ) {
+				if ( thisComp.MeteredVar( VarNum ).ResourceType == iRT_EnergyTransfer ) {
+					thisComp.EnergyTransComp = EnergyTrans;
+					CompType = thisComp.TypeOf;
+					CompName = thisComp.Name;
 					Idx = 0;
 					FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
 					if ( MatchFound ) UpdateAirSysCompPtrArray( Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-					PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).AirSysToPlantPtr = Idx;
+					thisComp.AirSysToPlantPtr = Idx;
 					break;
 				}
 			}
-			for ( SubCompNum = 1; SubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
+			for ( SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum ) {
 				//!!!!          IF(SysVentLoad == 0.0d0)EXIT
-				for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumMeteredVars; ++VarNum ) {
-					if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ResourceType == iRT_EnergyTransfer ) {
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).EnergyTransComp = EnergyTrans;
-						CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
-						CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
+				{ auto & thisSubComp( thisComp.SubComp( SubCompNum ) );
+				for ( VarNum = 1; VarNum <= thisSubComp.NumMeteredVars; ++VarNum ) {
+					if ( thisSubComp.MeteredVar( VarNum ).ResourceType == iRT_EnergyTransfer ) {
+						thisSubComp.EnergyTransComp = EnergyTrans;
+						CompType = thisSubComp.TypeOf;
+						CompName = thisSubComp.Name;
 						Idx = 0;
 						FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
 						if ( MatchFound ) UpdateAirSysSubCompPtrArray( Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-						PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).AirSysToPlantPtr = Idx;
+						thisSubComp.AirSysToPlantPtr = Idx;
 						break;
 					}
 				}
-				for ( SubSubCompNum = 1; SubSubCompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumSubSubComps; ++SubSubCompNum ) {
+				for ( SubSubCompNum = 1; SubSubCompNum <= thisSubComp.NumSubSubComps; ++SubSubCompNum ) {
 					//!!!!            IF(SysVentLoad == 0.0d0)EXIT
-					for ( VarNum = 1; VarNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).NumMeteredVars; ++VarNum ) {
-						if ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ).ResourceType == iRT_EnergyTransfer ) {
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).EnergyTransComp = EnergyTrans;
-							CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).TypeOf;
-							CompName = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).Name;
+					{ auto & thisSubSubComp( thisSubComp.SubSubComp( SubSubCompNum ) );
+					for ( VarNum = 1; VarNum <= thisSubSubComp.NumMeteredVars; ++VarNum ) {
+						if ( thisSubSubComp.MeteredVar( VarNum ).ResourceType == iRT_EnergyTransfer ) {
+							thisSubSubComp.EnergyTransComp = EnergyTrans;
+							CompType = thisSubSubComp.TypeOf;
+							CompName = thisSubSubComp.Name;
 							Idx = 0;
 							FindDemandSideMatch( CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
 							if ( MatchFound ) UpdateAirSysSubSubCompPtrArray( Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, SubSubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp );
-							PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).AirSysToPlantPtr = Idx;
+							thisSubSubComp.AirSysToPlantPtr = Idx;
 							break;
 						}
-					}
-				}
-			}
+					}}
+				}}
+			}}
 		}
 
 	}
@@ -4512,9 +4646,9 @@ namespace SystemReports {
 		gio::write( OutputFileBNDetails, Format_711 );
 		gio::write( OutputFileBNDetails, Format_712 );
 		gio::write( OutputFileBNDetails, Format_714 );
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>," "<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Branch>,<Outlet Branch>," "<Loop Name>,<Loop Type>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Node>,<Outlet Node>," "<Loop Name>,<Loop Type>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
 		for ( Count = 1; Count <= NumPrimaryAirSys; ++Count ) {
 			gio::write( ChrOut, fmtLD ) << AirToZoneNodeInfo( Count ).NumReturnNodes;
 			gio::write( ChrOut2, fmtLD ) << AirToZoneNodeInfo( Count ).NumSupplyNodes;
@@ -4678,29 +4812,6 @@ namespace SystemReports {
 
 	//        End of Reporting subroutines for the SimAir Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SystemReports
 

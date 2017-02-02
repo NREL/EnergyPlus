@@ -1,0 +1,2195 @@
+\section{Group - Performance Curves}\label{group---performance-curves}
+
+This group of objects primarily consists of polynomial curves that are used to characterize the performance of HVAC equipment. Several other non-polynomial curves are also included to characterize the performance of pumps and fans. All of the curves are input, stored, and evaluated entirely within the CurveManager module. The curves are usually derived from fits or regressions to data covering a limited range. Results for independent variable values outside this range are likely to be invalid, so curve input always contains a range of validity (maximum and minimum permitted values) for each independent variable and can optionally have limits on the curve ouput. No error or warning message is issued if an independent variable is outside the range. Instead, the curve manager uses the minimum value if an independent variable is less than the minimum, and the maximum if a variable exceeds the maximum. Similarly, no error or warning message is issued if the curve output is outside the range of the optional minimum and maximum curve output limits. Instead, the curve manager uses the minimum and maximum curve limits to cap the output of the performance curve.
+
+Curve names must be unique across all curve types.
+
+\subsection{Curve:Linear}\label{curvelinear}
+
+Input for the linear curve consists of a curve name, the two coefficients, and the maximum and minimum valid independent variable values. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the linear curve is:
+
+\begin{equation}
+y = {C_1} + {C_2}*x
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-031}
+
+\paragraph{Field: Name}\label{field-name-030}
+
+A user assigned unique name for an instance of a linear curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x}
+
+The linear coefficient (C\(_{2}\)) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Following is an example input:
+
+\begin{lstlisting}
+
+Curve:Linear,
+  Curve-Linear, ! name
+  -1, ! Coefficient1 Constant
+  2, ! Coefficient2 x
+  0.0, ! min curve output
+  1.0; ! max curve output
+\end{lstlisting}
+
+The following is another example, as might be applied in the Fan:ComponentModel to characterize duct static pressure reset (using a constant duct static pressure set point of 248.84 Pa in this case):
+
+\begin{lstlisting}
+
+Curve:Linear,
+  DiagnosticSPR, ! Curve Name f = C1 + C2\*x
+  248.84, ! Coefficient1 Constant [Pa]
+  0., ! Coefficent 2 Press/Flow [Pa-s/m3]
+  0., ! Minimum Value of x (Qfan) [m3/s]
+  100., ! Maximum Value of x (Qfan) [m3/s]
+  62.5, ! Minimum Curve Output [Pa]
+  248.84; ! Maximum Curve Output [Pa]
+\end{lstlisting}
+
+\subsection{Curve:QuadLinear}\label{curvequadlinear}
+
+Input consists of the curve name, the five coefficients, and maximum and minimum values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is represented by this curve:
+
+\subsubsection{Inputs}\label{inputs-1-028}
+
+\paragraph{y = C1 + C2 * w + C3 * x + C4 * y + C5 * z}\label{y-c1-c2-w-c3-x-c4-y-c5-z}
+
+\paragraph{Field: Name}\label{field-name-1-027}
+
+A user assigned unique name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-1}
+
+The constant coefficient (C1) in the equation.
+
+\paragraph{Field: Coefficient2 w}\label{field-coefficient2-w}
+
+The coefficient (C2) in the equation.
+
+\paragraph{Field: Coefficient3 x}\label{field-coefficient3-x}
+
+The coefficient (C3) in the equation.
+
+\paragraph{Field: Coefficient4 y}\label{field-coefficient4-y}
+
+The coefficient (C4) in the equation.
+
+\paragraph{Field: Coefficient5 z}\label{field-coefficient5-z}
+
+The coefficient (C5) in the equation.
+
+\paragraph{Field: Minimum Value of w}\label{field-minimum-value-of-w}
+
+The minimum allowable value of w. Values of w less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of w}\label{field-maximum-value-of-w}
+
+The maximum allowable value of w. Values of z greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-1}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-1}
+
+The maximum allowable value of x. Values of z greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y}
+
+The maximum allowable value of y. Values of z greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of z}\label{field-minimum-value-of-z}
+
+The minimum allowable value of z. Values of z less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of z}\label{field-maximum-value-of-z}
+
+The maximum allowable value of z. Values of z greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for w}\label{field-input-unit-type-for-w}
+
+This field is used to indicate the kind of units that may be associated with the w values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of w and Maximum Value of w. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-1}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of x and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for y}\label{field-input-unit-type-for-y}
+
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of y and Maximum Value of y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for z}\label{field-input-unit-type-for-z}
+
+This field is used to indicate the kind of units that may be associated with the z values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of z and Maximum Value of z. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select Dimensionless which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\item
+  VolumetricFlowPerPower
+\end{itemize}
+
+Below are an example inputs for QuadLinear Curves.
+
+\begin{lstlisting}
+
+CURVE:QUADLINEAR,
+  MinDsnWBCurveName, ! Curve Name
+  -3.3333,           ! CoefficientC1
+  0.0,               ! CoefficientC2
+  38.9,              ! CoefficientC3
+  0.,                ! CoefficientC4
+  0.,                ! CoefficientC5
+  -30.,              ! Minimum Value of w
+  40.,               ! Maximum Value of w
+  0.,                ! Minimum Value of x
+  1.,                ! Maximum Value of x
+  10.,               ! Minimum Value of y
+  8.,                ! Maximum Value of y
+  1. E-8,            ! Minimum Value of z
+  8. E-8,            ! Maximum Value of z
+  0.,                ! Minimum Curve Output
+  38.;               ! Maximum Curve Output
+
+  Curve:QuadLinear,
+  MinActWBCurveName, ! Curve Name
+  -8.3333,           ! CoefficientC1
+  2.0,               ! CoefficientC2
+  5.5556.,           ! CoefficientC3
+  -1.0,              ! CoefficientC4
+  0.,                ! CoefficientC5
+  0.,                ! Minimum Value of w
+  38.,               ! Maximum Value of w
+  0.,                ! Minimum Value of x
+  1.,                ! Maximum Value of x
+  10.,               ! Minimum Value of y
+  38.,               ! Maximum Value of y
+  1. E-8,            ! Minimum Value of z
+  8. E-8,            ! Maximum Value of z
+  0.,                ! Minimum Curve Output
+  43.;               ! Maximum Curve Output
+
+  Curve:QuadLinear,
+  OptCondEntCurveName, ! Curve Name
+  12.2711,             ! CoefficientC1
+  0.80,                ! CoefficientC2
+  6.6667,              ! CoefficientC3
+  -0.266,              ! CoefficientC4
+  -6193484.,           ! CoefficientC5
+  0.,                  ! Minimum Value of w
+  38.,                 ! Maximum Value of w
+  0.,                  ! Minimum Value of x
+  1.,                  ! Maximum Value of x
+  10.,                 ! Minimum Value of y
+  38.,                 ! Maximum Value of y
+  1. E-8,              ! Minimum Value of z
+  8. E-8,              ! Maximum Value of z
+  0.,                  ! Minimum Curve Output
+  32.;                 ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:Quadratic}\label{curvequadratic}
+
+Input for a quadratic curve consists of the curve name, the three coefficients, and the maximum and minimum valid independent variable values. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the quadratic curve is:
+
+\begin{equation}
+y = {C_1} + {C_2}*x + {C_3}*{x^2}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-2-026}
+
+\paragraph{Field: Name}\label{field-name-2-025}
+
+A user assigned unique name for an instance of a quadratic curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-2}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-1}
+
+The linear coefficient (C\(_{2}\)) in the equation.
+
+\paragraph{Field: Coefficient3 x**2}\label{field-coefficient3-x2}
+
+The quadratic coefficient (C\(_{3}\)) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-2}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-2}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-1}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-1}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-2}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-1}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Following is an example input.
+
+\begin{lstlisting}
+
+Curve:Quadratic,
+  WindACCBFFFF, ! name
+  -2.277,       ! Coefficient1 Constant
+  5.2114,       ! Coefficient2 x
+  -1.9344,      ! Coefficient3 x\*\*2
+  0.0,          ! Minimum Value of x
+  1.0;          ! Maximum Value of x
+\end{lstlisting}
+
+\subsection{Curve:Cubic}\label{curvecubic}
+
+Input for a cubic curve consists of the curve name, the 4 coefficients, and the maximum and minimum valid independent variable values. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the cubic curve is:
+
+\begin{equation}
+y = {C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*{x^3}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-3-024}
+
+\paragraph{Field: Name}\label{field-name-3-021}
+
+A user assigned unique name for an instance of a cubic curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-3}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-2}
+
+The linear coefficient (C\(_{2}\)) in the equation.
+
+\paragraph{Field: Coefficient3 x**2}\label{field-coefficient3-x2-1}
+
+The quadratic coefficient (C\(_{3}\)) in the equation.
+
+\paragraph{Field: Coefficient4 x**3}\label{field-coefficient4-x3}
+
+The cubic coefficient (C\(_{4}\)) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-3}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-3}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-2}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-2}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-3}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-2}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Following is an input example.
+
+\begin{lstlisting}
+
+Curve:Cubic,
+  WindACEIRFPLF, ! name
+  .00000273404,  ! Coefficient1 Constant
+  1.05259,       ! Coefficient2 x
+  -.0552087,     ! Coefficient3 x**2
+  .00262236,     ! Coefficient4
+  0.0,           ! min
+  1.1;           ! max
+\end{lstlisting}
+
+\subsection{Curve:Quartic}\label{curvequartic}
+
+Input for a Quartic (fourth order polynomial) curve consists of the curve name, the five coefficients, and the maximum and minimum valid independent variable values. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the quartic curve is:
+
+\begin{equation}
+y = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}{x^3} + {C_5}{x^4}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-4-021}
+
+\paragraph{Field: Name}\label{field-name-4-018}
+
+A user assigned unique name for an instance of a Quartic curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-4}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-3}
+
+The linear coefficient (C\(_{2}\)) in the equation.
+
+\paragraph{Field: Coefficient3 x**2}\label{field-coefficient3-x2-2}
+
+The quadratic coefficient (C\(_{3}\)) in the equation.
+
+\paragraph{Field: Coefficient4 x**3}\label{field-coefficient4-x3-1}
+
+The cubic coefficient (C\(_{4}\)) in the equation.
+
+\paragraph{Field: Coefficient5 x**4}\label{field-coefficient5-x4}
+
+The fourth-order coefficient (C\(_{5}\)) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-4}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-4}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-3}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-5}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-4}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-3}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Following is an input example.
+
+\begin{lstlisting}
+
+Curve:Quartic,
+  BGSeries60,                                 !- y = -611.41x4 + 192.68x3 - 88.843x2 + 4.7634x + 5.5656
+  5.5656,                                         !- Constant
+  4.7634,                                         !- 1st coefficient
+  -88.843,                                       !- 2nd coefficient
+  192.68,                                         !- 3rd coefficient
+  -611.41,                                       !- 4th coefficient
+  0.0,                                               !- Min Phi Value
+  0.2412;                                         !- Max Phi Value
+\end{lstlisting}
+
+The following is another example, as might be applied in the Fan:ComponentModel to characterize belt maximum efficiency (using a medium efficiency belt in this case):
+
+\begin{lstlisting}
+
+Curve:Quartic,
+  BeltMaxEffMedium,                               ! Curve Name
+  -0.09504,                                               ! CoefficientC1
+  0.03415,                                                 ! CoefficientC2
+  -0.008897,                                             ! CoefficientC3
+  0.001159,                                               ! CoefficientC4
+  -0.00006132,                                         ! CoefficientC5
+  -1.2,                                                       ! Minimum Value of x
+  6.2,                                                         ! Maximum Value of x
+  -4.6,                                                       ! Minimum Curve Output
+  0.;                                                           ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:Exponent}\label{curveexponent}
+
+Input for a exponent curve consists of the curve name, the 3 coefficients, and the maximum and minimum valid independent variable values. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the exponent curve is:
+
+\begin{equation}
+y = C1 + C2*{x^{C3}}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-5-019}
+
+\paragraph{Field: Name}\label{field-name-5-015}
+
+A user assigned unique name for an instance of an exponent curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-5}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 Constant}\label{field-coefficient2-constant}
+
+The linear coefficient (C\(_{2}\)) in the equation.
+
+\paragraph{Field: Coefficient3 Constant}\label{field-coefficient3-constant}
+
+The exponent coefficient (C\(_{3}\)) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-5}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-6}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-4}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-3}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-5}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-4}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Following is an input example.
+
+\begin{lstlisting}
+
+Curve:Exponent,
+  !     Curve = C1 + C2\*x\*\*C3, x = fan speed ratio
+  FanPowerExponentCurve, !- Name
+  0.0,                                     !- Coefficient1 Constant
+  1.0,                                     !- Coefficient2 Constant
+  3.0,                                     !- Coefficient3 Constant
+  0.0,                                     !- Minimum Value of x
+  1.5,                                     !- Maximum Value of x
+  0.1,                                     !- Minimum Curve Output
+  1.5;                                     !- Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:Bicubic}\label{curvebicubic}
+
+This curve type is a function of two independent variables. Input consists of the curve name, the ten coefficients, and the minimum and maximum values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the bicubic curve is:
+
+\begin{equation}
+z = {C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*y + {C_5}*{y^2} + {C_6}*xy + {C_7}*{x^3} + {C_8}*{y^3} + {C_9}*{x^2}y + {C_{10}}*x{y^2}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-6-016}
+
+\paragraph{Field: Name}\label{field-name-6-013}
+
+A user assigned unique name for an instance of a bicubic curve. When a curve is used by another object, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-6}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-4}
+
+The coefficient C\(_{2}\) in the equation.
+
+\paragraph{Field: Coefficient3 x**2}\label{field-coefficient3-x2-3}
+
+The coefficient C\(_{3}\) in the equation.
+
+\paragraph{Field: Coefficient4 y}\label{field-coefficient4-y-1}
+
+The coefficient C\(_{4}\) in the equation.
+
+\paragraph{Field: Coefficient5 y**2}\label{field-coefficient5-y2}
+
+The coefficient C\(_{5}\) in the equation.
+
+\paragraph{Field: Coefficient6 x*y}\label{field-coefficient6-xy}
+
+The coefficient C\(_{6}\) in the equation.
+
+\paragraph{Field: Coefficient7 x**3}\label{field-coefficient7-x3}
+
+The coefficient C\(_{7}\) in the equation.
+
+\paragraph{Field: Coefficient8 y**3}\label{field-coefficient8-y3}
+
+The coefficient C\(_{8}\) in the equation.
+
+\paragraph{Field: Coefficient9 x**2*y}\label{field-coefficient9-x2y}
+
+The coefficient C\(_{9}\) in the equation.
+
+\paragraph{Field: Coefficient10 x*y**2}\label{field-coefficient10-xy2}
+
+The coefficient C\(_{10}\) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-6}
+
+The minimum allowable value of x. Values of x less than this minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-7}
+
+The maximum allowable value of x. Values of x greater than this maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y-1}
+
+The minimum allowable value of y. Values of y less than this minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y-1}
+
+The maximum allowable value of y. Values of y greater than this maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-5}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-4}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-6}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-1}
+
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-5}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Below is an example input.
+
+\begin{lstlisting}
+
+Curve:Bicubic,
+  Main Chiller EIRFPLR,             !- Name
+  7.086284E-02,                             !- Coefficient1 Constant
+  2.787561E-03,                             !- Coefficient2 x
+  -8.917038E-06,                             !- Coefficient3 x\*\*2
+  2.309734E-01,                             !- Coefficient4 y
+  1.250442E+00,                             !- Coefficient5 y\*\*2
+  -2.161029E-03,                             !- Coefficient6 x\*y
+  0.000000E+00,                             !- Coefficient7 x\*\*3
+  -5.630094E-01,                             !- Coefficient8 y\*\*3
+  0.000000E+00,                             !- Coefficient9 x\*\*2\*y
+  0.000000E+00,                             !- Coefficient10 x\*y\*\*2
+  20.33,                                           !- Minimum Value of x
+  35.00,                                           !- Maximum Value of x
+  0.25,                                             !- Minimum Value of y
+  1.01;                                             !- Maximum Value of y
+\end{lstlisting}
+
+\subsection{Curve:Biquadratic}\label{curvebiquadratic}
+
+This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the bicubic curve is:
+
+\begin{equation}
+z = {C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*y + {C_5}*{y^2} + {C_6}*xy
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-7-016}
+
+\paragraph{Field: Name}\label{field-name-7-012}
+
+A user assigned unique name for an instance of a biquadratic curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-7}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-5}
+
+The coefficient C\(_{2}\) in the equation.
+
+\paragraph{Field: Coefficient3 x**2}\label{field-coefficient3-x2-4}
+
+The coefficient C\(_{3}\) in the equation.
+
+\paragraph{Field: Coefficient4 y}\label{field-coefficient4-y-2}
+
+The coefficient C\(_{4}\) in the equation.
+
+\paragraph{Field: Coefficient5 y**2}\label{field-coefficient5-y2-1}
+
+The coefficient C\(_{5}\) in the equation.
+
+\paragraph{Field: Coefficient6 x*y}\label{field-coefficient6-xy-1}
+
+The coefficient C\(_{6}\) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-7}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-8}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y-2}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y-2}
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-6}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-5}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-7}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-2}
+
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-6}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Below is an example input.
+
+\begin{lstlisting}
+
+Curve:Biquadratic,
+  WindACCoolCapFT, ! name
+  0.942587793,     ! Coefficient1 Constant
+  0.009543347,     ! Coefficient2 x
+  0.000683770,     ! Coefficient3 x\*\*2
+  -0.011042676,    ! Coefficient4 y
+  0.000005249,     ! Coefficient5 y\*\*2
+  -0.000009720,    ! Coefficient6 x\*y
+  15., 22.,        ! min and max of first independent variable
+  29., 47.;        ! min and max of second independent variable
+\end{lstlisting}
+
+\subsection{Curve:CubicLinear}\label{curvecubiclinear}
+
+This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the cubic linear curve:
+
+\begin{equation}
+y = \left( {{C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*{x^3}} \right) + \left( {{C_5} + {C_6}*x} \right)*y
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-8-014}
+
+\paragraph{Field: Name}\label{field-name-8-012}
+
+A user assigned unique name for an instance of a quadratic-linear curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-8}
+
+The constant coefficient (\(C_1\) ) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-6}
+
+The coefficient \(C_2\) in the equation.
+
+\paragraph{Field: Coefficient3 x**2 The coefficient \(C_3\) in the equation.}\label{field-coefficient3-x2-the-coefficient-cux5f3-in-the-equation.}
+
+\paragraph{Field: Coefficient4 x**3 The coefficient \(C_4\) in the equation.}\label{field-coefficient4-x3-the-coefficient-cux5f4-in-the-equation.}
+
+\paragraph{Field: Coefficient5 y}\label{field-coefficient5-y}
+
+The coefficient \(C_5\) in the equation.
+
+\paragraph{Field: Coefficient6 x*y The coefficient \(C_6\) in the equation.}\label{field-coefficient6-xy-the-coefficient-cux5f6-in-the-equation.}
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-8}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-9}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y-3}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y-3}
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-7}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-6}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-8}
+
+This field is used to indicate the kind of units that may be associated with the x values. The only option at this time is \textbf{Dimensionless}.
+
+\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-3}
+
+This field is used to indicate the kind of units that may be associated with the x values. The only option at this time is \textbf{Dimensionless}.
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-7}
+
+This field is used to indicate the kind of units that may be associated with the output values. The only option at this time is \textbf{Dimensionless}.
+
+An example input for the CubicLinear equation form is shown below.
+
+\begin{lstlisting}
+
+Curve:CubicLinear, 
+  InsideMeltIceDischarging, !- Name
+  0.108734675,              !- Coefficient1 Constant
+  -0.989874286,             !- Coefficient2 x
+  0.696303562,              !- Coefficient3 x**2
+  -0.134945307,             !- Coefficient4 x**3
+  1.724007415,              !- Coefficient5 y
+  -1.094020457,             !- Coefficient6 y*x
+  0.25,                     !- Minimum Value of x
+  1,                        !- Maximum Value of x
+  0.69,                     !- Minimum Value of y
+  1.26,                     !- Maximum Value of y
+  0.0926,                   !- Minimum Curve Output
+  0.4938,                   !- Maximum Curve Output
+  Dimensionless,            !- Input Unit Type for X
+  Dimensionless,            !- Input Unit Type for Y
+  Dimensionless,            !- Output Unit Type
+\end{lstlisting}
+
+\subsection{Curve:ChillerPartLoadCustom}\label{curvechillerpartloadcustom}
+
+A custom chiller part-load performance curve is a function of three independent variables, i.e., x, y, and z. Input consists of the curve name, the twelve coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve.
+
+The equation represented by the custom curve is:
+
+\begin{equation}
+C_1 + C_2 \cdot x + C_3 \cdot x^2 + C_4 \cdot y + C_5 \cdot y^2 + C_6 \cdot x \cdot y + C_7 \cdot x^3 + C_8 \cdot y^3 + C_9 \cdot x^2 \cdot y + C_{10} \cdot x \cdot y^2 + C_{11} \cdot x^2 \cdot y^2 + C_{12} \cdot z \cdot y^3
+\end{equation}
+
+where,
+
+\begin{itemize}
+\tightlist
+\item
+  x represents the normalized fractional lift (the delta of temperature across the leaving condenser water temperature and leaving evaporator water temperature of a chiller).
+\item
+  y represents the normalized deviation of leaving chilled water temperature from the reference condition.
+\item
+  z represents the part load ratio.
+\end{itemize}
+
+\subsubsection{Field: Name}\label{field-name-9-011}
+
+A user assigned unique name for an instance of a biquadratic curve. When a curve is used, it is referenced by this name.
+
+\subsubsection{Field: Coefficient1}\label{field-coefficient1}
+
+The constant coefficient (C1) in the equation.
+
+\subsubsection{Field: Coefficient2}\label{field-coefficient2}
+
+The coefficient C2 in the equation.
+
+\subsubsection{Field: Coefficient3}\label{field-coefficient3}
+
+The coefficient C3 in the equation.
+
+\subsubsection{Field: Coefficient4}\label{field-coefficient4}
+
+The coefficient C4 in the equation.
+
+\subsubsection{Field: Coefficient5}\label{field-coefficient5}
+
+The coefficient C5 in the equation.
+
+\subsubsection{Field: Coefficient6}\label{field-coefficient6}
+
+The coefficient C6 in the equation.
+
+\subsubsection{Field: Coefficient7}\label{field-coefficient7}
+
+The constant coefficient (C7) in the equation.
+
+\subsubsection{Field: Coefficient8}\label{field-coefficient8}
+
+The coefficient C8 in the equation.
+
+\subsubsection{Field: Coefficient9}\label{field-coefficient9}
+
+The coefficient C9 in the equation.
+
+\subsubsection{Field: Coefficient10}\label{field-coefficient10}
+
+The coefficient C10 in the equation.
+
+\subsubsection{Field: Coefficient11}\label{field-coefficient11}
+
+The coefficient C11 in the equation.
+
+\subsubsection{Field: Coefficient12}\label{field-coefficient12}
+
+The coefficient C12 in the equation.
+
+\subsubsection{Field: Minimum Value of x}\label{field-minimum-value-of-x-9}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\subsubsection{Field: Maximum Value of x}\label{field-maximum-value-of-x-10}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\subsubsection{Field: Minimum Value of y}\label{field-minimum-value-of-y-4}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\subsubsection{Field: Maximum Value of y}\label{field-maximum-value-of-y-4}
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+\subsubsection{Field: Minimum Value of z}\label{field-minimum-value-of-z-1}
+
+The minimum allowable value of z. Values of y less than the minimum will be replaced by the minimum.
+
+\subsubsection{Field: Maximum Value of z}\label{field-maximum-value-of-z-1}
+
+The maximum allowable value of z. Values of y greater than the maximum will be replaced by the maximum.
+
+\subsubsection{Field: Minimum Curve Output}\label{field-minimum-curve-output-8}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\subsubsection{Field: Maximum Curve Output}\label{field-maximum-curve-output-7}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\subsubsection{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-9}
+
+This field is used to indicate the kind of units that may be associated with the x values. Select Dimensionless.
+
+\subsubsection{Field: Input Unit Type for y}\label{field-input-unit-type-for-y-4}
+
+This field is used to indicate the kind of units that may be associated with the y values. Select Dimensionless.
+
+\subsubsection{Field: Input Unit Type for z}\label{field-input-unit-type-for-z-1}
+
+This field is used to indicate the kind of units that may be associated with the y values. Select Dimensionless.
+
+\subsubsection{Field: Output Unit Type}\label{field-output-unit-type-8}
+
+This field is used to indicate the kind of units that may be associated with the output values. Select Dimensionless.
+
+Below is an example input:
+
+\begin{lstlisting}
+
+Curve:ChillerPartLoadCustom,
+  EIRFPLR,        !- Name  
+  0.093291598,        !- Coefficient1 Constant
+  -0.234322952,       !- Coefficient2 x
+  0.426950368,        !- Coefficient3 x**2
+  0.188624721,        !- Coefficient4 y
+  -0.608010978,       !- Coefficient5 y**2
+  0.992031248,        !- Coefficient6 x*y
+  0.000000E+00,       !- Coefficient7 x**3
+  0.502338322,        !- Coefficient8 y**3
+  0.000000E+00,       !- Coefficient9 x**2*y
+  0.000000E+00,       !- Coefficient 10 x*y**2
+  -0.360902326,       !- Coefficient 11 x**2*y**2
+  -0.097978985,       !- Coefficient 12 z*y**3 
+  0.2562,             !- Minimum Value of x
+  1.0365,             !- Maximum Value of x
+  0.1,                !- Minimum Value of y
+  1,                  !- Maximum Value of y
+  -0.035,             !- Minimum Value of z
+  0.3144,             !- Maximum Value of z
+  ,                   !- Minimum Curve Output
+  ,                   !- Maximum Curve Output
+  Dimensionless,      !- Input Unit Type for x
+  Dimensionless,      !- Input Unit Type for y
+  Dimensionless,      !- Input Unit Type for z
+  Dimensionless;      !- Output Unit Type
+\end{lstlisting}
+
+\subsection{Curve:QuadraticLinear}\label{curvequadraticlinear}
+
+This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the quadratic linear curve:
+
+\begin{equation}
+z = \left( {{C_1} + {C_2}*x + {C_3}*{x^2}} \right) + \left( {{C_4} + {C_5}*x + {C_6}*{x^2}} \right)*y
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-9-012}
+
+\paragraph{Field: Name}\label{field-name-10-010}
+
+A user assigned unique name for an instance of a quadratic-linear curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-9}
+
+The constant coefficient (C\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x}\label{field-coefficient2-x-7}
+
+The coefficient C\(_{2}\) in the equation.
+
+\paragraph{Field: Coefficient3 x**2}\label{field-coefficient3-x2-5}
+
+The coefficient C\(_{3}\) in the equation.
+
+\paragraph{Field: Coefficient4 y}\label{field-coefficient4-y-3}
+
+The coefficient C\(_{4}\) in the equation.
+
+\paragraph{Field: Coefficient5 x*y}\label{field-coefficient5-xy}
+
+The coefficient C\(_{5}\) in the equation.
+
+\paragraph{Field: Coefficient6 x**2*y}\label{field-coefficient6-x2y}
+
+The coefficient C\(_{6}\) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-10}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-11}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y-5}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y-5}
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-9}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-8}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-10}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-5}
+
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-9}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+Below is an example input.
+
+\begin{lstlisting}
+
+Curve:QuadraticLinear,
+  DischargeCurve, !- Curve Name
+  0.0,            !- Coefficient1 Constant
+  0.09,           !- Coefficient2 x
+  -0.15,          !- Coefficient3 x\*\*2
+  0.612,          !- Coefficient4 y
+  -0.324,         !- Coefficient5 x\*y
+  -0.216,         !-Coefficient6 x\*\*2\*y
+  0.0,            !- Minimum Value of x
+  1.0,            !- Maximum Value of x
+  0.0,            !- Minimum Value of y
+  9.9;            !- Maximum Value of y
+\end{lstlisting}
+
+\subsection{Curve:Triquadratic}\label{curvetriquadratic}
+
+This curve is a 2\(^{nd}\) order polynomial function of three variable polynomial independent variables. Input consists of the curve name, the twenty seven coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the triquadratic curve:
+
+\begin{equation}
+  \begin{array}{l}
+    CurveValue = {A_0} + {A_1}*{x^2} + {A_2}*x + {A_3}*{y^2} + {A_4}*y + {A_5}*{z^2} + {A_6}*z + {A_7}*{x^2}{y^2} + {A_8}*xy + \\
+    \quad \quad \quad \quad \quad {A_9}*x{y^2} + {A_{10}}*{x^2}y + {A_{11}}*{x^2}{z^2} + {A_{12}}*xz + {A_{13}}*x{z^2} + {A_{14}}*{x^2}z + {A_{15}}*{y^2}{z^2} + \\
+    \quad \quad \quad \quad \quad {A_{16}}*yz + {A_{17}}*y{z^2} + {A_{18}}*{y^2}z + {A_{19}}*{x^2}{y^2}{z^2} + {A_{20}}*{x^2}{y^2}z + {A_{21}}{x^2}y{z^2} + {A_{22}}x{y^2}{z^2} + \\
+    \quad \quad \quad \quad \quad {A_{23}}{x^2}yz + {A_{24}}x{y^2}z + {A_{25}}xy{z^2} + {A_{26}}xyz
+  \end{array}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-10-011}
+
+\paragraph{Field: Coefficient1 Constant}\label{field-coefficient1-constant-10}
+
+The constant coefficient (A\(_{0}\)) in the equation.
+
+\paragraph{Field: Coefficient2 x**2}\label{field-coefficient2-x2}
+
+The coefficient (A\(_{1}\)) in the equation.
+
+\paragraph{Field: Coefficient3 x}\label{field-coefficient3-x-1}
+
+The coefficient (A\(_{2}\)) in the equation.
+
+\paragraph{Field: Coefficient4 y**2}\label{field-coefficient4-y2}
+
+The coefficient (A\(_{3}\)) in the equation.
+
+\paragraph{Field: Coefficient5 y}\label{field-coefficient5-y-1}
+
+The coefficient (A\(_{4}\)) in the equation.
+
+\paragraph{Field: Coefficient6 z**2}\label{field-coefficient6-z2}
+
+The coefficient (A\(_{5}\)) in the equation.
+
+\paragraph{Field: Coefficient7 z}\label{field-coefficient7-z}
+
+The coefficient (A\(_{6}\)) in the equation.
+
+\paragraph{Field: Coefficient8 x**2*y**2}\label{field-coefficient8-x2y2}
+
+The coefficient (A\(_{7}\)) in the equation.
+
+\paragraph{Field: Coefficient9 x*y}\label{field-coefficient9-xy}
+
+The coefficient (A\(_{8}\)) in the equation.
+
+\paragraph{Field: Coefficient10 x*y**2}\label{field-coefficient10-xy2-1}
+
+The coefficient (A\(_{9}\)) in the equation.
+
+\paragraph{Field: Coefficient11 x**2*y}\label{field-coefficient11-x2y}
+
+The coefficient (A\(_{10}\)) in the equation.
+
+\paragraph{Field: Coefficient12 x**2*z**2}\label{field-coefficient12-x2z2}
+
+The coefficient (A\(_{11}\)) in the equation.
+
+\paragraph{Field: Coefficient13 x*z}\label{field-coefficient13-xz}
+
+The coefficient (A\(_{12}\)) in the equation.
+
+\paragraph{Field: Coefficient14 x*z**2}\label{field-coefficient14-xz2}
+
+The coefficient (A\(_{13}\)) in the equation.
+
+\paragraph{Field: Coefficient15 x**2*z}\label{field-coefficient15-x2z}
+
+The coefficient (A\(_{14}\)) in the equation.
+
+\paragraph{Field: Coefficient16 y**2*z**2}\label{field-coefficient16-y2z2}
+
+The coefficient (A\(_{15}\)) in the equation.
+
+\paragraph{Field: Coefficient17 y*z}\label{field-coefficient17-yz}
+
+The coefficient (A\(_{16}\)) in the equation.
+
+\paragraph{Field: Coefficient18 y*z**2}\label{field-coefficient18-yz2}
+
+The coefficient (A\(_{17}\)) in the equation.
+
+\paragraph{Field: Coefficient19 y**2*z}\label{field-coefficient19-y2z}
+
+The coefficient (A\(_{18}\)) in the equation.
+
+\paragraph{Field: Coefficient20 x**2*y**2*z**2}\label{field-coefficient20-x2y2z2}
+
+The coefficient (A\(_{19}\)) in the equation.
+
+\paragraph{Field: Coefficient21 x**2*y**2*z}\label{field-coefficient21-x2y2z}
+
+The coefficient (A\(_{20}\)) in the equation.
+
+\paragraph{Field: Coefficient22 x**2*y*z**2}\label{field-coefficient22-x2yz2}
+
+The coefficient (A\(_{21}\)) in the equation.
+
+\paragraph{Field: Coefficient23 x*y**2*z**2}\label{field-coefficient23-xy2z2}
+
+The coefficient (A\(_{22}\)) in the equation.
+
+\paragraph{Field: Coefficient24 x**2*y*z}\label{field-coefficient24-x2yz}
+
+The coefficient (A\(_{23}\)) in the equation.
+
+\paragraph{Field: Coefficient25 x*y**2*z}\label{field-coefficient25-xy2z}
+
+The coefficient (A\(_{24}\)) in the equation.
+
+\paragraph{Field: Coefficient26 x*y*z**2}\label{field-coefficient26-xyz2}
+
+The coefficient (A\(_{25}\)) in the equation.
+
+\paragraph{Field: Coefficient27 x*y*z}\label{field-coefficient27-xyz}
+
+The coefficient (A\(_{26}\)) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-11}
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-12}
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of y}\label{field-minimum-value-of-y-6}
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of y}\label{field-maximum-value-of-y-6}
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Value of z}\label{field-minimum-value-of-z-2}
+
+The minimum allowable value of z. Values of z less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of z}\label{field-maximum-value-of-z-2}
+
+The maximum allowable value of z. Values of z greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-10}
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-9}
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-11}
+
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-6}
+
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Input Unit Type for Z}\label{field-input-unit-type-for-z-2}
+
+This field is used to indicate the kind of units that may be associated with the z values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Z and Maximum Value of Z. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Power
+\item
+  Distance
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-10}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+\subsection{Curve:Functional:PressureDrop}\label{curvefunctionalpressuredrop}
+
+Input for a pressure drop curve consists of the curve name, a varying number of parameters, and the maximum and minimum valid independent variable values. The equation represented by the pressure drop curve is:
+
+\begin{equation}
+\Delta P = \left( {K + f\frac{L}{D}} \right)\frac{{\rho {V^2}}}{2}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-11-010}
+
+\paragraph{Field: Name}\label{field-name-11-009}
+
+A user assigned unique name for an instance of a pressure drop curve. When a curve is used, it is referenced by this name.
+
+\paragraph{Field: Diameter}\label{field-diameter-000}
+
+This diameter represents an equivalent diameter for the given branch. This is parameter (D) in the equation, and has units of \{m\}. Since varying components may be found on the same branch, this value must be selected along with the other inputs in order to provide a proper value of pressure drop. This is used to calculate the velocity in addition to being used directly in the frictional pressure drop calculation.
+
+\paragraph{Field: Minor Loss Coefficient}\label{field-minor-loss-coefficient}
+
+This is the pressure drop coefficient typically applied to components such as fittings and occasionally heat pumps. This is parameter (K) in the equation and is dimensionless. This coefficient is used to describe the amount of dynamic pressure lost during the process. This value may be left blank if the user only wants to account for frictional losses in this branch.
+
+\paragraph{Field: Length}\label{field-length}
+
+This is the length of a pressure drop process in which friction is applied. This is parameter (L) in the equation and has units of \{m\}. In a pipe, this would be the length of the pipe, however in many cases, pressure drop in other components are applied as an equivalent length. This is only required if the user is wanting to perform frictional pressure drop calculations.
+
+\paragraph{Field: Roughness}\label{field-roughness}
+
+This field represents the first method to simulate frictional losses. This parameter does not appear directly in the equation above, as it is only used to develop the friction factor (f), but the roughness will have units of \{m\} if entered. If the user enters this roughness value, the pressure system will use it along with an approximation to the Moody chart to estimate the friction factor given the current flow conditions. This allows the friction calculate to be dynamic throughout the simulation.
+
+\paragraph{Field: Fixed Friction Factor}\label{field-fixed-friction-factor}
+
+This field represents the second method to simulate frictional losses. This is parameter (f) in the equation and is dimensionless. This parameter is a fixed value of friction factor which would override any calculations performed based on roughness, etc. If the user has a known friction factor for a given component, this is where it should be entered.
+
+In the curve outputs for this object:
+
+\begin{itemize}
+\item
+  Curve Input 1: MassFlow
+\item
+  Curve Input 2: Density
+\item
+  Curve Input 3: Velocity
+\item
+  Curve Output: the resultant value
+\end{itemize}
+
+Following is an input example.
+
+\begin{lstlisting}
+
+Curve:Functional:PressureDrop,
+  PressureMinorAndFriction,!- Name
+  0.05,                                       !- Diameter
+  53.8,                                       !- Minor Loss Coefficient
+  200,                                         !- Length
+  ,                                               !- Roughness
+  0.008;                                     !- Fixed Friction Factor
+\end{lstlisting}
+
+\subsection{Curve:FanPressureRise}\label{curvefanpressurerise}
+
+Input for the fan total pressure rise curve consists of the curve name, the four coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
+
+\begin{equation}
+\Delta {P_{fan,tot}} = {C_1}*Q_{fan}^2 + {C_2}*Q_{fan}^{} + {C_3}*Q_{fan}^{}*\sqrt {{P_{sm}} - {P_o}}  + {C_4}*\left( {{P_{sm}} - {P_o}} \right)
+\end{equation}
+
+where \(\Delta P_{fan,tot}\) is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (\(Q_{fan}, m^3/s\) ), duct static pressure set point (\(P_{sm}\) , Pa), and static pressure surrounding the ducts (\(P_o\) , Pa). \(P_o\) is assumed to be zero.
+
+The first term of the curve looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially ``leaks'' into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
+
+The second term accounts for significant flow resistances in the system where the pressure difference is linearly proportional to the flow. Some filters and coils in the return may need this term to be adequately described. This term could be ignored if there are no linear components or if their pressure drops are very small compared to the other terms.
+
+The third term, which depends on the fan flow and square root of the supply duct pressure \emph{P\(_{sm}\)}, accounts in part for leakage from the supply system when damper positions are fixed or are changed independently of static pressure or fan flow. In this case, reducing or eliminating supply leakage results in a different system curve. This, however, might be only a minor correction to the simple system curves generally used. The third term is zero when the VAV box dampers are modulated to control flow. Consequently, with variable-position supply dampers, reducing or eliminating supply leakage does not change the system curve.
+
+The last term also accounts in part for leakage from the supply system when damper positions are fixed or are changed independently of static pressure or fan flow. This term indicates that the same fan pressure rise can be achieved by raising the duct pressure and closing dampers. The only change in the system in such a case is that the leakage flow may increase. The coefficient for this term is one when the VAV box dampers are modulated to control flow. In both cases, this term may be the most important correction to the simple system curves generally used, especially at low flows.
+
+\subsubsection{Inputs}\label{inputs-12-010}
+
+\paragraph{Field: Name}\label{field-name-12-007}
+
+The required user-assigned unique alpha name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Fan Pressure Rise Coefficient1 C1}\label{field-fan-pressure-rise-coefficient1-c1}
+
+The required numeric constant coefficient C\emph{\(_{1}\)} (Pa s\(^{2}\)/m\(^{6}\)) in the curve. Must be greater than zero.
+
+\paragraph{Field: Fan Pressure Rise Coefficient2 C2}\label{field-fan-pressure-rise-coefficient2-c2}
+
+The required numeric constant coefficient C\emph{\(_{2}\)} (Pa s/m\(^{3}\)) in the curve\emph{.}
+
+\paragraph{Field: Fan Pressure Rise Coefficient3 C3}\label{field-fan-pressure-rise-coefficient3-c3}
+
+The required numeric constant coefficient \emph{C\(_{3}\)} (Pa\(^{0.5}\) s/m\(^{3}\)) in the curve\emph{.}
+
+\paragraph{Field: Fan Pressure Rise Coefficient4 C4}\label{field-fan-pressure-rise-coefficient4-c4}
+
+The required numeric constant coefficient C\emph{\(_{4}\)} (dimensionless) in the curve\emph{.}
+
+\paragraph{Field: Minimum Value of Qfan}\label{field-minimum-value-of-qfan}
+
+The required numeric minimum allowable value of \emph{Q\(_{fan}\)} (m\(^{3}\)/s). Values of \emph{Q\(_{fan}\)} less than the minimum will be replaced within this curve by the minimum.
+
+\paragraph{Field: Maximum Value of Qfan}\label{field-maximum-value-of-qfan}
+
+The required numeric maximum allowable value of \emph{Q\(_{fan}\)} (m\(^{3}\)/s). Values of \emph{Q\(_{fan}\)} greater than the maximum will be replaced within this curve by the maximum.
+
+\paragraph{Field: Minimum Value of Psm}\label{field-minimum-value-of-psm}
+
+The required numeric minimum allowable value of \emph{P\(_{sm}\)} (Pa). Values of \emph{P\(_{sm}\)} less than the minimum will be replaced within this curve by the minimum.
+
+\paragraph{Field: Maximum Value of Psm}\label{field-maximum-value-of-psm}
+
+The required numeric maximum allowable value of \emph{P\(_{sm}\)} (Pa). Values of \emph{P\(_{sm}\)} greater than the maximum will be replaced within this curve by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-11}
+
+The optional numeric minimum allowable value of the evaluated curve (Pa). Values less than the minimum will be replaced within this curve by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-10}
+
+The optional numeric maximum allowable value of the evaluated curve (Pa). Values greater than the maximum will be replaced within this curve by the maximum.
+
+The following is an input example describing the fan total pressure rise for a VAV system with a constant non-zero duct static pressure set point (the set point is described separately; see the Curve:Linear object for a related example):
+
+\begin{lstlisting}
+
+Curve:FanPressureRise,
+  VSD Example,                   ! Curve Name f = C1*Qfan**2+C2*Qfan+C3*Qfan*(Psm-Po)**0.5+C4*(Psm-Po) with Po = 0
+  1446.75833497653,         ! CoefficientC1 Alpha [Pa s2/m6]
+  0.,                                     ! CoefficientC2 Beta [Pa s/m3]
+  0.,                                     ! CoefficientC3 Gamma [Pa0.5 s/m3]
+  1.,                                     ! CoefficientC4 Delta [-]
+  0.,                                     ! Minimum Value of Qfan [m3/s]
+  100.,                                 ! Maximum Value of Qfan [m3/s]
+  62.5,                                 ! Minimum Value of Psm [Pa]
+  300.,                                 ! Maximum Value of Psm [Pa]
+  0.;                                     ! Minimum Curve Output [Pa]
+  5000.;                               ! Maximum Curve Output [Pa]
+\end{lstlisting}
+
+\subsection{Curve:ExponentialSkewNormal}\label{curveexponentialskewnormal}
+
+Input for the exponential-modified skew normal curve consists of the curve name, the four coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
+
+\begin{equation}
+y = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}}*erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}}*erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}
+\end{equation}
+
+where \emph{Z\(_{1}\) =} (\emph{x C\(_{1}\)}) \emph{/ C\(_{2}\)}; \emph{Z\(_{2}\) =} {[}(\emph{exp}\(^{(*C*}\)\emph{3\(^{\*x}\)}\(^{)}\) * \emph{C\(_{4}\)*x}) \emph{- C\(_{1}\)}{]} \emph{/ C\(_{2}\)}; \emph{Z\(_{3}\) = -C\(_{1}\) / C\(_{2}\)}
+
+\subsubsection{Inputs}\label{inputs-13-008}
+
+\paragraph{Field: Name}\label{field-name-13-006}
+
+The required user-assigned unique alpha name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 C1}\label{field-coefficient1-c1}
+
+The required numeric constant coefficient \emph{C\(_{1}\)} in the curve.
+
+\paragraph{Field: Coefficient2 C2}\label{field-coefficient2-c2}
+
+The required numeric constant coefficient \emph{C\(_{2}\)} in the curve. Must be non-zero.
+
+\paragraph{Field: Coefficient3 C3}\label{field-coefficient3-c3}
+
+The required numeric constant coefficient \emph{C\(_{3}\)} in the curve.
+
+\paragraph{Field: Coefficient4 C4}\label{field-coefficient4-c4}
+
+The required numeric constant coefficient \emph{C\(_{4}\)} in the curve.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-12}
+
+The required numeric minimum allowable value of \emph{x}. Values of \emph{x} less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-13}
+
+The required numeric maximum allowable value of \emph{x}. Values of \emph{x} greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-12}
+
+The optional numeric minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-11}
+
+The optional numeric maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-12}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Value of \emph{x} and Maximum Value of \emph{x} (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-11}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Curve Output and Maximum Curve Output (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+The following are input examples describing the normalized fan efficiency for the normal (non-stall) and stall operating regions of a backward-curved airfoil centrifugal fan:
+
+\begin{lstlisting}
+
+Curve:ExponentialSkewNormal,
+  FanEff120CPLANormal,                         ! Curve Name
+  0.072613,                                               ! CoefficientC1 Afan
+  0.833213,                                               ! CoefficientC2 Bfan
+  0.,                                                           ! CoefficientC3 Cfan
+  0.013911,                                               ! CoefficientC4 Dfan
+  -4.,                                                         ! Minimum Value of x
+  5.,                                                           ! Maximum Value of x
+  0.1,                                                         ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+
+
+  Curve:ExponentialSkewNormal,
+  FanEff120CPLAStall,                           ! Curve Name
+  -1.674931,                                             ! CoefficientC1 Afan
+  1.980182,                                               ! CoefficientC2 Bfan
+  0.,                                                           ! CoefficientC3 Cfan
+  1.844950,                                               ! CoefficientC4 Dfan
+  -4.,                                                         ! Minimum Value of x
+  5.,                                                           ! Maximum Value of x
+  0.1,                                                         ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:Sigmoid}\label{curvesigmoid}
+
+Input for the sigmoid curve consists of the curve name, the five coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
+
+\begin{equation}
+y = {C_1} + \frac{{{C_2}}}{{\left( {{{(1 + {e^{\left[ {\frac{{({C_3} - x)}}{{{C_4}}}} \right]}})}^{{C_5}}}} \right)}}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-14-008}
+
+\paragraph{Field: Name}\label{field-name-14-005}
+
+The required user-assigned unique alpha name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 C1}\label{field-coefficient1-c1-1}
+
+The required numeric constant coefficient \emph{C\(_{1}\)} in the equation.
+
+\paragraph{Field: Coefficient2 C2}\label{field-coefficient2-c2-1}
+
+The required numeric constant coefficient \emph{C\(_{2}\)} in the equation.
+
+\paragraph{Field: Coefficient3 C3}\label{field-coefficient3-c3-1}
+
+The required numeric constant coefficient \emph{C\(_{3}\)} in the equation.
+
+\paragraph{Field: Coefficient4 C4}\label{field-coefficient4-c4-1}
+
+The required numeric constant coefficient \emph{C\(_{4}\)} in the equation.
+
+\paragraph{Field: Coefficient5 C5}\label{field-coefficient5-c5}
+
+The required numeric constant coefficient \emph{C\(_{5}\)} in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-13}
+
+The required numeric minimum allowable value of \emph{x}. Values of \emph{x} less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-14}
+
+The required numeric maximum allowable value of \emph{x}. Values of \emph{x} greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-13}
+
+The optional numeric minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-12}
+
+The optional numeric maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-13}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Value of \emph{x} and Maximum Value of \emph{x} (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-12}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Curve Output and Maximum Curve Output (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+The following are input examples describing the normalized dimensionless flow for normal (non-stall) and stall operating regions of a backward-curved airfoil centrifugal fan:
+
+\begin{lstlisting}
+
+Curve:Sigmoid,
+  FanDimFlowNormal,                               ! Curve Name
+  0.,                                                           ! CoefficientC1 Aspd
+  1.001423,                                               ! CoefficientC2 Bspd
+  0.123935,                                               ! CoefficientC3 Cspd
+  -0.476026,                                             ! CoefficientC4 Dspd
+  1.,                                                           ! CoefficientC5 Espd
+  -4.,                                                         ! Minimum Value of x
+  5.,                                                           ! Maximum Value of x
+  0.05,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+
+  Curve:Sigmoid,
+  FanDimFlowStall,                                 ! Curve Name
+  0.,                                                           ! CoefficientC1 Aspd
+  5.924993,                                               ! CoefficientC2 Bspd
+  -1.91636,                                               ! CoefficientC3 Cspd
+  -0.851779,                                             ! CoefficientC4 Dspd
+  1.,                                                           ! CoefficientC5 Espd
+  -4.,                                                         ! Minimum Value of x
+  5.,                                                           ! Maximum Value of x
+  0.05,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:RectangularHyperbola1}\label{curverectangularhyperbola1}
+
+Input for the single rectangular hyperbola type 1 curve consists of the curve name, the three coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
+
+\emph{y =}(\emph{C\(_{1}\) -* x}) \emph{/} (\emph{C\(_{2}\)+x}) \emph{+ C\(_{3}\)}
+
+\subsubsection{Inputs}\label{inputs-15-008}
+
+\paragraph{Field: Name}\label{field-name-15-005}
+
+The required user-assigned unique alpha name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 C1}\label{field-coefficient1-c1-2}
+
+The required numeric constant coefficient \emph{C\(_{1}\)} in the equation.
+
+\paragraph{Field: Coefficient2 C2}\label{field-coefficient2-c2-2}
+
+The required numeric constant coefficient \emph{C\(_{2}\)} in the equation.
+
+\paragraph{Field: Coefficient3 C3}\label{field-coefficient3-c3-2}
+
+The required numeric constant coefficient \emph{C\(_{3}\)} in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-14}
+
+The required numeric minimum allowable value of \emph{x}. Values of \emph{x} less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-15}
+
+The required numeric maximum allowable value of \emph{x}. Values of \emph{x} greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-14}
+
+The optional numeric minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-13}
+
+The optional numeric maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-14}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Value of \emph{x} and Maximum Value of \emph{x} (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-13}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Curve Output and Maximum Curve Output (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+The following is an input example describing the maximum efficiency variation for a mid- or average-efficiency type of motor:
+
+\begin{lstlisting}
+
+Curve:RectangularHyperbola1,
+  MotorMaxEffAvg,                                   ! Curve Name
+  0.29228,                                                 ! CoefficientC1
+  3.368739,                                               ! CoefficientC2
+  0.762471,                                               ! CoefficientC3
+  0.,                                                           ! Minimum Value of x
+  7.6,                                                         ! Maximum Value of x
+  0.01,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:RectangularHyperbola2}\label{curverectangularhyperbola2}
+
+Input for the single rectangular hyperbola type 2 curve consists of the curve name, the three coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
+
+\emph{y =}(\emph{C\(_{1}\) -* x}) \emph{/} (\emph{C\(_{2}\)+x}) \emph{+ C\(_{3}\) -* x}
+
+\subsubsection{Inputs}\label{inputs-16-007}
+
+\paragraph{Field: Name}\label{field-name-16-005}
+
+The required user-assigned unique alpha name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 C1}\label{field-coefficient1-c1-3}
+
+The required numeric constant coefficient \emph{C\(_{1}\)} in the equation.
+
+\paragraph{Field: Coefficient2 C2}\label{field-coefficient2-c2-3}
+
+The required numeric constant coefficient \emph{C\(_{2}\)} in the equation.
+
+\paragraph{Field: Coefficient3 C3}\label{field-coefficient3-c3-3}
+
+The required numeric constant coefficient \emph{C\(_{3}\)} in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-15}
+
+The required numeric minimum allowable value of \emph{x}. Values of \emph{x} less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-16}
+
+The required numeric maximum allowable value of \emph{x}. Values of \emph{x} greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-15}
+
+The optional numeric minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-14}
+
+The optional numeric maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-15}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Value of \emph{x} and Maximum Value of \emph{x} (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-14}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Curve Output and Maximum Curve Output (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+The following are input examples describing part-load efficiency variations for a medium efficiency type of V-belt (Regions 1 and 3), for a mid- or average-efficiency nominal 25 hp 4-pole motor, and a nominal 30 hp VFD:
+
+\begin{lstlisting}
+
+Curve:RectangularHyperbola2,
+  BeltPartLoadRegion1,                         ! Curve Name
+  0.920797,                                               ! CoefficientC1
+  0.0262686,                                             ! CoefficientC2
+  0.151594,                                               ! CoefficientC3
+  0.,                                                           ! Minimum Value of x
+  1.,                                                           ! Maximum Value of x
+  0.01,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+
+  Curve:RectangularHyperbola2,
+  BeltPartLoadRegion3,                         ! Curve Name
+  1.037778,                                               ! CoefficientC1
+  0.0103068,                                             ! CoefficientC2
+  -0.0268146,                                           ! CoefficientC3
+  0.,                                                           ! Minimum Value of x
+  1.,                                                           ! Maximum Value of x
+  0.01,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+
+  Curve:RectangularHyperbola2,
+  MotorPartLoad,                                     ! Curve Name
+  1.137209,                                               ! CoefficientC1
+  0.0502359,                                             ! CoefficientC2
+  -0.0891503,                                           ! CoefficientC3
+  0.,                                                           ! Minimum Value of x
+  1.,                                                           ! Maximum Value of x
+  0.01,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+
+  Curve:RectangularHyperbola2,
+  VFDPartLoad,                                         ! Curve Name
+  0.987405,                                               ! CoefficientC1
+  0.0155361,                                             ! CoefficientC2
+  -0.0059365,                                           ! CoefficientC3
+  0.,                                                           ! Minimum Value of x
+  1.,                                                           ! Maximum Value of x
+  0.01,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:ExponentialDecay}\label{curveexponentialdecay}
+
+Input for the exponential decay curve consists of the curve name, the three coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
+
+\emph{y = C\(_{1}\) + C\(_{2}\) * exp}\(^{*C*}\)\emph{3\(^{*x}\)}\(^{)}\)
+
+\subsubsection{Inputs}\label{inputs-17-005}
+
+\paragraph{Field: Name}\label{field-name-17-004}
+
+The required user-assigned unique alpha name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 C1}\label{field-coefficient1-c1-4}
+
+The required numeric constant coefficient \emph{C\(_{1}\)} in the equation.
+
+\paragraph{Field: Coefficient2 C2}\label{field-coefficient2-c2-4}
+
+The required numeric constant coefficient \emph{C\(_{2}\)} in the equation.
+
+\paragraph{Field: Coefficient3 C3}\label{field-coefficient3-c3-4}
+
+The required numeric constant coefficient \emph{C\(_{3}\)} in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-16}
+
+The required numeric minimum allowable value of \emph{x}. Values of \emph{x} less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-17}
+
+The required numeric maximum allowable value of \emph{x}. Values of \emph{x} greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-16}
+
+The optional numeric minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-15}
+
+The optional numeric maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-16}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Value of \emph{x} and Maximum Value of \emph{x} (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-15}
+
+This optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum Curve Output and Maximum Curve Output (currently dimensionless). At this time, only the \textbf{Dimensionless} option is provided so that no unit conversion is used for this curve.
+
+The following is an input example describing the part-load efficiency variation for a medium efficiency type of V-belt (Region 2):
+
+\begin{lstlisting}
+
+Curve:ExponentialDecay,
+  BeltPartLoadRegion2,                         ! Curve Name
+  1.011965,                                               ! CoefficientC1
+  -0.339038,                                             ! CoefficientC2
+  -3.43626,                                               ! CoefficientC3
+  0.,                                                           ! Minimum Value of x
+  1.,                                                           ! Maximum Value of x
+  0.01,                                                       ! Minimum Curve Output
+  1.;                                                           ! Maximum Curve Output
+\end{lstlisting}
+
+\subsection{Curve:DoubleExponentialDecay}\label{curvedoubleexponentialdecay}
+
+Input for the double exponential decay curve consists of the curve name, the five coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve include the minimum and maximum output of the performance curve. The equation is:
+
+\begin{equation}
+y = {C_1} + {C_2}{\exp ^{({C_3}x)}} + {C_4}{\exp ^{({C_5}x)}}
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-18-005}
+
+\paragraph{Field: Name}\label{field-name-18-004}
+
+This field indicates the required user-assigned name for an instance of this curve. When a curve of this type is used, it is referenced by this name.
+
+\paragraph{Field: Coefficient1 C1}\label{field-coefficient1-c1-5}
+
+The required numeric constant coefficient C\(_{1}\) in the equation.
+
+\paragraph{Field: Coefficient2 C2}\label{field-coefficient2-c2-5}
+
+The required numeric constant coefficient C\(_{2}\) in the equation.
+
+\paragraph{Field: Coefficient3 C3}\label{field-coefficient3-c3-5}
+
+The required numeric constant coefficient C\(_{3}\) in the equation.
+
+\paragraph{Field: Coefficient4 C4}\label{field-coefficient4-c4-2}
+
+The required numeric constant coefficient C\(_{4}\) in the equation.
+
+\paragraph{Field: Coefficient5 C5}\label{field-coefficient5-c5-1}
+
+The required numeric constant coefficient C\(_{5}\) in the equation.
+
+\paragraph{Field: Minimum Value of x}\label{field-minimum-value-of-x-17}
+
+The required numeric minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum
+
+\paragraph{Field: Maximum Value of x}\label{field-maximum-value-of-x-18}
+
+The required numeric maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum
+
+\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-17}
+
+The optional numeric minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum
+
+\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-16}
+
+The optional numeric maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum
+
+\paragraph{Field: Input Unit Type for x}\label{field-input-unit-type-for-x-17}
+
+The optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum and Maximum Value of x. Currently, only Dimensionless option is provided so that no unit conversion is used for this curve
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-16}
+
+The optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum and Maximum Curve Ouput. Currently, only Dimensionless option is provided so that no unit conversion is used for this curve.
+
+An example input of the Curve:DoubleExponentialDecay input is:
+
+\begin{lstlisting}
+
+Curve:DoubleExponentialDecay,
+  BatteryCycleCurve,         !- Name
+  1380,                                   !- Coefficient1 C1
+  6834,                                   !- Coefficient2 C2
+  -8.75,                                 !- Coefficient3 C3
+  6747,                                   !- Coefficient4 C4
+  -6.22,                                 !- Coefficient5 C5
+  0,                                         !- Minimum Value of x
+  1.0;                                     !- Maximum Value of x
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-021}
+
+\paragraph{Performance Curve Output Value}\label{performance-curve-output-value}
+
+The current value of the performance curve. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
+
+\paragraph{Performance Curve Input Variable 1(-N) Value {[]}}\label{performance-curve-input-variable-1-n-value}
+
+The current value of the nth independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
+
+HVAC,Average,Performance Curve Output Value {[]}
+
+HVAC,Average,Performance Curve Input Variable 1 Value {[]}
+
+HVAC,Average,Performance Curve Input Variable 2 Value {[]}
+
+HVAC,Average,Performance Curve Input Variable 3 Value {[]}

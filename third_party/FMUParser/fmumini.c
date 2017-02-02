@@ -13,7 +13,7 @@
 ///
 /// This file provides unzip functions for fmus and it is modified
 /// based on the miniunz.c (Version 1.1) from the MiniZip project.
-/// The original file, its copyright notice and its license can 
+/// The original file, its copyright notice and its license can
 /// be found in ../zlib
 ///////////////////////////////////////////////////////
 /*
@@ -69,8 +69,10 @@
 #define MAXFILENAME (256)
 
 #ifdef _WIN32
+#ifndef __MINGW32__
 #define USEWIN32IOAPI
 #include <zlib/contrib/minizip/iowin32.h>
+#endif
 #endif
 /*
   mini unzip, demo of unzip package
@@ -559,7 +561,7 @@ int unpackmz(const char *filNam, char *tmpPat)
     const char *dirname=tmpPat;
     char *cmd;
     char cwd[1024];
-    unzFile uf=NULL;                 
+    unzFile uf=NULL;
 
     printDebug("Start Minizip\n");
     if (zipfilename)
@@ -602,7 +604,7 @@ int unpackmz(const char *filNam, char *tmpPat)
     }
 
     printfDebug("%s opened\n",filename_try);
- 
+
 	cmd = calloc(sizeof(char), strlen(dirname) + 11);
 	if (cmd == NULL){
 	    printfError("Fail to allocate memory for cmd.\n", tmpPat);
@@ -611,14 +613,14 @@ int unpackmz(const char *filNam, char *tmpPat)
 
 #ifdef _WIN32
   if(_access(dirname, 0) ==-1) {
-    sprintf(cmd, "mkdir \"%s\"", dirname); // Command in windows 
+    sprintf(cmd, "mkdir \"%s\"", dirname); // Command in windows
 #else
   if(access(dirname, F_OK) ==-1) {
     sprintf(cmd, "mkdir -p \"%s\"", dirname); // Command in linux
 #endif
 
 	  printfDebug("Generated cmd: \"%s\".\n", cmd);
-	  if ( system(cmd) != 0 ){	
+	  if ( system(cmd) != 0 ){
 		    printError("Fail to creat temporary folders");
 	    return -1;
 	  }
@@ -627,21 +629,21 @@ int unpackmz(const char *filNam, char *tmpPat)
   if(getcwd(cwd, sizeof(cwd)) == NULL)
     fprintf(stdout, "Cannot get current working dir: %s\n", cwd);
 
-#ifdef _WIN32   
-  _chdir(dirname); // Command in windows 
+#ifdef _WIN32
+  _chdir(dirname); // Command in windows
 #else
   int i_unused = chdir(dirname); // Command in linux
 #endif
 
   ret_value = do_extract(uf, opt_do_extract_withoutpath, opt_overwrite, password); // Extract all files
-  
+
   unzClose(uf);
 
-#ifdef _WIN32   
-  _chdir(cwd); // Command in windows 
+#ifdef _WIN32
+  _chdir(cwd); // Command in windows
 #else
   int j_unused = chdir(cwd); // Command in linux
 #endif
-  
+
   return ret_value;
 }

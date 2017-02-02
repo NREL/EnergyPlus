@@ -1,0 +1,436 @@
+! PipingSystem_Underground_TwoPipe.idf
+! Basic file description:
+!     This input file exemplifies the use of the PipingSystem:Underground
+!     collection of objects to perform the simulation of two buried pipes.
+! Highlights: Multiple buried pipe simulation
+! Location: Denver, CO
+! Design Days: SummerDesignDay, WinterDesignDay
+! Run Period: Annual simulation
+! Run Control: Run design days, not run period, no sizing
+!
+! Building: None
+! Floor Area: N/A
+! Number of Stories: N/A
+!
+! Zone Description Details: No Zone
+! Internal gains description: N/A
+! Interzone Surfaces: N/A
+! Internal Mass: N/A
+! People: N/A
+! Lights: N/A
+! Windows: N/A
+! Detached Shading: N/A
+! Daylight: N/A
+! Natural Ventilation: N/A
+! Compact Schedules (preferred): Used exclusively
+! Solar Distribution: N/A
+!
+! HVAC: Single plant loop only
+! Purchased Air: N/A
+! Zonal Equipment: N/A
+! Central Air Handling Equipment: N/A
+! System Equipment Autosize: N/A
+! Purchased Cooling: N/A
+! Purchased Heating: N/A
+! Coils: N/A
+! Pumps: Variable Speed
+! Boilers: N/A
+! Chillers: N/A
+! Towers: N/A
+! Plant feature: Single branch demand and supply loop sides for simplicity
+! Plant feature: Running propylene glycol/water mixture
+!
+! Results: Standard hourly reporting
+! Standard Reports: No
+! Timestep or Hourly Variables: node temperature, relevant heat exchanger variables
+! Time bins Report: No
+! HTML Report: Yes
+! Environmental Emissions: No
+! Utility Tariffs: No
+!***********************************************************
+!****** SIMULATION CONTROLS ********************************
+!***********************************************************
+
+  Version,8.6;
+
+  Building,
+    Piping System Example,   !- Name
+    0.0,                     !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.05,                    !- Loads Convergence Tolerance Value
+    0.05,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    35,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,1;
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+  RunPeriod,
+    Annual Run,              !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  SimulationControl,
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
+
+!***********************************************************
+!****** LOCATION SPECIFIC OBJECTS **************************
+!***********************************************************
+
+  Site:Location,
+    Denver Centennial CO USA WMO=724666,  !- Name
+    39.57,                   !- Latitude {deg}
+    -104.85,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1793.00;                 !- Elevation {m}
+
+  SizingPeriod:DesignDay,
+    Denver Centennial Ann Htg 99.6% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -18.8,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -18.8,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81560.,                  !- Barometric Pressure {Pa}
+    3,                       !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+  SizingPeriod:DesignDay,
+    Denver Centennial Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    32,                      !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    15.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81560.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    0,                       !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+!***********************************************************
+!****** OTHER SCHEDULING ***********************************
+!***********************************************************
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -100,                    !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  Schedule:Compact,
+    LoadSchedule,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 04/30,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,2000,       !- Field 3
+    Through: 09/30,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,-3000,      !- Field 7
+    Through: 12/31,          !- Field 9
+    For: AllDays,            !- Field 10
+    Until: 24:00,2000;       !- Field 11
+
+  Schedule:Compact,
+    FlowFracSchedule,        !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1;          !- Field 3
+
+  Schedule:Compact,
+    AlwaysOnSchedule,        !- Name
+    On/Off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1;          !- Field 3
+
+!***********************************************************
+!****** FOUNDATION HEAT EXCHANGER **************************
+!***********************************************************
+
+  PipingSystem:Underground:Domain,
+    My Piping System,        !- Name
+    4,                       !- Xmax {m}
+    2.5,                     !- Ymax {m}
+    75,                      !- Zmax {m}
+    2,                       !- X-Direction Mesh Density Parameter
+    Uniform,                 !- X-Direction Mesh Type
+    ,                        !- X-Direction Geometric Coefficient
+    2,                       !- Y-Direction Mesh Density Parameter
+    Uniform,                 !- Y-Direction Mesh Type
+    ,                        !- Y-Direction Geometric Coefficient
+    6,                       !- Z-Direction Mesh Density Parameter
+    Uniform,                 !- Z-Direction Mesh Type
+    ,                        !- Z-Direction Geometric Coefficient
+    1.08,                    !- Soil Thermal Conductivity {W/m-K}
+    962,                     !- Soil Density {kg/m3}
+    2576,                    !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    Site:GroundTemperature:Undisturbed:FiniteDifference,  !- Undisturbed Ground Temperature Model Type
+    FDTemps,                 !- Undisturbed Ground Temperature Model Name
+    No,                      !- This Domain Includes Basement Surface Interaction
+    ,                        !- Width of Basement Floor in Ground Domain {m}
+    ,                        !- Depth of Basement Wall In Ground Domain {m}
+    ,                        !- Shift Pipe X Coordinates By Basement Width
+    ,                        !- Name of Basement Wall Boundary Condition Model
+    ,                        !- Name of Basement Floor Boundary Condition Model
+    0.005,                   !- Convergence Criterion for the Outer Cartesian Domain Iteration Loop {deltaC}
+    100,                     !- Maximum Iterations in the Outer Cartesian Domain Iteration Loop
+    0.408,                   !- Evapotranspiration Ground Cover Parameter
+    1,                       !- Number of Pipe Circuits Entered for this Domain
+    My Pipe Circuit;         !- Pipe Circuit 1
+
+  Site:GroundTemperature:Undisturbed:FiniteDifference,
+    FDTemps,                 !- Name
+    1.08,                    !- Soil Thermal Conductivity {W/m-K}
+    962,                     !- Soil Density {kg/m3}
+    2576,                    !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    0.4;                     !- Evapotranspiration Ground Cover Parameter {dimensionless}
+
+  PipingSystem:Underground:PipeCircuit,
+    My Pipe Circuit,         !- Name
+    0.3895,                  !- Pipe Thermal Conductivity {W/m-K}
+    641,                     !- Pipe Density {kg/m3}
+    2405,                    !- Pipe Specific Heat {J/kg-K}
+    0.016,                   !- Pipe Inner Diameter {m}
+    0.02667,                 !- Pipe Outer Diameter {m}
+    0.004,                   !- Design Flow Rate {m3/s}
+    Plant Supply Intermediate Node,  !- Circuit Inlet Node
+    Plant Supply Outlet Node,!- Circuit Outlet Node
+    0.001,                   !- Convergence Criterion for the Inner Radial Iteration Loop {deltaC}
+    100,                     !- Maximum Iterations in the Inner Radial Iteration Loop
+    2,                       !- Number of Soil Nodes in the Inner Radial Near Pipe Mesh Region
+    0.03,                    !- Radial Thickness of Inner Radial Near Pipe Mesh Region
+    2,                       !- Number of Pipe Segments Entered for this Pipe Circuit
+    Segment 1,               !- Pipe Segment 1
+    Segment 2;               !- Pipe Segment 2
+
+  PipingSystem:Underground:PipeSegment,
+    Segment 1,               !- Name
+    1.95,                    !- X Position {m}
+    1.25,                    !- Y Position {m}
+    IncreasingZ;             !- Flow Direction
+
+  PipingSystem:Underground:PipeSegment,
+    Segment 2,               !- Name
+    2.05,                    !- X Position {m}
+    1.25,                    !- Y Position {m}
+    DecreasingZ;             !- Flow Direction
+
+!***********************************************************
+!****** Plant LOOP *************************************
+!***********************************************************
+
+  PlantLoop,
+    Plant Loop,              !- Name
+    UserDefinedFluidType,    !- Fluid Type
+    PropyleneGlycol70Percent,!- User Defined Fluid Type
+    Loop Operation,          !- Plant Equipment Operation Scheme Name
+    Plant Supply Outlet Node,!- Loop Temperature Setpoint Node Name
+    80,                      !- Maximum Loop Temperature {C}
+    -30,                     !- Minimum Loop Temperature {C}
+    0.004,                   !- Maximum Loop Flow Rate {m3/s}
+    0,                       !- Minimum Loop Flow Rate {m3/s}
+    autocalculate,           !- Plant Loop Volume {m3}
+    Plant Supply Inlet Node, !- Plant Side Inlet Node Name
+    Plant Supply Outlet Node,!- Plant Side Outlet Node Name
+    Plant Supply Side Branches,  !- Plant Side Branch List Name
+    ,                        !- Plant Side Connector List Name
+    Plant Demand Inlet Node, !- Demand Side Inlet Node Name
+    Plant Demand Outlet Node,!- Demand Side Outlet Node Name
+    Plant Demand Side Branches,  !- Demand Side Branch List Name
+    ,                        !- Demand Side Connector List Name
+    SequentialLoad;          !- Load Distribution Scheme
+
+  SetpointManager:Scheduled,
+    Main Loop Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    Main Loop Temp Sch,      !- Schedule Name
+    Main Loop Setpoint Node List;  !- Setpoint Node or NodeList Name
+
+  Schedule:Compact,
+    Main Loop Temp Sch,      !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,30.0;       !- Field 3
+
+  NodeList,
+    Main Loop Setpoint Node List,  !- Name
+    Plant Supply Outlet Node;!- Node 1 Name
+
+  BranchList,
+    Plant Supply Side Branches,  !- Name
+    Plant Supply Branch;     !- Branch 1 Name
+
+  Branch,
+    Plant Supply Branch,     !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:VariableSpeed,      !- Component 1 Object Type
+    Cond Circ Pump,          !- Component 1 Name
+    Plant Supply Inlet Node, !- Component 1 Inlet Node Name
+    Plant Supply Intermediate Node,  !- Component 1 Outlet Node Name
+    PipingSystem:Underground:PipeCircuit,  !- Component 2 Object Type
+    My Pipe Circuit,         !- Component 2 Name
+    Plant Supply Intermediate Node,  !- Component 2 Inlet Node Name
+    Plant Supply Outlet Node;!- Component 2 Outlet Node Name
+
+  BranchList,
+    Plant Demand Side Branches,  !- Name
+    Plant Demand Branch;     !- Branch 1 Name
+
+  Branch,
+    Plant Demand Branch,     !- Name
+    ,                        !- Pressure Drop Curve Name
+    LoadProfile:Plant,       !- Component 1 Object Type
+    Load Profile,            !- Component 1 Name
+    Plant Demand Inlet Node, !- Component 1 Inlet Node Name
+    Plant Demand Outlet Node;!- Component 1 Outlet Node Name
+
+  LoadProfile:Plant,
+    Load Profile,            !- Name
+    Plant Demand Inlet Node, !- Inlet Node Name
+    Plant Demand Outlet Node,!- Outlet Node Name
+    LoadSchedule,            !- Load Schedule Name
+    0.004,                   !- Peak Flow Rate {m3/s}
+    FlowFracSchedule;        !- Flow Rate Fraction Schedule Name
+
+  PlantEquipmentOperationSchemes,
+    Loop Operation,          !- Name
+    PlantEquipmentOperation:Uncontrolled,  !- Control Scheme 1 Object Type
+    Year Round Operation,    !- Control Scheme 1 Name
+    AlwaysOnSchedule;        !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:Uncontrolled,
+    Year Round Operation,    !- Name
+    HX Equipment;            !- Equipment List Name
+
+  PlantEquipmentList,
+    HX Equipment,            !- Name
+    PipingSystem:Underground:PipeCircuit,  !- Equipment 1 Object Type
+    My Pipe Circuit;         !- Equipment 1 Name
+
+  Pump:VariableSpeed,
+    Cond Circ Pump,          !- Name
+    Plant Supply Inlet Node, !- Inlet Node Name
+    Plant Supply Intermediate Node,  !- Outlet Node Name
+    .004,                    !- Design Maximum Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    25,                      !- Design Power Consumption {W}
+    .87,                     !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    0,                       !- Coefficient 1 of the Part Load Performance Curve
+    1,                       !- Coefficient 2 of the Part Load Performance Curve
+    0,                       !- Coefficient 3 of the Part Load Performance Curve
+    0,                       !- Coefficient 4 of the Part Load Performance Curve
+    0,                       !- Design Minimum Flow Rate {m3/s}
+    INTERMITTENT;            !- Pump Control Type
+
+!***********************************************************
+!****** OUTPUT CONTROLS ************************************
+!***********************************************************
+
+  Output:VariableDictionary,IDF;
+
+  Output:Variable,*,System Node Temperature,Hourly;
+
+  Output:Variable,*,Pump Mass Flow Rate,hourly;
+
+  Output:Variable,*,Pipe Segment Inlet Temperature,Hourly;
+
+  Output:Variable,*,Pipe Segment Outlet Temperature,Hourly;
+
+  Output:Variable,*,Pipe Circuit Mass Flow Rate,Hourly;
+
+  Output:Variable,*,Pipe Circuit Inlet Temperature,Hourly;
+
+  Output:Variable,*,Pipe Circuit Outlet Temperature,Hourly;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+!***********************************************************
+!****** CUSTOM FLUID PROPS *********************************
+!***********************************************************
+
+  FluidProperties:Name,
+    PropyleneGlycol,         !- Fluid Name
+    GLYCOL;                  !- Fluid Type
+
+  FluidProperties:GlycolConcentration,
+    PropyleneGlycol70Percent,!- Name
+    PropyleneGlycol,         !- Glycol Type
+    ,                        !- User Defined Glycol Name
+    0.7;                     !- Glycol Concentration
+

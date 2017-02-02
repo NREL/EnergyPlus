@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef ThermalComfort_hh_INCLUDED
 #define ThermalComfort_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -117,7 +163,7 @@ namespace ThermalComfort {
 	extern Real64 TotalAnyZoneNotMetHeatingOccupied;
 	extern Real64 TotalAnyZoneNotMetCoolingOccupied;
 	extern Real64 TotalAnyZoneNotMetOccupied;
-	extern FArray1D< Real64 > ZoneOccHrs;
+	extern Array1D< Real64 > ZoneOccHrs;
 
 	// Subroutine Specifications for the Thermal Comfort module
 
@@ -171,51 +217,6 @@ namespace ThermalComfort {
 			CEN15251RunningMeanOutdoorTemp( 0.0 )
 		{}
 
-		// Member Constructor
-		ThermalComfortDataType(
-			Real64 const FangerPMV,
-			Real64 const FangerPPD,
-			Real64 const CloSurfTemp, // clothing surface temp from iteration in FANGER calcs
-			Real64 const PiercePMVET,
-			Real64 const PiercePMVSET,
-			Real64 const PierceDISC,
-			Real64 const PierceTSENS,
-			Real64 const KsuTSV,
-			Real64 const ThermalComfortMRT,
-			Real64 const ThermalComfortOpTemp,
-			Real64 const ClothingValue,
-			int const ThermalComfortAdaptiveASH5590,
-			int const ThermalComfortAdaptiveASH5580,
-			int const ThermalComfortAdaptiveCEN15251CatI,
-			int const ThermalComfortAdaptiveCEN15251CatII,
-			int const ThermalComfortAdaptiveCEN15251CatIII,
-			Real64 const TComfASH55,
-			Real64 const TComfCEN15251,
-			Real64 const ASHRAE55RunningMeanOutdoorTemp,
-			Real64 const CEN15251RunningMeanOutdoorTemp
-		) :
-			FangerPMV( FangerPMV ),
-			FangerPPD( FangerPPD ),
-			CloSurfTemp( CloSurfTemp ),
-			PiercePMVET( PiercePMVET ),
-			PiercePMVSET( PiercePMVSET ),
-			PierceDISC( PierceDISC ),
-			PierceTSENS( PierceTSENS ),
-			KsuTSV( KsuTSV ),
-			ThermalComfortMRT( ThermalComfortMRT ),
-			ThermalComfortOpTemp( ThermalComfortOpTemp ),
-			ClothingValue( ClothingValue ),
-			ThermalComfortAdaptiveASH5590( ThermalComfortAdaptiveASH5590 ),
-			ThermalComfortAdaptiveASH5580( ThermalComfortAdaptiveASH5580 ),
-			ThermalComfortAdaptiveCEN15251CatI( ThermalComfortAdaptiveCEN15251CatI ),
-			ThermalComfortAdaptiveCEN15251CatII( ThermalComfortAdaptiveCEN15251CatII ),
-			ThermalComfortAdaptiveCEN15251CatIII( ThermalComfortAdaptiveCEN15251CatIII ),
-			TComfASH55( TComfASH55 ),
-			TComfCEN15251( TComfCEN15251 ),
-			ASHRAE55RunningMeanOutdoorTemp( ASHRAE55RunningMeanOutdoorTemp ),
-			CEN15251RunningMeanOutdoorTemp( CEN15251RunningMeanOutdoorTemp )
-		{}
-
 	};
 
 	struct ThermalComfortInASH55Type
@@ -251,31 +252,6 @@ namespace ThermalComfort {
 			Enable55Warning( false )
 		{}
 
-		// Member Constructor
-		ThermalComfortInASH55Type(
-			Real64 const timeNotSummer, // time when not in summer comfort range based on ASHRAE 55 simplified
-			Real64 const timeNotWinter, // time when not in winter comfort range based on ASHRAE 55 simplified
-			Real64 const timeNotEither, // time when  not in summer or winter comfort range based on ASHRAE 55 simplified
-			Real64 const totalTimeNotSummer, // sum for simulation for summer
-			Real64 const totalTimeNotWinter, // sum for simulation for winter
-			Real64 const totalTimeNotEither, // sum for simulation for either
-			bool const ZoneIsOccupied, // flag if zone has people
-			int const warningIndex, // variable to store pointer to the recurring warning
-			int const warningIndex2, // variable to store pointer to the recurring warning
-			bool const Enable55Warning // flag if the warning should be able to be shown if appropriate
-		) :
-			timeNotSummer( timeNotSummer ),
-			timeNotWinter( timeNotWinter ),
-			timeNotEither( timeNotEither ),
-			totalTimeNotSummer( totalTimeNotSummer ),
-			totalTimeNotWinter( totalTimeNotWinter ),
-			totalTimeNotEither( totalTimeNotEither ),
-			ZoneIsOccupied( ZoneIsOccupied ),
-			warningIndex( warningIndex ),
-			warningIndex2( warningIndex2 ),
-			Enable55Warning( Enable55Warning )
-		{}
-
 	};
 
 	struct ThermalComfortSetPointType
@@ -302,36 +278,15 @@ namespace ThermalComfort {
 			totalNotMetCoolingOccupied( 0.0 )
 		{}
 
-		// Member Constructor
-		ThermalComfortSetPointType(
-			Real64 const notMetHeating,
-			Real64 const notMetCooling,
-			Real64 const notMetHeatingOccupied,
-			Real64 const notMetCoolingOccupied,
-			Real64 const totalNotMetHeating,
-			Real64 const totalNotMetCooling,
-			Real64 const totalNotMetHeatingOccupied,
-			Real64 const totalNotMetCoolingOccupied
-		) :
-			notMetHeating( notMetHeating ),
-			notMetCooling( notMetCooling ),
-			notMetHeatingOccupied( notMetHeatingOccupied ),
-			notMetCoolingOccupied( notMetCoolingOccupied ),
-			totalNotMetHeating( totalNotMetHeating ),
-			totalNotMetCooling( totalNotMetCooling ),
-			totalNotMetHeatingOccupied( totalNotMetHeatingOccupied ),
-			totalNotMetCoolingOccupied( totalNotMetCoolingOccupied )
-		{}
-
 	};
 
 	struct AngleFactorData
 	{
 		// Members
-		FArray1D< Real64 > AngleFactor; // Angle factor of each surface
+		Array1D< Real64 > AngleFactor; // Angle factor of each surface
 		std::string Name; // Angle factor list name
-		FArray1D_string SurfaceName; // Names of the Surfces
-		FArray1D_int SurfacePtr; // ALLOCATABLE to the names of the Surfces
+		Array1D_string SurfaceName; // Names of the Surfces
+		Array1D_int SurfacePtr; // ALLOCATABLE to the names of the Surfces
 		int TotAngleFacSurfaces; // Total number of surfaces
 		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
@@ -342,34 +297,18 @@ namespace ThermalComfort {
 			ZonePtr( 0 )
 		{}
 
-		// Member Constructor
-		AngleFactorData(
-			FArray1< Real64 > const & AngleFactor, // Angle factor of each surface
-			std::string const & Name, // Angle factor list name
-			FArray1_string const & SurfaceName, // Names of the Surfces
-			FArray1_int const & SurfacePtr, // ALLOCATABLE to the names of the Surfces
-			int const TotAngleFacSurfaces, // Total number of surfaces
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr // Point to this zone in the Zone derived type
-		) :
-			AngleFactor( AngleFactor ),
-			Name( Name ),
-			SurfaceName( SurfaceName ),
-			SurfacePtr( SurfacePtr ),
-			TotAngleFacSurfaces( TotAngleFacSurfaces ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ThermalComfortInASH55Type > ThermalComfortInASH55;
-	extern FArray1D< ThermalComfortSetPointType > ThermalComfortSetPoint;
-	extern FArray1D< ThermalComfortDataType > ThermalComfortData;
-	extern FArray1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
+	extern Array1D< ThermalComfortInASH55Type > ThermalComfortInASH55;
+	extern Array1D< ThermalComfortSetPointType > ThermalComfortSetPoint;
+	extern Array1D< ThermalComfortDataType > ThermalComfortData;
+	extern Array1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	ManageThermalComfort( bool const InitializeOnly ); // when called from ZTPC and calculations aren't needed
@@ -393,8 +332,8 @@ namespace ThermalComfort {
 	void
 	DERIV(
 		int & TempIndiceNum, // Number of temperature indices  unused1208
-		FArray1A< Real64 > Temp, // Temperature unused1208
-		FArray1A< Real64 > TempChange // Change of temperature
+		Array1A< Real64 > Temp, // Temperature unused1208
+		Array1A< Real64 > TempChange // Change of temperature
 	);
 
 	void
@@ -402,9 +341,9 @@ namespace ThermalComfort {
 		int & NEQ,
 		Real64 & H,
 		Real64 & X,
-		FArray1A< Real64 > Y,
-		FArray1A< Real64 > DY,
-		FArray1A< Real64 > C
+		Array1A< Real64 > Y,
+		Array1A< Real64 > DY,
+		Array1A< Real64 > C
 	);
 
 	void
@@ -423,7 +362,13 @@ namespace ThermalComfort {
 	CalcThermalComfortSimpleASH55();
 
 	void
+	ResetThermalComfortSimpleASH55();
+
+	void
 	CalcIfSetPointMet();
+
+	void
+	ResetSetPointMet();
 
 	void
 	CalcThermalComfortAdaptiveASH55(
@@ -441,29 +386,6 @@ namespace ThermalComfort {
 
 	void
 	DynamicClothingModel();
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ThermalComfort
 

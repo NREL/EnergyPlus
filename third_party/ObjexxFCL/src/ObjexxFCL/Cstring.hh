@@ -5,13 +5,16 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -50,7 +53,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Cstring() :
 	 str_( new char[ 1 ] )
 	{
@@ -58,15 +60,20 @@ public: // Creation
 	}
 
 	// Copy Constructor
-	inline
 	Cstring( Cstring const & s ) :
 	 str_( new char[ std::strlen( s.str_ ) + 1 ] )
 	{
 		std::memcpy( str_, s.str_, std::strlen( s.str_ ) + 1 );
 	}
 
+	// Move Constructor
+	Cstring( Cstring && s ) NOEXCEPT :
+	 str_( s.str_ )
+	{
+		s.str_ = nullptr;
+	}
+
 	// C string Constructor: Implicit Conversion
-	inline
 	Cstring( c_cstring const s ) :
 	 str_( new char[ std::strlen( s ) + 1 ] )
 	{
@@ -74,7 +81,6 @@ public: // Creation
 	}
 
 	// std::string Constructor
-	inline
 	explicit
 	Cstring( std::string const & s ) :
 	 str_( new char[ s.length() + 1 ] )
@@ -85,7 +91,6 @@ public: // Creation
 	}
 
 	// Cstring + Length Constructor
-	inline
 	Cstring(
 	 Cstring const & s,
 	 size_type const len
@@ -98,7 +103,6 @@ public: // Creation
 	}
 
 	// C string + Length Constructor
-	inline
 	Cstring(
 	 c_cstring const s,
 	 size_type const len
@@ -111,7 +115,6 @@ public: // Creation
 	}
 
 	// std::string + Length Constructor
-	inline
 	Cstring(
 	 std::string const & s,
 	 size_type const len
@@ -124,7 +127,6 @@ public: // Creation
 	}
 
 	// char Constructor
-	inline
 	explicit
 	Cstring( char const c ) :
 	 str_( new char[ 2 ] )
@@ -134,7 +136,6 @@ public: // Creation
 	}
 
 	// Length Constructor
-	inline
 	explicit
 	Cstring( size_type const len ) :
 	 str_( new char[ len + 1 ] )
@@ -144,7 +145,6 @@ public: // Creation
 	}
 
 	// Length Constructor
-	inline
 	explicit
 	Cstring( int const len ) :
 	 str_( new char[ len + 1 ] )
@@ -154,7 +154,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~Cstring()
 	{
@@ -164,14 +163,12 @@ public: // Creation
 public: // Conversion
 
 	// C string Conversion
-	inline
 	operator c_cstring() const
 	{
 		return str_;
 	}
 
 	// C string Conversion
-	inline
 	operator cstring &()
 	{
 		return str_;
@@ -180,7 +177,6 @@ public: // Conversion
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Cstring &
 	operator =( Cstring const & s )
 	{
@@ -192,8 +188,18 @@ public: // Assignment
 		return *this;
 	}
 
+	// Move Assignment
+	Cstring &
+	operator =( Cstring && s ) NOEXCEPT
+	{
+		assert( this != &s );
+		delete[] str_;
+		str_ = s.str_;
+		s.str_ = nullptr;
+		return *this;
+	}
+
 	// cstring Assignment
-	inline
 	Cstring &
 	operator =( c_cstring const s )
 	{
@@ -204,7 +210,6 @@ public: // Assignment
 	}
 
 	// std::string Assignment
-	inline
 	Cstring &
 	operator =( std::string const & s )
 	{
@@ -216,7 +221,6 @@ public: // Assignment
 	}
 
 	// char Assignment
-	inline
 	Cstring &
 	operator =( char const c )
 	{
@@ -227,7 +231,6 @@ public: // Assignment
 	}
 
 	// Cstring Append
-	inline
 	Cstring &
 	operator +=( Cstring const & s )
 	{
@@ -236,7 +239,6 @@ public: // Assignment
 	}
 
 	// cstring Append
-	inline
 	Cstring &
 	operator +=( c_cstring const s )
 	{
@@ -245,7 +247,6 @@ public: // Assignment
 	}
 
 	// std::string Append
-	inline
 	Cstring &
 	operator +=( std::string const & s )
 	{
@@ -254,7 +255,6 @@ public: // Assignment
 	}
 
 	// char Append
-	inline
 	Cstring &
 	operator +=( char const c )
 	{
@@ -265,7 +265,6 @@ public: // Assignment
 public: // Predicate
 
 	// Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -273,7 +272,6 @@ public: // Predicate
 	}
 
 	// Blank?
-	inline
 	bool
 	is_blank() const
 	{
@@ -281,7 +279,6 @@ public: // Predicate
 	}
 
 	// Not blank?
-	inline
 	bool
 	not_blank() const
 	{
@@ -298,7 +295,7 @@ public: // Predicate
 
 	// Has any Character of a std::string?
 	bool
-	has_any_of( std::string const s ) const;
+	has_any_of( std::string const & s ) const;
 
 	// Has a Character?
 	bool
@@ -311,7 +308,6 @@ public: // Predicate
 public: // Inspector
 
 	// Length
-	inline
 	size_type
 	length() const
 	{
@@ -319,7 +315,6 @@ public: // Inspector
 	}
 
 	// Length
-	inline
 	size_type
 	len() const
 	{
@@ -327,7 +322,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -369,7 +363,6 @@ public: // Modifier
 	right_justify();
 
 	// Trim Trailing Space
-	inline
 	Cstring &
 	trim()
 	{
@@ -378,7 +371,6 @@ public: // Modifier
 	}
 
 	// Trim Trailing Whitespace
-	inline
 	Cstring &
 	trim_whitespace()
 	{
@@ -395,7 +387,6 @@ public: // Modifier
 	compress();
 
 	// swap( Cstring )
-	inline
 	void
 	swap( Cstring & s )
 	{
@@ -403,7 +394,6 @@ public: // Modifier
 	}
 
 	// swap( Cstring, Cstring )
-	inline
 	friend
 	void
 	swap( Cstring & s, Cstring & t )
@@ -414,7 +404,6 @@ public: // Modifier
 public: // Subscript
 
 	// Cstring[ i ] const
-	inline
 	char
 	operator []( size_type const i ) const
 	{
@@ -423,7 +412,6 @@ public: // Subscript
 	}
 
 	// Cstring[ i ]
-	inline
 	char &
 	operator []( size_type const i )
 	{
@@ -433,7 +421,6 @@ public: // Subscript
 
 	// Cstring[ i ] const
 	//  Overload prevents ambiguity with built-in operator[] with int arguments
-	inline
 	char
 	operator []( int const i ) const
 	{
@@ -444,7 +431,6 @@ public: // Subscript
 
 	// Cstring[ i ]
 	//  Overload prevents ambiguity with built-in operator[] with int arguments
-	inline
 	char &
 	operator []( int const i )
 	{
@@ -456,7 +442,6 @@ public: // Subscript
 public: // Concatenation
 
 	// Cstring + Cstring
-	inline
 	friend
 	Cstring
 	operator +( Cstring const & s, Cstring const & t )
@@ -470,7 +455,6 @@ public: // Concatenation
 	}
 
 	// Cstring + cstring
-	inline
 	friend
 	Cstring
 	operator +( Cstring const & s, c_cstring const t )
@@ -484,7 +468,6 @@ public: // Concatenation
 	}
 
 	// cstring + Cstring
-	inline
 	friend
 	Cstring
 	operator +( c_cstring const s, Cstring const & t )
@@ -498,7 +481,6 @@ public: // Concatenation
 	}
 
 	// Cstring + std::string
-	inline
 	friend
 	Cstring
 	operator +( Cstring const & s, std::string const & t )
@@ -512,7 +494,6 @@ public: // Concatenation
 	}
 
 	// Cstring + char
-	inline
 	friend
 	Cstring
 	operator +( Cstring const & s, char const c )
@@ -525,7 +506,6 @@ public: // Concatenation
 	}
 
 	// char + Cstring
-	inline
 	friend
 	Cstring
 	operator +( char const c, Cstring const & t )
@@ -540,7 +520,6 @@ public: // Concatenation
 public: // Generator
 
 	// Lowercased Copy
-	inline
 	Cstring
 	lowercased() const
 	{
@@ -548,7 +527,6 @@ public: // Generator
 	}
 
 	// Uppercased Copy
-	inline
 	Cstring
 	uppercased() const
 	{
@@ -556,7 +534,6 @@ public: // Generator
 	}
 
 	// Left-Justified Copy
-	inline
 	Cstring
 	left_justified() const
 	{
@@ -564,7 +541,6 @@ public: // Generator
 	}
 
 	// Right-Justified Copy
-	inline
 	Cstring
 	right_justified() const
 	{
@@ -572,7 +548,6 @@ public: // Generator
 	}
 
 	// Space-Trimmed Copy
-	inline
 	Cstring
 	trimmed() const
 	{
@@ -580,7 +555,6 @@ public: // Generator
 	}
 
 	// Whitespace-Trimmed Copy
-	inline
 	Cstring
 	trimmed_whitespace() const
 	{
@@ -588,7 +562,6 @@ public: // Generator
 	}
 
 	// Centered Copy
-	inline
 	Cstring
 	centered() const
 	{
@@ -596,7 +569,6 @@ public: // Generator
 	}
 
 	// Compressed Copy
-	inline
 	Cstring
 	compressed() const
 	{
@@ -606,7 +578,6 @@ public: // Generator
 public: // Comparison
 
 	// Cstring == Cstring
-	inline
 	friend
 	bool
 	operator ==( Cstring const & s, Cstring const & t )
@@ -615,7 +586,6 @@ public: // Comparison
 	}
 
 	// Cstring != Cstring
-	inline
 	friend
 	bool
 	operator !=( Cstring const & s, Cstring const & t )
@@ -624,7 +594,6 @@ public: // Comparison
 	}
 
 	// Cstring == cstring
-	inline
 	friend
 	bool
 	operator ==( Cstring const & s, c_cstring const t )
@@ -633,7 +602,6 @@ public: // Comparison
 	}
 
 	// cstring == Cstring
-	inline
 	friend
 	bool
 	operator ==( c_cstring const t, Cstring const & s )
@@ -642,7 +610,6 @@ public: // Comparison
 	}
 
 	// Cstring != cstring
-	inline
 	friend
 	bool
 	operator !=( Cstring const & s, c_cstring const t )
@@ -651,7 +618,6 @@ public: // Comparison
 	}
 
 	// cstring != Cstring
-	inline
 	friend
 	bool
 	operator !=( c_cstring const t, Cstring const & s )
@@ -660,7 +626,6 @@ public: // Comparison
 	}
 
 	// Cstring == std::string
-	inline
 	friend
 	bool
 	operator ==( Cstring const & s, std::string const & t )
@@ -669,7 +634,6 @@ public: // Comparison
 	}
 
 	// std::string == Cstring
-	inline
 	friend
 	bool
 	operator ==( std::string const & t, Cstring const & s )
@@ -678,7 +642,6 @@ public: // Comparison
 	}
 
 	// Cstring != std::string
-	inline
 	friend
 	bool
 	operator !=( Cstring const & s, std::string const & t )
@@ -687,7 +650,6 @@ public: // Comparison
 	}
 
 	// std::string != Cstring
-	inline
 	friend
 	bool
 	operator !=( std::string const & t, Cstring const & s )
@@ -696,7 +658,6 @@ public: // Comparison
 	}
 
 	// Cstring == char
-	inline
 	friend
 	bool
 	operator ==( Cstring const & s, char const c )
@@ -705,7 +666,6 @@ public: // Comparison
 	}
 
 	// char == Cstring
-	inline
 	friend
 	bool
 	operator ==( char const c, Cstring const & s )
@@ -714,7 +674,6 @@ public: // Comparison
 	}
 
 	// Cstring != char
-	inline
 	friend
 	bool
 	operator !=( Cstring const & s, char const c )
@@ -723,7 +682,6 @@ public: // Comparison
 	}
 
 	// char != Cstring
-	inline
 	friend
 	bool
 	operator !=( char const c, Cstring const & s )
@@ -768,19 +726,19 @@ public: // Comparison
 
 public: // I/O
 
-	// Output to Stream
-	friend
-	std::ostream &
-	operator <<( std::ostream & stream, Cstring const & s );
-
-	// Input from Stream
+	// Stream >> Cstring
 	friend
 	std::istream &
 	operator >>( std::istream & stream, Cstring & s );
 
+	// Stream << Cstring
+	friend
+	std::ostream &
+	operator <<( std::ostream & stream, Cstring const & s );
+
 public: // Data
 
-	static size_type const npos = static_cast< size_type >( -1 ); // Unbounded "size"
+	static size_type const npos; // Unbounded "size"
 
 private: // Data
 
@@ -900,13 +858,13 @@ equali( Cstring const & s, char const c );
 bool
 equali( char const c, Cstring const & s );
 
-// Output to Stream
-std::ostream &
-operator <<( std::ostream & stream, Cstring const & s );
-
-// Input from Stream
+// Stream >> Cstring
 std::istream &
 operator >>( std::istream & stream, Cstring & s );
+
+// Stream << Cstring
+std::ostream &
+operator <<( std::ostream & stream, Cstring const & s );
 
 } // ObjexxFCL
 

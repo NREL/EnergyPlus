@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -85,9 +131,9 @@ namespace SteamCoils {
 	// MODULE VARIABLE DECLARATIONS:
 	int SteamIndex( 0 );
 	int NumSteamCoils( 0 ); // The Number of SteamCoils found in the Input
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CoilWarningOnceFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CoilWarningOnceFlag;
+	Array1D_bool CheckEquipName;
 	bool GetSteamCoilsInputFlag( true ); // Flag set to make sure you get input once
 
 	// Subroutine Specifications for the Module
@@ -106,7 +152,7 @@ namespace SteamCoils {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< SteamCoilEquipConditions > SteamCoil;
+	Array1D< SteamCoilEquipConditions > SteamCoil;
 
 	// MODULE SUBROUTINES:
 
@@ -169,7 +215,7 @@ namespace SteamCoils {
 
 		// Find the correct SteamCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, SteamCoil.Name(), NumSteamCoils );
+			CoilNum = FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );
 			}
@@ -265,12 +311,12 @@ namespace SteamCoils {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 		bool errFlag;
@@ -296,10 +342,10 @@ namespace SteamCoils {
 
 			CoilNum = StmHeatNum;
 
-			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SteamCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SteamCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -376,6 +422,7 @@ namespace SteamCoils {
 		for ( CoilNum = 1; CoilNum <= NumStmHeat; ++CoilNum ) {
 
 			//Setup the Simple Heating Coil reporting variables
+			//CurrentModuleObject = "Coil:Heating:Steam"
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Heating Rate [W]", SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate [Kg/s]", SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
@@ -448,8 +495,8 @@ namespace SteamCoils {
 		Real64 SteamDensity;
 		Real64 StartEnthSteam;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) {
@@ -611,6 +658,7 @@ namespace SteamCoils {
 		using FluidProperties::GetSatDensityRefrig;
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -646,6 +694,12 @@ namespace SteamCoils {
 		Real64 CpAirStd; // specific heat of air at std conditions
 		Real64 CpWater; // specific heat of water (condensed steam)
 
+		std::string CompName; // component name
+		std::string	CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		bool bPRINT = false; // TRUE if sizing is reported to output (eio)
+		Real64 TempSize; // autosized value
+
 		ErrorsFound = false;
 		PltSizSteamNum = 0;
 		PltSizNum = 0;
@@ -671,6 +725,28 @@ namespace SteamCoils {
 				// If the coil water volume flow rate needs autosizing, then do it
 				if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 					CheckSysSizing( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name );
+
+					if ( SteamCoil( CoilNum ).DesiccantRegenerationCoil ) {
+
+						DataDesicRegCoil = true;
+						DataDesicDehumNum = SteamCoil( CoilNum ).DesiccantDehumNum;
+						CompType = SteamCoil( CoilNum ).SteamCoilType;
+						CompName = SteamCoil( CoilNum ).Name;
+						SizingString = "";
+						bPRINT = false;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+						DataDesInletAirTemp = TempSize;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+						DataDesOutletAirTemp = TempSize;
+						if ( CurOASysNum > 0 ) {
+							OASysEqSizing( CurOASysNum ).AirFlow = true;
+							OASysEqSizing( CurOASysNum ).AirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+						}
+						TempSize = AutoSize; // reset back
+					}
+
 					// Set the duct flow rate
 					{ auto const SELECT_CASE_var( CurDuctType );
 					if ( SELECT_CASE_var == Main ) {
@@ -684,6 +760,12 @@ namespace SteamCoils {
 					} else {
 						DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					}}
+					if ( DataDesicRegCoil ) {
+						bPRINT = false;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName );
+						DesVolFlow = TempSize;
+					}
 					DesMassFlow = RhoAirStd * DesVolFlow;
 					// get the outside air fraction
 					if ( FinalSysSizing( CurSysNum ).HeatOAOption == MinOA ) {
@@ -696,10 +778,15 @@ namespace SteamCoils {
 					} else {
 						OutAirFrac = 1.0;
 					}
-					// mixed air temp
-					CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-					// coil load
-					DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+
+					if ( DataDesicRegCoil ) {
+						DesCoilLoad = CpAirStd * DesMassFlow * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+					} else {
+						// mixed air temp
+						CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+						// coil load
+						DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+					}
 					//AUTOSTEAMCOIL
 					if ( DesCoilLoad >= SmallLoad ) {
 						//TempSteamIn=SteamCoil(CoilNum)%InletSteamTemp
@@ -728,6 +815,7 @@ namespace SteamCoils {
 					}
 					ReportSizingOutput( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 				}
+				DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
 				// if this is a zone coil
 			} else if ( CurZoneEqNum > 0 ) {
 				CheckZoneSizing( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name );
@@ -1371,7 +1459,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilType == "COIL:HEATING:STEAM" ) {
-			IndexNum = FindItemInList( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItemInList( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1387,7 +1475,7 @@ namespace SteamCoils {
 
 	void
 	CheckSteamCoilSchedule(
-		std::string const & CompType,
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -1436,7 +1524,7 @@ namespace SteamCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, SteamCoil.Name(), NumSteamCoils );
+			CoilNum = FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );
 			}
@@ -1510,7 +1598,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = 0.0;
@@ -1645,7 +1733,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1709,7 +1797,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1724,7 +1812,7 @@ namespace SteamCoils {
 	GetCoilAirOutletNode(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
-		bool & ErrorsFound // set to true if problem
+		bool & EP_UNUSED( ErrorsFound ) // set to true if problem
 	)
 	{
 
@@ -1774,7 +1862,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1842,7 +1930,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1907,13 +1995,13 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1977,7 +2065,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2042,13 +2130,13 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2113,7 +2201,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				Capacity = SteamCoil( WhichCoil ).OperatingCapacity;
@@ -2187,7 +2275,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			TypeOfCoil = 0;
 		} else {
@@ -2254,7 +2342,7 @@ namespace SteamCoils {
 		WhichCoil = 0;
 		NodeNumber = 0;
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = SteamCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -2329,7 +2417,7 @@ namespace SteamCoils {
 		AvailSchIndex = 0;
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = SteamCoil( WhichCoil ).SchedPtr;
 			}
@@ -2347,31 +2435,47 @@ namespace SteamCoils {
 
 	}
 
+	void
+	SetSteamCoilData(
+		int const CoilNum, // Number of hot water heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function sets data to water Heating Coil using the coil index and arguments passed
+
+		// Using/Aliasing
+		using General::TrimSigDigits;
+
+		if ( GetSteamCoilsInputFlag ) {
+			GetSteamCoilInput();
+			GetSteamCoilsInputFlag = false;
+		}
+
+		if ( CoilNum <= 0 || CoilNum > NumSteamCoils ) {
+			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumSteamCoils ) );
+			ErrorsFound = true;
+			return;
+		}
+
+		if ( present( DesiccantRegenerationCoil ) ) {
+			 SteamCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+		}
+
+		if ( present( DesiccantDehumIndex ) ) {
+			 SteamCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
+		}
+
+	}
 	// End of Utility subroutines for the SteamCoil Module
-
-	// *****************************************************************************
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SteamCoils
 

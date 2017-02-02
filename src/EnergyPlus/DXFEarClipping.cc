@@ -1,9 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -66,7 +111,7 @@ namespace DXFEarClipping {
 	bool
 	InPolygon(
 		Vector const & point,
-		FArray1A< Vector > poly,
+		Array1A< Vector > poly,
 		int const nsides
 	)
 	{
@@ -147,8 +192,8 @@ namespace DXFEarClipping {
 	int
 	Triangulate(
 		int const nsides, // number of sides to polygon
-		FArray1A< Vector > polygon,
-		FArray1D< dTriangle > & outtriangles,
+		Array1A< Vector > polygon,
+		Array1D< dTriangle > & outtriangles,
 		Real64 const surfazimuth, // surface azimuth angle (outward facing normal)
 		Real64 const surftilt, // surface tilt angle
 		std::string const & surfname, // surface name (for error messages)
@@ -203,18 +248,18 @@ namespace DXFEarClipping {
 
 		// Subroutine local variable declarations:
 		bool errFlag;
-		FArray1D_int ears( nsides );
-		FArray1D_int r_angles( nsides );
-		FArray1D< Real64 > rangles( nsides );
-		FArray1D_int c_vertices( nsides );
-		FArray2D_int earvert( 3, nsides );
-		FArray1D_bool removed( nsides );
+		Array1D_int ears( nsides );
+		Array1D_int r_angles( nsides );
+		Array1D< Real64 > rangles( nsides );
+		Array1D_int c_vertices( nsides );
+		Array2D_int earvert( nsides, 3 );
+		Array1D_bool removed( nsides );
 		//unused  type(Vector_2d), dimension(3) :: testtri
 		//unused  type(Vector_2d) :: point
-		FArray1D_int earverts( 3 );
-		FArray1D< Real64 > xvt( nsides );
-		FArray1D< Real64 > yvt( nsides );
-		FArray1D< Real64 > zvt( nsides );
+		Array1D_int earverts( 3 );
+		Array1D< Real64 > xvt( nsides );
+		Array1D< Real64 > yvt( nsides );
+		Array1D< Real64 > zvt( nsides );
 
 		//'General Variables
 		int i;
@@ -237,8 +282,8 @@ namespace DXFEarClipping {
 		static int errcount( 0 );
 
 		// Object Data
-		FArray1D< Vector_2d > vertex( nsides );
-		FArray1D< dTriangle > Triangle( nsides );
+		Array1D< Vector_2d > vertex( nsides );
+		Array1D< dTriangle > Triangle( nsides );
 
 		errFlag = false;
 		//  vertex=polygon
@@ -314,9 +359,9 @@ namespace DXFEarClipping {
 				// remove ear
 				++ncount;
 				removed( mvert ) = true;
-				earvert( 1, ncount ) = svert;
-				earvert( 2, ncount ) = mvert;
-				earvert( 3, ncount ) = evert;
+				earvert( ncount, 1 ) = svert;
+				earvert( ncount, 2 ) = mvert;
+				earvert( ncount, 3 ) = evert;
 				--nvertcur;
 			}
 			if ( nvertcur == 3 ) {
@@ -324,7 +369,7 @@ namespace DXFEarClipping {
 				++ncount;
 				for ( i = 1; i <= nsides; ++i ) {
 					if ( removed( i ) ) continue;
-					earvert( j, ncount ) = i;
+					earvert( ncount, j ) = i;
 					++j;
 				}
 			}
@@ -333,9 +378,9 @@ namespace DXFEarClipping {
 		ntri = ncount;
 
 		for ( i = 1; i <= ntri; ++i ) {
-			Triangle( i ).vv0 = earvert( 1, i );
-			Triangle( i ).vv1 = earvert( 2, i );
-			Triangle( i ).vv2 = earvert( 3, i );
+			Triangle( i ).vv0 = earvert( i, 1 );
+			Triangle( i ).vv1 = earvert( i, 2 );
+			Triangle( i ).vv2 = earvert( i, 3 );
 		}
 
 		outtriangles.allocate( ntri );
@@ -430,7 +475,7 @@ namespace DXFEarClipping {
 	bool
 	polygon_contains_point_2d(
 		int const nsides, // number of sides (vertices)
-		FArray1A< Vector_2d > polygon, // points of polygon
+		Array1A< Vector_2d > polygon, // points of polygon
 		Vector_2d const & point // point to be tested
 	)
 	{
@@ -465,7 +510,6 @@ namespace DXFEarClipping {
 		// Function argument definitions:
 
 		// Function parameter definitions:
-		Real64 const point_tolerance( 0.00001 );
 
 		// Interface block specifications:
 		// na
@@ -502,16 +546,16 @@ namespace DXFEarClipping {
 	void
 	generate_ears(
 		int const nvert, // number of vertices in polygon
-		FArray1A< Vector_2d > vertex,
-		FArray1A_int ears, // number of ears possible (dimensioned to nvert)
+		Array1A< Vector_2d > vertex,
+		Array1A_int ears, // number of ears possible (dimensioned to nvert)
 		int & nears, // number of ears found
-		FArray1A_int r_vertices, // number of reflex vertices (>180) possible
+		Array1A_int r_vertices, // number of reflex vertices (>180) possible
 		int & nrverts, // number of reflex vertices found (>=180)
-		FArray1A_int c_vertices, // number of convex vertices
+		Array1A_int c_vertices, // number of convex vertices
 		int & ncverts, // number of convex vertices found (< 180)
-		FArray1A_bool removed, // array that shows if a vertex has been removed (calling routine)
-		FArray1A_int earvert, // vertex indicators for first ear
-		FArray1A< Real64 > rangles
+		Array1A_bool removed, // array that shows if a vertex has been removed (calling routine)
+		Array1A_int earvert, // vertex indicators for first ear
+		Array1A< Real64 > rangles
 	)
 	{
 
@@ -568,7 +612,7 @@ namespace DXFEarClipping {
 
 		// Object Data
 		Vector_2d point; // structure for point
-		FArray1D< Vector_2d > testtri( 3 ); // structure for triangle
+		Array1D< Vector_2d > testtri( 3 ); // structure for triangle
 
 		// initialize, always recalculate
 		ears = 0;
@@ -658,12 +702,12 @@ namespace DXFEarClipping {
 	void
 	CalcWallCoordinateTransformation(
 		int const nsides,
-		FArray1A< Vector > polygon,
+		Array1A< Vector > polygon,
 		Real64 const surfazimuth,
-		Real64 const surftilt, // unused1208
-		FArray1A< Real64 > xvt,
-		FArray1A< Real64 > yvt,
-		FArray1A< Real64 > zvt
+		Real64 const EP_UNUSED( surftilt ), // unused1208
+		Array1A< Real64 > xvt,
+		Array1A< Real64 > yvt,
+		Array1A< Real64 > zvt
 	)
 	{
 
@@ -728,12 +772,12 @@ namespace DXFEarClipping {
 	void
 	CalcRfFlrCoordinateTransformation(
 		int const nsides,
-		FArray1A< Vector > polygon,
-		Real64 const surfazimuth, // unused1208
+		Array1A< Vector > polygon,
+		Real64 const EP_UNUSED( surfazimuth ), // unused1208
 		Real64 const surftilt,
-		FArray1A< Real64 > xvt,
-		FArray1A< Real64 > yvt,
-		FArray1A< Real64 > zvt
+		Array1A< Real64 > xvt,
+		Array1A< Real64 > yvt,
+		Array1A< Real64 > zvt
 	)
 	{
 
@@ -792,7 +836,7 @@ namespace DXFEarClipping {
 	}
 
 	void
-	reorder( int & nvert ) // unused1208
+	reorder( int & EP_UNUSED( nvert ) ) // unused1208
 	{
 
 		// Locals

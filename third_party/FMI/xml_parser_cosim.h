@@ -19,7 +19,10 @@
 
 // define XML_STATIC before including expat.h
 // to prevent error when linking with libexpatMT.lib
-#define XML_STATIC 
+#ifndef XML_STATIC
+#define XML_STATIC
+#endif
+
 #include "expat.h"
 #include "fmiModelTypes.h"
 #include "stack.h"

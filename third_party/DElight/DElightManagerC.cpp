@@ -133,7 +133,7 @@ void writewndo(const char* instring, string sfpflg)
 /******************************** subroutine delightdaylightcoefficients *******************************/
 /* Calls the DElight daylighting factors/coefficients routine from the DElight DLL. */
 /* Exported subroutine for EnergyPlus preprocessing call to DElight. */
-/* See corresponding Interface Subroutine in DElightManagerF.f90 EnergyPlus module. */
+/* See corresponding Interface Subroutine in DElightManagerF.cc EnergyPlus module. */
 /******************************** subroutine delightdaylightcoefficients *******************************/
 extern "C" DllExport void delightdaylightcoefficients(double dBldgLat, 
                                                       int* piErrorFlag)  // return Error Flag from DElight to EPlus
@@ -260,7 +260,7 @@ return;
 /******************************** subroutine delightelecltgctrl *******************************/
 /* Calls the DElight daylighting interior illuminance and electric lighting control routines from the DElight DLL. */
 /* Exported subroutine for EnergyPlus timestep call to DElight. */
-/* See corresponding Interface Subroutine in DElightManagerF.f90 EnergyPlus module. */
+/* See corresponding Interface Subroutine in DElightManagerF.cc EnergyPlus module. */
 /******************************** subroutine delightelecltgctrl *******************************/
 extern "C" DllExport void delightelecltgctrl(int iNameLength,
                                     char* cZoneName, 

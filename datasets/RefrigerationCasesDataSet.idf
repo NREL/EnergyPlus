@@ -389,9 +389,7 @@
 !  FW Wide Island Display with Solid Walls for Ice Cream,
 !  FW Wide Island Display with Solid Walls for Medium Temperature;
 !Example CaseAndWalkInList object
-
-!  Version,
-!    8.0;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Refrigeration:CaseAndWalkInList,
     NameofCaseList,          !- Name
@@ -10559,7 +10557,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Convertible Island End. Low Profile Multi-Deck,   !- Name
+    Convertible Island End. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10602,7 +10600,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10645,7 +10643,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Convertible Island. Low Profile Multi-Deck,   !- Name
+    Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10688,7 +10686,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10731,7 +10729,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10774,7 +10772,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10817,7 +10815,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10860,7 +10858,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Convertible Island. Low Profile Multi-Deck,   !- Name
+    Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}

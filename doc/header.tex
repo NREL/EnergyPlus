@@ -1,0 +1,85 @@
+\documentclass[12pt,twoside,letterpaper,titlepage]{report}
+
+\usepackage{amssymb,amsmath}
+\usepackage{mathspec}
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\usepackage[margin=1.0in]{geometry}
+% fixltx2e has been merged into LaTeX2e proper
+% see: https://latex-project.org/ltnews/ltnews22.pdf
+% \usepackage{fixltx2e}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\usepackage[table,svgnames]{xcolor}
+\usepackage{framed}
+\usepackage{longtable,booktabs}
+\usepackage{listings}
+\PassOptionsToPackage{hyphens}{url}\usepackage[breaklinks=true]{hyperref}
+
+% Background Color for Note/Admonition Boxes
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+
+% Band the Color of Rows in Tables
+% unfortunately, doesn't seem to work across the board. Turning off for now
+%\rowcolors{1}{white}{lightgray!25!white}
+
+\newenvironment{callout}{\begin{shaded*}\small}{\end{shaded*}}
+\newcommand{\warning}[1]{\small{\textbf{\textcolor[rgb]{0.8,0.2,0.2}{#1}}}}
+
+% Font Settings
+%\setmainfont[]{Calibri}
+%\setmonofont[Mapping=tex-ansi]{Inconsolata}
+%\usepackage{newtxtext,newtxmath}
+
+% The depth of numbering for sections
+\setcounter{secnumdepth}{4}
+
+% Listing Settings
+\lstset{
+  backgroundcolor=\color{BlanchedAlmond!20!white},
+  basicstyle=\ttfamily\scriptsize,
+  breakatwhitespace=false,
+  breaklines=true,
+  frame=bottomline,
+  keepspaces=true,
+}
+
+% Provide better table spacing
+% From https://www.inf.ethz.ch/personal/markusp/teaching/guides/guide-tables.pdf
+\renewcommand{\arraystretch}{1.2} 
+
+\graphicspath{{media/}}
+
+\pagestyle{headings}
+
+% Define custom commands from Pandoc
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Redefine (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% this is a great package for printing units in a standard way, we should move this way
+\usepackage{siunitx}
+
+% some additional macros
+\newcommand{\PB}[1]{\left(#1\right)}
+\newcommand{\RB}[1]{\left[#1\right]}
+\newcommand{\CB}[1]{\left\{#1\right\}}
+
+\author{U.S. Department of Energy}
+\date{September 30, 2016}

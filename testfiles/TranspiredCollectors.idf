@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,8.2;
+  Version,8.6;
 
   Timestep,4;
 
@@ -3208,30 +3208,40 @@
     Direct DX air Loop ZN1,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
 !
 
@@ -3257,28 +3267,23 @@
 
   Branch,
     Air Loop Main Branch ZN1,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN1,              !- Component 1 Name
     Air Loop Inlet Node ZN1, !- Component 1 Inlet Node Name
     Mixed Air Node ZN1,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN1,  !- Component 2 Name
     Mixed Air Node ZN1,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN1,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN1,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN1,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN1,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN1,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN1;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN1,  !- Name
@@ -3383,10 +3388,11 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN1;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN1,   !- Name
     Always_On,               !- Availability Schedule Name
-    0.850000,                !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.850000,                !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN1,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN1,  !- Air Outlet Node Name
@@ -3491,30 +3497,40 @@
     Direct DX air Loop ZN2,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
 !
 
@@ -3540,28 +3556,23 @@
 
   Branch,
     Air Loop Main Branch ZN2,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN2,              !- Component 1 Name
     Air Loop Inlet Node ZN2, !- Component 1 Inlet Node Name
     Mixed Air Node ZN2,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN2,  !- Component 2 Name
     Mixed Air Node ZN2,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN2,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN2,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN2,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN2,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN2,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN2,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN2,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN2;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN2,  !- Name
@@ -3666,10 +3677,11 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN2;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN2,   !- Name
     Always_On,               !- Availability Schedule Name
-    0.850000,                !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.850000,                !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN2,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN2,  !- Air Outlet Node Name
@@ -3774,30 +3786,40 @@
     Direct DX air Loop ZN3,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
 !
 
@@ -3823,28 +3845,23 @@
 
   Branch,
     Air Loop Main Branch ZN3,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN3,              !- Component 1 Name
     Air Loop Inlet Node ZN3, !- Component 1 Inlet Node Name
     Mixed Air Node ZN3,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN3,  !- Component 2 Name
     Mixed Air Node ZN3,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN3,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN3,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN3,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN3,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN3,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN3;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN3,  !- Name
@@ -3949,10 +3966,11 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN3;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN3,   !- Name
     Always_On,               !- Availability Schedule Name
-    0.850000,                !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.850000,                !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN3,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN3,  !- Air Outlet Node Name
@@ -4057,30 +4075,40 @@
     Direct DX air Loop ZN4,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
 !
 
@@ -4106,28 +4134,23 @@
 
   Branch,
     Air Loop Main Branch ZN4,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN4,              !- Component 1 Name
     Air Loop Inlet Node ZN4, !- Component 1 Inlet Node Name
     Mixed Air Node ZN4,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN4,  !- Component 2 Name
     Mixed Air Node ZN4,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN4,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN4,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN4,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN4,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN4,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN4,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN4,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN4;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN4,  !- Name
@@ -4232,10 +4255,11 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN4;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN4,   !- Name
     Always_On,               !- Availability Schedule Name
-    0.850000,                !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.850000,                !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN4,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN4,  !- Air Outlet Node Name
@@ -4340,30 +4364,40 @@
     Direct DX air Loop ZN5,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
 !
 
@@ -4389,28 +4423,23 @@
 
   Branch,
     Air Loop Main Branch ZN5,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN5,              !- Component 1 Name
     Air Loop Inlet Node ZN5, !- Component 1 Inlet Node Name
     Mixed Air Node ZN5,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN5,  !- Component 2 Name
     Mixed Air Node ZN5,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN5,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN5,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN5,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN5,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN5,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN5;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN5,  !- Name
@@ -4515,10 +4544,11 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN5;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN5,   !- Name
     Always_On,               !- Availability Schedule Name
-    0.850000,                !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.850000,                !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN5,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN5,  !- Air Outlet Node Name
@@ -4614,23 +4644,19 @@
 
   Branch,
     Air Loop Main Branch ZN11,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN11,             !- Component 1 Name
     Air Loop Inlet Node ZN11,!- Component 1 Inlet Node Name
     Mixed Air Node ZN11,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
-    Coil:Heating:Gas,        !- Component 2 Object Type
+    Coil:Heating:Fuel,       !- Component 2 Object Type
     Main Heating Coil ZN11,  !- Component 2 Name
     Mixed Air Node ZN11,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN11,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:ConstantVolume,      !- Component 3 Object Type
     Supply Fan ZN11,         !- Component 3 Name
     Heating Coil Air Outlet Node ZN11,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node ZN11,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    Air Loop Outlet Node ZN11;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN11,  !- Name
@@ -4724,10 +4750,11 @@
     ZN11 Inlet Node,         !- Zone Supply Air Node Name
     3.0;                     !- Maximum Air Flow Rate {m3/s}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN11,  !- Name
     HeatingAvailSched,       !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Mixed Air Node ZN11,     !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN11,  !- Air Outlet Node Name
@@ -4817,23 +4844,19 @@
 
   Branch,
     Air Loop Main Branch ZN12,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN12,             !- Component 1 Name
     Air Loop Inlet Node ZN12,!- Component 1 Inlet Node Name
     Mixed Air Node ZN12,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
-    Coil:Heating:Gas,        !- Component 2 Object Type
+    Coil:Heating:Fuel,       !- Component 2 Object Type
     Main Heating Coil ZN12,  !- Component 2 Name
     Mixed Air Node ZN12,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN12,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:ConstantVolume,      !- Component 3 Object Type
     Supply Fan ZN12,         !- Component 3 Name
     Heating Coil Air Outlet Node ZN12,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node ZN12,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    Air Loop Outlet Node ZN12;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN12,  !- Name
@@ -4927,10 +4950,11 @@
     ZN12 Inlet Node,         !- Zone Supply Air Node Name
     3.0;                     !- Maximum Air Flow Rate {m3/s}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN12,  !- Name
     HeatingAvailSched,       !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Mixed Air Node ZN12,     !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN12,  !- Air Outlet Node Name
@@ -5021,18 +5045,15 @@
 
   Branch,
     Air Loop Main Branch ZN13,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN13,             !- Component 1 Name
     Air Loop Inlet Node ZN13,!- Component 1 Inlet Node Name
     Mixed Air Node ZN13,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan ZN13,         !- Component 2 Name
     Mixed Air Node ZN13,     !- Component 2 Inlet Node Name
-    Air Loop Outlet Node ZN13,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node ZN13;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN13,  !- Name
@@ -5209,23 +5230,19 @@
 
   Branch,
     Air Loop Main Branch ZN14,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN14,             !- Component 1 Name
     Air Loop Inlet Node ZN14,!- Component 1 Inlet Node Name
     Mixed Air Node ZN14,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
-    Coil:Heating:Gas,        !- Component 2 Object Type
+    Coil:Heating:Fuel,       !- Component 2 Object Type
     Main Heating Coil ZN14,  !- Component 2 Name
     Mixed Air Node ZN14,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN14,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:ConstantVolume,      !- Component 3 Object Type
     Supply Fan ZN14,         !- Component 3 Name
     Heating Coil Air Outlet Node ZN14,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node ZN14,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    Air Loop Outlet Node ZN14;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN14,  !- Name
@@ -5319,10 +5336,11 @@
     ZN14 Inlet Node,         !- Zone Supply Air Node Name
     3.0;                     !- Maximum Air Flow Rate {m3/s}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN14,  !- Name
     HeatingAvailSched,       !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Mixed Air Node ZN14,     !- Air Inlet Node Name
     Heating Coil Air Outlet Node ZN14,  !- Air Outlet Node Name
@@ -5394,11 +5412,11 @@
     Simple Electric Load Center,  !- Name
     PV List,                 !- Generator List Name
     BASELOAD,                !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     DirectCurrentWithInverter,  !- Electrical Buss Type
-    Curve Inverter;          !- Inverter Object Name
+    Curve Inverter;          !- Inverter Name
 
   ElectricLoadCenter:Inverter:FunctionOfPower,
     Curve Inverter,          !- Name

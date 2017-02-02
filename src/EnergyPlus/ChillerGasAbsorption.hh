@@ -1,8 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef ChillerGasAbsorption_hh_INCLUDED
 #define ChillerGasAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -23,7 +69,7 @@ namespace ChillerGasAbsorption {
 
 	// This type holds the output from the algorithm i.e., the Report Variables
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
@@ -41,6 +87,7 @@ namespace ChillerGasAbsorption {
 		std::string Name; // user identifier
 		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
 		Real64 NomCoolingCap; // W - design nominal capacity of Absorber
+		bool NomCoolingCapWasAutoSized; // true if nominal capacity was autosize on input
 		Real64 NomHeatCoolRatio; // ratio of heating to cooling capacity
 		Real64 FuelCoolRatio; // ratio of fuel input to cooling output
 		Real64 FuelHeatRatio; // ratio of fuel input to heating output
@@ -62,8 +109,11 @@ namespace ChillerGasAbsorption {
 		Real64 TempDesCondReturn; // design secondary loop fluid temperature at the Absorber condenser side inlet
 		Real64 TempDesCHWSupply; // design chilled water supply temperature
 		Real64 EvapVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the evaporator
+		bool EvapVolFlowRateWasAutoSized; //true if evaporator flow rate was autosize on input
 		Real64 CondVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the condenser
+		bool CondVolFlowRateWasAutoSized; //true if condenser flow rate was autosize on input
 		Real64 HeatVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the heater side
+		bool HeatVolFlowRateWasAutoSized; // true if hot water flow rate was autosize on input
 		Real64 SizFac; // sizing factor
 		int CoolCapFTCurve; // cooling capacity as a function of temperature curve (chilled water temp,
 		// condenser water temp)
@@ -101,7 +151,6 @@ namespace ChillerGasAbsorption {
 		int HWLoopSideNum; // hot water plant loop side index
 		int HWBranchNum; // hot water plant loop branch index
 		int HWCompNum; // hot water plant loop component index
-		bool IsThisSized; // TRUE if sizing is done
 
 		// Default Constructor
 		GasAbsorberSpecs() :
@@ -110,6 +159,7 @@ namespace ChillerGasAbsorption {
 			InCoolingMode( false ),
 			InHeatingMode( false ),
 			NomCoolingCap( 0.0 ),
+			NomCoolingCapWasAutoSized( false ),
 			NomHeatCoolRatio( 0.0 ),
 			FuelCoolRatio( 0.0 ),
 			FuelHeatRatio( 0.0 ),
@@ -131,8 +181,11 @@ namespace ChillerGasAbsorption {
 			TempDesCondReturn( 0.0 ),
 			TempDesCHWSupply( 0.0 ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			HeatVolFlowRate( 0.0 ),
+			HeatVolFlowRateWasAutoSized( false ),
 			SizFac( 0.0 ),
 			CoolCapFTCurve( 0 ),
 			FuelCoolFTCurve( 0 ),
@@ -163,139 +216,8 @@ namespace ChillerGasAbsorption {
 			HWLoopNum( 0 ),
 			HWLoopSideNum( 0 ),
 			HWBranchNum( 0 ),
-			HWCompNum( 0 ),
-			IsThisSized( false )
+			HWCompNum( 0 )
 		{}
-
-		// Member Constructor
-		GasAbsorberSpecs(
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // simulate the machine at it's operating part load ratio
-			bool const InCoolingMode,
-			bool const InHeatingMode,
-			std::string const & Name, // user identifier
-			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
-			Real64 const NomCoolingCap, // W - design nominal capacity of Absorber
-			Real64 const NomHeatCoolRatio, // ratio of heating to cooling capacity
-			Real64 const FuelCoolRatio, // ratio of fuel input to cooling output
-			Real64 const FuelHeatRatio, // ratio of fuel input to heating output
-			Real64 const ElecCoolRatio, // ratio of electricity input to cooling output
-			Real64 const ElecHeatRatio, // ratio of electricity input to heating output
-			int const ChillReturnNodeNum, // Node number on the inlet side of the plant
-			int const ChillSupplyNodeNum, // Node number on the outlet side of the plant
-			bool const ChillSetPointErrDone, // flag to report missing setpoint on CW outlet
-			bool const ChillSetPointSetToLoop, // flag to use overall loop setpoint
-			int const CondReturnNodeNum, // Node number on the inlet side of the condenser
-			int const CondSupplyNodeNum, // Node number on the outlet side of the condenser
-			int const HeatReturnNodeNum, // absorber steam inlet node number, water side
-			int const HeatSupplyNodeNum, // absorber steam outlet node number, water side
-			bool const HeatSetPointErrDone, // flag to report missing setpoint on HW outlet
-			bool const HeatSetPointSetToLoop, // flag to use overall loop setpoint
-			Real64 const MinPartLoadRat, // min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // max allowed operating frac full load
-			Real64 const OptPartLoadRat, // optimal operating frac full load
-			Real64 const TempDesCondReturn, // design secondary loop fluid temperature at the Absorber condenser side inlet
-			Real64 const TempDesCHWSupply, // design chilled water supply temperature
-			Real64 const EvapVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the evaporator
-			Real64 const CondVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the condenser
-			Real64 const HeatVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the heater side
-			Real64 const SizFac, // sizing factor
-			int const CoolCapFTCurve, // cooling capacity as a function of temperature curve (chilled water temp,
-			int const FuelCoolFTCurve, // Fuel-Input-to cooling output Ratio Function of Temperature Curve (chilled
-			int const FuelCoolFPLRCurve, // Fuel-Input-to cooling output Ratio Function of Part Load Ratio Curve
-			int const ElecCoolFTCurve, // Electric-Input-to cooling output Ratio Function of Temperature Curve
-			int const ElecCoolFPLRCurve, // Electric-Input-to cooling output Ratio Function of Part Load Ratio Curve
-			int const HeatCapFCoolCurve, // Heating Capacity Function of Cooling Capacity Curve
-			int const FuelHeatFHPLRCurve, // Fuel Input to heat output ratio during heating only function
-			bool const isEnterCondensTemp, // if using entering conderser water temperature is TRUE, exiting is FALSE
-			bool const isWaterCooled, // if water cooled it is TRUE
-			Real64 const CHWLowLimitTemp, // Chilled Water Lower Limit Temperature
-			Real64 const FuelHeatingValue,
-			Real64 const DesCondMassFlowRate, // design nominal mass flow rate of water through the condenser [kg/s]
-			Real64 const DesHeatMassFlowRate, // design nominal mass flow rate of water through the hot water side [kg/s]
-			Real64 const DesEvapMassFlowRate, // design nominal mass flow rate of water through chilled water side [kg/s]
-			int const DeltaTempCoolErrCount, // error count for Delta Temp = 0 while cooling
-			int const DeltaTempHeatErrCount, // error count for Delta Temp = 0 while heating
-			int const CondErrCount, // error count for poor Condenser Supply Estimate
-			bool const PossibleSubcooling, // Flag to determine whether plant is overcooled
-			int const CWLoopNum, // chilled water plant loop index number
-			int const CWLoopSideNum, // chilled water plant loop side index
-			int const CWBranchNum, // chilled water plant loop branch index
-			int const CWCompNum, // chilled water plant loop component index
-			int const CDLoopNum, // condenser water plant loop index number
-			int const CDLoopSideNum, // condenser water plant loop side index
-			int const CDBranchNum, // condenser water plant loop branch index
-			int const CDCompNum, // condenser water plant loop component index
-			int const HWLoopNum, // hot water plant loop side index
-			int const HWLoopSideNum, // hot water plant loop side index
-			int const HWBranchNum, // hot water plant loop branch index
-			int const HWCompNum, // hot water plant loop component index
-			bool const IsThisSized // TRUE if sizing is done
-		) :
-			Available( Available ),
-			ON( ON ),
-			InCoolingMode( InCoolingMode ),
-			InHeatingMode( InHeatingMode ),
-			Name( Name ),
-			FuelType( FuelType ),
-			NomCoolingCap( NomCoolingCap ),
-			NomHeatCoolRatio( NomHeatCoolRatio ),
-			FuelCoolRatio( FuelCoolRatio ),
-			FuelHeatRatio( FuelHeatRatio ),
-			ElecCoolRatio( ElecCoolRatio ),
-			ElecHeatRatio( ElecHeatRatio ),
-			ChillReturnNodeNum( ChillReturnNodeNum ),
-			ChillSupplyNodeNum( ChillSupplyNodeNum ),
-			ChillSetPointErrDone( ChillSetPointErrDone ),
-			ChillSetPointSetToLoop( ChillSetPointSetToLoop ),
-			CondReturnNodeNum( CondReturnNodeNum ),
-			CondSupplyNodeNum( CondSupplyNodeNum ),
-			HeatReturnNodeNum( HeatReturnNodeNum ),
-			HeatSupplyNodeNum( HeatSupplyNodeNum ),
-			HeatSetPointErrDone( HeatSetPointErrDone ),
-			HeatSetPointSetToLoop( HeatSetPointSetToLoop ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondReturn( TempDesCondReturn ),
-			TempDesCHWSupply( TempDesCHWSupply ),
-			EvapVolFlowRate( EvapVolFlowRate ),
-			CondVolFlowRate( CondVolFlowRate ),
-			HeatVolFlowRate( HeatVolFlowRate ),
-			SizFac( SizFac ),
-			CoolCapFTCurve( CoolCapFTCurve ),
-			FuelCoolFTCurve( FuelCoolFTCurve ),
-			FuelCoolFPLRCurve( FuelCoolFPLRCurve ),
-			ElecCoolFTCurve( ElecCoolFTCurve ),
-			ElecCoolFPLRCurve( ElecCoolFPLRCurve ),
-			HeatCapFCoolCurve( HeatCapFCoolCurve ),
-			FuelHeatFHPLRCurve( FuelHeatFHPLRCurve ),
-			isEnterCondensTemp( isEnterCondensTemp ),
-			isWaterCooled( isWaterCooled ),
-			CHWLowLimitTemp( CHWLowLimitTemp ),
-			FuelHeatingValue( FuelHeatingValue ),
-			DesCondMassFlowRate( DesCondMassFlowRate ),
-			DesHeatMassFlowRate( DesHeatMassFlowRate ),
-			DesEvapMassFlowRate( DesEvapMassFlowRate ),
-			DeltaTempCoolErrCount( DeltaTempCoolErrCount ),
-			DeltaTempHeatErrCount( DeltaTempHeatErrCount ),
-			CondErrCount( CondErrCount ),
-			PossibleSubcooling( PossibleSubcooling ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CDLoopNum( CDLoopNum ),
-			CDLoopSideNum( CDLoopSideNum ),
-			CDBranchNum( CDBranchNum ),
-			CDCompNum( CDCompNum ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSideNum( HWLoopSideNum ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	struct ReportVars
@@ -372,82 +294,11 @@ namespace ChillerGasAbsorption {
 			FuelCOP( 0.0 )
 		{}
 
-		// Member Constructor
-		ReportVars(
-			Real64 const CoolingLoad, // cooling load on the chiller (previously called QEvap)
-			Real64 const CoolingEnergy, // variable to track total cooling load for period (was EvapEnergy)
-			Real64 const HeatingLoad, // heating load on the chiller
-			Real64 const HeatingEnergy, // heating energy
-			Real64 const TowerLoad, // load on the cooling tower/condenser (previously called QCond)
-			Real64 const TowerEnergy, // variable to track total tower load for a period (was CondEnergy)
-			Real64 const FuelUseRate, // instantaneous use of gas for period
-			Real64 const FuelEnergy, // variable to track total fuel used for a period
-			Real64 const CoolFuelUseRate, // instantaneous use of gas for period for cooling
-			Real64 const CoolFuelEnergy, // variable to track total fuel used for a period for cooling
-			Real64 const HeatFuelUseRate, // instantaneous use of gas for period for heating
-			Real64 const HeatFuelEnergy, // variable to track total fuel used for a period for heating
-			Real64 const ElectricPower, // parasitic electric power used (was PumpingPower)
-			Real64 const ElectricEnergy, // track the total electricity used for a period (was PumpingEnergy)
-			Real64 const CoolElectricPower, // parasitic electric power used  for cooling
-			Real64 const CoolElectricEnergy, // track the total electricity used for a period for cooling
-			Real64 const HeatElectricPower, // parasitic electric power used  for heating
-			Real64 const HeatElectricEnergy, // track the total electricity used for a period for heating
-			Real64 const ChillReturnTemp, // reporting: evaporator inlet temperature (was EvapInletTemp)
-			Real64 const ChillSupplyTemp, // reporting: evaporator outlet temperature (was EvapOutletTemp)
-			Real64 const ChillWaterFlowRate, // reporting: evaporator mass flow rate (was Evapmdot)
-			Real64 const CondReturnTemp, // reporting: condenser inlet temperature (was CondInletTemp)
-			Real64 const CondSupplyTemp, // reporting: condenser outlet temperature (was CondOutletTemp)
-			Real64 const CondWaterFlowRate, // reporting: condenser mass flow rate (was Condmdot)
-			Real64 const HotWaterReturnTemp, // reporting: hot water return (inlet) temperature
-			Real64 const HotWaterSupplyTemp, // reporting: hot water supply (outlet) temperature
-			Real64 const HotWaterFlowRate, // reporting: hot water mass flow rate
-			Real64 const CoolPartLoadRatio, // operating part load ratio (load/capacity for cooling)
-			Real64 const HeatPartLoadRatio, // operating part load ratio (load/capacity for heating)
-			Real64 const CoolingCapacity, // current capacity after temperature adjustment
-			Real64 const HeatingCapacity, // current heating capacity
-			Real64 const FractionOfPeriodRunning, // fraction of the time period that the unit is operating
-			Real64 const FuelCOP // reporting: cooling output/fuel input = CoolingLoad/CoolFuelUseRate
-		) :
-			CoolingLoad( CoolingLoad ),
-			CoolingEnergy( CoolingEnergy ),
-			HeatingLoad( HeatingLoad ),
-			HeatingEnergy( HeatingEnergy ),
-			TowerLoad( TowerLoad ),
-			TowerEnergy( TowerEnergy ),
-			FuelUseRate( FuelUseRate ),
-			FuelEnergy( FuelEnergy ),
-			CoolFuelUseRate( CoolFuelUseRate ),
-			CoolFuelEnergy( CoolFuelEnergy ),
-			HeatFuelUseRate( HeatFuelUseRate ),
-			HeatFuelEnergy( HeatFuelEnergy ),
-			ElectricPower( ElectricPower ),
-			ElectricEnergy( ElectricEnergy ),
-			CoolElectricPower( CoolElectricPower ),
-			CoolElectricEnergy( CoolElectricEnergy ),
-			HeatElectricPower( HeatElectricPower ),
-			HeatElectricEnergy( HeatElectricEnergy ),
-			ChillReturnTemp( ChillReturnTemp ),
-			ChillSupplyTemp( ChillSupplyTemp ),
-			ChillWaterFlowRate( ChillWaterFlowRate ),
-			CondReturnTemp( CondReturnTemp ),
-			CondSupplyTemp( CondSupplyTemp ),
-			CondWaterFlowRate( CondWaterFlowRate ),
-			HotWaterReturnTemp( HotWaterReturnTemp ),
-			HotWaterSupplyTemp( HotWaterSupplyTemp ),
-			HotWaterFlowRate( HotWaterFlowRate ),
-			CoolPartLoadRatio( CoolPartLoadRatio ),
-			HeatPartLoadRatio( HeatPartLoadRatio ),
-			CoolingCapacity( CoolingCapacity ),
-			HeatingCapacity( HeatingCapacity ),
-			FractionOfPeriodRunning( FractionOfPeriodRunning ),
-			FuelCOP( FuelCOP )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > GasAbsorberReport;
+	extern Array1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > GasAbsorberReport;
 
 	// Functions
 
@@ -532,9 +383,12 @@ namespace ChillerGasAbsorption {
 	// End of Record Keeping subroutines for the Absorption Chiller Module
 	// *****************************************************************************
 
+	void
+	clear_state();
+
 	//                                 COPYRIGHT NOTICE
 
-	//     Portions Copyright © Gas Research Institute 2001.  All rights reserved.
+	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
 
 	//     GRI LEGAL NOTICE
 	//     Neither GRI, members of GRI nor any person or organization acting on behalf
@@ -551,28 +405,6 @@ namespace ChillerGasAbsorption {
 	//         damages resulting from the use of the program or any portion thereof or
 	//         any information disclosed therein.
 
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ChillerGasAbsorption
 

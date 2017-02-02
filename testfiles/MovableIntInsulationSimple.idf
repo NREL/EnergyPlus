@@ -12,7 +12,7 @@
 ! Plant:    None
 ! SolDis=FullInteriorAndExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.2;
+  Version,8.6;
 
   Timestep,6;
 
@@ -526,9 +526,4 @@
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
     Until: 24:00,1.00;       !- Field 11
-
-  Output:PreprocessorMessage,
-    Conversion 8.1 => 8.1.0.004,  !- Preprocessor Name
-    Warning,                 !- Error Severity
-    rvi file associated with this input is being processed. Review for accuracy.;  !- Message Line 1
 
