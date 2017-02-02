@@ -285,7 +285,6 @@ namespace EnergyPlus {
 			"  -0.5, !- Convergence Acceleration Limit{ dimensionless }",
 			"  90, !- Azimuth Angle of Long Axis of Building{ deg }",
 			"  0.36;                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
-
 			"AirflowNetwork:MultiZone:Zone,",
 			"  WEST_ZONE, !- Zone Name",
 			"  Temperature, !- Ventilation Control Mode",
@@ -3725,7 +3724,9 @@ namespace EnergyPlus {
 			"AirflowNetwork:MultiZone:ExternalNode,",
 			"  SFacade,                 !- Name",
 			"  1.524,                   !- External Node Height{ m }",
-			"  SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name",
+			"  SFacade_WPCValue,        !- Wind Pressure Coefficient Values Object Name",
+			"  No,                      !- Symmetric Wind Pressure Coefficient Curve",
+			"  Yes;                      !- Use Relative Wind Angle",
 			"AirflowNetwork:MultiZone:ReferenceCrackConditions,",
 			"  ReferenceCrackConditions,!- Name",
 			"  20.0,                    !- Reference Temperature{ C }",
@@ -3807,6 +3808,9 @@ namespace EnergyPlus {
 		SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
 		EXPECT_FALSE(errors); // expect no errors
 
+		CurveManager::GetCurveInput();
+		EXPECT_EQ( CurveManager::NumCurves, 2 );
+
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
@@ -3823,11 +3827,9 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth, 180.0 );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
-		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
+		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
 		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).CPVNum, 2 );
 		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve, 0 );
-
-		//compare_err_stream( "" ); // just for debugging
 
 		// Set up some environmental parameters
 		DataEnvironment::OutBaroPress = 101325.0;
@@ -3843,7 +3845,6 @@ namespace EnergyPlus {
 
 		Real64 p = CalcWindPressure( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).CPVNum, 1.0, 
 			DataAirflowNetwork::AirflowNetworkNodeData( 1 ).NodeHeight );
-
 		EXPECT_DOUBLE_EQ( -0.56*0.5*1.1841123742118911, p );
 
 		//Real64 p = CalcWindPressure( MultizoneExternalNodeData( 1 ).CPVNum, 

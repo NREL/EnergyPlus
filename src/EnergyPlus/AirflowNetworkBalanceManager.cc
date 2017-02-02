@@ -826,7 +826,7 @@ namespace AirflowNetworkBalanceManager {
 			return;
 		}
 		if ( NumAirflowNetwork > 1 ) {
-			ShowFatalError( RoutineName + "Currently only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed." );
+			ShowFatalError( RoutineName + "Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed." );
 		}
 
 		SimObjectError = false;
@@ -1220,6 +1220,12 @@ namespace AirflowNetworkBalanceManager {
 					}
 					MultizoneExternalNodeData( i ).ExtNum = AirflowNetworkNumOfZones + i; // External node number
 					MultizoneExternalNodeData( i ).WPCName = Alphas( 2 ); // Name of Wind Pressure Coefficient Values Object
+					if ( NumAlphas >= 3 & !lAlphaBlanks( 3 ) ) {
+						MultizoneExternalNodeData( i ).symmetricCurve = SameString( Alphas( 3 ), "Yes"); // Symmetric curve or not
+					}
+					if ( NumAlphas == 4 & !lAlphaBlanks( 4 ) ) {
+						MultizoneExternalNodeData( i ).useRelativeAngle = SameString( Alphas( 4 ), "Yes"); // Relative or absolute wind angle
+					}
 				}
 			} else {
 				ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found when Wind Pressure Coefficient Type = Input." );
