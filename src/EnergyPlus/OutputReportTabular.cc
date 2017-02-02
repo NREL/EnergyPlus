@@ -11428,26 +11428,45 @@ namespace OutputReportTabular {
 		//   This report actually consists of many sub-tables each with
 		//   its own call to WriteTable.
 		// The overall methodology is explained below:
-		// Determine decay curve - Pulse of radiant heat which is about 5% of lighting and
-		// equipment input [radiantPulseUsed(iZone)] for a single timestep a few hours after
-		// cooling or heat is scheduled on for each zone [radiantPulseTimestep(iZone)].
-		// The radiant heat received on each wall is stored [radiantPulseReceived(jSurface)].
-		// The load convected in the normal case [loadConvectedNormal(jSurface, kTime, mode)]
-		// and in the case with the pulse [loadConvectedWithPulse(jSurface, kTime, mode)].
-		// The difference divided by the pulse received by each surface
-		// [radiantPulseReceived(jSurface)] is stored in [decayCurve(jSurface,kTime,mode)].
-		// Determine delayed loads - From the last timestep of the peak load on the zone
-		// working backwards any radiant heat that was absorbed by the wall from an internal gain
-		// or solar gain is multiplied by the appropriate timesteps in the decay curve
-		// [decayCurve(jSurface,kTime,mode)] for timesteps that make up
-		// the number of averaged timesteps are used to determine the peak load
-		// [NumTimeStepsInAvg]. The sum for all surfaces in the zone are added together to
-		// determine the delayed load.
-		// Determine instant loads - Average the convective portion of the internal gains
-		// for the timesteps made up of the peak load period. Average those across the peak
-		// load period.
-		// REFERENCES:
-		// na
+		//
+        // Determine decay curve - Pulse of radiant heat which is about 5% of lighting and
+		//   equipment input [radiantPulseUsed(iZone)] for a single timestep a few hours after
+		//   cooling or heat is scheduled on for each zone [radiantPulseTimestep(iZone)].
+		//   The radiant heat received on each wall is stored [radiantPulseReceived(jSurface)].
+		//   The load convected in the normal case [loadConvectedNormal(jSurface, kTime, mode)]
+		//   and in the case with the pulse [loadConvectedWithPulse(jSurface, kTime, mode)].
+		//   The difference divided by the pulse received by each surface
+		//   [radiantPulseReceived(jSurface)] is stored in [decayCurve(jSurface,kTime,mode)].
+		//
+        // Determine delayed loads - From the last timestep of the peak load on the zone
+		//   working backwards any radiant heat that was absorbed by the wall from an internal gain
+		//   or solar gain is multiplied by the appropriate timesteps in the decay curve
+		//   [decayCurve(jSurface,kTime,mode)] for timesteps that make up
+		//   the number of averaged timesteps are used to determine the peak load
+		//   [NumTimeStepsInAvg]. The sum for all surfaces in the zone are added together to
+		//   determine the delayed load.
+		//
+        // Determine instant loads - Average the convective portion of the internal gains
+		//   for the timesteps made up of the peak load period. Average those across the peak
+		//   load period.
+        //
+        // The comments from ComputeDelayedComponents which was incorporated into this routine follow:
+        //
+ 		// PURPOSE OF THIS SUBROUTINE:
+		//   For load component report, convert the sequence of radiant gains
+		//   for people and equipment and other internal loads into convective
+		//   gains based on the decay curves.
+		//
+		// METHODOLOGY EMPLOYED:
+		//   For each step of sequence from each design day, compute the
+		//   contributations from previous timesteps multiplied by the decay
+		//   curve. Rather than store every internal load's radiant contribution
+		//   to each surface, the TMULT and ITABSF sequences were also stored
+		//   which allocates the total radiant to each surface in the zone. The
+		//   formula used is:
+		//       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
+
+
 
 		// USE STATEMENTS:
 		// na
@@ -11663,6 +11682,7 @@ namespace OutputReportTabular {
 						Real64 feneSolarConvIntoZone = 0.0;
 						Real64 adjFeneSurfNetRadSeq = 0.0;
 
+                        // code from ComputeDelayedComponents starts
 						for ( int jSurf = zd.SurfaceFirst; jSurf <= zd.SurfaceLast; ++jSurf ) {
 							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -11698,6 +11718,7 @@ namespace OutputReportTabular {
 							lightLWConvIntoZone += lightLWConvFromSurf;
 							lightSWConvIntoZone += lightSWConvFromSurf;
 							feneSolarConvIntoZone += feneSolarConvFromSurf;
+							// code from ComputeDelayedComponents ends
 							// determine the remaining convective heat from the surfaces that are not based
 							// on any of these other loads
 							//negative because heat from surface should be positive
@@ -11733,6 +11754,7 @@ namespace OutputReportTabular {
 						Real64 feneSolarConvIntoZone = 0.0;
 						Real64 adjFeneSurfNetRadSeq = 0.0;
 
+						// code from ComputeDelayedComponents starts
 						for ( int jSurf = zd.SurfaceFirst; jSurf <= zd.SurfaceLast; ++jSurf ) {
 							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -11768,6 +11790,7 @@ namespace OutputReportTabular {
 							lightLWConvIntoZone += lightLWConvFromSurf;
 							lightSWConvIntoZone += lightSWConvFromSurf;
 							feneSolarConvIntoZone += feneSolarConvFromSurf;
+							// code from ComputeDelayedComponents ends
 							// determine the remaining convective heat from the surfaces that are not based
 							// on any of these other loads
 							//negative because heat from surface should be positive
