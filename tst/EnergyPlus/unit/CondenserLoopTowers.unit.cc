@@ -1040,7 +1040,7 @@ namespace EnergyPlus {
 			"    35.0,					  !- Design Inlet Air Dry-Bulb Temperature",
 			"    25.6,					  !- Design Inlet Air Wet-Bulb Temperature",
 			"    3.9,                     !- Design Approach Temperature",
-			"    5.6,                     !- Design Range Temperature",
+			"    5.5,                     !- Design Range Temperature",
 			"    ,                        !- Basin Heater Capacity {W/K}",
 			"    ,                        !- Basin Heater Setpoint Temperature {C}",
 			"    ,                        !- Basin Heater Operating Schedule Name",
@@ -1313,7 +1313,7 @@ namespace EnergyPlus {
 
 		// input not needed for sizing
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.6K  
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K  
 
 		// input not needed for sizing
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).DesignWaterFlowRateWasAutoSized );
@@ -1455,7 +1455,7 @@ namespace EnergyPlus {
 			"    35.0,					  !- Design Inlet Air Dry-Bulb Temperature",
 			"    25.6,					  !- Design Inlet Air Wet-Bulb Temperature",
 			"    3.9,                     !- Design Approach Temperature",
-			"    5.6,                     !- Design Range Temperature",
+			"    5.5,                     !- Design Range Temperature",
 			"    ,                        !- Basin Heater Capacity {W/K}",
 			"    ,                        !- Basin Heater Setpoint Temperature {C}",
 			"    ,                        !- Basin Heater Operating Schedule Name",
@@ -1727,7 +1727,7 @@ namespace EnergyPlus {
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.55, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.6K  
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.55, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K  
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).DesignWaterFlowRateWasAutoSized );
@@ -1882,7 +1882,7 @@ namespace EnergyPlus {
 		"    35.0,					  !- Design Inlet Air Dry-Bulb Temperature",
 		"    25.6,					  !- Design Inlet Air Wet-Bulb Temperature",
 		"    3.9,                     !- Design Approach Temperature",
-		"    5.6,                     !- Design Range Temperature",
+		"    5.5,                     !- Design Range Temperature",
 		"    ,                        !- Basin Heater Capacity {W/K}",
 		"    ,                        !- Basin Heater Setpoint Temperature {C}",
 		"    ,                        !- Basin Heater Operating Schedule Name",
@@ -2207,7 +2207,7 @@ namespace EnergyPlus {
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9373.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.6K  
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9770.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K  
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).DesignWaterFlowRateWasAutoSized );
@@ -2231,7 +2231,7 @@ namespace EnergyPlus {
 
 		// autosized input
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).FreeConvTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).FreeConvTowerUA, 573.0, 1.0 );
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).FreeConvTowerUA, 590.0, 1.0 );
 
 	}
 
