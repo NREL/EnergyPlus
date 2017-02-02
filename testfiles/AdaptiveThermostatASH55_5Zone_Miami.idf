@@ -2575,7 +2575,7 @@
     DualSetPoint;            !- Control 3 Name
 
   ZoneControl:Thermostat:OperativeTemperature,
-    SPACE3-1 AllControlledZones Thermostat,  !- Thermostat Name
+    AllControlledZones Thermostat,  !- Thermostat Name
     CONSTANT,                                !- Radiative Fraction Input Mode
     0.4,                                     !- Fixed Radiative Fraction
 	,                                        !- Radiative Fraction Schedule Name
@@ -3077,6 +3077,7 @@
   Output:Variable,*,Heating Coil Gas Rate,Hourly;
   
   Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,Hourly;
+  Output:Variable, Clg-SetP-sch,Schedule Value, hourly;
 
   Output:Meter,Cooling:Electricity,monthly;
 

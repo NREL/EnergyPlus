@@ -1631,7 +1631,7 @@ namespace ZoneTempPredictorCorrector {
 						// added Jan, 2017 - Xuan Luo
 						// read adaptive comfort model and calculate adaptive thermal comfort setpoint
 						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
-							if ( NumAlphas >= 4 ) {
+							if ( NumAlphas >= 4 && ! lAlphaFieldBlanks( 4 ) ) {
 								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
 								if( !adaptiveComfortModelTypeIndex ) {
 									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
@@ -1646,7 +1646,7 @@ namespace ZoneTempPredictorCorrector {
 										CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN );
 									}
 								}
-								if (NumAlphas == 5) {
+								if ( ! lAlphaFieldBlanks( 5 ) ) {
 									if ( SameString( cAlphaArgs( 5 ), "AlwaysOverwrite" ) ) {
 										TempControlledZone( TempControlledZoneNum ).AdaptiveModelAlwaysOverwrite = true;
 									}
@@ -1718,7 +1718,7 @@ namespace ZoneTempPredictorCorrector {
 						// added Jan, 2017 - Xuan Luo
 						// read adaptive comfort model and calculate adaptive thermal comfort setpoint
 						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
-							if ( NumAlphas >= 4 ) {
+							if ( NumAlphas >= 4 && ! lAlphaFieldBlanks( 4 ) ) {
 								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
 								if ( !adaptiveComfortModelTypeIndex ) {
 									ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
@@ -1733,7 +1733,7 @@ namespace ZoneTempPredictorCorrector {
 										CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN ); 
 									}
 								}
-								if ( NumAlphas == 5 ) {
+								if ( ! lAlphaFieldBlanks( 5 ) ) {
 									if ( SameString( cAlphaArgs( 5 ), "AlwaysOverwrite" ) ) {
 										TempControlledZone(TempControlledZoneNum ).AdaptiveModelAlwaysOverwrite = true;
 									}
