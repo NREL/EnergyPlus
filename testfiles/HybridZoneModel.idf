@@ -208,7 +208,7 @@ HybridModel:Zone,
     NO,                      !- Calculate Zone Internal Thermal Mass
     YES,                     !- Calculate Zone Air Infiltration Rate
     ZONE 2_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-    ,                       !- Begin Month
+    1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
     31;                      !- End Day of Month

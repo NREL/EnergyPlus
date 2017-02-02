@@ -211,9 +211,6 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
 
-	// Number of zone capacitance multiplier objects
-	int NumZoneCapaMultiplier( 0 );
-
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
@@ -1545,7 +1542,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		NumZoneCapaMultiplier = GetNumObjectsFound( cCurrentModuleObject );
+		int NumZoneCapaMultiplier = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumZoneCapaMultiplier == 0 ) {
 		// Assign default multiplier values to all zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
@@ -4083,7 +4080,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			//Hybrid modeling start: Added by Sang Hoon Lee May 2015
-			if (( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && !WarmupFlag && !DoingSizing ) {
+			if ( FlagHybridModel && !WarmupFlag && !DoingSizing ) {
 
 				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 

@@ -1344,8 +1344,6 @@ namespace DataHeatBalance {
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
 		// Hybrid Modeling
-		bool FlagHMInternalThermalMass; // True if hybrid modeling (Internal thermal mass calculations) is used for the Zone
-		bool FlagHMInfiltration;  // True if hybrid modeling (Infiltration calculations) is used for the Zone
 		Real64 ZoneMeasuredTemperature; // Measured zone air temperature input by user
 		Real64 ZoneVolCapMultpSens; // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
 		Real64 ZoneVolCapMultpMoist; // Zone humidity capacity multiplier
@@ -1424,8 +1422,6 @@ namespace DataHeatBalance {
 			ZoneContamControllerSchedIndex( 0 ),
 			FlagCustomizedZoneCap( false ),
 			// Hybrid Modeling
-			FlagHMInternalThermalMass( false ),
-			FlagHMInfiltration( false ),
 			ZoneMeasuredTemperature( 0.0 ),
 			ZoneVolCapMultpSens( 1.0 ),
 			ZoneVolCapMultpMoist( 1.0 ),

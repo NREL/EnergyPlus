@@ -57,10 +57,9 @@ namespace HybridModel {
 
 		using ScheduleManager::GetScheduleIndex;
 
-		static bool RunMeOnceFlag( false );
-		static bool ErrorsFound( false ); // If errors detected in input
-		static Array1D_bool lAlphaFieldBlanks( 10, false );
-		static Array1D_bool lNumericFieldBlanks( 10, false );
+		bool ErrorsFound( false ); // If errors detected in input
+		Array1D_bool lAlphaFieldBlanks( 10, false );
+		Array1D_bool lNumericFieldBlanks( 10, false );
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int IOStatus;
@@ -78,16 +77,12 @@ namespace HybridModel {
 		int HMStartDay( 0 );
 		int HMEndDay( 0 );
 
-		if ( RunMeOnceFlag ) return;
-
 		// Read hybrid model input
 		CurrentModuleObject = "HybridModel:Zone";
 		NumOfHybridModelZones = GetNumObjectsFound( CurrentModuleObject );
 		HybridModelZone.allocate( NumOfZones );
 
 		if ( NumOfHybridModelZones > 0 ) {
-
-			RunMeOnceFlag = true;
 
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 

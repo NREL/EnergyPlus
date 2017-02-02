@@ -135,7 +135,6 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -338,7 +337,6 @@ namespace EnergyPlus {
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
-		HybridModel::clear_state();
 		InputProcessor::clear_state();
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
