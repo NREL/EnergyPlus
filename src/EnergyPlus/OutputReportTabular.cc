@@ -9897,7 +9897,7 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
-			//---- Hyrbid Model: Internal Thermal Mass Sub-Table
+			//---- Hybrid Model: Internal Thermal Mass Sub-Table
 			if ( FlagHMInternalThermalMass ){
 				rowHead.allocate( NumOfZones );
 				NumOfCol = 2;
@@ -9923,10 +9923,10 @@ namespace OutputReportTabular {
 					tableBody( 2, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
 				}
 				
-				WriteSubtitle( "Hyrbid Model: Internal Thermal Mass" );
+				WriteSubtitle( "Hybrid Model: Internal Thermal Mass" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Hyrbid Model: Internal Thermal Mass" );
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Hybrid Model: Internal Thermal Mass" );
 				}
 			}
 
@@ -9969,7 +9969,7 @@ namespace OutputReportTabular {
 			columnHead( 10 ) = "Lighting " + Wm2_unitName;
 			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
-			
+
 			rowHead = "";
 			rowHead( NumOfZones + grandTotal ) = "Total";
 			rowHead( NumOfZones + condTotal ) = "Conditioned Total";

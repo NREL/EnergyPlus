@@ -1,9 +1,9 @@
-! 4ZoneHybridModel.idf
+! HybridZoneModel.idf
 ! Basic file description:  Small, 4 zone model to illustrate simple rectangular building using 4ZoneWithShading_Simple_1.idf
 !
 ! Highlights:              Hybrid model use measured zone air temperature data to inversely calculate zone air infiltration air change per hour (ach) and zone internal !                          thermal mass 
 !
-! External file:		   HybridModel_TemperatureData.csv for zone air temperature data input
+! External file:           HybridZoneModel_TemperatureData.csv for zone air temperature data input
 !
 ! Simulation Location/Run: CHICAGO_OHARE_INTL_IL_USA, 2 design days
 !
@@ -13,7 +13,7 @@
 !
 ! Building: Fictional 4 zone, 2 story building.
 !
-!           The building is oriented due north.
+! The building is oriented due north.
 !
 ! Floor Area:        1,600 m2
 ! Number of Stories: 2
@@ -97,7 +97,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
     ,                        !- Humidity Capacity Multiplier
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
-	
+
 ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier3,             !- MultiplierName
     ZONE 3,                  !- Zone or ZoneList Name
@@ -105,7 +105,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
     ,                        !- Humidity Capacity Multiplier
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
-	
+
 ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier4,             !- MultiplierName
     ZONE 4,                  !- Zone or ZoneList Name
@@ -157,7 +157,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
-	
+
 ZoneInfiltration:DesignFlowRate,
     ZONE 4 Infil,            !- Name
     ZONE 4,                  !- Zone or ZoneList Name
@@ -171,7 +171,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
-  
+
 Schedule:Compact,
     INFIL-SCHED,             !- Name
     Fraction,                !- Schedule Type Limits Name
@@ -181,9 +181,9 @@ Schedule:Compact,
     1,                       !- Field 4
     Until: 09:00,            !- Field 5
     0.5,                     !- Field 6
-	Until: 19:00,            !- Field 7
+    Until: 19:00,            !- Field 7
     0.25,                    !- Field 8
-	Until: 22:00,            !- Field 9
+    Until: 22:00,            !- Field 9
     0.5,                     !- Field 10
     Until: 24:00,            !- Field 11
     1;                       !- Field 12
@@ -192,55 +192,55 @@ Schedule:Compact,
 !-   ===========  ALL OBJECTS IN CLASS: HYBRIDMODEL:ZONE ===========
 
 HybridModel:Zone,
-	ZONE 1 HybridModel,      !- Name
-	ZONE 1,                  !- Zone or ZoneList Name
-	NO,                      !- Calculate Zone Internal Thermal Mass
-	NO,                      !- Calculate Zone Air Infiltration Rate
-	ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-	1,                       !- Begin Month
-	1,                       !- Begin Day of Month
-	12,                      !- End Month
-	31;                      !- End Day of Month
+    ZONE 1 HybridModel,      !- Name
+    ZONE 1,                  !- Zone or ZoneList Name
+    NO,                      !- Calculate Zone Internal Thermal Mass
+    NO,                      !- Calculate Zone Air Infiltration Rate
+    ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31;                      !- End Day of Month
 
 HybridModel:Zone,
-	ZONE 2 HybridModel,      !- Name
-	ZONE 2,                  !- Zone or ZoneList Name
-	NO,                      !- Calculate Zone Internal Thermal Mass
-	YES,                     !- Calculate Zone Air Infiltration Rate
-	ZONE 2_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-	1,                       !- Begin Month
-	1,                       !- Begin Day of Month
-	12,                      !- End Month
-	31;                      !- End Day of Month
-	
+    ZONE 2 HybridModel,      !- Name
+    ZONE 2,                  !- Zone or ZoneList Name
+    NO,                      !- Calculate Zone Internal Thermal Mass
+    YES,                     !- Calculate Zone Air Infiltration Rate
+    ZONE 2_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    ,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31;                      !- End Day of Month
+
 HybridModel:Zone,
-	ZONE 3 HybridModel,      !- Name
-	ZONE 3,                  !- Zone or ZoneList Name
-	YES,                     !- Calculate Zone Internal Thermal Mass
-	NO,                      !- Calculate Zone Air Infiltration Rate
-	ZONE 3_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-	1,                       !- Begin Month
-	1,                       !- Begin Day of Month
-	12,                      !- End Month
-	31;                      !- End Day of Month
-	
+    ZONE 3 HybridModel,      !- Name
+    ZONE 3,                  !- Zone or ZoneList Name
+    YES,                     !- Calculate Zone Internal Thermal Mass
+    NO,                      !- Calculate Zone Air Infiltration Rate
+    ZONE 3_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31;                      !- End Day of Month
+
 HybridModel:Zone,
-	ZONE 4 HybridModel,      !- Name
-	ZONE 4,                  !- Zone or ZoneList Name
-	YES,                     !- Calculate Zone Internal Thermal Mass
-	NO,                      !- Calculate Zone Air Infiltration Rate
-	ZONE 4_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
-	1,                       !- Begin Month
-	1,                       !- Begin Day of Month
-	12,                      !- End Month
-	31;	                     !- End Day of Month
+    ZONE 4 HybridModel,      !- Name
+    ZONE 4,                  !- Zone or ZoneList Name
+    YES,                     !- Calculate Zone Internal Thermal Mass
+    NO,                      !- Calculate Zone Air Infiltration Rate
+    ZONE 4_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31;                      !- End Day of Month
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:FILE ===========
 
 Schedule:File,
     ZONE 1_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridZoneModel_TemperatureData.csv,  !- File Name
     2,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -251,29 +251,29 @@ Schedule:File,
 Schedule:File,
     ZONE 2_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridZoneModel_TemperatureData.csv,  !- File Name
     3,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
-	
+
 Schedule:File,
     ZONE 3_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridZoneModel_TemperatureData.csv,  !- File Name
     4,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
-	
+
 Schedule:File,
     ZONE 4_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridZoneModel_TemperatureData.csv,  !- File Name
     5,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data

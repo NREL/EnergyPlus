@@ -284,6 +284,7 @@ ADD_SIMULATION_TEST(IDF_FILE HospitalBaselineReheatReportEMS.idf EPW_FILE USA_IL
 ADD_SIMULATION_TEST(IDF_FILE HospitalLowEnergy.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HybridVentilationControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HybridVentilationControlGlobalSimple.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE HybridZoneModel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE IceStorage-Parallel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE IceStorage-Series-ChillerDownstream.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE IceStorage-Series-ChillerUpstream.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
