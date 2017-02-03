@@ -68,7 +68,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
-
+#include <EnergyPlus/ResultsSchema.hh>
 #include <map>
 
 using namespace EnergyPlus::PurchasedAirManager;
@@ -300,6 +300,9 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
+			if (ResultsFramework::OutputSchema->HRMeters.rDataFrameEnabled()){
+				ResultsFramework::OutputSchema->HRMeters.setRDataFrameEnabled(false);
+			}
 			functionUsingSQLite( std::bind( ReportHRMeters, true ) );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
@@ -328,6 +331,11 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportDYMeters )
 		{
+			if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled()) {
+				ResultsFramework::OutputSchema->DYMeters.setRDataFrameEnabled(false);
+			}
+			if (ResultsFramework::OutputSchema->DYMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->DYMeters.setRVariablesScanned(false);
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -404,6 +412,9 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportMNMeters )
 		{
+			if (ResultsFramework::OutputSchema->MNMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->MNMeters.setRVariablesScanned(false);
+
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -480,6 +491,9 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportSMMeters )
 		{
+			if (ResultsFramework::OutputSchema->SMMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->SMMeters.setRVariablesScanned(false);
+
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -2727,6 +2741,17 @@ namespace EnergyPlus {
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
 
+			if (ResultsFramework::OutputSchema->HRMeters.rDataFrameEnabled())
+				ResultsFramework::OutputSchema->HRMeters.setRDataFrameEnabled(false);
+			if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled())
+				ResultsFramework::OutputSchema->DYMeters.setRDataFrameEnabled(false);
+			if (ResultsFramework::OutputSchema->DYMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->DYMeters.setRVariablesScanned(false);
+			if (ResultsFramework::OutputSchema->MNMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->MNMeters.setRVariablesScanned(false);
+			if (ResultsFramework::OutputSchema->SMMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->SMMeters.setRVariablesScanned(false);
+
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
 			DataEnvironment::Month = 12;
@@ -2908,6 +2933,17 @@ namespace EnergyPlus {
 			});
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			if (ResultsFramework::OutputSchema->HRMeters.rDataFrameEnabled())
+				ResultsFramework::OutputSchema->HRMeters.setRDataFrameEnabled(false);
+			if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled())
+				ResultsFramework::OutputSchema->DYMeters.setRDataFrameEnabled(false);
+			if (ResultsFramework::OutputSchema->DYMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->DYMeters.setRVariablesScanned(false);
+			if (ResultsFramework::OutputSchema->MNMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->MNMeters.setRVariablesScanned(false);
+			if (ResultsFramework::OutputSchema->SMMeters.rVariablesScanned())
+				ResultsFramework::OutputSchema->SMMeters.setRVariablesScanned(false);
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
