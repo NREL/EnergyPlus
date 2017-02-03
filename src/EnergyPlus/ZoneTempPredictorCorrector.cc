@@ -4094,7 +4094,7 @@ namespace ZoneTempPredictorCorrector {
 					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
 
 					// Hybrid Modeling-Infiltration calcualtion start
-					if ( HybridModelZone( ZoneNum ).InfiltrationCalc && SumSysMCpT == 0 && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
+					if ( FlagHMInfiltration && SumSysMCpT == 0 && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
 						// Calculate MCPI used for hybrid modeling included in TempIndCoef and TempDepCoef
 						Real64 a = Zone( ZoneNum ).OutDryBulbTemp;
@@ -4128,7 +4128,7 @@ namespace ZoneTempPredictorCorrector {
 					} // Hybrid model infiltration calcualtion end
 
 					// Hybrid modeling internal thermal mass calcualtion start
-					if ( HybridModelZone( ZoneNum).InternalThermalMassCalc && SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
+					if ( FlagHMInternalThermalMass && SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
 						// Calculate air capacity using UseAnalyticalSolution
 						if ( TempDepCoef == 0.0 ) {
