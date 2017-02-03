@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
@@ -63,6 +51,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -118,6 +107,7 @@ namespace ExteriorEnergyUse {
 	int const DistrictHeatUse( 12 ); // Purchased Heating
 	int const OtherFuel1Use( 13 ); // OtherFuel1
 	int const OtherFuel2Use( 14 ); // OtherFuel2
+	bool GetExteriorEnergyInputFlag( true ); // First time, input is "gotten"
 
 	int const ScheduleOnly( 1 ); // exterior lights only on schedule
 	int const AstroClockOverride( 2 ); // exterior lights controlled to turn off during day.
@@ -137,6 +127,7 @@ namespace ExteriorEnergyUse {
 	// Object Data
 	Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
 	Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
+	std::unordered_map< std::string, std::string > UniqueExteriorEquipNames;
 
 	// Functions
 
@@ -149,6 +140,8 @@ namespace ExteriorEnergyUse {
 		NumExteriorEqs = 0;
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
+		UniqueExteriorEquipNames.clear();
+		GetExteriorEnergyInputFlag = true;
 	}
 
 	void
@@ -164,34 +157,9 @@ namespace ExteriorEnergyUse {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine provides the usual call for the Simulation Manager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
-
-		if ( GetInputFlag ) {
+		if ( GetExteriorEnergyInputFlag ) {
 			GetExteriorEnergyUseInput();
-			GetInputFlag = false;
+			GetExteriorEnergyInputFlag = false;
 		}
 
 		ReportExteriorEnergyUse();
@@ -211,18 +179,8 @@ namespace ExteriorEnergyUse {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the Exterior Lights and Equipment.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleMaxValue;
@@ -231,18 +189,8 @@ namespace ExteriorEnergyUse {
 		using namespace OutputReportPredefined;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetExteriorEnergyUseInput: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -255,33 +203,28 @@ namespace ExteriorEnergyUse {
 		std::string TypeString; // Fuel Type string (returned from Validation)
 		std::string ConUnits; // String for Fuel Consumption units (allow Water)
 		std::string EndUseSubcategoryName;
-		bool ErrorInName;
-		bool IsBlank;
 		Real64 SchMax; // Max value of schedule for item
 		Real64 SchMin; // Min value of schedule for item
 		static Real64 sumDesignLevel( 0.0 ); // for predefined report of design level total
 
-		NumExteriorLights = GetNumObjectsFound( "Exterior:Lights" );
+		NumExteriorLights = InputProcessor::GetNumObjectsFound( "Exterior:Lights" );
 		ExteriorLights.allocate( NumExteriorLights );
 
-		NumFuelEq = GetNumObjectsFound( "Exterior:FuelEquipment" );
-		NumWtrEq = GetNumObjectsFound( "Exterior:WaterEquipment" );
+		NumFuelEq = InputProcessor::GetNumObjectsFound( "Exterior:FuelEquipment" );
+		NumWtrEq = InputProcessor::GetNumObjectsFound( "Exterior:WaterEquipment" );
 		ExteriorEquipment.allocate( NumFuelEq + NumWtrEq );
+		UniqueExteriorEquipNames.reserve( NumFuelEq + NumWtrEq );
 
+		GetExteriorEnergyInputFlag = false;
 		NumExteriorEqs = 0;
 
 		// =================================  Get Exterior Lights
 
 		cCurrentModuleObject = "Exterior:Lights";
 		for ( Item = 1; Item <= NumExteriorLights; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorLights, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			ExteriorLights( Item ).Name = cAlphaArgs( 1 );
 			ExteriorLights( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ExteriorLights( Item ).SchedPtr == 0 ) {
@@ -309,9 +252,9 @@ namespace ExteriorEnergyUse {
 			}
 			if ( lAlphaFieldBlanks( 3 ) ) {
 				ExteriorLights( Item ).ControlMode = ScheduleOnly;
-			} else if ( SameString( cAlphaArgs( 3 ), "ScheduleNameOnly" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "ScheduleNameOnly" ) ) {
 				ExteriorLights( Item ).ControlMode = ScheduleOnly;
-			} else if ( SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
 				ExteriorLights( Item ).ControlMode = AstroClockOverride;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
@@ -350,14 +293,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 
@@ -420,14 +359,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 			ExteriorEquipment( NumExteriorEqs ).FuelType = WaterUse;
@@ -497,26 +432,8 @@ namespace ExteriorEnergyUse {
 		// This subroutine compares the input Fuel Type value against the
 		// valid values and sets the correct in the returned FuelTypeNumber.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ValidateFuelType: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -524,69 +441,51 @@ namespace ExteriorEnergyUse {
 		FuelTypeString = "";
 
 		//Select the correct Number for the associated ascii name for the fuel type
-		if ( SameString( FuelTypeAlpha, "Electricity" ) || SameString( FuelTypeAlpha, "Electric" ) ) {
+		if ( InputProcessor::SameString( FuelTypeAlpha, "Electricity" ) || InputProcessor::SameString( FuelTypeAlpha, "Electric" ) ) {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
-		}
-		if ( SameString( FuelTypeAlpha, "Gas" ) || SameString( FuelTypeAlpha, "NaturalGas" ) ) {
-			if ( SameString( FuelTypeAlpha, "Gas" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"NaturalGas\"." );
-			}
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
-		}
-		if ( SameString( FuelTypeAlpha, "Coal" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "Coal" ) ) {
 			FuelTypeNumber = CoalUse;
 			FuelTypeString = "Coal";
-		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
 			FuelTypeNumber = FuelOil1Use;
 			FuelTypeString = "FuelOil#1";
-		}
-		if ( SameString( FuelTypeAlpha, "PropaneGas" ) || SameString( FuelTypeAlpha, "LPG" ) ) {
-			if ( SameString( FuelTypeAlpha, "LPG" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"PropaneGas\"." );
-			}
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "PropaneGas" ) ) {
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";
-		}
-		if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "Gasoline" ) ) {
 			FuelTypeNumber = GasolineUse;
 			FuelTypeString = "Gasoline";
-		}
-		if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "Diesel" ) ) {
 			FuelTypeNumber = DieselUse;
 			FuelTypeString = "Diesel";
-		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
 			FuelTypeNumber = FuelOil2Use;
 			FuelTypeString = "FuelOil#2";
-		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel1";
-		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel2";
-		}
-		if ( SameString( FuelTypeAlpha, "Water" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "Water" ) ) {
 			FuelTypeNumber = WaterUse;
 			FuelTypeString = "Water";
-		}
-		if ( SameString( FuelTypeAlpha, "Steam" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "Steam" ) ) {
 			FuelTypeNumber = SteamUse;
 			FuelTypeString = "Steam";
-		}
-		if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
 			FuelTypeNumber = DistrictCoolUse;
 			FuelTypeString = "DistrictCooling";
-		}
-		if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+		} else if ( InputProcessor::SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
 			FuelTypeNumber = DistrictHeatUse;
 			FuelTypeString = "DistrictHeating";
+		} else {
+			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
+			ShowFatalError( "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha );
 		}
 
 	}

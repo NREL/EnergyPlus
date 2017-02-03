@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -147,8 +135,6 @@ namespace WindowAC {
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::BlowThru;
 	using DataHVACGlobals::SingleHeatingSetPoint;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -231,7 +217,6 @@ namespace WindowAC {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataHeatBalFanSys::TempControlType;
 
@@ -262,7 +247,7 @@ namespace WindowAC {
 
 		// Find the correct Window AC Equipment
 		if ( CompIndex == 0 ) {
-			WindACNum = FindItemInList( CompName, WindAC );
+			WindACNum = InputProcessor::FindItemInList( CompName, WindAC );
 			if ( WindACNum == 0 ) {
 				ShowFatalError( "SimWindowAC: Unit not found=" + CompName );
 			}
@@ -327,12 +312,6 @@ namespace WindowAC {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanIndex;
@@ -379,8 +358,6 @@ namespace WindowAC {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool FanErrFlag( false ); // Error flag used in GetFanIndex call
 		Real64 FanVolFlow; // Fan volumetric flow rate
 		bool CoilNodeErrFlag; // Used in error messages for mining coil outlet node number
@@ -400,14 +377,14 @@ namespace WindowAC {
 		// find the number of each type of window AC unit
 		CurrentModuleObject = "ZoneHVAC:WindowAirConditioner";
 
-		NumWindACCyc = GetNumObjectsFound( CurrentModuleObject );
+		NumWindACCyc = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		NumWindAC = NumWindACCyc;
 		// allocate the data structures
 		WindAC.allocate( NumWindAC );
 		CheckEquipName.dimension( NumWindAC, true );
 		WindACNumericFields.allocate( NumWindAC );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -419,21 +396,15 @@ namespace WindowAC {
 		// loop over window AC units; get and load the input data
 		for ( WindACIndex = 1; WindACIndex <= NumWindACCyc; ++WindACIndex ) {
 
-			GetObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WindACNum = WindACIndex;
 
 			WindACNumericFields( WindACNum ).FieldNames.allocate( NumNumbers );
 			WindACNumericFields( WindACNum ).FieldNames = "";
 			WindACNumericFields( WindACNum ).FieldNames = cNumericFields;
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), WindAC, WindACNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
 			WindAC( WindACNum ).Name = Alphas( 1 );
 			WindAC( WindACNum ).UnitType = WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'
 			WindAC( WindACNum ).Sched = Alphas( 2 );
@@ -518,13 +489,13 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).DXCoilName = Alphas( 10 );
 
-			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				WindAC( WindACNum ).DXCoilType = Alphas( 9 );
 				CoilNodeErrFlag = false;
-				if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
-				} else if ( SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingHXAssisted;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
 				}
@@ -548,8 +519,8 @@ namespace WindowAC {
 				WindAC( WindACNum ).OpMode = CycFanCycCoil;
 			}
 
-			if ( SameString( Alphas( 12 ), "BlowThrough" ) ) WindAC( WindACNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 12 ), "DrawThrough" ) ) WindAC( WindACNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 12 ), "BlowThrough" ) ) WindAC( WindACNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 12 ), "DrawThrough" ) ) WindAC( WindACNum ).FanPlace = DrawThru;
 			if ( WindAC( WindACNum ).FanPlace == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
@@ -564,7 +535,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 14 ) ) {
-				WindAC( WindACNum ).HVACSizingIndex = FindItemInList( Alphas( 14 ), ZoneHVACSizing );
+				WindAC( WindACNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 14 ), ZoneHVACSizing );
 				if ( WindAC( WindACNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 14 ) + " = " + Alphas( 14 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
@@ -903,12 +874,8 @@ namespace WindowAC {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
@@ -917,17 +884,8 @@ namespace WindowAC {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MaxAirVolFlowDes; // Autosized maximum air flow for reporting
@@ -958,6 +916,7 @@ namespace WindowAC {
 		DataScalableSizingON = false;
 		ZoneHeatingOnlyFan = false;
 		ZoneCoolingOnlyFan = true;
+		DataScalableCapSizingON = false;
 		CompType = "ZoneHVAC:WindowAirConditioner";
 		CompName = WindAC( WindACNum ).Name;
 		DataZoneNumber = WindAC( WindACNum ).ZonePtr;
@@ -1065,6 +1024,8 @@ namespace WindowAC {
 			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = WindAC( WindACNum ).OutAirVolFlow;
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = WindAC( WindACNum ).MaxAirVolFlow;
 		}
+
+		DataScalableCapSizingON = false;
 
 	}
 
@@ -1292,7 +1253,6 @@ namespace WindowAC {
 		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-		using InputProcessor::SameString;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 

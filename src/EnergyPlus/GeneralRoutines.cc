@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -149,15 +137,11 @@ ControlCompOutput(
 	// METHODOLOGY EMPLOYED:
 	// Currently this is using an intervasl halving scheme to a control tolerance
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::WarmupFlag;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-	using InputProcessor::FindItemInSortedList;
 	using WaterCoils::SimulateWaterCoilComponents;
 	using FanCoilUnits::Calc4PipeFanCoil;
 	using UnitVentilator::CalcUnitVentilatorComponents;
@@ -172,9 +156,6 @@ ControlCompOutput(
 	using OutdoorAirUnit::CalcOAUnitCoilComps;
 	using PlantUtilities::SetActuatedBranchFlowRate;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	//Iteration maximum for reheat control
 	static int const MaxIter( 25 );
@@ -186,9 +167,6 @@ ControlCompOutput(
 	//  Plus -- order in ListOfComponents array must be in sorted order.
 	int const NumComponents( 11 );
 	static Array1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
 
 	// DERIVED TYPE DEFINITIONS
 	//Interval Half Type used for Controller
@@ -287,7 +265,7 @@ ControlCompOutput(
 	if ( ControlCompTypeNum != 0 ) {
 		SimCompNum = ControlCompTypeNum;
 	} else {
-		SimCompNum = FindItemInSortedList( CompType, ListOfComponents, NumComponents );
+		SimCompNum = InputProcessor::FindItemInSortedList( CompType, ListOfComponents, NumComponents );
 		ControlCompTypeNum = SimCompNum;
 	}
 
@@ -874,30 +852,12 @@ ValidateComponent(
 	// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
 	// convention of the Name of the item/object being the first Alpha Argument.
 
-	// REFERENCES:
-	// na
-
-	// Using/Aliasing
-	using InputProcessor::GetObjectItemNum;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
-
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int ItemNum;
 
 	IsNotOK = false;
 
-	ItemNum = GetObjectItemNum( CompType, CompName );
+	ItemNum = InputProcessor::GetObjectItemNum( CompType, CompName );
 
 	if ( ItemNum < 0 ) {
 		ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
@@ -910,6 +870,54 @@ ValidateComponent(
 	}
 
 }
+
+
+	void
+	ValidateComponent(
+			std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+			std::string const & CompValType, //Component "name" field type
+			std::string const & CompName, // Component Name (e.g. Big Chiller)
+			bool & IsNotOK, // .TRUE. if this component pair is invalid
+			std::string const & CallString // Context of this pair -- for error message
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   October 2002
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine can be called to validate the component type-name pairs that
+		// are so much a part of the EnergyPlus input.  The main drawback to this validation
+		// has been that the "GetInput" routine may not have been called and/or exists in
+		// another module from the one with the list.  This means that validation must be
+		// done later, perhaps after simulation has already started or perhaps raises an
+		// array bound error instead.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
+		// convention of the Name of the item/object being the first Alpha Argument.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ItemNum;
+
+		IsNotOK = false;
+
+		ItemNum = InputProcessor::GetObjectItemNum( CompType, CompValType, CompName );
+
+		if ( ItemNum < 0 ) {
+			ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
+			ShowContinueError( "Component name=" + CompName );
+			IsNotOK = true;
+		} else if ( ItemNum == 0 ) {
+			ShowSevereError( "During " + CallString + " Input, Invalid Component Name input=" + CompName );
+			ShowContinueError( "Component type=" + CompType );
+			IsNotOK = true;
+		}
+
+	}
 
 void
 CalcPassiveExteriorBaffleGap(
@@ -1469,12 +1477,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	// This subroutine tests supply air path integrity and displays the loop for each branch.
 	// Also, input and output nodes.
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::OutputFileBNDetails;
@@ -1486,21 +1488,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	using namespace ZonePlenum;
 	using DataAirLoop::AirToZoneNodeInfo;
 	using DataHVACGlobals::NumPrimaryAirSys;
-	using InputProcessor::SameString;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::GetNumObjectsFound;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Count;
@@ -1572,7 +1559,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Supply Air Path Component," + ChrOut + ',' + SupplyAirPath( BCount ).ComponentType( Count ) + ',' + SupplyAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
+			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:SUPPLYPLENUM" ) {
 				for ( Count2 = 1; Count2 <= NumZoneSupplyPlenums; ++Count2 ) {
@@ -1641,12 +1628,12 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 
 	if ( NumSplitters == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
+		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
 			GetZoneSplitterInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
+		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}
@@ -1769,28 +1756,11 @@ TestReturnAirPathIntegrity(
 	using DataAirLoop::AirToZoneNodeInfo;
 	using namespace ZonePlenum;
 	using DataHVACGlobals::NumPrimaryAirSys;
-	using InputProcessor::SameString;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::GetNumObjectsFound;
 	using MixerComponent::MixerCond;
 	using MixerComponent::NumMixers;
 	auto & GetZoneMixerInput( MixerComponent::GetMixerInput );
 	using PoweredInductionUnits::PIUnitHasMixer;
 	using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
-
-	// Argument array dimensioning
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
@@ -1873,7 +1843,7 @@ TestReturnAirPathIntegrity(
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Return Air Path Component," + ChrOut + ',' + ReturnAirPath( BCount ).ComponentType( Count ) + ',' + ReturnAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			if ( SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
+			if ( InputProcessor::SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
 				HasMixer = true;
 				MixerComp = Count;
 				++MixerCount;
@@ -1893,7 +1863,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 0 ) {
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
+			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 				for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -1957,7 +1927,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 1 ) {
 			for ( Count3 = 1; Count3 <= NumComp - 1; ++Count3 ) {
-				{ auto const SELECT_CASE_var( MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
+				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
 
 				if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 					for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -2019,12 +1989,12 @@ TestReturnAirPathIntegrity(
 	AllNodes.deallocate();
 
 	if ( NumMixers == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
+		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
 			GetZoneMixerInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
+		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}

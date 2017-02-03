@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -1548,27 +1536,8 @@ namespace General {
 		// This subroutine will process a date from a string and determine
 		// the proper month and day for that date string.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::ProcessNumber;
 		using namespace DataStringGlobals;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FstNum;
@@ -1578,7 +1547,7 @@ namespace General {
 		int TokenMonth;
 		int TokenWeekday;
 
-		FstNum = int( ProcessNumber( String, errFlag ) );
+		FstNum = int( InputProcessor::ProcessNumber( String, errFlag ) );
 		DateType = -1;
 		if ( ! errFlag ) {
 			// Entered single number, do inverse JDay
@@ -1642,16 +1611,6 @@ namespace General {
 		// Delete everything that is extraneous to the date information needed.  Process what
 		// is left.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::ProcessNumber;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static int const NumSingleChars( 3 );
 		static Array1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
@@ -1660,12 +1619,6 @@ namespace General {
 		static Array1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
 		static Array1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
 		static std::string const Numbers( "0123456789" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentString;
@@ -1728,17 +1681,17 @@ namespace General {
 			} else if ( Loop == 2 ) {
 				// Field must be Day Month or Month Day (if both numeric, mon / day)
 				InternalError = false;
-				NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
+				NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
 				if ( errFlag ) {
 					// Month day, but first field is not numeric, 2nd must be
-					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( errFlag ) {
 						ShowSevereError( "Invalid date field=" + String );
 						InternalError = true;
 					} else {
 						TokenDay = NumField2;
 					}
-					TokenMonth = FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
+					TokenMonth = InputProcessor::FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
 					ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 					if ( ! InternalError ) {
 						DateType = 1;
@@ -1747,7 +1700,7 @@ namespace General {
 					}
 				} else {
 					// Month Day, first field was numeric, if 2nd is, then it's month<num> day<num>
-					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( ! errFlag ) {
 						TokenMonth = NumField1;
 						TokenDay = NumField2;
@@ -1759,7 +1712,7 @@ namespace General {
 						}
 					} else { // 2nd field was not numeric.  Must be Month
 						TokenDay = NumField1;
-						TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+						TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
 						ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 						if ( ! InternalError ) {
 							DateType = 1;
@@ -1772,16 +1725,16 @@ namespace General {
 			} else if ( Loop == 3 ) {
 				// Field must be some combination of <num> Weekday Month (if WkDayInMonth true)
 				if ( WkDayInMonth ) {
-					NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
 					if ( ! errFlag ) { // the expected result
 						TokenDay = NumField1;
-						TokenWeekday = FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+						TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 						if ( TokenWeekday == 0 ) {
-							TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-							TokenWeekday = FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+							TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 						} else {
-							TokenMonth = FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+							TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 							if ( TokenMonth == 0 ) InternalError = true;
 						}
 						DateType = 2;
@@ -1791,13 +1744,13 @@ namespace General {
 						if ( Fields( 1 ) == "LA" ) {
 							DateType = 3;
 							NumTokens = 3;
-							TokenWeekday = FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenWeekday == 0 ) {
-								TokenMonth = FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-								TokenWeekday = FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+								TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+								TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 								if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 							} else {
-								TokenMonth = FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+								TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 								if ( TokenMonth == 0 ) InternalError = true;
 							}
 						} else { // error....
@@ -1805,9 +1758,9 @@ namespace General {
 						}
 					}
 				} else { // mm/dd/yyyy or yyyy/mm/dd
-					NumField1 = int( ProcessNumber( Fields( 1 ), errFlag ) );
-					NumField2 = int( ProcessNumber( Fields( 2 ), errFlag ) );
-					NumField3 = int( ProcessNumber( Fields( 3 ), errFlag ) );
+					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField3 = int( InputProcessor::ProcessNumber( Fields( 3 ), errFlag ) );
 					DateType = 1;
 					// error detection later..
 					if ( NumField1 > 100 ) {
@@ -1857,25 +1810,8 @@ namespace General {
 		// This subroutine validates a potential Day, Month values, produces an error
 		// message when not valid, and sets error flag.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_int const EndMonthDay( 12, { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool InternalError;
@@ -3060,17 +2996,8 @@ namespace General {
 		// First time routine is called, all the viable combinations/settings for the reports are
 		// stored in SAVEd variables.  Later callings will retrieve those.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetNumSectionsFound;
-		using InputProcessor::SameString;
 		using DataRuntimeLanguage::OutputFullEMSTrace;
 		using DataRuntimeLanguage::OutputEMSErrors;
 		using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
@@ -3078,18 +3005,6 @@ namespace General {
 		using DataRuntimeLanguage::OutputEMSInternalVarsFull;
 		using DataRuntimeLanguage::OutputEMSInternalVarsSmall;
 		using DataGlobals::ShowDecayCurvesInEIO;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumReports;
@@ -3128,9 +3043,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:List";
 
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3171,9 +3086,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3203,7 +3118,7 @@ namespace General {
 				}}
 			}
 
-			RepNum = GetNumSectionsFound( "Report Variable Dictionary" );
+			RepNum = InputProcessor::GetNumSectionsFound( "Report Variable Dictionary" );
 			if ( RepNum > 0 ) {
 				VarDict = true;
 				VarDictOption1 = "REGULAR";
@@ -3212,9 +3127,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:VariableDictionary";
 
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				VarDict = true;
 				VarDictOption1 = cAlphaArgs( 1 );
 				VarDictOption2 = cAlphaArgs( 2 );
@@ -3222,9 +3137,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:Constructions";
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( has_prefix( cAlphaArgs( 1 ), "CONSTRUCT" ) ) {
 					Constructions = true;
 				} else if ( has_prefix( cAlphaArgs( 1 ), "MAT" ) ) {
@@ -3240,9 +3155,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:EnergyManagementSystem";
-			NumReports = GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				EMSoutput = true;
 
@@ -3319,9 +3234,9 @@ namespace General {
 			}
 
 			//    cCurrentModuleObject='Output:Schedules'
-			//    NumReports=GetNumObjectsFound(cCurrentModuleObject)
+			//    NumReports=InputProcessor::GetNumObjectsFound(cCurrentModuleObject)
 			//    DO RepNum=1,NumReports
-			//      CALL GetObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
+			//      CALL InputProcessor::GetObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
 			//                     AlphaBlank=lAlphaFieldBlanks,NumBlank=lNumericFieldBlanks,  &
 			//                     AlphaFieldNames=cAlphaFieldNames,NumericFieldNames=cNumericFieldNames)
 			//      SchRpt=.TRUE.
@@ -3335,11 +3250,11 @@ namespace General {
 		// Process the Scan Request
 		DoReport = false;
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( reportName ) );
+		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( reportName ) );
 		if ( SELECT_CASE_var == "CONSTRUCTIONS" ) {
 			if ( present( ReportKey ) ) {
-				if ( SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
-				if ( SameString( ReportKey, "Materials" ) ) DoReport = Materials;
+				if ( InputProcessor::SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
+				if ( InputProcessor::SameString( ReportKey, "Materials" ) ) DoReport = Materials;
 			}
 		} else if ( SELECT_CASE_var == "VIEWFACTORINFO" ) {
 			DoReport = ViewFactorInfo;
@@ -3352,7 +3267,7 @@ namespace General {
 			//     DoReport=SchRpt
 			//      IF (PRESENT(Option1)) Option1=SchRptOption
 		} else if ( SELECT_CASE_var == "SURFACES" ) {
-			{ auto const SELECT_CASE_var1( MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
+			{ auto const SELECT_CASE_var1( InputProcessor::MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
 			if ( SELECT_CASE_var1 == "COSTINFO" ) {
 				DoReport = CostInfo;
 			} else if ( SELECT_CASE_var1 == "DXF" ) {
@@ -3418,7 +3333,6 @@ namespace General {
 
 		// Using/Aliasing
 		using DataGlobals::MaxNameLength;
-		using InputProcessor::FindItemInList;
 
 		// Argument array dimensioning
 
@@ -3451,7 +3365,7 @@ namespace General {
 			TooLong = true;
 		}
 
-		int FoundItem = FindItemInList( ResultName, ItemNames, NumItems );
+		int FoundItem = InputProcessor::FindItemInList( ResultName, ItemNames, NumItems );
 
 		if ( FoundItem != 0 ) {
 			ShowSevereError( calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered." );

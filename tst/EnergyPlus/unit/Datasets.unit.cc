@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <fstream>
@@ -85,127 +73,127 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( DataSetFixture, AirCooledChiller ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/AirCooledChiller.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/AirCooledChiller.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, ASHRAE_2005_HOF_Materials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ASHRAE_2005_HOF_Materials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ASHRAE_2005_HOF_Materials.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, Boilers ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/Boilers.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/Boilers.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, California_Title_24_2008 ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/California_Title_24-2008.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/California_Title_24-2008.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, Chillers ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, CompositeWallConstructions ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/CompositeWallConstructions.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/CompositeWallConstructions.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, DXCoolingCoil ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/DXCoolingCoil.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/DXCoolingCoil.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, ElectricGenerators ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ElectricGenerators.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ElectricGenerators.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, ElectricityUSAEnvironmentalImpactFactors ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ElectricityUSAEnvironmentalImpactFactors.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ElectricityUSAEnvironmentalImpactFactors.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, ElectronicEnthalpyEconomizerCurves ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ElectronicEnthalpyEconomizerCurves.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ElectronicEnthalpyEconomizerCurves.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, ExhaustFiredChiller ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ExhaustFiredChiller.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ExhaustFiredChiller.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, FluidPropertiesRefData ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/FluidPropertiesRefData.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/FluidPropertiesRefData.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, FossilFuelEnvironmentalImpactFactors ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/FossilFuelEnvironmentalImpactFactors.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/FossilFuelEnvironmentalImpactFactors.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, GLHERefData ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/GLHERefData.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/GLHERefData.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, GlycolPropertiesRefData ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/GlycolPropertiesRefData.idf" ) ) ) );
-	}
-	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2011 ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2011.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/GlycolPropertiesRefData.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2012 ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2012.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2012.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2013 ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2013.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2013.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2014 ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2014.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2014.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2015 ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2015.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2015.idf" ) ) ) );
+	}
+	TEST_F (DataSetFixture, LCCusePriceEscalationDataSet2016) {
+		ASSERT_TRUE(process_idf (delimited_string (getAllLinesInFile (configured_source_directory () + "/datasets/LCCusePriceEscalationDataSet2016.idf"))));
 	}
 	TEST_F( DataSetFixture, MoistureMaterials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/MoistureMaterials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/MoistureMaterials.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, PerfCurves ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PerfCurves.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PerfCurves.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, PrecipitationSchedulesUSA ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PrecipitationSchedulesUSA.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PrecipitationSchedulesUSA.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RefrigerationCasesDataSet ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RefrigerationCompressorCurvesNeedFix ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesNeedFix.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesNeedFix.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RefrigerationCompressorCurvesOK ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesOK.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesOK.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, ResidentialACsAndHPsPerfCurves ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ResidentialACsAndHPsPerfCurves.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ResidentialACsAndHPsPerfCurves.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RooftopPackagedHeatPump ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RooftopPackagedHeatPump.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RooftopPackagedHeatPump.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, SandiaPVdata ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/SandiaPVdata.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/SandiaPVdata.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, Schedules ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/Schedules.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/Schedules.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, SolarCollectors ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/SolarCollectors.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/SolarCollectors.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, StandardReports ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/StandardReports.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/StandardReports.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, SurfaceColorSchemes ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/SurfaceColorSchemes.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/SurfaceColorSchemes.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, USHolidays_DST ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/USHolidays-DST.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/USHolidays-DST.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, WindowBlindMaterials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowBlindMaterials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowBlindMaterials.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, WindowConstructs ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowConstructs.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowConstructs.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, WindowGasMaterials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowGasMaterials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowGasMaterials.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, WindowGlassMaterials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowGlassMaterials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowGlassMaterials.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, WindowScreenMaterials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowScreenMaterials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowScreenMaterials.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, WindowShadeMaterials ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowShadeMaterials.idf" ) ) ) );
+		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/WindowShadeMaterials.idf" ) ) ) );
 	}
 
 }

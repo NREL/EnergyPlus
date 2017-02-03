@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HVACUnitarySystem Unit Tests
 
@@ -154,7 +142,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 		"  Until: 24:00, 1.0;      !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 	int UnitarySysNum( 1 );
 	Real64 OnOffAirFlowRatio; // This is a return value
 	Real64 PartLoadRatio( 1.0 );
@@ -917,7 +905,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  Supply Fan 1,           !- Supply Fan Name",
 		"  BlowThrough,            !- Fan Placement",
 		"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-		"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 		"  Furnace Heating Coil 1, !- Heating Coil Name",
 		"  ,                       !- DX Heating Coil Sizing Ratio",
 		"  Coil:Cooling:DX:SingleSpeed, !- Cooling Coil Object Type",
@@ -925,7 +913,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -977,17 +965,19 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
 		"  45;                      !- Latent Capacity Time Constant {s}",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Furnace Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8,                    !- Gas Burner Efficiency",
 		"  32000,                  !- Nominal Capacity{ W }",
 		"  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
 		"  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -1071,7 +1061,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -1124,7 +1114,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( 2 ).CurrentValue = 1.0; //changed index of schedule to 2 because object has new position in a schedule
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
@@ -1241,7 +1231,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -1446,9 +1436,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"      Temperature,             !- Input Unit Type for Y",
 		"      Dimensionless;           !- Output Unit Type",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1,    !- Name",
 		"  FanAndCoilAvailSched,        !- Availability Schedule Name",
+		"  Gas,                         !- Fuel Type",
 		"  0.8,                         !- Gas Burner Efficiency",
 		"  32000,                       !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node,  !- Air Inlet Node Name",
@@ -1532,7 +1523,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -1605,7 +1596,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  Supply Fan 1,           !- Supply Fan Name",
 		"  BlowThrough,            !- Fan Placement",
 		"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-		"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 		"  Furnace Heating Coil 1, !- Heating Coil Name",
 		"  ,                       !- DX Heating Coil Sizing Ratio",
 		"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
@@ -1613,7 +1604,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -1767,17 +1758,19 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
 		"  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
 		 "  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Furnace Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8,                    !- Gas Burner Efficiency",
 		"  32000,                  !- Nominal Capacity{ W }",
 		"  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
 		"  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -1861,7 +1854,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -1918,7 +1911,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( 2 ).CurrentValue = 1.0;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
@@ -2020,7 +2013,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  Supply Fan 1,           !- Supply Fan Name",
 		"  BlowThrough,            !- Fan Placement",
 		"  FanAndCoilAvailSched,   !- Supply Air Fan Operating Mode Schedule Name",
-		"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 		"  Furnace Heating Coil 1, !- Heating Coil Name",
 		"  1,                      !- DX Heating Coil Sizing Ratio",
 		"  Coil:Cooling:DX:SingleSpeed, !- Cooling Coil Object Type",
@@ -2090,9 +2083,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
 		"  45;                      !- Latent Capacity Time Constant {s}",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Furnace Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8,                    !- Gas Burner Efficiency",
 		"  32000,                  !- Nominal Capacity{ W }",
 		"  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -2135,7 +2129,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -2362,7 +2356,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 		"  1.0,                                                     !- Heating Speed 2 Supply Air Flow Ratio",
 		"  0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio",
 		"  1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio",
-		"  1.0;,                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
+		"  1.0;                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
 
 		"Coil:Cooling:DX:MultiSpeed,",
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name",
@@ -2558,7 +2552,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -2582,7 +2576,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	CoolingLoad = false;
 
 	// zone predicted load is assume to be heating and the unitary system zone equipment
-	// inlet and outlet air conditions were set for heating 
+	// inlet and outlet air conditions were set for heating
 	HeatingLoad = true;
 	// set up zone equipment inlet node condtions
 	Node( InletNode ).Temp = 17.57;
@@ -2606,7 +2600,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 
 }
 
-	
+
 TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	std::string const idf_objects = delimited_string( {
@@ -2697,7 +2691,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  FlowPerCoolingCapacity, !- Supply Air Flow Rate Method During Cooling Operation",
 		"  ,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -2986,9 +2980,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"      Temperature,             !- Input Unit Type for Y",
 		"      Dimensionless;           !- Output Unit Type",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -3069,7 +3064,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  ,                       !- Maximum Curve Output",
 		"  Temperature,            !- Input Unit Type for X",
 		"  Temperature,            !- Input Unit Type for Y",
-		"  Dimensionless;          !- Output Unit Type",	
+		"  Dimensionless;          !- Output Unit Type",
 
 		"  Sizing:Zone,",
 		"    EAST ZONE,      !- Zone or ZoneList Name",
@@ -3269,7 +3264,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"    Until: 24:00,15.6;       !- Field 23",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData();
 	createFacilityElectricPowerServiceObject();
@@ -3351,13 +3346,11 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"Branch,",
 		"  Air Loop Main Branch, !- Name",
-		"  1.7, !- Maximum Flow Rate{ m3 / s }",
 		"  , !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
 		"  DXAC Heat Pump 1, !- Component 2 Name",
 		"  	Mixed Air Node, !- Component 2 Inlet Node Name",
-		"  Air Loop Outlet Node, !- Component 2 Outlet Node Name",
-		"  ACTIVE;                  !- Component 2 Branch Control Type",
+		"  Air Loop Outlet Node; !- Component 2 Outlet Node Name",
 		"  ",
 		"AirLoopHVAC,",
 		"  Heat Pump Sys 1, !- Name",
@@ -3391,7 +3384,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.7,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -3451,9 +3444,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  Mixed Air Node,      !- Air Inlet Node Name",
 		"  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Heat Pump DX Supp Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  45000, !- Nominal Capacity{ W }",
 		"  SuppHeating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -3920,7 +3914,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  HPACCoolCapFT Speed 1, !- Name",
 		"  1, !- Coefficient1 Constant",
 		"  0, !- Coefficient2 x",
-		"  0 !- Coefficient3 x**2",
+		"  0, !- Coefficient3 x**2",
 		"  0, !- Coefficient4 y",
 		"  0, !- Coefficient5 y**2",
 		"  0, !- Coefficient6 x*y",
@@ -4015,7 +4009,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 	Node.allocate( 10 );
 	ZoneEqSizing.deallocate( );
 	ZoneEqSizing.allocate( 1 );
@@ -4048,7 +4042,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 
-	HVACUnitarySystem::GetInputFlag = true; 
+	HVACUnitarySystem::GetInputFlag = true;
 	GetUnitarySystemInput( ); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 
@@ -4087,7 +4081,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
 	UnitarySystem( 1 ).ZoneInletNode = 3;
 
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ).CurrentValue = 1.0;
 
 	DataSizing::CurSysNum = 1;
 	UnitarySysEqSizing.allocate( 1 );
@@ -4290,7 +4284,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  FlowPerCoolingCapacity, !- Supply Air Flow Rate Method During Cooling Operation",
 		"  ,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -4785,9 +4779,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  Dimensionless;           !- Output Unit Type",
 		"  ",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5068,7 +5063,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"    Until: 24:00,15.6;       !- Field 23",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData( );
 	createFacilityElectricPowerServiceObject( );
@@ -5149,7 +5144,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -5232,9 +5227,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 		"  -0.050682973,            !- Heating Power Consumption Coefficient 4",
 		"  0.011385145;             !- Heating Power Consumption Coefficient 5",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5318,7 +5314,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -5405,7 +5401,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( 2 ).CurrentValue = 1.0;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignFanVolFlowRate * StdRhoAir;

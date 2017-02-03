@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -142,24 +130,8 @@ namespace ICEngineElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -172,7 +144,7 @@ namespace ICEngineElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, ICEngineGenerator );
+			GenNum = InputProcessor::FindItemInList( GeneratorName, ICEngineGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -268,32 +240,9 @@ namespace ICEngineElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Generator_ICEngine;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetICEInput ) {
 			GetICEngineGeneratorInput();
@@ -301,7 +250,7 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, ICEngineGenerator );
+			CompNum = InputProcessor::FindItemInList( CompName, ICEngineGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
 				return;
@@ -336,12 +285,7 @@ namespace ICEngineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
@@ -349,9 +293,6 @@ namespace ICEngineElectricGenerator {
 		using BranchNodeConnections::TestCompSet;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS
 
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter
@@ -361,13 +302,11 @@ namespace ICEngineElectricGenerator {
 		Array1D_string AlphArray( 10 ); // character string data
 		Array1D< Real64 > NumArray( 11 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 xValue; // test curve limits
 
 		//FLOW
 		cCurrentModuleObject = "Generator:InternalCombustionEngine";
-		NumICEngineGenerators = GetNumObjectsFound( cCurrentModuleObject );
+		NumICEngineGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumICEngineGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -382,15 +321,9 @@ namespace ICEngineElectricGenerator {
 
 		//LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
-			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ICEngineGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			ICEngineGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			ICEngineGenerator( GeneratorNum ).RatedPowerOutput = NumArray( 1 );

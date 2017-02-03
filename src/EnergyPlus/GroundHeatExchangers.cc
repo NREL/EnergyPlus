@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -150,7 +138,7 @@ namespace GroundHeatExchangers {
 	int locDayOfSim( 0 );
 	namespace {
 		bool GetInput( true );
-		bool errorsFound( false );
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    		bool errorsFound( false );
 	}
 
 	Array1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
@@ -1259,14 +1247,7 @@ namespace GroundHeatExchangers {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -1275,25 +1256,11 @@ namespace GroundHeatExchangers {
 		using DataEnvironment::MaxNumberSimYears;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GLHENum;
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array. "numNums" :)
 		int IOStat; // IO Status when calling get input subroutine
-		bool isNotOK; // Flag to verify name
-		bool isBlank; // Flag for blank name
 		int indexNum;
 		int pairNum;
 		bool allocated;
@@ -1302,8 +1269,8 @@ namespace GroundHeatExchangers {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 
-		numVerticalGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Vertical" );
-		numSlinkyGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
+		numVerticalGLHEs = InputProcessor::GetNumObjectsFound( "GroundHeatExchanger:Vertical" );
+		numSlinkyGLHEs = InputProcessor::GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
 
 		allocated = false;
 
@@ -1324,30 +1291,9 @@ namespace GroundHeatExchangers {
 			checkEquipName.dimension( numVerticalGLHEs, true );
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
-				isNotOK = false;
-				isBlank = false;
-
-				// Create temporary array of previous names to pass to VerifyName
-				Array1D <std::string> tmpNames;
-				tmpNames.allocate( numVerticalGLHEs - 1 );
-
-				// Populate temporary array with previous entrys
-				for (int i = 1; i < numVerticalGLHEs - 1; ++i ) {
-					tmpNames( i ) = verticalGLHE( i ).Name;
-				}
-
-				//get object name
-				VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
-
-				// Deallocate temporary array when no longer needed
-				tmpNames.deallocate();
-
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num
@@ -1469,30 +1415,9 @@ namespace GroundHeatExchangers {
 			checkEquipName.dimension( numSlinkyGLHEs, true );
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
-				isNotOK = false;
-				isBlank = false;
-
-				// Create temporary array of previous names to pass to VerifyName
-				Array1D <std::string> tmpNames;
-				tmpNames.allocate( numSlinkyGLHEs - 1 );
-
-				// Populate temporary array with previous entrys
-				for (int i = 1; i < numSlinkyGLHEs - 1; ++i ) {
-					tmpNames( i ) = slinkyGLHE( i ).Name;
-				}
-
-				//get object name
-				VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
-
-				// Deallocate temporary array when no longer needed
-				tmpNames.deallocate();
-
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num
@@ -1517,9 +1442,9 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).pipeOutDia = rNumericArgs( 8 );
 				slinkyGLHE( GLHENum ).pipeThick = rNumericArgs( 9 );
 
-				if ( SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
 					slinkyGLHE( GLHENum ).verticalConfig = true;
-				} else if ( SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
 					slinkyGLHE( GLHENum ).verticalConfig = false;
 				}
 

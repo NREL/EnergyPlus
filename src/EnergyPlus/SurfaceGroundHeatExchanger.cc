@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -244,15 +232,8 @@ namespace loc {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::Construct;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -262,19 +243,6 @@ namespace loc {
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
 		using General::RoundSigDigits;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -288,7 +256,7 @@ namespace loc {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Surface";
-		int NumOfSurfaceGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		int NumOfSurfaceGHEs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( SurfaceGHE ) ) SurfaceGHE.deallocate();
 
@@ -301,12 +269,12 @@ namespace loc {
 		for ( Item = 1; Item <= NumOfSurfaceGHEs; ++Item ) {
 
 			// get the input data
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			// General user input data
 			SurfaceGHE( Item ).Name = cAlphaArgs( 1 );
 			SurfaceGHE( Item ).ConstructionName = cAlphaArgs( 2 );
-			SurfaceGHE( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			SurfaceGHE( Item ).ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( SurfaceGHE( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -377,9 +345,9 @@ namespace loc {
 			}
 
 			// get lower b.c. type
-			if ( SameString( cAlphaArgs( 5 ), "GROUND" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "GROUND" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Ground;
-			} else if ( SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Exposed;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
@@ -440,11 +408,6 @@ namespace loc {
 		// METHODOLOGY EMPLOYED:
 		// Check flags and update data structure
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DataGlobals::BeginEnvrnFlag;
@@ -453,7 +416,6 @@ namespace loc {
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
-		using InputProcessor::SameString;
 		using DataPlant::TypeOf_GrndHtExchgSurface;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -463,19 +425,9 @@ namespace loc {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN) :: FlowLock            ! flow initialization/condition flag    !DSU
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DesignVelocity( 0.5 ); // Hypothetical design max pipe velocity [m/s]
 		static std::string const RoutineName( "InitSurfaceGroundHeatExchanger" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -506,7 +458,7 @@ namespace loc {
 		// get QTF data - only once
 		if ( this->InitQTF ) {
 			for ( Cons = 1; Cons <= TotConstructs; ++Cons ) {
-				if ( SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
+				if ( InputProcessor::SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
 					// some error checking ??
 					// CTF stuff
 					LayerNum = Construct( Cons ).TotLayers;

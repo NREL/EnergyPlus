@@ -1559,7 +1559,7 @@
     4,                       !- Maximum Cycling Rate {cycles/hr}
     45;                      !- Latent Capacity Time Constant {s}
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
   Coil:Heating:DX:SingleSpeed,
     HP DX Heating Coil 1,    !- Name
@@ -1593,9 +1593,9 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    1.60,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.60,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
-    1.60,                    !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.60,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.60,                    !- Heating Supply Air Flow Rate {m3/s}
+    1.60,                    !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1603,7 +1603,7 @@
     HP DX Heating Coil 1,    !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     HatPump DXCoil 1,        !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil,       !- Supplemental Heating Coil Name
     80,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -1611,10 +1611,11 @@
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     CoolReheat;              !- Dehumidification Control Type
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Supp Heating Coil,       !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     20000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
@@ -1731,18 +1732,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.6,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:AirToAir,  !- Component 2 Object Type
     GasHeat DX Heat Pump 1,  !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -2247,23 +2245,19 @@
 
   Branch,
     Storage Tank Use Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     DHW Loop Pump,           !- Component 1 Name
     Storage Tank Use Loop Inlet Node,  !- Component 1 Inlet Node Name
-    DHW Use Side Pump Outlet,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    DHW Use Side Pump Outlet;!- Component 1 Outlet Node Name
 
   Branch,
     Storage Tank Tempering Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     TemperingValve,          !- Component 1 Object Type
     DHW Anti-Scald Diverter, !- Component 1 Name
     DHW Anti-Scald Inlet Node,  !- Component 1 Inlet Node Name
-    DHW Anti-Scald Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    DHW Anti-Scald Outlet Node;  !- Component 1 Outlet Node Name
 
   TemperingValve,
     DHW Anti-Scald Diverter, !- Name
@@ -2277,37 +2271,33 @@
     DHW Loop Pump,           !- Name
     Storage Tank Use Loop Inlet Node,  !- Inlet Node Name
     DHW Use Side Pump Outlet,!- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     Storage Tank Use Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Storage Tank,            !- Component 1 Name
     Storage Tank Use Inlet Node,  !- Component 1 Inlet Node Name
-    Storage Tank Use Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Storage Tank Use Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Storage Tank Use Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Instantaneous Water Heater,  !- Component 1 Name
     Instantaneous Water Heater Inlet Node,  !- Component 1 Inlet Node Name
-    Instantaneous Water Heater Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Instantaneous Water Heater Outlet Node;  !- Component 1 Outlet Node Name
 
   WaterHeater:Mixed,
     Instantaneous Water Heater,  !- Name
@@ -2380,13 +2370,11 @@
 
   Branch,
     Coil Bypass Branch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Coil Bypass,             !- Component 1 Name
     Coil Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Coil Bypass Outlet Node, !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Coil Bypass Outlet Node; !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Coil Bypass,             !- Name
@@ -2395,13 +2383,11 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-DHW Node,    !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Pipe-DHW Node;    !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Inlet Pipe,       !- Name
@@ -2410,13 +2396,11 @@
 
   Branch,
     Domestic Hot Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Domestic Hot Water,      !- Component 1 Name
     Domestic Hot Water Inlet Node,  !- Component 1 Inlet Node Name
-    Domestic Hot Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Domestic Hot Water Outlet Node;  !- Component 1 Outlet Node Name
 
   WaterUse:Connections,
     Domestic Hot Water,      !- Name
@@ -2464,13 +2448,11 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand DHW-Pipe Node,    !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Outlet Pipe,      !- Name
@@ -2593,39 +2575,35 @@
 
   Branch,
     Storage Tank Source Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Collector Loop Pump,     !- Component 1 Name
     Storage Tank Source Loop Inlet Node,  !- Component 1 Inlet Node Name
-    Storage Tank Source Pump-Water Heater Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Storage Tank Source Pump-Water Heater Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Collector Loop Pump,     !- Name
     Storage Tank Source Loop Inlet Node,  !- Inlet Node Name
     Storage Tank Source Pump-Water Heater Node,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     Storage Tank Source Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Storage Tank,            !- Component 1 Name
     Storage Tank Source Inlet Node,  !- Component 1 Inlet Node Name
-    Storage Tank Source Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Storage Tank Source Outlet Node;  !- Component 1 Outlet Node Name
 
   WaterHeater:Mixed,
     Storage Tank,            !- Name
@@ -2670,13 +2648,11 @@
 
   Branch,
     Storage Tank Source Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Storage Tank Source Outlet Pipe,  !- Component 1 Name
     Storage Tank Source Water Heater-Pipe Node,  !- Component 1 Inlet Node Name
-    Storage Tank Source Loop Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Storage Tank Source Loop Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Storage Tank Source Outlet Pipe,  !- Name
@@ -2710,13 +2686,11 @@
 
   Branch,
     Collector Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Inlet Pipe,    !- Component 1 Name
     Collector Loop Inlet Node,  !- Component 1 Inlet Node Name
-    Collector Pipe-Collector Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Collector Pipe-Collector Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Collector Inlet Pipe,    !- Name
@@ -2725,18 +2699,15 @@
 
   Branch,
     Collector 1 Branch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     SolarCollector:IntegralCollectorStorage,  !- Component 1 Object Type
     Collector 1,             !- Component 1 Name
     Collector 1 Inlet Node,  !- Component 1 Inlet Node Name
     Collector 1 Outlet Node, !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     SolarCollector:IntegralCollectorStorage,  !- Component 2 Object Type
     Collector 2,             !- Component 2 Name
     Collector 1 Outlet Node, !- Component 2 Inlet Node Name
-    Collector 2 Outlet Node, !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Collector 2 Outlet Node; !- Component 2 Outlet Node Name
 
   SolarCollector:IntegralCollectorStorage,
     Collector 1,             !- Name
@@ -2817,13 +2788,11 @@
 
   Branch,
     Collector Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Collector Outlet Pipe,   !- Component 1 Name
     Collector Collector-Pipe Node,  !- Component 1 Inlet Node Name
-    Collector Loop Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Collector Loop Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Collector Outlet Pipe,   !- Name

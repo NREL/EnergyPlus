@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -75,6 +63,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -147,8 +136,11 @@ namespace Humidifiers {
 	int const FixedInletWaterTemperature( 1 );
 	int const VariableInletWaterTemperature( 2 );
 
+	bool GetInputFlag = true; // moved up from a static function variable
+
 	// Object Data
 	Array1D< HumidifierData > Humidifier;
+	std::unordered_map< std::string, std::string > HumidifierUniqueNames;
 
 	// Clears the global data in Humidifiers.
 	// Needed for unit tests, should not be normally called.
@@ -160,6 +152,8 @@ namespace Humidifiers {
 		NumGasSteamHums = 0;
 		CheckEquipName.deallocate();
 		Humidifier.deallocate();
+		HumidifierUniqueNames.clear();
+		GetInputFlag = true;
 	}
 
 	void
@@ -179,31 +173,11 @@ namespace Humidifiers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manage the simulation of an air humidifier
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// NA
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HumNum; // index of humidifier unit being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
 
 		if ( GetInputFlag ) {
@@ -213,7 +187,7 @@ namespace Humidifiers {
 
 		// Get the humidifier unit index
 		if ( CompIndex == 0 ) {
-			HumNum = FindItemInList( CompName, Humidifier );
+			HumNum = InputProcessor::FindItemInList( CompName, Humidifier );
 			if ( HumNum == 0 ) {
 				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
 			}
@@ -282,14 +256,7 @@ namespace Humidifiers {
 		// METHODOLOGY EMPLOYED:
 		// Uses InputProcessor "Get" routines to obtain data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankDemandComponent;
@@ -298,18 +265,8 @@ namespace Humidifiers {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHumidifierInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HumidifierIndex; // loop index
@@ -320,8 +277,6 @@ namespace Humidifiers {
 		int MaxAlphas; // maximum Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -333,19 +288,20 @@ namespace Humidifiers {
 		//  certain object in the input file
 
 		CurrentModuleObject = "Humidifier:Steam:Electric";
-		NumElecSteamHums = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumElecSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = NumNumbers;
 		MaxAlphas = NumAlphas;
 		CurrentModuleObject = "Humidifier:Steam:Gas";
-		NumGasSteamHums = GetNumObjectsFound( CurrentModuleObject );
+		NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		NumHumidifiers = NumElecSteamHums + NumGasSteamHums;
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		// allocate the data array
 		Humidifier.allocate( NumHumidifiers );
+		HumidifierUniqueNames.reserve( static_cast< unsigned >( NumHumidifiers ) );
 		CheckEquipName.dimension( NumHumidifiers, true );
 
 		Alphas.allocate( MaxAlphas );
@@ -358,15 +314,9 @@ namespace Humidifiers {
 		// loop over electric steam humidifiers and load the input data
 		CurrentModuleObject = "Humidifier:Steam:Electric";
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex ) {
-			GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = HumidifierIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			//    Humidifier(HumNum)%HumType = TRIM(CurrentModuleObject)
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Electric;
@@ -401,15 +351,9 @@ namespace Humidifiers {
 		// loop over gas fired steam humidifiers and load the input data
 		CurrentModuleObject = "Humidifier:Steam:Gas";
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumGasSteamHums; ++HumidifierIndex ) {
-			GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = NumElecSteamHums + HumidifierIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Gas;
 			Humidifier( HumNum ).Sched = Alphas( 2 );
@@ -629,7 +573,7 @@ namespace Humidifiers {
 		// This subroutine is for for sizing electric steam humidifier nominal electric power.
 
 		// METHODOLOGY EMPLOYED:
-		// Uses user sepecified nominal capacity in m3/s and water enthalpy change required to
+		// Uses user specified nominal capacity in m3/s and water enthalpy change required to
 		// vaporize water from a reference temperature of 20.0C. to steam at 100.0C.
 		//  m_dot = Nominal Capacity [m3/s] * Density of water at 5.05 [kg/m3]
 		//  Nominal Capacity =  m_dot [kg/s] * delta_enthalpy [J/kg]
@@ -666,8 +610,8 @@ namespace Humidifiers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CalledFrom( "Humidifier:SizeHumidifier" );
-		Real64 const Tref( 20.0 ); // Reference temp of water for rated capacity calac [C]
-		Real64 const TSteam( 100.0 ); // saturated steam temperatur generated by Humidifier [C]
+		Real64 const Tref( 20.0 ); // Reference temp of water for rated capacity calcs [C]
+		Real64 const TSteam( 100.0 ); // saturated steam temperature generated by Humidifier [C]
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -677,7 +621,7 @@ namespace Humidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ModuleObjectType; // for ease in getting objects
-		int RefrigerantIndex; // refiferant index
+		int RefrigerantIndex; // refrigerant index
 		int WaterIndex; // fluid type index
 		Real64 NominalPower; // Nominal power input to humidifier, W
 		Real64 WaterSpecHeatAvg; // specific heat of water, J/kgK
@@ -1062,16 +1006,12 @@ namespace Humidifiers {
 		// Uses energy and mass balance as well as pschrometric relations. Adopted
 		// from routine CalcElecSteamHumidifier by Fred Buhl
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyTdbFnHW;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::RhoH2O;
 		using CurveManager::CurveValue;
-
 		using DataEnvironment::WaterMainsTemp;
 		using DataWater::WaterStorage;
 		using FluidProperties::GetSatEnthalpyRefrig;
@@ -1079,19 +1019,9 @@ namespace Humidifiers {
 		using FluidProperties::FindGlycol;
 		using FluidProperties::FindRefrigerant;
 
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcGasSteamHumidifier" );
-		Real64 const TSteam( 100.0 ); // saturated steam temperatur generated by Humidifier [C]
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
+		Real64 const TSteam( 100.0 ); // saturated steam temperature generated by Humidifier [C]
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1165,9 +1095,9 @@ namespace Humidifiers {
 			if ( InletWaterTempOption == FixedInletWaterTemperature ) {
 				GasUseRateAtRatedEff = ( WaterAdd / NomCap ) * NomPower;
 			} else if ( InletWaterTempOption == VariableInletWaterTemperature ) {
-				if ( SuppliedByWaterSystem ) { // use water use storage tank supply temperaure
+				if ( SuppliedByWaterSystem ) { // use water use storage tank supply temperature
 					 CurMakeupWaterTemp = WaterStorage( WaterTankID ).TwaterSupply( TankSupplyID );
-				} else { // use water main temperaure
+				} else { // use water main temperature
 					 CurMakeupWaterTemp = WaterMainsTemp;
 				}
 				Tref = CurMakeupWaterTemp;

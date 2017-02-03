@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -177,26 +165,9 @@ namespace MicroCHPElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataPlant::PlantFirstSizeCompleted;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -210,7 +181,7 @@ namespace MicroCHPElectricGenerator {
 		//  Call InitMicroCHPNoNormalizeGenerators
 
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MicroCHP );
+			GenNum = InputProcessor::FindItemInList( GeneratorName, MicroCHP );
 			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -260,15 +231,8 @@ namespace MicroCHPElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataGenerators;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveCheck;
 		using CurveManager::CurveValue;
@@ -289,8 +253,6 @@ namespace MicroCHPElectricGenerator {
 		Array1D_string AlphArray( 25 ); // character string data
 		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		//  INTEGER       :: thisMicroCHP  !temporary index
 		//  INTEGER       :: otherMicroCHP !loop counter and temporary indexer
 		//  INTEGER       :: I   ! loop counter
@@ -307,7 +269,7 @@ namespace MicroCHPElectricGenerator {
 
 			// First get the Micro CHP Parameters so they can be nested in structure later
 			cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";
-			NumMicroCHPParams = GetNumObjectsFound( cCurrentModuleObject );
+			NumMicroCHPParams = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPParams <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -318,16 +280,9 @@ namespace MicroCHPElectricGenerator {
 			CheckEquipName.dimension( NumMicroCHPParams, true );
 
 			for ( CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum ) {
-				GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				//  Can't validate this name.
-				//    IsNotOK=.FALSE.
-				//    IsBlank=.FALSE.
-
-				//    CALL VerifyName(AlphArray(1),MicroCHP%Name,CHPParamNum-1,IsNotOK,IsBlank,TRIM(cCurrentModuleObject))
-				//    IF (IsNotOK) THEN
-				//      ErrorsFound=.TRUE.
-				//      IF (IsBlank) AlphArray(1)='xxxxx'
-				//    ENDIF
+				InputProcessor::GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				// Can't validate this name
+				//InputProcessor::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
 
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 
@@ -339,11 +294,11 @@ namespace MicroCHPElectricGenerator {
 				MicroCHPParamInput( CHPParamNum ).ElecEffCurveID = GetCurveCheck( AlphArray( 2 ), ErrorsFound, ObjMSGName ); //Electrical Eff. ID
 				MicroCHPParamInput( CHPParamNum ).ThermalEffCurveID = GetCurveCheck( AlphArray( 3 ), ErrorsFound, ObjMSGName ); //Thermal Efficiency
 
-				if ( SameString( AlphArray( 4 ), "InternalControl" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 4 ), "InternalControl" ) ) {
 					MicroCHPParamInput( CHPParamNum ).InternalFlowControl = true; //  A4, \field Cooling Water Flow Rate Mode
 					MicroCHPParamInput( CHPParamNum ).PlantFlowControl = false;
 				}
-				if ( ( ! ( SameString( AlphArray( 4 ), "InternalControl" ) ) ) && ( ! ( SameString( AlphArray( 4 ), "PlantControl" ) ) ) ) {
+				if ( ( ! ( InputProcessor::SameString( AlphArray( 4 ), "InternalControl" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 4 ), "PlantControl" ) ) ) ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
@@ -375,11 +330,11 @@ namespace MicroCHPElectricGenerator {
 				}
 				MicroCHPParamInput( CHPParamNum ).Pstandby = NumArray( 12 ); // N12 Standby Power [W]
 
-				if ( SameString( AlphArray( 7 ), "TimeDelay" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 7 ), "TimeDelay" ) ) {
 					MicroCHPParamInput( CHPParamNum ).WarmUpByTimeDelay = true;
 					MicroCHPParamInput( CHPParamNum ).WarmUpByEngineTemp = false;
 				}
-				if ( ( ! ( SameString( AlphArray( 7 ), "NominalEngineTemperature" ) ) ) && ( ! ( SameString( AlphArray( 7 ), "TimeDelay" ) ) ) ) {
+				if ( ( ! ( InputProcessor::SameString( AlphArray( 7 ), "NominalEngineTemperature" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 7 ), "TimeDelay" ) ) ) ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
@@ -394,11 +349,11 @@ namespace MicroCHPElectricGenerator {
 
 				MicroCHPParamInput( CHPParamNum ).CoolDownDelay = NumArray( 19 ); // N19 Cool Down Delay Time in seconds
 
-				if ( SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) {
 					MicroCHPParamInput( CHPParamNum ).MandatoryFullCoolDown = true;
 					MicroCHPParamInput( CHPParamNum ).WarmRestartOkay = false;
 				}
-				if ( ( ! ( SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) ) && ( ! ( SameString( AlphArray( 8 ), "OptionalCoolDown" ) ) ) ) {
+				if ( ( ! ( InputProcessor::SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 8 ), "OptionalCoolDown" ) ) ) ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
@@ -406,7 +361,7 @@ namespace MicroCHPElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:MicroCHP";
-			NumMicroCHPs = GetNumObjectsFound( cCurrentModuleObject );
+			NumMicroCHPs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPs <= 0 ) {
 				// shouldn't ever come here?
@@ -422,21 +377,15 @@ namespace MicroCHPElectricGenerator {
 
 			// load in Micro CHPs
 			for ( GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum ) {
-				GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), MicroCHP, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				//GENERATOR:MICRO CHP,
 				MicroCHP( GeneratorNum ).Name = AlphArray( 1 ); //  A1 Generator name
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 				MicroCHP( GeneratorNum ).ParamObjName = AlphArray( 2 ); //  A2 Micro CHP Parameter Object Name
 				//find input structure
-				thisParamID = FindItemInList( AlphArray( 2 ), MicroCHPParamInput );
+				thisParamID = InputProcessor::FindItemInList( AlphArray( 2 ), MicroCHPParamInput );
 				if ( thisParamID != 0 ) {
 					MicroCHP( GeneratorNum ).A42Model = MicroCHPParamInput( thisParamID ); // entire structure of input data assigned here!
 				} else {
@@ -447,7 +396,7 @@ namespace MicroCHPElectricGenerator {
 
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
 					MicroCHP( GeneratorNum ).ZoneName = AlphArray( 3 ); //  A3 Zone Name
-					MicroCHP( GeneratorNum ).ZoneID = FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone );
+					MicroCHP( GeneratorNum ).ZoneID = InputProcessor::FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone );
 					if ( MicroCHP( GeneratorNum ).ZoneID == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + AlphArray( 3 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -470,7 +419,7 @@ namespace MicroCHPElectricGenerator {
 				MicroCHP( GeneratorNum ).AirOutletNodeName = AlphArray( 7 ); //  A7 Air Outlet Node Name
 				MicroCHP( GeneratorNum ).AirOutletNodeID = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
-				MicroCHP( GeneratorNum ).FuelSupplyID = FindItemInList( AlphArray( 8 ), FuelSupply ); // Fuel Supply ID
+				MicroCHP( GeneratorNum ).FuelSupplyID = InputProcessor::FindItemInList( AlphArray( 8 ), FuelSupply ); // Fuel Supply ID
 				if ( MicroCHP( GeneratorNum ).FuelSupplyID == 0 ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -1530,32 +1479,10 @@ namespace MicroCHPElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using namespace DataGlobalConstants;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Generator_MicroCHP;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetMicroCHPInput ) {
 
@@ -1565,7 +1492,7 @@ namespace MicroCHPElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MicroCHP );
+			CompNum = InputProcessor::FindItemInList( CompName, MicroCHP );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );
 				return;

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -85,6 +73,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -154,6 +143,7 @@ namespace DualDuct {
 
 	// Object Data
 	Array1D< DamperDesignParams > Damper;
+	std::unordered_map< std::string, std::string > UniqueDamperNames;
 	Array1D< DamperFlowConditions > DamperInlet;
 	Array1D< DamperFlowConditions > DamperHotAirInlet;
 	Array1D< DamperFlowConditions > DamperColdAirInlet;
@@ -182,27 +172,8 @@ namespace DualDuct {
 		// It is called from the SimAirLoopComponent
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DamperNum; // The Damper that you are currently loading input into
@@ -217,7 +188,7 @@ namespace DualDuct {
 
 		// Find the correct DamperNumber with the AirLoop & CompNum from AirLoop Derived Type
 		if ( CompIndex == 0 ) {
-			DamperNum = FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
+			DamperNum = InputProcessor::FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
 			if ( DamperNum == 0 ) {
 				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
 			}
@@ -286,15 +257,7 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using BranchNodeConnections::TestCompSet;
@@ -305,18 +268,8 @@ namespace DualDuct {
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDualDuctInput: " ); // include trailing bla
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -333,19 +286,18 @@ namespace DualDuct {
 		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zone do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		int ADUNum; // loop control to search Air Distribution Units
 		static Real64 DummyOAFlow( 0.0 );
 
 		// Flow
-		NumDualDuctConstVolDampers = GetNumObjectsFound( cCMO_DDConstantVolume );
-		NumDualDuctVarVolDampers = GetNumObjectsFound( cCMO_DDVariableVolume );
-		NumDualDuctVarVolOA = GetNumObjectsFound( cCMO_DDVarVolOA );
+		NumDualDuctConstVolDampers = InputProcessor::GetNumObjectsFound( cCMO_DDConstantVolume );
+		NumDualDuctVarVolDampers = InputProcessor::GetNumObjectsFound( cCMO_DDVariableVolume );
+		NumDualDuctVarVolOA = InputProcessor::GetNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
+		UniqueDamperNames.reserve( NumDampers );
 		CheckEquipName.dimension( NumDampers, true );
 
 		DamperInlet.allocate( NumDampers );
@@ -361,16 +313,10 @@ namespace DualDuct {
 
 				CurrentModuleObject = cCMO_DDConstantVolume;
 
-				GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex;
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -428,16 +374,10 @@ namespace DualDuct {
 
 				CurrentModuleObject = cCMO_DDVariableVolume;
 
-				GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_VariableVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -479,7 +419,7 @@ namespace DualDuct {
 				}
 
 				if ( ! lAlphaBlanks( 6 ) ) {
-					Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
+					Damper( DamperNum ).OARequirementsPtr = InputProcessor::FindItemInList( AlphArray( 6 ), OARequirements );
 					if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 						ShowContinueError( "Occurs in " + cCMO_DDVariableVolume + " = " + Damper( DamperNum ).DamperName );
@@ -502,16 +442,10 @@ namespace DualDuct {
 
 				CurrentModuleObject = cCMO_DDVarVolOA;
 
-				GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_OutdoorAir;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -571,7 +505,7 @@ namespace DualDuct {
 						}
 					}
 				}
-				Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
+				Damper( DamperNum ).OARequirementsPtr = InputProcessor::FindItemInList( AlphArray( 6 ), OARequirements );
 				if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCMO_DDVarVolOA + " = " + Damper( DamperNum ).DamperName );
@@ -681,9 +615,6 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataConvergParams::HVACFlowRateToler;
@@ -691,21 +622,8 @@ namespace DualDuct {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataDefineEquip::AirDistUnit;
-		using InputProcessor::SameString;
 		using DataHeatBalance::TotPeople;
 		using DataHeatBalance::People;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HotInNode;
@@ -983,24 +901,8 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using ReportSizingManager::ReportSizingOutput;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string DamperType;
@@ -1712,7 +1614,6 @@ namespace DualDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // Index to air loop
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
@@ -1730,8 +1631,7 @@ namespace DualDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat );
-				OAMassFlow = OAVolumeFlowRate * RhoAir;
+				OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction
 				SAMassFlow = OAMassFlow / AirLoopOAFrac;
@@ -1785,7 +1685,6 @@ namespace DualDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		bool UseOccSchFlag; // TRUE = use actual occupancy, FALSE = use total zone people
 		bool PerPersonNotSet;
@@ -1811,9 +1710,7 @@ namespace DualDuct {
 
 		OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet );
 
-		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, RoutineName );
-
-		OAMassFlow = OAVolumeFlowRate * RhoAir;
+		OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 		if ( present( MaxOAVolFlow ) ) {
 			OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true );
@@ -2140,29 +2037,6 @@ namespace DualDuct {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get routine to learn if a dual duct outdoor air unit is using its recirc deck
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER :: DamperNum
 		static bool FirstTimeOnly( true );
@@ -2189,7 +2063,7 @@ namespace DualDuct {
 		//  END IF
 
 		if ( FirstTimeOnly ) {
-			NumDualDuctVarVolOA = GetNumObjectsFound( cCMO_DDVarVolOA );
+			NumDualDuctVarVolOA = InputProcessor::GetNumObjectsFound( cCMO_DDVarVolOA );
 			RecircIsUsedARR.allocate( NumDualDuctVarVolOA );
 			DamperNamesARR.allocate( NumDualDuctVarVolOA );
 			if ( NumDualDuctVarVolOA > 0 ) {
@@ -2197,7 +2071,7 @@ namespace DualDuct {
 
 					CurrentModuleObject = cCMO_DDVarVolOA;
 
-					GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					DamperNamesARR( DamperIndex ) = AlphArray( 1 );
 					if ( ! lAlphaBlanks( 5 ) ) {
 						RecircIsUsedARR( DamperIndex ) = true;
@@ -2209,7 +2083,7 @@ namespace DualDuct {
 			FirstTimeOnly = false;
 		}
 
-		DamperIndex = FindItemInList( CompName, DamperNamesARR, NumDualDuctVarVolOA );
+		DamperIndex = InputProcessor::FindItemInList( CompName, DamperNamesARR, NumDualDuctVarVolOA );
 		if ( DamperIndex > 0 ) {
 			RecircIsUsed = RecircIsUsedARR( DamperIndex );
 		}
@@ -2218,6 +2092,11 @@ namespace DualDuct {
 
 	//        End of Reporting subroutines for the Damper Module
 	// *****************************************************************************
+
+	void
+	clear_state() {
+		UniqueDamperNames.clear();
+	}
 
 } // DualDuct
 

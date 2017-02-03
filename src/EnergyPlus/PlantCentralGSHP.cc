@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -186,11 +174,6 @@ namespace PlantCentralGSHP {
 	{
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
@@ -214,7 +197,7 @@ namespace PlantCentralGSHP {
 
 		// Find the correct wrapper
 		if ( CompIndex == 0 ) {
-			WrapperNum = FindItemInList( WrapperName, Wrapper );
+			WrapperNum = InputProcessor::FindItemInList( WrapperName, Wrapper );
 			if ( WrapperNum == 0 ) {
 				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName );
 			}
@@ -606,16 +589,7 @@ namespace PlantCentralGSHP {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the Wrapper model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -630,14 +604,9 @@ namespace PlantCentralGSHP {
 		// Locals
 		static int NumChillerHeaters( 0 ); // total number of chiller heater (without identical multiplier)
 
-		// PARAMETERS
-		// na
-
 		// LOCAL VARIABLES
 		static std::string CompName; // component name
 		static bool ErrorsFound( false ); // True when input errors are found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool AllocatedFlag( false ); // True when arrays are allocated
 		static bool CHAllocatedFlag( false ); // True when arrays are allocated
 		int NumAlphas; // Number of elements in the alpha array
@@ -654,7 +623,7 @@ namespace PlantCentralGSHP {
 
 		if ( AllocatedFlag ) return;
 		cCurrentModuleObject = "CentralHeatPumpSystem";
-		NumWrappers = GetNumObjectsFound( cCurrentModuleObject );
+		NumWrappers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWrappers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -669,20 +638,13 @@ namespace PlantCentralGSHP {
 
 		// Load arrays with electric EIR chiller data
 		for ( WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum ) {
-			GetObjectItem( cCurrentModuleObject, WrapperNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, WrapperNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			Wrapper( WrapperNum ).Name = cAlphaArgs( 1 );
 
 			// intialize nth chiller heater index (including identical units) for current wrapper
 			NumChHtrPerWrapper = 0;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Wrapper, WrapperNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
 
@@ -775,7 +737,7 @@ namespace PlantCentralGSHP {
 			for ( Comp = 1; Comp <= Wrapper( WrapperNum ).NumOfComp; ++Comp ) {
 				if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR" ) {
 					CompName = Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperComponentName;
-					CompIndex = FindItemInList( CompName, ChillerHeater );
+					CompIndex = InputProcessor::FindItemInList( CompName, ChillerHeater );
 					// User may enter invalid name rather than selecting one from the object list
 					if ( CompIndex <= 0 ) {
 						ShowSevereError( "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName );
@@ -907,15 +869,7 @@ namespace PlantCentralGSHP {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -928,15 +882,9 @@ namespace PlantCentralGSHP {
 		using General::RoundSigDigits;
 		using DataSizing::AutoSize;
 
-		// Locals
-		// PARAMETERS
-		// na
-
 		// LOCAL VARIABLES
 		std::string StringVar; // Used for EIRFPLR warning messages
 		static bool CHErrorsFound( false ); // True when input errors are found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool FoundNegValue( false ); // Used to evaluate PLFFPLR curve objects
 		int CurveValPtr; // Index to EIRFPLR curve output
 		static int CurveCheck( 0 ); // Used to evaluate PLFFPLR curve objects
@@ -953,7 +901,7 @@ namespace PlantCentralGSHP {
 		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-		NumChillerHeaters = GetNumObjectsFound( cCurrentModuleObject );
+		NumChillerHeaters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumChillerHeaters <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -968,17 +916,10 @@ namespace PlantCentralGSHP {
 
 		// Load arrays with electric EIR chiller data
 		for ( ChillerHeaterNum = 1; ChillerHeaterNum <= NumChillerHeaters; ++ChillerHeaterNum ) {
-			GetObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ChillerHeater( ChillerHeaterNum ).Name = cAlphaArgs( 1 );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ChillerHeater, ChillerHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				CHErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, CHErrorsFound);
 
 			ChillerHeater( ChillerHeaterNum ).CondModeCooling = cAlphaArgs( 4 );
 
@@ -1051,7 +992,7 @@ namespace PlantCentralGSHP {
 				}
 			}
 
-			if ( SameString( cAlphaArgs( 3 ), "WaterCooled" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "WaterCooled" ) ) {
 				ChillerHeater( ChillerHeaterNum ).CondenserType = WaterCooled;
 			} else {
 				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -1272,7 +1213,6 @@ namespace PlantCentralGSHP {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-		using InputProcessor::SameString;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using CurveManager::GetCurveMinMaxValues;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;

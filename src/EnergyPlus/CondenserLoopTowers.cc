@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -82,6 +70,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -126,7 +115,6 @@ namespace CondenserLoopTowers {
 	using DataEnvironment::OutHumRat;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutWetBulbTemp;
-
 	using FluidProperties::GetDensityGlycol;
 	using FluidProperties::GetSpecificHeatGlycol;
 	using DataPlant::PlantLoop;
@@ -214,6 +202,7 @@ namespace CondenserLoopTowers {
 	Array1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleTowerReport; // report variables
 	Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
+	std::unordered_map< std::string, std::string > UniqueSimpleTowerNames;
 
 	// MODULE SUBROUTINES:
 
@@ -240,6 +229,7 @@ namespace CondenserLoopTowers {
 		FanCyclingRatio = 0.0;
 		CheckEquipName.deallocate();
 		SimpleTower.deallocate();
+		UniqueSimpleTowerNames.clear();
 		SimpleTowerInlet.deallocate();
 		SimpleTowerReport.deallocate();
 		VSTower.deallocate();
@@ -277,24 +267,6 @@ namespace CondenserLoopTowers {
 		// then calls the appropriate subroutine to calculate tower performance,
 		// update records (node info) and writes output report info.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int TowerNum;
@@ -307,7 +279,7 @@ namespace CondenserLoopTowers {
 
 		// Find the correct CoolingTower
 		if ( CompIndex == 0 ) {
-			TowerNum = FindItemInList( TowerName, SimpleTower );
+			TowerNum = InputProcessor::FindItemInList( TowerName, SimpleTower );
 			if ( TowerNum == 0 ) {
 				ShowFatalError( "SimTowers: Unit not found=" + TowerName );
 			}
@@ -440,15 +412,7 @@ namespace CondenserLoopTowers {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in the data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -459,18 +423,8 @@ namespace CondenserLoopTowers {
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt OutputFormat( "(F5.2)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TowerNum; // Tower number, reference counter for SimpleTower data array
@@ -491,8 +445,6 @@ namespace CondenserLoopTowers {
 		int NumNums2; // Number of elements in the numeric2 array
 		int IOStat; // IO Status when calling get input subroutine
 		int CoeffNum; // Index for reading user defined VS tower coefficients
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		std::string OutputChar; // report variable for warning messages
 		std::string OutputCharLo; // report variable for warning messages
@@ -503,19 +455,21 @@ namespace CondenserLoopTowers {
 		Array1D_string AlphArray2( 1 ); // Character string input data array for VS tower coefficients
 
 		// Get number of all cooling towers specified in the input data file (idf)
-		NumSingleSpeedTowers = GetNumObjectsFound( cCoolingTower_SingleSpeed );
-		NumTwoSpeedTowers = GetNumObjectsFound( cCoolingTower_TwoSpeed );
-		NumVariableSpeedTowers = GetNumObjectsFound( cCoolingTower_VariableSpeed );
-		NumVSMerkelTowers = GetNumObjectsFound( cCoolingTower_VariableSpeedMerkel );
+		NumSingleSpeedTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_SingleSpeed );
+		NumTwoSpeedTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_TwoSpeed );
+		NumVariableSpeedTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_VariableSpeed );
+		NumVSMerkelTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_VariableSpeedMerkel );
 		NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
 		if ( NumSimpleTowers <= 0 ) ShowFatalError( "No Cooling Tower objects found in input, however, a branch object has specified a cooling tower. Search the input for CoolingTower to determine the cause for this error." );
 
+		GetInput = false;
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleTower ) ) return;
 
 		// Allocate data structures to hold tower input data, report data and tower inlet conditions
 		SimpleTower.allocate( NumSimpleTowers );
+		UniqueSimpleTowerNames.reserve( NumSimpleTowers );
 		SimpleTowerReport.allocate( NumSimpleTowers );
 		SimpleTowerInlet.allocate( NumSimpleTowers );
 		CheckEquipName.dimension( NumSimpleTowers, true );
@@ -523,22 +477,16 @@ namespace CondenserLoopTowers {
 		if ( NumVariableSpeedTowers > 0 ) {
 			VSTower.allocate( NumVariableSpeedTowers );
 			// Allow users to input model coefficients other than default
-			NumVSCoolToolsModelCoeffs = GetNumObjectsFound( "CoolingTowerPerformance:CoolTools" );
-			NumVSYorkCalcModelCoeffs = GetNumObjectsFound( "CoolingTowerPerformance:YorkCalc" );
+			NumVSCoolToolsModelCoeffs = InputProcessor::GetNumObjectsFound( "CoolingTowerPerformance:CoolTools" );
+			NumVSYorkCalcModelCoeffs = InputProcessor::GetNumObjectsFound( "CoolingTowerPerformance:YorkCalc" );
 		}
 
 		// Load data structures with cooling tower input data
 		cCurrentModuleObject = cCoolingTower_SingleSpeed;
 		for ( SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber ) {
 			TowerNum = SingleSpeedTowerNumber;
-			GetObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_SingleSpeed;
@@ -583,9 +531,9 @@ namespace CondenserLoopTowers {
 			}
 			SimpleTower( TowerNum ).TowerFreeConvNomCapSizingFactor = NumArray( 12 );
 			if ( NumAlphas >= 4 ) {
-				if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 					SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_UFactor;
-				} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 					SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 				} else {
 					ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -623,9 +571,9 @@ namespace CondenserLoopTowers {
 			}
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 6 ), "LossFactor" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 6 ), "LossFactor" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( AlphArray( 6 ).empty() ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -647,9 +595,9 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).SizFac = NumArray( 21 ); //  N17  \field Sizing Factor
 			if ( SimpleTower( TowerNum ).SizFac <= 0.0 ) SimpleTower( TowerNum ).SizFac = 1.0;
 
-			if ( SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( AlphArray( 7 ).empty() ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
@@ -693,7 +641,7 @@ namespace CondenserLoopTowers {
 			if ( lAlphaFieldBlanks( 11 ) || AlphArray( 11 ).empty() ) {
 				SimpleTower( TowerNum ).CapacityControl = CapacityControl_FanCycling; // FanCycling
 			} else {
-				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 11 ) ) );
+				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( AlphArray( 11 ) ) );
 				if ( SELECT_CASE_var == "FANCYCLING" ) {
 					SimpleTower( TowerNum ).CapacityControl = CapacityControl_FanCycling;
 				} else if ( SELECT_CASE_var == "FLUIDBYPASS" ) {
@@ -726,12 +674,12 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
-					if ( SameString( AlphArray( 12 ), "MinimalCell" ) || SameString( AlphArray( 12 ), "MaximalCell" ) ) {
-						if ( SameString( AlphArray( 12 ), "MinimalCell" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 12 ), "MinimalCell" ) || InputProcessor::SameString( AlphArray( 12 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 12 ), "MinimalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MinCell;
 							SimpleTower( TowerNum ).CellCtrl = "MinimalCell";
 						}
-						if ( SameString( AlphArray( 12 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 12 ), "MaximalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
@@ -775,30 +723,27 @@ namespace CondenserLoopTowers {
 				}
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate != 0.0 ) {
 					if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
 					}
-					ShowContinueError( "Design water flow rate must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Design water flow rate will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity and design tower UA have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity and design tower UA have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity has been specified and design tower UA is being autosized." );
 					}
-					ShowContinueError( "Design tower UA field must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Design tower UA will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
 					}
-					ShowContinueError( "Free convection UA should be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Free convection UA will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap >= SimpleTower( TowerNum ).TowerNominalCapacity ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection nominal capacity must be less than the nominal (design) tower capacity." );
@@ -818,15 +763,9 @@ namespace CondenserLoopTowers {
 		cCurrentModuleObject = cCoolingTower_TwoSpeed;
 		for ( TwoSpeedTowerNumber = 1; TwoSpeedTowerNumber <= NumTwoSpeedTowers; ++TwoSpeedTowerNumber ) {
 			TowerNum = NumSingleSpeedTowers + TwoSpeedTowerNumber;
-			GetObjectItem( cCurrentModuleObject, TwoSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_TwoSpeed;
@@ -836,9 +775,9 @@ namespace CondenserLoopTowers {
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
 			if ( NumAlphas >= 4 ) {
-				if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 					SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_UFactor;
-				} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 					SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 				} else {
 					ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -930,9 +869,9 @@ namespace CondenserLoopTowers {
 			}
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 6 ), "LossFactor" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 6 ), "LossFactor" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( lAlphaFieldBlanks( 6 ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -953,9 +892,9 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).SizFac = NumArray( 29 ); //  N21  \field Sizing Factor
 			if ( SimpleTower( TowerNum ).SizFac <= 0.0 ) SimpleTower( TowerNum ).SizFac = 1.0;
 
-			if ( SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( lAlphaFieldBlanks( 7 ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
@@ -997,12 +936,12 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
-					if ( SameString( AlphArray( 11 ), "MinimalCell" ) || SameString( AlphArray( 11 ), "MaximalCell" ) ) {
-						if ( SameString( AlphArray( 11 ), "MinimalCell" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 11 ), "MinimalCell" ) || InputProcessor::SameString( AlphArray( 11 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 11 ), "MinimalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MinCell;
 							SimpleTower( TowerNum ).CellCtrl = "MinimalCell";
 						}
-						if ( SameString( AlphArray( 11 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 11 ), "MaximalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
@@ -1079,39 +1018,35 @@ namespace CondenserLoopTowers {
 				}
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate != 0.0 ) {
 					if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
 					}
-					ShowContinueError( "Design water flow rate must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Design water flow rate will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at high fan speed have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at high fan speed have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and tower UA at high fan speed is being autosized." );
 					}
-					ShowContinueError( "Tower UA at high fan speed must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Tower UA at high fan speed will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).LowSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).LowSpeedTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at low fan speed have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at low fan speed have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and tower UA at low fan speed is being autosized." );
 					}
-					ShowContinueError( "Tower UA at low fan speed must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Tower UA at low fan speed will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
 					}
-					ShowContinueError( "Free convection UA should be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Free convection UA will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).TowerLowSpeedNomCap >= SimpleTower( TowerNum ).TowerNominalCapacity ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Low-speed nominal capacity must be less than the high-speed nominal capacity." );
@@ -1135,14 +1070,9 @@ namespace CondenserLoopTowers {
 		cCurrentModuleObject = cCoolingTower_VariableSpeed;
 		for ( VariableSpeedTowerNumber = 1; VariableSpeedTowerNumber <= NumVariableSpeedTowers; ++VariableSpeedTowerNumber ) {
 			TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + VariableSpeedTowerNumber;
-			GetObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleTower( TowerNum ).VSTower = VariableSpeedTowerNumber;
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
@@ -1151,10 +1081,10 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
-			if ( ( SameString( AlphArray( 4 ), "CoolToolsUserDefined" ) || SameString( AlphArray( 4 ), "YorkCalcUserDefined" ) ) && lAlphaFieldBlanks( 5 ) ) {
+			if ( ( InputProcessor::SameString( AlphArray( 4 ), "CoolToolsUserDefined" ) || InputProcessor::SameString( AlphArray( 4 ), "YorkCalcUserDefined" ) ) && lAlphaFieldBlanks( 5 ) ) {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" a " + cAlphaFieldNames( 5 ) + " must be specified when " + cAlphaFieldNames( 4 ) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined" );
 				ErrorsFound = true;
-			} else if ( ( SameString( AlphArray( 4 ), "CoolToolsCrossFlow" ) || SameString( AlphArray( 4 ), "YorkCalc" ) ) && ! lAlphaFieldBlanks( 5 ) ) {
+			} else if ( ( InputProcessor::SameString( AlphArray( 4 ), "CoolToolsCrossFlow" ) || InputProcessor::SameString( AlphArray( 4 ), "YorkCalc" ) ) && ! lAlphaFieldBlanks( 5 ) ) {
 				ShowWarningError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" a Tower Model Coefficient Name is specified and the Tower Model Type is not specified as CoolToolsUserDefined or YorkCalcUserDefined. The CoolingTowerPerformance:CoolTools (orCoolingTowerPerformance:YorkCalc) data object will not be used." );
 			} else {
 				SimpleTower( TowerNum ).ModelCoeffObjectName = AlphArray( 5 );
@@ -1170,7 +1100,7 @@ namespace CondenserLoopTowers {
 			VSTower( VariableSpeedTowerNumber ).Coeff.allocate( 35 );
 			VSTower( VariableSpeedTowerNumber ).Coeff = 0.0;
 
-			if ( SameString( AlphArray( 4 ), "CoolToolsCrossFlow" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 4 ), "CoolToolsCrossFlow" ) ) {
 				SimpleTower( TowerNum ).TowerModelType = CoolToolsXFModel;
 				//     set cross-flow model coefficients
 				//       Outputs approach in F
@@ -1259,7 +1189,7 @@ namespace CondenserLoopTowers {
 
 				//    CoolTools counterflow model does not work properly. The empirical model seems flawed since the tower
 				//    operates in the free convection regime on the design day.
-				//    ELSEIF(SameString(AlphArray(5),'COOLTOOLS COUNTERFLOW'))THEN
+				//    ELSEIF(InputProcessor::SameString(AlphArray(5),'COOLTOOLS COUNTERFLOW'))THEN
 				//      SimpleTower(TowerNum)%TowerModelType               = CoolToolsCFModel
 				//!     set counter-flow model coefficients
 				//!       Outputs approach in F
@@ -1345,7 +1275,7 @@ namespace CondenserLoopTowers {
 				//        VSTower(SimpleTower(TowerNum)%VSTower)%MinWaterFlowRatio = 0.75
 				//        VSTower(SimpleTower(TowerNum)%VSTower)%MaxWaterFlowRatio = 1.25
 
-			} else if ( SameString( AlphArray( 4 ), "YorkCalc" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "YorkCalc" ) ) {
 				SimpleTower( TowerNum ).TowerModelType = YorkCalcModel;
 				//     set counter-flow model coefficients
 				//       Outputs approach in F
@@ -1417,12 +1347,12 @@ namespace CondenserLoopTowers {
 				VSTower( SimpleTower( TowerNum ).VSTower ).MaxWaterFlowRatio = 1.25;
 				VSTower( SimpleTower( TowerNum ).VSTower ).MaxLiquidToGasRatio = 8.0;
 
-			} else if ( SameString( AlphArray( 4 ), "CoolToolsUserDefined" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "CoolToolsUserDefined" ) ) {
 				SimpleTower( TowerNum ).TowerModelType = CoolToolsUserDefined;
 				// Nested Get-input routines below.  Should pull out of here and read in beforehand.
 				for ( VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSCoolToolsModelCoeffs; ++VSModelCoeffNum ) {
-					GetObjectItem( "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
-					if ( ! SameString( AlphArray2( 1 ), SimpleTower( TowerNum ).ModelCoeffObjectName ) ) continue;
+					InputProcessor::GetObjectItem( "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
+					if ( ! InputProcessor::SameString( AlphArray2( 1 ), SimpleTower( TowerNum ).ModelCoeffObjectName ) ) continue;
 					VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff = true;
 					// verify the correct number of coefficients for the CoolTools model
 					if ( NumNums2 != 43 ) {
@@ -1449,12 +1379,12 @@ namespace CondenserLoopTowers {
 					ShowSevereError( "CoolingTower:VariableSpeed \"" + SimpleTower( TowerNum ).Name + "\". User defined name for variable speed cooling tower model coefficients object not found = " + SimpleTower( TowerNum ).ModelCoeffObjectName );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "YorkCalcUserDefined" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "YorkCalcUserDefined" ) ) {
 				SimpleTower( TowerNum ).TowerModelType = YorkCalcUserDefined;
 				// Nested Get-input routines below.  Should pull out of here and read in beforehand.
 				for ( VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSYorkCalcModelCoeffs; ++VSModelCoeffNum ) {
-					GetObjectItem( "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
-					if ( ! SameString( AlphArray2( 1 ), SimpleTower( TowerNum ).ModelCoeffObjectName ) ) continue;
+					InputProcessor::GetObjectItem( "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
+					if ( ! InputProcessor::SameString( AlphArray2( 1 ), SimpleTower( TowerNum ).ModelCoeffObjectName ) ) continue;
 					VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff = true;
 					// verify the correct number of coefficients for the YorkCalc model
 					if ( NumNums2 != 36 ) {
@@ -1634,9 +1564,9 @@ namespace CondenserLoopTowers {
 			//    END IF
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 8 ), "LossFactor" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 8 ), "LossFactor" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 8 ), "SaturatedExit" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 8 ), "SaturatedExit" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( lAlphaFieldBlanks( 8 ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -1652,9 +1582,9 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).SizFac = NumArray( 17 ); //  N14  \field Sizing Factor
 			if ( SimpleTower( TowerNum ).SizFac <= 0.0 ) SimpleTower( TowerNum ).SizFac = 1.0;
 
-			if ( SameString( AlphArray( 9 ), "ScheduledRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 9 ), "ScheduledRate" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 9 ), "ConcentrationRatio" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 9 ), "ConcentrationRatio" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( lAlphaFieldBlanks( 9 ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
@@ -1692,12 +1622,12 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
-					if ( SameString( AlphArray( 13 ), "MinimalCell" ) || SameString( AlphArray( 13 ), "MaximalCell" ) ) {
-						if ( SameString( AlphArray( 13 ), "MinimalCell" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 13 ), "MinimalCell" ) || InputProcessor::SameString( AlphArray( 13 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 13 ), "MinimalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MinCell;
 							SimpleTower( TowerNum ).CellCtrl = "MinimalCell";
 						}
-						if ( SameString( AlphArray( 13 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 13 ), "MaximalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
@@ -1737,14 +1667,8 @@ namespace CondenserLoopTowers {
 		cCurrentModuleObject = cCoolingTower_VariableSpeedMerkel;
 		for ( MerkelVSTowerNum = 1; MerkelVSTowerNum <= NumVSMerkelTowers; ++MerkelVSTowerNum ) {
 			TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + MerkelVSTowerNum;
-			GetObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_VariableSpeedMerkel;
@@ -1752,9 +1676,9 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
-			if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 				SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_UFactor;
-			} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 				SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 			} else {
 				ShowSevereError( cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -1865,9 +1789,9 @@ namespace CondenserLoopTowers {
 			}
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 10 ), "LossFactor" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 10 ), "LossFactor" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 10 ), "SaturatedExit" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 10 ), "SaturatedExit" ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( lAlphaFieldBlanks( 10 ) ) {
 				SimpleTower( TowerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -1888,9 +1812,9 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).SizFac = NumArray( 25 ); //  N25  \field Sizing Factor
 			if ( SimpleTower( TowerNum ).SizFac <= 0.0 ) SimpleTower( TowerNum ).SizFac = 1.0;
 
-			if ( SameString( AlphArray( 11 ), "ScheduledRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 11 ), "ScheduledRate" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 11 ), "ConcentrationRatio" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 11 ), "ConcentrationRatio" ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( lAlphaFieldBlanks( 11 ) ) {
 				SimpleTower( TowerNum ).BlowdownMode = BlowdownByConcentration;
@@ -1932,12 +1856,12 @@ namespace CondenserLoopTowers {
 					SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 					SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 				} else {
-					if ( SameString( AlphArray( 15 ), "MinimalCell" ) || SameString( AlphArray( 15 ), "MaximalCell" ) ) {
-						if ( SameString( AlphArray( 15 ), "MinimalCell" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 15 ), "MinimalCell" ) || InputProcessor::SameString( AlphArray( 15 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 15 ), "MinimalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MinCell;
 							SimpleTower( TowerNum ).CellCtrl = "MinimalCell";
 						}
-						if ( SameString( AlphArray( 15 ), "MaximalCell" ) ) {
+						if ( InputProcessor::SameString( AlphArray( 15 ), "MaximalCell" ) ) {
 							SimpleTower( TowerNum ).CellCtrl_Num = CellCtrl_MaxCell;
 							SimpleTower( TowerNum ).CellCtrl = "MaximalCell";
 						}
@@ -2163,13 +2087,9 @@ namespace CondenserLoopTowers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using Psychrometrics::PsyTwbFnTdbWPb;
-		using InputProcessor::SameString;
 		using DataPlant::TypeOf_CoolingTower_SingleSpd;
 		using DataPlant::TypeOf_CoolingTower_TwoSpd;
 		using DataPlant::TypeOf_CoolingTower_VarSpd;
@@ -2181,17 +2101,8 @@ namespace CondenserLoopTowers {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitTower" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
@@ -2329,7 +2240,6 @@ namespace CondenserLoopTowers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2379,6 +2289,8 @@ namespace CondenserLoopTowers {
 		Real64 AssumedDeltaT; // default delta T for nominal capacity of hard sized with UA method
 		Real64 AssumedExitTemp; // default for cp fo nominal capacity of hard sized with UA method
 		bool ErrorsFound;
+		Real64 OutWaterTemp; // outlet water temperature during sizing [C]
+		Real64 CoolingOutput; // tower capacity during sizing [W]
 
 		tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
@@ -2435,7 +2347,7 @@ namespace CondenserLoopTowers {
 			// Design water flow rate is assumed to be 3 gpm per ton (SI equivalent 5.382E-8 m3/s per watt)
 			SimpleTower( TowerNum ).DesignWaterFlowRate = 5.382e-8 * SimpleTower( TowerNum ).TowerNominalCapacity;
 			tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
-			if ( SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:SingleSpeed" ) ) {
+			if ( InputProcessor::SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:SingleSpeed" ) ) {
 				if ( PlantFinalSizesOkayToReport ) {
 					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
 						"Design Water Flow Rate based on tower nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
@@ -2444,7 +2356,7 @@ namespace CondenserLoopTowers {
 					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
 						"Initial Design Water Flow Rate based on tower nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
 				}
-			} else if ( SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:TwoSpeed" ) ) {
+			} else if ( InputProcessor::SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:TwoSpeed" ) ) {
 				if ( PlantFinalSizesOkayToReport ) {
 					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
 						"Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
@@ -2462,6 +2374,7 @@ namespace CondenserLoopTowers {
 			// We assume the nominal fan power is 0.0105 times the design load
 			if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				SimpleTower( TowerNum ).HighSpeedFanPower = 0.0105 * SimpleTower( TowerNum ).TowerNominalCapacity;
+				tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
 			} else {
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -2735,7 +2648,7 @@ namespace CondenserLoopTowers {
 
 		}
 
-		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity && SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:TwoSpeed" ) ) {
+		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity && InputProcessor::SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:TwoSpeed" ) ) {
 			if ( SimpleTower( TowerNum ).DesignWaterFlowRate >= SmallWaterVolFlow && SimpleTower( TowerNum ).TowerLowSpeedNomCap > 0.0 ) {
 				// nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now is a user input
 				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, 29.44, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName ); // 85F design exiting water temp
@@ -2778,6 +2691,7 @@ namespace CondenserLoopTowers {
 		}
 
 		if ( SimpleTower( TowerNum ).FreeConvAirFlowRateWasAutoSized ) {
+			SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * tmpHighSpeedAirFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {
 				SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * SimpleTower( TowerNum ).HighSpeedAirFlowRate;
 				if ( PlantFinalSizesOkayToReport ) {
@@ -2828,8 +2742,25 @@ namespace CondenserLoopTowers {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
-					ShowSevereError( "Bad starting values for UA" );
+					ShowSevereError( "Bad starting values for UA calculations" );
+					ShowContinueError( "Tower inlet design water temperature assumed to be 35.0 C." );
+					ShowContinueError( "Tower inlet design air dry-bulb temperature assumed to be 35.0 C." );
+					ShowContinueError( "Tower inlet design air wet-bulb temperature assumed to be 25.6 C." );
+					ShowContinueError( "Tower load assumed to be " + TrimSigDigits( SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio, 3 ) + " times free convection capacity of " + TrimSigDigits( SimpleTower( TowerNum ).TowerFreeConvNomCap, 0 ) + " W." );
+
+					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA0, OutWaterTemp );
+					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
+					ShowContinueError( "Tower capacity at lower UA guess (" + TrimSigDigits( UA0, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
+
+					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA1, OutWaterTemp );
+					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
+					ShowContinueError( "Tower capacity at upper UA guess (" + TrimSigDigits( UA1, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
+
+					if ( CoolingOutput < DesTowerLoad ) {
+						ShowContinueError( "Free convection capacity should be less than tower capacity at upper UA guess." );
+					}
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+
 				}
 				if ( PlantFirstSizesOkayToFinalize ) {
 					SimpleTower( TowerNum ).FreeConvTowerUA = UA;
@@ -2849,7 +2780,7 @@ namespace CondenserLoopTowers {
 
 		// calibrate variable speed tower model based on user input by finding calibration water flow rate ratio that
 		// yields an approach temperature that matches user input
-		if ( SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:VariableSpeed" ) ) {
+		if ( InputProcessor::SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:VariableSpeed" ) ) {
 
 			Twb = SimpleTower( TowerNum ).DesignInletWB;
 			Tr = SimpleTower( TowerNum ).DesignRange;

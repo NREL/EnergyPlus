@@ -218,7 +218,7 @@ Here is a list of some of the things that the Airflow Network calculation can an
 
 2)~~~Air circulation and/or air temperature stratification within a thermal zone. For example, you should not try to divide a high space, such as an atrium, into subzones separated by artificial horizontal surfaces that have cracks or openings with the expectation that AirflowNetwork will give you a realistic temperature in each subzone and/or a realistic air flow between subzones.
 
-3)~~~The model is restricted to eleven types of coils that can be in the air distribution system (Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas, Coil:Heating:Electric,~ Coil:Heating:DX:SingleSpeed, Coil:Cooling:Water, Coil:Heating:Water, Coil:Cooling:Water:DetailedGeometry, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, and Coil:Heating:Desuperheater).
+3)~~~The model is restricted to eleven types of coils that can be in the air distribution system (Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel, Coil:Heating:Electric,~ Coil:Heating:DX:SingleSpeed, Coil:Cooling:Water, Coil:Heating:Water, Coil:Cooling:Water:DetailedGeometry, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, and Coil:Heating:Desuperheater).
 
 4)~~~The model is restricted to a single type of air distribution equipment terminal units (AirTerminal:SingleDuct:ConstantVolume:Reheat).
 
@@ -535,11 +535,7 @@ The AirflowNetwork:MultiZone:Surface object allows a heat transfer surface or su
 
 An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:MultiZone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
-When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
-
-Effective width = 0.75 x Length between Vertex 1 and Vertex 2
-
-Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )
+When a non-rectangular subsurface is used, the model will automatically convert it into a rectangular subsurface using equivalent width and height based on an entered choice from the Equivalent Rectangle Method field or a default choice.
 
 \subsubsection{Field: Surface Name}\label{field-surface-name-000}
 
@@ -684,6 +680,31 @@ If Ventilation Control Mode = NoVent, this schedule has no effect.
 \subsubsection{Field: Occupant Ventilation Control Name}\label{field-occupant-ventilation-control-name-1}
 
 The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden.
+
+\subsubsection{Field: Equivalent Rectangle Method }\label{equivalent-rectangle-method}
+
+This field is applied to a non-rectangular window or door. The equivalent 
+rectangular surface has the same area as the non-rectangular one. The valid
+choices are: PolygonHeight, BaseSurfaceAspectRatio, and UserDefinedAspectRatio,
+with the default of PolygonHeight. When PolygonHeight is entered, the equivalent
+width is equal to the area divided by the PolygonHeight for a non-horizontal
+surface. When a surface is horizontal with the same height for all vertices,
+the model will automatically switch a choice to BaseSurfaceAspectRatio if a
+base surface is rectangular, or UserDefinedAspectRatio with the default value if
+a base surface is non-rectangular.  When BaseSurfaceAspectRatio is entered for
+a rectangular base surface, the equivalent height is equal to Square Root of
+Area divided by the base surface aspect ratio. The equivalent width is equal
+to the equivalent height times the base surface aspect ratio. When a base
+surface is non-rectangular, the model will automatically switch the choice to
+PolygonHeight for a non-horizontal base surface, and UserDefinedAspectRatio
+with the default value if a base surface is horizontal. When
+UserDefinedAspectRatio is entered, the equivalent height is equal to Square
+Root of Area divided by UserDefinedAspectRatio. The equivalent width is equal
+to the equivalent height times the user-defined aspect ratio.
+
+ \subsubsection{Field: Equivalent Rectangle Aspect Ratio}\label{equivalent-rectangular-aspect-ratio}
+
+ This field applies only if Equivalent Rectangle Method = UserDefinedAspectRatio. This value must be greater than zero, with the default being 1.0. 
 
 IDF examples are provided below:
 
@@ -895,7 +916,9 @@ The AirflowNetwork model assumes that open windows or doors are vertical or clos
 
 It is assumed that the air flow through a window opening is unaffected by the presence of a shading device such as a shade or blind on the window. Also, the calculation of conductive heat transfer and solar gain through a window or door assumes that the window or door is closed.
 
-The AirflowNetwork model does not have a model for bi-directional flow through large horizontal openings. For this reason, \textbf{Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Detailed\-Opening should not be used for horizontal openings}. The best modeling technique in this case is to put an Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object in a horizontal surface and use a large air mass flow coefficient. Crack flow is assumed to be uni-directional in any given timestep (but can reverse flow direction from timestep to timestep).
+The AirflowNetwork model does not have a model for bi-directional flow through large horizontal openings in exterior surfaces. For this reason, \textbf{Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Detailed\-Opening should not be used for exterior horizontal openings}. The best modeling technique in this case is to put an Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object in a horizontal surface and use a large air mass flow coefficient. Crack flow is assumed to be uni-directional in any given timestep (but can reverse flow direction from timestep to timestep).
+
+For large horizontal openings in interior surfaces, see Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Horizontal\-Opening.
 
 A subsurface multiplier may be used to represent multiple subsurfaces and calculates total air flow when the subsurface (window, glassdoor, or door) is either closed or open. The total airflow across the surface is equal to the airflow based on the surface geometry multiplied by the subsurface multiplier.
 
@@ -1916,7 +1939,7 @@ This field requires input of the coil type used in the AirflowNetwork model. The
 \item
   Coil:Cooling:DX:SingleSpeed
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Electric
 \item

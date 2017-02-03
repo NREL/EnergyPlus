@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -157,24 +145,8 @@ namespace FuelCellElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -186,7 +158,7 @@ namespace FuelCellElectricGenerator {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, FuelCell );
+			GenNum = InputProcessor::FindItemInList( GeneratorName, FuelCell );
 			if ( GenNum == 0 ) ShowFatalError( "SimFuelCellGenerator: Specified Generator not one of Valid FuelCell Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -232,16 +204,8 @@ namespace FuelCellElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataGenerators;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItem;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using NodeInputManager::GetOnlySingleNode;
@@ -253,9 +217,6 @@ namespace FuelCellElectricGenerator {
 		using DataGlobals::DisplayAdvancedReportVariables;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
-		// Locals
-		// PARAMETERS
-
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -264,8 +225,6 @@ namespace FuelCellElectricGenerator {
 		Array1D_string AlphArray( 25 ); // character string data
 		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumFuelCellPMs; // number of power subsystems in input file
 		int NumFuelCellAirSups; // number of air supply subsystems in input file
 		//  INTEGER       :: NumFuelCellFuelSups      ! number of fuel supply subsystems in input file
@@ -304,7 +263,7 @@ namespace FuelCellElectricGenerator {
 		if ( MyOneTimeFlag ) {
 
 			cCurrentModuleObject = "Generator:FuelCell";
-			NumFuelCellGenerators = GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellGenerators <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -317,15 +276,9 @@ namespace FuelCellElectricGenerator {
 
 			// first load in FuelCell names
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
-				GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				FuelCell( GeneratorNum ).Name = AlphArray( 1 );
 				FuelCell( GeneratorNum ).NameFCPM = AlphArray( 2 );
 				FuelCell( GeneratorNum ).NameFCAirSup = AlphArray( 3 );
@@ -341,7 +294,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:PowerModule";
-			NumFuelCellPMs = GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellPMs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellPMs <= 0 ) { //Autodesk:Uninit Allowing code to continue past this condition used thisFuelCell uninitialized in EP 8.0
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -349,22 +302,15 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCPMNum = 1; FCPMNum <= NumFuelCellPMs; ++FCPMNum ) {
-				GetObjectItem( cCurrentModuleObject, FCPMNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FCPMNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::FCPM ), FCPMNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCPM );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCPM );
 				if ( thisFuelCell > 0 ) { //cr9323
 
 					FuelCell( thisFuelCell ).FCPM.Name = AlphArray( 1 );
-					if ( SameString( AlphArray( 2 ), "ANNEX42" ) ) FuelCell( thisFuelCell ).FCPM.EffMode = DirectCurveMode;
-					if ( SameString( AlphArray( 2 ), "NORMALIZED" ) ) FuelCell( thisFuelCell ).FCPM.EffMode = NormalizedCurveMode;
+					if ( InputProcessor::SameString( AlphArray( 2 ), "ANNEX42" ) ) FuelCell( thisFuelCell ).FCPM.EffMode = DirectCurveMode;
+					if ( InputProcessor::SameString( AlphArray( 2 ), "NORMALIZED" ) ) FuelCell( thisFuelCell ).FCPM.EffMode = NormalizedCurveMode;
 					if ( FuelCell( thisFuelCell ).FCPM.EffMode == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -395,9 +341,9 @@ namespace FuelCellElectricGenerator {
 					FuelCell( thisFuelCell ).FCPM.ShutDownElectConsum = NumArray( 16 );
 					FuelCell( thisFuelCell ).FCPM.ANC0 = NumArray( 17 );
 					FuelCell( thisFuelCell ).FCPM.ANC1 = NumArray( 18 );
-					if ( SameString( AlphArray( 4 ), "ConstantRate" ) ) FuelCell( thisFuelCell ).FCPM.SkinLossMode = ConstantRateSkinLoss;
-					if ( SameString( AlphArray( 4 ), "UAForProcessGasTemperature" ) ) FuelCell( thisFuelCell ).FCPM.SkinLossMode = UADTSkinLoss;
-					if ( SameString( AlphArray( 4 ), "QUADRATIC FUNCTION OF FUEL RATE" ) ) FuelCell( thisFuelCell ).FCPM.SkinLossMode = QuadraticFuelNdotSkin;
+					if ( InputProcessor::SameString( AlphArray( 4 ), "ConstantRate" ) ) FuelCell( thisFuelCell ).FCPM.SkinLossMode = ConstantRateSkinLoss;
+					if ( InputProcessor::SameString( AlphArray( 4 ), "UAForProcessGasTemperature" ) ) FuelCell( thisFuelCell ).FCPM.SkinLossMode = UADTSkinLoss;
+					if ( InputProcessor::SameString( AlphArray( 4 ), "QUADRATIC FUNCTION OF FUEL RATE" ) ) FuelCell( thisFuelCell ).FCPM.SkinLossMode = QuadraticFuelNdotSkin;
 					if ( FuelCell( thisFuelCell ).FCPM.SkinLossMode == 0 ) {
 						//throw error
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
@@ -406,7 +352,7 @@ namespace FuelCellElectricGenerator {
 
 					}
 					FuelCell( thisFuelCell ).FCPM.ZoneName = AlphArray( 5 );
-					FuelCell( thisFuelCell ).FCPM.ZoneID = FindItemInList( FuelCell( thisFuelCell ).FCPM.ZoneName, Zone );
+					FuelCell( thisFuelCell ).FCPM.ZoneID = InputProcessor::FindItemInList( FuelCell( thisFuelCell ).FCPM.ZoneName, Zone );
 					if ( FuelCell( thisFuelCell ).FCPM.ZoneID == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " = " + AlphArray( 5 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -439,7 +385,7 @@ namespace FuelCellElectricGenerator {
 
 					//check for other FuelCell using the same power module and fill
 					for ( otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell ) {
-						if ( SameString( FuelCell( otherFuelCell ).FCPM.Name, FuelCell( thisFuelCell ).FCPM.Name ) ) {
+						if ( InputProcessor::SameString( FuelCell( otherFuelCell ).FCPM.Name, FuelCell( thisFuelCell ).FCPM.Name ) ) {
 							FuelCell( otherFuelCell ).FCPM = FuelCell( thisFuelCell ).FCPM;
 						}
 
@@ -459,7 +405,7 @@ namespace FuelCellElectricGenerator {
 
 			//set fuel supply ID in Fuel cell structure
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
-				FuelCell( GeneratorNum ).FuelSupNum = FindItemInList( FuelCell( GeneratorNum ).NameFCFuelSup, FuelSupply ); // Fuel Supply ID
+				FuelCell( GeneratorNum ).FuelSupNum = InputProcessor::FindItemInList( FuelCell( GeneratorNum ).NameFCFuelSup, FuelSupply ); // Fuel Supply ID
 				if ( FuelCell( GeneratorNum ).FuelSupNum == 0 ) {
 					ShowSevereError( "Fuel Supply Name: " + FuelCell( GeneratorNum ).NameFCFuelSup + " not found in " + FuelCell( GeneratorNum ).Name );
 					ErrorsFound = true;
@@ -467,7 +413,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:AirSupply";
-			NumFuelCellAirSups = GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellAirSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellAirSups <= 0 ) { //Autodesk:Uninit thisFuelCell was possibly uninitialized past this condition
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -475,17 +421,10 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCAirSupNum = 1; FCAirSupNum <= NumFuelCellAirSups; ++FCAirSupNum ) {
-				GetObjectItem( cCurrentModuleObject, FCAirSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FCAirSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::AirSup ), FCAirSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCAirSup );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCAirSup );
 				if ( thisFuelCell > 0 ) {
 
 					FuelCell( thisFuelCell ).AirSup.Name = AlphArray( 1 );
@@ -503,11 +442,11 @@ namespace FuelCellElectricGenerator {
 					}
 					FuelCell( thisFuelCell ).AirSup.BlowerHeatLossFactor = NumArray( 1 );
 
-					if ( SameString( AlphArray( 4 ), "AirRatiobyStoics" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 4 ), "AirRatiobyStoics" ) ) {
 						FuelCell( thisFuelCell ).AirSup.AirSupRateMode = ConstantStoicsAirRat;
-					} else if ( SameString( AlphArray( 4 ), "QuadraticFunctionofElectricPower" ) ) {
+					} else if ( InputProcessor::SameString( AlphArray( 4 ), "QuadraticFunctionofElectricPower" ) ) {
 						FuelCell( thisFuelCell ).AirSup.AirSupRateMode = QuadraticFuncofPel;
-					} else if ( SameString( AlphArray( 4 ), "QUADRATIC FUNCTION OF FUEL RATE" ) ) {
+					} else if ( InputProcessor::SameString( AlphArray( 4 ), "QUADRATIC FUNCTION OF FUEL RATE" ) ) {
 						FuelCell( thisFuelCell ).AirSup.AirSupRateMode = QuadraticFuncofNdot;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
@@ -535,17 +474,17 @@ namespace FuelCellElectricGenerator {
 						ErrorsFound = true;
 					}
 
-					if ( SameString( "RecoverBurnerInverterStorage", AlphArray( 7 ) ) ) {
+					if ( InputProcessor::SameString( "RecoverBurnerInverterStorage", AlphArray( 7 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.IntakeRecoveryMode = RecoverBurnInvertBatt;
-					} else if ( SameString( "RecoverAuxiliaryBurner", AlphArray( 7 ) ) ) {
+					} else if ( InputProcessor::SameString( "RecoverAuxiliaryBurner", AlphArray( 7 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.IntakeRecoveryMode = RecoverAuxiliaryBurner;
-					} else if ( SameString( "RecoverInverterandStorage", AlphArray( 7 ) ) ) {
+					} else if ( InputProcessor::SameString( "RecoverInverterandStorage", AlphArray( 7 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.IntakeRecoveryMode = RecoverInverterBatt;
-					} else if ( SameString( "RecoverInverter", AlphArray( 7 ) ) ) {
+					} else if ( InputProcessor::SameString( "RecoverInverter", AlphArray( 7 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.IntakeRecoveryMode = RecoverInverter;
-					} else if ( SameString( "RecoverElectricalStorage", AlphArray( 7 ) ) ) {
+					} else if ( InputProcessor::SameString( "RecoverElectricalStorage", AlphArray( 7 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.IntakeRecoveryMode = RecoverBattery;
-					} else if ( SameString( "NoRecovery", AlphArray( 7 ) ) ) {
+					} else if ( InputProcessor::SameString( "NoRecovery", AlphArray( 7 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.IntakeRecoveryMode = NoRecoveryOnAirIntake;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
@@ -553,9 +492,9 @@ namespace FuelCellElectricGenerator {
 						ErrorsFound = true;
 					}
 
-					if ( SameString( "AmbientAir", AlphArray( 8 ) ) ) {
+					if ( InputProcessor::SameString( "AmbientAir", AlphArray( 8 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.ConstituentMode = RegularAir;
-					} else if ( SameString( "UserDefinedConstituents", AlphArray( 8 ) ) ) {
+					} else if ( InputProcessor::SameString( "UserDefinedConstituents", AlphArray( 8 ) ) ) {
 						FuelCell( thisFuelCell ).AirSup.ConstituentMode = UserDefinedConstituents;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
@@ -613,7 +552,7 @@ namespace FuelCellElectricGenerator {
 
 					//check for other FuelCell using the same Air Supply module and fill
 					for ( otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell ) {
-						if ( SameString( FuelCell( otherFuelCell ).AirSup.Name, FuelCell( thisFuelCell ).AirSup.Name ) ) {
+						if ( InputProcessor::SameString( FuelCell( otherFuelCell ).AirSup.Name, FuelCell( thisFuelCell ).AirSup.Name ) ) {
 							FuelCell( otherFuelCell ).AirSup = FuelCell( thisFuelCell ).AirSup;
 						}
 					}
@@ -627,7 +566,7 @@ namespace FuelCellElectricGenerator {
 
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
 				// find molal fraction of oxygen in air supply
-				thisConstituent = FindItem( "Oxygen", FuelCell( GeneratorNum ).AirSup.ConstitName, FuelCell( GeneratorNum ).AirSup.NumConstituents );
+				thisConstituent = InputProcessor::FindItem( "Oxygen", FuelCell( GeneratorNum ).AirSup.ConstitName, FuelCell( GeneratorNum ).AirSup.NumConstituents );
 				if ( thisConstituent > 0 ) FuelCell( GeneratorNum ).AirSup.O2fraction = FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstituent );
 
 				NumHardCodedConstituents = 14;
@@ -637,7 +576,7 @@ namespace FuelCellElectricGenerator {
 
 					thisName = FuelCell( GeneratorNum ).AirSup.ConstitName( i );
 
-					thisGasID = FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
+					thisGasID = InputProcessor::FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
 
 					FuelCell( GeneratorNum ).AirSup.GasLibID( i ) = thisGasID;
 
@@ -652,7 +591,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:WaterSupply";
-			NumFCWaterSups = GetNumObjectsFound( cCurrentModuleObject );
+			NumFCWaterSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCWaterSups <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -660,17 +599,10 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCWaterSupNum = 1; FCWaterSupNum <= NumFCWaterSups; ++FCWaterSupNum ) {
-				GetObjectItem( cCurrentModuleObject, FCWaterSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FCWaterSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::WaterSup ), FCWaterSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCWaterSup );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCWaterSup );
 				if ( thisFuelCell > 0 ) {
 					//  this is only the first instance of a FuelCell generator using this type of Water supply module
 					FuelCell( thisFuelCell ).WaterSup.Name = AlphArray( 1 );
@@ -691,22 +623,22 @@ namespace FuelCellElectricGenerator {
 					FuelCell( thisFuelCell ).WaterSup.PmpPowerLossFactor = NumArray( 1 );
 
 					//!CR9240?
-					if ( SameString( "TemperatureFromAirNode", AlphArray( 4 ) ) ) {
+					if ( InputProcessor::SameString( "TemperatureFromAirNode", AlphArray( 4 ) ) ) {
 						FuelCell( thisFuelCell ).WaterSup.WaterTempMode = WaterInReformAirNode;
 
 						FuelCell( thisFuelCell ).WaterSup.NodeName = AlphArray( 5 );
 						FuelCell( thisFuelCell ).WaterSup.NodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-					} else if ( SameString( "TemperatureFromWaterNode", AlphArray( 4 ) ) ) {
+					} else if ( InputProcessor::SameString( "TemperatureFromWaterNode", AlphArray( 4 ) ) ) {
 						FuelCell( thisFuelCell ).WaterSup.WaterTempMode = WaterInReformWaterNode;
 
 						FuelCell( thisFuelCell ).WaterSup.NodeName = AlphArray( 5 );
 						FuelCell( thisFuelCell ).WaterSup.NodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-					} else if ( SameString( "MainsWaterTemperature", AlphArray( 4 ) ) ) {
+					} else if ( InputProcessor::SameString( "MainsWaterTemperature", AlphArray( 4 ) ) ) {
 						FuelCell( thisFuelCell ).WaterSup.WaterTempMode = WaterInReformMains;
 
-					} else if ( SameString( "TemperatureFromSchedule", AlphArray( 4 ) ) ) {
+					} else if ( InputProcessor::SameString( "TemperatureFromSchedule", AlphArray( 4 ) ) ) {
 						FuelCell( thisFuelCell ).WaterSup.WaterTempMode = WaterInReformSchedule;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
@@ -724,7 +656,7 @@ namespace FuelCellElectricGenerator {
 
 					//check for other FuelCell using the same Water Supply module and fill
 					for ( otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell ) {
-						if ( SameString( FuelCell( otherFuelCell ).WaterSup.Name, FuelCell( thisFuelCell ).WaterSup.Name ) ) {
+						if ( InputProcessor::SameString( FuelCell( otherFuelCell ).WaterSup.Name, FuelCell( thisFuelCell ).WaterSup.Name ) ) {
 							FuelCell( otherFuelCell ).WaterSup = FuelCell( thisFuelCell ).WaterSup;
 						}
 					}
@@ -737,7 +669,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:AuxiliaryHeater";
-			NumFuelCellAuxilHeaters = GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellAuxilHeaters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellAuxilHeaters <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -745,17 +677,10 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCAuxHeatNum = 1; FCAuxHeatNum <= NumFuelCellAuxilHeaters; ++FCAuxHeatNum ) {
-				GetObjectItem( cCurrentModuleObject, FCAuxHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FCAuxHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::AuxilHeat ), FCAuxHeatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCAuxilHeat );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCAuxilHeat );
 				if ( thisFuelCell > 0 ) {
 					FuelCell( thisFuelCell ).AuxilHeat.Name = AlphArray( 1 );
 
@@ -764,9 +689,9 @@ namespace FuelCellElectricGenerator {
 					FuelCell( thisFuelCell ).AuxilHeat.ANC1 = NumArray( 3 );
 					FuelCell( thisFuelCell ).AuxilHeat.UASkin = NumArray( 4 );
 
-					if ( SameString( "SurroundingZone", AlphArray( 2 ) ) ) {
+					if ( InputProcessor::SameString( "SurroundingZone", AlphArray( 2 ) ) ) {
 						FuelCell( thisFuelCell ).AuxilHeat.SkinLossDestination = SurroundingZone;
-					} else if ( SameString( "AirInletForFuelCell", AlphArray( 2 ) ) ) {
+					} else if ( InputProcessor::SameString( "AirInletForFuelCell", AlphArray( 2 ) ) ) {
 						FuelCell( thisFuelCell ).AuxilHeat.SkinLossDestination = AirInletForFC;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
@@ -775,7 +700,7 @@ namespace FuelCellElectricGenerator {
 					}
 
 					FuelCell( thisFuelCell ).AuxilHeat.ZoneName = AlphArray( 3 );
-					FuelCell( thisFuelCell ).AuxilHeat.ZoneID = FindItemInList( AlphArray( 3 ), Zone );
+					FuelCell( thisFuelCell ).AuxilHeat.ZoneID = InputProcessor::FindItemInList( AlphArray( 3 ), Zone );
 					if ( ( FuelCell( thisFuelCell ).AuxilHeat.ZoneID == 0 ) && ( FuelCell( thisFuelCell ).AuxilHeat.SkinLossDestination == SurroundingZone ) ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + AlphArray( 3 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -791,7 +716,7 @@ namespace FuelCellElectricGenerator {
 
 					//check for other FuelCell using the same Auxiliary Heating module and fill
 					for ( otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell ) {
-						if ( SameString( FuelCell( otherFuelCell ).AuxilHeat.Name, FuelCell( thisFuelCell ).AuxilHeat.Name ) ) {
+						if ( InputProcessor::SameString( FuelCell( otherFuelCell ).AuxilHeat.Name, FuelCell( thisFuelCell ).AuxilHeat.Name ) ) {
 							FuelCell( otherFuelCell ).AuxilHeat = FuelCell( thisFuelCell ).AuxilHeat;
 						}
 					}
@@ -805,7 +730,7 @@ namespace FuelCellElectricGenerator {
 
 			// exhaust gas heat exchanger
 			cCurrentModuleObject = "Generator:FuelCell:ExhaustGasToWaterHeatExchanger";
-			NumFCExhaustGasHXs = GetNumObjectsFound( cCurrentModuleObject );
+			NumFCExhaustGasHXs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumFCExhaustGasHXs <= 0 ) {
 				ShowWarningError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 				ShowContinueError( "Fuel Cell model requires an " + cCurrentModuleObject + " object" );
@@ -813,17 +738,10 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCHXNum = 1; FCHXNum <= NumFCExhaustGasHXs; ++FCHXNum ) {
-				GetObjectItem( cCurrentModuleObject, FCHXNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FCHXNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::ExhaustHX ), FCHXNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameExhaustHX );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameExhaustHX );
 				if ( thisFuelCell > 0 ) {
 					FuelCell( thisFuelCell ).ExhaustHX.Name = AlphArray( 1 );
 					FuelCell( thisFuelCell ).ExhaustHX.WaterInNodeName = AlphArray( 2 );
@@ -837,13 +755,13 @@ namespace FuelCellElectricGenerator {
 					FuelCell( thisFuelCell ).ExhaustHX.ExhaustOutNodeName = AlphArray( 4 );
 					FuelCell( thisFuelCell ).ExhaustHX.ExhaustOutNode = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
-					if ( SameString( "FixedEffectiveness", AlphArray( 5 ) ) ) {
+					if ( InputProcessor::SameString( "FixedEffectiveness", AlphArray( 5 ) ) ) {
 						FuelCell( thisFuelCell ).ExhaustHX.HXmodelMode = FixedEffectiveness;
-					} else if ( SameString( "EmpiricalUAeff", AlphArray( 5 ) ) ) {
+					} else if ( InputProcessor::SameString( "EmpiricalUAeff", AlphArray( 5 ) ) ) {
 						FuelCell( thisFuelCell ).ExhaustHX.HXmodelMode = LMTDempiricalUAeff;
-					} else if ( SameString( "FundementalUAeff", AlphArray( 5 ) ) ) {
+					} else if ( InputProcessor::SameString( "FundementalUAeff", AlphArray( 5 ) ) ) {
 						FuelCell( thisFuelCell ).ExhaustHX.HXmodelMode = LMTDfundementalUAeff;
-					} else if ( SameString( "CONDENSING", AlphArray( 5 ) ) ) {
+					} else if ( InputProcessor::SameString( "CONDENSING", AlphArray( 5 ) ) ) {
 						FuelCell( thisFuelCell ).ExhaustHX.HXmodelMode = Condensing;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " = " + AlphArray( 5 ) );
@@ -881,7 +799,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:ElectricalStorage";
-			NumFCElecStorageUnits = GetNumObjectsFound( cCurrentModuleObject );
+			NumFCElecStorageUnits = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCElecStorageUnits <= 0 ) {
 				ShowWarningError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -890,21 +808,14 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( StorageNum = 1; StorageNum <= NumFCElecStorageUnits; ++StorageNum ) {
-				GetObjectItem( cCurrentModuleObject, StorageNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, StorageNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::ElecStorage ), StorageNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameElecStorage );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameElecStorage );
 				if ( thisFuelCell > 0 ) {
 					FuelCell( thisFuelCell ).ElecStorage.Name = AlphArray( 1 );
 
-					if ( SameString( AlphArray( 2 ), "SimpleEfficiencyWithConstraints" ) ) {
+					if ( InputProcessor::SameString( AlphArray( 2 ), "SimpleEfficiencyWithConstraints" ) ) {
 						FuelCell( thisFuelCell ).ElecStorage.StorageModelMode = SimpleEffConstraints;
 					} else {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
@@ -921,7 +832,7 @@ namespace FuelCellElectricGenerator {
 
 					//check for other FuelCell using the same Electrical Storage and fill
 					for ( otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell ) {
-						if ( SameString( FuelCell( otherFuelCell ).ElecStorage.Name, FuelCell( thisFuelCell ).ElecStorage.Name ) ) {
+						if ( InputProcessor::SameString( FuelCell( otherFuelCell ).ElecStorage.Name, FuelCell( thisFuelCell ).ElecStorage.Name ) ) {
 							FuelCell( otherFuelCell ).ElecStorage = FuelCell( thisFuelCell ).ElecStorage;
 						}
 					}
@@ -934,7 +845,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:Inverter";
-			NumFCPowerCondUnits = GetNumObjectsFound( cCurrentModuleObject );
+			NumFCPowerCondUnits = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCPowerCondUnits <= 0 ) {
 				ShowWarningError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -944,22 +855,15 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCPCUNum = 1; FCPCUNum <= NumFCPowerCondUnits; ++FCPCUNum ) {
-				GetObjectItem( cCurrentModuleObject, FCPCUNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FCPCUNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::Inverter ), FCPCUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameInverter );
+				thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameInverter );
 				if ( thisFuelCell > 0 ) {
 					FuelCell( thisFuelCell ).Inverter.Name = AlphArray( 1 );
 
-					if ( SameString( AlphArray( 2 ), "QUADRATIC" ) ) FuelCell( thisFuelCell ).Inverter.EffMode = InverterEffQuadratic;
-					if ( SameString( AlphArray( 2 ), "Constant" ) ) FuelCell( thisFuelCell ).Inverter.EffMode = InverterEffConstant;
+					if ( InputProcessor::SameString( AlphArray( 2 ), "QUADRATIC" ) ) FuelCell( thisFuelCell ).Inverter.EffMode = InverterEffQuadratic;
+					if ( InputProcessor::SameString( AlphArray( 2 ), "Constant" ) ) FuelCell( thisFuelCell ).Inverter.EffMode = InverterEffConstant;
 					if ( FuelCell( thisFuelCell ).Inverter.EffMode == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -978,7 +882,7 @@ namespace FuelCellElectricGenerator {
 
 					//check for other FuelCell using the same Inverter and fill
 					for ( otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell ) {
-						if ( SameString( FuelCell( otherFuelCell ).Inverter.Name, FuelCell( thisFuelCell ).Inverter.Name ) ) {
+						if ( InputProcessor::SameString( FuelCell( otherFuelCell ).Inverter.Name, FuelCell( thisFuelCell ).Inverter.Name ) ) {
 							FuelCell( otherFuelCell ).Inverter = FuelCell( thisFuelCell ).Inverter;
 						}
 					}
@@ -991,20 +895,14 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:StackCooler";
-			NumFCStackCoolers = GetNumObjectsFound( cCurrentModuleObject );
+			NumFCStackCoolers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCStackCoolers > 0 ) { // get stack cooler input data
 				for ( FCScoolNum = 1; FCScoolNum <= NumFCStackCoolers; ++FCScoolNum ) {
-					GetObjectItem( cCurrentModuleObject, FCScoolNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+					InputProcessor::GetObjectItem( cCurrentModuleObject, FCScoolNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+					InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( AlphArray( 1 ), FuelCell.ma( &FCDataStruct::StackCooler ), NumFCStackCoolers - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-					}
-					thisFuelCell = FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameStackCooler );
+					thisFuelCell = InputProcessor::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameStackCooler );
 					if ( thisFuelCell > 0 ) {
 						FuelCell( thisFuelCell ).StackCooler.Name = AlphArray( 1 );
 						FuelCell( thisFuelCell ).StackCooler.WaterInNodeName = AlphArray( 2 );
@@ -3670,35 +3568,10 @@ namespace FuelCellElectricGenerator {
 		// makes sure input are gotten and setup from Plant loop perspective.
 		// does not (re)simulate entire FuelCell model
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataPlant::TypeOf_Generator_FCExhaust;
 		using DataPlant::TypeOf_Generator_FCStackCooler;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetFuelCellInput ) {
 
@@ -3709,9 +3582,9 @@ namespace FuelCellElectricGenerator {
 
 		if ( InitLoopEquip ) {
 			if ( CompTypeNum == TypeOf_Generator_FCExhaust ) {
-				CompNum = FindItemInList( CompName, FuelCell, &FCDataStruct::NameExhaustHX );
+				CompNum = InputProcessor::FindItemInList( CompName, FuelCell, &FCDataStruct::NameExhaustHX );
 			} else if ( CompTypeNum == TypeOf_Generator_FCStackCooler ) {
-				CompNum = FindItemInList( CompName, FuelCell, &FCDataStruct::NameStackCooler );
+				CompNum = InputProcessor::FindItemInList( CompName, FuelCell, &FCDataStruct::NameStackCooler );
 			}
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimFuelCellPlantHeatRecovery: Fuel Cell Generator Unit not found=" + CompName );
@@ -3953,25 +3826,6 @@ namespace FuelCellElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// This routine adds up the various skin losses and then
 		//  sets the values in the ZoneIntGain structure
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused  INTEGER :: thisZone ! index in Zone structure array

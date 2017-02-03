@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -80,21 +68,10 @@ namespace BranchNodeConnections {
 	// MODULE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   May 2005
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// This module encapsulates the connection data necessary for some of the checks
 	// needed in the branch-node data
-
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
 
 	// Using/Aliasing
 	using DataGlobals::OutputFileDebug;
@@ -104,14 +81,6 @@ namespace BranchNodeConnections {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
-	// na
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Functions
 
@@ -139,28 +108,8 @@ namespace BranchNodeConnections {
 		// This subroutine registers a node connection in the Node Connection data structure.  This
 		// structure is intended to help with HVAC diagramming as well as validation of nodes.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "RegisterNodeConnection: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFoundHere;
@@ -178,9 +127,9 @@ namespace BranchNodeConnections {
 		MakeNew = true;
 		for ( Count = 1; Count <= NumOfNodeConnections; ++Count ) {
 			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
-			if ( ! SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
-			if ( ! SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
-			if ( ! SameString( NodeConnections( Count ).ConnectionType, ConnectionType ) ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ConnectionType, ConnectionType ) ) continue;
 			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
 			if ( ( NodeConnections( Count ).ObjectIsParent && ! IsParent ) || ( ! NodeConnections( Count ).ObjectIsParent && IsParent ) ) {
 				ShowSevereError( RoutineName + "Node registered for both Parent and \"not\" Parent" );
@@ -200,7 +149,7 @@ namespace BranchNodeConnections {
 
 			NodeConnections( NumOfNodeConnections ).NodeNumber = NodeNumber;
 			NodeConnections( NumOfNodeConnections ).NodeName = NodeName;
-			NodeConnections( NumOfNodeConnections ).ObjectType = MakeUPPERCase( ObjectType );
+			NodeConnections( NumOfNodeConnections ).ObjectType = InputProcessor::MakeUPPERCase( ObjectType );
 			NodeConnections( NumOfNodeConnections ).ObjectName = ObjectName;
 			NodeConnections( NumOfNodeConnections ).ConnectionType = ConnectionType;
 			NodeConnections( NumOfNodeConnections ).FluidStream = FluidStream;
@@ -219,7 +168,7 @@ namespace BranchNodeConnections {
 				}
 
 				// Check out AirTerminal inlet/outlet nodes
-				Found = FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
+				Found = InputProcessor::FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
 				if ( Found != 0 ) { // Nodename already used
 					ShowSevereError( RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated." );
 					ShowContinueError( "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType );
@@ -244,6 +193,56 @@ namespace BranchNodeConnections {
 			errFlag = true;
 		}
 
+	}
+
+	void
+	OverrideNodeConnectionType(
+		int const NodeNumber, // Number for this Node
+		std::string const & NodeName, // Name of this Node
+		std::string const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		std::string const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		std::string const & ConnectionType, // Connection Type for this Node (must be valid)
+		int const FluidStream, // Count on Fluid Streams
+		bool const IsParent, // True when node is a parent node
+		bool & errFlag // Will be True if errors already detected or if errors found here
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M. J. Witte
+		//       DATE WRITTEN   June 2016
+
+		// PURPOSE:
+		// This subroutine modifies an existing node connection in the Node Connection data structure.  This
+		// structure is intended to help with HVAC diagramming as well as validation of nodes. This function
+		// is a based on RegisterNodeConnection.
+
+		static std::string const RoutineName( "ModifyNodeConnectionType: " );
+
+		if ( ! IsValidConnectionType( ConnectionType ) ) {
+			ShowSevereError( RoutineName + "Invalid ConnectionType=" + ConnectionType );
+			ShowContinueError( "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName );
+			errFlag = true;
+		}
+
+		int Found = 0;
+		for ( int Count = 1; Count <= NumOfNodeConnections; ++Count ) {
+			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
+			if ( ( NodeConnections( Count ).ObjectIsParent != IsParent )) continue;
+			Found = Count;
+			break;
+		}
+
+		if ( Found > 0 ) {
+			NodeConnections( Found ).ConnectionType = ConnectionType;
+		} else {
+			ShowSevereError( RoutineName + "Existing node connection not found." );
+			ShowContinueError( "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName );
+			errFlag = true;
+		}
 	}
 
 	bool
@@ -335,24 +334,8 @@ namespace BranchNodeConnections {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop1;
@@ -844,24 +827,6 @@ namespace BranchNodeConnections {
 		// METHODOLOGY EMPLOYED:
 		// Traverses CompSet structure.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER Loop
 		bool ErrInObject;
@@ -878,8 +843,8 @@ namespace BranchNodeConnections {
 			InletNodeName = ParentNodeList( Which ).InletNodeName;
 			OutletNodeName = ParentNodeList( Which ).OutletNodeName;
 			// Get Node Numbers
-			InletNodeNum = FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
-			OutletNodeNum = FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+			InletNodeNum = InputProcessor::FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+			OutletNodeNum = InputProcessor::FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
 			//    IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
 			//      CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
 			//        ', Component Name='//TRIM(ComponentName))
@@ -897,8 +862,8 @@ namespace BranchNodeConnections {
 			if ( Which != 0 ) {
 				InletNodeName = CompSets( Which ).InletNodeName;
 				OutletNodeName = CompSets( Which ).OutletNodeName;
-				InletNodeNum = FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
-				OutletNodeNum = FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+				InletNodeNum = InputProcessor::FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+				OutletNodeNum = InputProcessor::FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
 				//      IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
 				//        CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
 				//          ', Component Name='//TRIM(ComponentName))
@@ -1176,27 +1141,6 @@ namespace BranchNodeConnections {
 		// METHODOLOGY EMPLOYED:
 		// Traverses CompSet structure.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER Loop
 		bool ErrInObject;
@@ -1219,8 +1163,8 @@ namespace BranchNodeConnections {
 			if ( NodeConnections( Which ).ObjectType != ComponentType || NodeConnections( Which ).ObjectName != ComponentName ) continue;
 			//    FoundObject=.TRUE.
 			if ( NodeConnections( Which ).ObjectIsParent ) IsParent = true;
-			if ( SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) ++NumInlets;
-			if ( SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) ++NumOutlets;
+			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) ++NumInlets;
+			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) ++NumOutlets;
 		}
 
 		InletNodeNames.allocate( NumInlets );
@@ -1246,13 +1190,13 @@ namespace BranchNodeConnections {
 
 		for ( Which = 1; Which <= NumOfNodeConnections; ++Which ) {
 			if ( NodeConnections( Which ).ObjectType != ComponentType || NodeConnections( Which ).ObjectName != ComponentName ) continue;
-			if ( SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) {
+			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) {
 				++NumInlets;
 				InletNodeNames( NumInlets ) = NodeConnections( Which ).NodeName;
 				InletNodeNums( NumInlets ) = NodeConnections( Which ).NodeNumber;
 				InletFluidStreams( NumInlets ) = NodeConnections( Which ).FluidStream;
 			}
-			if ( SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) {
+			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) {
 				++NumOutlets;
 				OutletNodeNames( NumOutlets ) = NodeConnections( Which ).NodeName;
 				OutletNodeNums( NumOutlets ) = NodeConnections( Which ).NodeNumber;
@@ -1293,26 +1237,6 @@ namespace BranchNodeConnections {
 
 		// METHODOLOGY EMPLOYED:
 		// Traverses CompSet structure.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string ChildCType;
@@ -1367,7 +1291,7 @@ namespace BranchNodeConnections {
 						ChildInNodeName( CountNum ) = CompSets( Loop ).InletNodeName;
 						ChildOutNodeName( CountNum ) = CompSets( Loop ).OutletNodeName;
 						// Get Node Numbers
-						ChildInNodeNum( CountNum ) = FindItemInList( ChildInNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
+						ChildInNodeNum( CountNum ) = InputProcessor::FindItemInList( ChildInNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
 						//          IF (ChildInNodeNum(CountNum) == 0) THEN
 						//            CALL ShowSevereError('GetChildrenData: Inlet Node not previously assigned, Node='//  &
 						//                    TRIM(ChildInNodeName(CountNum)))
@@ -1375,7 +1299,7 @@ namespace BranchNodeConnections {
 						//            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
 						//            ErrInObject=.TRUE.
 						//          ENDIF
-						ChildOutNodeNum( CountNum ) = FindItemInList( ChildOutNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
+						ChildOutNodeNum( CountNum ) = InputProcessor::FindItemInList( ChildOutNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
 						//          IF (ChildOutNodeNum(CountNum) == 0) THEN
 						//            CALL ShowSevereError('GetChildrenData: Outlet Node not previously assigned, Node='//  &
 						//                    TRIM(ChildOutNodeName(CountNum)))
@@ -1490,28 +1414,6 @@ namespace BranchNodeConnections {
 		// "CompSets" cannot be used in multiple places and issues a warning if they are.
 		// This subroutine also
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompTypeUC; // Component type in upper case
 		std::string ParentTypeUC; // Parent component type in upper case
@@ -1522,8 +1424,8 @@ namespace BranchNodeConnections {
 
 		// Object Data
 
-		ParentTypeUC = MakeUPPERCase( ParentType );
-		CompTypeUC = MakeUPPERCase( CompType );
+		ParentTypeUC = InputProcessor::MakeUPPERCase( ParentType );
+		CompTypeUC = InputProcessor::MakeUPPERCase( CompType );
 		Found = 0;
 
 		// See if Component-Nodes set is already there - should be unique
@@ -1759,33 +1661,12 @@ namespace BranchNodeConnections {
 		//   c)  If not found, call SetUpCompSets (with parent type and name UNDEFINED)
 		//       to add a new item in the CompSets array
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Count;
 		int Found;
 		std::string CompTypeUC; // Component type in upper case
 
-		CompTypeUC = MakeUPPERCase( CompType );
+		CompTypeUC = InputProcessor::MakeUPPERCase( CompType );
 
 		// See if Already there
 		Found = 0;
@@ -1945,29 +1826,6 @@ namespace BranchNodeConnections {
 		// PURPOSE OF THIS FUNCTION:
 		// This function provides a connection type with given node number
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NodeConnectIndex;
 		int NumInList;
@@ -1981,7 +1839,7 @@ namespace BranchNodeConnections {
 
 		if ( NumInList > 0 ) {
 			for ( NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex ) {
-				NodeConnectType( NodeConnectIndex ) = FindItemInList( NodeConnections( ListArray( NodeConnectIndex ) ).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes );
+				NodeConnectType( NodeConnectIndex ) = InputProcessor::FindItemInList( NodeConnections( ListArray( NodeConnectIndex ) ).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes );
 			}
 		} else {
 			if ( NodeNumber > 0 ) {

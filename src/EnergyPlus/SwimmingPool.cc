@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -264,19 +252,10 @@ namespace SwimmingPool {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using DataHeatBalance::Construct;
 		using General::TrimSigDigits;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using DataSurfaces::Surface;
@@ -287,10 +266,6 @@ namespace SwimmingPool {
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSwimmingPool: " ); // include trailing blank space
 		Real64 const MinCoverFactor( 0.0 ); // minimum value for cover factors
@@ -298,12 +273,6 @@ namespace SwimmingPool {
 		Real64 const MinDepth( 0.05 ); // minimum average pool depth (to avoid obvious input errors)
 		Real64 const MaxDepth( 10.0 ); // maximum average pool depth (to avoid obvious input errors)
 		Real64 const MinPowerFactor( 0.0 ); // minimum power factor for miscellaneous equipment
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if something goes wrong
@@ -319,8 +288,6 @@ namespace SwimmingPool {
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int SurfNum; // Surface number
@@ -330,7 +297,7 @@ namespace SwimmingPool {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		GetObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -347,7 +314,7 @@ namespace SwimmingPool {
 		lNumericBlanks.allocate( MaxNumbers );
 		lNumericBlanks = true;
 
-		NumSwimmingPools = GetNumObjectsFound( "SwimmingPool:Indoor" );
+		NumSwimmingPools = InputProcessor::GetNumObjectsFound( "SwimmingPool:Indoor" );
 		CheckEquipName.allocate( NumSwimmingPools );
 		CheckEquipName = true;
 
@@ -359,21 +326,14 @@ namespace SwimmingPool {
 		CurrentModuleObject = "SwimmingPool:Indoor";
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), Pool, Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			Pool( Item ).Name = Alphas( 1 );
 
 			Pool( Item ).SurfaceName = Alphas( 2 );
 			Pool( Item ).SurfacePtr = 0;
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-				if ( SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
+				if ( InputProcessor::SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
 					Pool( Item ).SurfacePtr = SurfNum;
 					break;
 				}
@@ -574,6 +534,12 @@ namespace SwimmingPool {
 			SetupOutputVariable( "Indoor Pool Current Cover Factor []", Pool( Item ).CurCoverSchedVal, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Rate [W]", Pool( Item ).EvapHeatLossRate, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Energy [J]", Pool( Item ).EvapEnergyLoss, "System", "Sum", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Saturation Pressure at Pool Temperature [Pa]", Pool( Item ).SatPressPoolWaterTemp, "System", "Average", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Partial Pressure of Water Vapor in Air [Pa]", Pool( Item ).PartPressZoneAirTemp, "System", "Average", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Current Cover Evaporation Factor []", Pool( Item ).CurCoverEvapFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover Convective Factor []", Pool( Item ).CurCoverConvFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover SW Radiation Factor []", Pool( Item ).CurCoverSWRadFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover LW Radiation Factor []", Pool( Item ).CurCoverLWRadFac, "System", "Average", Pool( Item ).Name );
 		}
 
 	}
@@ -854,14 +820,9 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using DataHeatBalFanSys::MAT;
-		using DataHeatBalFanSys::ZoneAirHumRatAvg;
+		using DataHeatBalFanSys::ZoneAirHumRat;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataConversions::CFA;
-		using DataConversions::CFMF;
-		using Psychrometrics::PsyPsatFnTemp;
-		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyHfgAirFnWTdb;
-		using DataEnvironment::OutBaroPress;
 		using DataHeatBalance::QRadThermInAbs;
 		using DataHeatBalSurface::NetLWRadToSurf;
 		using DataHeatBalFanSys::QHTRadSysSurf;
@@ -889,7 +850,6 @@ namespace SwimmingPool {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcSwimmingPool" );
-		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -901,8 +861,6 @@ namespace SwimmingPool {
 		Real64 HConvIn; // convection coefficient for pool
 		Real64 EvapRate; // evaporation rate for pool in kg/s
 		Real64 EvapEnergyLossPerArea; // energy effect of evaporation rate per unit area in W/m2
-		Real64 PSatPool; // saturation pressure at pool water temperature
-		Real64 PParAir; // partial pressure of vapor of zone air
 		int ZoneNum; // index to zone array
 		Real64 LWtotal; // total flux from long-wavelength radiation to surface
 		Real64 LWsum; // summation of all long-wavelenth radiation going to surface
@@ -931,16 +889,9 @@ namespace SwimmingPool {
 		// Convection coefficient calculation
 		HConvIn = 0.22 * std::pow( abs( Pool( PoolNum ).PoolWaterTemp - MAT( ZoneNum ) ), 1.0 / 3.0 ) * Pool( PoolNum ).CurCoverConvFac;
 
-		// Evaporation calculation:
-		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
-		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
-		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
-		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
-		PParAir = PsyPsatFnTemp( MAT( ZoneNum ), RoutineName ) * PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRatAvg( ZoneNum ), OutBaroPress );
-		if ( PSatPool < PParAir ) PSatPool = PParAir;
-		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
+		CalcSwimmingPoolEvap( EvapRate, PoolNum, SurfNum, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
-		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
+		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
 		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
 		// to the air directly and added to the zone air heat balance
@@ -989,7 +940,43 @@ namespace SwimmingPool {
 
 		// Finally take care of the latent and convective gains resulting from the pool
 		SumConvPool( ZoneNum ) += Pool( PoolNum ).RadConvertToConvect;
-		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) );
+		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) );
+	}
+
+	void
+	CalcSwimmingPoolEvap(
+		Real64 & EvapRate, // evaporation rate of pool
+		int const PoolNum, // pool index
+		int const SurfNum, // surface index
+		Real64 const MAT,  // mean air temperature
+		Real64 const HumRat // zone air humidity ratio
+	)
+	{
+
+		using Psychrometrics::PsyPsatFnTemp;
+		using Psychrometrics::PsyRhFnTdbWPb;
+		using DataEnvironment::OutBaroPress;
+		using DataConversions::CFA;
+		using DataConversions::CFMF;
+
+		static std::string const RoutineName( "CalcSwimmingPoolEvap" );
+		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
+
+		Real64 PSatPool;
+		Real64 PParAir;
+
+		// Evaporation calculation:
+		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
+		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
+		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
+
+		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
+		PParAir = PsyPsatFnTemp( MAT, RoutineName ) * PsyRhFnTdbWPb( MAT, HumRat, OutBaroPress );
+		if ( PSatPool < PParAir ) PSatPool = PParAir;
+		Pool( PoolNum ).SatPressPoolWaterTemp = PSatPool;
+		Pool( PoolNum ).PartPressZoneAirTemp = PParAir;
+		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
+
 	}
 
 	void

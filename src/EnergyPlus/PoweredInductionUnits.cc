@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -81,6 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessor.hh>
 #include <MixerComponent.hh>
@@ -136,8 +125,6 @@ namespace PoweredInductionUnits {
 	using DataHVACGlobals::PlenumInducedMassFlow;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -168,6 +155,13 @@ namespace PoweredInductionUnits {
 
 	// Object Data
 	Array1D< PowIndUnitData > PIU;
+	std::unordered_map< std::string, std::string > PiuUniqueNames;
+
+	void
+	clear_state() {
+		PiuUniqueNames.clear();
+		GetPIUInputFlag = true;
+	}
 
 	void
 	SimPIU(
@@ -189,28 +183,9 @@ namespace PoweredInductionUnits {
 		// Manages the simulation of a fan powered induction terminal unit.
 		// Called from SimZoneAirLoopEquipmentin module ZoneAirLoopEquipmentManager.
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::TermUnitPIU;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PIUNum; // index of powered induction unit being simulated
@@ -225,7 +200,7 @@ namespace PoweredInductionUnits {
 
 		// Get the powered induction unit index
 		if ( CompIndex == 0 ) {
-			PIUNum = FindItemInList( CompName, PIU );
+			PIUNum = InputProcessor::FindItemInList( CompName, PIU );
 			if ( PIUNum == 0 ) {
 				ShowFatalError( "SimPIU: PIU Unit not found=" + CompName );
 			}
@@ -293,14 +268,7 @@ namespace PoweredInductionUnits {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using FluidProperties::FindRefrigerant;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -314,19 +282,6 @@ namespace PoweredInductionUnits {
 		using WaterCoils::GetCoilWaterInletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PIUIndex; // loop index
 		int PIUNum; // current fan coil number
@@ -335,7 +290,6 @@ namespace PoweredInductionUnits {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zome do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
@@ -346,11 +300,12 @@ namespace PoweredInductionUnits {
 		// FLOW
 		// find the number of each type of fan coil unit
 		SteamMessageNeeded = true;
-		NumSeriesPIUs = GetNumObjectsFound( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
-		NumParallelPIUs = GetNumObjectsFound( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
+		NumSeriesPIUs = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
+		NumParallelPIUs = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
 		NumPIUs = NumSeriesPIUs + NumParallelPIUs;
 		// allocate the data structures
 		PIU.allocate( NumPIUs );
+		PiuUniqueNames.reserve( static_cast< unsigned >( NumPIUs ) );
 		CheckEquipName.dimension( NumPIUs, true );
 
 		// loop over Series PIUs; get and load the input data
@@ -358,16 +313,10 @@ namespace PoweredInductionUnits {
 
 			cCurrentModuleObject = "AirTerminal:SingleDuct:SeriesPIU:Reheat";
 
-			GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PIU( PIUNum ).Name = cAlphaArgs( 1 );
 			PIU( PIUNum ).UnitType = cCurrentModuleObject;
 			PIU( PIUNum ).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
@@ -387,12 +336,12 @@ namespace PoweredInductionUnits {
 			PIU( PIUNum ).MinPriAirFlowFrac = rNumericArgs( 3 );
 
 			PIU( PIUNum ).HCoilType = cAlphaArgs( 9 ); // type (key) of heating coil
-			if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:FUEL" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 				PIU( PIUNum ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
@@ -402,7 +351,7 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 					SteamMessageNeeded = false;
 				}
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Electric;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
@@ -475,16 +424,10 @@ namespace PoweredInductionUnits {
 
 			cCurrentModuleObject = "AirTerminal:SingleDuct:ParallelPIU:Reheat";
 
-			GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex + NumSeriesPIUs;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PIU( PIUNum ).Name = cAlphaArgs( 1 );
 			PIU( PIUNum ).UnitType = cCurrentModuleObject;
 			PIU( PIUNum ).UnitType_Num = SingleDuct_ParallelPIU_Reheat;
@@ -503,12 +446,12 @@ namespace PoweredInductionUnits {
 			PIU( PIUNum ).MinPriAirFlowFrac = rNumericArgs( 3 );
 			PIU( PIUNum ).FanOnFlowFrac = rNumericArgs( 4 );
 			PIU( PIUNum ).HCoilType = cAlphaArgs( 9 ); // type (key) of heating coil
-			if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:FUEL" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 				PIU( PIUNum ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
@@ -518,7 +461,7 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 					SteamMessageNeeded = false;
 				}
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:ELECTRIC" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Electric;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFieldNames( 9 ) + " = " + cAlphaArgs( 9 ) );
@@ -838,7 +781,6 @@ namespace PoweredInductionUnits {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
@@ -1109,7 +1051,7 @@ namespace PoweredInductionUnits {
 				}
 			} else {
 				CheckZoneSizing( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name );
-				if ( SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+				if ( InputProcessor::SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", PIU( PIUNum ).HCoil, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", PIU( PIUNum ).HCoil, ErrorsFound );
@@ -1173,7 +1115,7 @@ namespace PoweredInductionUnits {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", PIU( PIUNum ).MaxVolHotWaterFlow );
 				}
 			} else {
-				if ( SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Steam" ) ) {
+				if ( InputProcessor::SameString( PIU( PIUNum ).HCoilType, "Coil:Heating:Steam" ) ) {
 
 					CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", PIU( PIUNum ).HCoil, ErrorsFound );
 					CoilSteamOutletNode = GetCoilSteamOutletNode( "Coil:Heating:Steam", PIU( PIUNum ).HCoil, ErrorsFound );
@@ -1599,14 +1541,36 @@ namespace PoweredInductionUnits {
 		// Set the mass flow rates
 		if ( UnitOn ) {
 			// unit is on
+			// Special controls if FanOnFlowFrac = 0.0
+			bool ReheatRequired = false;
+			if (PIU(PIUNum).FanOnFlowFrac <= 0.0) {
+				// Calculate if reheat is needed
+				Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
+				if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
+			}
+
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				// PIU fan off if FanOnFlowFrac is 0.0 and there is no heating load, also reset fan flag if fan should be off
+				if ( ( QZnReq <= SmallLoad ) && ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) ) {
+					SecAirMassFlow = 0.0;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				}
 			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
 				// in deadband or very small load: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
+				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+					SecAirMassFlow = 0.0;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				}
 			} else if ( QZnReq > SmallLoad ) {
 				// heating: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
@@ -1625,8 +1589,12 @@ namespace PoweredInductionUnits {
 				PriAirMassFlow = QZnReq / ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
 				PriAirMassFlow = min( max( PriAirMassFlow, PriAirMassFlowMin ), PriAirMassFlowMax );
 				// check for fan on or off
-				if ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) {
+				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
+					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
 				} else {
 					// fan is on; recalc primary air flow
 					// CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) +
@@ -1645,7 +1613,7 @@ namespace PoweredInductionUnits {
 		Node( PriNode ).MassFlowRate = PriAirMassFlow;
 		Node( SecNode ).MassFlowRate = SecAirMassFlow;
 		Node( SecNode ).MassFlowRateMaxAvail = SecAirMassFlow;
-		//now that inlet airflows have been set, the terminal bos components can be simulated.
+		//now that inlet airflows have been set, the terminal box components can be simulated.
 		// fire the fan
 		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index );
 		// fire the mixer
@@ -1767,29 +1735,8 @@ namespace PoweredInductionUnits {
 		// Given a mixer name, this routine determines if that mixer is found on
 		// PIUnits.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		bool YesNo; // True if found
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ItemNum;
@@ -1801,7 +1748,7 @@ namespace PoweredInductionUnits {
 
 		YesNo = false;
 		if ( NumPIUs > 0 ) {
-			ItemNum = FindItemInList( CompName, PIU, &PowIndUnitData::MixerName );
+			ItemNum = InputProcessor::FindItemInList( CompName, PIU, &PowIndUnitData::MixerName );
 			if ( ItemNum > 0 ) YesNo = true;
 		}
 
@@ -1822,27 +1769,6 @@ namespace PoweredInductionUnits {
 		// PURPOSE OF THIS FUNCTION:
 		// Marks a PIU air terminal unit as obtaining its induced air from
 		// a plenum.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PIUIndex;

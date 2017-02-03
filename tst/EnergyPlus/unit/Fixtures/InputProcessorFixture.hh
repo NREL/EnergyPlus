@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef InputProcessorFixture_hh_INCLUDED
 #define InputProcessorFixture_hh_INCLUDED
@@ -70,11 +58,13 @@ namespace EnergyPlus {
 	class InputProcessorFixture : public EnergyPlusFixture
 	{
 	protected:
-		static void SetUpTestCase() { }
+		static void SetUpTestCase() {
+			EnergyPlusFixture::SetUpTestCase();  // Sets up the base fixture
+		}
 		static void TearDownTestCase() { }
 
 		virtual void SetUp() {
-			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+			EnergyPlusFixture::SetUp();  // Sets up individual test cases.
 		}
 
 		virtual void TearDown() {
@@ -83,6 +73,74 @@ namespace EnergyPlus {
 
 		bool process_idd( std::string const & idd, bool & errors_found ) {
 			return EnergyPlusFixture::process_idd( idd, errors_found );
+		}
+
+		std::vector < std::string > const & validation_errors() {
+			return InputProcessor::validation_errors();
+		}
+
+		std::vector < std::string > const & validation_warnings() {
+			return InputProcessor::validation_warnings();
+		}
+
+		std::string encodeIDF() {
+			return InputProcessor::idf_parser.encode(InputProcessor::jdf, InputProcessor::schema);
+		}
+
+		json & getJDF() {
+			return InputProcessor::jdf;
+		}
+
+		void eat_whitespace( std::string const & idf, size_t & index ) {
+			IdfParser idfParser;
+			idfParser.eat_whitespace( idf, index );
+		}
+
+		void eat_comment( std::string const & idf, size_t & index ) {
+			IdfParser idfParser;
+			idfParser.eat_comment( idf, index );
+		}
+
+		std::string parse_string( std::string const & idf, size_t & index, bool & success) {
+			IdfParser idfParser;
+			return idfParser.parse_string( idf, index, success );
+		}
+
+		json parse_value( std::string const & idf, size_t & index, bool & success ) {
+			IdfParser idfParser;
+			return idfParser.parse_value( idf, index, success, InputProcessor::schema["properties"] );
+		}
+
+		json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
+			IdfParser idfParser;
+			return idfParser.parse_value( idf, index, success, field_loc );
+		}
+
+		json parse_number( std::string const & idf, size_t & index, bool & success ) {
+			IdfParser idfParser;
+			return idfParser.parse_number( idf, index, success );
+		}
+
+		IdfParser::Token look_ahead( std::string const & idf, size_t index)
+		{
+			IdfParser idfParser;
+			return idfParser.look_ahead( idf, index );
+		}
+
+		IdfParser::Token next_token( std::string const & idf, size_t & index)
+		{
+			IdfParser idfParser;
+			return idfParser.next_token( idf, index );
+		}
+
+		json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
+			IdfParser idfParser;
+			return idfParser.parse_idf( idf, index, success, schema );
+		}
+
+		json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc, json const & obj_loc ) {
+			IdfParser idfParser;
+			return idfParser.parse_object( idf, index, success, schema_loc, obj_loc );
 		}
 	};
 

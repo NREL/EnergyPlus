@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -86,6 +74,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessor.hh>
@@ -212,6 +201,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	Array1D< PTUnitData > PTUnit;
+	std::unordered_map< std::string, std::string > PTUnitUniqueNames;
 	Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
@@ -219,6 +209,7 @@ namespace PackagedTerminalHeatPump {
 	clear_state()
 	{
 		MyOneTimeFlag = true;
+		PTUnitUniqueNames.clear();
 	}
 
 
@@ -243,32 +234,13 @@ namespace PackagedTerminalHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a packaged terminal heat pump. Called from SimZoneEquipment.
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
 		using namespace DataZoneEnergyDemands;
 		using DataHeatBalFanSys::TempControlType;
 		using DataZoneEquipment::PkgTermHPAirToAir_Num;
 		using DataZoneEquipment::PkgTermHPWaterToAir_Num;
 		using DataZoneEquipment::PkgTermACAirToAir_Num;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PTUnitNum( 0 ); // index of packaged terminal heat pump being simulated
@@ -288,7 +260,7 @@ namespace PackagedTerminalHeatPump {
 
 		// Find the correct packaged terminal heat pump
 		if ( CompIndex == 0 ) {
-			PTUnitNum = FindItemInList( CompName, PTUnit );
+			PTUnitNum = InputProcessor::FindItemInList( CompName, PTUnit );
 			if ( PTUnitNum == 0 ) {
 				ShowFatalError( "SimPackagedTerminalUnit: Unit not found=" + CompName );
 			}
@@ -500,7 +472,7 @@ namespace PackagedTerminalHeatPump {
 
 		if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 			{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).ACHeatCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
 			} else if ( ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) {
 				PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower;
@@ -530,9 +502,6 @@ namespace PackagedTerminalHeatPump {
 
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using Fans::GetFanType;
@@ -568,12 +537,6 @@ namespace PackagedTerminalHeatPump {
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using FluidProperties::GetSatDensityRefrig;
@@ -600,19 +563,9 @@ namespace PackagedTerminalHeatPump {
 		using SingleDuct::GetATMixer;
 		using DataSizing::ZoneHVACSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPTUnit: " ); // include trailing blank space
 		static std::string const RoutineNameFull( "GetPackagedTerminalHeatPumpInput" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PTUnitIndex; // loop index
@@ -647,7 +600,6 @@ namespace PackagedTerminalHeatPump {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions
 		Real64 FanVolFlow; // maximum supply air volumetric flow rate of fan
@@ -669,20 +621,20 @@ namespace PackagedTerminalHeatPump {
 
 		// find the number of each type of packaged terminal unit
 		CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-		NumPTHP = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumPTHP = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-		NumPTAC = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumPTAC = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-		NumPTWSHP = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumPTWSHP = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -697,6 +649,7 @@ namespace PackagedTerminalHeatPump {
 		// allocate the data structures
 		if ( NumPTUs > 0 ) {
 			PTUnit.allocate( NumPTUs );
+			PTUnitUniqueNames.reserve( static_cast< unsigned >( NumPTUs ) );
 			CheckEquipName.allocate( NumPTUs );
 			PTUnitUNumericFields.allocate( NumPTUs );
 		}
@@ -718,7 +671,7 @@ namespace PackagedTerminalHeatPump {
 			OANodeNums = 0;
 
 			CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-			GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex;
 
@@ -726,14 +679,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTHPUnit;
@@ -756,26 +702,28 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).OAMixType = Alphas( 5 );
 			PTUnit( PTUnitNum ).OAMixName = Alphas( 6 );
 
-			errFlag = false;
-			ValidateComponent( PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, errFlag, CurrentModuleObject );
-			if ( errFlag ) {
-				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." );
-				ErrorsFound = true;
-			} else {
-				// OANodeNums = outside air mixer node numbers, OANodeNums(4) = outside air mixer mixed air node
-				OANodeNums = GetOAMixerNodeNumbers( PTUnit( PTUnitNum ).OAMixName, errFlag );
+			// check to see if local OA mixer specified
+			if ( !lAlphaBlanks( 6 ) ) {
+				errFlag = false;
+				ValidateComponent( PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, errFlag, CurrentModuleObject );
 				if ( errFlag ) {
-					ShowContinueError( "that was specified in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name." );
+					ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." );
 					ErrorsFound = true;
 				} else {
-					//  Set connection type to 'Inlet', because this is not necessarily directly come from
-					//  outside air.  Outside Air Inlet Node List will set the connection to outside air
-					PTUnit( PTUnitNum ).OutsideAirNode = OANodeNums( 1 );
-					PTUnit( PTUnitNum ).AirReliefNode = OANodeNums( 2 );
+					// OANodeNums = outside air mixer node numbers, OANodeNums(4) = outside air mixer mixed air node
+					OANodeNums = GetOAMixerNodeNumbers( PTUnit( PTUnitNum ).OAMixName, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "that was specified in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+						ShowContinueError( "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name." );
+						ErrorsFound = true;
+					} else {
+						//  Set connection type to 'Inlet', because this is not necessarily directly come from
+						//  outside air.  Outside Air Inlet Node List will set the connection to outside air
+						PTUnit( PTUnitNum ).OutsideAirNode = OANodeNums( 1 );
+						PTUnit( PTUnitNum ).AirReliefNode = OANodeNums( 2 );
+					}
 				}
 			}
-
 			PTUnit( PTUnitNum ).MaxCoolAirVolFlow = Numbers( 1 );
 			if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow <= 0 && PTUnit( PTUnitNum ).MaxCoolAirVolFlow != AutoSize ) {
 				ShowSevereError( CurrentModuleObject + " illegal " + cNumericFields( 1 ) + " = " + TrimSigDigits( Numbers( 1 ), 7 ) );
@@ -865,7 +813,7 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			PTUnit( PTUnitNum ).DXHeatCoilName = Alphas( 10 );
-			if ( SameString( Alphas( 9 ), "Coil:Heating:DX:SingleSpeed" ) ) {
+			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:DX:SingleSpeed" ) ) {
 				PTUnit( PTUnitNum ).DXHeatCoilType = Alphas( 9 );
 				//       PTUnit(PTUnitNum)%DXHeatCoilType_Num = CoilDX_HeatingEmpirical
 				errFlag = false;
@@ -873,7 +821,7 @@ namespace PackagedTerminalHeatPump {
 				HeatCoilInletNodeNum = GetDXCoilInletNode( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 				HeatCoilOutletNodeNum = GetDXCoilOutletNode( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 				if ( errFlag ) ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-			} else if ( SameString( Alphas( 9 ), "COIL:HEATING:DX:VARIABLESPEED" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 9 ), "COIL:HEATING:DX:VARIABLESPEED" ) ) {
 				PTUnit( PTUnitNum ).DXHeatCoilType = Alphas( 9 );
 				PTUnit( PTUnitNum ).DXHeatCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
 				PTUnit( PTUnitNum ).DXHeatCoilName = Alphas( 10 );
@@ -902,9 +850,9 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
 			PTUnit( PTUnitNum ).CoolConvergenceTol = Numbers( 9 );
 
-			if ( SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
-				if ( SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
 					errFlag = false;
 					GetDXCoilIndex( PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, PTUnit( PTUnitNum ).DXCoolCoilType );
@@ -912,7 +860,7 @@ namespace PackagedTerminalHeatPump {
 					CoolCoilOutletNodeNum = GetDXCoilOutletNode( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
 					PTUnit( PTUnitNum ).CondenserNodeNum = GetCoilCondenserInletNode( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
 					if ( errFlag ) ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-				} else if ( SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
 					errFlag = false;
 					GetDXCoilIndex( GetHXDXCoilName( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag ), PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, "Coil:Cooling:DX:SingleSpeed" );
@@ -921,7 +869,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).CondenserNodeNum = GetCoilCondenserInletNode( "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag ), errFlag );
 					if ( errFlag ) ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 				}
-			} else if ( SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
 				PTUnit( PTUnitNum ).DXCoolCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 				PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
@@ -959,12 +907,12 @@ namespace PackagedTerminalHeatPump {
 			SuppHeatCoilType = Alphas( 13 );
 			SuppHeatCoilName = Alphas( 14 );
 			PTUnit( PTUnitNum ).SuppHeatCoilName = SuppHeatCoilName;
-			if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) || SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || SameString( Alphas( 13 ), "Coil:Heating:Water" ) || SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+			if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).SuppHeatCoilType = SuppHeatCoilType;
-				if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) || SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
-					if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) ) {
-						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGas;
-					} else if ( SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+				if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+					if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) ) {
+						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
+					} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingElectric;
 					}
 					errFlag = false;
@@ -982,7 +930,7 @@ namespace PackagedTerminalHeatPump {
 							ErrorsFound = true;
 						}
 					}
-				} else if ( SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 					errFlag = false;
 					SuppHeatHWInletNodeNum = GetCoilWaterInletNode( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -1004,7 +952,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 
-				} else if ( SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).SuppHeatCoilIndex = GetSteamCoilIndex( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -1050,21 +998,29 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "..." + cNumericFields( 11 ) + " = " + TrimSigDigits( Numbers( 11 ), 1 ) );
 			}
 
-			if ( SameString( Alphas( 15 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 15 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 15 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 15 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			if ( PTUnit( PTUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( CurrentModuleObject + " illegal " + cAlphaFields( 15 ) + " = " + Alphas( 15 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 				ErrorsFound = true;
 			}
 
-			// Check component placement
-			if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
-				// PTUnit inlet node must be the same as a zone exhaust node and the OA Mixer return node
-				// check that PTUnit inlet node is a zone exhaust node.
+			// Get AirTerminal mixer data
+			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
+			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
+				PTUnit( PTUnitNum ).ATMixerExists = true;
+			}
+			// check that heat pump doesn' have local outside air and DOA
+			if ( PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit has local as well as central outdoor air specified" );
+				ErrorsFound = true;
+			}
+			// check that PTUnit inlet node is a zone exhaust node.
+			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				ZoneNodeNotFound = true;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
 						if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
 							ZoneNodeNotFound = false;
@@ -1073,25 +1029,77 @@ namespace PackagedTerminalHeatPump {
 					}
 				}
 				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air inlet node name must be the same as a zone exhaust node name." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Heat Pumps air inlet node name must be the same as a zone exhaust node name." );
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Heat pumps inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
-				// check OA Mixer return node
-				if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
-					ShowContinueError( "..PTUnit air inlet node name            = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
+			}
+			// check that PTUnit outlet node is a zone inlet node.
+			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+				ZoneNodeNotFound = true;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
+							ZoneNodeNotFound = false;
+							break;
+						}
+					}
+				}
+				if ( ZoneNodeNotFound ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Heat Pumps air outlet node name must be the same as a zone inlet node name." );
+					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "..Heat pumps outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
-				// Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
-				if ( OANodeNums( 4 ) != FanInletNodeNum ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan inlet node name must be the same as the heat pumps" );
-					ShowContinueError( "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields( 15 ) + " is specified." );
-					ShowContinueError( "..Fan inlet node name                   = " + NodeID( FanInletNodeNum ) );
-					ShowContinueError( "..OutdoorAir:Mixer mixed air node name = " + NodeID( OANodeNums( 4 ) ) );
+			}
+			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+				// check that the air teminal mixer out node is the heat pump inlet node
+				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
+					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+					ShowContinueError( "..heat pump unit air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
+				}
+			}
+			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
+				// check that the air teminal mixer secondary air node is the heat pump outlet node
+				if ( PTUnit( PTUnitNum ).AirOutNode != PTUnit( PTUnitNum ).ATMixerSecNode ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowContinueError( "..heat pump unit air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
+					ErrorsFound = true;
+				}
+				// check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
+				if ( PTUnit( PTUnitNum ).AirOutNode != SuppHeatOutletNodeNum ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
+					ShowContinueError( "..heat pump unit supp heater outlet node name = " + NodeID( SuppHeatOutletNodeNum ) );
+					ErrorsFound = true;
+				}
+			}
+			// Check component placement
+			if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
+				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+					// check OA Mixer return node
+					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
+						ShowContinueError( "..PTUnit air inlet node name            = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+						ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
+						ErrorsFound = true;
+					}
+					// Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
+					if ( OANodeNums( 4 ) != FanInletNodeNum ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan inlet node name must be the same as the heat pumps" );
+						ShowContinueError( "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields( 15 ) + " is specified." );
+						ShowContinueError( "..Fan inlet node name                   = " + NodeID( FanInletNodeNum ) );
+						ShowContinueError( "..OutdoorAir:Mixer mixed air node name = " + NodeID( OANodeNums( 4 ) ) );
+						ErrorsFound = true;
+					}
 				}
 				if ( CoolCoilInletNodeNum != FanOutletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan outlet node name must be the same as the cooling coil" );
@@ -1119,56 +1127,33 @@ namespace PackagedTerminalHeatPump {
 					ShowContinueError( "..Heat pumps outlet node name                   = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
-				// check that PTUnit outlet node is a zone inlet node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
-							ZoneNodeNotFound = false;
-							break;
-						}
+				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+					// check that the air teminal mixer out node is the fan inlet node
+					if ( PTUnit( PTUnitNum ).ATMixerOutNode != FanInletNodeNum ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
+						ErrorsFound = true;
 					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air outlet node name must be the same as a zone inlet node name." );
-					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Heat pumps outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-					ErrorsFound = true;
 				}
 			} else { // draw through fan from IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
 				// check that PTUnit inlet node is a zone exhaust node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-							ZoneNodeNotFound = false;
-							break;
-						}
+				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+					// check OA Mixer return node
+					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
+						ShowContinueError( "..PTUnit air inlet node name            = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+						ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
+						ErrorsFound = true;
 					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air inlet node name must be the same as a zone exhaust node name." );
-					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Heat pumps inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ErrorsFound = true;
-				}
-				// check OA Mixer return node
-				if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" PTUnit air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
-					ShowContinueError( "..PTUnit air inlet node name            = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
-					ErrorsFound = true;
-				}
-				// Fan outlet node name must be the same as the supplemental heating coil inlet node name
-				if ( CoolCoilInletNodeNum != OANodeNums( 4 ) ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil" );
-					ShowContinueError( " inlet node name when draw through " + cAlphaFields( 15 ) + " is specified." );
-					ShowContinueError( "..OutdoorAir:Mixer mixed air name = " + NodeID( OANodeNums( 4 ) ) );
-					ShowContinueError( "..Cooling coil inlet node name     = " + NodeID( CoolCoilInletNodeNum ) );
-					ErrorsFound = true;
+					// Fan outlet node name must be the same as the supplemental heating coil inlet node name
+					if ( CoolCoilInletNodeNum != OANodeNums( 4 ) ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil" );
+						ShowContinueError( " inlet node name when draw through " + cAlphaFields( 15 ) + " is specified." );
+						ShowContinueError( "..OutdoorAir:Mixer mixed air name = " + NodeID( OANodeNums( 4 ) ) );
+						ShowContinueError( "..Cooling coil inlet node name     = " + NodeID( CoolCoilInletNodeNum ) );
+						ErrorsFound = true;
+					}
 				}
 				if ( CoolCoilOutletNodeNum != HeatCoilInletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Cooling coil outlet node name must be the same as the heating coil inlet node name." );
@@ -1196,22 +1181,14 @@ namespace PackagedTerminalHeatPump {
 					ShowContinueError( "..Heat pumps outlet node name                = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
-				// check that PTUnit outlet node is a zone inlet node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-							ZoneNodeNotFound = false;
-							break;
-						}
+				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+					// check that the air teminal mixer out node is the cooling coil inlet node
+					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
+						ErrorsFound = true;
 					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Heat Pumps air outlet node name must be the same as a zone inlet node name." );
-					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Heat pumps outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-					ErrorsFound = true;
 				}
 			} // IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
 
@@ -1230,7 +1207,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 18 )) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 18 ), ZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 18 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 18 ) + " = " + Alphas( 18 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1250,8 +1227,8 @@ namespace PackagedTerminalHeatPump {
 			//   Initialize last mode of compressor operation
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-			if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
-				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
@@ -1288,6 +1265,33 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+				//   check that OA flow in cooling must be set to zero when connected to DOAS
+				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
+					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+					ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
+					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
+				}
+				//   check that OA flow in heating must be set to zero when connected to DOAS
+				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
+					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+					ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
+					PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
+				}
+				//   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
+				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
+					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
+					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
+				}
+			}
+
 			CompSetFanInlet = NodeID( FanInletNodeNum );
 			CompSetFanOutlet = NodeID( FanOutletNodeNum );
 			CompSetCoolInlet = NodeID( CoolCoilInletNodeNum );
@@ -1318,8 +1322,10 @@ namespace PackagedTerminalHeatPump {
 					TempNodeNum = GetOnlySingleNode( NodeID( PTUnit( PTUnitNum ).HWCoilSteamInletNode ), ErrorsFound, PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, NodeType_Steam, NodeConnectionType_Actuator, 1, ObjectIsParent );
 				}
 			}
-			// Set up component set for OA mixer - use OA node and Mixed air node
-			SetUpCompSets( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, NodeID( OANodeNums( 1 ) ), NodeID( OANodeNums( 4 ) ) );
+			if ( OANodeNums( 1 ) > 0 ) {
+				// Set up component set for OA mixer - use OA node and Mixed air node
+				SetUpCompSets( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, NodeID( OANodeNums( 1 ) ), NodeID( OANodeNums( 4 ) ) );
+			}
 		}
 
 		// loop over PTAC units; get and load the input data
@@ -1332,9 +1338,10 @@ namespace PackagedTerminalHeatPump {
 			HeatCoilInletNodeNum = 0;
 			HeatCoilOutletNodeNum = 0;
 			SuppHeatInletNodeNum = 0;
+			OANodeNums = 0;
 
 			CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-			GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex + NumPTHP;
 
@@ -1342,14 +1349,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTACUnit;
@@ -1372,26 +1372,28 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).OAMixType = Alphas( 5 );
 			PTUnit( PTUnitNum ).OAMixName = Alphas( 6 );
 
-			errFlag = false;
-			ValidateComponent( PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, errFlag, CurrentModuleObject );
-			if ( errFlag ) {
-				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." );
-				ErrorsFound = true;
-			} else {
-				// OANodeNums = outside air mixer node numbers, OANodeNums(4) = outside air mixer mixed air node
-				OANodeNums = GetOAMixerNodeNumbers( PTUnit( PTUnitNum ).OAMixName, errFlag );
+			// check to see if local OA mixer specified
+			if ( !lAlphaBlanks( 6 ) ) {
+				errFlag = false;
+				ValidateComponent( PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, errFlag, CurrentModuleObject );
 				if ( errFlag ) {
-					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name." );
+					ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." );
 					ErrorsFound = true;
 				} else {
-					//  Set connection type to 'Inlet', because this is not necessarily directly come from
-					//  outside air.  Outside Air Inlet Node List will set the connection to outside air
-					PTUnit( PTUnitNum ).OutsideAirNode = OANodeNums( 1 );
-					PTUnit( PTUnitNum ).AirReliefNode = OANodeNums( 2 );
+					// OANodeNums = outside air mixer node numbers, OANodeNums(4) = outside air mixer mixed air node
+					OANodeNums = GetOAMixerNodeNumbers( PTUnit( PTUnitNum ).OAMixName, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+						ShowContinueError( "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name." );
+						ErrorsFound = true;
+					} else {
+						//  Set connection type to 'Inlet', because this is not necessarily directly come from
+						//  outside air.  Outside Air Inlet Node List will set the connection to outside air
+						PTUnit( PTUnitNum ).OutsideAirNode = OANodeNums( 1 );
+						PTUnit( PTUnitNum ).AirReliefNode = OANodeNums( 2 );
+					}
 				}
 			}
-
 			PTUnit( PTUnitNum ).MaxCoolAirVolFlow = Numbers( 1 );
 			if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow <= 0 && PTUnit( PTUnitNum ).MaxCoolAirVolFlow != AutoSize ) {
 				ShowSevereError( CurrentModuleObject + " illegal " + cNumericFields( 1 ) + " = " + TrimSigDigits( Numbers( 1 ), 7 ) );
@@ -1496,11 +1498,11 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).ACHeatCoilName = Alphas( 10 );
 			ACHeatCoilName = Alphas( 10 );
 
-			if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) || SameString( Alphas( 9 ), "Coil:Heating:Electric" ) || SameString( Alphas( 9 ), "Coil:Heating:Water" ) || SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
+			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).ACHeatCoilType = Alphas( 9 );
-				if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) || SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) {
-					if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingGas;
-					if ( SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingElectric;
+				if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) {
+					if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
+					if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingElectric;
 					PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, ACHeatCoilName, ErrorsFound );
 					errFlag = false;
 					HeatCoilInletNodeNum = GetHeatingCoilInletNode( PTUnit( PTUnitNum ).ACHeatCoilType, ACHeatCoilName, errFlag );
@@ -1509,7 +1511,7 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( Alphas( 9 ), "Coil:Heating:Water" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Water" ) ) {
 					PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingWater;
 					errFlag = false;
 					PTUnit( PTUnitNum ).HotWaterControlNode = GetCoilWaterInletNode( "Coil:Heating:Water", ACHeatCoilName, errFlag );
@@ -1524,7 +1526,7 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
 					PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).ACHeatCoilIndex = GetSteamCoilIndex( Alphas( 9 ), ACHeatCoilName, errFlag );
@@ -1560,9 +1562,9 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).HeatConvergenceTol = 0.001;
 			PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
 
-			if ( SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
-				if ( SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
 					errFlag = false;
 					GetDXCoilIndex( PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, PTUnit( PTUnitNum ).DXCoolCoilType );
@@ -1573,7 +1575,7 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
 					errFlag = false;
 					GetDXCoilIndex( GetHXDXCoilName( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag ), PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, "Coil:Cooling:DX:SingleSpeed" );
@@ -1585,7 +1587,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
 				PTUnit( PTUnitNum ).DXCoolCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 				PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
@@ -1612,8 +1614,8 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( Alphas( 13 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 13 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 13 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 13 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			//   default to draw through if not specified in input
 			if ( lAlphaBlanks( 13 ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			if ( PTUnit( PTUnitNum ).FanPlace == 0 ) {
@@ -1622,13 +1624,22 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
-			// Check component placement
-			if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
-				// PTUnit inlet node must be the same as a zone exhaust node and the OA Mixer return node
-				// check that PTUnit inlet node is a zone exhaust node.
+
+			// Get AirTerminal mixer data
+			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
+			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
+				PTUnit( PTUnitNum ).ATMixerExists = true;
+			}
+			// check that air-conditioner doesn' have local outside air and DOA
+			if ( PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". Air-conditioners has local as well as central outdoor air specified" );
+				ErrorsFound = true;
+			}
+			// check that Air-conditioners inlet node is a zone exhaust node or the OA Mixer return node.
+			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				ZoneNodeNotFound = true;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
 						if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
 							ZoneNodeNotFound = false;
@@ -1637,27 +1648,79 @@ namespace PackagedTerminalHeatPump {
 					}
 				}
 				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as a zone exhaust node name." );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Air-conditioners air inlet node name must be the same as a zone exhaust node name." );
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Air Conditioners inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+					ShowContinueError( "..Air-conditioners inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
-				// check OA Mixer return node
-				if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
-					ShowContinueError( "..PTUnit air inlet node name            = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
+			}
+			// check that Air-conditioners outlet node is a zone inlet node.
+			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+				ZoneNodeNotFound = true;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
+							ZoneNodeNotFound = false;
+							break;
+						}
+					}
+				}
+				if ( ZoneNodeNotFound ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Air-conditioners air outlet node name must be the same as a zone inlet node name." );
+					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "..Air-conditioners outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
-				// Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
-				if ( OANodeNums( 4 ) != FanInletNodeNum ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan inlet node name must be the same as the air conditioners" );
-					ShowContinueError( "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields( 13 ) + " is specified." );
-					ShowContinueError( "..Fan inlet node name                   = " + NodeID( FanInletNodeNum ) );
-					ShowContinueError( "..OutdoorAir:Mixer mixed air node name = " + NodeID( OANodeNums( 4 ) ) );
+			}
+			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+				// check that the air teminal mixer out node is the air-conditioner inlet node
+				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Air-conditioners air inlet node name must be the same as the air terminal mixer outlet node name." );
+					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+					ShowContinueError( "..Air-conditioners air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
-				if ( CoolCoilInletNodeNum != FanOutletNodeNum ) {
+			}
+			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
+				// check that the air teminal mixer secondary air node is the air-conditioner outlet node
+				if ( PTUnit( PTUnitNum ).AirOutNode != PTUnit( PTUnitNum ).ATMixerSecNode ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"" );
+					ShowContinueError( "..Air-conditioners air outlet node name must be the same as the air terminal mixer secondary node name." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
+					ShowContinueError( "..Air-conditioners air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
+					ErrorsFound = true;
+				}
+			}
+
+			// Check component placement
+			if ( PTUnit( PTUnitNum ).FanPlace == BlowThru ) {
+
+				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+					// Fan inlet node name must be the same as the air-conditioner's OA mixer mixed air node name
+					if ( OANodeNums( 4 ) != FanInletNodeNum ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan inlet node name must be the same as the air conditioners" );
+						ShowContinueError( "OutdoorAir:Mixer mixed air node name when blow through " + cAlphaFields( 13 ) + " is specified." );
+						ShowContinueError( "..Fan inlet node name                   = " + NodeID( FanInletNodeNum ) );
+						ShowContinueError( "..OutdoorAir:Mixer mixed air node name = " + NodeID( OANodeNums( 4 ) ) );
+						ErrorsFound = true;
+					}
+
+					// OA mixer return node must equal air-conditioner air inlet node
+					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+						ShowContinueError( "..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
+						ShowContinueError( "..Heat Pump air inlet node name         = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+						ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
+						ErrorsFound = true;
+					}
+				}
+
+				if ( CoolCoilInletNodeNum != FanOutletNodeNum ) {// check that fan outlet equals cooling coil inlet
 					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Fan outlet node name must be the same as the cooling coil" );
 					ShowContinueError( " inlet node name when blow through " + cAlphaFields( 12 ) + " is specified." );
 					ShowContinueError( "..Fan outlet node name         = " + NodeID( FanOutletNodeNum ) );
@@ -1677,57 +1740,45 @@ namespace PackagedTerminalHeatPump {
 					ShowContinueError( "..Air conditioners outlet node name  = " + NodeID( SuppHeatInletNodeNum ) );
 					ErrorsFound = true;
 				}
-				// check that PTUnit outlet node is a zone inlet node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
-							ZoneNodeNotFound = false;
-							break;
-						}
+				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) == 0 ) {
+					// For no OA Mixer fan inlet node name must be the same as the Air-conditioner's inlet air node name
+					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+						ShowContinueError( "..Fan inlet node name must be the same as the Air-conditioners inlet air node name" );
+						ShowContinueError( "..when blow through " + cAlphaFields( 16 ) + " is specified and an outdoor air mixer is not used." );
+						ShowContinueError( "..Fan inlet node name           = " + NodeID( FanInletNodeNum ) );
+						ShowContinueError( "..Heat pump air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+						ErrorsFound = true;
 					}
 				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air outlet node name must be the same as a zone inlet node name." );
-					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Air Conditioners outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-					ErrorsFound = true;
+				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+					// check that the air teminal mixer outlet node is the fan inlet node
+					if ( PTUnit( PTUnitNum ).ATMixerOutNode != FanInletNodeNum ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
+						ErrorsFound = true;
+					}
 				}
+
 			} else { // draw through fan from IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
-				// PTUnit inlet node must be the same as a zone exhaust node and the OA Mixer return node
-				// check that PTUnit inlet node is a zone exhaust node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-							ZoneNodeNotFound = false;
-							break;
-						}
+
+				if ( !PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
+					// check OA Mixer return node
+					if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
+						ShowContinueError( "..Air Conditioner air inlet node name   = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
+						ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
+						ErrorsFound = true;
 					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as a zone exhaust node name." );
-					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Air Conditioners inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ErrorsFound = true;
-				}
-				// check OA Mixer return node
-				if ( PTUnit( PTUnitNum ).AirInNode != OANodeNums( 3 ) ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditioners air inlet node name must be the same as the OutdoorAir:Mixer return air node name." );
-					ShowContinueError( "..Air Conditioner air inlet node name   = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
-					ShowContinueError( "..OutdoorAir:Mixer return air node name = " + NodeID( OANodeNums( 3 ) ) );
-					ErrorsFound = true;
-				}
-				// cooling coil inlet node name must be the same as the OA mixers mixed air node name
-				if ( CoolCoilInletNodeNum != OANodeNums( 4 ) ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil" );
-					ShowContinueError( " inlet node name when draw through " + cAlphaFields( 13 ) + " is specified." );
-					ShowContinueError( "..OutdoorAir:Mixer mixed air name = " + NodeID( OANodeNums( 4 ) ) );
-					ShowContinueError( "..Cooling coil inlet node name     = " + NodeID( CoolCoilInletNodeNum ) );
-					ErrorsFound = true;
+					// cooling coil inlet node name must be the same as the OA mixers mixed air node name
+					if ( CoolCoilInletNodeNum != OANodeNums( 4 ) ) {
+						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" OutdoorAir:Mixer mixed air node name must be the same as the cooling coil" );
+						ShowContinueError( " inlet node name when draw through " + cAlphaFields( 13 ) + " is specified." );
+						ShowContinueError( "..OutdoorAir:Mixer mixed air name = " + NodeID( OANodeNums( 4 ) ) );
+						ShowContinueError( "..Cooling coil inlet node name     = " + NodeID( CoolCoilInletNodeNum ) );
+						ErrorsFound = true;
+					}
 				}
 				if ( CoolCoilOutletNodeNum != HeatCoilInletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Cooling coil outlet node name must be the same as the heating coil inlet node name." );
@@ -1749,23 +1800,14 @@ namespace PackagedTerminalHeatPump {
 					ShowContinueError( "..Air conditioners outlet node name = " + NodeID( SuppHeatInletNodeNum ) );
 					ErrorsFound = true;
 				}
-				// check that PTUnit outlet node is a zone inlet node.
-				ZoneNodeNotFound = true;
-				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-							PTUnit(PTUnitNum).ZonePtr = CtrlZone;
-							ZoneNodeNotFound = false;
-							break;
-						}
+				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
+					// check that the air teminal mixer out node is the cooling coil inlet node
+					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
+						ErrorsFound = true;
 					}
-				}
-				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\" Air Conditionerss air outlet node name must be the same as a zone inlet node name." );
-					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-					ShowContinueError( "..Air Conditioners outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
-					ErrorsFound = true;
 				}
 			} // IF (PTUnit(PTUnitNum)%FanPlace == BlowThru) THEN
 
@@ -1784,7 +1826,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 16 ), ZoneHVACSizing );
 				if ( PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1804,8 +1846,8 @@ namespace PackagedTerminalHeatPump {
 			//   Initialize last mode of compressor operation
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-			if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
-				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
@@ -1831,6 +1873,33 @@ namespace PackagedTerminalHeatPump {
 				if ( errFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
+				}
+			}
+
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+				//   check that OA flow in cooling must be set to zero when connected to DOAS
+				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
+					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+					ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
+					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
+				}
+				//   check that OA flow in heating must be set to zero when connected to DOAS
+				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
+					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+					ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
+					PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
+				}
+				//  check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
+				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
+					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
+					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
+					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
 				}
 			}
 
@@ -1860,8 +1929,10 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			// Set up component set for OA mixer - use OA node and Mixed air node
-			SetUpCompSets( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, NodeID( OANodeNums( 1 ) ), NodeID( OANodeNums( 4 ) ) );
+			if ( OANodeNums( 1 ) > 0 ) {
+				// Set up component set for OA mixer - use OA node and Mixed air node
+				SetUpCompSets( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).OAMixType, PTUnit( PTUnitNum ).OAMixName, NodeID( OANodeNums( 1 ) ), NodeID( OANodeNums( 4 ) ) );
+			}
 		}
 
 		//***********************************************************************************
@@ -1881,7 +1952,7 @@ namespace PackagedTerminalHeatPump {
 			OANodeNums = 0;
 
 			CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-			GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex + NumPTHP + NumPTAC;
 
@@ -1889,14 +1960,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTWSHPUnit;
@@ -2081,9 +2145,9 @@ namespace PackagedTerminalHeatPump {
 
 			if ( NumAlphas >= 19 ) {
 				// get water flow mode info before calling SetSimpleWSHPData
-				if ( SameString( Alphas( 19 ), "Constant" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstant;
-				if ( SameString( Alphas( 19 ), "Cycling" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterCycling;
-				if ( SameString( Alphas( 19 ), "ConstantOnDemand" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstantOnDemand;
+				if ( InputProcessor::SameString( Alphas( 19 ), "Constant" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstant;
+				if ( InputProcessor::SameString( Alphas( 19 ), "Cycling" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterCycling;
+				if ( InputProcessor::SameString( Alphas( 19 ), "ConstantOnDemand" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstantOnDemand;
 				//default to draw through if not specified in input
 				if ( lAlphaBlanks( 19 ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterCycling;
 				if ( PTUnit( PTUnitNum ).WaterCyclingMode == 0 ) {
@@ -2116,12 +2180,12 @@ namespace PackagedTerminalHeatPump {
 			SuppHeatCoilType = Alphas( 13 );
 			SuppHeatCoilName = Alphas( 14 );
 			PTUnit( PTUnitNum ).SuppHeatCoilName = SuppHeatCoilName;
-			if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) || SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || SameString( Alphas( 13 ), "Coil:Heating:Water" ) || SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+			if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).SuppHeatCoilType = SuppHeatCoilType;
-				if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) || SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
-					if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) ) {
-						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGas;
-					} else if ( SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+				if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+					if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) ) {
+						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
+					} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingElectric;
 					}
 					errFlag = false;
@@ -2139,7 +2203,7 @@ namespace PackagedTerminalHeatPump {
 							ErrorsFound = true;
 						}
 					}
-				} else if ( SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 					errFlag = false;
 					SuppHeatHWInletNodeNum = GetCoilWaterInletNode( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -2161,7 +2225,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 
-				} else if ( SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).SuppHeatCoilIndex = GetSteamCoilIndex( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -2211,8 +2275,8 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			if ( SameString( Alphas( 16 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 16 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( Alphas( 16 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( Alphas( 16 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			if ( PTUnit( PTUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
 				ShowContinueError( "Illegal " + cAlphaFields( 16 ) + "=\"" + Alphas( 16 ) + "\"." );
@@ -2234,7 +2298,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 20 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -2315,7 +2379,7 @@ namespace PackagedTerminalHeatPump {
 				// check that the air teminal mixer out node is the heat pump inlet node
 				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
-					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
@@ -2324,14 +2388,14 @@ namespace PackagedTerminalHeatPump {
 				// check that the air teminal mixer secondary air node is the heat pump outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != PTUnit( PTUnitNum ).ATMixerSecNode ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
 				// check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != SuppHeatOutletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
-					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object." );
 					ShowContinueError( "..heat pump unit supp heater outlet node name = " + NodeID( SuppHeatOutletNodeNum ) );
 					ErrorsFound = true;
 				}
@@ -2389,7 +2453,7 @@ namespace PackagedTerminalHeatPump {
 					// check that the air teminal mixer out node is the fan inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
 						ErrorsFound = true;
 					}
@@ -2447,7 +2511,7 @@ namespace PackagedTerminalHeatPump {
 					// check that the air teminal mixer out node is the cooling coil inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
 						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
-						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
 						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
 						ErrorsFound = true;
 					}
@@ -2656,7 +2720,7 @@ namespace PackagedTerminalHeatPump {
 
 			//Set the heatpump design supplemental heating capacity
 			//  Get from coil module.
-			if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingElectric ) {
+			if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingElectric ) {
 				errFlag = false;
 				PTUnit( PTUnitNum ).DesignSuppHeatingCapacity = GetHeatingCoilCapacity( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -3251,7 +3315,7 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		if ( PTUnit( PTUnitNum ).ACHeatCoilCap == AutoSize ) {
-			if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas ) {
+			if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ) {
 				PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
 			} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 				PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
@@ -4016,6 +4080,8 @@ namespace PackagedTerminalHeatPump {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
+		DataScalableCapSizingON = false;
+
 	}
 
 	void
@@ -4243,7 +4309,7 @@ namespace PackagedTerminalHeatPump {
 				// If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
 				SupHeaterLoad = 0.0;
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -4297,9 +4363,6 @@ namespace PackagedTerminalHeatPump {
 		// METHODOLOGY EMPLOYED:
 		// Simulates the unit components sequentially in the air flow direction.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
@@ -4307,7 +4370,6 @@ namespace PackagedTerminalHeatPump {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
-		using InputProcessor::SameString;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
@@ -4327,12 +4389,6 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode; // PTHP air outlet node
@@ -4433,7 +4489,7 @@ namespace PackagedTerminalHeatPump {
 		if ( HeatingLoad ) {
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				QCoilReq = PTUnit( PTUnitNum ).ACHeatCoilCap * PartLoadFrac;
-				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, False, OpMode, PartLoadFrac );
 				} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 					//       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
@@ -4476,7 +4532,7 @@ namespace PackagedTerminalHeatPump {
 			//   heating coil is off
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				QCoilReq = 0.0;
-				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex );
 				} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -4508,7 +4564,7 @@ namespace PackagedTerminalHeatPump {
 		if ( PTUnit( PTUnitNum ).SuppHeatCoilIndex > 0 ) {
 			if ( SupHeaterLoad < SmallLoad ) {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, True, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -4521,7 +4577,7 @@ namespace PackagedTerminalHeatPump {
 				}}
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, True, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;
@@ -5905,7 +5961,7 @@ namespace PackagedTerminalHeatPump {
 				// If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
 				SupHeaterLoad = 0.0;
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -6190,11 +6246,6 @@ namespace PackagedTerminalHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will calcultes MSHP performance based on given system load
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
@@ -6202,7 +6253,6 @@ namespace PackagedTerminalHeatPump {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
-		using InputProcessor::SameString;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
@@ -6216,19 +6266,10 @@ namespace PackagedTerminalHeatPump {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using SingleDuct::SimATMixer;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcVarSpeedHeatPump: " ); // for error messages
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode; // PTHP air outlet node
@@ -6275,7 +6316,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( PTUnit( PTUnitNum ).ATMixerPriNode ).MassFlowRate = min( Node( PTUnit( PTUnitNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRate );
-				// now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
+				// now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
 				// the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
 				SimATMixer( PTUnit( PTUnitNum ).ATMixerName, FirstHVACIteration, PTUnit( PTUnitNum ).ATMixerIndex );
 			}
@@ -6311,7 +6352,7 @@ namespace PackagedTerminalHeatPump {
 			if ( HeatingLoad ) {
 				if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 					QCoilReq = PTUnit( PTUnitNum ).ACHeatCoilCap * PartLoadFrac;
-					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 						SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, false, OpMode, PartLoadFrac );
 					} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 						//       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
@@ -6332,7 +6373,7 @@ namespace PackagedTerminalHeatPump {
 				//   heating coil is off
 				if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 					QCoilReq = 0.0;
-					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 						SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex );
 					} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 						mdot = 0.0;
@@ -6357,7 +6398,7 @@ namespace PackagedTerminalHeatPump {
 		if ( PTUnit( PTUnitNum ).SuppHeatCoilIndex > 0 ) {
 			if ( SupHeaterLoad < SmallLoad ) {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, true, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -6370,7 +6411,7 @@ namespace PackagedTerminalHeatPump {
 				}}
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, true, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;

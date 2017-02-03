@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -69,6 +57,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -135,12 +124,14 @@ namespace HeatPumpWaterToWaterSimple {
 	// Object Data
 	Array1D< GshpSpecs > GSHP;
 	Array1D< ReportVars > GSHPReport;
+	std::unordered_map< std::string, std::string > HeatPumpWaterUniqueNames;
 
 	void
 	clear_state(){
 		NumGSHPs = 0;
 		GetInputFlag = true;
 		InitWatertoWaterHPOneTimeFlag = true;
+		HeatPumpWaterUniqueNames.clear();
 		GSHP.deallocate();
 		GSHPReport.deallocate();
 	}
@@ -169,31 +160,12 @@ namespace HeatPumpWaterToWaterSimple {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Water-to-Water Heat Pump Simple (Equation-Fit Model)
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		//Get input from IDF
 		if ( GetInputFlag ) {
@@ -202,7 +174,7 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		if ( InitLoopEquip ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP );
+			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum != 0 ) { // if 0, fall through to next
 				if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
 					MinCap = 0.0;
@@ -270,33 +242,13 @@ namespace HeatPumpWaterToWaterSimple {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Obtain input from IDF and store them in data structures
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
 		using DataPlant::ScanPlantLoopsForObject;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GSHPNum; // GSHP number
@@ -310,12 +262,10 @@ namespace HeatPumpWaterToWaterSimple {
 		Array1D< Real64 > NumArray( 15 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumCoolCoil = GetNumObjectsFound( HPEqFitCoolingUC );
-		NumHeatCoil = GetNumObjectsFound( HPEqFitHeatingUC );
+		NumCoolCoil = InputProcessor::GetNumObjectsFound( HPEqFitCoolingUC );
+		NumHeatCoil = InputProcessor::GetNumObjectsFound( HPEqFitHeatingUC );
 		NumGSHPs = NumCoolCoil + NumHeatCoil;
 
 		if ( NumGSHPs <= 0 ) {
@@ -325,6 +275,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		if ( NumGSHPs > 0 ) {
 			GSHP.allocate( NumGSHPs );
+			HeatPumpWaterUniqueNames.reserve( NumGSHPs );
 			GSHPReport.allocate( NumGSHPs );
 			// initialize the data structures
 		}
@@ -334,15 +285,8 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitCoolingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowCool = NumArray( 1 );
@@ -386,15 +330,8 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitHeatingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowHeat = NumArray( 1 );
@@ -498,7 +435,6 @@ namespace HeatPumpWaterToWaterSimple {
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
 		using DataPlant::PlantLoop;
-		using InputProcessor::SameString;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;

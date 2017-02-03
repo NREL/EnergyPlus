@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -84,6 +72,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ReportSizingManager.hh>
@@ -390,29 +379,13 @@ namespace PlantCondLoopOperation {
 		//    PlantEquipmentOperationSchemes
 		//    CondenserEquipmentOperationSchemes
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetScheduleIndex;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPlantOperationInput: " ); // include trailing blank space
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopNum; // Loop counter (Plant or Cond)
 		int OpNum; // Scheme counter
@@ -425,9 +398,6 @@ namespace PlantCondLoopOperation {
 		std::string PlantOpSchemeName; // Name of the plant or condenser operating scheme
 		std::string CurrentModuleObject; // for ease in renaming
 		std::string PlantLoopObject; // for ease in renaming
-		Array1D_string OpSchemeNames; // Used to verify unique op scheme names
-		bool IsNotOK;
-		bool IsBlank;
 		bool ErrorsFound; // Passed in from OpSchemeInput
 
 		ErrorsFound = false;
@@ -441,51 +411,17 @@ namespace PlantCondLoopOperation {
 
 		// get number of operation schemes
 		CurrentModuleObject = "PlantEquipmentOperationSchemes";
-		NumPlantOpSchemes = GetNumObjectsFound( CurrentModuleObject );
-
-		if ( NumPlantOpSchemes > 0 ) {
-			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
-			OpSchemeNames.allocate( NumPlantOpSchemes );
-			Num = 0;
-			for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
-				GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), OpSchemeNames, Num, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					continue;
-				}
-				++Num;
-				OpSchemeNames( Num ) = cAlphaArgs( 1 );
-			}
-
-			OpSchemeNames.deallocate();
-
+		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
 		}
 
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
-		NumCondOpSchemes = GetNumObjectsFound( CurrentModuleObject );
-
-		if ( NumCondOpSchemes > 0 ) {
-			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
-			OpSchemeNames.allocate( NumCondOpSchemes );
-			Num = 0;
-			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
-				GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), OpSchemeNames, Num, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					continue;
-				}
-				++Num;
-				OpSchemeNames( Num ) = cAlphaArgs( 1 );
-			}
-
-			OpSchemeNames.deallocate();
-
+		NumCondOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
 		}
 
 		//Load the Plant data structure
@@ -498,9 +434,9 @@ namespace PlantCondLoopOperation {
 				CurrentModuleObject = "CondenserEquipmentOperationSchemes";
 				PlantLoopObject = "CondenserLoop";
 			}
-			OpNum = GetObjectItemNum( CurrentModuleObject, PlantOpSchemeName );
+			OpNum = InputProcessor::GetObjectItemNum( CurrentModuleObject, PlantOpSchemeName );
 			if ( OpNum > 0 ) {
-				GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				PlantLoop( LoopNum ).NumOpSchemes = ( NumAlphas - 1 ) / 3;
 				if ( PlantLoop( LoopNum ).NumOpSchemes > 0 ) {
 					PlantLoop( LoopNum ).OpScheme.allocate( PlantLoop( LoopNum ).NumOpSchemes );
@@ -509,11 +445,7 @@ namespace PlantCondLoopOperation {
 
 						{ auto const plantLoopOperation( PlantLoop( LoopNum ).OpScheme( Num ).TypeOf );
 
-						if ( plantLoopOperation == "LOAD RANGE BASED OPERATION" ) { // Deprecated
-							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = LoadRBOpSchemeType; // Deprecated
-							ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" deprecated field value =\"" + PlantLoop( LoopNum ).OpScheme( Num ).TypeOf + "\"." );
-							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad" );
-						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
+						if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CoolingRBOpSchemeType;
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = HeatingRBOpSchemeType;
@@ -590,38 +522,21 @@ namespace PlantCondLoopOperation {
 		// following keywords is reflected exactly in this subroutine:
 		//    PlantEquipmentOperation:*
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
 		using namespace DataSizing;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOperationSchemeInput: " ); // include trailing blank space
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SchemeNum;
 		int Num;
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool ErrorsFound; // May be set here and passed on
 		int CLRBO; // Number ofCooling Load Range Based Operation Inputs
 		int HLRBO; // Number ofHeating Load Range Based Operation Inputs
@@ -643,31 +558,31 @@ namespace PlantCondLoopOperation {
 		int NumSchemeLists;
 		int LoopNum;
 		std::string CurrentModuleObject; // for ease in renaming.
-		Array1D_string TempVerifyNames;
+		std::unordered_map< std::string, std::string > UniqueNames;
 
 		ErrorsFound = false; //DSU CS
 
 		//**********VERIFY THE 'PLANTEQUIPMENTOPERATION:...' KEYWORDS**********
-		CLRBO = GetNumObjectsFound( "PlantEquipmentOperation:CoolingLoad" );
-		HLRBO = GetNumObjectsFound( "PlantEquipmentOperation:HeatingLoad" );
-		DBRBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDryBulb" );
-		WBRBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorWetBulb" );
-		DPRBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDewpoint" );
-		RHRBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorRelativeHumidity" );
-		CSPBO = GetNumObjectsFound( "PlantEquipmentOperation:ComponentSetpoint" ); //* Temp Based Control
-		NumUserDefOpSchemes = GetNumObjectsFound( "PlantEquipmentOperation:UserDefined" );
-		DBTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDryBulbDifference" );
-		WBTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorWetBulbDifference" );
-		DPTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDewpointDifference" );
-		TESSPBO = GetNumObjectsFound( "PlantEquipmentOperation:ThermalEnergyStorage" );
+		CLRBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:CoolingLoad" );
+		HLRBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:HeatingLoad" );
+		DBRBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDryBulb" );
+		WBRBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorWetBulb" );
+		DPRBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDewpoint" );
+		RHRBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorRelativeHumidity" );
+		CSPBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:ComponentSetpoint" ); //* Temp Based Control
+		NumUserDefOpSchemes = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:UserDefined" );
+		DBTDBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDryBulbDifference" );
+		WBTDBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorWetBulbDifference" );
+		DPTDBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDewpointDifference" );
+		TESSPBO = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:ThermalEnergyStorage" );
 		NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
-		NumUncontrolledSchemes = GetNumObjectsFound( "PlantEquipmentOperation:Uncontrolled" );
+		NumUncontrolledSchemes = InputProcessor::GetNumObjectsFound( "PlantEquipmentOperation:Uncontrolled" );
 		if ( ( NumSchemes + NumUncontrolledSchemes ) <= 0 ) {
 			ShowFatalError( "No PlantEquipmentOperation:* objects specified. Stop simulation." );
 		}
 
 		// test for blank or duplicates -- this section just determines if there are any duplicate operation scheme names
-		TempVerifyNames.allocate( NumSchemes );
+		UniqueNames.reserve( static_cast< unsigned >( NumSchemes ) );
 
 		//Check for existence of duplicates in keyword names
 		Count = 0;
@@ -715,23 +630,18 @@ namespace PlantCondLoopOperation {
 				ShowFatalError( "Error in control scheme identification" );
 			}
 
-			GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
-			TempVerifyNames( Num ) = cAlphaArgs( 1 );
-
 		}
 
 		//**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
-		PELists = GetNumObjectsFound( "PlantEquipmentList" );
-		CELists = GetNumObjectsFound( "CondenserEquipmentList" );
+		PELists = InputProcessor::GetNumObjectsFound( "PlantEquipmentList" );
+		CELists = InputProcessor::GetNumObjectsFound( "CondenserEquipmentList" );
 		NumSchemeLists = PELists + CELists;
-		TempVerifyNames.allocate( NumSchemeLists );
+		UniqueNames.clear();
+		UniqueNames.reserve( NumSchemeLists );
 		Count = 0;
 		for ( Num = 1; Num <= NumSchemeLists; ++Num ) {
 			if ( Num <= PELists ) {
@@ -741,15 +651,10 @@ namespace PlantCondLoopOperation {
 				CurrentModuleObject = "CondenserEquipmentList";
 				Count = Num - PELists;
 			}
-			GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
-			TempVerifyNames( Num ) = cAlphaArgs( 1 );
 		}
 
 		//**********GET INPUT AND LOAD PLANT DATA STRUCTURE*********
@@ -864,26 +769,13 @@ namespace PlantCondLoopOperation {
 		//       PlantEquipmentOperation:OutdoorRelativeHumidity
 		//       PlantEquipmentOperation:Uncontrolled
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
 		int NumNums;
@@ -910,7 +802,7 @@ namespace PlantCondLoopOperation {
 		SchemeNameFound = true;
 
 		// Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -927,8 +819,8 @@ namespace PlantCondLoopOperation {
 
 		if ( NumSchemes > 0 ) {
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
-				GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-				if ( SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
+				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
 				if ( Num == NumSchemes ) {
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1052,23 +944,13 @@ namespace PlantCondLoopOperation {
 		// Based on subroutine FindRangeBasedOrUncontrolledInput from Dan Fisher, July 2010
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
 		int NumNums;
@@ -1090,7 +972,7 @@ namespace PlantCondLoopOperation {
 		SchemeNameFound = true;
 
 		// Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -1107,8 +989,8 @@ namespace PlantCondLoopOperation {
 
 		if ( NumSchemes > 0 ) {
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
-				GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-				if ( SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
+				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
 				if ( Num == NumSchemes ) {
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1173,23 +1055,9 @@ namespace PlantCondLoopOperation {
 		// METHODOLOGY EMPLOYED:
 		// calls the Input Processor to retrieve data from input file.
 
-		// REFERENCES:
-		// na
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		bool FoundIntendedList;
@@ -1212,8 +1080,8 @@ namespace PlantCondLoopOperation {
 
 		if ( LoadEquipListOneTimeFlag ) {
 			// assemble mapping between list names and indices one time
-			PELists = GetNumObjectsFound( "PlantEquipmentList" );
-			CELists = GetNumObjectsFound( "CondenserEquipmentList" );
+			PELists = InputProcessor::GetNumObjectsFound( "PlantEquipmentList" );
+			CELists = InputProcessor::GetNumObjectsFound( "CondenserEquipmentList" );
 			TotNumLists = PELists + CELists;
 			if ( TotNumLists > 0 ) {
 				EquipListsNameList.allocate( TotNumLists );
@@ -1225,7 +1093,7 @@ namespace PlantCondLoopOperation {
 					CurrentModuleObject = "PlantEquipmentList";
 					for ( Num = 1; Num <= PELists; ++Num ) {
 						iIndex = Num;
-						GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+						InputProcessor::GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 						EquipListsNameList( iIndex ) = cAlphaArgs( 1 );
 						EquipListsTypeList( iIndex ) = LoopType_Plant;
 						EquipListsIndexList( iIndex ) = Num;
@@ -1261,7 +1129,7 @@ namespace PlantCondLoopOperation {
 					CurrentModuleObject = "CondenserEquipmentList";
 					for ( Num = 1; Num <= CELists; ++Num ) {
 						iIndex = Num + PELists;
-						GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+						InputProcessor::GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 						EquipListsNameList( iIndex ) = cAlphaArgs( 1 );
 						EquipListsTypeList( iIndex ) = LoopType_Condenser;
 						EquipListsIndexList( iIndex ) = Num;
@@ -1303,7 +1171,7 @@ namespace PlantCondLoopOperation {
 		FoundIntendedList = false;
 		// find name in set of possible list
 		for ( Num = 1; Num <= TotNumLists; ++Num ) {
-			if ( SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).Name, EquipListsNameList( Num ) ) ) {
+			if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).Name, EquipListsNameList( Num ) ) ) {
 				FoundIntendedList = true;
 				// get object item for real this time
 				{ auto const SELECT_CASE_var( EquipListsTypeList( Num ) );
@@ -1312,7 +1180,7 @@ namespace PlantCondLoopOperation {
 				} else if ( SELECT_CASE_var == LoopType_Condenser ) {
 					CurrentModuleObject = "CondenserEquipmentList";
 				}}
-				GetObjectItem( CurrentModuleObject, EquipListsIndexList( Num ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( CurrentModuleObject, EquipListsIndexList( Num ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).NumComps = ( NumAlphas - 1 ) / 2;
 				if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).NumComps > 0 ) {
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).Comp.allocate( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).NumComps );
@@ -1357,11 +1225,7 @@ namespace PlantCondLoopOperation {
 		//    PlantEquipmentOperation:ComponentSetPoint
 		//    PlantEquipmentOperation:ThermalEnergyStorage
 
-		// REFERENCES:
-		// na
 		// Using/Aliasing
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataSizing;
@@ -1384,10 +1248,6 @@ namespace PlantCondLoopOperation {
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
 		static gio::Fmt fmtLD( "*" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
 		int NumNums;
@@ -1419,8 +1279,8 @@ namespace PlantCondLoopOperation {
 
 		if ( NumSchemes > 0 ) {
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
-				GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				if ( SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break;
+				InputProcessor::GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break;
 				if ( Num == NumSchemes ) {
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1654,33 +1514,14 @@ namespace PlantCondLoopOperation {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace DataPlant;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-
 		using DataRuntimeLanguage::EMSProgramCallManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -1704,8 +1545,8 @@ namespace PlantCondLoopOperation {
 		if ( NumSchemes > 0 ) {
 
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
-				GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break; //found the correct one
+				InputProcessor::GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break; //found the correct one
 				if ( Num == NumSchemes ) { // did not find it
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1728,7 +1569,7 @@ namespace PlantCondLoopOperation {
 						SetupEMSInternalVariable( "Component Remaining Current Demand Rate", PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + ':' + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name, "[W]", PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).EMSIntVarRemainingLoadValue );
 					}
 				}
-				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
+				StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 				if ( StackMngrNum > 0 ) { // found it
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlSimProgramMngr = StackMngrNum;
 				} else {
@@ -1738,7 +1579,7 @@ namespace PlantCondLoopOperation {
 					ErrorsFound = true;
 				}
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
+					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1781,26 +1622,12 @@ namespace PlantCondLoopOperation {
 		// structure to facilitate a new load management routine that calls
 		// ManageLoadDistribution for every component.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-		// REFERENCES:
-		// na
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::emsCallFromUserDefinedComponentModel;
 		using EMSManager::ManageEMS;
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopPtr;
@@ -1861,7 +1688,7 @@ namespace PlantCondLoopOperation {
 						auto & this_equip_list( this_op_scheme.EquipList( ListNum ) );
 						for ( int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum ) {
 							auto & this_equip( this_equip_list.Comp( EquipNum ) );
-							ThisTypeOfNum = FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
+							ThisTypeOfNum = InputProcessor::FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 							errFlag1 = false;
 							ScanPlantLoopsForObject( this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _, _, NumSearchResults, _, LoopNum, errFlag1 );
 
@@ -3262,19 +3089,6 @@ namespace PlantCondLoopOperation {
 
 		// METHODOLOGY EMPLOYED:
 		// Call the setupAcuator routine
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// SUBROUTINE VARIABLE DEFINITIONS
 
 		// Locals
 		std::string ActuatorType;

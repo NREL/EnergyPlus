@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -135,8 +123,6 @@ namespace UnitVentilator {
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 	using DataHVACGlobals::CycFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
@@ -224,25 +210,9 @@ namespace UnitVentilator {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqUnitVent;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitVentNum; // index of unit ventilator being simulated
@@ -255,7 +225,7 @@ namespace UnitVentilator {
 
 		// Find the correct Unit Ventilator Equipment
 		if ( CompIndex == 0 ) {
-			UnitVentNum = FindItemInList( CompName, UnitVent );
+			UnitVentNum = InputProcessor::FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
 				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
 			}
@@ -309,12 +279,6 @@ namespace UnitVentilator {
 		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
@@ -346,23 +310,12 @@ namespace UnitVentilator {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUnitVentilatorInput: " ); // include trailing blank
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumFields; // Total number of fields in object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -390,8 +343,8 @@ namespace UnitVentilator {
 		// Figure out how many unit ventilators there are in the input file
 
 		CurrentModuleObject = cMO_UnitVentilator;
-		NumOfUnitVents = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfUnitVents = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -410,19 +363,12 @@ namespace UnitVentilator {
 
 		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) { // Begin looping over all of the unit ventilators found in the input file...
 
-			GetObjectItem( CurrentModuleObject, UnitVentNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, UnitVentNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitVentNumericFields( UnitVentNum ).FieldNames.allocate (NumNumbers );
 			UnitVentNumericFields( UnitVentNum ).FieldNames = "";
 			UnitVentNumericFields( UnitVentNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitVent, UnitVentNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitVent( UnitVentNum ).Name = Alphas( 1 );
 			UnitVent( UnitVentNum ).SchedName = Alphas( 2 );
@@ -606,7 +552,7 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).HVACSizingIndex = 0;
 			if (!lAlphaBlanks( 20 )) {
-				UnitVent( UnitVentNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
+				UnitVent( UnitVentNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (UnitVent( UnitVentNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found.");
 					ShowContinueError( "Occurs in " + cMO_UnitVentilator + " = " + UnitVent(UnitVentNum).Name );
@@ -668,7 +614,7 @@ namespace UnitVentilator {
 				//      \type choice
 				//      \key Coil:Heating:Water
 				//      \key Coil:Heating:Electric
-				//      \key Coil:Heating:Gas
+				//      \key Coil:Heating:Fuel
 				//      \key Coil:Heating:Steam
 				// A15, \field Heating Coil Name
 				//      \type object-list
@@ -688,7 +634,7 @@ namespace UnitVentilator {
 						UnitVent( UnitVentNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 					} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 						UnitVent( UnitVentNum ).HCoilType = Heating_ElectricCoilType;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+					} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 						UnitVent( UnitVentNum ).HCoilType = Heating_GasCoilType;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );
@@ -780,9 +726,9 @@ namespace UnitVentilator {
 					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						UnitVent( UnitVentNum ).CCoilType = Cooling_CoilHXAssisted;
 						GetHXCoilTypeAndName( cCoolingCoilType, Alphas( 18 ), ErrorsFound, UnitVent( UnitVentNum ).CCoilPlantType, UnitVent( UnitVentNum ).CCoilPlantName );
-						if ( SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+						if ( InputProcessor::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+						} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );
@@ -1240,12 +1186,8 @@ namespace UnitVentilator {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using WaterCoils::SetCoilDesFlow;
@@ -1268,17 +1210,8 @@ namespace UnitVentilator {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeUnitVentilator" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1705,6 +1638,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1798,6 +1732,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1902,6 +1837,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoolingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -2102,7 +2038,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
 				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
 			}}
@@ -2130,7 +2066,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
 				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
 			}}

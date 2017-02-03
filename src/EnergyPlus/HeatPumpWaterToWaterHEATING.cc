@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -127,10 +115,10 @@ namespace HeatPumpWaterToWaterHEATING {
 	Real64 Power( 0.0 ); // power consumption Watts Joules/sec
 	Real64 QLoad( 0.0 ); // heat rejection from Load Side coil Joules
 	Real64 QSource( 0.0 ); // cooling capacity Joules
-	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
+	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
 	Array1D_bool CheckEquipName;
 
 	// Object Data
@@ -161,28 +149,11 @@ namespace HeatPumpWaterToWaterHEATING {
 		// It gets the input for the models, initializes simulation variables, calls
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using DataPlant::TypeOf_HPWaterEFHeating;
-		using InputProcessor::FindItemInList;
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInput( true ); // then TRUE, calls subroutine to read input file.
@@ -197,7 +168,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP );
+			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterHEATING: Unit not found=" + GSHPName );
 			}
@@ -252,33 +223,13 @@ namespace HeatPumpWaterToWaterHEATING {
 		// GSHPs and begin to fill the
 		// arrays associated with the type GSHP.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPEHeating;
 		using DataPlant::ScanPlantLoopsForObject;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GSHPNum; // Gshp counter
@@ -289,11 +240,9 @@ namespace HeatPumpWaterToWaterHEATING {
 		Array1D< Real64 > NumArray( 23 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumGSHPs = GetNumObjectsFound( ModuleCompName );
+		NumGSHPs = InputProcessor::GetNumObjectsFound( ModuleCompName );
 
 		if ( NumGSHPs <= 0 ) {
 			ShowSevereError( ModuleCompName + ": No Equipment found" );
@@ -306,15 +255,9 @@ namespace HeatPumpWaterToWaterHEATING {
 		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterPEHeating;
@@ -610,19 +553,19 @@ namespace HeatPumpWaterToWaterHEATING {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 SourceSideEffect; // Source Side effectiveness
 		Real64 LoadSideEffect; // Load Side effectiveness
-		Real64 SourceSideTemp; // Source Side temperature °C
-		Real64 LoadSideTemp; // Load Side temperature °C
+		Real64 SourceSideTemp; // Source Side temperature ï¿½C
+		Real64 LoadSideTemp; // Load Side temperature ï¿½C
 		Real64 SourceSideUA; // Source Side heat transfer coefficient    w/k
 		Real64 LoadSideUA; // Load Side heat transfer coefficient W/k
 		Real64 SourceSidePressure; // Source Side pressure Pascals
 		Real64 LoadSidePressure; // Load Side pressure Pascals
 		Real64 SuctionPr; // Suction Pressure  pascals
 		Real64 DischargePr; // Discharge Pressure pascals
-		Real64 CompressInletTemp; // Compressor inlet temperature  °C
-		Real64 PressureDrop; // Suction Pressure drop °C
+		Real64 CompressInletTemp; // Compressor inlet temperature  ï¿½C
+		Real64 PressureDrop; // Suction Pressure drop ï¿½C
 		Real64 ClearanceFactor; // Clearance factor
 		Real64 PistonDisp; // Compressor piston displacement  m3
-		Real64 ShTemp; // Superheat temperature °C
+		Real64 ShTemp; // Superheat temperature ï¿½C
 		Real64 LosFac; // Loss factor used to define the electromechanical loss for compressor
 		Real64 MassRef; // mass flow rate of refrigerant Kg/s
 		Real64 SourceSideOutletEnth; // Enthalpy at Source Side pressure Joules

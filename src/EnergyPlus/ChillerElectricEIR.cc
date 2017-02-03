@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -79,6 +67,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -222,27 +211,10 @@ namespace ChillerElectricEIR {
 		//  model, initializes simulation variables, calls the appropriate model and sets
 		//  up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EIRChillNum; // Chiller number pointer
@@ -255,7 +227,7 @@ namespace ChillerElectricEIR {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			EIRChillNum = FindItemInList( EIRChillerName, ElectricEIRChiller );
+			EIRChillNum = InputProcessor::FindItemInList( EIRChillerName, ElectricEIRChiller );
 			if ( EIRChillNum == 0 ) {
 				ShowFatalError( "SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName );
 			}
@@ -323,16 +295,8 @@ namespace ChillerElectricEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the Electric EIR Chiller model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataGlobals::MaxNameLength;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -358,8 +322,6 @@ namespace ChillerElectricEIR {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // True when input errors are found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 CurveVal; // Used to verify EIR-FT and CAP-FT curves equal 1 at reference conditions
 		static bool FoundNegValue( false ); // Used to evaluate PLFFPLR curve objects
 		static int CurveCheck( 0 ); // Used to evaluate PLFFPLR curve objects
@@ -378,7 +340,7 @@ namespace ChillerElectricEIR {
 
 		if ( AllocatedFlag ) return;
 		cCurrentModuleObject = "Chiller:Electric:EIR";
-		NumElectricEIRChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumElectricEIRChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricEIRChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -393,15 +355,9 @@ namespace ChillerElectricEIR {
 
 		// Load arrays with electric EIR chiller data
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElectricEIRChiller, EIRChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -434,11 +390,11 @@ namespace ChillerElectricEIR {
 			ElectricEIRChiller( EIRChillerNum ).EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Chilled Water Nodes" );
 
-			if ( SameString( cAlphaArgs( 9 ), "WaterCooled" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "WaterCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = WaterCooled;
-			} else if ( SameString( cAlphaArgs( 9 ), "AirCooled" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "AirCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = AirCooled;
-			} else if ( SameString( cAlphaArgs( 9 ), "EvaporativelyCooled" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "EvaporativelyCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = EvapCooled;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
@@ -1387,7 +1343,8 @@ namespace ChillerElectricEIR {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   July 2004
-		//       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1400,8 +1357,10 @@ namespace ChillerElectricEIR {
 		// 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::CurrentTime;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
@@ -1420,6 +1379,7 @@ namespace ChillerElectricEIR {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
 		using Psychrometrics::PsyWFnTdbTwbPb;
@@ -1618,6 +1578,19 @@ namespace ChillerElectricEIR {
 		} else {
 			assert( false );
 		}}
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the EvapOutletTempSetPoint
+			EvapOutletTempSetPoint = max( ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
+			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
+			
+		}
 
 		// correct temperature if using heat recovery
 		// use report values for latest valid calculation, lagged somewhat
@@ -1774,6 +1747,7 @@ namespace ChillerElectricEIR {
 			QEvaporator = max( 0.0, ( EvapMassFlowRate * Cp * EvapDeltaTemp ) );
 			EvapOutletTemp = EvapOutletTempSetPoint;
 		}
+		
 		//Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
 		if ( EvapOutletTemp < TempLowLimitEout ) {
 			if ( ( Node( EvapInletNode ).Temp - TempLowLimitEout ) > DeltaTempTol ) {
@@ -1807,6 +1781,19 @@ namespace ChillerElectricEIR {
 				QEvaporator = 0.0;
 				EvapOutletTemp = Node( EvapInletNode ).Temp;
 			}
+		}
+
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+			//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+			bool VarFlowFlag = ( ElectricEIRChiller( EIRChillNum ).FlowMode == LeavingSetPointModulated );
+			FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+			//update corresponding variables at faulty case
+			PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+			PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+			ChillerPartLoadRatio = PartLoadRat;
+			EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 		}
 
 		// Checks QEvaporator on the basis of the machine limits.
@@ -2068,27 +2055,12 @@ namespace ChillerElectricEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Reporting
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
 		using Psychrometrics::PsyHFnTdbW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapInletNode; // Evaporator inlet node number

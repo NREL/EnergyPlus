@@ -63,23 +63,23 @@ If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0
 L = N * {P_{kW - COP}}
 \end{equation}
 
-\subsubsection{Coil:Heating:Gas}\label{coilheatinggas}
+\subsubsection{Coil:Heating:Fuel}\label{coilheatinggas}
 
-Gas-fired heating coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
+Fuel-fired heating coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
 
-If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}, is the number of heaters.~ This will be 1 if the \textbf{Item Name} is the name of a specific heater described elsewhere.~ If the name is set to the wildcard (*) then this will equal the total number of Coil:Heating:Gas objects in the model.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}, is the number of heaters.~ This will be 1 if the \textbf{Item Name} is the name of a specific heater described elsewhere.~ If the name is set to the wildcard (*) then this will equal the total number of Coil:Heating:Fuel objects in the model.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
 
 \begin{equation}
 L = N * {P_e}
 \end{equation}
 
-If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity.~ This will be based on all the Coil:Heating:Gas objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity.~ This will be based on all the Coil:Heating:Fuel objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
 
 \begin{equation}
 L = N * {P_{kW}}
 \end{equation}
 
-If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity multiplied by the theoretical efficiency of the heater(s).~ (Here we are treating gas heating efficiency as a Coefficient of Performance (COP)).~ This will be based on all the Coil:Heating:Gas objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity multiplied by the theoretical efficiency of the heater(s).~ (Here we are treating gas heating efficiency as a Coefficient of Performance (COP)).~ This will be based on all the Coil:Heating:Fuel objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
 
 \begin{equation}
 L = N * {P_{kW - COP}}

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -127,8 +115,6 @@ namespace HighTempRadiantSystem {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallLoad;
 
-	// Use statements for access to subroutines in other modules
-
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	std::string const cGas( "Gas" );
@@ -174,6 +160,22 @@ namespace HighTempRadiantSystem {
 	Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
+	void
+ 	clear_state()
+ 	{
+		NumOfHighTempRadSys = 0;
+		QHTRadSource.deallocate();
+		QHTRadSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQHTRadSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		HighTempRadSys.deallocate();
+		HighTempRadSysNumericFields.deallocate();
+	}
+
 
 	void
 	SimHighTempRadiantSystem(
@@ -198,38 +200,25 @@ namespace HighTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus manager subroutine layout
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
+		bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
 		int RadSysNum; // Radiant system number/index in local derived types
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetHighTempRadiantSystem();
+			ErrorsFoundInGet = false;
+			GetHighTempRadiantSystem( ErrorsFoundInGet );
+			if ( ErrorsFoundInGet ) ShowFatalError( "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination." );
 			GetInputFlag = false;
 		}
 
 		// Find the correct ZoneHVAC:HighTemperatureRadiant
 		if ( CompIndex == 0 ) {
-			RadSysNum = FindItemInList( CompName, HighTempRadSys );
+			RadSysNum = InputProcessor::FindItemInList( CompName, HighTempRadSys );
 			if ( RadSysNum == 0 ) {
 				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + CompName );
 			}
@@ -263,7 +252,9 @@ namespace HighTempRadiantSystem {
 	}
 
 	void
-	GetHighTempRadiantSystem()
+	GetHighTempRadiantSystem(
+			bool & ErrorsFound // TRUE if errors are found on processing the input
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -280,18 +271,9 @@ namespace HighTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using ScheduleManager::GetScheduleIndex;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
@@ -299,10 +281,6 @@ namespace HighTempRadiantSystem {
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MaxCombustionEffic( 1.00 ); // Limit the combustion efficiency to perfection
@@ -317,26 +295,19 @@ namespace HighTempRadiantSystem {
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to High Temperature Radiant system heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant, latent, and lost (must be <= 1)
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
+		Real64 FracOfRadPotentiallyLost; // Difference between unity and AllFracsSummed for error reporting
 		int IOStatus; // Used in GetObjectItem
 		int Item; // Item to be "gotten"
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int SurfNum; // Surface number DO loop counter
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
+		Real64 TotalFracToSurfs; // Sum of fractions of radiation to surfaces
 
 		// FLOW:
 		// Initializations and allocations
-		NumOfHighTempRadSys = GetNumObjectsFound( "ZoneHVAC:HighTemperatureRadiant" );
+		NumOfHighTempRadSys = InputProcessor::GetNumObjectsFound( "ZoneHVAC:HighTemperatureRadiant" );
 
 		HighTempRadSys.allocate( NumOfHighTempRadSys );
 		CheckEquipName.allocate( NumOfHighTempRadSys );
@@ -349,19 +320,12 @@ namespace HighTempRadiantSystem {
 		// Obtain all of the user data related to high temperature radiant systems...
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
 
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			HighTempRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HighTempRadSysNumericFields( Item ).FieldNames = "";
 			HighTempRadSysNumericFields( Item ).FieldNames = cNumericFieldNames;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HighTempRadSys, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// General user input data
 			HighTempRadSys( Item ).Name = cAlphaArgs( 1 );
 
@@ -377,7 +341,7 @@ namespace HighTempRadiantSystem {
 			}
 
 			HighTempRadSys( Item ).ZoneName = cAlphaArgs( 3 );
-			HighTempRadSys( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
+			HighTempRadSys( Item ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( HighTempRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -388,7 +352,7 @@ namespace HighTempRadiantSystem {
 
 
 			// Determine High Temp Radiant heating design capacity sizing method
-			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 				HighTempRadSys( Item ).HeatingCapMethod = HeatingDesignCapacity;
 
 				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
@@ -404,7 +368,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 				HighTempRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
@@ -425,7 +389,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				HighTempRadSys( Item ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -446,13 +410,13 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( cAlphaArgs( 5 ), cNaturalGas ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), cNaturalGas ) ) {
 				HighTempRadSys( Item ).HeaterType = Gas;
-			} else if ( SameString( cAlphaArgs( 5 ), cElectricity ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), cElectricity ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
-			} else if ( SameString( cAlphaArgs( 5 ), cGas ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), cGas ) ) {
 				HighTempRadSys( Item ).HeaterType = Gas;
-			} else if ( SameString( cAlphaArgs( 5 ), cElectric ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), cElectric ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
@@ -525,17 +489,17 @@ namespace HighTempRadiantSystem {
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 6 ), cMATControl ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMATControl ) ) {
 				HighTempRadSys( Item ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cMRTControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMRTControl ) ) {
 				HighTempRadSys( Item ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cOperativeControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cOperativeControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cMATSPControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMATSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = MATSPControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cMRTSPControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cMRTSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = MRTSPControl;
-			} else if ( SameString( cAlphaArgs( 6 ), cOperativeSPControl ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), cOperativeSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeSPControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
@@ -585,7 +549,7 @@ namespace HighTempRadiantSystem {
 			AllFracsSummed = HighTempRadSys( Item ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= HighTempRadSys( Item ).TotSurfToDistrib; ++SurfNum ) {
 				HighTempRadSys( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 7 );
-				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface );
+				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface );
 				HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
 				// Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
 				if ( HighTempRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) {
@@ -624,9 +588,16 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 			if ( AllFracsSummed < ( MaxFraction - 0.01 ) ) { // User didn't distribute all of the radiation warn that some will be lost
-				ShowWarningError( "Fraction of radiation distributed to surfaces sums up to less than 1 for " + cAlphaArgs( 1 ) );
-				ShowContinueError( "As a result, some of the radiant energy delivered by the high temp radiant heater will be lost." );
-				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				TotalFracToSurfs = AllFracsSummed - HighTempRadSys( Item ).FracDistribPerson;
+				FracOfRadPotentiallyLost = 1.0 - AllFracsSummed;
+				ShowSevereError( "Fraction of radiation distributed to surfaces and people sums up to less than 1 for " + cAlphaArgs( 1 ) );
+				ShowContinueError( "This would result in some of the radiant energy delivered by the high temp radiant heater being lost." );
+				ShowContinueError( "The sum of all radiation fractions to surfaces = " + TrimSigDigits( TotalFracToSurfs, 5) );
+				ShowContinueError( "The radiant fraction to people = " + TrimSigDigits( HighTempRadSys( Item ).FracDistribPerson, 5) );
+				ShowContinueError( "So, all radiant fractions including surfaces and people = " + TrimSigDigits( AllFracsSummed, 5) );
+				ShowContinueError( "This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = " +  TrimSigDigits( FracOfRadPotentiallyLost, 5) );
+				ShowContinueError( "Please check and correct this so that all radiant energy is accounted for in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ErrorsFound = true;
 			}
 
 		} // ...end of DO loop through all of the high temperature radiant heaters
@@ -644,10 +615,6 @@ namespace HighTempRadiantSystem {
 				SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", HighTempRadSys( Item ).ElecEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
 		}
 
 	}
@@ -851,6 +818,7 @@ namespace HighTempRadiantSystem {
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
+				DataScalableCapSizingON = false;
 			}
 
 		}

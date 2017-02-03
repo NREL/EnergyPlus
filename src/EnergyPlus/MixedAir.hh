@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef MixedAir_hh_INCLUDED
 #define MixedAir_hh_INCLUDED
@@ -254,8 +242,7 @@ namespace MixedAir {
 		int HumidistatZoneNum; // zone number where humidistat is located
 		int NodeNumofHumidistatZone; // node number of zone where humidistat is located
 		Real64 HighRHOAFlowRatio; // Modify ratio with respect to maximum outdoor air flow rate (high RH)
-		bool ModifyDuringHighOAMoisture; // flag to Modify outdoor air flow, TRUE when modify any time
-		// FALSE when modify only when indoor air humrat is less than outdoor HR
+		bool ModifyDuringHighOAMoisture; // flag to Modify outdoor air flow, TRUE when modify any time, FALSE when modify only when indoor air humrat is less than outdoor HR
 		int EconomizerOASchedPtr; // schedule to modify outdoor air flow
 		std::string MinOAflowSch; // Name of the Minimum fraction of Design/Mixed Mass of air
 		std::string MaxOAflowSch; // Name of the Maximum fraction of Design/Mixed Mass of air
@@ -274,12 +261,13 @@ namespace MixedAir {
 		Real64 OAFractionRpt; // Actual outdoor air fraction for reporting (based on mixed air flow rate),
 		// 0 to 1 (normally)
 		Real64 MinOAFracLimit; // Minimum OA fraction limit
+		Real64 MechVentOAMassFlowRequest; // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		bool EMSOverrideOARate; // if true, EMS is calling to override OA rate
 		Real64 EMSOARateValue; // Value EMS is directing to use. [kg/s]
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
 		bool ManageDemand; // Used by demand manager to manage ventilation
 		Real64 DemandLimitFlowRate; //Current demand limit if demand manager is ON
-		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 		int MixedAirSPMNum; // index of mixed air setpoint manager
 		bool CoolCoilFreezeCheck; // if true, cooling coil freezing is prevented by recalculating the amount of OA
 		bool EconoActive; // if true economizer is active
@@ -339,6 +327,7 @@ namespace MixedAir {
 			HighHumCtrlStatus( 0 ),
 			OAFractionRpt( 0.0 ),
 			MinOAFracLimit( 0.0 ),
+			MechVentOAMassFlowRequest( 0.0 ),
 			EMSOverrideOARate( false ),
 			EMSOARateValue( 0.0 ),
 			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits ),
@@ -398,30 +387,21 @@ namespace MixedAir {
 		Array1D< Real64 > ZoneOAFlowRate; // OA Flow Rate (m3/s/zone) for each zone
 		Array1D< Real64 > ZoneOAACHRate; // OA ACH (m3/s/volume) for each zone
 		Array1D_int VentMechZone; // Zones requiring mechanical ventilation
-		Array1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
-		// for each zone in zone list
-		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
-		// for each zone in zone list
-		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration
-		// For SOAM_ProportionalControlSchOcc
-		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message
-		// For SOAM_ProportionalControlSchOcc
+		Array1D_string VentMechZoneName; // name of mech vent zone
+		Array1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object for each zone
+		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object for each zone
+		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
+		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
-		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero
-		// For SOAM_ProportionalControlSchOcc
-		Array1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
-		// for each zone
-		Array1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode
-		// for each zone
-		Array1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
-		// for each zone
-		Array1D_string ZoneADEffSchName; // Zone air distribution effectiveness schedule name
-		// for each zone
-		Array1D_int ZoneDesignSpecADObjIndex; // index of the design specification zone air
-		//  distribution object for each zone in the zone list
-		Array1D_string ZoneDesignSpecADObjName; // name of the design specification zone air
-		// distribution object for each zone in the zone list
-		Array1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio
+		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+		Array1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode for each zone
+		Array1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode for each zone
+		Array1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule for each zone
+		Array1D_int ZoneDesignSpecADObjIndex; // index of the design specification zone air distribution object for each zone
+		Array1D_string ZoneDesignSpecADObjName; // name of the design specification zone air distribution object for each zone
+		Array1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
+		Array1D_int ZoneOAFlowMethod; // OA flow method for each zone
+		Array1D_int ZoneOASchPtr; // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
 
 		// Default Constructor
 		VentilationMechanicalProps() :
@@ -442,8 +422,8 @@ namespace MixedAir {
 
 		void
 		CalcMechVentController(
-			Real64 & SysSA,
-			Real64 & MechVentOutsideAirFlow
+			Real64 & SysSA, // System supply air mass flow rate [kg/s]
+			Real64 & MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		);
 
 	};
@@ -730,11 +710,10 @@ namespace MixedAir {
 
 	void
 	CheckOAControllerName(
-		std::string const & OAControllerName, // proposed name
-		int const NumCurrentOAControllers, // Count on number of controllers
-		bool & IsNotOK, // Pass through to VerifyName
-		bool & IsBlank, // Pass through to VerifyName
-		std::string const & SourceID // Pass through to VerifyName
+		std::string & OAControllerName,
+		std::string const & ObjectType,
+		std::string const & FieldName,
+		bool & ErrorsFound
 	);
 
 	int

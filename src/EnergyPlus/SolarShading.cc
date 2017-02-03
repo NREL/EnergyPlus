@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -551,34 +539,15 @@ namespace SolarShading {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the Shadowing Calculation object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
 		using DataSystemVariables::SutherlandHodgman;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumItems;
@@ -590,7 +559,7 @@ namespace SolarShading {
 		cAlphaArgs( 1 ) = "";
 		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
-		NumItems = GetNumObjectsFound( cCurrentModuleObject );
+		NumItems = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {
@@ -598,7 +567,7 @@ namespace SolarShading {
 		}
 
 		if ( NumItems != 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ShadowingCalcFrequency = rNumericArgs( 1 );
 		}
 
@@ -618,10 +587,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 1 ) {
-			if ( SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
 				DetailedSolarTimestepIntegration = false;
 				cAlphaArgs( 1 ) = "AverageOverDaysInFrequency";
-			} else if ( SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
 				DetailedSolarTimestepIntegration = true;
 				cAlphaArgs( 1 ) = "TimestepFrequency";
 			} else {
@@ -636,10 +605,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 2 ) {
-			if ( SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
 				SutherlandHodgman = true;
 				cAlphaArgs( 2 ) = "SutherlandHodgman";
-			} else if ( SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
 				SutherlandHodgman = false;
 				cAlphaArgs( 2 ) = "ConvexWeilerAtherton";
 			} else if ( lAlphaFieldBlanks( 2 ) ) {
@@ -665,10 +634,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 3 ) {
-			if ( SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = false;
 				cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
-			} else if ( SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = true;
 				cAlphaArgs( 3 ) = "DetailedSkyDiffuseModeling";
 			} else if ( lAlphaFieldBlanks( 3 ) ) {
@@ -700,8 +669,8 @@ namespace SolarShading {
 			}
 		}
 
-		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations> [Annual Simulations], Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
+		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
+		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
 
 	}
 
@@ -6230,7 +6199,7 @@ namespace SolarShading {
 									// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 									HMovInsul = 0.0;
 									if ( Surface( BackSurfNum ).MaterialMovInsulInt > 0 ) {
-										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulExt );
+										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulInt );
 										if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 											HMovInsul = 0.0;
 										} else { // Movable insulation present
@@ -6708,7 +6677,7 @@ namespace SolarShading {
 									// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 									HMovInsul = 0.0;
 									if ( Surface( BackSurfNum ).MaterialMovInsulInt > 0 ) {
-										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulExt );
+										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulInt );
 										if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 											HMovInsul = 0.0;
 										} else { // Movable insulation present
@@ -9679,31 +9648,17 @@ namespace SolarShading {
 		// 3. surface absorptances, reflectances, and transmittances
 		// determined here using revised code from SUBROUTINE InitIntSolarDistribution
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using General::InterpSw;
 		using General::InterpSlatAng;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataViewFactorInformation;
-
 		using DataHeatBalSurface::InitialDifSolInAbs;
 		using DataHeatBalSurface::InitialDifSolInTrans;
 		using DataHeatBalance::InitialDifSolwinAbs;
 		using DataHeatBalance::InitialZoneDifSolReflW;
-
 		using WindowEquivalentLayer::CalcEQLOpticalProperty;
 		using namespace DataWindowEquivalentLayer;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // DO loop counter for zones
@@ -9846,7 +9801,7 @@ namespace SolarShading {
 						// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 						HMovInsul = 0.0;
 						if ( Surface( HeatTransSurfNum ).MaterialMovInsulInt > 0 ) {
-							MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulExt );
+							MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulInt );
 							if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 								HMovInsul = 0.0;
 							} else { // Movable insulation present
@@ -10292,30 +10247,15 @@ namespace SolarShading {
 		// 3. surface absorptances, reflectances, and transmittances
 		// determined here using revised code from SUBROUTINE InitIntSolarDistribution
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using General::InterpSw;
 		using General::InterpSlatAng;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataViewFactorInformation;
-
 		using DataHeatBalSurface::InitialDifSolInAbs;
 		using DataHeatBalSurface::InitialDifSolInTrans;
 		using DataHeatBalance::InitialDifSolwinAbs;
 		using DataHeatBalance::InitialZoneDifSolReflW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AdjZoneNum; // Index for adjacent zones
@@ -10406,7 +10346,7 @@ namespace SolarShading {
 				// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 				HMovInsul = 0.0;
 				if ( Surface( HeatTransSurfNum ).MaterialMovInsulInt > 0 ) {
-					MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulExt );
+					MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulInt );
 					if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 						HMovInsul = 0.0;
 					} else { // Movable insulation present

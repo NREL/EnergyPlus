@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -163,27 +151,8 @@ namespace SplitterComponent {
 		// It is called from the SimAirLoopComponent
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SplitterNum; // The Splitter that you are currently loading input for
@@ -197,7 +166,7 @@ namespace SplitterComponent {
 
 		// Find the correct SplitterNumber
 		if ( CompIndex == 0 ) {
-			SplitterNum = FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
+			SplitterNum = InputProcessor::FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
 			if ( SplitterNum == 0 ) {
 				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
 			}
@@ -250,29 +219,12 @@ namespace SplitterComponent {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSplitterInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SplitterNum; // The Splitter that you are currently loading input into
@@ -281,8 +233,6 @@ namespace SplitterComponent {
 		int NodeNum;
 		int IOStat;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumParams;
 		int OutNodeNum1;
 		int OutNodeNum2;
@@ -299,12 +249,12 @@ namespace SplitterComponent {
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
-		NumSplitters = GetNumObjectsFound( CurrentModuleObject );
+		NumSplitters = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumSplitters > 0 ) SplitterCond.allocate( NumSplitters );
 		CheckEquipName.dimension( NumSplitters, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		lAlphaBlanks.dimension( NumAlphas, true );
@@ -313,15 +263,9 @@ namespace SplitterComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
-			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SplitterCond, &SplitterConditions::SplitterName, SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			SplitterCond( SplitterNum ).SplitterName = AlphArray( 1 );
 			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			SplitterCond( SplitterNum ).NumOutletNodes = NumAlphas - 2;
@@ -787,29 +731,8 @@ namespace SplitterComponent {
 		// incorrect AirLoopHVAC:ZoneSplitter name is given, ErrorsFound is returned as true
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int SplitterOutletNumber;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichSplitter;
@@ -821,7 +744,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
+			WhichSplitter = InputProcessor::FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -859,29 +782,8 @@ namespace SplitterComponent {
 		// incorrect AirLoopHVAC:ZoneSplitter name is given, ErrorsFound is returned as true
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		Array1D_int SplitterNodeNumbers;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichSplitter;
@@ -894,7 +796,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
+			WhichSplitter = InputProcessor::FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -183,7 +171,7 @@ namespace ChillerGasAbsorption {
 		// PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
-		using InputProcessor::FindItemInList;
+
 		using CurveManager::CurveValue;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
@@ -198,7 +186,7 @@ namespace ChillerGasAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, GasAbsorber );
+			ChillNum = InputProcessor::FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -298,10 +286,6 @@ namespace ChillerGasAbsorption {
 		// This routine will get the input
 		// required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
 
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -314,15 +298,12 @@ namespace ChillerGasAbsorption {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW
 		cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-		NumGasAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
+		NumGasAbsorbers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGasAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
@@ -340,19 +321,10 @@ namespace ChillerGasAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), Get_ErrorsFound, cCurrentModuleObject + " Name" );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				Get_ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
-			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				Get_ErrorsFound = true;
-			}
 			GasAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
 			ChillerName = cCurrentModuleObject + " Named " + GasAbsorber( AbsorberNum ).Name;
 
@@ -392,7 +364,7 @@ namespace ChillerGasAbsorption {
 			if ( GasAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
 				GasAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
 			} else {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -416,9 +388,9 @@ namespace ChillerGasAbsorption {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				Get_ErrorsFound = false;
 			}
-			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = false;
-			} else if ( SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
@@ -426,10 +398,10 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\"" );
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
-			// Assign Other Paramters
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			// Assign Other Parameters
+			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
-			} else if ( SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
@@ -466,7 +438,7 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).SizFac = rNumericArgs( 17 );
 
 			//Fuel Type Case Statement
-			{ auto const SELECT_CASE_var( cAlphaArgs( 18 ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 17 ) );
 			if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
 				GasAbsorber( AbsorberNum ).FuelType = "Gas";
 
@@ -493,7 +465,7 @@ namespace ChillerGasAbsorption {
 
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
-				ShowContinueError( "Invalid " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 17 ) + '=' + cAlphaArgs( 17 ) );
 				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
 				Get_ErrorsFound = true;
 			}}

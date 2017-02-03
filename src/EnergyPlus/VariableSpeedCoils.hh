@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,37 +43,23 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
+
 
 #ifndef VariableSpeedCoils_hh_INCLUDED
 #define VariableSpeedCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.fwd.hh>
+#include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <VariableSpeedCoils.hh>
-#include <DataSizing.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
 namespace VariableSpeedCoils {
 
 	// Using/Aliasing
-	using namespace DataHVACGlobals;
-	using DataSizing::AutoSize;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -370,168 +353,11 @@ namespace VariableSpeedCoils {
 		bool WaterVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
 		Real64 TotalHeatingEnergy; //total water heating energy
 		Real64 TotalHeatingEnergyRate;//total WH energy rate
+		bool bIsDesuperheater;//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
 		//end variables for HPWH
 
 		// Default Constructor
-		VariableSpeedCoilData() :
-			NumOfSpeeds( 2 ),
-			NormSpedLevel( MaxSpedLevels ),
-			RatedWaterVolFlowRate( AutoSize ),
-			RatedWaterMassFlowRate( AutoSize ),
-			RatedAirVolFlowRate( AutoSize ),
-			RatedCapHeat( AutoSize ),
-			RatedCapCoolTotal( AutoSize ),
-			MaxONOFFCyclesperHour( 0.0 ),
-			Twet_Rated( 0.0 ),
-			Gamma_Rated( 0.0 ),
-			HOTGASREHEATFLG( 0 ),
-			HPTimeConstant( 0.0 ),
-			PLFFPLR( 0 ),
-			VSCoilTypeOfNum( 0 ),
-			SimFlag( false ),
-			DesignWaterMassFlowRate( 0.0 ),
-			DesignWaterVolFlowRate( 0.0 ),
-			DesignAirMassFlowRate( 0.0 ),
-			DesignAirVolFlowRate( 0.0 ),
-			AirVolFlowRate( 0.0 ),
-			AirMassFlowRate( 0.0 ),
-			InletAirPressure( 0.0 ),
-			InletAirDBTemp( 0.0 ),
-			InletAirHumRat( 0.0 ),
-			InletAirEnthalpy( 0.0 ),
-			OutletAirDBTemp( 0.0 ),
-			OutletAirHumRat( 0.0 ),
-			OutletAirEnthalpy( 0.0 ),
-			WaterVolFlowRate( 0.0 ),
-			WaterMassFlowRate( 0.0 ),
-			InletWaterTemp( 0.0 ),
-			InletWaterEnthalpy( 0.0 ),
-			OutletWaterTemp( 0.0 ),
-			OutletWaterEnthalpy( 0.0 ),
-			Power( 0.0 ),
-			QLoadTotal( 0.0 ),
-			QSensible( 0.0 ),
-			QLatent( 0.0 ),
-			QSource( 0.0 ),
-			QWasteHeat( 0.0 ),
-			Energy( 0.0 ),
-			EnergyLoadTotal( 0.0 ),
-			EnergySensible( 0.0 ),
-			EnergyLatent( 0.0 ),
-			EnergySource( 0.0 ),
-			COP( 0.0 ),
-			RunFrac( 0.0 ),
-			PartLoadRatio( 0.0 ),
-			RatedPowerHeat( 0.0 ),
-			RatedCOPHeat( 0.0 ),
-			RatedCapCoolSens( 0.0 ),
-			RatedPowerCool( 0.0 ),
-			RatedCOPCool( 0.0 ),
-			AirInletNodeNum( 0 ),
-			AirOutletNodeNum( 0 ),
-			WaterInletNodeNum( 0 ),
-			WaterOutletNodeNum( 0 ),
-			LoopNum( 0 ),
-			LoopSide( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 ),
-			FindCompanionUpStreamCoil( true ),
-			IsDXCoilInZone( false ),
-			CompanionCoolingCoilNum( 0 ),
-			CompanionHeatingCoilNum( 0 ),
-			FanDelayTime( 0.0 ),
-			MSErrIndex( MaxSpedLevels, 0 ),
-			MSRatedPercentTotCap( MaxSpedLevels, 0.0 ),
-			MSRatedTotCap( MaxSpedLevels, 0.0 ),
-			MSRatedSHR( MaxSpedLevels, 0.0 ),
-			MSRatedCOP( MaxSpedLevels, 0.0 ),
-			MSRatedAirVolFlowPerRatedTotCap( MaxSpedLevels, 0.0 ),
-			MSRatedAirVolFlowRate( MaxSpedLevels, 0.0 ),
-			MSRatedAirMassFlowRate( MaxSpedLevels, 0.0 ),
-			MSRatedWaterVolFlowPerRatedTotCap( MaxSpedLevels, 0.0 ),
-			MSRatedWaterVolFlowRate( MaxSpedLevels, 0.0 ),
-			MSRatedWaterMassFlowRate( MaxSpedLevels, 0.0 ),
-			MSRatedCBF( MaxSpedLevels, 0.0 ),
-			MSEffectiveAo( MaxSpedLevels, 0.0 ),
-			MSCCapFTemp( MaxSpedLevels, 0 ),
-			MSCCapAirFFlow( MaxSpedLevels, 0 ),
-			MSCCapWaterFFlow( MaxSpedLevels, 0 ),
-			MSEIRFTemp( MaxSpedLevels, 0 ),
-			MSEIRAirFFlow( MaxSpedLevels, 0 ),
-			MSEIRWaterFFlow( MaxSpedLevels, 0 ),
-			MSWasteHeat( MaxSpedLevels, 0 ),
-			MSWasteHeatFrac( MaxSpedLevels, 0.0 ),
-			MSWHPumpPower( MaxSpedLevels, 0.0 ),
-			MSWHPumpPowerPerRatedTotCap( MaxSpedLevels, 0.0 ),
-			SpeedNumReport( 0.0 ),
-			SpeedRatioReport( 0.0 ),
-			DefrostStrategy( 0 ),
-			DefrostControl( 0 ),
-			EIRFPLR( 0 ),
-			DefrostEIRFT( 0 ),
-			MinOATCompressor( 0.0 ),
-			OATempCompressorOn( 0.0 ),
-			MaxOATDefrost( 0.0 ),
-			DefrostTime( 0.0 ),
-			DefrostCapacity( 0.0 ),
-			HPCompressorRuntime( 0.0 ),
-			HPCompressorRuntimeLast( 0.0 ),
-			TimeLeftToDefrost( 0.0 ),
-			DefrostPower( 0.0 ),
-			DefrostConsumption( 0.0 ),
-			ReportCoolingCoilCrankcasePower( true ),
-			CrankcaseHeaterCapacity( 0.0 ),
-			CrankcaseHeaterPower( 0.0 ),
-			MaxOATCrankcaseHeater( 0.0 ),
-			CrankcaseHeaterConsumption( 0.0 ),
-			CondenserInletNodeNum( 0 ),
-			CondenserType( AirCooled ),
-			ReportEvapCondVars( false ),
-			EvapCondPumpElecNomPower( 0.0 ),
-			EvapCondPumpElecPower( 0.0 ),
-			EvapWaterConsumpRate( 0.0 ),
-			EvapCondPumpElecConsumption( 0.0 ),
-			EvapWaterConsump( 0.0 ),
-			BasinHeaterConsumption( 0.0 ),
-			BasinHeaterPowerFTempDiff( 0.0 ),
-			BasinHeaterSetPointTemp( 0.0 ),
-			BasinHeaterPower( 0.0 ),
-			BasinHeaterSchedulePtr( 0 ),
-			EvapCondAirFlow( MaxSpedLevels, 0.0 ),
-			EvapCondEffect( MaxSpedLevels, 0.0 ),
-			MSRatedEvapCondVolFlowPerRatedTotCap( MaxSpedLevels, 0.0 ),
-			EvapWaterSupplyMode( WaterSupplyFromMains ),
-			EvapWaterSupTankID( 0 ),
-			EvapWaterTankDemandARRID( 0 ),
-			CondensateCollectMode( CondensateDiscarded ),
-			CondensateTankID( 0 ),
-			CondensateTankSupplyARRID( 0 ),
-			CondensateVdot( 0.0 ),
-			CondensateVol( 0.0 ),
-			CondInletTemp( 0.0 ),
-			SourceAirMassFlowRate( 0.0 ),
-			InletSourceAirTemp( 0.0 ),
-			InletSourceAirEnthalpy( 0.0 ),
-			//begin varibles for HPWH
-			RatedCapWH( 0.0 ), // Rated water heating Capacity [W]
-			InletAirTemperatureType( 0 ), // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-			WHRatedInletDBTemp( 0.0 ), // Rated inlet air dry-bulb temperature [C]
-			WHRatedInletWBTemp( 0.0 ),  // Rated inlet air wet-bulb temperature [C]
-			WHRatedInletWaterTemp( 0.0 ),  // Rated condenser water inlet temperature [C]
-			HPWHCondPumpElecNomPower( 0.0 ),  // Nominal power input to the condenser water circulation pump [W]
-			HPWHCondPumpFracToWater( 1.0 ),  // Nominal power fraction to water for the condenser water circulation pump
-			RatedHPWHCondWaterFlow( 0.0 ), // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-			ElecWaterHeatingPower( 0.0 ),  // Total electric power consumed by compressor and condenser pump [W]
-			ElecWaterHeatingConsumption( 0.0 ),  // Total electric consumption by compressor and condenser pump [J]
-			FanPowerIncludedInCOP( false ), // Indicates that fan heat is included in heating capacity and COP
-			CondPumpHeatInCapacity( false ), // Indicates that condenser pump heat is included in heating capacity
-			CondPumpPowerInCOP( false ), // Indicates that condenser pump power is included in heating COP
-			AirVolFlowAutoSized( false ), // Used to report autosizing info for the HPWH DX coil
-			WaterVolFlowAutoSized( false ), // Used to report autosizing info for the HPWH DX coil
-			TotalHeatingEnergy( 0.0 ),  //total water heating energy
-			TotalHeatingEnergyRate( 0.0 ) //total WH energy rate
-			//end variables for HPWH
-		{}
+		VariableSpeedCoilData();
 
 	};
 

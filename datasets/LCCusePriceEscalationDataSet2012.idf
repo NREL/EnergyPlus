@@ -22,7 +22,6 @@
 ! The factors are from a file available upon request from NIST called ENCOSTxx.TXT and are
 ! converted into EnergyPlus objects using a spreadsheet called ConvertENCOSTtoEnergyPlusLifeCycleCost.xls
 ! which is available upon request.
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   LifeCycleCost:UsePriceEscalation,

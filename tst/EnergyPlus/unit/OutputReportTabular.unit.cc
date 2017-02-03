@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::OutputReportTabular Unit Tests
 
@@ -150,6 +138,75 @@ TEST( OutputReportTabularTest, RealToStr )
 	EXPECT_EQ( "0.123457E+06", RealToStr( 123456.789, 5 ) );
 
 }
+
+TEST(OutputReportTabularTest, isNumber)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
+	EXPECT_TRUE(isNumber("0"));
+	EXPECT_TRUE(isNumber("0.12"));
+	EXPECT_TRUE(isNumber("0.12E01"));
+	EXPECT_TRUE(isNumber("-6"));
+	EXPECT_TRUE(isNumber("-6.12"));
+	EXPECT_TRUE(isNumber("-6.12E-09"));
+	EXPECT_TRUE(isNumber(" 0"));
+	EXPECT_TRUE(isNumber(" 0.12"));
+	EXPECT_TRUE(isNumber(" 0.12E01"));
+	EXPECT_TRUE(isNumber("0 "));
+	EXPECT_TRUE(isNumber("0.12 "));
+	EXPECT_TRUE(isNumber("0.12E01 "));
+	EXPECT_TRUE(isNumber(" 0 "));
+	EXPECT_TRUE(isNumber(" 0.12 "));
+	EXPECT_TRUE(isNumber(" 0.12E01 "));
+}
+
+TEST(OutputReportTabularTest, digitsAferDecimal)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
+	EXPECT_EQ(0, digitsAferDecimal("0"));
+	EXPECT_EQ(0, digitsAferDecimal("1."));
+	EXPECT_EQ(2, digitsAferDecimal("0.12"));
+	EXPECT_EQ(4, digitsAferDecimal("0.1234"));
+	EXPECT_EQ(2, digitsAferDecimal("3.12E01"));
+	EXPECT_EQ(0, digitsAferDecimal("-6"));
+	EXPECT_EQ(0, digitsAferDecimal("-6."));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12"));
+	EXPECT_EQ(5, digitsAferDecimal("-6.12765"));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
+}
+
+TEST(OutputReportTabularTest, splitCommaString)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
+	std::vector<std::string> actual;
+	actual.push_back("part1");
+	EXPECT_EQ(actual, splitCommaString("part1"));
+	actual.push_back("part2");
+	EXPECT_EQ(actual, splitCommaString("part1,part2"));
+	EXPECT_EQ(actual, splitCommaString(" part1,part2 "));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 "));
+	actual.push_back("part3");
+	EXPECT_EQ(actual, splitCommaString("part1,part2,part3"));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
+}
+
+TEST(OutputReportTabularTest, unitsFromHeading)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+	std::string unitString;
+	SetupUnitConversions();
+	unitsStyle = unitsStyleInchPound;
+	unitString = "";
+	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ("", unitString);
+	unitString = "Zone Floor Area {m2}";
+	EXPECT_EQ(46, unitsFromHeading(unitString));
+	EXPECT_EQ("Zone Floor Area {ft2}", unitString);
+	unitString = "Fictional field {nonsense}";
+	EXPECT_EQ(0, unitsFromHeading(unitString));
+	EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+}
+
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
@@ -1362,7 +1419,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2042,28 +2099,23 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 		"Branch,",
 		"  DOAS Main Branch,        !- Name",
-		"  autosize,                !- Maximum Flow Rate {m3/s}",
 		"  ,                        !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"  DOAS OA System,          !- Component 1 Name",
 		"  DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 		"  DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-		"  Passive,                 !- Component 1 Branch Control Type",
 		"  CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 		"  DOAS Cooling Coil,       !- Component 2 Name",
 		"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 		"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
-		"  Coil:Heating:Gas,        !- Component 2 Object Type",
+		"  Coil:Heating:Fuel,        !- Component 2 Object Type",
 		"  DOAS Heating Coil,       !- Component 2 Name",
 		"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
 		"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
 		"  Fan:VariableVolume,      !- Component 3 Object Type",
 		"  DOAS Supply Fan,         !- Component 3 Name",
 		"  DOAS Heating Coil Outlet,!- Component 3 Inlet Node Name",
-		"  DOAS Supply Fan Outlet,  !- Component 3 Outlet Node Name",
-		"  Active;                  !- Component 3 Branch Control Type",
+		"  DOAS Supply Fan Outlet;  !- Component 3 Outlet Node Name",
 
 		"AirLoopHVAC:SupplyPath,",
 		"  DOAS Supply Path,        !- Name",
@@ -2160,9 +2212,10 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"	0.0,                   !- Crankcase Heater Capacity",
 		"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  DOAS Heating Coil,       !- Name",
 		"  AvailSched,              !- Availability Schedule Name",
+		"  Gas,                     !- Fuel Type",
 		"  0.8,                     !- Gas Burner Efficiency",
 		"  autosize,                !- Nominal Capacity {W}",
 		"  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -2400,7 +2453,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;
@@ -3022,28 +3075,23 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 
 		"Branch,",
 		"  DOAS Main Branch,        !- Name",
-		"  autosize,                !- Maximum Flow Rate {m3/s}",
 		"  ,                        !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"  DOAS OA System,          !- Component 1 Name",
 		"  DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 		"  DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-		"  Passive,                 !- Component 1 Branch Control Type",
 		"  CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 		"  DOAS Cooling Coil,       !- Component 2 Name",
 		"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 		"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
-		"  Coil:Heating:Gas,        !- Component 2 Object Type",
+		"  Coil:Heating:Fuel,        !- Component 2 Object Type",
 		"  DOAS Heating Coil,       !- Component 2 Name",
 		"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
 		"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
 		"  Fan:VariableVolume,      !- Component 3 Object Type",
 		"  DOAS Supply Fan,         !- Component 3 Name",
 		"  DOAS Heating Coil Outlet,!- Component 3 Inlet Node Name",
-		"  DOAS Supply Fan Outlet,  !- Component 3 Outlet Node Name",
-		"  Active;                  !- Component 3 Branch Control Type",
+		"  DOAS Supply Fan Outlet;  !- Component 3 Outlet Node Name",
 
 		"AirLoopHVAC:SupplyPath,",
 		"  DOAS Supply Path,        !- Name",
@@ -3140,9 +3188,10 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"	0.0,                   !- Crankcase Heater Capacity",
 		"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  DOAS Heating Coil,       !- Name",
 		"  AvailSched,              !- Availability Schedule Name",
+		"  Gas,                     !- Fuel Type",
 		"  0.8,                     !- Gas Burner Efficiency",
 		"  autosize,                !- Nominal Capacity {W}",
 		"  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -3380,7 +3429,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;
@@ -3412,7 +3461,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 		"Minimum; !- Aggregation Type for Variable or Meter 2",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitUse;
 
@@ -3517,7 +3566,7 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 		"Always1; !- Schedule Name"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 
@@ -4653,7 +4702,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"                                                                                                   "
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;
@@ -5541,26 +5590,40 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    2.6575,6.8425,2.5,  !- X,Y,Z ==> Vertex 3 {m}                                         ",
 		"    2.6575,7.1575,2.5;  !- X,Y,Z ==> Vertex 4 {m}                                         ",
 		"                                                                                          ",
-		"  Daylighting:Controls,                                                                   ",
-		"    Daylit Zone,             !- Zone Name                                                 ",
-		"    2,                       !- Total Daylighting Reference Points                        ",
-		"    2.5,                     !- X-Coordinate of First Reference Point {m}                 ",
-		"    5.0,                     !- Y-Coordinate of First Reference Point {m}                 ",
-		"    0.8,                     !- Z-Coordinate of First Reference Point {m}                 ",
-		"    2.5,                     !- X-Coordinate of Second Reference Point {m}                ",
-		"    3.0,                     !- Y-Coordinate of Second Reference Point {m}                ",
-		"    0.8,                     !- Z-Coordinate of Second Reference Point {m}                ",
-		"    1.0,                     !- Fraction of Zone Controlled by First Reference Point      ",
-		"    0.0,                     !- Fraction of Zone Controlled by Second Reference Point     ",
-		"    550,                     !- Illuminance Setpoint at First Reference Point {lux}       ",
-		"    0,                       !- Illuminance Setpoint at Second Reference Point {lux}      ",
-		"    1,                       !- Lighting Control Type                                     ",
-		"    0.0,                     !- Glare Calculation Azimuth Angle of View Direction Clockwis",
-		"    20.0,                    !- Maximum Allowable Discomfort Glare Index                  ",
-		"    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Contro",
-		"    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Contr",
-		"    0,                       !- Number of Stepped Control Steps                           ",
-		"    1.0;                     !- Probability Lighting will be Reset When Needed in Manual S",
+		"  Daylighting:Controls,                                                                                                  ",
+		"    Daylit Zone_DaylCtrl,    !- Name                                                                                     ",
+		"    Daylit Zone,             !- Zone Name                                                                                ",
+		"    SplitFlux,               !- Daylighting Method                                                                       ",
+		"    ,                        !- Availability Schedule Name                                                               ",
+		"    Continuous,              !- Lighting Control Type                                                                    ",
+		"    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control             ",
+		"    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control            ",
+		"    ,                        !- Number of Stepped Control Steps                                                          ",
+		"    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control                 ",
+		"    Daylit Zone_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name                                       ",
+		"    0.0,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}       ",
+		"    20.0,                    !- Maximum Allowable Discomfort Glare Index                                                 ",
+		"    ,                        !- DElight Gridding Resolution {m2}                                                         ",
+		"    Daylit Zone_DaylRefPt1,  !- Daylighting Reference Point 1 Name                                                       ",
+		"    1.0,                     !- Fraction of Zone Controlled by Reference Point 1                                         ",
+		"    550,                     !- Illuminance Setpoint at Reference Point 1 {lux}                                          ",
+		"    Daylit Zone_DaylRefPt2,  !- Daylighting Reference Point 2 Name                                                       ",
+		"    0.0,                     !- Fraction of Zone Controlled by Reference Point 2                                         ",
+		"    0;                       !- Illuminance Setpoint at Reference Point 2 {lux}                                          ",
+		"                                                                                                                         ",
+		"  Daylighting:ReferencePoint,                                                                                            ",
+		"    Daylit Zone_DaylRefPt1,  !- Name                                                                                     ",
+		"    Daylit Zone,             !- Zone Name                                                                                ",
+		"    2.5,                     !- X-Coordinate of Reference Point {m}                                                      ",
+		"    5.0,                     !- Y-Coordinate of Reference Point {m}                                                      ",
+		"    0.8;                     !- Z-Coordinate of Reference Point {m}                                                      ",
+		"                                                                                                                         ",
+		"  Daylighting:ReferencePoint,                                                                                            ",
+		"    Daylit Zone_DaylRefPt2,  !- Name                                                                                     ",
+		"    Daylit Zone,             !- Zone Name                                                                                ",
+		"    2.5,                     !- X-Coordinate of Reference Point {m}                                                      ",
+		"    3.0,                     !- Y-Coordinate of Reference Point {m}                                                      ",
+		"    0.8;                     !- Z-Coordinate of Reference Point {m}                                                      ",
 		"                                                                                          ",
 		"  OutputControl:IlluminanceMap:Style,                                                     ",
 		"    Comma;                   !- Column Separator                                          ",
@@ -5686,10 +5749,6 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    Standard Zone Air Node,  !- Zone Air Node Name                                        ",
 		"    Standard Zone Return Node;  !- Zone Return Air Node Name                              ",
 		"                                                                                          ",
-		"  ThermostatSetpoint:SingleHeatingOrCooling,                                              ",
-		"    Heating Cooling Setpoint,!- Name                                                      ",
-		"    Zone Temp Sch;           !- Setpoint Temperature Schedule Name                        ",
-		"                                                                                          ",
 		"  ZoneControl:Thermostat,                                                                 ",
 		"    Standard Zone Thermostat,!- Name                                                      ",
 		"    Standard Zone,           !- Zone or ZoneList Name                                     ",
@@ -5750,7 +5809,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    SimpleAndTabular;        !- Option Type                                               ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -83,6 +71,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
 #include <HVACDXHeatPumpSystem.hh>
@@ -139,8 +128,6 @@ namespace OutdoorAirUnit {
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::BlowThru;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
@@ -202,6 +189,9 @@ namespace OutdoorAirUnit {
 
 	// Object Data
 	Array1D< OAUnitData > OutAirUnit;
+	std::unordered_set< std::string > SupplyFanUniqueNames;
+	std::unordered_set< std::string > ExhaustFanUniqueNames;
+	std::unordered_set< std::string > ComponentListUniqueNames;
 
 	namespace {
 		bool MyOneTimeFlag( true );
@@ -220,6 +210,9 @@ namespace OutdoorAirUnit {
 		CheckEquipName.deallocate();
 		MyOneTimeErrorFlag.deallocate();
 		OutAirUnit.deallocate();
+		SupplyFanUniqueNames.clear();
+		ExhaustFanUniqueNames.clear();
+		ComponentListUniqueNames.clear();
 		MyOneTimeFlag = true;
 		ZoneEquipmentListChecked = false;
 	}
@@ -248,24 +241,8 @@ namespace OutdoorAirUnit {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OAUnitNum; // index of outdoor air unit being simulated
@@ -279,7 +256,7 @@ namespace OutdoorAirUnit {
 		// Find the correct Outdoor Air Unit
 
 		if ( CompIndex == 0 ) {
-			OAUnitNum = FindItemInList( CompName, OutAirUnit );
+			OAUnitNum = InputProcessor::FindItemInList( CompName, OutAirUnit );
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
@@ -333,7 +310,6 @@ namespace OutdoorAirUnit {
 		// Mixed Air.cc
 
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
@@ -376,18 +352,8 @@ namespace OutdoorAirUnit {
 		using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOutdoorAirUnitInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -401,8 +367,6 @@ namespace OutdoorAirUnit {
 		int InListNum;
 		int ListNum;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -422,10 +386,10 @@ namespace OutdoorAirUnit {
 
 		if ( ! GetOutdoorAirUnitInputFlag ) return;
 
-		GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -438,26 +402,22 @@ namespace OutdoorAirUnit {
 		cAlphaArgs.allocate( NumAlphas );
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
-		NumOfOAUnits = GetNumObjectsFound( CurrentModuleObject );
+		NumOfOAUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
+		SupplyFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
+		ExhaustFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
+		ComponentListUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
 		MyOneTimeErrorFlag.dimension( NumOfOAUnits, true );
 		CheckEquipName.dimension( NumOfOAUnits, true );
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
-			GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OutAirUnit, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(cAlphaArgs(1),CurrentModuleObject,ErrorsFound);
+
 			//A1
 			OutAirUnit( OAUnitNum ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
 
 			//A2
 			OutAirUnit( OAUnitNum ).SchedName = cAlphaArgs( 2 );
@@ -473,7 +433,7 @@ namespace OutdoorAirUnit {
 
 			//A3
 			OutAirUnit( OAUnitNum ).ZoneName = cAlphaArgs( 3 );
-			OutAirUnit( OAUnitNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
+			OutAirUnit( OAUnitNum ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
 
 			if ( OutAirUnit( OAUnitNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
@@ -498,11 +458,7 @@ namespace OutdoorAirUnit {
 
 			//A5
 			OutAirUnit( OAUnitNum ).SFanName = cAlphaArgs( 5 );
-			VerifyName( cAlphaArgs( 5 ), OutAirUnit, &OAUnitData::SFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Supply Fan Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 5 ) = "xxxxx";
-			}
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 5 ), CurrentModuleObject, cAlphaFields( 5 ), SupplyFanUniqueNames, ErrorsFound );
 			errFlag = false;
 			GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 			OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
@@ -514,8 +470,8 @@ namespace OutdoorAirUnit {
 				ErrorsFound = true;
 			}
 			//A6 :Fan Place
-			if ( SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
-			if ( SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
+			if ( InputProcessor::SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
+			if ( InputProcessor::SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
 			if ( OutAirUnit( OAUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFields( 6 ) + " = " + cAlphaArgs( 6 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -528,11 +484,7 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
-				VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 7 ) = "xxxxx";
-				}
+				GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 7 ), CurrentModuleObject, cAlphaFields( 7 ), ExhaustFanUniqueNames, ErrorsFound );
 				errFlag = false;
 				GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 				OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
@@ -560,7 +512,6 @@ namespace OutdoorAirUnit {
 			}
 
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
-
 				SetUpCompSets( CurrentModuleObject, OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 7 ), "UNDEFINED", "UNDEFINED" );
 			}
 
@@ -631,17 +582,14 @@ namespace OutdoorAirUnit {
 			}
 
 			//A16 : component list
-			VerifyName( cAlphaArgs( 16 ), OutAirUnit, &OAUnitData::ComponentListName, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObjects( CO_OAEqList ) + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 16 ) = "xxxxx";
-			}
+
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 16 ), CurrentModuleObject, cAlphaFields( 16 ), ComponentListUniqueNames, ErrorsFound );
 			ComponentListName = cAlphaArgs( 16 );
 			OutAirUnit( OAUnitNum ).ComponentListName = ComponentListName;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				ListNum = GetObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
+				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
 				if ( ListNum > 0 ) {
-					GetObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					InputProcessor::GetObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2; // potential problem if puts in type but not name
 					if ( mod( NumAlphas - 1, 2 ) != 0 ) ++NumInList;
 					OutAirUnit( OAUnitNum ).NumComponents = NumInList;
@@ -652,7 +600,7 @@ namespace OutdoorAirUnit {
 						OutAirUnit( OAUnitNum ).OAEquip( InListNum ).ComponentName = AlphArray( InListNum * 2 + 1 );
 						OutAirUnit( OAUnitNum ).OAEquip( InListNum ).ComponentType = AlphArray( InListNum * 2 );
 						CompNum = InListNum;
-						{ auto const SELECT_CASE_var( MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
+						{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
 						// Coil Types
 						if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
@@ -716,7 +664,7 @@ namespace OutdoorAirUnit {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetElecCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetElecCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 
-						} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+						} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
 							// Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
 							GetHeatingCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ErrorsFound );
@@ -1142,12 +1090,8 @@ namespace OutdoorAirUnit {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using DataEnvironment::StdRhoAir;
 		using DataHVACGlobals::cFanTypes;
 		using DataPlant::PlantLoop;
@@ -1164,17 +1108,8 @@ namespace OutdoorAirUnit {
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeOutdoorAirUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1631,24 +1566,6 @@ namespace OutdoorAirUnit {
 		// PURPOSE OF THIS SUBROUTINE
 		// Simulate the controllers and components in the outside air system.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-//		using InputProcessor::FindItemInList;
-//		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum;
 		int CurOAUnitNum;
@@ -1830,7 +1747,7 @@ namespace OutdoorAirUnit {
 				CalcOAUnitCoilComps( UnitNum, FirstHVACIteration, SimCompNum, QUnitOut );
 			}
 
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			if ( Sim ) {
 				//     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
 				CalcOAUnitCoilComps( UnitNum, FirstHVACIteration, SimCompNum, QUnitOut );

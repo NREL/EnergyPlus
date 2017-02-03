@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -163,28 +151,8 @@ namespace WindTurbine {
 		// This subroutine manages the simulation of wind turbine component.
 		// This drivers manages the calls to all of the other drivers and simulation algorithms.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true );
@@ -197,7 +165,7 @@ namespace WindTurbine {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			WindTurbineNum = FindItemInList( GeneratorName, WindTurbineSys );
+			WindTurbineNum = InputProcessor::FindItemInList( GeneratorName, WindTurbineSys );
 			if ( WindTurbineNum == 0 ) {
 				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );
 			}
@@ -284,24 +252,9 @@ namespace WindTurbine {
 		// This subroutine gets input data for wind turbine components
 		// and stores it in the wind turbine data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using ScheduleManager::GetScheduleIndex;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "Generator:WindTurbine" );
@@ -311,16 +264,8 @@ namespace WindTurbine {
 		Real64 const MaxPowerCoeff( 0.59 ); // Maximum power coefficient
 		Real64 const DefaultH( 50.0 ); // Default of height for local wind speed
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int WindTurbineNum; // Wind turbine number
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
@@ -334,7 +279,7 @@ namespace WindTurbine {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Initializations and allocations
-		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -342,21 +287,15 @@ namespace WindTurbine {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 
-		NumWindTurbines = GetNumObjectsFound( CurrentModuleObject );
+		NumWindTurbines = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		WindTurbineSys.allocate( NumWindTurbines );
 
 		// Flow
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
 
-			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WindTurbineSys, WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
+			InputProcessor::GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound);
 
 			WindTurbineSys( WindTurbineNum ).Name = cAlphaArgs( 1 ); // Name of wind turbine
 

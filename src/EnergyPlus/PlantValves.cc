@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -151,27 +139,6 @@ namespace PlantValves {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulation manager for Plant valves
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int EqNum;
@@ -183,7 +150,7 @@ namespace PlantValves {
 
 		// Find the correct Equipment
 		if ( CompNum == 0 ) {
-			EqNum = FindItemInList( CompName, TemperValve );
+			EqNum = InputProcessor::FindItemInList( CompName, TemperValve );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );
 			}
@@ -234,28 +201,10 @@ namespace PlantValves {
 		// METHODOLOGY EMPLOYED:
 		// usual method using InputProcessor
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound; // might also use FindItemInList
-		using InputProcessor::GetObjectItem;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -268,14 +217,14 @@ namespace PlantValves {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "TemperingValve";
-		NumTemperingValves = GetNumObjectsFound( CurrentModuleObject );
+		NumTemperingValves = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		TemperValve.allocate( NumTemperingValves );
 		CheckEquipName.dimension( NumTemperingValves, true );
 
 		for ( Item = 1; Item <= NumTemperingValves; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
+			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
 			//  <process, noting errors>
 			TemperValve( Item ).Name = Alphas( 1 );
 			// Get Plant Inlet Node
@@ -324,11 +273,6 @@ namespace PlantValves {
 		// PURPOSE OF THIS SUBROUTINE:
 		// intialize data for valve modeling
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataLoopNode::Node;
@@ -337,20 +281,8 @@ namespace PlantValves {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::GenEquipTypes_Pump;
 		using DataBranchAirLoopPlant::ControlType_Active;
-		using InputProcessor::SameString;
 		using DataHVACGlobals::NumPlantLoops;
 		using PlantUtilities::InitComponentNodes;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode; // local working variable for inlet node number
@@ -414,7 +346,7 @@ namespace PlantValves {
 
 										if ( ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).TypeOf_Num == CompTypeNum ) && ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).CompNum == CompNum ) ) { // we found it.
 
-											if ( ! SameString( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).Name, TemperValve( CompNum ).Name ) ) {
+											if ( ! InputProcessor::SameString( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).Name, TemperValve( CompNum ).Name ) ) {
 												// why not, maybe plant loop structures not completely filled with available data?
 												//write(*,*) 'Temper Valve names', PlantLoop(i)%LoopSide(j)%Branch(k)%Comp(l)%Name, TemperValve(CompNum)%Name
 											}

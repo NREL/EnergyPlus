@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -2169,7 +2157,6 @@ namespace WindowManager {
 		using DataHeatBalSurface::QdotRadOutRep;
 		using DataHeatBalSurface::QdotRadOutRepPerArea;
 		//unused0909  USE DataEnvironment, ONLY: CurMnDyHr
-		using InputProcessor::SameString;
 		using WindowComplexManager::CalcComplexWindowThermal;
 		using WindowEquivalentLayer::EQLWindowSurfaceHeatBalance;
 
@@ -2920,7 +2907,6 @@ namespace WindowManager {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdbFnHW;
-		using InputProcessor::SameString;
 		using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
 
 		// Locals
@@ -4113,7 +4099,6 @@ namespace WindowManager {
 
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4236,27 +4221,9 @@ namespace WindowManager {
 		// Based on ISO/DIS 15099, "Thermal Performance of Windows, Doors and Shading Devices --
 		// Detailed Calculations," 1/12/2000, Chapter 7, "Shading Devices."
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
 		// Argument array dimensioning
 		TGapNew.dim( 2 );
 		hcv.dim( 2 );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ConstrNumSh; // Shaded construction number
@@ -7543,16 +7510,6 @@ namespace WindowManager {
 		// "Solar-Thermal Window Blind Model for DOE-2," H. Simmler, U. Fischer and
 		// F. Winkelmann, Lawrence Berkeley National Laboratory, Jan. 1996.
 
-		// USE STATEMENTS:na
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:na
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Array1D< Real64 > bld_pr( 15 ); // Slat properties
@@ -7725,7 +7682,6 @@ namespace WindowManager {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -7788,11 +7744,11 @@ namespace WindowManager {
 					//     Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
 					SurfaceScreens( ScreenNum ).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt( Material( MatNum ).Trans );
 
-					if ( SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
+					if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = DoNotModel;
-					} else if ( SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
+					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDirectBeam;
-					} else if ( SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
+					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDiffuse;
 					}
 
@@ -8869,28 +8825,6 @@ Label99999: ;
 		// METHODOLOGY EMPLOYED:
 		// Overwriting the default values
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		using namespace InputProcessor;
-		//USE DataGlobals ,    ONLY: AnyEnergyManagementSystemInModel
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // If errors detected in input
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
@@ -8914,7 +8848,7 @@ Label99999: ;
 
 		// Step 1 - check whether there is custom solar or visible spectrum
 		cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-		NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
+		NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		// no custom spectrum data, done!
 		if ( NumSiteSpectrum == 0 ) {
@@ -8928,15 +8862,15 @@ Label99999: ;
 			ErrorsFound = true;
 		}
 
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 			// use default spectrum data, done!
-			if ( SameString( cAlphaArgs( 2 ), "Default" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Default" ) ) {
 				RunMeOnceFlag = true;
 				return;
 			}
@@ -8946,7 +8880,7 @@ Label99999: ;
 			cVisibleSpectrum = cAlphaArgs( 4 );
 
 			cCurrentModuleObject = "Site:SpectrumData";
-			NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
+			NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
 				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;
@@ -8955,7 +8889,7 @@ Label99999: ;
 			cAlphaArgs.deallocate();
 			rNumericArgs.deallocate();
 
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
 			rNumericArgs.dimension( NumNumbers, 0.0 );
 
@@ -8963,8 +8897,8 @@ Label99999: ;
 			iVisibleSpectrum = 0;
 			for ( Loop = 1; Loop <= NumSiteSpectrum; ++Loop ) {
 				// Step 2 - read user-defined spectrum data
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
-				if ( SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * nume ) {
@@ -8983,7 +8917,7 @@ Label99999: ;
 						}
 					}
 				}
-				if ( SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
 					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {

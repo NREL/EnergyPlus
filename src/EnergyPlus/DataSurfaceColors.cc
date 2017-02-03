@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataSurfaceColors.hh>
@@ -141,38 +129,14 @@ namespace DataSurfaceColors {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem; // case insensitive Find
-
 		// Return value
 		bool WasSet;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int found;
 
 		WasSet = false;
-		found = FindItem( String, colorkeys, NumColors );
+		found = InputProcessor::FindItem( String, colorkeys, NumColors );
 
 		if ( found != 0 ) {
 			if ( present( ColorType ) ) {
@@ -214,25 +178,8 @@ namespace DataSurfaceColors {
 		// Worst case: the colors remain as default.  Note -- this allocates and deallocates
 		// the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "OutputControl:SurfaceColorScheme" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -249,11 +196,11 @@ namespace DataSurfaceColors {
 
 		DXFcolorno = defaultcolorno;
 		// first see if there is a scheme name
-		numptr = GetObjectItemNum( CurrentModuleObject, SchemeName );
+		numptr = InputProcessor::GetObjectItemNum( CurrentModuleObject, SchemeName );
 
 		if ( numptr > 0 ) {
 
-			GetObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
+			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
 
 			cAlphas.allocate( NumAlphas );
 			cAlphaFields.allocate( NumAlphas );
@@ -265,7 +212,7 @@ namespace DataSurfaceColors {
 			cAlphas( {1,NumAlphas} ) = "";
 			rNumerics( {1,numNumbers} ) = 0.0;
 
-			GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			for ( numargs = 1; numargs <= numNumbers; ++numargs ) {
 				numptr = rNumerics( numargs ); // set to integer
 				if ( lNumericBlanks( numargs ) ) {

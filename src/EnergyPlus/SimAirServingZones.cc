@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -375,17 +363,7 @@ namespace SimAirServingZones {
 		//        \note Name of a Node or NodeList containing the outlet node(s) supplying air to the demand side.
 		//        \required-field
 
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
 		using NodeInputManager::GetNodeNums;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchInputManager::GetBranchList;
@@ -414,17 +392,9 @@ namespace SimAirServingZones {
 		using WaterCoils::GetCoilWaterInletNode;
 		using General::RoundSigDigits;
 		using DataConvergParams::AirLoopConvergence;
-		//USE DataMixedAir, ONLY: OAMixer, OutsideAirSys, NumOAMixers, NumOASys
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: none
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetAirPathData: " );
-
-		// INTERFACE BLOCK DEFINITIONS: None
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
 		int NumNumbers; // number of numbers returned by GetObjectItem
@@ -475,8 +445,6 @@ namespace SimAirServingZones {
 		static Array1D_int OutletNodeNumbers; // Component outlet node numbers from GetBranchData call
 		Array1D_int DummyInteger( 2 ); // Placeholder for corresponding plant loop branch pressure drop info
 		static bool ErrorsFound( false ); // TRUE if errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static Array1D_bool PackagedUnit;
 		int test;
 		int count;
@@ -485,6 +453,7 @@ namespace SimAirServingZones {
 		static bool SplitterExists( false ); // TRUE if there is a slitter in a primary air system
 		static bool MixerExists( false ); // TRUE if there is a mixer in a primary air system
 		bool errFlag;
+		bool IsNotOK;
 		/////////// hoisted into namespace
 		//static int TestUniqueNodesNum( 0 );
 		///////////////////////////
@@ -517,11 +486,11 @@ namespace SimAirServingZones {
 		// Object Data
 		Array1D< AirUniqueNodes > TestUniqueNodes;
 
-		GetObjectDefMaxArgs( "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers );
-		GetObjectDefMaxArgs( "ConnectorList", NumParams, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "ConnectorList", NumParams, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
-		GetObjectDefMaxArgs( "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -542,14 +511,14 @@ namespace SimAirServingZones {
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
-		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 		NodeNums.dimension( NumParams, 0 );
 
 		// Find number of primary air systems
-		NumPrimaryAirSys = GetNumObjectsFound( "AirLoopHVAC" );
+		NumPrimaryAirSys = InputProcessor::GetNumObjectsFound( "AirLoopHVAC" );
 		TestUniqueNodes.allocate( NumPrimaryAirSys * 4 ); // used to look at specific nodes that must be unique, fields A6-A9
 
-		PrimaryAirSystem.allocate( NumPrimaryAirSys ); // alloacate the primary air sys data array
+		PrimaryAirSystem.allocate( NumPrimaryAirSys ); // allocate the primary air sys data array
 		AirToZoneNodeInfo.allocate( NumPrimaryAirSys ); // allocate the array that stores the air sys / zone equp connection data
 		AirToOANodeInfo.allocate( NumPrimaryAirSys ); // allocate the array that stores the OA node connections (reporting)
 		PackagedUnit.allocate( NumPrimaryAirSys );
@@ -580,18 +549,12 @@ namespace SimAirServingZones {
 
 			CurrentModuleObject = "AirLoopHVAC";
 
-			GetObjectItem( CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // get all the input data for the air system
+			InputProcessor::GetObjectItem( CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // get all the input data for the air system
 
 			// Assign the air system data to the simulation variables.
 			// Data needed to simulate the system goes into PrimaryAirSystem.
 			// Data connecting the air system to the zone equioment goes into AirToZoneNodeInfo (in DataLoopNode).
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), PrimaryAirSystem, AirSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			PrimaryAirSystem( AirSysNum ).Name = Alphas( 1 );
 			AirToZoneNodeInfo( AirSysNum ).AirLoopName = Alphas( 1 );
 			if ( NumAlphas < 9 ) {
@@ -616,7 +579,7 @@ namespace SimAirServingZones {
 			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 			// work on unique nodes
-			test = FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
+			test = InputProcessor::FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
@@ -629,7 +592,7 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-			test = FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
+			test = InputProcessor::FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 7 );
@@ -642,7 +605,7 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-			test = FindItemInList( Alphas( 8 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
+			test = InputProcessor::FindItemInList( Alphas( 8 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 8 );
@@ -655,7 +618,7 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-			test = FindItemInList( Alphas( 9 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
+			test = InputProcessor::FindItemInList( Alphas( 9 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 9 );
@@ -787,7 +750,7 @@ namespace SimAirServingZones {
 					PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( CompNum + 1 ) = OutletNodeNumbers( CompNum );
 
 					// Check for Outside Air system; if there, store its connection node numbers to primary air system
-					if ( SameString( CompTypes( CompNum ), "AirLoopHVAC:OutdoorAirSystem" ) ) {
+					if ( InputProcessor::SameString( CompTypes( CompNum ), "AirLoopHVAC:OutdoorAirSystem" ) ) {
 						if ( PrimaryAirSystem( AirSysNum ).OASysExists ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem( AirSysNum ).Name + "\", too many outdoor air systems." );
 							ShowContinueError( "Only one AirLoopHVAC:OutdoorAirSystem allowed." );
@@ -910,13 +873,13 @@ namespace SimAirServingZones {
 			MixerExists = false;
 
 			if ( ConnectorListName != "" ) {
-				ConListNum = GetObjectItemNum( "ConnectorList", ConnectorListName );
+				ConListNum = InputProcessor::GetObjectItemNum( "ConnectorList", ConnectorListName );
 				if ( ConListNum > 0 ) {
-					GetObjectItem( "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
-					if ( ( SameString( Alphas( 2 ), "Connector:Splitter" ) ) || ( SameString( Alphas( 4 ), "Connector:Splitter" ) ) ) {
+					InputProcessor::GetObjectItem( "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+					if ( ( InputProcessor::SameString( Alphas( 2 ), "Connector:Splitter" ) ) || ( InputProcessor::SameString( Alphas( 4 ), "Connector:Splitter" ) ) ) {
 						SplitterExists = true;
 					}
-					if ( ( SameString( Alphas( 2 ), "Connector:Mixer" ) ) || ( SameString( Alphas( 4 ), "Connector:Mixer" ) ) ) {
+					if ( ( InputProcessor::SameString( Alphas( 2 ), "Connector:Mixer" ) ) || ( InputProcessor::SameString( Alphas( 4 ), "Connector:Mixer" ) ) ) {
 						MixerExists = true;
 					}
 				} else {
@@ -931,7 +894,7 @@ namespace SimAirServingZones {
 
 			// If there is a SPLITTER, get its data
 			if ( SplitterExists ) {
-				GetObjectDefMaxArgs( "Connector:Splitter", NumParams, NumAlphas, NumNodes );
+				InputProcessor::GetObjectDefMaxArgs( "Connector:Splitter", NumParams, NumAlphas, NumNodes );
 				NodeNames.allocate( NumAlphas );
 				NodeNumbers.allocate( NumAlphas );
 				GetLoopSplitter( PrimaryAirSystem( AirSysNum ).Name, ConnectorListName, PrimaryAirSystem( AirSysNum ).Splitter.Name, PrimaryAirSystem( AirSysNum ).Splitter.Exists, PrimaryAirSystem( AirSysNum ).Splitter.NodeNameIn, PrimaryAirSystem( AirSysNum ).Splitter.NodeNumIn, PrimaryAirSystem( AirSysNum ).Splitter.TotalOutletNodes, NodeNames, NodeNumbers, ErrorsFound );
@@ -985,7 +948,7 @@ namespace SimAirServingZones {
 
 			// If there is a MIXER, get its data
 			if ( MixerExists ) {
-				GetObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNodes );
+				InputProcessor::GetObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNodes );
 				NodeNames.allocate( NumAlphas );
 				NodeNumbers.allocate( NumAlphas );
 				GetLoopMixer( PrimaryAirSystem( AirSysNum ).Name, ConnectorListName, PrimaryAirSystem( AirSysNum ).Mixer.Name, PrimaryAirSystem( AirSysNum ).Mixer.Exists, PrimaryAirSystem( AirSysNum ).Mixer.NodeNameOut, PrimaryAirSystem( AirSysNum ).Mixer.NodeNumOut, PrimaryAirSystem( AirSysNum ).Mixer.TotalInletNodes, NodeNames, NodeNumbers, ErrorsFound );
@@ -1040,9 +1003,9 @@ namespace SimAirServingZones {
 			NumControllers = 0;
 			if ( ControllerListName != "" ) { // If not blank, then must be there and valid
 				// Loop through the controller lists until you find the one attached to this primary air system
-				ControllerListNum = GetObjectItemNum( "AirLoopHVAC:ControllerList", ControllerListName );
+				ControllerListNum = InputProcessor::GetObjectItemNum( "AirLoopHVAC:ControllerList", ControllerListName );
 				if ( ControllerListNum > 0 ) {
-					GetObjectItem( "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+					InputProcessor::GetObjectItem( "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 					//Check the current controller list and if it matches input names
 					NumControllers = ( NumAlphas - 1 ) / 2; //Subtract off the controller list name first
 					// store all the controller data
@@ -1074,7 +1037,7 @@ namespace SimAirServingZones {
 				}
 			}
 			if ( NumOASysSimpControllers > 0 ) {
-				GetObjectItem( "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+				InputProcessor::GetObjectItem( "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 				// allocate air primary system controller lists if not already done
 				if ( NumControllers == 0 ) {
 					PrimaryAirSystem( AirSysNum ).NumControllers = NumOASysSimpControllers;
@@ -1093,7 +1056,7 @@ namespace SimAirServingZones {
 				for ( ControllerNum = 1; ControllerNum <= NumOASysControllers; ++ControllerNum ) {
 					ControllerName = Alphas( ControllerNum * 2 + 1 );
 					ControllerType = Alphas( ControllerNum * 2 );
-					if ( ! SameString( ControllerType, "Controller:OutdoorAir" ) ) {
+					if ( ! InputProcessor::SameString( ControllerType, "Controller:OutdoorAir" ) ) {
 						++OASysControllerNum;
 						PrimaryAirSystem( AirSysNum ).ControllerName( OASysControllerNum ) = ControllerName;
 						PrimaryAirSystem( AirSysNum ).ControllerType( OASysControllerNum ) = ControllerType;
@@ -1106,10 +1069,10 @@ namespace SimAirServingZones {
 						GetControllerActuatorNodeNum( ControllerName, ActuatorNodeNum, errFlag );
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
+								if ( InputProcessor::SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
 								CompType = PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
 								WaterCoilNodeNum = -1;
-								if ( SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CompType, "Coil:Heating:Water" ) || SameString( CompType, "Coil:Cooling:Water" ) ) {
+								if ( InputProcessor::SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CompType, "Coil:Heating:Water" ) || InputProcessor::SameString( CompType, "Coil:Cooling:Water" ) ) {
 									WaterCoilNodeNum = GetCoilWaterInletNode( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name, ErrorsFound );
 								}
 								if ( WaterCoilNodeNum == ActuatorNodeNum ) {
@@ -1185,7 +1148,7 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_Cooling;
 					} else if ( componentType == "COIL:HEATING:ELECTRIC" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_ElectricHeat;
-					} else if ( componentType == "COIL:HEATING:GAS" ) {
+					} else if ( componentType == "COIL:HEATING:FUEL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_GasHeat;
 
 						// Heat reclaim
@@ -1352,17 +1315,12 @@ namespace SimAirServingZones {
 		// (3) Other air system node data such as temperatures and humidity ratios are only
 		//     initialized at the start of an environment (run period or design day).
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using SplitterComponent::SplitterCond;
 		using SplitterComponent::SplitterConditions;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using ZonePlenum::ZoneSupPlenCond;
@@ -1375,17 +1333,6 @@ namespace SimAirServingZones {
 		using DataContaminantBalance::OutdoorGC;
 		using General::FindNumberInList;
 		using Fans::GetFanIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAllSupAirPathNodes; // total number of nodes in a supply air path including duplicates
@@ -1490,8 +1437,8 @@ namespace SimAirServingZones {
 				// each supply air path may have up to one splitter and one plenum.  Check for all combinations count
 				// all nodes (including duplicates)
 				for ( CompNum = 1; CompNum <= SupplyAirPath( SupAirPath ).NumOfComponents; ++CompNum ) {
-					if ( SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "AirLoopHVAC:ZoneSplitter" ) ) {
-						SplitterNum = FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), SplitterCond, &SplitterConditions::SplitterName );
+					if ( InputProcessor::SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "AirLoopHVAC:ZoneSplitter" ) ) {
+						SplitterNum = InputProcessor::FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), SplitterCond, &SplitterConditions::SplitterName );
 						if ( SplitterNum == 0 ) {
 							ShowSevereError( "AirLoopHVAC:ZoneSplitter not found=" + SupplyAirPath( SupAirPath ).ComponentName( CompNum ) );
 							ShowContinueError( "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath( SupAirPath ).Name );
@@ -1499,8 +1446,8 @@ namespace SimAirServingZones {
 						}
 						SupplyAirPath( SupAirPath ).SplitterIndex( CompNum ) = SplitterNum;
 						NumAllSupAirPathNodes += SplitterCond( SplitterNum ).NumOutletNodes + 1;
-					} else if ( SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "AirLoopHVAC:SupplyPlenum" ) ) {
-						PlenumNum = FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
+					} else if ( InputProcessor::SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "AirLoopHVAC:SupplyPlenum" ) ) {
+						PlenumNum = InputProcessor::FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
 						if ( PlenumNum == 0 ) {
 							ShowSevereError( "AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath( SupAirPath ).ComponentName( CompNum ) );
 							ShowContinueError( "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath( SupAirPath ).Name );
@@ -1808,7 +1755,7 @@ namespace SimAirServingZones {
 					PrimaryAirSystem( AirLoopNum ).RABExists = true;
 					for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
 						// find the RAB branch; its inlet is a splitter outlet and it outlet is a mixer inlet
-						if ( ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumIn == PrimaryAirSystem( AirLoopNum ).Splitter.NodeNumOut( 1 ) || PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumIn == PrimaryAirSystem( AirLoopNum ).Splitter.NodeNumOut( 2 ) ) && ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumOut == PrimaryAirSystem( AirLoopNum ).Mixer.NodeNumIn( 1 ) || PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumOut == PrimaryAirSystem( AirLoopNum ).Mixer.NodeNumIn( 2 ) ) && ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents == 1 ) && ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( 1 ).TypeOf, "Duct" ) ) ) {
+						if ( ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumIn == PrimaryAirSystem( AirLoopNum ).Splitter.NodeNumOut( 1 ) || PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumIn == PrimaryAirSystem( AirLoopNum ).Splitter.NodeNumOut( 2 ) ) && ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumOut == PrimaryAirSystem( AirLoopNum ).Mixer.NodeNumIn( 1 ) || PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumOut == PrimaryAirSystem( AirLoopNum ).Mixer.NodeNumIn( 2 ) ) && ( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents == 1 ) && ( InputProcessor::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( 1 ).TypeOf, "Duct" ) ) ) {
 							// set the RAB splitter outlet node and the RAB mixer inlet node
 							PrimaryAirSystem( AirLoopNum ).RABSplitOutNode = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumIn;
 							PrimaryAirSystem( AirLoopNum ).RABMixInNode = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).NodeNumOut;
@@ -1906,7 +1853,7 @@ namespace SimAirServingZones {
 							FoundCentralHeatCoil = true;
 						}
 					} // end of component loop
-				} // end of Branch loop			
+				} // end of Branch loop
 				PrimaryAirSystem( AirLoopNum ).CentralHeatCoilExists = FoundCentralHeatCoil;
 			} // end of AirLoop loop
 
@@ -2917,7 +2864,7 @@ namespace SimAirServingZones {
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 
 			// stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, QActual );
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 			// stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
@@ -3472,11 +3419,7 @@ namespace SimAirServingZones {
 		// Uses data from System Sizing input and the system to zone connection data
 		// calculated in InitAirLoops and stored in AirToZoneNodeInfo in DataLoopNode..
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::FindNumberInList;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace OutputReportPredefined;
@@ -3484,19 +3427,6 @@ namespace SimAirServingZones {
 		using DataDefineEquip::AirDistUnit;
 		using DataDefineEquip::NumAirDistUnits;
 		using namespace DataSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // primary air system index
@@ -3571,7 +3501,7 @@ namespace SimAirServingZones {
 		}
 
 		for ( SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex ) {
-			PrimAirIndex = FindItemInList( SysSizInput( SysSizIndex ).AirPriLoopName, PrimaryAirSystem );
+			PrimAirIndex = InputProcessor::FindItemInList( SysSizInput( SysSizIndex ).AirPriLoopName, PrimaryAirSystem );
 			if ( PrimAirIndex == 0 ) {
 				ShowSevereError( "Sizing:System: " + SysSizInput( SysSizIndex ).AirPriLoopName + " references unknown AirLoopHVAC" );
 				ErrorsFound = true;
@@ -3593,7 +3523,7 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				SysSizing( DesDayEnvrnNum, AirLoopNum ).AirPriLoopName = PrimaryAirSystem( AirLoopNum ).Name;
-				SysSizNum = FindItemInList( SysSizing( DesDayEnvrnNum, AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+				SysSizNum = InputProcessor::FindItemInList( SysSizing( DesDayEnvrnNum, AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 				if ( SysSizNum > 0 ) { // move data from system sizing input
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).LoadSizeType = SysSizInput( SysSizNum ).LoadSizeType;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolingPeakLoadType = SysSizInput( SysSizNum ).CoolingPeakLoadType;
@@ -3673,7 +3603,7 @@ namespace SimAirServingZones {
 
 			FinalSysSizing( AirLoopNum ).AirPriLoopName = PrimaryAirSystem( AirLoopNum ).Name;
 			CalcSysSizing( AirLoopNum ).AirPriLoopName = PrimaryAirSystem( AirLoopNum ).Name;
-			SysSizNum = FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+			SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum > 0 ) { // move data from system sizing input
 				FinalSysSizing( AirLoopNum ).LoadSizeType = SysSizInput( SysSizNum ).LoadSizeType;
 				FinalSysSizing( AirLoopNum ).CoolingPeakLoadType = SysSizInput( SysSizNum ).CoolingPeakLoadType;
@@ -3961,7 +3891,7 @@ namespace SimAirServingZones {
 			PeakPeople = 0.0;
 			ClgSupplyAirAdjustFactor = 1.0;
 			HtgSupplyAirAdjustFactor = 1.0;
-			SysSizNum = FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+			SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
 			if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
@@ -4610,6 +4540,7 @@ namespace SimAirServingZones {
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
+		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flaw rate [m3/s]
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
@@ -4994,6 +4925,7 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5014,6 +4946,8 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
+									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum ); // Save previous EvzByZoneCool
@@ -5233,6 +5167,7 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5252,6 +5187,8 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
+									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum );
@@ -6027,7 +5964,7 @@ namespace SimAirServingZones {
 
 			// Specify the heating supply air Temp/HumRat for different system configurations
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				
+
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
@@ -6199,33 +6136,17 @@ namespace SimAirServingZones {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Modifies the design sizing flow rates for system scalable sizing method
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using ReportSizingManager::RequestSizing;
-		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using DataEnvironment::StdRhoAir;
 		using DataSizing::CalcSysSizing;
 		using DataSizing::FinalSysSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TempSize; // autosized value
@@ -6360,7 +6281,7 @@ namespace SimAirServingZones {
 
 	Real64
 	GetHeatingSATempForSizing(
-		int const IndexAirLoop // air loop index 
+		int const IndexAirLoop // air loop index
 	)
 	{
 
@@ -6371,8 +6292,8 @@ namespace SimAirServingZones {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on 
-		// the system configurations: 
+		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on
+		// the system configurations:
 		// (1) Central heating coils exist
 		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
 		// (3) No central heating coils; No preheating coils or OA heat-exchangers
@@ -6396,7 +6317,7 @@ namespace SimAirServingZones {
 		Real64 ReheatCoilInHumRatForSizing; // Humidity ratio of the reheat coil inlet air [kg/kg]
 		Real64 ReheatCoilInEnthalpyForSizing; // Enthalpy of the reheat coil inlet air [J/kg]
 		Real64 OutAirFrac;
-		
+
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -6409,12 +6330,12 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
 		//Case: Central heating coils exist
-			
+
 			ReheatCoilInTempForSizing = CalcSysSizing( IndexAirLoop ).HeatSupTemp;
-			
+
 		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
@@ -6427,26 +6348,26 @@ namespace SimAirServingZones {
 
 			// Mixed air humidity ratio and enthalpy
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
-			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat ) 
+			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat )
 			                      + ( 1 - OutAirFrac ) * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).HeatRetTemp, FinalSysSizing( IndexAirLoop ).HeatRetHumRat );
 
 			// Mixed air dry bulb temperature
 			ReheatCoilInTempForSizing = PsyTdbFnHW( ReheatCoilInEnthalpyForSizing, ReheatCoilInHumRatForSizing );
-			
+
 		} else {
 		//Case: No central heating coils; No preheating coils or OA heat-exchangers
-			
+
 			ReheatCoilInTempForSizing = FinalSysSizing( IndexAirLoop ).HeatMixTemp;
-		
+
 		}
 
 		return ReheatCoilInTempForSizing;
-		
+
 	}
 
 	Real64
 	GetHeatingSATempHumRatForSizing(
-		int const IndexAirLoop // air loop index 
+		int const IndexAirLoop // air loop index
 	)
 	{
 
@@ -6457,8 +6378,8 @@ namespace SimAirServingZones {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine get the proper reheat coil inlet humidity ratio for sizing, depending on 
-		// the system configurations: 
+		// This subroutine get the proper reheat coil inlet humidity ratio for sizing, depending on
+		// the system configurations:
 		// (1) Central heating coils exist
 		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
 		// (3) No central heating coils; No preheating coils or OA heat-exchangers
@@ -6472,13 +6393,13 @@ namespace SimAirServingZones {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
-		
+
 		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
 
 		// Locals
 		Real64 ReheatCoilInHumRatForSizing;
 		Real64 OutAirFrac;
-		
+
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -6491,12 +6412,12 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ) {
 		//Case: Central heating coils exist
-			
+
 			ReheatCoilInHumRatForSizing = CalcSysSizing( IndexAirLoop ).HeatSupHumRat;
-		
+
 		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
@@ -6508,18 +6429,18 @@ namespace SimAirServingZones {
 			}
 
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
-		
+
 		} else {
 		//Case: No central heating coils; No preheating coils or OA heat-exchangers
-		
+
 			ReheatCoilInHumRatForSizing = FinalSysSizing( IndexAirLoop ).HeatMixHumRat;
-		
+
 		}
 
 		return ReheatCoilInHumRatForSizing;
-		
+
 	}
-	
+
 
 	// End Algorithm Section of the Module
 	// *****************************************************************************
@@ -6532,6 +6453,46 @@ namespace SimAirServingZones {
 
 	//        Utility Subroutines for the SimAir Module
 	// *****************************************************************************
+
+	void
+		LimitZoneVentEff(
+		Real64 Xs,  // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
+		int CtrlZoneNum, //controlled zone number
+		Real64 & SystemCoolingEv // system ventilation efficiency
+		)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   November 2015
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Check that system ventilation eff is not less than input minimum system ventilation efficiency.
+		// If it is, back calculate and reset ZpzClgByZone and DesCoolVolFlowMin and system ventilation efficiency
+
+		// METHODOLOGY EMPLOYED:
+		// Ventilation Rate Procedure for single pass system
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
+		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]
+
+		if ( SystemCoolingEv < FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff ) {
+			// reset ZoneOAFrac
+			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+			// reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
+			AvailSAFlow = Voz/ZoneOAFrac;
+			// save ZoneOAFrac
+			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+			// save new (increased) minimum flow rate
+			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			// set the system ventilation efficiency to the user specified minimum
+			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+		}
+	}
+
 
 	//        End of Utility subroutines for the SimAir Module
 	// *****************************************************************************

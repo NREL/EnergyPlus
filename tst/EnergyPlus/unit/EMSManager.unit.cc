@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::EMSManager Unit Tests
 
@@ -163,7 +151,7 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 
@@ -207,7 +195,7 @@ TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		OutAirNodeManager::SetOutAirNodes();
 		EMSManager::GetEMSInput();
 
@@ -221,7 +209,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		// test EMS actuator for Plant Component
 		// test SetActuatedBranchFlowRate for expected response
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
 		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
@@ -239,7 +227,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
@@ -323,7 +311,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
-	
+
 		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
@@ -385,7 +373,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		// test EMS actuator for Plant Component
 		// test SetComponentFlowRate for expected response
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
 		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
@@ -403,7 +391,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
@@ -486,7 +474,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
-	
+
 		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
@@ -710,7 +698,7 @@ TEST_F( EnergyPlusFixture, Test_EMSLogic ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -781,7 +769,7 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -822,7 +810,7 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 		NodeInputManager::SetupNodeVarsForReporting();
@@ -862,7 +850,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EMSManager::CheckIfAnyEMS();
 	EMSManager::FinishProcessingUserInput = true;
@@ -916,7 +904,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -929,14 +917,14 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 	ErlValueType ReturnValue;
 	bool seriousErrorFound = false;
 	EMSManager::FinishProcessingUserInput = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( InputProcessor::FindItemInList("SETNODESETPOINTTEST", ErlStack) ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
 	EXPECT_TRUE ( seriousErrorFound );
 
 	// next run a small program that sets the global variable value
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
 	// now check that it worked, should stay false
 	seriousErrorFound = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); 
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( InputProcessor::FindItemInList("SETNODESETPOINTTEST", ErlStack) ).Instruction( 1 ).Argument2, seriousErrorFound );
 	EXPECT_FALSE ( seriousErrorFound );
 }
 
@@ -951,7 +939,7 @@ TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
 		"    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	CheckIfAnyEMS();
 	EXPECT_TRUE( AnyEnergyManagementSystemInModel );
@@ -1087,7 +1075,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::TimeStepZone = 0.25;
 

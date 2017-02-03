@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -140,30 +128,9 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get input for Matrix objects
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumTwoDimMatrix; // count of Matrix:TwoDimension objects
@@ -173,14 +140,12 @@ namespace MatrixDataManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumRows;
 		int NumCols;
 		int NumElements;
 
 		cCurrentModuleObject = "Matrix:TwoDimension";
-		NumTwoDimMatrix = GetNumObjectsFound( cCurrentModuleObject );
+		NumTwoDimMatrix = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		NumMats = NumTwoDimMatrix;
 
@@ -188,15 +153,10 @@ namespace MatrixDataManager {
 
 		MatNum = 0;
 		for ( MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex ) {
-			GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++MatNum;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MatData, MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			MatData( MatNum ).Name = cAlphaArgs( 1 );
 			NumRows = std::floor( rNumericArgs( 1 ) );
 			NumCols = std::floor( rNumericArgs( 2 ) );
@@ -247,27 +207,10 @@ namespace MatrixDataManager {
 
 		// METHODOLOGY EMPLOYED:
 		// inputs name of matrix and returns integer index
-		// currently uses FindItemInList which is case sensitive
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+		// currently uses InputProcessor::FindItemInList( which is case sensitive
 
 		// Return value
 		int MatrixIndexPtr; // Function result
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -278,7 +221,7 @@ namespace MatrixDataManager {
 		}
 
 		if ( NumMats > 0 ) {
-			MatrixIndexPtr = FindItemInList( MatrixName, MatData );
+			MatrixIndexPtr = InputProcessor::FindItemInList( MatrixName, MatData );
 		} else {
 			MatrixIndexPtr = 0;
 		}
@@ -302,31 +245,6 @@ namespace MatrixDataManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// pass matrix to calling routine
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( Idx > 0 ) { // protect hard crash
 			Mat2D = MatData( Idx ).Mat2D;
@@ -354,27 +272,6 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( Idx > 0 ) {
 			NumRows = MatData( Idx ).Mat2D.isize( 2 );
 			NumCols = MatData( Idx ).Mat2D.isize( 1 );

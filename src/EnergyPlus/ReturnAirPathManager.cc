@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -180,17 +168,7 @@ namespace ReturnAirPathManager {
 
 		// PURPOSE OF THIS SUBROUTINE: This subroutine
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
@@ -206,13 +184,12 @@ namespace ReturnAirPathManager {
 		// static bool ErrorsFound( false );
 		////////////////////////////////////////////////////////////////////////////////////
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		if ( allocated( ReturnAirPath ) ) {
 			return;
 		}
 		cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-		NumReturnAirPaths = GetNumObjectsFound( cCurrentModuleObject );
+		NumReturnAirPaths = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumReturnAirPaths > 0 ) {
 
@@ -220,15 +197,9 @@ namespace ReturnAirPathManager {
 
 			for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
-				GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				ReturnAirPath( PathNum ).Name = cAlphaArgs( 1 );
 				ReturnAirPath( PathNum ).NumOfComponents = nint( ( NumAlphas - 2.0 ) / 2.0 );
 
@@ -246,7 +217,7 @@ namespace ReturnAirPathManager {
 
 				for ( CompNum = 1; CompNum <= ReturnAirPath( PathNum ).NumOfComponents; ++CompNum ) {
 
-					if ( ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) || ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ) {
+					if ( ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) || ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ) {
 
 						ReturnAirPath( PathNum ).ComponentType( CompNum ) = cAlphaArgs( Counter );
 						ReturnAirPath( PathNum ).ComponentName( CompNum ) = cAlphaArgs( Counter + 1 );
@@ -255,8 +226,8 @@ namespace ReturnAirPathManager {
 							ShowContinueError( "In AirLoopHVAC:ReturnPath =" + ReturnAirPath( PathNum ).Name );
 							ErrorsFound = true;
 						}
-						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
-						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
+						if ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
+						if ( InputProcessor::SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
 					} else {
 						ShowSevereError( "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs( Counter ) );
 						ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath( PathNum ).Name );

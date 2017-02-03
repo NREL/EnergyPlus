@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -81,6 +69,7 @@
 #include <DataWater.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -111,7 +100,7 @@ namespace EvaporativeFluidCoolers {
 
 	// METHODOLOGY EMPLOYED:
 	// Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
-	
+
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
@@ -127,8 +116,6 @@ namespace EvaporativeFluidCoolers {
 	using General::TrimSigDigits;
 	using DataPlant::PlantLoop;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbRhPb;
@@ -155,6 +142,7 @@ namespace EvaporativeFluidCoolers {
 	int const EvapFluidCooler_TwoSpeed( 2 );
 
 	static std::string const BlankString;
+	bool GetEvapFluidCoolerInputFlag( true );
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleEvapFluidCoolers( 0 ); // Number of similar evaporative fluid coolers
@@ -193,6 +181,7 @@ namespace EvaporativeFluidCoolers {
 
 	// Object Data
 	Array1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
+	std::unordered_map< std::string, std::string > UniqueSimpleEvapFluidCoolerNames;
 	Array1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
 
@@ -237,34 +226,18 @@ namespace EvaporativeFluidCoolers {
 		// REFERENCES:
 		// Based on SimTowers subroutine by Fred Buhl, May 2002
 
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
 		int EvapFluidCoolerNum; // Pointer to EvapFluidCooler
 
 		//GET INPUT
-		if ( GetInput ) {
+		if ( GetEvapFluidCoolerInputFlag ) {
 			GetEvapFluidCoolerInput();
-			GetInput = false;
+			GetEvapFluidCoolerInputFlag = false;
 		}
 
 		// Find the correct EvapCooler
 		if ( CompIndex == 0 ) {
-			EvapFluidCoolerNum = FindItemInList( EvapFluidCoolerName, SimpleEvapFluidCooler );
+			EvapFluidCoolerNum = InputProcessor::FindItemInList( EvapFluidCoolerName, SimpleEvapFluidCooler );
 			if ( EvapFluidCoolerNum == 0 ) {
 				ShowFatalError( "SimEvapFluidCoolers: Unit not found = " + EvapFluidCoolerName );
 			}
@@ -363,12 +336,6 @@ namespace EvaporativeFluidCoolers {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace DataLoopNode;
-		//  USE DataPlant,          ONLY: PlantLoop
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -383,19 +350,6 @@ namespace EvaporativeFluidCoolers {
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutRelHumValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapFluidCoolerNum; // Evaporative fluid cooler number,
 		// reference counter for SimpleEvapFluidCooler data array
@@ -406,26 +360,26 @@ namespace EvaporativeFluidCoolers {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		Array1D< Real64 > NumArray( 25 ); // Numeric input data array
 		Array1D_string AlphArray( 13 ); // Character string input data array
 		std::string FluidName;
 
 		// Get number of all evaporative fluid coolers specified in the input data file (idf)
-		NumSingleSpeedEvapFluidCoolers = GetNumObjectsFound( cEvapFluidCooler_SingleSpeed );
-		NumTwoSpeedEvapFluidCoolers = GetNumObjectsFound( cEvapFluidCooler_TwoSpeed );
+		NumSingleSpeedEvapFluidCoolers = InputProcessor::GetNumObjectsFound( cEvapFluidCooler_SingleSpeed );
+		NumTwoSpeedEvapFluidCoolers = InputProcessor::GetNumObjectsFound( cEvapFluidCooler_TwoSpeed );
 		NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
 		if ( NumSimpleEvapFluidCoolers <= 0 ) ShowFatalError( "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. Search the input for evaporative fluid cooler to determine the cause for this error." );
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleEvapFluidCooler ) ) return;
+		GetEvapFluidCoolerInputFlag = false;
 
 		// Allocate data structures to hold evaporative fluid cooler input data,
 		// report data and evaporative fluid cooler inlet conditions
 		SimpleEvapFluidCooler.allocate( NumSimpleEvapFluidCoolers );
+		UniqueSimpleEvapFluidCoolerNames.reserve( static_cast< unsigned > (NumSimpleEvapFluidCoolers) );
 		SimpleEvapFluidCoolerReport.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerInlet.allocate( NumSimpleEvapFluidCoolers );
 		CheckEquipName.dimension( NumSimpleEvapFluidCoolers, true );
@@ -434,14 +388,9 @@ namespace EvaporativeFluidCoolers {
 		cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
 		for ( SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers; ++SingleSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
-			GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleEvapFluidCooler, EvapFluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_SingleSpeed;
@@ -479,7 +428,7 @@ namespace EvaporativeFluidCoolers {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\" Performance input method is not specified. " );
 				ErrorsFound = true;
 			}
-			if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( FluidName != "WATER" ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\". StandardDesignCapacity performance input method is only valid for fluid type = \"Water\"." );
@@ -504,7 +453,7 @@ namespace EvaporativeFluidCoolers {
 			if ( lAlphaFieldBlanks( 6 ) || AlphArray( 6 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).CapacityControl = 0; // FanCycling
 			} else {
-				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 6 ) ) );
+				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( AlphArray( 6 ) ) );
 				if ( SELECT_CASE_var == "FANCYCLING" ) {
 					SimpleEvapFluidCooler( EvapFluidCoolerNum ).CapacityControl = 0;
 				} else if ( SELECT_CASE_var == "FLUIDBYPASS" ) {
@@ -519,9 +468,9 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac <= 0.0 ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac = 1.0;
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 7 ), "LossFactor" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 7 ), "LossFactor" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 7 ), "SaturatedExit" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 7 ), "SaturatedExit" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( AlphArray( 7 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -550,9 +499,9 @@ namespace EvaporativeFluidCoolers {
 			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).ConcentrationRatio = NumArray( 15 ); //  N15, \field Blowdown Concentration Ratio
 
-			if ( SameString( AlphArray( 8 ), "ScheduledRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 8 ), "ScheduledRate" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 8 ), "ConcentrationRatio" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 8 ), "ConcentrationRatio" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( AlphArray( 8 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
@@ -595,7 +544,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 6 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -605,13 +554,13 @@ namespace EvaporativeFluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 7 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 5 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UserSpecifiedDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 7 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -651,15 +600,10 @@ namespace EvaporativeFluidCoolers {
 		cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
 		for ( TwoSpeedEvapFluidCoolerNumber = 1; TwoSpeedEvapFluidCoolerNumber <= NumTwoSpeedEvapFluidCoolers; ++TwoSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
-			GetObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleEvapFluidCooler, EvapFluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_TwoSpeed;
@@ -718,7 +662,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( FluidName != "WATER" ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\". StandardDesignCapacity performance input method is only valid for fluid type = \"Water\"." );
@@ -743,9 +687,9 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac <= 0.0 ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac = 1.0;
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 6 ), "LossFactor" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 6 ), "LossFactor" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( lAlphaFieldBlanks( 6 ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -773,9 +717,9 @@ namespace EvaporativeFluidCoolers {
 
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).ConcentrationRatio = NumArray( 25 ); //  N25, \field Blowdown Concentration Ratio
 
-			if ( SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( lAlphaFieldBlanks( 7 ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
@@ -835,7 +779,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
+			if ( InputProcessor::SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 12 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -853,7 +797,7 @@ namespace EvaporativeFluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 15 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 9 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -867,7 +811,7 @@ namespace EvaporativeFluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\". Low-Speed Standard Design Capacity must be less than the High-Speed Standard Design Capacity." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
+			} else if ( InputProcessor::SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UserSpecifiedDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 15 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -1072,8 +1016,6 @@ namespace EvaporativeFluidCoolers {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using Psychrometrics::PsyTwbFnTdbWPb;
-		using InputProcessor::SameString;
-		//  USE FluidProperties, ONLY : GetDensityGlycol
 		using DataPlant::TypeOf_EvapFluidCooler_SingleSpd;
 		using DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -1082,17 +1024,8 @@ namespace EvaporativeFluidCoolers {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitEvapFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
@@ -1225,24 +1158,14 @@ namespace EvaporativeFluidCoolers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		using InputProcessor::SameString;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const CalledFrom( "SizeEvapFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizCondNum; // Plant Sizing index for condenser loop
@@ -2784,6 +2707,12 @@ namespace EvaporativeFluidCoolers {
 
 		// set
 
+	}
+
+	void
+	clear_state() {
+		UniqueSimpleEvapFluidCoolerNames.clear();
+		GetEvapFluidCoolerInputFlag = true;
 	}
 
 } // EvaporativeFluidCoolers

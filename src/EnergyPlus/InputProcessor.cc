@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,30 +43,19 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
 #include <istream>
+#include <iostream>
+#include <unordered_set>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Backspace.hh>
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/stream.functions.hh>
-#include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
 #include <InputProcessor.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -79,38 +65,881 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
+#include <FileSystem.hh>
+#include <milo/dtoa.hpp>
+#include <milo/itoa.hpp>
+
+typedef std::unordered_map < std::string, std::string > UnorderedObjectTypeMap;
+typedef std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > UnorderedObjectCacheMap;
+typedef std::map < const json::object_t * const, std::pair < std::string, std::string > > UnorderedUnusedObjectMap;
 
 namespace EnergyPlus {
+	// initialization of class static variables
+	json InputProcessor::jdf = json();
+	json InputProcessor::schema = json();
+	IdfParser InputProcessor::idf_parser = IdfParser();
+	State InputProcessor::state = State();
+	char InputProcessor::s[] = { 0 };
+	std::ostream * InputProcessor::echo_stream = nullptr;
 
-namespace InputProcessor {
-	// Module containing the input processor routines
+	UnorderedObjectTypeMap InputProcessor::case_insensitive_object_map = UnorderedObjectTypeMap();
+	UnorderedObjectCacheMap InputProcessor::jdd_jdf_cache_map = UnorderedObjectCacheMap();
+	UnorderedUnusedObjectMap InputProcessor::unused_inputs = UnorderedUnusedObjectMap();
+}
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Linda K. Lawrie
-	//       DATE WRITTEN   August 1997
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+bool icompare( std::string const & s1, std::string const & s2 ) {
+	return s1.length() == s2.length() &&
+		std::equal(
+			s1.begin(),
+			s1.end(),
+			s2.begin(),
+			[ ]( unsigned char c1, unsigned char c2 ) { return ::tolower( c1 ) == ::tolower( c2 );}
+		);
+}
 
-	// PURPOSE OF THIS MODULE:
-	// To provide the capabilities of reading the input data dictionary
-	// and input file and supplying the simulation routines with the data
-	// contained therein.
 
-	// METHODOLOGY EMPLOYED:
+json IdfParser::decode( std::string const & idf, json const & schema ) {
+	bool success = true;
+	return decode( idf, schema, success );
+}
 
-	// REFERENCES:
-	// The input syntax is designed to allow for future flexibility without
-	// necessitating massive (or any) changes to this code.  Two files are
-	// used as key elements: (1) the input data dictionary will specify the
-	// sections and objects that will be allowed in the actual simulation
-	// input file and (2) the simulation input data file will be processed
-	// with the data therein being supplied to the actual simulation routines.
+json IdfParser::decode( std::string const & idf, json const & schema, bool & success ) {
+	success = true;
+	if ( idf.empty() ) {
+		success = false;
+		return nullptr;
+	}
 
-	// OTHER NOTES:
+	size_t index = 0;
+	return parse_idf( idf, index, success, schema );
+}
 
-	// USE STATEMENTS:
-	// Use statements for data only modules
-	// Using/Aliasing
+std::string IdfParser::encode( json const & root, json const & schema ) {
+	std::string end_of_field( "," + EnergyPlus::DataStringGlobals::NL + "  " );
+	std::string end_of_object( ";" + EnergyPlus::DataStringGlobals::NL + EnergyPlus::DataStringGlobals::NL );
+
+	std::string encoded, extension_key;
+
+	for ( auto obj = root.begin(); obj != root.end(); ++obj ) {
+		const auto & legacy_idd = schema[ "properties" ][ obj.key() ][ "legacy_idd" ];
+		const auto & legacy_idd_field = legacy_idd[ "fields" ];
+		auto key = legacy_idd.find( "extension" );
+		if ( key != legacy_idd.end() ) {
+			extension_key = key.value();
+		}
+		for ( auto obj_in = obj.value().begin(); obj_in != obj.value().end(); ++obj_in ) {
+			encoded += obj.key();
+			size_t skipped_fields = 0;
+			for ( size_t i = 0; i < legacy_idd_field.size(); i++ ) {
+				std::string const & entry = legacy_idd_field[ i ];
+				if ( obj_in.value().find( entry ) == obj_in.value().end() ) {
+					if ( entry == "name" ) encoded += end_of_field + obj_in.key();
+					else skipped_fields++;
+					continue;
+				}
+				for ( size_t j = 0; j < skipped_fields; j++ ) encoded += "," + EnergyPlus::DataStringGlobals::NL + "  ";
+				skipped_fields = 0;
+				encoded += end_of_field;
+				auto const & val = obj_in.value()[ entry ];
+				if ( val.is_string() ) {
+					encoded += val.get < std::string >();
+				} else {
+					dtoa( val.get < double >(), s );
+					encoded += s;
+				}
+			}
+
+			if ( obj_in.value().find( extension_key ) == obj_in.value().end() ) {
+				encoded += end_of_object;
+				continue;
+			}
+
+			auto & extensions = obj_in.value()[ extension_key ];
+			for ( size_t extension_i = 0; extension_i < extensions.size(); extension_i++ ) {
+				auto const & cur_extension_obj = extensions[ extension_i ];
+				auto const & extensible = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "extensibles" ];
+				for ( size_t i = 0; i < extensible.size(); i++ ) {
+					std::string const & tmp = extensible[ i ];
+					if ( cur_extension_obj.find( tmp ) == cur_extension_obj.end() ) {
+						skipped_fields++;
+						continue;
+					}
+					for ( size_t j = 0; j < skipped_fields; j++ ) encoded += end_of_field;
+					skipped_fields = 0;
+					encoded += end_of_field;
+					if ( cur_extension_obj[ tmp ].is_string() ) {
+						encoded += cur_extension_obj[ tmp ];
+					} else {
+						dtoa( cur_extension_obj[ tmp ].get < double >(), s );
+						encoded += s;
+					}
+				}
+			}
+			encoded += end_of_object;
+		}
+	}
+	return encoded;
+}
+
+json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
+	json root;
+	Token token;
+	auto const & schema_properties = schema[ "properties" ];
+
+	while ( true ) {
+		token = look_ahead( idf, index );
+		if ( token == Token::END ) {
+			break;
+		} else if ( token == Token::NONE ) {
+			success = false;
+			return root;
+		} else if ( token == Token::EXCLAMATION ) {
+			eat_comment( idf, index );
+		} else {
+			std::string obj_name = parse_string( idf, index, success );
+
+			auto const converted = EnergyPlus::InputProcessor::ConvertInsensitiveObjectType( obj_name );
+			if ( converted.first ) {
+				obj_name = converted.second;
+			} else {
+				print_out_line_error( idf, false );
+				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
+				continue;
+			}
+
+			json const & obj_loc = schema_properties[ obj_name ];
+			json const & legacy_idd = obj_loc[ "legacy_idd" ];
+			json obj = parse_object( idf, index, success, legacy_idd, obj_loc );
+			if ( !success ) print_out_line_error( idf, true );
+			u64toa( root[ obj_name ].size() + 1, s );
+			std::string name = obj_name + " " + s;
+			if ( !obj.is_null() ) {
+				auto const & name_iter = obj.find( "name" );
+				if ( name_iter != obj.end() ) {
+					name = name_iter.value();
+					obj.erase( name_iter );
+					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
+						// hacky but needed to warn if there are duplicate names in parsed IDF
+						if ( obj_name != "RunPeriod" ) {
+							EnergyPlus::ShowWarningMessage("Duplicate name found. name: \"" + name + "\"");
+						}
+					}
+				}
+			}
+
+			root[ obj_name ][ name ] = std::move( obj );
+		}
+	}
+
+	return root;
+}
+
+json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
+							  json const & legacy_idd, json const & schema_obj_loc ) {
+	json root = json::object();
+	json extensible = json::object();
+	json array_of_extensions = json::array();
+	Token token;
+	std::string extension_key;
+	size_t legacy_idd_index = 0, extensible_index = 0;
+	success = true;
+	bool was_value_parsed = false;
+	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
+	auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
+
+	auto const & schema_patternProperties = schema_obj_loc[ "patternProperties" ];
+	auto const & schema_dot_star = schema_patternProperties[ ".*" ];
+	auto const & schema_obj_props = schema_dot_star[ "properties" ];
+	auto key = legacy_idd.find( "extension" );
+
+	json const * schema_obj_extensions = nullptr;
+	if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
+		extension_key = key.value();
+		schema_obj_extensions = & schema_obj_props[ extension_key ][ "items" ][ "properties" ];
+	}
+
+	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
+
+	index += 1;
+
+	while ( true ) {
+		token = look_ahead( idf, index );
+		if ( token == Token::NONE ) {
+			success = false;
+			return root;
+		} else if ( token == Token::END ) {
+			return root;
+		} else if ( token == Token::COMMA || token == Token::SEMICOLON ) {
+			if ( !was_value_parsed ) {
+				int ext_size = 0;
+				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
+					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+					root[ field_name ] = "";
+				} else {
+					auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
+					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
+					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
+					extensible_index++;
+					extensible[ field_name ] = "";
+				}
+				if ( ext_size && extensible_index % ext_size == 0 ) {
+					array_of_extensions.push_back( extensible );
+					extensible.clear();
+				}
+			}
+			legacy_idd_index++;
+			was_value_parsed = false;
+			next_token( idf, index );
+			if ( token == Token::SEMICOLON ) {
+				size_t min_fields = 0;
+				if ( found_min_fields != schema_obj_loc.end() ) {
+					min_fields = found_min_fields.value();
+				}
+				for (; legacy_idd_index < min_fields; legacy_idd_index++) {
+					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+					root[ field_name ] = "";
+				}
+				if ( extensible.size() ) {
+					array_of_extensions.push_back( extensible );
+					extensible.clear();
+				}
+				break;
+			}
+		} else if ( token == Token::EXCLAMATION ) {
+			eat_comment( idf, index );
+		} else if ( legacy_idd_index >= legacy_idd_fields_array.size() ) {
+			if ( legacy_idd_extensibles_iter == legacy_idd.end() ) {
+				success = false;
+				return root;
+			}
+			auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
+			auto const size = legacy_idd_extensibles_array.size();
+			std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % size ];
+			auto const val = parse_value( idf, index, success, schema_obj_extensions->at( field_name ) );
+			extensible[ field_name ] = std::move( val );
+			was_value_parsed = true;
+			extensible_index++;
+			if ( extensible_index && extensible_index % size == 0 ) {
+				array_of_extensions.push_back( extensible );
+				extensible.clear();
+			}
+		} else {
+			was_value_parsed = true;
+			std::string const & field = legacy_idd_fields_array[ legacy_idd_index ];
+			auto const & find_field_iter = schema_obj_props.find( field );
+			if ( find_field_iter == schema_obj_props.end() ) {
+				if ( field == "name" ) {
+					root[ field ] = parse_string( idf, index, success );
+				} else {
+					u64toa( cur_line_num, s );
+					EnergyPlus::ShowWarningMessage( "Field " + field + " was not found at line " + s );
+				}
+			} else {
+				auto const val = parse_value( idf, index, success, find_field_iter.value() );
+				root[ field ] = std::move( val );
+			}
+			if ( !success ) return root;
+		}
+	}
+	if ( array_of_extensions.size() ) {
+		root[ extension_key ] = std::move( array_of_extensions );
+		array_of_extensions = nullptr;
+	}
+	return root;
+}
+
+json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
+	size_t save_i = index;
+	eat_whitespace( idf, save_i );
+	bool is_double = false, is_sign = false, is_scientific = false;
+	std::string num_str, numeric = "-+.eE0123456789";
+
+	while ( numeric.find_first_of( idf[ save_i ] ) != std::string::npos ) {
+		num_str += idf[ save_i ];
+		if ( idf[ save_i ] == '.' ) {
+			if ( is_double ) {
+				success = false;
+				return nullptr;
+			}
+			is_double = true;
+		} else if ( idf[ save_i ] == '-' || idf[ save_i ] == '+' ) {
+			if ( is_sign && !is_scientific ) {
+				success = false;
+				return nullptr;
+			}
+			is_sign = true;
+		} else if ( idf[ save_i ] == 'e' || idf[ save_i ] == 'E' ) {
+			if ( is_scientific ) {
+				success = false;
+				return nullptr;
+			}
+			is_scientific = true;
+			is_double = true;
+		}
+		save_i++;
+	}
+
+
+	assert( !num_str.empty() );
+
+	if ( num_str[ num_str.size() - 1 ] == 'e' || num_str[ num_str.size() - 1 ] == 'E' ) {
+		success = false;
+		return nullptr;
+	}
+
+	Token token = look_ahead( idf, save_i );
+	if ( token != Token::SEMICOLON && token != Token::COMMA ) {
+		success = false;
+		return nullptr;
+	}
+	json val;
+	if ( is_double ) {
+		try {
+			auto const double_val = stod(num_str, nullptr );
+			val = double_val;
+		} catch ( std::exception e ) {
+			auto const double_val = stold( num_str, nullptr );
+			val = double_val;
+		}
+	} else {
+		try {
+			auto const int_val = stoi( num_str, nullptr );
+			val = int_val;
+		} catch ( std::exception e ) {
+			auto const int_val = stoll( num_str, nullptr );
+			val = int_val;
+		}
+	}
+	index = save_i;
+	return val;
+}
+
+json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
+	auto const & field_type = field_loc.find("type");
+	if ( field_type != field_loc.end() ) {
+		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
+			return parse_number( idf, index, success );
+		} else {
+			auto const parsed_string = parse_string( idf, index, success );
+			auto const & enum_it = field_loc.find( "enum" );
+			if ( enum_it == field_loc.end() ) return parsed_string;
+			for ( auto const & s : enum_it.value() ) {
+				auto const & str = s.get < std::string >();
+				if ( icompare( str, parsed_string ) ) {
+					return str;
+				}
+			}
+			return parsed_string;
+		}
+	} else {
+		switch (look_ahead(idf, index)) {
+			case Token::STRING: {
+				auto const parsed_string = parse_string(idf, index, success);
+				auto const & enum_it = field_loc.find( "enum" );
+				if (enum_it != field_loc.end()) {
+					for ( auto const & s : enum_it.value() ) {
+						auto const & str = s.get < std::string >();
+						if ( icompare( str, parsed_string ) ) {
+							return str;
+						}
+					}
+				} else if ( icompare( parsed_string, "Autosize" ) || icompare( parsed_string, "Autocalculate" ) ) {
+					auto const & default_it = field_loc.find( "default" );
+					// The following is hacky because it abuses knowing the consistent generated structure
+					// in the future this might not hold true for the array indexes.
+					if ( default_it != field_loc.end() ) {
+						return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 1 ];
+					} else {
+						return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
+					}
+				}
+				return parsed_string;
+			}
+			case Token::NUMBER: {
+				size_t save_line_index = index_into_cur_line;
+				size_t save_line_num = cur_line_num;
+				json value = parse_number(idf, index, success);
+				if ( !success ) {
+					cur_line_num = save_line_num;
+					index_into_cur_line = save_line_index;
+					success = true;
+					return parse_string(idf, index, success);
+				}
+				return value;
+			}
+			case Token::NONE:
+			case Token::END:
+			case Token::EXCLAMATION:
+			case Token::COMMA:
+			case Token::SEMICOLON:
+				break;
+		}
+		success = false;
+		return nullptr;
+	}
+}
+
+std::string IdfParser::parse_string( std::string const & idf, size_t & index, bool & success ) {
+	eat_whitespace( idf, index );
+
+	std::string s;
+	char c;
+
+	bool complete = false;
+	while ( !complete ) {
+		if ( index == idf.size() ) {
+			complete = true;
+			break;
+		}
+
+		c = idf[ index ];
+		increment_both_index( index, index_into_cur_line );
+		if ( c == ',' ) {
+			complete = true;
+			decrement_both_index( index, index_into_cur_line );
+			break;
+		} else if ( c == ';' ) {
+			complete = true;
+			decrement_both_index( index, index_into_cur_line );
+			break;
+		} else if ( c == '!' ) {
+			complete = true;
+			decrement_both_index( index, index_into_cur_line );
+			break;
+		} else if ( c == '\\' ) {
+			if ( index == idf.size() ) break;
+			char next_c = idf[ index ];
+			increment_both_index( index, index_into_cur_line );
+			if ( next_c == '"' ) {
+				s += '"';
+			} else if ( next_c == '\\' ) {
+				s += '\\';
+			} else if ( next_c == '/' ) {
+				s += '/';
+			} else if ( next_c == 'b' ) {
+				s += '\b';
+			} else if ( next_c == 't' ) {
+				s += '\t';
+			} else if ( next_c == 'n' ) {
+				complete = false;
+				break;
+			} else if ( next_c == 'r' ) {
+				complete = false;
+				break;
+			} else {
+				s += c;
+				s += next_c;
+			}
+		} else {
+			s += c;
+		}
+	}
+
+	if ( !complete ) {
+		success = false;
+		return std::string();
+	}
+	return rtrim( s );
+}
+
+void IdfParser::increment_both_index( size_t & index, size_t & line_index ) {
+	index++;
+	line_index++;
+}
+
+void IdfParser::decrement_both_index( size_t & index, size_t & line_index ) {
+	index--;
+	line_index--;
+}
+
+void IdfParser::print_out_line_error( std::string const & idf, bool obj_found ) {
+	std::string line;
+	if ( obj_found ) EnergyPlus::ShowWarningError( "error: \"extra field(s)\" " );
+	else EnergyPlus::ShowWarningError( "error: \"obj not found in schema\" " );
+	EnergyPlus::ShowWarningError( "at line number " + std::to_string( cur_line_num )
+								  + " (index " + std::to_string(index_into_cur_line)  + ")\nLine:\n" );
+	while ( idf[ beginning_of_line_index++ ] != '\n' ) line += idf[ beginning_of_line_index ];
+	EnergyPlus::ShowWarningError( line );
+}
+
+void IdfParser::eat_whitespace( std::string const & idf, size_t & index ) {
+	while ( index < idf.size() ) {
+		switch ( idf[ index ] ) {
+			case ' ':
+			case '\r':
+			case '\t':
+				increment_both_index( index, index_into_cur_line );
+				continue;
+			case '\n':
+				increment_both_index( index, cur_line_num );
+				beginning_of_line_index = index;
+				index_into_cur_line = 0;
+				continue;
+			default:
+				return;
+		}
+	}
+}
+
+void IdfParser::eat_comment( std::string const & idf, size_t & index ) {
+	while ( true ) {
+		if ( index == idf.size() ) break;
+		if ( idf[ index ] == '\n' ) {
+			increment_both_index( index, cur_line_num );
+			index_into_cur_line = 0;
+			beginning_of_line_index = index;
+			break;
+		}
+		increment_both_index( index, index_into_cur_line );
+	}
+}
+
+IdfParser::Token IdfParser::look_ahead( std::string const & idf, size_t index ) {
+	size_t save_index = index;
+	size_t save_line_num = cur_line_num;
+	size_t save_line_index = index_into_cur_line;
+	Token token = next_token( idf, save_index );
+	cur_line_num = save_line_num;
+	index_into_cur_line = save_line_index;
+	return token;
+}
+
+IdfParser::Token IdfParser::next_token( std::string const & idf, size_t & index ) {
+	eat_whitespace( idf, index );
+
+	if ( index == idf.size() ) {
+		return Token::END;
+	}
+
+	char const c = idf[ index ];
+	increment_both_index( index, index_into_cur_line );
+	switch ( c ) {
+		case '!':
+			return Token::EXCLAMATION;
+		case ',':
+			return Token::COMMA;
+		case ';':
+			return Token::SEMICOLON;
+		default:
+			static std::string const search_chars( "-:.#/\\[]{}_@$%^&*()|+=<>?'\"~" );
+			static std::string const numeric( ".-+0123456789" );
+			if ( numeric.find_first_of( c ) != std::string::npos ) {
+				return Token::NUMBER;
+			} else if ( isalnum( c ) || ( std::string::npos != search_chars.find_first_of( c ) ) ) {
+				return Token::STRING;
+			}
+			break;
+	}
+	decrement_both_index( index, index_into_cur_line );
+	return Token::NONE;
+}
+
+void State::initialize( json const * parsed_schema ) {
+	stack.clear();
+	schema = parsed_schema;
+	stack.push_back( schema );
+	json const & loc = stack.back()->at( "required" );
+	for ( auto & s : loc ) root_required.emplace( s.get < std::string >(), false );
+}
+
+void State::add_error( ErrorType err, double val, unsigned line_num, unsigned line_index ) {
+	std::string str = "Out of Range: Value \"" + std::to_string( val ) + "\" parsed at line " +
+					  std::to_string( line_num ) + " (index " + std::to_string( line_index ) + ")";
+	if ( err == ErrorType::Maximum ) {
+		errors.push_back( str + " exceeds maximum" );
+	} else if ( err == ErrorType::ExclusiveMaximum ) {
+		errors.push_back( str + " exceeds or equals exclusive maximum" );
+	} else if ( err == ErrorType::Minimum ) {
+		errors.push_back( str + " is less than the minimum" );
+	} else if ( err == ErrorType::ExclusiveMinimum ) {
+		errors.push_back( str + " is less than or equal to the exclusive minimum" );
+	}
+}
+
+int State::print_errors() {
+	if ( warnings.size() ) EnergyPlus::ShowWarningError("Number of validation warnings: " + std::to_string(warnings.size()));
+	for ( auto const & s : warnings ) EnergyPlus::ShowContinueError( s );
+	if ( errors.size() ) EnergyPlus::ShowSevereError("Number of validation errors: " + std::to_string(errors.size()));
+	for ( auto const & s : errors ) EnergyPlus::ShowContinueError( s );
+	return static_cast<int> ( errors.size() );
+}
+
+std::vector < std::string > const & State::validation_errors() {
+	return errors;
+}
+
+std::vector < std::string > const & State::validation_warnings() {
+	return warnings;
+}
+
+void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index ) {
+	switch ( event ) {
+		case json::parse_event_t::object_start: {
+			if ( is_in_extensibles || stack.back()->find( "patternProperties" ) == stack.back()->end() ) {
+				if ( stack.back()->find( "properties" ) != stack.back()->end() )
+					stack.push_back( & stack.back()->at( "properties" ) );
+			} else {
+				stack.push_back( & stack.back()->at( "patternProperties" )[ ".*" ] );
+				if ( stack.back()->find( "required" ) != stack.back()->end() ) {
+					auto & loc = stack.back()->at( "required" );
+					obj_required.clear();
+					for ( auto & s : loc ) obj_required.emplace( s.get < std::string >(), false );
+				}
+			}
+			last_seen_event = event;
+			break;
+		}
+
+		case json::parse_event_t::value: {
+			validate( parsed, line_num, line_index );
+			if ( does_key_exist ) stack.pop_back();
+			does_key_exist = true;
+			last_seen_event = event;
+			break;
+		}
+
+		case json::parse_event_t::key: {
+			std::string const & key = parsed;
+			prev_line_index = line_index;
+			prev_key_len = ( unsigned ) key.size() + 3;
+			if ( need_new_object_name ) {
+				cur_obj_name = key;
+				cur_obj_count = 0;
+				need_new_object_name = false;
+				if ( cur_obj_name.find( "Parametric:" ) != std::string::npos ) {
+					u64toa( line_num + 1, s );
+					errors.push_back( "You must run Parametric Preprocessor for \"" + cur_obj_name + "\" at line " + s );
+				} else if ( cur_obj_name.find( "Template" ) != std::string::npos ) {
+					u64toa( line_num + 1, s );
+					errors.push_back( "You must run the ExpandObjects program for \"" + cur_obj_name + "\" at line " + s );
+				}
+			}
+
+			if ( stack.back()->find( "properties" ) == stack.back()->end() ) {
+				if ( stack.back()->find( key ) != stack.back()->end() ) {
+					stack.push_back( & stack.back()->at( key ) );
+				} else {
+					u64toa( line_num, s );
+					u64toa( line_index, s2 );
+					errors.push_back( "Key \"" + key + "\" in object \"" + cur_obj_name + "\" at line "
+									  + s2 + " (index " + s + ") not found in schema" );
+					does_key_exist = false;
+				}
+			}
+
+			if ( !is_in_extensibles ) {
+				auto req = obj_required.find( key );
+				if ( req != obj_required.end() ) {
+					req->second = true; // required field is now accounted for, for this specific object
+				}
+				req = root_required.find( key );
+				if ( req != root_required.end() ) {
+					req->second = true; // root_required field is now accounted for
+				}
+			} else {
+				auto req = extensible_required.find( key );
+				if ( req != extensible_required.end() ) req->second = true;
+			}
+
+			last_seen_event = event;
+			break;
+		}
+
+		case json::parse_event_t::array_start: {
+			stack.push_back( & stack.back()->at( "items" ) );
+			if ( stack.back()->find( "required" ) != stack.back()->end() ) {
+				auto & loc = stack.back()->at( "required" );
+				extensible_required.clear();
+				for ( auto & s : loc ) extensible_required.emplace( s.get < std::string >(), false );
+			}
+			is_in_extensibles = true;
+			last_seen_event = event;
+			break;
+		}
+
+		case json::parse_event_t::array_end: {
+			stack.pop_back();
+			stack.pop_back();
+			is_in_extensibles = false;
+			last_seen_event = event;
+			break;
+		}
+
+		case json::parse_event_t::object_end: {
+			if ( is_in_extensibles ) {
+				for ( auto & it : extensible_required ) {
+					if ( !it.second ) {
+						u64toa( line_num, s );
+						u64toa( line_index, s2 );
+						errors.push_back(
+						"Required extensible field \"" + it.first + "\" in object \"" + cur_obj_name
+						+ "\" ending at line " + s2 + " (index " + s + ") was not provided" );
+					}
+					it.second = false;
+				}
+			} else if ( last_seen_event != json::parse_event_t::object_end ) {
+				cur_obj_count++;
+				for ( auto & it : obj_required ) {
+					if ( !it.second ) {
+						u64toa( line_num, s );
+						u64toa( line_index, s2 );
+						errors.push_back(
+						"Required field \"" + it.first + "\" in object \"" + cur_obj_name
+						+ "\" ending at line " + s2 + " (index " + s + ") was not provided" );
+					}
+					it.second = false;
+				}
+			} else { // must be at the very end of an object now
+				const auto * loc = stack.back();
+				if ( loc->find( "minProperties" ) != loc->end() &&
+					 cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
+					u64toa( line_num, s );
+					errors.push_back(
+					"minProperties for object \"" + cur_obj_name + "\" at line " + s + " was not met" );
+				}
+				if ( loc->find( "maxProperties" ) != loc->end() &&
+					 cur_obj_count > loc->at( "maxProperties" ).get < unsigned >() ) {
+					u64toa( line_num, s );
+					errors.push_back(
+					"maxProperties for object \"" + cur_obj_name + "\" at line " + s + " was exceeded" );
+				}
+				obj_required.clear();
+				extensible_required.clear();
+				need_new_object_name = true;
+				stack.pop_back();
+			}
+			stack.pop_back();
+			last_seen_event = event;
+			break;
+		}
+	}
+	if ( !stack.size() ) {
+		for ( auto & it: root_required ) {
+			if ( !it.second ) {
+				errors.push_back( "Required object \"" + it.first + "\" was not provided in input file" );
+			}
+		}
+	}
+}
+
+void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line_index ) ) {
+	auto const * loc = stack.back();
+
+	if ( loc->find( "enum" ) != loc->end() ) {
+		size_t i;
+		auto const & enum_array = loc->at( "enum" );
+		auto const enum_array_size = enum_array.size();
+		if ( parsed.is_string() ) {
+			auto const & parsed_string = parsed.get < std::string >();
+			for ( i = 0; i < enum_array_size; i++ ) {
+				auto const & enum_string = enum_array[ i ].get< std::string >();
+				if ( icompare( enum_string, parsed_string ) ) break;
+			}
+			if ( i == enum_array_size ) {
+				u64toa( line_num, s );
+				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
+								  + ": \"" + parsed_string + "\" was not found in the enum" );
+			}
+		} else {
+			int const parsed_int = parsed.get < int >();
+			for ( i = 0; i < enum_array_size; i++ ) {
+				auto const & enum_int = enum_array[ i ].get< int >();
+				if ( enum_int == parsed_int ) break;
+			}
+			if ( i == enum_array_size ) {
+				i64toa( parsed_int, s );
+				u64toa( line_num, s2 );
+				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
+								  + ": \"" + s2 + "\" was not found in the enum" );
+			}
+		}
+	} else if ( parsed.is_number() ) {
+		double const val = parsed.get < double >();
+		auto const found_anyOf = loc->find( "anyOf" );
+		if ( found_anyOf != loc->end() ) {
+			loc = & found_anyOf->at( 0 );
+		}
+		auto const found_min = loc->find( "minimum" );
+		if ( found_min != loc->end() ) {
+			double const min_val = found_min->get < double >();
+			if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= min_val ) {
+				add_error( State::ErrorType::ExclusiveMinimum, val, line_num, prev_line_index + prev_key_len );
+			} else if ( val < min_val ) {
+				add_error( State::ErrorType::Minimum, val, line_num, prev_line_index + prev_key_len );
+			}
+		}
+		auto const found_max = loc->find( "maximum" );
+		if ( found_max != loc->end() ) {
+			double const max_val = found_max->get < double >();
+			if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= max_val ) {
+				add_error( State::ErrorType::ExclusiveMaximum, val, line_num, prev_line_index + prev_key_len );
+			} else if ( val > max_val ) {
+				add_error( State::ErrorType::Maximum, val, line_num, prev_line_index + prev_key_len );
+			}
+		}
+		auto const found_type = loc->find( "type" );
+		if ( found_type != loc->end() && found_type.value() != "number" ) {
+			dtoa( val, s );
+			u64toa( line_num, s2 );
+			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
+								+ ", type == " + loc->at( "type" ).get < std::string >()
+								+ " but parsed value = " + s2 );
+		}
+	} else if ( parsed.is_string() ) {
+		auto const found_anyOf = loc->find( "anyOf" );
+		if ( found_anyOf != loc->end() ) {
+			size_t i;
+			for ( i = 0; i < found_anyOf->size(); i++ ) {
+				auto const & any_of_check = found_anyOf->at( i );
+				auto const found_type = any_of_check.find( "type" );
+				if ( found_type != any_of_check.end() && *found_type == "string" ) break;
+			}
+			if ( i == found_anyOf->size() ) {
+				u64toa( line_num, s );
+				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
+									+ "\" at line " + s );
+			}
+			return;
+		}
+		auto const found_type = loc->find( "type" );
+		auto const & parsed_string = parsed.get< std::string >();
+		if ( found_type != loc->end() && *found_type != "string" && ! parsed_string.empty() ) {
+			u64toa( line_num, s );
+			errors.push_back( "In object \"" + cur_obj_name + "\", at line " + s + ": type needs to be string" );
+		}
+	}
+}
+
+
+namespace EnergyPlus {
+// Module containing the input processor routines
+
+// MODULE INFORMATION:
+//       AUTHOR         Linda K. Lawrie
+//       DATE WRITTEN   August 1997
+//       MODIFIED       na
+//       RE-ENGINEERED  na
+
+// PURPOSE OF THIS MODULE:
+// To provide the capabilities of reading the input data dictionary
+// and input file and supplying the simulation routines with the data
+// contained therein.
+
+// METHODOLOGY EMPLOYED:
+
+// REFERENCES:
+// The input syntax is designed to allow for future flexibility without
+// necessitating massive (or any) changes to this code.  Two files are
+// used as key elements: (1) the input data dictionary will specify the
+// sections and objects that will be allowed in the actual simulation
+// input file and (2) the simulation input data file will be processed
+// with the data therein being supplied to the actual simulation routines.
+
+// OTHER NOTES:
+
+// USE STATEMENTS:
+// Use statements for data only modules
+// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataStringGlobals;
 	using DataGlobals::MaxNameLength;
@@ -127,1880 +956,209 @@ namespace InputProcessor {
 	using DataSystemVariables::iUnicode_end;
 	using DataGlobals::DisplayInputInAudit;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	int const ObjectDefAllocInc( 100 ); // Starting number of Objects allowed in IDD as well as the increment
-	// when max is reached
-	int const ANArgsDefAllocInc( 500 ); // The increment when max total args is reached
-	int const SectionDefAllocInc( 20 ); // Starting number of Sections allowed in IDD as well as the increment
-	// when max is reached
-	int const SectionsIDFAllocInc( 20 ); // Initial number of Sections allowed in IDF as well as the increment
-	// when max is reached
-	int const ObjectsIDFAllocInc( 500 ); // Initial number of Objects allowed in IDF as well as the increment
-	// when max is reached
-	std::string::size_type const MaxObjectNameLength( MaxNameLength ); // Maximum number of characters in an Object Name
-	std::string::size_type const MaxSectionNameLength( MaxNameLength ); // Maximum number of characters in a Section Name
-	std::string::size_type const MaxAlphaArgLength( MaxNameLength ); // Maximum number of characters in an Alpha Argument
-	std::string::size_type const MaxInputLineLength( 500 ); // Maximum number of characters in an input line (in.idf, energy+.idd)
-	std::string::size_type const MaxFieldNameLength( 140 ); // Maximum number of characters in a field name string // Not used with std::string
-	std::string const Blank;
 	static std::string const BlankString;
-	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
-	Real64 const DefAutoSizeValue( AutoSize );
-	Real64 const DefAutoCalculateValue( AutoCalculate );
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 
-	// DERIVED TYPE DEFINITIONS
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	namespace {
-		// These were static variables within different functions. They were hoisted into the namespace
-		// to facilitate easier unit testing of those functions.
-		// These are purposefully not in the header file as an extern variable. No one outside of InputProcessor should
-		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		Array1D_string AlphaArgs;
-		Array1D< Real64 > NumberArgs;
-		Array1D_bool AlphaArgsBlank;
-		Array1D_bool NumberArgsBlank;
-	}
-
-	//Integer Variables for the Module
-	int NumObjectDefs( 0 ); // Count of number of object definitions found in the IDD
-	int NumSectionDefs( 0 ); // Count of number of section defintions found in the IDD
-	int MaxObjectDefs( 0 ); // Current "max" object defs (IDD), when reached will be reallocated and new Max set
-	int MaxSectionDefs( 0 ); // Current "max" section defs (IDD), when reached will be reallocated and new Max set
-	int NumLines( 0 ); // Count of number of lines in IDF
-	int MaxIDFRecords( 0 ); // Current "max" IDF records (lines), when reached will be reallocated and new Max set
-	int NumIDFRecords( 0 ); // Count of number of IDF records
-	int MaxIDFSections( 0 ); // Current "max" IDF sections (lines), when reached will be reallocated and new Max set
-	int NumIDFSections( 0 ); // Count of number of IDF records
 	int EchoInputFile( 0 ); // Unit number of the file echoing the IDD and input records (eplusout.audit)
-	int InputLineLength( 0 ); // Actual input line length or position of comment character
-	int MaxAlphaArgsFound( 0 ); // Count of max alpha args found in the IDD
-	int MaxNumericArgsFound( 0 ); // Count of max numeric args found in the IDD
-	int NumAlphaArgsFound( 0 ); // Count of max alpha args found in the IDD
-	int NumNumericArgsFound( 0 ); // Count of max numeric args found in the IDD
-	int MaxAlphaIDFArgsFound( 0 ); // Count of max alpha args found in the IDF
-	int MaxNumericIDFArgsFound( 0 ); // Count of max numeric args found in the IDF
-	int MaxAlphaIDFDefArgsFound( 0 ); // Count of max alpha args found in the IDF
-	int MaxNumericIDFDefArgsFound( 0 ); // Count of max numeric args found in the IDF
-	int NumOutOfRangeErrorsFound( 0 ); // Count of number of "out of range" errors found
-	int NumBlankReqFieldFound( 0 ); // Count of number of blank required field errors found
-	int NumMiscErrorsFound( 0 ); // Count of other errors found
-	int MinimumNumberOfFields( 0 ); // When ReadLine discovers a "minimum" number of fields for an object, this variable is set
-	int NumObsoleteObjects( 0 ); // Number of \obsolete objects
-	int TotalAuditErrors( 0 ); // Counting some warnings that go onto only the audit file
-	int NumSecretObjects( 0 ); // Number of objects in "Secret Mode"
-	bool ProcessingIDD( false ); // True when processing IDD, false when processing IDF
-	std::ostream * echo_stream( nullptr ); // Internal stream used for input file echoing (used for performance)
 
-	//Real Variables for Module
-	//na
+// Functions
 
-	//Character Variables for Module
-	std::string InputLine; // Each line can be up to MaxInputLineLength characters long
-	Array1D_string ListOfSections;
-	Array1D_string ListOfObjects;
-	Array1D_int iListOfObjects;
-	Array1D_int ObjectGotCount;
-	Array1D_int ObjectStartRecord;
-	std::string CurrentFieldName; // Current Field Name (IDD)
-	Array1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
-	std::string ReplacementName;
-
-	//Logical Variables for Module
-	bool OverallErrorFlag( false ); // If errors found during parse of IDF, will fatal at end
-	bool EchoInputLine( true ); // Usually True, if the IDD is backspaced, then is set to false, then back to true
-	bool ReportRangeCheckErrors( true ); // Module level reporting logical, can be turned off from outside the module (and then
-	// must be turned back on.
-	bool FieldSet( false ); // Set to true when ReadInputLine has just scanned a "field"
-	bool RequiredField( false ); // Set to true when ReadInputLine has determined that this field is required
-	bool RetainCaseFlag( false ); // Set to true when ReadInputLine has determined that this field should retain case
-	bool ObsoleteObject( false ); // Set to true when ReadInputLine has an obsolete object
-	bool RequiredObject( false ); // Set to true when ReadInputLine has a required object
-	bool UniqueObject( false ); // Set to true when ReadInputLine has a unique object
-	bool ExtensibleObject( false ); // Set to true when ReadInputLine has an extensible object
-	int ExtensibleNumFields( 0 ); // set to number when ReadInputLine has an extensible object
-	Array1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
-
-	//Derived Types Variables
-
-	// Object Data
-	Array1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
-	Array1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
-	Array1D< FileSectionsDefinition > SectionsOnFile; // lists the sections on file (IDF)
-	LineDefinition LineItem; // Description of current record
-	Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
-	Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
-
-	// MODULE SUBROUTINES:
-	//*************************************************************************
-
-	// Functions
-
-	// Clears the global data in InputProcessor.
-	// Needed for unit tests, should not be normally called.
+// Clears the global data in InputProcessor.
+// Needed for unit tests, should not be normally called.
 	void
-	clear_state()
-	{
-		ObjectDef.deallocate();
-		SectionDef.deallocate();
-		SectionsOnFile.deallocate();
-		ObjectStartRecord.deallocate();
-		ObjectGotCount.deallocate();
-		ObsoleteObjectsRepNames.deallocate();
-		ListOfSections.deallocate();
-		ListOfObjects.deallocate();
-		iListOfObjects.deallocate();
-		IDFRecordsGotten.deallocate();
-		IDFRecords.deallocate();
-		RepObjects.deallocate();
-		LineItem = LineDefinition();
-
-		NumObjectDefs = 0;
-		NumSectionDefs = 0;
-		MaxObjectDefs = 0;
-		MaxSectionDefs = 0;
-		NumLines = 0;
-		MaxIDFRecords = 0;
-		NumIDFRecords = 0;
-		MaxIDFSections = 0;
-		NumIDFSections = 0;
+	InputProcessor::clear_state() {
+		state = State();
+		idf_parser = IdfParser();
+		jdf.clear();
+		jdd_jdf_cache_map.clear();
 		EchoInputFile = 0;
-		InputLineLength = 0;
-		MaxAlphaArgsFound = 0;
-		MaxNumericArgsFound = 0;
-		NumAlphaArgsFound = 0;
-		NumNumericArgsFound = 0;
-		MaxAlphaIDFArgsFound = 0;
-		MaxNumericIDFArgsFound = 0;
-		MaxAlphaIDFDefArgsFound = 0;
-		MaxNumericIDFDefArgsFound = 0;
-		NumOutOfRangeErrorsFound = 0;
-		NumBlankReqFieldFound = 0;
-		NumMiscErrorsFound = 0;
-		MinimumNumberOfFields = 0;
-		NumObsoleteObjects = 0;
-		TotalAuditErrors = 0;
-		NumSecretObjects = 0;
-		ProcessingIDD = false;
-
-		InputLine = std::string();
-		CurrentFieldName = std::string();
-		ReplacementName = std::string();
-
-		OverallErrorFlag = false;
-		EchoInputLine = true;
-		ReportRangeCheckErrors = true;
-		FieldSet = false;
-		RequiredField = false;
-		RetainCaseFlag = false;
-		ObsoleteObject = false;
-		RequiredObject = false;
-		UniqueObject = false;
-		ExtensibleObject = false;
-		ExtensibleNumFields = 0;
-
-		AlphaArgs.deallocate();
-		NumberArgs.deallocate();
-		AlphaArgsBlank.deallocate();
-		NumberArgsBlank.deallocate();
-
 		echo_stream = nullptr;
 	}
 
+	std::vector < std::string > const & InputProcessor::validation_errors() {
+		return state.validation_errors();
+	}
+
+	std::vector < std::string > const & InputProcessor::validation_warnings() {
+		return state.validation_warnings();
+	}
+
+	std::pair< bool, std::string >
+	InputProcessor::ConvertInsensitiveObjectType( std::string const & objectType ) {
+		auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( MakeUPPERCase( objectType ) );
+		if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
+			return std::make_pair( true, tmp_umit->second );
+		}
+		return std::make_pair( false, "" );
+	}
+
 	void
-	ProcessInput()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   August 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine processes the input for EnergyPlus.  First, the
-		// input data dictionary is read and interpreted.  Using the structure
-		// from the data dictionary, the actual simulation input file is read.
-		// This file is processed according to the "rules" in the data dictionary
-		// and stored in a local data structure which will be used during the simulation.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using SortAndStringUtilities::SetupAndSort;
-		using DataOutputs::iNumberOfRecords;
-		using DataOutputs::iNumberOfDefaultedFields;
-		using DataOutputs::iTotalFieldsWithDefaults;
-		using DataOutputs::iNumberOfAutoSizedFields;
-		using DataOutputs::iTotalAutoSizableFields;
-		using DataOutputs::iNumberOfAutoCalcedFields;
-		using DataOutputs::iTotalAutoCalculatableFields;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool FileExists; // Check variable for .idd/.idf files
-		static bool ErrorsInIDD( false ); // to check for any errors flagged during data dictionary processing
-		int Loop;
-		int CountErr;
-		int Num1;
-		int Which;
+	InputProcessor::InitFiles() {
 		int write_stat;
-		int read_stat;
-
-		InitSecretObjects();
+//		int read_stat;
+//		bool FileExists;
 
 		EchoInputFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
+		{
+			IOFlags flags;
+			flags.ACTION( "write" );
+			gio::open( EchoInputFile, outputAuditFileName, flags );
+			write_stat = flags.ios();
+		}
 		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) "+ outputAuditFileName + " ." );
+			DisplayString( "Could not open (write) " + outputAuditFileName + " ." );
 			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
 		}
 		echo_stream = gio::out_stream( EchoInputFile );
 
-		{ IOFlags flags; gio::inquire( outputIperrFileName, flags ); FileExists = flags.exists(); }
-		if ( FileExists ) {
-			CacheIPErrorFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
-			if ( read_stat != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );
-			}
-			{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
-		}
-		CacheIPErrorFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
-		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) "+outputIperrFileName );
-			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
-		}
-
-		std::ifstream idd_stream( inputIddFileName, std::ios_base::in | std::ios_base::binary );
-		if ( ! idd_stream ) {
-			if ( idd_stream.is_open() ) idd_stream.close();
-			if ( ! gio::file_exists( inputIddFileName ) ) { // No such file
-				ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + inputIddFileName );
-			} else {
-				ShowFatalError( "ProcessInput: Could not open file \"" + inputIddFileName + "\" for input (read)." );
-			}
-		}
-		NumLines = 0;
-
-		DoingInputProcessing = true;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary -- Start";
-		DisplayString( "Processing Data Dictionary" );
-		ProcessingIDD = true;
-		ProcessDataDicFile( idd_stream, ErrorsInIDD );
-		idd_stream.close();
-
-		ListOfObjects.allocate( NumObjectDefs );
-		for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
-		if ( SortedIDD ) {
-			iListOfObjects.allocate( NumObjectDefs );
-			SetupAndSort( ListOfObjects, iListOfObjects );
-		}
-		ObjectStartRecord.dimension( NumObjectDefs, 0 );
-		ObjectGotCount.dimension( NumObjectDefs, 0 );
-
-		if ( NumObjectDefs == 0 ) {
-			ShowFatalError( "ProcessInput: No objects found in IDD.  Program will terminate." );
-			ErrorsInIDD = true;
-		}
-		//  If no fatal to here, rewind EchoInputFile -- only keep processing data...
-		if ( ! ErrorsInIDD ) {
-			gio::rewind_truncate( EchoInputFile );
-		}
-
-		ProcessingIDD = false;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary -- Complete";
-
-		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
-		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Object Definitions=" << NumObjectDefs;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Section Definitions=" << NumSectionDefs;
-		gio::write( EchoInputFile, fmtLD ) << " Total Number of Alpha Fields=" << NumAlphaArgsFound;
-		gio::write( EchoInputFile, fmtLD ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
-		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
-
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Start";
-		if ( !DisplayInputInAudit ) {
-			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
-		}
-
-		std::ifstream idf_stream( inputIdfFileName, std::ios_base::in | std::ios_base::binary );
-		if ( ! idf_stream ) {
-			if ( idf_stream.is_open() ) idf_stream.close();
-			ShowFatalError( "ProcessInput: Could not open file \"" + inputIdfFileName + "\" for input (read)." );
-		}
-		NumLines = 0;
-		EchoInputLine = true;
-		DisplayString( "Processing Input File" );
-		ProcessInputDataFile( idf_stream );
-		idf_stream.close();
-
-		ListOfSections.allocate( NumSectionDefs );
-		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
-
-		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		lAlphaFieldBlanks.dimension( MaxAlphaIDFDefArgsFound, false );
-		cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		rNumericArgs.dimension( MaxNumericIDFDefArgsFound, 0.0 );
-		lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
-
-		IDFRecordsGotten.dimension( NumIDFRecords, false );
-
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Complete";
-		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
-		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
-		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
-		GetIDFRecordsStats( iNumberOfRecords, iNumberOfDefaultedFields, iTotalFieldsWithDefaults, iNumberOfAutoSizedFields, iTotalAutoSizableFields, iNumberOfAutoCalcedFields, iTotalAutoCalculatableFields );
-		gio::write( EchoInputFile, fmtLD ) << " Number of IDF \"Lines\"=" << iNumberOfRecords;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Defaulted Fields=" << iNumberOfDefaultedFields;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Fields with Defaults=" << iTotalFieldsWithDefaults;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Autosized Fields=" << iNumberOfAutoSizedFields;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Autosizable Fields =" << iTotalAutoSizableFields;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Autocalculated Fields=" << iNumberOfAutoCalcedFields;
-		gio::write( EchoInputFile, fmtLD ) << " Number of Autocalculatable Fields =" << iTotalAutoCalculatableFields;
-
-		CountErr = 0;
-		for ( Loop = 1; Loop <= NumIDFSections; ++Loop ) {
-			if ( SectionsOnFile( Loop ).LastRecord != 0 ) continue;
-			if ( equali( SectionsOnFile( Loop ).Name, "REPORT VARIABLE DICTIONARY" ) ) continue;
-			if ( CountErr == 0 ) {
-				ShowSevereError( "IP: Potential errors in IDF processing -- see .audit file for details." );
-				gio::write( EchoInputFile, fmtA ) << " Potential errors in IDF processing:";
-			}
-			++CountErr;
-			Which = SectionsOnFile( Loop ).FirstRecord;
-			if ( Which > 0 ) {
-				if ( SortedIDD ) {
-					Num1 = FindItemInSortedList( IDFRecords( Which ).Name, ListOfObjects, NumObjectDefs );
-					if ( Num1 != 0 ) Num1 = iListOfObjects( Num1 );
-				} else {
-					Num1 = FindItemInList( IDFRecords( Which ).Name, ListOfObjects, NumObjectDefs );
-				}
-				if ( ObjectDef( Num1 ).NameAlpha1 && IDFRecords( Which ).NumAlphas > 0 ) {
-					gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Object Name=" + IDFRecords( Which ).Alphas( 1 );
-				} else {
-					gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Name field not recorded for Object.";
-				}
-			} else {
-				gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], No prior Objects.";
-			}
-		}
-
-		if ( NumIDFRecords == 0 ) {
-			ShowSevereError( "IP: The IDF file has no records." );
-			++NumMiscErrorsFound;
-		}
-
-		// Check for required objects
-		for ( Loop = 1; Loop <= NumObjectDefs; ++Loop ) {
-			if ( ! ObjectDef( Loop ).RequiredObject ) continue;
-			if ( ObjectDef( Loop ).NumFound > 0 ) continue;
-			ShowSevereError( "IP: Required Object=\"" + ObjectDef( Loop ).Name + "\" not found in IDF." );
-			++NumMiscErrorsFound;
-		}
-
-		if ( TotalAuditErrors > 0 ) {
-			ShowWarningError( "IP: Note -- Some missing fields have been filled with defaults. See the audit output file for details." );
-		}
-
-		if ( NumOutOfRangeErrorsFound > 0 ) {
-			ShowSevereError( "IP: Out of \"range\" values found in input" );
-		}
-
-		if ( NumBlankReqFieldFound > 0 ) {
-			ShowSevereError( "IP: Blank \"required\" fields found in input" );
-		}
-
-		if ( NumMiscErrorsFound > 0 ) {
-			ShowSevereError( "IP: Other miscellaneous errors found in input" );
-		}
-
-		if ( OverallErrorFlag ) {
-			if (IDDVerString.find(MatchVersion) == std::string::npos) {
-				ShowSevereError("IP: Possible incorrect IDD File");
-				ShowContinueError(IDDVerString + " not the same as expected =\"" + MatchVersion + "\"");
-			}
-			for ( Loop = 1; Loop <= NumIDFRecords; ++Loop ) {
-				if ( SameString( IDFRecords( Loop ).Name, "Version" ) ) {
-					std::string::size_type const lenVer( len( MatchVersion ) );
-					if ( ( lenVer > 0 ) && ( MatchVersion[ lenVer - 1 ] == '0' ) ) {
-						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ).substr( 0, lenVer - 2 ), MatchVersion.substr( 0, lenVer - 2 ) ) );
-					} else {
-						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ), MatchVersion ) );
-					}
-					if ( Which != 0 ) {
-						ShowContinueError( "Version in IDF=\"" + IDFRecords( Loop ).Alphas( 1 ) + "\" not the same as expected=\"" + MatchVersion + "\"" );
-					}
-					break;
-				}
-			}
-			ShowContinueError( "Possible Invalid Numerics or other problems" );
-			// Fatal error will now occur during post IP processing check in Simulation manager.
-		}
-
+//		{
+//			IOFlags flags;
+//			gio::inquire( outputIperrFileName, flags );
+//			FileExists = flags.exists();
+//		}
+//		if ( FileExists ) {
+//			CacheIPErrorFile = GetNewUnitNumber();
+//			{
+//				IOFlags flags;
+//				flags.ACTION( "read" );
+//				gio::open( CacheIPErrorFile, outputIperrFileName, flags );
+//				read_stat = flags.ios();
+//			}
+//			if ( read_stat != 0 ) {
+//				ShowFatalError( "EnergyPlus: Could not open file " + outputIperrFileName + " for input (read)." );
+//			}
+//			{
+//				IOFlags flags;
+//				flags.DISPOSE( "delete" );
+//				gio::close( CacheIPErrorFile, flags );
+//			}
+//		}
+//		CacheIPErrorFile = GetNewUnitNumber();
+//		{
+//			IOFlags flags;
+//			flags.ACTION( "write" );
+//			gio::open( CacheIPErrorFile, outputIperrFileName, flags );
+//			write_stat = flags.ios();
+//		}
+//		if ( write_stat != 0 ) {
+//			DisplayString( "Could not open (write) " + outputIperrFileName );
+//			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
+//		}
 	}
 
 	void
-	ProcessDataDicFile(
-		std::istream & idd_stream,
-		bool & ErrorsFound // set to true if any errors flagged during IDD processing
-	)
-	{
+	InputProcessor::InitializeMaps() {
+		unused_inputs.clear();
+		jdd_jdf_cache_map.clear();
+		jdd_jdf_cache_map.reserve( jdf.size() );
+		auto const & schema_properties = schema.at( "properties" );
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   August 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine processes data dictionary file for EnergyPlus.
-		// The structure of the sections and objects are stored in derived
-		// types (SectionDefs and ObjectDefs)
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		bool EndofFile( false ); // True when End of File has been reached (IDD or IDF)
-		bool BlankLine( false );
-		std::string::size_type Pos; // Test of scanning position on the current input line
-
-		MaxSectionDefs = SectionDefAllocInc;
-		MaxObjectDefs = ObjectDefAllocInc;
-
-		SectionDef.allocate( MaxSectionDefs );
-		ObjectDef.allocate( MaxObjectDefs );
-
-		NumObjectDefs = 0;
-		NumSectionDefs = 0;
-
-		// Get version
-		cross_platform_get_line( idd_stream, InputLine );
-		std::string::size_type const len_line( InputLine.length() );
-		if ( idd_stream && ( len_line > 0 ) ) {
-			if ( int( InputLine[ len_line - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: \"Energy+.idd\" appears to be a Unicode or binary file." );
-				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
+		for ( auto jdf_iter = jdf.begin(); jdf_iter != jdf.end(); ++jdf_iter ) {
+			auto const & objects = jdf_iter.value();
+			std::vector < json::const_iterator > jdf_obj_iterators_vec;
+			jdf_obj_iterators_vec.reserve( objects.size() );
+			for ( auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); ++jdf_obj_iter ) {
+				jdf_obj_iterators_vec.emplace_back( jdf_obj_iter );
+				auto const * const obj_ptr = jdf_obj_iter.value().get_ptr< const json::object_t * const >();
+				unused_inputs.emplace( obj_ptr, std::make_pair( jdf_iter.key(), jdf_obj_iter.key() ) );
 			}
-			if ( has( InputLine, "!IDD_Version" ) ) {
-				IDDVerString = InputLine.substr( 1, len( InputLine ) - 1 );
-			}
+			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
+			jdd_jdf_cache_map.emplace( schema_iter.key(), std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) ) );
 		}
-		if ( idd_stream ) idd_stream.seekg( 0, std::ios::beg );
-
-		while ( ! EndofFile ) {
-			ReadInputLine( idd_stream, Pos, BlankLine, EndofFile );
-			if ( BlankLine || EndofFile ) continue;
-			Pos = scan( InputLine, ",;" );
-			if ( Pos != std::string::npos ) {
-				if ( InputLine[ Pos ] == ';' ) {
-					AddSectionDef( InputLine.substr( 0, Pos ), ErrorsFound );
-					if ( NumSectionDefs == MaxSectionDefs ) {
-						SectionDef.redimension( MaxSectionDefs += SectionDefAllocInc );
-					}
-				} else {
-					AddObjectDefandParse( idd_stream, InputLine.substr( 0, Pos ), Pos, EndofFile, ErrorsFound );
-					if ( NumObjectDefs == MaxObjectDefs ) {
-						ObjectDef.redimension( MaxObjectDefs += ObjectDefAllocInc );
-					}
-				}
-			} else {
-				ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line", EchoInputFile );
-				ErrorsFound = true;
-			}
-		}
-
 	}
 
 	void
-	AddSectionDef(
-		std::string const & ProposedSection, // Proposed Section to be added
-		bool & ErrorsFound // set to true if errors found here
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   August 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine adds a new section to SectionDefs.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool errFlag; // Local error flag.  When True, Proposed Section is not added to global list
-
-		std::string const SqueezedSection( MakeUPPERCase( stripped( ProposedSection ) ) ); // Input Argument, Left-Justified and Uppercase
-		if ( len( stripped( ProposedSection ) ) > static_cast< std::string::size_type >( MaxSectionNameLength ) ) {
-			ShowWarningError( "IP: Section length exceeds maximum, will be truncated=" + ProposedSection, EchoInputFile );
-			ShowContinueError( "Will be processed as Section=" + SqueezedSection, EchoInputFile );
-			ErrorsFound = true;
+	InputProcessor::ProcessInput() {
+		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
+		if ( !jdd_stream.is_open() ) {
+			ShowFatalError( "JDD file path " + inputJddFileName + " not found" );
+			return;
 		}
-		errFlag = false;
+		InputProcessor::schema = json::parse(jdd_stream);
 
-		if ( ! SqueezedSection.empty() ) {
-			if ( FindItemInList( SqueezedSection, SectionDef ) > 0 ) {
-				ShowSevereError( "IP: Already a Section called " + SqueezedSection + ". This definition ignored.", EchoInputFile );
-				// Error Condition
-				errFlag = true;
-				ErrorsFound = true;
-			}
-		} else {
-			ShowSevereError( "IP: Blank Sections not allowed.  Review " + outputAuditFileName + " file.", EchoInputFile );
-			errFlag = true;
-			ErrorsFound = true;
+		const json & loc = InputProcessor::schema[ "properties" ];
+		case_insensitive_object_map.reserve( loc.size() );
+		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+			std::string key = it.key();
+			for ( char & c : key ) c = toupper( c );
+			case_insensitive_object_map.emplace( std::move( key ), it.key() );
 		}
 
-		if ( ! errFlag ) {
-			++NumSectionDefs;
-			SectionDef( NumSectionDefs ).Name = SqueezedSection;
-			SectionDef( NumSectionDefs ).NumFound = 0;
+		std::ifstream input_stream( inputFileName , std::ifstream::in | std::ios::ate);
+		if ( !input_stream.is_open() ) {
+			ShowFatalError( "Input file path " + inputFileName + " not found" );
+			return;
 		}
 
-	}
+		// TODO: Check which file read approach works properly on windows
+		// std::string lines;
+		// std::string line;
+		// while (std::getline(infile, line))
+		// {
+		// 	lines.append(line + NL);
+		// }
+		std::ifstream::pos_type size = input_stream.tellg();
+		char *memblock = new char[(size_t) size + 1];
+		input_stream.seekg(0, std::ios::beg);
+		input_stream.read(memblock, size);
+		memblock[size] = '\0';
+		input_stream.close();
+		std::string input_file = memblock;
+		delete[] memblock;
 
-	void
-	AddObjectDefandParse(
-		std::istream & idd_stream,
-		std::string const & ProposedObject, // Proposed Object to Add
-		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
-		bool & EndofFile, // End of File marker
-		bool & ErrorsFound // set to true if errors found here
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   August 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine processes data dictionary file for EnergyPlus.
-		// The structure of the sections and objects are stored in derived
-		// types (SectionDefs and ObjectDefs)
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string SqueezedObject; // Input Object, Left Justified, UpperCase
-		int Count; // Count on arguments, loop
-		std::string::size_type Pos; // Position scanning variable
-		bool EndofObjectDef; // Set to true when ; has been found
-		bool errFlag; // Local Error condition flag, when true, object not added to Global list
-		char TargetChar; // Single character scanned to test for current field type (A or N)
-		bool BlankLine; // True when this line is "blank" (may have comment characters as first character on line)
-		static Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha, False is numeric, saved in ObjectDef when done
-		static Array1D_bool RequiredFields; // Array of argument required fields
-		static Array1D_bool AlphRetainCase; // Array of argument for retain case
-		static Array1D_string AlphFieldChecks; // Array with alpha field names
-		static Array1D_string AlphFieldDefaults; // Array with alpha field defaults
-		bool MinMax; // Set to true when MinMax field has been found by ReadInputLine
-		bool Default; // Set to true when Default field has been found by ReadInputLine
-		bool AutoSize; // Set to true when Autosizable field has been found by ReadInputLine
-		bool AutoCalculate; // Set to true when AutoCalculatable field has been found by ReadInputLine
-		std::string MinMaxString; // Set from ReadInputLine
-		std::string AlphDefaultString;
-		int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-		Real64 Value; // Value returned by ReadInputLine (either min, max, default, autosize or autocalculate)
-		bool MinMaxError; // Used to see if min, max, defaults have been set appropriately (True if error)
-		static int MaxANArgs( 7700 ); // Current count of Max args to object  (9/2010)
-		bool ErrorsFoundFlag;
-		static int PrevSizeNumNumeric( -1 );
-		static int PrevCount( -1 );
-		static int PrevSizeNumAlpha( -1 );
-
-		// Object Data
-		static Array1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
-		static Array1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
-
-		if ( ! allocated( AlphaOrNumeric ) ) {
-			AlphaOrNumeric.allocate( {0,MaxANArgs} );
-			RequiredFields.allocate( {0,MaxANArgs} );
-			AlphRetainCase.allocate( {0,MaxANArgs} );
-			NumRangeChecks.allocate( MaxANArgs );
-			AlphFieldChecks.allocate( MaxANArgs );
-			AlphFieldDefaults.allocate( MaxANArgs );
-			ObsoleteObjectsRepNames.allocate( 0 );
-		}
-
-		SqueezedObject = MakeUPPERCase( stripped( ProposedObject ) );
-		if ( len( SqueezedObject ) > static_cast< std::string::size_type >( MaxObjectNameLength ) ) {
-			ShowWarningError( "IP: Object length exceeds maximum, will be truncated=" + ProposedObject, EchoInputFile );
-			ShowContinueError( "Will be processed as Object=" + SqueezedObject, EchoInputFile );
-			ErrorsFound = true;
-		}
-
-		// Start of Object parse, set object level items
-		errFlag = false;
-		ErrorsFoundFlag = false;
-		MinimumNumberOfFields = 0;
-		ObsoleteObject = false;
-		UniqueObject = false;
-		RequiredObject = false;
-		ExtensibleObject = false;
-		ExtensibleNumFields = 0;
-		MinMax = false;
-		Default = false;
-		AutoSize = false;
-		AutoCalculate = false;
-		WhichMinMax = 0;
-
-		if ( ! SqueezedObject.empty() ) {
-			if ( FindItemInList( SqueezedObject, ObjectDef ) > 0 ) {
-				ShowSevereError( "IP: Already an Object called " + SqueezedObject + ". This definition ignored.", EchoInputFile );
-				// Error Condition
-				errFlag = true;
-				// Rest of Object has to be processed. Error condition will be caught
-				// at end
-				ErrorsFound = true;
-			}
-		} else {
-			errFlag = true;
-			ErrorsFound = true;
-		}
-
-		++NumObjectDefs;
-		ObjectDef( NumObjectDefs ).Name = SqueezedObject;
-		ObjectDef( NumObjectDefs ).NumParams = 0;
-		ObjectDef( NumObjectDefs ).NumAlpha = 0;
-		ObjectDef( NumObjectDefs ).NumNumeric = 0;
-		ObjectDef( NumObjectDefs ).NumFound = 0;
-		ObjectDef( NumObjectDefs ).MinNumFields = 0;
-		ObjectDef( NumObjectDefs ).NameAlpha1 = false;
-		ObjectDef( NumObjectDefs ).ObsPtr = 0;
-		ObjectDef( NumObjectDefs ).UniqueObject = false;
-		ObjectDef( NumObjectDefs ).RequiredObject = false;
-		ObjectDef( NumObjectDefs ).ExtensibleObject = false;
-		ObjectDef( NumObjectDefs ).ExtensibleNum = 0;
-
-		if ( PrevCount == -1 ) {
-			PrevCount = MaxANArgs;
-		}
-
-		AlphaOrNumeric( {0,PrevCount} ) = true;
-		RequiredFields( {0,PrevCount} ) = false;
-		AlphRetainCase( {0,PrevCount} ) = false;
-
-		if ( PrevSizeNumAlpha == -1 ) {
-			PrevSizeNumAlpha = MaxANArgs;
-		}
-
-		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = BlankString;
-		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = BlankString;
-
-		if ( PrevSizeNumNumeric == -1 ) {
-			PrevSizeNumNumeric = MaxANArgs;
-		}
-
-		//clear only portion of NumRangeChecks array used in the previous
-		//call to reduce computation time to clear this large array.
-		for ( int i = 1; i <= PrevSizeNumNumeric; ++i ) {
-			auto & numRangeCheck( NumRangeChecks( i ) );
-			numRangeCheck.MinMaxChk = false;
-			numRangeCheck.WhichMinMax( 1 ) = 0;
-			numRangeCheck.WhichMinMax( 2 ) = 0;
-			numRangeCheck.MinMaxString( 1 ).clear();
-			numRangeCheck.MinMaxString( 2 ).clear();
-			numRangeCheck.MinMaxValue( 1 ) = 0.0;
-			numRangeCheck.MinMaxValue( 2 ) = 0.0;
-			numRangeCheck.Default = 0.0;
-			numRangeCheck.DefaultChk = false;
-			numRangeCheck.DefAutoSize = false;
-			numRangeCheck.DefAutoCalculate = false;
-			numRangeCheck.FieldNumber = 0;
-			numRangeCheck.FieldName = BlankString;
-			numRangeCheck.AutoSizable = false;
-			numRangeCheck.AutoSizeValue = DefAutoSizeValue;
-			numRangeCheck.AutoCalculatable = false;
-			numRangeCheck.AutoCalculateValue = DefAutoCalculateValue;
-		}
-
-		Count = 0;
-		EndofObjectDef = false;
-		// Parse rest of Object Definition
-
-		while ( ! EndofFile && ! EndofObjectDef ) {
-
-			if ( CurPos < static_cast< std::string::size_type >( InputLineLength ) ) {
-				Pos = scan( InputLine.substr( CurPos, InputLineLength - CurPos ), AlphaNum );
-				if ( Pos != std::string::npos ) {
-
-					++Count;
-					RequiredField = false;
-					RetainCaseFlag = false;
-
-					if ( Count > MaxANArgs ) { // Reallocation
-						int const newANArgs( MaxANArgs + ANArgsDefAllocInc );
-						AlphaOrNumeric.redimension( {0,newANArgs}, false );
-						RequiredFields.redimension( {0,newANArgs}, false );
-						AlphRetainCase.redimension( {0,newANArgs}, false );
-						NumRangeChecks.redimension( newANArgs );
-						AlphFieldChecks.redimension( newANArgs );
-						AlphFieldDefaults.redimension( newANArgs );
-						MaxANArgs = newANArgs;
-					}
-
-					TargetChar = InputLine[ CurPos + Pos ];
-
-					if ( TargetChar == 'A' || TargetChar == 'a' ) {
-						AlphaOrNumeric( Count ) = true;
-						++ObjectDef( NumObjectDefs ).NumAlpha;
-						if ( FieldSet ) AlphFieldChecks( ObjectDef( NumObjectDefs ).NumAlpha ) = CurrentFieldName;
-						if ( ObjectDef( NumObjectDefs ).NumAlpha == 1 ) {
-							if ( hasi( CurrentFieldName, "NAME" ) ) ObjectDef( NumObjectDefs ).NameAlpha1 = true;
-						}
-					} else {
-						AlphaOrNumeric( Count ) = false;
-						++ObjectDef( NumObjectDefs ).NumNumeric;
-						if ( FieldSet ) NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).FieldName = CurrentFieldName;
-					}
-
-				} else {
-					ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile, MinMax, WhichMinMax, MinMaxString, Value, Default, AlphDefaultString, AutoSize, AutoCalculate, RetainCaseFlag, ErrorsFoundFlag );
-					if ( ! AlphaOrNumeric( Count ) ) {
-						// only record for numeric fields
-						if ( MinMax ) {
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxChk = true;
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).FieldNumber = Count;
-							if ( WhichMinMax <= 2 ) { //=0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-								NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).WhichMinMax( 1 ) = WhichMinMax;
-								NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxString( 1 ) = MinMaxString;
-								NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxValue( 1 ) = Value;
-							} else {
-								NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).WhichMinMax( 2 ) = WhichMinMax;
-								NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxString( 2 ) = MinMaxString;
-								NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxValue( 2 ) = Value;
-							}
-						} // End Min/Max
-						if ( Default ) {
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).DefaultChk = true;
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).Default = Value;
-							if ( AlphDefaultString == "AUTOSIZE" ) NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).DefAutoSize = true;
-							if ( AlphDefaultString == "AUTOCALCULATE" ) NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).DefAutoCalculate = true;
-						}
-						if ( AutoSize ) {
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoSizable = true;
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoSizeValue = Value;
-						}
-						if ( AutoCalculate ) {
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoCalculatable = true;
-							NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoCalculateValue = Value;
-						}
-					} else { // Alpha Field
-						if ( Default ) {
-							AlphFieldDefaults( ObjectDef( NumObjectDefs ).NumAlpha ) = AlphDefaultString;
-						}
-					}
-					if ( ErrorsFoundFlag ) {
-						errFlag = true;
-						ErrorsFoundFlag = false;
-					}
-					if ( RequiredField ) {
-						RequiredFields( Count ) = true;
-						MinimumNumberOfFields = max( Count, MinimumNumberOfFields );
-					}
-					if ( RetainCaseFlag ) {
-						AlphRetainCase( Count ) = true;
-					}
-					continue;
-				}
-
-				//  For the moment dont care about descriptions on each object
-				if ( CurPos < static_cast< std::string::size_type >( InputLineLength ) ) {
-					CurPos += Pos + 1;
-					if ( CurPos < InputLine.length() ) {
-						Pos = scan( InputLine.substr( CurPos, InputLineLength - CurPos ), ",;" );
-					} else {
-						Pos = std::string::npos;
-					}
-					if ( Pos == std::string::npos ) {
-						ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line,position=\"" + InputLine.substr( CurPos ) + "\"", EchoInputFile );
-						errFlag = true;
-						ErrorsFound = true;
-					}
-					if ( InputLine[ InputLineLength - 1 ] != '\\' ) {
-						ShowWarningError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " \\ expected on this line", EchoInputFile );
-					}
-				} else {
-					ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile );
-					if ( BlankLine || EndofFile ) continue;
-					Pos = scan( InputLine.substr( CurPos, InputLineLength - CurPos ), ",;" );
-				}
+		if ( ! DataGlobals::isJDF ) {
+			json const input_file_json = InputProcessor::idf_parser.decode( input_file, InputProcessor::schema );
+			if ( DataGlobals::outputJDFConversion ) {
+				input_file = input_file_json.dump( 4 );
+				std::string convertedIDF( outputDirPathName + inputFileNameOnly + ".jdf" );
+				FileSystem::makeNativePath( convertedIDF );
+				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
+				convertedFS << input_file << std::endl;
 			} else {
-				ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile );
-				continue;
-			}
-
-			if ( Pos == std::string::npos ) {
-				// must be time to read another line
-				ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile );
-				if ( BlankLine || EndofFile ) continue;
-			} else {
-				if ( InputLine[ CurPos + Pos ] == ';' ) {
-					EndofObjectDef = true;
-				}
-				CurPos += Pos;
-			}
-
-		}
-
-		// Reached end of object def but there may still be more \ lines to parse....
-		// Goes until next object is encountered ("not blankline") or end of idd file
-		// If last object is not numeric, then exit immediately....
-		BlankLine = true;
-		while ( BlankLine && ! EndofFile ) {
-			// It's a numeric object as last one...
-			ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile, MinMax, WhichMinMax, MinMaxString, Value, Default, AlphDefaultString, AutoSize, AutoCalculate, RetainCaseFlag, ErrorsFoundFlag );
-			if ( MinMax ) {
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxChk = true;
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).FieldNumber = Count;
-				if ( WhichMinMax <= 2 ) { //=0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-					NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).WhichMinMax( 1 ) = WhichMinMax;
-					NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxString( 1 ) = MinMaxString;
-					NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxValue( 1 ) = Value;
-				} else {
-					NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).WhichMinMax( 2 ) = WhichMinMax;
-					NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxString( 2 ) = MinMaxString;
-					NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxValue( 2 ) = Value;
-				}
-			}
-			if ( Default && ! AlphaOrNumeric( Count ) ) {
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).DefaultChk = true;
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).Default = Value;
-				if ( AlphDefaultString == "AUTOSIZE" ) NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).DefAutoSize = true;
-				if ( AlphDefaultString == "AUTOCALCULATE" ) NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).DefAutoCalculate = true;
-			} else if ( Default && AlphaOrNumeric( Count ) ) {
-				AlphFieldDefaults( ObjectDef( NumObjectDefs ).NumAlpha ) = AlphDefaultString;
-			}
-			if ( AutoSize ) {
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoSizable = true;
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoSizeValue = Value;
-			}
-			if ( AutoCalculate ) {
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoCalculatable = true;
-				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).AutoCalculateValue = Value;
-			}
-			if ( ErrorsFoundFlag ) {
-				errFlag = true;
-				ErrorsFoundFlag = false;
+				input_file = input_file_json.dump( 4 );
 			}
 		}
 
-		if ( ! BlankLine ) {
-			Backspace( idd_stream );
-			EchoInputLine = false;
+		InputProcessor::state.initialize( & InputProcessor::schema );
+
+		json::parser_callback_t cb = []( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
+			InputProcessor::state.traverse( event, parsed, line_num, line_index );
+			return true;
+		};
+
+		InputProcessor::jdf = json::parse( input_file, cb );
+
+		if ( DataGlobals::isJDF && DataGlobals::outputJDFConversion ) {
+			std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
+			std::string convertedJDF( outputDirPathName + inputFileNameOnly + ".idf" );
+			FileSystem::makeNativePath( convertedJDF );
+			std::ofstream convertedFS( convertedJDF, std::ofstream::out );
+			convertedFS << encoded << std::endl;
 		}
 
-		if ( RequiredField ) {
-			RequiredFields( Count ) = true;
-			MinimumNumberOfFields = max( Count, MinimumNumberOfFields );
-		}
-		if ( RetainCaseFlag ) {
-			AlphRetainCase( Count ) = true;
+		auto const num_errors = InputProcessor::state.print_errors();
+		if ( num_errors ) {
+			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}
 
-		ObjectDef( NumObjectDefs ).NumParams = Count; // Also the total of ObjectDef(..)%NumAlpha+ObjectDef(..)%NumNumeric
-		ObjectDef( NumObjectDefs ).MinNumFields = MinimumNumberOfFields;
-		if ( ObsoleteObject ) {
-			ObsoleteObjectsRepNames.redimension( ++NumObsoleteObjects );
-			ObsoleteObjectsRepNames( NumObsoleteObjects ) = ReplacementName;
-			ObjectDef( NumObjectDefs ).ObsPtr = NumObsoleteObjects;
-		}
-		if ( RequiredObject ) {
-			ObjectDef( NumObjectDefs ).RequiredObject = true;
-		}
-		if ( UniqueObject ) {
-			ObjectDef( NumObjectDefs ).UniqueObject = true;
-		}
-		if ( ExtensibleObject ) {
-			ObjectDef( NumObjectDefs ).ExtensibleObject = true;
-			ObjectDef( NumObjectDefs ).ExtensibleNum = ExtensibleNumFields;
-		}
-
-		NumAlphaArgsFound += ObjectDef( NumObjectDefs ).NumAlpha;
-		MaxAlphaArgsFound = max( MaxAlphaArgsFound, ObjectDef( NumObjectDefs ).NumAlpha );
-		NumNumericArgsFound += ObjectDef( NumObjectDefs ).NumNumeric;
-		MaxNumericArgsFound = max( MaxNumericArgsFound, ObjectDef( NumObjectDefs ).NumNumeric );
-		ObjectDef( NumObjectDefs ).AlphaOrNumeric.allocate( Count );
-		ObjectDef( NumObjectDefs ).AlphaOrNumeric = AlphaOrNumeric( {1,Count} );
-		ObjectDef( NumObjectDefs ).AlphRetainCase.allocate( Count );
-		ObjectDef( NumObjectDefs ).AlphRetainCase = AlphRetainCase( {1,Count} );
-		PrevCount = Count;
-		ObjectDef( NumObjectDefs ).NumRangeChks.allocate( ObjectDef( NumObjectDefs ).NumNumeric );
-		if ( ObjectDef( NumObjectDefs ).NumNumeric > 0 ) {
-			ObjectDef( NumObjectDefs ).NumRangeChks = NumRangeChecks( {1,ObjectDef( NumObjectDefs ).NumNumeric} );
-		}
-		PrevSizeNumNumeric = ObjectDef( NumObjectDefs ).NumNumeric; //used to clear only portion of NumRangeChecks array
-		ObjectDef( NumObjectDefs ).AlphFieldChks.allocate( ObjectDef( NumObjectDefs ).NumAlpha );
-		if ( ObjectDef( NumObjectDefs ).NumAlpha > 0 ) {
-			ObjectDef( NumObjectDefs ).AlphFieldChks = AlphFieldChecks( {1,ObjectDef( NumObjectDefs ).NumAlpha} );
-		}
-		ObjectDef( NumObjectDefs ).AlphFieldDefs.allocate( ObjectDef( NumObjectDefs ).NumAlpha );
-		if ( ObjectDef( NumObjectDefs ).NumAlpha > 0 ) {
-			ObjectDef( NumObjectDefs ).AlphFieldDefs = AlphFieldDefaults( {1,ObjectDef( NumObjectDefs ).NumAlpha} );
-		}
-		PrevSizeNumAlpha = ObjectDef( NumObjectDefs ).NumAlpha;
-		ObjectDef( NumObjectDefs ).ReqField.allocate( Count );
-		ObjectDef( NumObjectDefs ).ReqField = RequiredFields( {1,Count} );
-		for ( Count = 1; Count <= ObjectDef( NumObjectDefs ).NumNumeric; ++Count ) {
-			if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxChk ) {
-				// Checking MinMax Range (min vs. max and vice versa)
-				MinMaxError = false;
-				// check min against max
-				if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 1 ) {
-					// min
-					Value = ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 );
-					if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 3 ) {
-						if ( Value > ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) ) MinMaxError = true;
-					} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 4 ) {
-						if ( Value == ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) ) MinMaxError = true;
-					}
-				} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 2 ) {
-					// min>
-					Value = ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) + rTinyValue; // infintesimally bigger than min
-					if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 3 ) {
-						if ( Value > ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) ) MinMaxError = true;
-					} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 4 ) {
-						if ( Value == ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) ) MinMaxError = true;
-					}
-				}
-				// check max against min
-				if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 3 ) {
-					// max
-					Value = ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 );
-					// Check max value against min
-					if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 1 ) {
-						if ( Value < ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) ) MinMaxError = true;
-					} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 2 ) {
-						if ( Value == ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) ) MinMaxError = true;
-					}
-				} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 4 ) {
-					// max<
-					Value = ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) - rTinyValue; // infintesimally bigger than min
-					if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 1 ) {
-						if ( Value < ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) ) MinMaxError = true;
-					} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 2 ) {
-						if ( Value == ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) ) MinMaxError = true;
-					}
-				}
-				// check if error condition
-				if ( MinMaxError ) {
-					//  Error stated min is not in range with stated max
-					MinMaxString = IPTrimSigDigits( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).FieldNumber );
-					ShowSevereError( "IP: IDD: Field #" + MinMaxString + " conflict in Min/Max specifications/values, in class=" + ObjectDef( NumObjectDefs ).Name, EchoInputFile );
-					errFlag = true;
-				}
-			}
-			if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).DefaultChk ) {
-				// Check Default against MinMaxRange
-				//  Don't check when default is autosize...
-				if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).AutoSizable && ObjectDef( NumObjectDefs ).NumRangeChks( Count ).DefAutoSize ) continue;
-				if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).AutoCalculatable && ObjectDef( NumObjectDefs ).NumRangeChks( Count ).DefAutoCalculate ) continue;
-				MinMaxError = false;
-				Value = ObjectDef( NumObjectDefs ).NumRangeChks( Count ).Default;
-				if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 1 ) {
-					if ( Value < ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) ) MinMaxError = true;
-				} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 1 ) == 2 ) {
-					if ( Value <= ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 1 ) ) MinMaxError = true;
-				}
-				if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 3 ) {
-					if ( Value > ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) ) MinMaxError = true;
-				} else if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).WhichMinMax( 2 ) == 4 ) {
-					if ( Value >= ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxValue( 2 ) ) MinMaxError = true;
-				}
-				if ( MinMaxError ) {
-					//  Error stated default is not in min/max range
-					MinMaxString = IPTrimSigDigits( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).FieldNumber );
-					ShowSevereError( "IP: IDD: Field #" + MinMaxString + " default is invalid for Min/Max values, in class=" + ObjectDef( NumObjectDefs ).Name, EchoInputFile );
-					errFlag = true;
-				}
-			}
-		}
-
-		if ( errFlag ) {
-			ShowContinueError( "IP: Errors occured in ObjectDefinition for Class=" + ObjectDef( NumObjectDefs ).Name + ", Object not available for IDF processing.", EchoInputFile );
-			ObjectDef( NumObjectDefs ).AlphaOrNumeric.deallocate();
-			ObjectDef( NumObjectDefs ).NumRangeChks.deallocate();
-			ObjectDef( NumObjectDefs ).AlphFieldChks.deallocate();
-			ObjectDef( NumObjectDefs ).AlphFieldDefs.deallocate();
-			ObjectDef( NumObjectDefs ).ReqField.deallocate();
-			ObjectDef( NumObjectDefs ).AlphRetainCase.deallocate();
-			--NumObjectDefs;
-			ErrorsFound = true;
-		}
-
-	}
-
-	void
-	ProcessInputDataFile( std::istream & idf_stream )
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   August 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine processes input data file for EnergyPlus.  Each "record" is
-		// parsed into the LineItem data structure and, if okay, put into the
-		// IDFRecords data structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		bool EndofFile( false );
-		bool BlankLine( false );
-		std::string::size_type Pos;
-
-		MaxIDFRecords = ObjectsIDFAllocInc;
-		NumIDFRecords = 0;
-		MaxIDFSections = SectionsIDFAllocInc;
-		NumIDFSections = 0;
-
-		SectionsOnFile.allocate( MaxIDFSections );
-		IDFRecords.allocate( MaxIDFRecords );
-		LineItem.Numbers.allocate( MaxNumericArgsFound );
-		LineItem.NumBlank.allocate( MaxNumericArgsFound );
-		LineItem.Alphas.allocate( MaxAlphaArgsFound );
-		LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
-
-		// Check file
-		cross_platform_get_line( idf_stream, InputLine );
-		std::string::size_type const len_line( InputLine.length() );
-		if ( idf_stream && ( len_line > 0 ) ) {
-			if ( int( InputLine[ len_line - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: \"in.idf\" appears to be a Unicode or binary file." );
-				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
-			}
-		}
-		if ( idf_stream ) idf_stream.seekg( 0, std::ios::beg );
-
-		while ( ! EndofFile ) {
-			ReadInputLine( idf_stream, Pos, BlankLine, EndofFile );
-			if ( BlankLine || EndofFile ) continue;
-			Pos = scan( InputLine, ",;" );
-			if ( Pos != std::string::npos ) {
-				if ( InputLine[ Pos ] == ';' ) {
-					ValidateSection( InputLine.substr( 0, Pos ), NumLines );
-					if ( NumIDFSections == MaxIDFSections ) {
-						SectionsOnFile.redimension( MaxIDFSections += SectionsIDFAllocInc );
-					}
-				} else {
-					ValidateObjectandParse( idf_stream, InputLine.substr( 0, Pos ), Pos, EndofFile );
-					if ( NumIDFRecords == MaxIDFRecords ) {
-						IDFRecords.redimension( MaxIDFRecords += ObjectsIDFAllocInc );
-					}
-				}
-			} else { // Error condition, no , or ; on first line
-				ShowMessage( "IP: IDF Line~" + IPTrimSigDigits( NumLines ) + ' ' + InputLine );
-				ShowSevereError( ", or ; expected on this line", EchoInputFile );
-			}
-		}
-
-		//   IF (NumIDFSections > 0) THEN
-		//     SectionsOnFile(NumIDFSections)%LastRecord=NumIDFRecords
-		//   ENDIF
-
-		if ( NumIDFRecords > 0 ) {
-			for ( int i = 1; i <= NumObjectDefs; ++i ) {
-				if ( ObjectDef( i ).RequiredObject && ObjectDef( i ).NumFound == 0 ) {
-					ShowSevereError( "IP: No items found for Required Object=" + ObjectDef( i ).Name );
-					++NumMiscErrorsFound;
-				}
-			}
-		}
-
-	}
-
-	void
-	ValidateSection(
-		std::string const & ProposedSection,
-		int const LineNo
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine validates the section from the input data file
-		// with the list of objects from the data dictionary file.
-
-		// METHODOLOGY EMPLOYED:
-		// A "squeezed" string is formed and checked against the list of
-		// sections.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string SqueezedSection;
-		int Found;
-		int OFound;
-
-		SqueezedSection = MakeUPPERCase( stripped( ProposedSection ) );
-		if ( len( stripped( ProposedSection ) ) > static_cast< std::string::size_type >( MaxSectionNameLength ) ) {
-			ShowWarningError( "IP: Section length exceeds maximum, will be truncated=" + ProposedSection, EchoInputFile );
-			ShowContinueError( "Will be processed as Section=" + SqueezedSection, EchoInputFile );
-		}
-		if ( ! has_prefix( SqueezedSection, "END" ) ) {
-			Found = FindItemInList( SqueezedSection, SectionDef );
-			if ( Found == 0 ) {
-				// Make sure this Section not an object name
-				if ( SortedIDD ) {
-					OFound = FindItemInSortedList( SqueezedSection, ListOfObjects, NumObjectDefs );
-					if ( OFound != 0 ) OFound = iListOfObjects( OFound );
-				} else {
-					OFound = FindItemInList( SqueezedSection, ListOfObjects, NumObjectDefs );
-				}
-				if ( OFound != 0 ) {
-					AddRecordFromSection( OFound );
-				} else if ( NumSectionDefs == MaxSectionDefs ) {
-					SectionDef.redimension( MaxSectionDefs += SectionDefAllocInc );
-				}
-				++NumSectionDefs;
-				SectionDef( NumSectionDefs ).Name = SqueezedSection;
-				SectionDef( NumSectionDefs ).NumFound = 1;
-				// Add to "Sections on file" if appropriate
-				if ( ! ProcessingIDD ) {
-					++NumIDFSections;
-					SectionsOnFile( NumIDFSections ).Name = SqueezedSection;
-					SectionsOnFile( NumIDFSections ).FirstRecord = NumIDFRecords;
-					SectionsOnFile( NumIDFSections ).FirstLineNo = LineNo;
-				}
-			} else {
-				//      IF (NumIDFSections > 0) THEN
-				//        SectionsOnFile(NumIDFSections)%LastRecord=NumIDFRecords
-				//      ENDIF
-				++SectionDef( Found ).NumFound;
-				if ( ! ProcessingIDD ) {
-					++NumIDFSections;
-					SectionsOnFile( NumIDFSections ).Name = SqueezedSection;
-					SectionsOnFile( NumIDFSections ).FirstRecord = NumIDFRecords;
-					SectionsOnFile( NumIDFSections ).FirstLineNo = LineNo;
-				}
-			}
-		} else { // End ...
-			if ( ! ProcessingIDD ) {
-				SqueezedSection.erase( 0, 3 );
-				strip( SqueezedSection );
-				for ( Found = NumIDFSections; Found >= 1; --Found ) {
-					if ( ! SameString( SectionsOnFile( Found ).Name, SqueezedSection ) ) continue;
-					SectionsOnFile( Found ).LastRecord = NumIDFRecords;
-				}
-			}
-		}
-
-	}
-
-	void
-	ValidateObjectandParse(
-		std::istream & idf_stream,
-		std::string const & ProposedObject,
-		std::string::size_type & CurPos,
-		bool & EndofFile
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine validates the proposed object from the IDF and then
-		// parses it, putting it into the internal InputProcessor Data structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const dimLineBuf( 10 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string SqueezedObject;
-		std::string SqueezedArg;
-		int Found;
-		int NumArg;
-		int NumArgExpected;
-		int NumAlpha;
-		int NumNumeric;
-		std::string::size_type Pos;
-		bool EndofObject;
-		bool BlankLine;
-		static bool errFlag( false );
-		std::string::size_type LenLeft;
-		int Count;
-		std::string FieldString;
-		std::string FieldNameString;
-		std::string Message;
-		std::string cStartLine;
-		std::string cStartName;
-		static Array1D_string LineBuf( dimLineBuf );
-		static int StartLine;
-		static int NumConxLines;
-		static int CurLines;
-		static int CurQPtr;
-
-		std::string String;
-		bool IDidntMeanIt;
-		bool TestingObject;
-		bool TransitionDefer;
-		int TFound;
-		std::string::size_type NextChr;
-		std::string String1;
-
-		SqueezedObject = MakeUPPERCase( stripped( ProposedObject ) );
-		if ( len( SqueezedObject ) > static_cast< std::string::size_type >( MaxObjectNameLength ) ) {
-			ShowWarningError( "IP: Object name length exceeds maximum, will be truncated=" + stripped( ProposedObject ), EchoInputFile );
-			ShowContinueError( "Will be processed as Object=" + SqueezedObject, EchoInputFile );
-		}
-		IDidntMeanIt = false;
-
-		TestingObject = true;
-		TransitionDefer = false;
-		while ( TestingObject ) {
-			errFlag = false;
-			IDidntMeanIt = false;
-			if ( SortedIDD ) {
-				Found = FindItemInSortedList( SqueezedObject, ListOfObjects, NumObjectDefs );
-				if ( Found != 0 ) Found = iListOfObjects( Found );
-			} else {
-				Found = FindItemInList( SqueezedObject, ListOfObjects, NumObjectDefs );
-			}
-			if ( Found != 0 ) {
-				if ( ObjectDef( Found ).ObsPtr > 0 ) {
-					TFound = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
-					if ( TFound != 0 ) {
-						if ( RepObjects( TFound ).Transitioned ) {
-							if ( ! RepObjects( TFound ).Used ) ShowWarningError( "IP: Objects=\"" + stripped( ProposedObject ) + "\" are being transitioned to this object=\"" + RepObjects( TFound ).NewName + "\"" );
-							RepObjects( TFound ).Used = true;
-							if ( SortedIDD ) {
-								Found = FindItemInSortedList( SqueezedObject, ListOfObjects, NumObjectDefs );
-								if ( Found != 0 ) Found = iListOfObjects( Found );
-							} else {
-								Found = FindItemInList( SqueezedObject, ListOfObjects, NumObjectDefs );
-							}
-						} else if ( RepObjects( TFound ).TransitionDefer ) {
-							if ( ! RepObjects( TFound ).Used ) ShowWarningError( "IP: Objects=\"" + stripped( ProposedObject ) + "\" are being transitioned to this object=\"" + RepObjects( TFound ).NewName + "\"" );
-							RepObjects( TFound ).Used = true;
-							if ( SortedIDD ) {
-								Found = FindItemInSortedList( SqueezedObject, ListOfObjects, NumObjectDefs );
-								if ( Found != 0 ) Found = iListOfObjects( Found );
-							} else {
-								Found = FindItemInList( SqueezedObject, ListOfObjects, NumObjectDefs );
-							}
-							TransitionDefer = true;
-						} else {
-							Found = 0; // being handled differently for this obsolete object
-						}
-					}
-				}
-			}
-
-			TestingObject = false;
-			if ( Found == 0 ) {
-				// Check to see if it's a "secret" object
-				Found = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
-				if ( Found == 0 ) {
-					ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Did not find \"" + stripped( ProposedObject ) + "\" in list of Objects", EchoInputFile );
-					// Will need to parse to next ;
-					errFlag = true;
-				} else if ( RepObjects( Found ).Deleted ) {
-					if ( ! RepObjects( Found ).Used ) {
-						ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Objects=\"" + stripped( ProposedObject ) + "\" have been deleted from the IDD.  Will be ignored." );
-						RepObjects( Found ).Used = true;
-					}
-					IDidntMeanIt = true;
-					errFlag = true;
-					Found = 0;
-				} else if ( RepObjects( Found ).TransitionDefer ) {
-
-				} else { // This name is replaced with something else
-					if ( ! RepObjects( Found ).Used ) {
-						if ( ! RepObjects( Found ).Transitioned ) {
-							ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Objects=\"" + stripped( ProposedObject ) + "\" are being replaced with this object=\"" + RepObjects( Found ).NewName + "\"" );
-							RepObjects( Found ).Used = true;
-							SqueezedObject = RepObjects( Found ).NewName;
-							TestingObject = true;
-						} else {
-							ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Objects=\"" + stripped( ProposedObject ) + "\" are being transitioned to this object=\"" + RepObjects( Found ).NewName + "\"" );
-							RepObjects( Found ).Used = true;
-							if ( SortedIDD ) {
-								Found = FindItemInSortedList( SqueezedObject, ListOfObjects, NumObjectDefs );
-								if ( Found != 0 ) Found = iListOfObjects( Found );
-							} else {
-								Found = FindItemInList( SqueezedObject, ListOfObjects, NumObjectDefs );
-							}
-						}
-					} else if ( ! RepObjects( Found ).Transitioned ) {
-						SqueezedObject = RepObjects( Found ).NewName;
-						TestingObject = true;
-					} else {
-						if ( SortedIDD ) {
-							Found = FindItemInSortedList( SqueezedObject, ListOfObjects, NumObjectDefs );
-							if ( Found != 0 ) Found = iListOfObjects( Found );
-						} else {
-							Found = FindItemInList( SqueezedObject, ListOfObjects, NumObjectDefs );
-						}
-					}
-				}
-			} else {
-
-				// Start Parsing the Object according to definition
-
-				errFlag = false;
-				LineItem.Name = SqueezedObject;
-				LineItem.Alphas = BlankString;
-				LineItem.AlphBlank = false;
-				LineItem.NumAlphas = 0;
-				LineItem.Numbers = 0.0;
-				LineItem.NumNumbers = 0;
-				LineItem.NumBlank = false;
-				LineItem.ObjectDefPtr = Found;
-				NumArgExpected = ObjectDef( Found ).NumParams;
-				++ObjectDef( Found ).NumFound;
-				if ( ObjectDef( Found ).UniqueObject && ObjectDef( Found ).NumFound > 1 ) {
-					ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Multiple occurrences of Unique Object=" + stripped( ProposedObject ) );
-					++NumMiscErrorsFound;
-				}
-				if ( ObjectDef( Found ).ObsPtr > 0 ) {
-					TFound = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
-					if ( TFound == 0 ) {
-						ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Obsolete object=" + stripped( ProposedObject ) + ", encountered.  Should be replaced with new object=" + ObsoleteObjectsRepNames( ObjectDef( Found ).ObsPtr ) );
-					} else if ( ! RepObjects( TFound ).Used && RepObjects( TFound ).Transitioned ) {
-						ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Objects=\"" + stripped( ProposedObject ) + "\" are being transitioned to this object=\"" + RepObjects( TFound ).NewName + "\"" );
-						RepObjects( TFound ).Used = true;
-					}
-				}
-			}
-		}
-
-		NumArg = 0;
-		NumAlpha = 0;
-		NumNumeric = 0;
-		EndofObject = false;
-		++CurPos;
-
-		//  Keep context buffer in case of errors
-		LineBuf = BlankString;
-		NumConxLines = 0;
-		StartLine = NumLines;
-		cStartLine = InputLine.substr( 0, 300 );
-		cStartName = BlankString;
-		NumConxLines = 0;
-		CurLines = NumLines;
-		CurQPtr = 0;
-
-		while ( ! EndofFile && ! EndofObject ) {
-			if ( CurLines != NumLines ) {
-				NumConxLines = min( NumConxLines + 1, dimLineBuf );
-				++CurQPtr;
-				if ( CurQPtr == 1 && is_blank( cStartName ) && not_blank( InputLine ) ) {
-					if ( Found > 0 ) {
-						if ( ObjectDef( Found ).NameAlpha1 ) {
-							Pos = index( InputLine, ',' );
-							if ( Pos != std::string::npos ) {
-								cStartName = stripped( InputLine.substr( 0, Pos ) );
-							}
-						}
-					}
-				}
-				if ( CurQPtr > dimLineBuf ) CurQPtr = 1;
-				LineBuf( CurQPtr ) = InputLine;
-				CurLines = NumLines;
-			}
-			if ( CurPos < static_cast< std::string::size_type >( InputLineLength ) ) {
-				Pos = scan( InputLine.substr( CurPos, InputLineLength - CurPos ), ",;" );
-				if ( Pos == std::string::npos ) {
-					if ( InputLine[ InputLineLength - 1 ] == '!' ) {
-						LenLeft = len_trim( InputLine.substr( CurPos, InputLineLength - CurPos - 1 ) );
-					} else {
-						LenLeft = len_trim( InputLine.substr( CurPos, InputLineLength - CurPos ) );
-					}
-					if ( LenLeft == 0 ) {
-						CurPos = InputLineLength;
-						continue;
-					} else {
-						if ( InputLine[ InputLineLength - 1 ] == '!' ) {
-							Pos = InputLineLength - CurPos;
-							DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-							ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Comma being inserted after:\"" + InputLine.substr( CurPos, InputLineLength - CurPos - 1 ) + "\" in Object=" + SqueezedObject, EchoInputFile );
-						} else {
-							Pos = InputLineLength - CurPos + 1;
-							DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-							ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Comma being inserted after:\"" + InputLine.substr( CurPos, InputLineLength - CurPos ) + "\" in Object=" + SqueezedObject, EchoInputFile );
-						}
-					}
-				}
-			} else {
-				ReadInputLine( idf_stream, CurPos, BlankLine, EndofFile );
-				continue;
-			}
-			if ( Pos != std::string::npos ) {
-				if ( ! errFlag ) {
-					if ( Pos > 0 ) {
-						SqueezedArg = MakeUPPERCase( stripped( InputLine.substr( CurPos, Pos ) ) );
-						if ( len( stripped( InputLine.substr( CurPos, Pos ) ) ) > static_cast< std::string::size_type >( MaxAlphaArgLength ) ) {
-							DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-							ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Alpha Argument length exceeds maximum, will be truncated=" + InputLine.substr( CurPos, Pos - 1 ), EchoInputFile );
-							ShowContinueError( "Will be processed as Alpha=" + SqueezedArg, EchoInputFile );
-						}
-					} else {
-						SqueezedArg = BlankString;
-					}
-					if ( NumArg == NumArgExpected && ! ObjectDef( Found ).ExtensibleObject ) {
-						DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-						ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected for Object=" + ObjectDef( Found ).Name, EchoInputFile );
-						ShowContinueError( " Maximum arguments reached for this object, trying to process ->" + SqueezedArg + "<-", EchoInputFile );
-						errFlag = true;
-					} else {
-						if ( NumArg == NumArgExpected && ObjectDef( Found ).ExtensibleObject ) {
-							ExtendObjectDefinition( Found, NumArgExpected );
-						}
-						++NumArg;
-						if ( ObjectDef( Found ).AlphaOrNumeric( NumArg ) ) {
-							if ( NumAlpha == ObjectDef( Found ).NumAlpha ) {
-								DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-								ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected for Object=" + ObjectDef( Found ).Name, EchoInputFile );
-								ShowContinueError( " Too many Alphas for this object, trying to process ->" + SqueezedArg + "<-", EchoInputFile );
-								errFlag = true;
-							} else {
-								++NumAlpha;
-								LineItem.NumAlphas = NumAlpha;
-								if ( ObjectDef( Found ).AlphRetainCase( NumArg ) ) {
-									SqueezedArg = InputLine.substr( CurPos, Pos );
-									strip( SqueezedArg );
-								}
-								if ( ! SqueezedArg.empty() ) {
-									LineItem.Alphas( NumAlpha ) = SqueezedArg;
-								} else if ( ObjectDef( Found ).ReqField( NumArg ) ) { // Blank Argument
-									if ( ! ObjectDef( Found ).AlphFieldDefs( NumAlpha ).empty() ) {
-										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
-									} else {
-										if ( ObjectDef( Found ).NameAlpha1 && NumAlpha != 1 ) {
-											DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-											ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected in Object=" + ObjectDef( Found ).Name + ", name=" + LineItem.Alphas( 1 ), EchoInputFile );
-										} else {
-											DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-											ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected in Object=" + ObjectDef( Found ).Name, EchoInputFile );
-										}
-										ShowContinueError( "Field [" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) + "] is required but was blank", EchoInputFile );
-										++NumBlankReqFieldFound;
-									}
-								} else {
-									LineItem.AlphBlank( NumAlpha ) = true;
-									if ( ! ObjectDef( Found ).AlphFieldDefs( NumAlpha ).empty() ) {
-										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
-									}
-								}
-							}
-						} else {
-							if ( NumNumeric == ObjectDef( Found ).NumNumeric ) {
-								DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-								ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected for Object=" + ObjectDef( Found ).Name, EchoInputFile );
-								ShowContinueError( " Too many Numbers for this object, trying to process ->" + SqueezedArg + "<-", EchoInputFile );
-								errFlag = true;
-							} else {
-								++NumNumeric;
-								LineItem.NumNumbers = NumNumeric;
-								if ( ! SqueezedArg.empty() ) {
-									if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizable && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculatable ) {
-										LineItem.Numbers( NumNumeric ) = ProcessNumber( SqueezedArg, errFlag );
-									} else if ( SqueezedArg == "AUTOSIZE" ) {
-										LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizeValue;
-									} else if ( SqueezedArg == "AUTOCALCULATE" ) {
-										LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculateValue;
-									} else {
-										LineItem.Numbers( NumNumeric ) = ProcessNumber( SqueezedArg, errFlag );
-									}
-								} else { // numeric arg is blank.
-									if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefaultChk ) { // blank arg has default
-										if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculatable ) {
-											LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
-											LineItem.NumBlank( NumNumeric ) = true;
-										} else if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize ) {
-											LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizeValue;
-											LineItem.NumBlank( NumNumeric ) = true;
-										} else if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
-											LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculateValue;
-											LineItem.NumBlank( NumNumeric ) = true;
-										}
-										errFlag = false;
-									} else { // blank arg does not have default
-										if ( ObjectDef( Found ).ReqField( NumArg ) ) { // arg is required
-											if ( ObjectDef( Found ).NameAlpha1 ) { // object has name field - more context for error
-												DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-												ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected in Object=" + ObjectDef( Found ).Name + ", name=" + LineItem.Alphas( 1 ), EchoInputFile );
-												errFlag = true;
-											} else { // object does not have name field
-												DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-												ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected in Object=" + ObjectDef( Found ).Name, EchoInputFile );
-												errFlag = true;
-											}
-											ShowContinueError( "Field [" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName + "] is required but was blank", EchoInputFile );
-											++NumBlankReqFieldFound;
-										}
-										LineItem.Numbers( NumNumeric ) = 0.0;
-										LineItem.NumBlank( NumNumeric ) = true;
-									}
-								}
-								if ( errFlag ) {
-									if ( SqueezedArg[ 0 ] != '=' ) { // argument does not start with "=" (parametric)
-										FieldString = IPTrimSigDigits( NumNumeric );
-										FieldNameString = ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName;
-										if ( ! FieldNameString.empty() ) {
-											Message = "Invalid Number in Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + SqueezedArg;
-										} else { // Field Name not recorded
-											Message = "Invalid Number in Numeric Field#" + FieldString + ", value=" + SqueezedArg;
-										}
-										Message += ", in " + ObjectDef( Found ).Name;
-										if ( ObjectDef( Found ).NameAlpha1 ) {
-											Message += "=" + LineItem.Alphas( 1 );
-										}
-										DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-										ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + ' ' + Message, EchoInputFile );
-									} else { // parametric in Numeric field
-										errFlag = false;
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if ( InputLine[ CurPos + Pos ] == ';' ) {
-					EndofObject = true;
-					// Check if more characters on line -- and if first is a comment character
-					if ( not_blank( InputLine.substr( CurPos + Pos + 1 ) ) ) {
-						NextChr = FindNonSpace( InputLine.substr( CurPos + Pos + 1 ) );
-						if ( ( NextChr == std::string::npos ) || ( InputLine[ CurPos + Pos + 1 + NextChr ] != '!' ) ) {
-							DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-							ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " End of Object=\"" + ObjectDef( Found ).Name + "\" reached, but next part of line not comment.", EchoInputFile );
-							ShowContinueError( "Final line above shows line that contains error." );
-						}
-					}
-				}
-				CurPos += Pos + 1;
-			}
-
-		}
-
-		// Store to IDFRecord Data Structure, errFlag is true if there was an error
-		// Check out MinimumNumberOfFields
-		if ( ! errFlag && ! IDidntMeanIt ) {
-			if ( NumArg < ObjectDef( Found ).MinNumFields ) {
-				if ( ObjectDef( Found ).NameAlpha1 ) {
-					ShowAuditErrorMessage( " ** Warning ** ", "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Found ).Name + ", name=" + LineItem.Alphas( 1 ) + ", entered with less than minimum number of fields." );
-				} else {
-					ShowAuditErrorMessage( " ** Warning ** ", "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Found ).Name + ", entered with less than minimum number of fields." );
-				}
-				ShowAuditErrorMessage( " **   ~~~   ** ", "Attempting fill to minimum." );
-				NumAlpha = 0;
-				NumNumeric = 0;
-				if ( ObjectDef( Found ).MinNumFields > ObjectDef( Found ).NumParams ) {
-					String = IPTrimSigDigits( ObjectDef( Found ).MinNumFields );
-					String1 = IPTrimSigDigits( ObjectDef( Found ).NumParams );
-					ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object \\min-fields > number of fields specified, Object=" + ObjectDef( Found ).Name );
-					ShowContinueError( "..\\min-fields=" + String + ", total number of fields in object definition=" + String1 );
-					errFlag = true;
-				} else {
-					for ( Count = 1; Count <= ObjectDef( Found ).MinNumFields; ++Count ) {
-						if ( ObjectDef( Found ).AlphaOrNumeric( Count ) ) {
-							++NumAlpha;
-							if ( NumAlpha <= LineItem.NumAlphas ) continue;
-							++LineItem.NumAlphas;
-							if ( ! ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ).empty() ) {
-								LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas );
-								ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
-							} else if ( ObjectDef( Found ).ReqField( Count ) ) {
-								if ( ObjectDef( Found ).NameAlpha1 ) {
-									ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Found ).Name + ", name=" + LineItem.Alphas( 1 ) + ", Required Field=[" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) + "] was blank.", EchoInputFile );
-								} else {
-									ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Found ).Name + ", Required Field=[" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) + "] was blank.", EchoInputFile );
-								}
-								errFlag = true;
-							} else {
-								LineItem.Alphas( LineItem.NumAlphas ).clear();
-								LineItem.AlphBlank( LineItem.NumAlphas ) = true;
-								ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
-							}
-						} else {
-							++NumNumeric;
-							if ( NumNumeric <= LineItem.NumNumbers ) continue;
-							++LineItem.NumNumbers;
-							LineItem.NumBlank( NumNumeric ) = true;
-							if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefaultChk ) {
-								if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
-									LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
-									gio::write( String, fmtLD ) << ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
-									strip( String );
-									ShowAuditErrorMessage( " **   Add   ** ", String + "   ! field=>" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName );
-								} else if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize ) {
-									LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizeValue;
-									ShowAuditErrorMessage( " **   Add   ** ", "autosize    ! field=>" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName );
-								} else if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
-									LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculateValue;
-									ShowAuditErrorMessage( " **   Add   ** ", "autocalculate    ! field=>" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName );
-								}
-							} else if ( ObjectDef( Found ).ReqField( Count ) ) {
-								if ( ObjectDef( Found ).NameAlpha1 ) {
-									ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Found ).Name + ", name=" + LineItem.Alphas( 1 ) + ", Required Field=[" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName + "] was blank.", EchoInputFile );
-								} else {
-									ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Found ).Name + ", Required Field=[" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName + "] was blank.", EchoInputFile );
-								}
-								errFlag = true;
-							} else {
-								LineItem.Numbers( NumNumeric ) = 0.0;
-								LineItem.NumBlank( NumNumeric ) = true;
-								ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName );
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if ( ! errFlag && ! IDidntMeanIt ) {
-			if ( TransitionDefer ) {
-				MakeTransition( Found );
-			}
-			++NumIDFRecords;
-			if ( ObjectStartRecord( Found ) == 0 ) ObjectStartRecord( Found ) = NumIDFRecords;
-			MaxAlphaIDFArgsFound = max( MaxAlphaIDFArgsFound, LineItem.NumAlphas );
-			MaxNumericIDFArgsFound = max( MaxNumericIDFArgsFound, LineItem.NumNumbers );
-			MaxAlphaIDFDefArgsFound = max( MaxAlphaIDFDefArgsFound, ObjectDef( Found ).NumAlpha );
-			MaxNumericIDFDefArgsFound = max( MaxNumericIDFDefArgsFound, ObjectDef( Found ).NumNumeric );
-			IDFRecords( NumIDFRecords ).Name = LineItem.Name;
-			IDFRecords( NumIDFRecords ).NumNumbers = LineItem.NumNumbers;
-			IDFRecords( NumIDFRecords ).NumAlphas = LineItem.NumAlphas;
-			IDFRecords( NumIDFRecords ).ObjectDefPtr = LineItem.ObjectDefPtr;
-			IDFRecords( NumIDFRecords ).Alphas.allocate( LineItem.NumAlphas );
-			IDFRecords( NumIDFRecords ).Alphas = LineItem.Alphas( {1,LineItem.NumAlphas} );
-			IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
-			IDFRecords( NumIDFRecords ).AlphBlank = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
-			IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
-			IDFRecords( NumIDFRecords ).Numbers = LineItem.Numbers( {1,LineItem.NumNumbers} );
-			IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
-			IDFRecords( NumIDFRecords ).NumBlank = LineItem.NumBlank( {1,LineItem.NumNumbers} );
-			if ( LineItem.NumNumbers > 0 ) {
-				for ( Count = 1; Count <= LineItem.NumNumbers; ++Count ) {
-					if ( ObjectDef( Found ).NumRangeChks( Count ).MinMaxChk && ! LineItem.NumBlank( Count ) ) {
-						InternalRangeCheck( LineItem.Numbers( Count ), Count, Found, LineItem.Alphas( 1 ), ObjectDef( Found ).NumRangeChks( Count ).AutoSizable, ObjectDef( Found ).NumRangeChks( Count ).AutoCalculatable );
-					}
-				}
-			}
-		} else if ( ! IDidntMeanIt ) {
-			OverallErrorFlag = true;
-		}
-
-	}
-
-	void
-	ValidateSectionsInput()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine uses the data structure that is set up during
-		// IDF processing and makes sure that record pointers are accurate.
-		// They could be inaccurate if a 'section' is input without any
-		// 'objects' following.  The invalidity will show itself in the
-		// values of the FirstRecord and Last Record pointer.
-		// If FirstRecord>LastRecord, then no records (Objects) have been
-		// written to the SIDF file for that Section.
-
-		// METHODOLOGY EMPLOYED:
-		// Scan the SectionsOnFile data structure and look for invalid
-		// FirstRecord,LastRecord items.  Reset those items to -1.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( int Count = 1; Count <= NumIDFSections; ++Count ) {
-			if ( SectionsOnFile( Count ).FirstRecord > SectionsOnFile( Count ).LastRecord ) {
-				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << ' ' << SectionsOnFile( Count ).Name << " had no object records";
-				SectionsOnFile( Count ).FirstRecord = -1;
-				SectionsOnFile( Count ).LastRecord = -1;
-			}
-		}
-
+		InitializeMaps();
+
+		int MaxArgs = 0;
+		int MaxAlpha = 0;
+		int MaxNumeric = 0;
+		GetMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
+
+		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlpha );
+		DataIPShortCuts::cAlphaArgs.allocate( MaxAlpha );
+		DataIPShortCuts::lAlphaFieldBlanks.dimension( MaxAlpha, false );
+		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
+		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
+		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 	}
 
 	int
-	GetNumSectionsFound( std::string const & SectionWord )
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
+	InputProcessor::GetNumSectionsFound( std::string const & SectionWord ) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This function returns the number of a particular section (in input data file)
 		// found in the current run.  If it can't find the section in list
@@ -2008,144 +1166,15 @@ namespace InputProcessor {
 
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
-		// number of sections of that kind found in the current input.  If not, return
-		// -1.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		int GetNumSectionsFound;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int Found = FindItemInList( MakeUPPERCase( SectionWord ), ListOfSections, NumSectionDefs );
-		if ( Found == 0 ) {
-			//    CALL ShowFatalError('Requested Section not found in Definitions: '//TRIM(SectionWord))
-			GetNumSectionsFound = 0;
-		} else {
-			GetNumSectionsFound = SectionDef( Found ).NumFound;
-		}
-
-		return GetNumSectionsFound;
-
+		// number of sections of that kind found in the current input.  If not, return -1.
+		auto const & SectionWord_iter = jdf.find( SectionWord );
+		if ( SectionWord_iter == jdf.end() ) return -1;
+		return static_cast <int> ( SectionWord_iter.value().size() );
 	}
+
 
 	int
-	GetNumSectionsinInput()
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns the number of sections in the entire input data file
-		// of the current run.
-
-		// METHODOLOGY EMPLOYED:
-		// Return value of NumIDFSections.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		return NumIDFSections;
-
-	}
-
-	void
-	GetListofSectionsinInput(
-		Array1S_string SectionList,
-		int & NuminList
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine returns the list of sections as they occurred
-		// in the Input Data File (IDF).
-
-		// METHODOLOGY EMPLOYED:
-		// Look up object in list of objects.  If there, return the
-		// number of objects found in the current input.  If not, return
-		// -1.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int const MaxAllowedOut = min( NumIDFSections, isize( SectionList ) );
-		if ( MaxAllowedOut != NumIDFSections ) {
-			ShowWarningError( "More in list than allowed in passed array - (GetListofSectionsinInput)" );
-		}
-		NuminList = MaxAllowedOut;
-		for ( int i = 1; i <= MaxAllowedOut; ++i ) SectionList( i ) = SectionsOnFile( i ).Name;
-
-	}
-
-	int
-	GetNumObjectsFound( std::string const & ObjectWord )
-	{
+	InputProcessor::GetNumObjectsFound( std::string const & ObjectWord ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -2162,112 +1191,42 @@ namespace InputProcessor {
 		// Look up object in list of objects.  If there, return the
 		// number of objects found in the current input.  If not, return 0.
 
-		// REFERENCES:
-		// na
+		auto const & find_obj = jdf.find( ObjectWord );
 
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		int GetNumObjectsFound;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
-
-		if ( SortedIDD ) {
-			Found = FindItemInSortedList( MakeUPPERCase( ObjectWord ), ListOfObjects, NumObjectDefs );
-			if ( Found != 0 ) Found = iListOfObjects( Found );
+		if ( find_obj == jdf.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end()
+				 || jdf.find( tmp_umit->second ) == jdf.end() ) {
+				return 0;
+			}
+			return static_cast< int >( jdf[ tmp_umit->second ].size() );
 		} else {
-			Found = FindItemInList( MakeUPPERCase( ObjectWord ), ListOfObjects, NumObjectDefs );
+			return static_cast< int >( find_obj.value().size() );
 		}
 
-		if ( Found != 0 ) {
-			GetNumObjectsFound = ObjectDef( Found ).NumFound;
-		} else {
-			GetNumObjectsFound = 0;
-			ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
+				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+			}
 		}
-
-		return GetNumObjectsFound;
-
+		return 0;
 	}
 
 	void
-	GetRecordLocations(
-		int const Which,
-		int & FirstRecord,
-		int & LastRecord
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine returns the record location values (which will be
-		// passed to 'GetObjectItem') for a section from the list of inputted
-		// sections (sequential).
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		FirstRecord = SectionsOnFile( Which ).FirstRecord;
-		LastRecord = SectionsOnFile( Which ).LastRecord;
-
-	}
-
-	void
-	GetObjectItem(
+	InputProcessor::GetObjectItem(
 		std::string const & Object,
 		int const Number,
 		Array1S_string Alphas,
 		int & NumAlphas,
-		Array1S< Real64 > Numbers,
+		Array1S < Real64 > Numbers,
 		int & NumNumbers,
 		int & Status,
-		Optional< Array1_bool > NumBlank,
-		Optional< Array1_bool > AlphaBlank,
-		Optional< Array1_string > AlphaFieldNames,
-		Optional< Array1_string > NumericFieldNames
-	)
-	{
-
+		Optional < Array1D_bool > NumBlank,
+		Optional < Array1D_bool > AlphaBlank,
+		Optional < Array1D_string > AlphaFieldNames,
+		Optional < Array1D_string > NumericFieldNames
+	) {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
 		//       DATE WRITTEN   September 1997
@@ -2277,1001 +1236,366 @@ namespace InputProcessor {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Count;
-		int LoopIndex;
-		std::string ObjectWord;
-		std::string UCObject;
-		//////////// hoisted into namespace ////////////
-		// static Array1D_string AlphaArgs;
-		// static Array1D< Real64 > NumberArgs;
-		// static Array1D_bool AlphaArgsBlank;
-		// static Array1D_bool NumberArgsBlank;
-		////////////////////////////////////////////////
-		int MaxAlphas;
-		int MaxNumbers;
-		int Found;
-		int StartRecord;
-		std::string cfld1;
-		std::string cfld2;
-		bool GoodItem;
-
-		//Autodesk:Uninit Initialize variables used uninitialized
-		NumAlphas = 0; //Autodesk:Uninit Force default initialization
-		NumNumbers = 0; //Autodesk:Uninit Force default initialization
-
-		MaxAlphas = isize( Alphas, 1 );
-		MaxNumbers = isize( Numbers, 1 );
-		GoodItem = false;
-
-		if ( ! allocated( AlphaArgs ) ) {
-			if ( NumObjectDefs == 0 ) {
-				ProcessInput();
+		auto find_iterators = jdd_jdf_cache_map.find( Object );
+		if ( find_iterators == jdd_jdf_cache_map.end() ) {
+			auto const tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( Object ) );
+			if ( tmp_umit == case_insensitive_object_map.end()
+				 || jdf.find( tmp_umit->second ) == jdf.end() ) {
+				return;
 			}
-			AlphaArgs.allocate( MaxAlphaArgsFound );
-			NumberArgs.allocate( MaxNumericArgsFound );
-			NumberArgsBlank.allocate( MaxNumericArgsFound );
-			AlphaArgsBlank.allocate( MaxAlphaArgsFound );
+			find_iterators = jdd_jdf_cache_map.find( tmp_umit->second );
 		}
 
-		Count = 0;
+		NumAlphas = 0;
+		NumNumbers = 0;
 		Status = -1;
-		UCObject = MakeUPPERCase( Object );
-		if ( SortedIDD ) {
-			Found = FindItemInSortedList( UCObject, ListOfObjects, NumObjectDefs );
-			if ( Found != 0 ) Found = iListOfObjects( Found );
-		} else {
-			Found = FindItemInList( UCObject, ListOfObjects, NumObjectDefs );
-		}
-		if ( Found == 0 ) { //  This is more of a developer problem
-			ShowFatalError( "IP: GetObjectItem: Requested object=" + UCObject + ", not found in Object Definitions -- incorrect IDD attached." );
+		auto const & is_AlphaBlank = present(AlphaBlank);
+		auto const & is_AlphaFieldNames = present(AlphaFieldNames);
+		auto const & is_NumBlank = present(NumBlank);
+		auto const & is_NumericFieldNames = present(NumericFieldNames);
+
+		auto const & jdf_it = find_iterators->second.second.at( Number - 1 );
+		auto const & jdd_it = find_iterators->second.first;
+		auto const & jdd_it_val = jdd_it.value();
+
+		auto const * const obj_ptr = jdf_it.value().get_ptr< const json::object_t * const >();
+		auto const find_unused = unused_inputs.find( obj_ptr );
+		if ( find_unused != unused_inputs.end() ) {
+			unused_inputs.erase( find_unused );
 		}
 
-		if ( ObjectDef( Found ).NumAlpha > 0 ) {
-			if ( ObjectDef( Found ).NumAlpha > MaxAlphas ) {
-				cfld1 = IPTrimSigDigits( ObjectDef( Found ).NumAlpha );
-				cfld2 = IPTrimSigDigits( MaxAlphas );
-				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );
-			}
-			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = BlankString;
-		}
-		if ( ObjectDef( Found ).NumNumeric > 0 ) {
-			if ( ObjectDef( Found ).NumNumeric > MaxNumbers ) {
-				cfld1 = IPTrimSigDigits( ObjectDef( Found ).NumNumeric );
-				cfld2 = IPTrimSigDigits( MaxNumbers );
-				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Numeric Args [" + cfld1 + "] > Size of NumericArg array [" + cfld2 + "]." );
-			}
-			Numbers( {1,ObjectDef( Found ).NumNumeric} ) = 0.0;
+		// Locations in JSON schema relating to normal fields
+		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
+
+		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
+		auto const & legacy_idd = jdd_it_val[ "legacy_idd" ];
+		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
+		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
+		auto const & schema_name_field = jdd_it_val.find( "name" );
+
+		auto key = legacy_idd.find("extension");
+		std::string extension_key;
+		if ( key != legacy_idd.end() ) {
+			extension_key = key.value();
 		}
 
-		StartRecord = ObjectStartRecord( Found );
-		if ( StartRecord == 0 ) {
-			ShowWarningError( "IP: GetObjectItem: Requested object=" + UCObject + ", not found in IDF." );
-			Status = -1;
-			StartRecord = NumIDFRecords + 1;
-		}
+		Alphas = "";
+		Numbers = 0;
 
-		if ( ObjectGotCount( Found ) == 0 ) {
-			gio::write( EchoInputFile, fmtLD ) << "Getting object=" << UCObject;
-		}
-		++ObjectGotCount( Found );
-
-		for ( LoopIndex = StartRecord; LoopIndex <= NumIDFRecords; ++LoopIndex ) {
-			if ( IDFRecords( LoopIndex ).Name == UCObject ) {
-				++Count;
-				if ( Count == Number ) {
-					IDFRecordsGotten( LoopIndex ) = true; // only object level "gets" recorded
-					// Read this one
-					GetObjectItemfromFile( LoopIndex, ObjectWord, NumAlphas, NumNumbers, AlphaArgs, NumberArgs, AlphaArgsBlank, NumberArgsBlank );
-					if ( NumAlphas > MaxAlphas || NumNumbers > MaxNumbers ) {
-						ShowFatalError( "IP: GetObjectItem: Too many actual arguments for those expected on Object: " + ObjectWord, EchoInputFile );
-					}
-					NumAlphas = min( MaxAlphas, NumAlphas );
-					NumNumbers = min( MaxNumbers, NumNumbers );
-					GoodItem = true;
-					if ( NumAlphas > 0 ) {
-						Alphas( {1,NumAlphas} ) = AlphaArgs( {1,NumAlphas} );
-					}
-					if ( NumNumbers > 0 ) {
-						Numbers( {1,NumNumbers} ) = NumberArgs( {1,NumNumbers} );
-					}
-					if ( present( NumBlank ) ) {
-						NumBlank = true;
-						if ( NumNumbers > 0 ) NumBlank()( {1,NumNumbers} ) = NumberArgsBlank( {1,NumNumbers} );
-					}
-					if ( present( AlphaBlank ) ) {
-						AlphaBlank = true;
-						if ( NumAlphas > 0 ) AlphaBlank()( {1,NumAlphas} ) = AlphaArgsBlank( {1,NumAlphas} );
-					}
-					if ( present( AlphaFieldNames ) ) {
-						AlphaFieldNames()( {1,ObjectDef( Found ).NumAlpha} ) = ObjectDef( Found ).AlphFieldChks( {1,ObjectDef( Found ).NumAlpha} );
-					}
-					if ( present( NumericFieldNames ) ) {
-						for ( int i = 1, e = ObjectDef( Found ).NumNumeric; i <= e; ++i ) NumericFieldNames()( i ) = ObjectDef( Found ).NumRangeChks( i ).FieldName;
-					}
-					Status = 1;
-					break;
+		auto const & obj = jdf_it;
+		auto const & obj_val = obj.value();
+		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
+		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
+			std::string const & field = legacy_idd_alphas_fields[ i ];
+			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
+				auto const & name_iter = schema_name_field.value();
+				if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
+					Alphas( i + 1 ) = obj.key();
+				} else {
+					Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
 				}
+				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = obj.key().empty();
+				if ( is_AlphaFieldNames ) AlphaFieldNames()( i + 1 ) = field;
+				NumAlphas++;
+				continue;
 			}
-		}
-
-#ifdef IDDTEST
-		// This checks various principles of the IDD (e.g. required fields, defaults) to see what happens in the GetInput
-		// This can only work for "good" objects. (Found=object def)
-		// exempt certain objects
-		if ( SameString( ObjectDef( Found ).Name, "Schedule:Compact" ) ) return;
-		if ( has_prefixi( ObjectDef( Found ).Name, "Schedule" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "Construction" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "Construction:InternalSource" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "BuildingSurface:Detailed" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "Wall:Detailed" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "RoofCeiling:Detailed" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "Floor:Detailed" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "FenestrationSurface:Detailed" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "SizingPeriod:DesignDay" ) ) return;
-		if ( SameString( ObjectDef( Found ).Name, "Branch" ) ) return;
-
-		if ( GoodItem ) {
-			NAfld = 0;
-			NNfld = 0;
-			for ( LoopIndex = 1; LoopIndex <= NumAlphas + NumNumbers; ++LoopIndex ) {
-				if ( LoopIndex > ObjectDef( Found ).MinNumFields ) break;
-				if ( ObjectDef( Found ).AlphaOrNumeric( LoopIndex ) ) {
-					++NAfld;
-					if ( ! ObjectDef( Found ).ReqField( LoopIndex ) ) {
-						if ( AlphaArgsBlank( NAfld ) ) Alphas( NAfld ) = ObjectDef( Found ).AlphFieldDefs( NAfld );
-						if ( present( AlphaBlank ) ) {
-							if ( is_blank( Alphas( NAfld ) ) ) {
-								AlphaBlank()( NAfld ) = true;
-							} else {
-								AlphaBlank()( NAfld ) = false;
-							}
+			auto it = obj_val.find( field );
+			if ( it != obj_val.end() ) {
+				if ( it.value().is_string() ) {
+					std::string val;
+					auto const & schema_field_obj = schema_obj_props[ field ];
+					auto const & find_default = schema_field_obj.find( "default" );
+					if ( it.value().get < std::string >().empty() &&
+						 find_default != schema_field_obj.end() ) {
+						auto const & default_val = find_default.value();
+						if ( default_val.is_string() ) {
+							val = default_val.get < std::string >();
+						} else {
+							dtoa( default_val.get < double >(), s );
+							val = s;
 						}
+						if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = true;
+					} else {
+						val = it.value().get < std::string >();
+						if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = val.empty();
+					}
+					if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
+						Alphas( i + 1 ) = val;
+					} else {
+						Alphas( i + 1 ) = MakeUPPERCase( val );
 					}
 				} else {
-					++NNfld;
-					if ( ! ObjectDef( Found ).ReqField( LoopIndex ) ) {
-						Numbers( NNfld ) = ObjectDef( Found ).NumRangeChks( NNfld ).Default;
-						if ( ObjectDef( Found ).NumRangeChks( NNfld ).DefAutoSize ) Numbers( NNfld ) = ObjectDef( Found ).NumRangeChks( NNfld ).AutoSizeValue;
-						if ( ObjectDef( Found ).NumRangeChks( NNfld ).AutoCalculatable ) Numbers( NNfld ) = ObjectDef( Found ).NumRangeChks( NNfld ).AutoCalculateValue;
-
-						if ( present( NumBlank ) ) {
-							if ( Numbers( NNfld ) == ObjectDef( Found ).NumRangeChks( NNfld ).Default ) {
-								NumBlank()( NNfld ) = true;
-							} else {
-								NumBlank()( NNfld ) = false;
-							}
-						}
+					if ( it.value().is_number_integer() ) {
+						i64toa( it.value().get < int >(), s );
+					} else {
+						dtoa( it.value().get < double >(), s );
 					}
+					Alphas( i + 1 ) = s;
+					if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = false;
+				}
+				NumAlphas++;
+			} else {
+				Alphas( i + 1 ) = "";
+				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = true;
+			}
+			if ( is_AlphaFieldNames ) AlphaFieldNames()( i + 1 ) = field;
+		}
+
+		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
+		if ( legacy_idd_alphas_extension_iter != legacy_idd_alphas.end() ) {
+			auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
+			auto const & jdf_extensions_array = obj.value()[ extension_key];
+			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
+			int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
+
+			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
+				auto const & jdf_extension_obj = it.value();
+
+				for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
+					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
+					auto const & jdf_obj_field_iter = jdf_extension_obj.find( field_name );
+
+					if ( jdf_obj_field_iter != jdf_extension_obj.end() ) {
+						auto const & jdf_field_val = jdf_obj_field_iter.value();
+						if ( jdf_field_val.is_string() ) {
+							auto const & schema_field = schema_extension_fields[ field_name ];
+							std::string val = jdf_field_val;
+							auto const & tmp_find_default_iter = schema_field.find( "default" );
+							if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
+								auto const & field_default_val = tmp_find_default_iter.value();
+								if ( field_default_val.is_string() ) {
+									val = field_default_val.get < std::string >();
+								} else {
+									if ( field_default_val.is_number_integer() ) {
+										i64toa( field_default_val.get < int >(), s );
+									} else {
+										dtoa( field_default_val.get < double >(), s );
+									}
+									val = s;
+								}
+								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
+							} else {
+								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = val.empty();
+							}
+							if ( schema_field.find("retaincase") != schema_field.end() ) {
+								Alphas( alphas_index + 1 ) = val;
+							} else {
+								Alphas( alphas_index + 1 ) = MakeUPPERCase( val );
+							}
+						} else {
+							if ( jdf_field_val.is_number_integer() ) {
+								i64toa( jdf_field_val.get < int >(), s );
+							} else {
+								dtoa( jdf_field_val.get < double >(), s );
+							}
+							Alphas( alphas_index + 1 ) = s;
+							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
+						}
+						NumAlphas++;
+					} else {
+						Alphas( alphas_index + 1 ) = "";
+						if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
+					}
+					if ( is_AlphaFieldNames ) AlphaFieldNames()( alphas_index + 1 ) = field_name;
+					alphas_index++;
 				}
 			}
 		}
-#endif
 
+		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
+		for ( size_t i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
+			std::string const & field = legacy_idd_numerics_fields[ i ];
+			auto it = obj.value().find( field );
+			if ( it != obj.value().end() ) {
+				if ( !it.value().is_string() ) {
+					Numbers( i + 1 ) = it.value().get < double >();
+					if ( is_NumBlank ) NumBlank()( i + 1 ) = false;
+				} else {
+					if ( it.value().get < std::string >().empty() ) {
+						auto const & schema_obj = schema_obj_props[ field ];
+						auto const & schema_default_iter = schema_obj.find( "default" );
+						if ( schema_default_iter != schema_obj.end() ) {
+							auto const & schema_default_val = schema_default_iter.value();
+							if ( schema_default_val.is_string() ) Numbers( i + 1 ) = -99999;
+							else Numbers( i + 1 ) = schema_default_val.get < double >();
+						} else {
+							Numbers( i + 1 ) = 0;
+						}
+					} else {
+						Numbers( i + 1 ) = -99999; // autosize and autocalculate
+					}
+					if ( is_NumBlank ) NumBlank()( i + 1 ) = it.value().get < std::string >().empty();
+				}
+				NumNumbers++;
+			} else {
+				Numbers( i + 1 ) = 0;
+				if ( is_NumBlank )
+					NumBlank()( i + 1 ) = true;
+			}
+			if ( is_NumericFieldNames ) NumericFieldNames()( i + 1 ) = field;
+		}
+
+		auto const & legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
+		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() ) {
+			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
+			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
+			auto const & jdf_extensions_array = obj.value()[ extension_key ];
+			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
+
+			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
+				auto const & jdf_extension_obj = it.value();
+
+				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
+					std::string const & field = legacy_idd_numerics_extensions[ i ];
+					auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
+
+					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
+						auto const & val = jdf_extension_field_iter.value();
+						if ( !val.is_string() ) {
+							if ( val.is_number_integer() ) {
+								Numbers( numerics_index + 1 ) = val.get < int >();
+							} else {
+								Numbers( numerics_index + 1 ) = val.get < double >();
+							}
+							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = false;
+						} else {
+							if ( val.get < std::string >().empty() ) {
+								auto const & schema_obj = schema_extension_fields[ field ];
+								auto const & default_iter = schema_obj.find( "default" );
+								if ( default_iter != schema_obj.end() ) {
+									auto const & default_val = default_iter.value();
+									if ( default_val.is_string() ) {
+										Numbers( numerics_index + 1 ) = -99999;
+									} else if ( default_val.is_number_integer() ) {
+										Numbers( numerics_index + 1 ) = default_val.get < int >();
+									} else {
+										Numbers( numerics_index + 1 ) = default_val.get < double >();
+									}
+								} else {
+									Numbers( numerics_index + 1 ) = 0;
+								}
+							} else { // autosize and autocalculate
+								Numbers( numerics_index + 1 ) = -99999;
+							}
+							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = val.get < std::string >().empty();
+						}
+						NumNumbers++;
+					} else {
+						auto const & schema_field = schema_extension_fields[ field ];
+						auto const & schema_field_default_iter = schema_field.find( "default" );
+						if ( schema_field_default_iter != schema_field.end() ) {
+							auto const & schema_field_default_val = schema_field_default_iter.value();
+							if ( schema_field_default_val.is_number_integer() ) {
+								Numbers( numerics_index + 1 ) = schema_field_default_val.get < int >();
+							} else if ( schema_field_default_val.is_number_float() ) {
+								Numbers( numerics_index + 1 ) = schema_field_default_val.get < double >();
+							} else {
+								if ( it.value().get < std::string >().empty() ) {
+									Numbers( numerics_index + 1 ) = 0;
+								} else {
+									Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
+								}
+							}
+						} else {
+							Numbers( numerics_index + 1 ) = 0;
+						}
+						if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = true;
+					}
+					if ( is_NumericFieldNames ) NumericFieldNames()( numerics_index + 1 ) = field;
+					numerics_index++;
+				}
+			}
+		}
+
+		Status = 1;
 	}
 
 	int
-	GetObjectItemNum(
-		std::string const & ObjType, // Object Type (ref: IDD Objects)
-		std::string const & ObjName // Name of the object type
-	)
-	{
-
-		// SUBROUTINE INFORMATION
-		//             AUTHOR:  Fred Buhl
-		//       DATE WRITTEN:  Jan 1998
-		//           MODIFIED:  Lawrie, September 1999. Take advantage of internal
-		//                      InputProcessor structures to speed search.
-		//      RE-ENGINEERED:  This is new code, not reengineered
-
+	InputProcessor::GetObjectItemNum(
+	std::string const & ObjType, // Object Type (ref: IDD Objects)
+	std::string const & ObjName // Name of the object type
+	) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
-		// METHODOLOGY EMPLOYED:
-		// Use internal IDF record structure for each object occurrence
-		// and compare the name with ObjName.
-
-		// REFERENCES:
-		// na
-
-		// Return value
-		int GetObjectItemNum;
-
-		// Locals
-		// SUBROUTINE ARGUMENTS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
-		int NumObjOfType; // Total number of Object Type in IDF
-		int ObjNum; // Loop index variable
-		int ItemNum; // Item number for Object Name
-		int Found; // Indicator for Object Type in list of Valid Objects
-		std::string UCObjType; // Upper Case for ObjType
-		bool ItemFound; // Set to true if item found
-		bool ObjectFound; // Set to true if object found
-		int StartRecord; // Start record for objects
-
-		ItemNum = 0;
-		ItemFound = false;
-		ObjectFound = false;
-		UCObjType = MakeUPPERCase( ObjType );
-		if ( SortedIDD ) {
-			Found = FindItemInSortedList( UCObjType, ListOfObjects, NumObjectDefs );
-			if ( Found != 0 ) Found = iListOfObjects( Found );
+		json * obj;
+		auto obj_iter = jdf.find( ObjType );
+		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
+				return -1;
+			}
+			obj = &jdf[ tmp_umit->second ];
 		} else {
-			Found = FindItemInList( UCObjType, ListOfObjects, NumObjectDefs );
+			obj = &( obj_iter.value() );
 		}
 
-		if ( Found != 0 ) {
-
-			ObjectFound = true;
-			NumObjOfType = ObjectDef( Found ).NumFound;
-			ItemNum = 0;
-			StartRecord = ObjectStartRecord( Found );
-
-			if ( StartRecord > 0 ) {
-				for ( ObjNum = StartRecord; ObjNum <= NumIDFRecords; ++ObjNum ) {
-					if ( IDFRecords( ObjNum ).Name != UCObjType ) continue;
-					++ItemNum;
-					if ( ItemNum > NumObjOfType ) break;
-					if ( IDFRecords( ObjNum ).Alphas( 1 ) == ObjName ) {
-						ItemFound = true;
-						break;
-					}
-				}
+		int object_item_num = 1;
+		bool found = false;
+		auto const upperObjName = MakeUPPERCase( ObjName );
+		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
+			if ( MakeUPPERCase( it.key() ) == upperObjName ) {
+				found = true;
+				break;
 			}
+			object_item_num++;
 		}
 
-		if ( ObjectFound ) {
-			if ( ! ItemFound ) ItemNum = 0;
+		if ( !found ) {
+			// ShowWarningError("Didn't find name, need to probably use search key");
+			return -1;
+		}
+		return object_item_num;
+		}
+
+
+	int
+	InputProcessor::GetObjectItemNum(
+			std::string const & ObjType, // Object Type (ref: IDD Objects)
+			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
+			std::string const & ObjName // Name of the object type
+	) {
+		// PURPOSE OF THIS SUBROUTINE:
+		// Get the occurrence number of an object of type ObjType and name ObjName
+
+		json * obj;
+		auto obj_iter = jdf.find( ObjType );
+		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
+				return -1;
+			}
+			obj = &jdf[ tmp_umit->second ];
 		} else {
-			ItemNum = -1; // if object not found, then flag it
+			obj = &( obj_iter.value() );
 		}
 
-		GetObjectItemNum = ItemNum;
+		int object_item_num = 1;
+		bool found = false;
+		auto const upperObjName = MakeUPPERCase( ObjName );
+		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
+			auto it2 = it.value().find(NameTypeVal);
 
-		return GetObjectItemNum;
-
-	}
-
-	void
-	TellMeHowManyObjectItemArgs(
-		std::string const & Object,
-		int const Number,
-		int & NumAlpha,
-		int & NumNumbers,
-		int & Status
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine returns the number of arguments (alpha and numeric) for
-		// the referenced 'number' Object.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Count;
-		int LoopIndex;
-		std::string ObjectWord;
-
-		Count = 0;
-		Status = -1;
-		for ( LoopIndex = 1; LoopIndex <= NumIDFRecords; ++LoopIndex ) {
-			if ( SameString( IDFRecords( LoopIndex ).Name, Object ) ) {
-				++Count;
-				if ( Count == Number ) {
-					// Read this one
-					GetObjectItemfromFile( LoopIndex, ObjectWord, NumAlpha, NumNumbers );
-					Status = 1;
-					break;
-				}
+			if ( ( it2 != it.value().end() ) && ( MakeUPPERCase( it2.value() ) == upperObjName ) ) {
+				found = true;
+				break;
 			}
+			object_item_num++;
 		}
 
-	}
 
-	void
-	GetObjectItemfromFile(
-		int const Which,
-		std::string & ObjectWord,
-		int & NumAlpha,
-		int & NumNumeric,
-		Optional< Array1S_string > AlphaArgs,
-		Optional< Array1S< Real64 > > NumericArgs,
-		Optional< Array1S_bool > AlphaBlanks,
-		Optional< Array1S_bool > NumericBlanks
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine "gets" the object instance from the data structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using
-		using DataStringGlobals::NL;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-		LineDefinition xLineItem; // Description of current record
-
-		if ( Which > 0 && Which <= NumIDFRecords ) {
-			xLineItem = IDFRecords( Which );
-			ObjectWord = xLineItem.Name;
-			NumAlpha = xLineItem.NumAlphas;
-			NumNumeric = xLineItem.NumNumbers;
-			if ( present( AlphaArgs ) ) {
-				if ( NumAlpha >= 1 ) {
-					AlphaArgs()( {1,NumAlpha} ) = xLineItem.Alphas( {1,NumAlpha} );
-				}
-			}
-			if ( present( AlphaBlanks ) ) {
-				if ( NumAlpha >= 1 ) {
-					AlphaBlanks()( {1,NumAlpha} ) = xLineItem.AlphBlank( {1,NumAlpha} );
-				}
-			}
-			if ( present( NumericArgs ) ) {
-				if ( NumNumeric >= 1 ) {
-					NumericArgs()( {1,NumNumeric} ) = xLineItem.Numbers( {1,NumNumeric} );
-				}
-			}
-			if ( present( NumericBlanks ) ) {
-				if ( NumNumeric >= 1 ) {
-					NumericBlanks()( {1,NumNumeric} ) = xLineItem.NumBlank( {1,NumNumeric} );
-				}
-			}
-		} else {
-			if ( echo_stream ) *echo_stream << " Requested Record " << Which << " not in range, 1 -- " << NumIDFRecords << NL;
+		if ( !found ) {
+			// ShowWarningError("Didn't find name, need to probably use search key");
+			return -1;
 		}
-
-	}
-
-	// Utility Functions/Routines for Module
-
-	void
-	ReadInputLine(
-		std::istream & in_stream,
-		std::string::size_type & CurPos,
-		bool & BlankLine,
-		bool & EndofFile
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine reads a line in the specified file and checks for end of file
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using
-		using DataStringGlobals::NL;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		char const SPC( ' ' );
-		char const TAB( '\t' );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ReadStat;
-		std::string::size_type Pos;
-		std::string::size_type Slash;
-		std::string::size_type NSpace;
-		bool errFlag;
-
-		errFlag = false;
-		{ IOFlags flags; cross_platform_get_line( in_stream, InputLine ); flags.set_status( in_stream ); ReadStat = flags.ios(); }
-
-		if ( ReadStat != 0 ) InputLine.clear();
-		std::replace( InputLine.begin(), InputLine.end(), TAB, SPC ); // Replace tabs with spaces
-
-		BlankLine = false;
-		CurPos = 0;
-		if ( ReadStat < 0 ) {
-			EndofFile = true;
-		} else {
-			if ( EchoInputLine ) {
-				++NumLines;
-				if ( DisplayInputInAudit ) {
-					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
-				}
-			}
-			EchoInputLine = true;
-			InputLineLength = static_cast< int >( len_trim( InputLine ) );
-			if ( InputLineLength == 0 ) {
-				BlankLine = true;
-			}
-			Pos = ( ProcessingIDD ? InputLine.find_first_of( "!\\" ) : InputLine.find( '!' ) ); // 4/30/09 remove ~
-			if ( Pos != std::string::npos ) {
-				Slash = ( ProcessingIDD ? InputLine.find( '\\' ) : std::string::npos );
-				InputLineLength = static_cast< int >( Pos + 1 );
-				if ( Pos > 0 ) {
-					if ( is_blank( InputLine.substr( 0, Pos ) ) ) {
-						BlankLine = true;
-					}
-				} else {
-					BlankLine = true;
-				}
-				if ( ( Slash != std::string::npos ) && ( Pos == Slash ) ) {
-					std::string UCInputLine( InputLine, Pos );
-					uppercase( UCInputLine ); // With this many comparisons probably faster to uppercase once vs many c-i comparisons
-					FieldSet = false;
-					switch ( UCInputLine.length() > 1 ? UCInputLine[ 1 ] : ' ' ) { //Performance Switch to reduce expensive string operations
-					case 'E':
-						if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
-							ExtensibleObject = true;
-							if ( UCInputLine[ 11 ] != ':' ) {
-								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
-							} else { // process number
-								std::string const number_str( UCInputLine.substr( 12 ) );
-								NSpace = scan( number_str, " !" );
-								if ( NSpace != std::string::npos ) {
-									ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-									if ( errFlag ) {
-										ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
-									}
-								} else {
-									ExtensibleNumFields = 0.0;
-									errFlag = false;
-								}
-							}
-						}
-						break;
-					case 'F':
-						if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
-							// Capture Field Name
-							CurrentFieldName = InputLine.substr( Slash + 6 );
-							strip( CurrentFieldName );
-							FieldSet = true;
-						}
-						break;
-					case 'M':
-						if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
-							//RequiredField = true;
-							NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
-							if ( NSpace == std::string::npos ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
-								errFlag = true;
-								MinimumNumberOfFields = 0;
-							} else {
-								std::string const number_str( trimmed( UCInputLine.substr( 11 + NSpace ) ) );
-								NSpace = scan( number_str, " !" );
-								if ( NSpace == std::string::npos ) {
-									MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
-								} else {
-									MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-								}
-								if ( errFlag ) {
-									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
-								}
-							}
-						}
-						break;
-					case 'O':
-						if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
-							NSpace = index( UCInputLine.substr( 9 ), "=>" );
-							if ( NSpace == std::string::npos ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
-								errFlag = true;
-							} else {
-								std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
-								ReplacementName = trimmed( name_str );
-								ObsoleteObject = true;
-							}
-						}
-						break;
-					case 'R':
-						if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
-							RequiredField = true;
-						} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
-							RequiredObject = true;
-//						} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
-//							//RetainCase = true; // Arg not present
-						}
-						break;
-					case 'U':
-						if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
-							UniqueObject = true;
-						}
-						break;
-					}
-				}
-			}
-		}
-
-	}
-
-	void
-	ReadInputLine(
-		std::istream & in_stream,
-		std::string::size_type & CurPos,
-		bool & BlankLine,
-		bool & EndofFile,
-		bool & MinMax,
-		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-		std::string & MinMaxString,
-		Real64 & Value,
-		bool & Default,
-		std::string & DefString,
-		bool & AutoSizable,
-		bool & AutoCalculatable,
-		bool & RetainCase,
-		bool & ErrorsFound
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine reads a line in the specified file and checks for end of file
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using
-		using DataStringGlobals::NL;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		char const SPC( ' ' );
-		char const TAB( '\t' );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ReadStat;
-		std::string::size_type Pos;
-		std::string::size_type Slash;
-		std::string::size_type P1;
-		std::string::size_type NSpace;
-		bool errFlag;
-		int ErrLevel;
-
-		errFlag = false;
-		{ IOFlags flags; cross_platform_get_line( in_stream, InputLine ); flags.set_status( in_stream ); ReadStat = flags.ios(); }
-
-		if ( ReadStat != 0 ) InputLine.clear();
-		std::replace( InputLine.begin(), InputLine.end(), TAB, SPC ); // Replace tabs with spaces
-
-		BlankLine = false;
-		CurPos = 0;
-		if ( ReadStat < 0 ) {
-			EndofFile = true;
-		} else {
-			if ( EchoInputLine ) {
-				++NumLines;
-				if ( DisplayInputInAudit ) {
-					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
-				}
-			}
-			EchoInputLine = true;
-			InputLineLength = static_cast< int >( len_trim( InputLine ) );
-			if ( InputLineLength == 0 ) {
-				BlankLine = true;
-			}
-			Pos = ( ProcessingIDD ? InputLine.find_first_of( "!\\" ) : InputLine.find( '!' ) ); // 4/30/09 remove ~
-			if ( Pos != std::string::npos ) {
-				Slash = ( ProcessingIDD ? InputLine.find( '\\' ) : std::string::npos );
-				InputLineLength = static_cast< int >( Pos + 1 );
-				if ( Pos > 0 ) {
-					if ( is_blank( InputLine.substr( 0, Pos ) ) ) {
-						BlankLine = true;
-					}
-				} else {
-					BlankLine = true;
-				}
-				if ( ( Slash != std::string::npos ) && ( Pos == Slash ) ) {
-					std::string UCInputLine( InputLine, Pos );
-					uppercase( UCInputLine ); // With this many comparisons probably faster to uppercase once vs many c-i comparisons
-					FieldSet = false;
-					MinMax = false;
-					Default = false;
-					AutoSizable = false;
-					AutoCalculatable = false;
-					switch ( UCInputLine.length() > 1 ? UCInputLine[ 1 ] : ' ' ) { //Performance Switch to reduce expensive string operations
-					case 'A':
-						if ( has_prefix( UCInputLine, "\\AUTOS" ) ) { // AutoSizable arg
-							AutoSizable = true;
-							ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ErrLevel > 0 ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autosize designation -- invalid number=" + UCInputLine, EchoInputFile );
-								errFlag = true;
-							}
-						} else if ( has_prefix( UCInputLine, "\\AUTOC" ) ) { // AutoCalculatable arg
-							AutoCalculatable = true;
-							ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ErrLevel > 0 ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autocalculate designation -- invalid number=" + UCInputLine, EchoInputFile );
-								errFlag = true;
-							}
-						}
-						break;
-					case 'D':
-						if ( has_prefix( UCInputLine, "\\DEFAULT" ) ) { // Default arg
-							// WhichMinMax, MinMaxString not filled here
-							Default = true;
-							ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ( ! RetainCase ) && ( ! DefString.empty() ) ) uppercase( DefString );
-							if ( ErrLevel > 1 ) {
-								ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
-								errFlag = true;
-							}
-						}
-						break;
-					case 'E':
-						if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
-							ExtensibleObject = true;
-							if ( UCInputLine[ 11 ] != ':' ) {
-								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
-							} else { // process number
-								std::string const number_str( UCInputLine.substr( 12 ) );
-								NSpace = scan( number_str, " !" );
-								if ( NSpace != std::string::npos ) {
-									ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-									if ( errFlag ) {
-										ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
-									}
-								} else {
-									ExtensibleNumFields = 0.0;
-									errFlag = false;
-								}
-							}
-						}
-						break;
-					case 'F':
-						if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
-							// Capture Field Name
-							CurrentFieldName = InputLine.substr( Slash + 6 );
-							strip( CurrentFieldName );
-							P1 = scan( CurrentFieldName, '!' );
-							if ( P1 != std::string::npos ) CurrentFieldName.erase( P1 );
-							FieldSet = true;
-						}
-						break;
-					case 'M':
-						if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
-							//RequiredField = true;
-							NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
-							if ( NSpace == std::string::npos ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
-								errFlag = true;
-								MinimumNumberOfFields = 0;
-							} else {
-								std::string const number_str( UCInputLine.substr( 11 + NSpace ) );
-								NSpace = scan( number_str, " !" );
-								if ( NSpace == std::string::npos ) {
-									MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
-								} else {
-									MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-								}
-								if ( errFlag ) {
-									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
-								}
-							}
-						} else if ( has_prefix( UCInputLine, "\\MINIMUM" ) || has_prefix( UCInputLine, "\\MAXIMUM" ) ) { // Min/Max args
-							MinMax = true;
-							ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ErrLevel > 0 ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Minimum/Maximum designation -- invalid number=" + UCInputLine, EchoInputFile );
-								errFlag = true;
-							}
-						}
-						break;
-					case 'O':
-						if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
-							NSpace = index( UCInputLine.substr( 9 ), "=>" );
-							if ( NSpace == std::string::npos ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
-								errFlag = true;
-							} else {
-								std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
-								NSpace = scan( name_str, '!' );
-								if ( NSpace == std::string::npos ) {
-									ReplacementName = trimmed( name_str );
-								} else {
-									ReplacementName = trimmed( name_str.substr( 0, NSpace ) );
-								}
-								ObsoleteObject = true;
-							}
-						}
-						break;
-					case 'R':
-						if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
-							RequiredField = true;
-						} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
-							RequiredObject = true;
-						} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
-							RetainCase = true;
-						}
-						break;
-					case 'U':
-						if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
-							UniqueObject = true;
-						}
-						break;
-					}
-				}
-			}
-		}
-		if ( errFlag ) {
-			ErrorsFound = true;
-		}
-
-	}
-
-	void
-	ExtendObjectDefinition(
-		int const ObjectNum, // Number of the object definition to be extended.
-		int & NumNewArgsLimit // Number of the parameters after extension
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   Sep 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine expands the object definition according to the extensible "rules" entered
-		// by the developer.  The developer should enter the number of fields to be duplicated.
-		// See References section for examples.
-
-		// METHODOLOGY EMPLOYED:
-		// The routine determines the type of the fields to be added (A or N) and reallocates the
-		// appropriate arrays in the object definition structure.
-
-		// REFERENCES:
-		// Extensible objects have a \extensible:<num> specification
-		// \extensible:3 -- the last 3 fields are "extended"
-		// Works on this part of the definition:
-		//   INTEGER :: NumParams                       =0   ! Number of parameters to be processed for each object
-		//   INTEGER :: NumAlpha                        =0   ! Number of Alpha elements in the object
-		//   INTEGER :: NumNumeric                      =0   ! Number of Numeric elements in the object
-		//   LOGICAL(1), ALLOCATABLE, DIMENSION(:) :: AlphaOrNumeric ! Positionally, whether the argument
-		//                                                           ! is alpha (true) or numeric (false)
-		//   LOGICAL(1), ALLOCATABLE, DIMENSION(:) :: ReqField ! True for required fields
-		//   LOGICAL(1), ALLOCATABLE, DIMENSION(:) :: AlphRetainCase ! true if retaincase is set for this field (alpha fields only)
-		//   CHARACTER(len=MaxNameLength+40),  &
-		//               ALLOCATABLE, DIMENSION(:) :: AlphFieldChks ! Field names for alphas
-		//   CHARACTER(len=MaxNameLength),  &
-		//               ALLOCATABLE, DIMENSION(:) :: AlphFieldDefs ! Defaults for alphas
-		//   TYPE(RangeCheckDef), ALLOCATABLE, DIMENSION(:) :: NumRangeChks  ! Used to range check and default numeric fields
-		//   INTEGER :: LastExtendAlpha                 =0   ! Count for extended alpha fields
-		//   INTEGER :: LastExtendNum                   =0   ! Count for extended numeric fields
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NewAlloc( 1000 ); // number of new items to allocate (* number of fields)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumAlphaField;
-		int NumNumericField;
-		int NumNewAlphas;
-		int NumNewNumerics;
-		int NumNewParams;
-		int NumExtendFields;
-		int NumParams;
-		int Count;
-		//  LOGICAL :: MaxArgsChanged
-		std::string charout;
-		static std::string CurObject;
-
-		gio::write( EchoInputFile, fmtA ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
-		if ( CurObject != ObjectDef( ObjectNum ).Name ) {
-			DisplayString( "Auto-extending object=\"" + ObjectDef( ObjectNum ).Name + "\", input processing may be slow." );
-			CurObject = ObjectDef( ObjectNum ).Name;
-		}
-
-		NumAlphaField = 0;
-		NumNumericField = 0;
-		NumParams = ObjectDef( ObjectNum ).NumParams;
-		Count = NumParams - ObjectDef( ObjectNum ).ExtensibleNum + 1;
-		//  MaxArgsChanged=.FALSE.
-
-		Array1D_bool AorN( ObjectDef( ObjectNum ).ExtensibleNum, false );
-		for ( int Loop = Count, Item = 1; Loop <= NumParams; ++Loop, ++Item ) {
-			bool const AON_Loop( ObjectDef( ObjectNum ).AlphaOrNumeric( Loop ) );
-			if ( AON_Loop ) {
-				++NumAlphaField;
-			} else {
-				++NumNumericField;
-			}
-			AorN( Item ) = AON_Loop;
-		}
-		NumNewAlphas = NumAlphaField * NewAlloc;
-		NumNewNumerics = NumNumericField * NewAlloc;
-		NumNewParams = NumParams + NumNewAlphas + NumNewNumerics;
-		NumExtendFields = NumAlphaField + NumNumericField;
-		ObjectDef( ObjectNum ).AlphaOrNumeric.redimension( NumNewParams, false );
-		for ( int Loop = NumParams + 1; Loop <= NumNewParams; Loop += NumExtendFields ) {
-			ObjectDef( ObjectNum ).AlphaOrNumeric( {Loop,Loop+NumExtendFields-1} ) = AorN;
-		}
-		AorN.deallocate(); // done with this object AorN array.
-
-		// required fields -- can't be extended and required.
-		ObjectDef( ObjectNum ).ReqField.redimension( NumNewParams, false );
-
-		ObjectDef( ObjectNum ).AlphRetainCase.redimension( NumNewParams, false );
-
-		if ( NumAlphaField > 0 ) {
-			ObjectDef( ObjectNum ).AlphFieldChks.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			for ( int Loop = ObjectDef( ObjectNum ).NumAlpha + 1, Loop_end = ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas; Loop <= Loop_end; ++Loop ) {
-				++ObjectDef( ObjectNum ).LastExtendAlpha;
-				charout = IPTrimSigDigits( ObjectDef( ObjectNum ).LastExtendAlpha );
-				ObjectDef( ObjectNum ).AlphFieldChks( Loop ) = "Extended Alpha Field " + charout;
-			}
-
-			ObjectDef( ObjectNum ).AlphFieldDefs.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-
-			if ( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas > MaxAlphaArgsFound ) {
-				// must redimension LineItem args
-				LineItem.Alphas.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-
-				LineItem.AlphBlank.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas, true );
-
-				MaxAlphaArgsFound = ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas;
-				//      MaxArgsChanged=.TRUE.
-			}
-
-		}
-
-		if ( NumNumericField > 0 ) {
-			ObjectDef( ObjectNum ).NumRangeChks.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-			for ( int Loop = ObjectDef( ObjectNum ).NumNumeric + 1, Loop_end = ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics; Loop <= Loop_end; ++Loop ) {
-				ObjectDef( ObjectNum ).NumRangeChks( Loop ).FieldNumber = Loop;
-				++ObjectDef( ObjectNum ).LastExtendNum;
-				charout = IPTrimSigDigits( ObjectDef( ObjectNum ).LastExtendNum );
-				ObjectDef( ObjectNum ).NumRangeChks( Loop ).FieldName = "Extended Numeric Field " + charout;
-			}
-
-			if ( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics > MaxNumericArgsFound ) {
-				// must redimension LineItem args
-				LineItem.Numbers.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics, 0.0 );
-
-				LineItem.NumBlank.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics, true );
-
-				MaxNumericArgsFound = ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics;
-				//      MaxArgsChanged=.TRUE.
-			}
-
-		}
-
-		ObjectDef( ObjectNum ).NumParams = NumNewParams;
-		NumNewArgsLimit = NumNewParams;
-		ObjectDef( ObjectNum ).NumAlpha += NumNewAlphas;
-		ObjectDef( ObjectNum ).NumNumeric += NumNewNumerics;
-
+		return object_item_num;
 	}
 
 	Real64
-	ProcessNumber(
+	InputProcessor::ProcessNumber(
 		std::string const & String,
 		bool & ErrorFlag
-	)
-	{
+	) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3295,25 +1619,8 @@ namespace InputProcessor {
 		// REFERENCES:
 		// List directed Fortran input/output.
 
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const ValidNumerics( "0123456789.+-EeDd" ); // This had a trailing tab character: Not sure why
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		static std::string const ValidNumerics( "0123456789.+-EeDd" );
 
 		Real64 rProcessNumber = 0.0;
 		//  Make sure the string has all what we think numerics should have
@@ -3323,7 +1630,11 @@ namespace InputProcessor {
 		if ( StringLen == 0 ) return rProcessNumber;
 		int IoStatus( 0 );
 		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
-			{ IOFlags flags; gio::read( PString, fmtLD, flags ) >> rProcessNumber; IoStatus = flags.ios(); }
+			{
+				IOFlags flags;
+				gio::read( PString, fmtLD, flags ) >> rProcessNumber;
+				IoStatus = flags.ios();
+			}
 			ErrorFlag = false;
 		} else {
 			rProcessNumber = 0.0;
@@ -3338,152 +1649,12 @@ namespace InputProcessor {
 
 	}
 
-	void
-	ProcessMinMaxDefLine(
-		std::string const & partLine, // part of input line starting \min or \max  Not uppercase if \default
-		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-		std::string & MinMaxString,
-		Real64 & Value,
-		std::string & DefaultString,
-		int & ErrLevel
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine processes the IDD lines that start with
-		// \minimum or \maximum and set up the parameters so that it can
-		// be automatically checked.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// IDD Statements.
-		//  \minimum         Minimum that includes the following value
-		//  i.e. min >=
-		//  \minimum>        Minimum that must be > than the following value
-		//  \maximum         Maximum that includes the following value
-		//  i.e. max <=
-		//  \maximum<        Maximum that must be < than the following value
-		//  \default         Default for field (when field is blank)
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		ErrLevel = 0;
-		std::string::size_type Pos = scan( partLine, ' ' );
-
-		{ auto const maxMinDefLine( uppercased( partLine.substr( 0, 4 ) ) );
-
-		if ( maxMinDefLine == "\\MIN" ) {
-			WhichMinMax = 1;
-			if ( has( partLine, '>' ) ) {
-				Pos = scan( partLine, '>' ) + 1;
-				WhichMinMax = 2;
-			}
-			if ( WhichMinMax == 1 ) {
-				MinMaxString = ">=";
-			} else {
-				MinMaxString = ">";
-			}
-
-		} else if ( maxMinDefLine == "\\MAX" ) {
-			WhichMinMax = 3;
-			if ( has( partLine, '<' ) ) {
-				Pos = scan( partLine, '<' ) + 1;
-				WhichMinMax = 4;
-			}
-			if ( WhichMinMax == 3 ) {
-				MinMaxString = "<=";
-			} else {
-				MinMaxString = "<";
-			}
-
-		} else if ( maxMinDefLine == "\\DEF" ) {
-			WhichMinMax = 5;
-			MinMaxString = BlankString;
-
-		} else if ( maxMinDefLine == "\\AUT" ) {
-			WhichMinMax = 6;
-			MinMaxString = BlankString;
-
-		} else {
-			WhichMinMax = 0; // invalid field
-			MinMaxString = BlankString;
-			Value = -999999.0;
-
-		}}
-
-		if ( WhichMinMax != 0 ) {
-			if ( Pos == std::string::npos ) Pos = partLine.length(); // So that NSpace=npos
-			std::string::size_type NSpace = FindNonSpace( partLine.substr( Pos ) );
-			if ( NSpace == std::string::npos ) {
-				if ( WhichMinMax != 6 ) { // Only autosize/autocalculate can't have argument
-					ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + "Min/Max/Default field cannot be blank -- must have value", EchoInputFile );
-					ErrLevel = 2;
-				} else if ( has_prefix( partLine, "\\AUTOS" ) ) {
-					Value = DefAutoSizeValue;
-				} else if ( has_prefix( partLine, "\\AUTOC" ) ) {
-					Value = DefAutoCalculateValue;
-				}
-			} else {
-				Pos += NSpace;
-				NSpace = scan( partLine.substr( Pos ), " !" );
-				MinMaxString += partLine.substr( Pos, NSpace );
-				bool errFlag;
-				Value = ProcessNumber( partLine.substr( Pos, NSpace ), errFlag );
-				if ( errFlag ) ErrLevel = 1;
-				NSpace = scan( partLine.substr( Pos ), '!' );
-				if ( NSpace != std::string::npos ) {
-					DefaultString = partLine.substr( Pos, NSpace - 1 );
-				} else {
-					DefaultString = partLine.substr( Pos );
-				}
-				strip( DefaultString );
-				if ( DefaultString == BlankString ) {
-					if ( WhichMinMax == 6 ) {
-						if ( has_prefix( partLine, "\\AUTOS" ) ) {
-							Value = DefAutoSizeValue;
-						} else {
-							Value = DefAutoCalculateValue;
-						}
-					} else {
-						ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + "Min/Max/Default field cannot be blank -- must have value", EchoInputFile );
-						ErrLevel = 2;
-					}
-				}
-			}
-		}
-
-	}
-
 	int
-	FindItemInList(
+	InputProcessor::FindItemInList(
 		std::string const & String,
 		Array1_string const & ListOfItems,
 		int const NumItems
-	)
-	{
+	) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3498,31 +1669,6 @@ namespace InputProcessor {
 		// for most inputs -- they are automatically turned to UPPERCASE.
 		// If you need case insensitivity use FindItem.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
@@ -3532,12 +1678,11 @@ namespace InputProcessor {
 	}
 
 	int
-	FindItemInList(
+	InputProcessor::FindItemInList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
-	)
-	{
+	) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3552,31 +1697,6 @@ namespace InputProcessor {
 		// for most inputs -- they are automatically turned to UPPERCASE.
 		// If you need case insensitivity use FindItem.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
@@ -3585,13 +1705,13 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
+
 	int
-	FindItemInSortedList(
+	InputProcessor::FindItemInSortedList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
-	)
-	{
+	) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3604,38 +1724,13 @@ namespace InputProcessor {
 		// items and returns the index of the item in the list, if
 		// found.  This routine is case insensitive.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int Probe( 0 );
 		int LBnd( 0 );
 		int UBnd( NumItems + 1 );
 		bool Found( false );
-		while ( ( ! Found ) || ( Probe != 0 ) ) {
+		while ( ( !Found ) || ( Probe != 0 ) ) {
 			Probe = ( UBnd - LBnd ) / 2;
 			if ( Probe == 0 ) break;
 			Probe += LBnd;
@@ -3652,12 +1747,11 @@ namespace InputProcessor {
 	}
 
 	int
-	FindItem(
+	InputProcessor::FindItem(
 		std::string const & String,
 		Array1D_string const & ListOfItems,
 		int const NumItems
-	)
-	{
+	) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3669,31 +1763,6 @@ namespace InputProcessor {
 		// This function looks up a string in a similar list of
 		// items and returns the index of the item in the list, if
 		// found.  This routine is case insensitive.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -3707,12 +1776,11 @@ namespace InputProcessor {
 	}
 
 	int
-	FindItem(
+	InputProcessor::FindItem(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
-	)
-	{
+	) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3724,31 +1792,6 @@ namespace InputProcessor {
 		// This function looks up a string in a similar list of
 		// items and returns the index of the item in the list, if
 		// found.  This routine is case insensitive.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -3762,8 +1805,7 @@ namespace InputProcessor {
 	}
 
 	std::string
-	MakeUPPERCase( std::string const & InputString )
-	{
+	InputProcessor::MakeUPPERCase( std::string const & InputString ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -3778,35 +1820,14 @@ namespace InputProcessor {
 		// Uses the Intrinsic SCAN function to scan the lowercase representation of
 		// characters (DataStringGlobals) for each character in the given string.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// MaxInputLineLength because of PowerStation Compiler
-		// otherwise could say (CHARACTER(len=LEN(InputString))
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		std::string ResultString( InputString );
 
 		for ( std::string::size_type i = 0, e = len( InputString ); i < e; ++i ) {
 			int const curCharVal = int( InputString[ i ] );
-			if ( ( 97 <= curCharVal && curCharVal <= 122 ) || ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
+			if ( ( 97 <= curCharVal && curCharVal <= 122 ) ||
+				 ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
 				ResultString[ i ] = char( curCharVal - 32 );
 			}
 		}
@@ -3816,15 +1837,14 @@ namespace InputProcessor {
 	}
 
 	void
-	VerifyName(
+	InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1D_string const & NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
 		bool & IsBlank,
 		std::string const & StringToDisplay
-	)
-	{
+	) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
@@ -3836,29 +1856,6 @@ namespace InputProcessor {
 		// This subroutine verifys that a new name can be added to the
 		// list of names for this item (i.e., that there isn't one of that
 		// name already and that this name is not blank).
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found;
@@ -3883,15 +1880,14 @@ namespace InputProcessor {
 	}
 
 	void
-	VerifyName(
+	InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1S_string const NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
 		bool & IsBlank,
 		std::string const & StringToDisplay
-	)
-	{
+	) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
@@ -3903,29 +1899,6 @@ namespace InputProcessor {
 		// This subroutine verifys that a new name can be added to the
 		// list of names for this item (i.e., that there isn't one of that
 		// name already and that this name is not blank).
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found;
@@ -3949,8 +1922,23 @@ namespace InputProcessor {
 
 	}
 
+	bool
+	EnergyPlus::InputProcessor::IsNameEmpty (
+		std::string & NameToVerify,
+		std::string const & StringToDisplay,
+		bool & ErrorFound
+	){
+		if ( NameToVerify.empty() ) {
+			ShowSevereError(StringToDisplay + " Name, cannot be blank");
+			ErrorFound = true;
+			NameToVerify = "xxxxx";
+			return true;
+		}
+		return false;
+	}
+
 	void
-	RangeCheck(
+	InputProcessor::RangeCheck(
 		bool & ErrorsFound, // Set to true if error detected
 		std::string const & WhatFieldString, // Descriptive field for string
 		std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
@@ -3961,8 +1949,7 @@ namespace InputProcessor {
 		Optional_bool_const UpperBoundCondition, // Condition for error condition, if applicable
 		Optional_string_const ValueString, // Value with digits if to be displayed with error
 		Optional_string_const WhatObjectName // ObjectName -- used for error messages
-	)
-	{
+	) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
@@ -3976,38 +1963,16 @@ namespace InputProcessor {
 		// error message to describe the situation in addition to setting the ErrorsFound variable
 		// to true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ErrorString; // Uppercase representation of ErrorLevel
 		std::string Message1;
 		std::string Message2;
 
 		bool Error = false;
 		if ( present( UpperBoundCondition ) ) {
-			if ( ! UpperBoundCondition ) Error = true;
+			if ( !UpperBoundCondition ) Error = true;
 		}
 		if ( present( LowerBoundCondition ) ) {
-			if ( ! LowerBoundCondition ) Error = true;
+			if ( !LowerBoundCondition ) Error = true;
 		}
 
 		if ( Error ) {
@@ -4025,1036 +1990,246 @@ namespace InputProcessor {
 			}
 			Message2 += "}";
 
-			{ auto const errorCheck( ErrorString[ 0 ] );
+			{
+				auto const errorCheck( ErrorString[ 0 ] );
 
-			if ( ( errorCheck == 'W' ) || ( errorCheck == 'w' ) ) {
-				ShowWarningError( Message1 );
-				ShowContinueError( Message2 );
+				if ( ( errorCheck == 'W' ) || ( errorCheck == 'w' ) ) {
+					ShowWarningError( Message1 );
+					ShowContinueError( Message2 );
 
-			} else if ( ( errorCheck == 'S' ) || ( errorCheck == 's' ) ) {
-				ShowSevereError( Message1 );
-				ShowContinueError( Message2 );
-				ErrorsFound = true;
+				} else if ( ( errorCheck == 'S' ) || ( errorCheck == 's' ) ) {
+					ShowSevereError( Message1 );
+					ShowContinueError( Message2 );
+					ErrorsFound = true;
 
-			} else if ( ( errorCheck == 'F' ) || ( errorCheck == 'f' ) ) {
-				ShowSevereError( Message1 );
-				ShowContinueError( Message2 );
-				ShowFatalError( "Program terminates due to preceding condition(s)." );
+				} else if ( ( errorCheck == 'F' ) || ( errorCheck == 'f' ) ) {
+					ShowSevereError( Message1 );
+					ShowContinueError( Message2 );
+					ShowFatalError( "Program terminates due to preceding condition(s)." );
 
-			} else {
-				ShowSevereError( Message1 );
-				ShowContinueError( Message2 );
-				ErrorsFound = true;
-
-			}}
-
-		}
-
-	}
-
-	void
-	InternalRangeCheck(
-		Real64 const Value,
-		int const FieldNumber,
-		int const WhichObject,
-		std::string const & PossibleAlpha,
-		bool const AutoSizable,
-		bool const AutoCalculatable
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is an internal range check that checks fields which have
-		// the \min and/or \max values set for appropriate values.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string FieldString;
-		std::string FieldNameString;
-		std::string ValueString;
-		std::string Message;
-
-		bool Error = false;
-		if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 1 ) == 1 ) {
-			if ( Value < ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxValue( 1 ) ) Error = true;
-		} else if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 1 ) == 2 ) {
-			if ( Value <= ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxValue( 1 ) ) Error = true;
-		}
-		if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 2 ) == 3 ) {
-			if ( Value > ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxValue( 2 ) ) Error = true;
-		} else if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 2 ) == 4 ) {
-			if ( Value >= ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxValue( 2 ) ) Error = true;
-		}
-
-		if ( Error ) {
-			if ( ! ( AutoSizable && Value == ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).AutoSizeValue ) && ! ( AutoCalculatable && Value == ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).AutoCalculateValue ) ) {
-				++NumOutOfRangeErrorsFound;
-				if ( ReportRangeCheckErrors ) {
-					FieldString = IPTrimSigDigits( FieldNumber );
-					FieldNameString = ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).FieldName;
-					gio::write( ValueString, "(F20.5)" ) << Value;
-					strip( ValueString );
-					if ( ! FieldNameString.empty() ) {
-						Message = "Out of range value Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + ValueString + ", range={";
-					} else { // Field Name not recorded
-						Message = "Out of range value Numeric Field#" + FieldString + ", value=" + ValueString + ", range={";
-					}
-					if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 1 ) != 0 ) Message += ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxString( 1 );
-					if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 1 ) != 0 && ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 2 ) != 0 ) {
-						Message += " and " + ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxString( 2 );
-					} else if ( ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).WhichMinMax( 2 ) != 0 ) {
-						Message += ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).MinMaxString( 2 );
-					}
-					Message += "}, in " + ObjectDef( WhichObject ).Name;
-					if ( ObjectDef( WhichObject ).NameAlpha1 ) {
-						Message += "=" + PossibleAlpha;
-					}
-					ShowSevereError( Message, EchoInputFile );
+				} else {
+					ShowSevereError( Message1 );
+					ShowContinueError( Message2 );
+					ErrorsFound = true;
 				}
 			}
 		}
-
 	}
 
 	void
-	TurnOnReportRangeCheckErrors()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine turns on the logical to report range check errors
-		// directly out of the InputProcessor.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		ReportRangeCheckErrors = true;
-
-	}
-
-	void
-	TurnOffReportRangeCheckErrors()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   July 20000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine turns off the logical to report range check errors
-		// directly out of the InputProcessor.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		ReportRangeCheckErrors = false;
-
-	}
-
-	int
-	GetNumRangeCheckErrorsFound()
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns the number of OutOfRange errors found during
-		// input processing.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// na
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		return NumOutOfRangeErrorsFound;
-
-	}
-
-	//==============================================================================
-	// The following routines allow access to the definition lines of the IDD and
-	// thus can be used to "report" on expected arguments for the Input Processor.
-
-	int
-	GetNumObjectsInIDD()
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   May 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine returns the number of objects found in the IDD and
-		// can be used to allocate the array for determining the definitions.
-
-		// METHODOLOGY EMPLOYED:
-		// Essentially allows outside access to an internal variable of the InputProcessor.
-		// Used primarily by utility programs that use the InputProcessor outside of the
-		// "true" EnergyPlus code.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		return NumObjectDefs;
-
-	}
-
-	void
-	GetListOfObjectsInIDD(
-		Array1S_string ObjectNames, // List of Object Names (from IDD)
-		int & Number // Number in List
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   May 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine returns the list of Object names that occur in the IDD.
-
-		// METHODOLOGY EMPLOYED:
-		// Essentially allows outside access to an internal variable of the InputProcessor.
-		// Used primarily by utility programs that use the InputProcessor outside of the
-		// "true" EnergyPlus code.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		for ( int i = 1; i <= NumObjectDefs; ++i ) ObjectNames( i ) = ObjectDef( i ).Name;
-		Number = NumObjectDefs;
-
-	}
-
-	void
-	GetObjectDefInIDD(
-		std::string const & ObjectWord, // Object for definition
-		int & NumArgs, // How many arguments (max) this Object can have
-		Array1S_bool AlphaOrNumeric, // Array designating Alpha (true) or Numeric (false) for each
-		Array1S_bool RequiredFields, // Array designating RequiredFields (true) for each argument
-		int & MinNumFields // Minimum Number of Fields to be returned to Get routines
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   May 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine returns the "definition" of an Object from the IDD.  This is
-		// the "maximum" definition with total number of arguments, and whether each argument
-		// is "alpha" or "numeric".
-
-		// METHODOLOGY EMPLOYED:
-		// Essentially allows outside access to an internal variable of the InputProcessor.
-		// Used primarily by utility programs that use the InputProcessor outside of the
-		// "true" EnergyPlus code.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// argument
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Which; // to determine which object definition to use
-
-		if ( SortedIDD ) {
-			Which = FindItemInSortedList( ObjectWord, ListOfObjects, NumObjectDefs );
-			if ( Which != 0 ) Which = iListOfObjects( Which );
-		} else {
-			Which = FindItemInList( ObjectWord, ListOfObjects, NumObjectDefs );
+	InputProcessor::GetMaxSchemaArgs(
+		int & NumArgs,
+		int & NumAlpha,
+		int & NumNumeric
+	) {
+		NumArgs = 0;
+		NumAlpha = 0;
+		NumNumeric = 0;
+		std::string extension_key;
+		auto const & schema_properties = schema.at( "properties" );
+
+		for ( json::iterator object = jdf.begin(); object != jdf.end(); ++object ) {
+			int num_alpha = 0;
+			int num_numeric = 0;
+
+			const json & legacy_idd = schema_properties.at( object.key() ).at( "legacy_idd" );
+			auto key = legacy_idd.find("extension");
+			if ( key != legacy_idd.end() ) {
+				extension_key = key.value();
+			}
+
+			size_t max_size = 0;
+			for ( auto const & obj : object.value() ) {
+				auto const & find_extensions = obj.find( extension_key );
+				if ( find_extensions != obj.end() ) {
+					auto const size = find_extensions.value().size();
+					if ( size > max_size ) max_size = size;
+				}
+			}
+
+			auto const & find_alphas = legacy_idd.find( "alphas" );
+			if ( find_alphas != legacy_idd.end() ) {
+				json const & alphas = find_alphas.value();
+				auto const & find_fields = alphas.find( "fields" );
+				if ( find_fields != alphas.end() ) {
+					num_alpha += find_fields.value().size();
+				}
+				if ( alphas.find( "extensions" ) != alphas.end() ) {
+					num_alpha += alphas[ "extensions" ].size() * max_size;
+				}
+			}
+			if ( legacy_idd.find( "numerics" ) != legacy_idd.end() ) {
+				json const & numerics = legacy_idd[ "numerics" ];
+				if ( numerics.find( "fields" ) != numerics.end() ) {
+					num_numeric += numerics[ "fields" ].size();
+				}
+				if ( numerics.find( "extensions" ) != numerics.end() ) {
+					num_numeric += numerics[ "extensions" ].size() * max_size;
+				}
+			}
+			if ( num_alpha > NumAlpha ) NumAlpha = num_alpha;
+			if ( num_numeric > NumNumeric ) NumNumeric = num_numeric;
 		}
-		NumArgs = ObjectDef( Which ).NumParams;
-		AlphaOrNumeric( {1,NumArgs} ) = ObjectDef( Which ).AlphaOrNumeric( {1,NumArgs} );
-		RequiredFields( {1,NumArgs} ) = ObjectDef( Which ).ReqField( {1,NumArgs} );
-		MinNumFields = ObjectDef( Which ).MinNumFields;
 
+		NumArgs = NumAlpha + NumNumeric;
 	}
 
 	void
-	GetObjectDefMaxArgs(
+	InputProcessor::GetObjectDefMaxArgs(
 		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
 		int & NumAlpha, // How many Alpha arguments (max) this Object can have
 		int & NumNumeric // How many Numeric arguments (max) this Object can have
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   October 2001
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
+	) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine returns maximum argument limits (total, alphas, numerics) of an Object from the IDD.
 		// These dimensions (not sure what one can use the total for) can be used to dynamically dimension the
 		// arrays in the GetInput routines.
 
-		// METHODOLOGY EMPLOYED:
-		// Essentially allows outside access to internal variables of the InputProcessor.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Which; // to determine which object definition to use
-
-		if ( SortedIDD ) {
-			Which = FindItemInSortedList( MakeUPPERCase( ObjectWord ), ListOfObjects, NumObjectDefs );
-			if ( Which != 0 ) Which = iListOfObjects( Which );
-		} else {
-			Which = FindItemInList( MakeUPPERCase( ObjectWord ), ListOfObjects, NumObjectDefs );
-		}
-
-		if ( Which > 0 ) {
-			NumArgs = ObjectDef( Which ).NumParams;
-			NumAlpha = ObjectDef( Which ).NumAlpha;
-			NumNumeric = ObjectDef( Which ).NumNumeric;
-		} else {
-			NumArgs = 0;
-			NumAlpha = 0;
-			NumNumeric = 0;
-			ShowSevereError( "GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
-		}
-
-	}
-
-	void
-	GetIDFRecordsStats(
-		int & iNumberOfRecords, // Number of IDF Records
-		int & iNumberOfDefaultedFields, // Number of defaulted fields in IDF
-		int & iTotalFieldsWithDefaults, // Total number of fields that could be defaulted
-		int & iNumberOfAutoSizedFields, // Number of autosized fields in IDF
-		int & iTotalAutoSizableFields, // Total number of autosizeable fields
-		int & iNumberOfAutoCalcedFields, // Total number of autocalculate fields
-		int & iTotalAutoCalculatableFields // Total number of autocalculatable fields
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   February 2009
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine provides some statistics on the current IDF, such as number of records, total fields with defaults,
-		// number of fields that overrode the default (even if it was default value), and similarly for AutoSize.
-
-		// METHODOLOGY EMPLOYED:
-		// Traverses the IDF Records looking at each field vs object definition for defaults and autosize.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iRecord;
-		int iField;
-		int iObjectDef;
-
-		iNumberOfRecords = NumIDFRecords;
-		iNumberOfDefaultedFields = 0;
-		iTotalFieldsWithDefaults = 0;
-		iNumberOfAutoSizedFields = 0;
-		iTotalAutoSizableFields = 0;
-		iNumberOfAutoCalcedFields = 0;
-		iTotalAutoCalculatableFields = 0;
-
-		for ( iRecord = 1; iRecord <= NumIDFRecords; ++iRecord ) {
-			if ( IDFRecords( iRecord ).ObjectDefPtr <= 0 || IDFRecords( iRecord ).ObjectDefPtr > NumObjectDefs ) continue;
-			iObjectDef = IDFRecords( iRecord ).ObjectDefPtr;
-			for ( iField = 1; iField <= IDFRecords( iRecord ).NumAlphas; ++iField ) {
-				if ( ! ObjectDef( iObjectDef ).AlphFieldDefs( iField ).empty() ) ++iTotalFieldsWithDefaults;
-				if ( ! ObjectDef( iObjectDef ).AlphFieldDefs( iField ).empty() && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
+		NumArgs = 0;
+		NumAlpha = 0;
+		NumNumeric = 0;
+		json * object;
+		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
+				ShowSevereError(
+				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+				return;
 			}
-			for ( iField = 1; iField <= IDFRecords( iRecord ).NumNumbers; ++iField ) {
-				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk ) ++iTotalFieldsWithDefaults;
-				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk && IDFRecords( iRecord ).NumBlank( iField ) ) ++iNumberOfDefaultedFields;
-				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoSizable ) ++iTotalAutoSizableFields;
-				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoSizable && IDFRecords( iRecord ).Numbers( iField ) == ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoSizeValue ) ++iNumberOfAutoSizedFields;
-				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoCalculatable ) ++iTotalAutoCalculatableFields;
-				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoCalculatable && IDFRecords( iRecord ).Numbers( iField ) == ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoCalculateValue ) ++iNumberOfAutoCalcedFields;
+			object = &schema[ "properties" ][ tmp_umit->second ];
+		} else {
+			object = &schema[ "properties" ][ ObjectWord ];
+		}
+		const json & legacy_idd = object->at( "legacy_idd" );
+
+		json * objects;
+		if ( jdf.find( ObjectWord ) == jdf.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
+				ShowSevereError(
+				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+				return;
+			}
+			objects = &jdf[ tmp_umit->second ];
+		} else {
+			objects = &jdf[ ObjectWord ];
+		}
+
+		size_t max_size = 0;
+
+		std::string extension_key;
+		auto key = legacy_idd.find("extension");
+		if ( key != legacy_idd.end() ) {
+			extension_key = key.value();
+		}
+
+		for ( auto const obj : *objects ) {
+			if ( obj.find( extension_key ) != obj.end() ) {
+				auto const size = obj[ extension_key ].size();
+				if ( size > max_size ) max_size = size;
 			}
 		}
 
+		if ( legacy_idd.find( "alphas" ) != legacy_idd.end() ) {
+			json const alphas = legacy_idd[ "alphas" ];
+			if ( alphas.find( "fields" ) != alphas.end() ) {
+				NumAlpha += alphas[ "fields" ].size();
+			}
+			if ( alphas.find( "extensions" ) != alphas.end() ) {
+				NumAlpha += alphas[ "extensions" ].size() * max_size;
+			}
+		}
+		if ( legacy_idd.find( "numerics" ) != legacy_idd.end() ) {
+			json const numerics = legacy_idd[ "numerics" ];
+			if ( numerics.find( "fields" ) != numerics.end() ) {
+				NumNumeric += numerics[ "fields" ].size();
+			}
+			if ( numerics.find( "extensions" ) != numerics.end() ) {
+				NumNumeric += numerics[ "extensions" ].size() * max_size;
+			}
+		}
+		NumArgs = NumAlpha + NumNumeric;
 	}
 
 	void
-	ReportOrphanRecordObjects()
+	InputProcessor::ReportOrphanRecordObjects()
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   August 2002
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Mark Adams, Oct 2016
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine reports "orphan" objects that are in the IDF but were
+		// This subroutine reports "orphan" objects that are in the input but were
 		// not "gotten" during the simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// Uses internal (to InputProcessor) IDFRecordsGotten array, cross-matched with Object
-		// names -- puts those into array to be printed (not adding dups).
+		std::unordered_set< std::string > unused_object_types;
+		unused_object_types.reserve( unused_inputs.size() );
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-		int Count;
-		int Found;
-		int ObjFound;
-		int NumOrphObjNames;
-		bool potentialOrphanedSpecialObjects( false );
-
-		Array1D_string OrphanObjectNames( NumIDFRecords );
-		Array1D_string OrphanNames( NumIDFRecords );
-		NumOrphObjNames = 0;
-
-		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
-			if ( IDFRecordsGotten( Count ) ) continue;
-			//  This one not gotten
-			Found = FindItemInList( IDFRecords( Count ).Name, OrphanObjectNames, NumOrphObjNames );
-			if ( Found == 0 ) {
-				if ( SortedIDD ) {
-					ObjFound = FindItemInSortedList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-					if ( ObjFound != 0 ) ObjFound = iListOfObjects( ObjFound );
-				} else {
-					ObjFound = FindItemInList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-				}
-				if ( ObjFound > 0 ) {
-					if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
-					++NumOrphObjNames;
-					OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
-					// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
-					//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
-					if ( ( ! potentialOrphanedSpecialObjects ) && ( ! OrphanObjectNames( NumOrphObjNames ).empty() )  && ( OrphanObjectNames( NumOrphObjNames )[ 0 ] == 'Z' ) ) {
-						potentialOrphanedSpecialObjects = true;
-					}
-					if ( ObjectDef( ObjFound ).NameAlpha1 ) {
-						OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
-					}
-				} else {
-					ShowWarningError( "object not found=" + IDFRecords( Count ).Name );
-				}
-			} else if ( DisplayAllWarnings ) {
-				if ( SortedIDD ) {
-					ObjFound = FindItemInSortedList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-					if ( ObjFound != 0 ) ObjFound = iListOfObjects( ObjFound );
-				} else {
-					ObjFound = FindItemInList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-				}
-				if ( ObjFound > 0 ) {
-					if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
-					++NumOrphObjNames;
-					OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
-					if ( ObjectDef( ObjFound ).NameAlpha1 ) {
-						OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
-					}
-				} else {
-					ShowWarningError( "ReportOrphanRecordObjects: object not found=" + IDFRecords( Count ).Name );
-				}
-			}
-		}
-
-		// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
-		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if
-		// for now, the list includes:
-		//  - objects that start with "ZONEHVAC:"
-		if ( potentialOrphanedSpecialObjects ) {
-			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( has_prefix( OrphanObjectNames( Count ), "ZONEHVAC:" ) ) {
-					ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the idf, and was not used." );
-					ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
-					ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
-				}
-			}
-		}
-
-		if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
-			gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
-			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( ! OrphanNames( Count ).empty() ) {
-					gio::write( EchoInputFile, fmtA ) << ' ' + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
-				} else {
-					gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
-				}
-			}
-			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
+		if ( unused_inputs.size() && DisplayUnusedObjects ) {
+			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the input" );
 			ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
 			if ( ! DisplayAllWarnings ) {
-				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings to see all." );
+				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all." );
 			} else {
 				ShowContinueError( " Each unused object is shown." );
 			}
 			ShowContinueError( " See InputOutputReference document for more details." );
-			if ( ! OrphanNames( 1 ).empty() ) {
-				ShowMessage( "Object=" + OrphanObjectNames( 1 ) + '=' + OrphanNames( 1 ) );
-			} else {
-				ShowMessage( "Object=" + OrphanObjectNames( 1 ) );
+		}
+
+		bool first_iteration = true;
+		for ( auto it = unused_inputs.begin(); it != unused_inputs.end(); ++it ) {
+			auto const & object_type = it->second.first;
+			auto const & name = it->second.second;
+
+			// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
+			if ( has_prefix( object_type, "ZoneHVAC:" ) ) {
+				ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used." );
+				ShowContinueError( " -- Object type: " + object_type );
+				ShowContinueError( " -- Object name: " + name );
 			}
-			for ( Count = 2; Count <= NumOrphObjNames; ++Count ) {
-				if ( ! OrphanNames( Count ).empty() ) {
-					ShowContinueError( "Object=" + OrphanObjectNames( Count ) + '=' + OrphanNames( Count ) );
+
+			if ( ! DisplayUnusedObjects ) continue;
+
+			if ( ! DisplayAllWarnings ) {
+				auto found_type = unused_object_types.find( object_type );
+				if ( found_type != unused_object_types.end() ) {
+					// only show first unused named object of an object class
+					continue;
 				} else {
-					ShowContinueError( "Object=" + OrphanObjectNames( Count ) );
+					unused_object_types.emplace( object_type );
 				}
 			}
-		} else if ( NumOrphObjNames > 0 ) {
-			ShowMessage( "There are " + IPTrimSigDigits( NumOrphObjNames ) + " unused objects in input." );
+
+			if ( first_iteration ) {
+				if ( ! name.empty() ) {
+					ShowMessage( "Object=" + object_type + '=' + name );
+				} else {
+					ShowMessage( "Object=" + object_type );
+				}
+				first_iteration = false;
+			} else {
+				if ( ! name.empty() ) {
+					ShowContinueError( "Object=" + object_type + '=' + name );
+				} else {
+					ShowContinueError( "Object=" + object_type );
+				}
+			}
+		}
+
+		if ( unused_inputs.size() && ! DisplayUnusedObjects ) {
+			u64toa( unused_inputs.size(), s );
+			ShowMessage( "There are " + std::string( s ) + " unused objects in input." );
 			ShowMessage( "Use Output:Diagnostics,DisplayUnusedObjects; to see them." );
 		}
 
-		OrphanObjectNames.deallocate();
-		OrphanNames.deallocate();
-
 	}
 
 	void
-	InitSecretObjects()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   March 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine holds a set of objects that are either exact replacements for existing
-		// objects or objects which are deleted.  If these are encountered in a user input file, they
-		// will be flagged with a warning message but will not cause termination.  This routine allocates
-		// and builds an internal structure used by the InputProcessor.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		NumSecretObjects = 5;
-		RepObjects.allocate( NumSecretObjects );
-
-		RepObjects( 1 ).OldName = "SKY RADIANCE DISTRIBUTION";
-		RepObjects( 1 ).Deleted = true;
-
-		RepObjects( 2 ).OldName = "SURFACE:SHADING:DETACHED";
-		RepObjects( 2 ).NewName = "Shading:Site:Detailed";
-
-		RepObjects( 3 ).OldName = "AIRFLOW MODEL";
-		RepObjects( 3 ).Deleted = true;
-
-		RepObjects( 4 ).OldName = "AIRFLOWNETWORK:MULTIZONE:SITEWINDCONDITIONS";
-		RepObjects( 4 ).Deleted = true;
-
-		RepObjects( 5 ).OldName = "OUTPUT:REPORTS";
-		RepObjects( 5 ).NewName = "various - depends on fields";
-		RepObjects( 5 ).Deleted = true;
-		RepObjects( 5 ).TransitionDefer = true; // defer transition until ready to write IDF Record
-
-	}
-
-	void
-	MakeTransition( int & ObjPtr ) // Pointer to Object Definition
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   March 2009
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// For those who keep Output:Reports in their input files, this will make a
-		// transition before storing in IDF Records
-
-		// METHODOLOGY EMPLOYED:
-		// Manipulates LineItem structure
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		if ( ! equali( LineItem.Name, "OUTPUT:REPORTS" ) ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
-		if ( LineItem.NumAlphas < 1 ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
-
-		{ auto const makeTransition( uppercased( LineItem.Alphas( 1 ) ) );
-
-		if ( makeTransition == "VARIABLEDICTIONARY" ) {
-			LineItem.Name = "OUTPUT:VARIABLEDICTIONARY";
-			if ( SameString( LineItem.Alphas( 2 ), "IDF" ) ) {
-				LineItem.Alphas( 1 ) = "IDF";
-			} else {
-				LineItem.Alphas( 1 ) = "REGULAR";
-			}
-			LineItem.NumAlphas = 1;
-			if ( SameString( LineItem.Alphas( 3 ), "Name" ) ) {
-				LineItem.Alphas( 2 ) = "NAME";
-				LineItem.NumAlphas = 2;
-			} else {
-				LineItem.Alphas( 2 ) = "NONE";
-				LineItem.NumAlphas = 2;
-			}
-
-		} else if ( makeTransition == "SURFACES" ) {
-			// Depends on first Alpha
-			{ auto const surfacesTransition( LineItem.Alphas( 2 ) );
-
-			if ( surfacesTransition == "DXF" || surfacesTransition == "DXF:WIREFRAME" || surfacesTransition == "VRML" ) {
-				LineItem.Name = "OUTPUT:SURFACES:DRAWING";
-				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
-				LineItem.NumAlphas = 1;
-				if ( ! LineItem.Alphas( 3 ).empty() ) {
-					++LineItem.NumAlphas;
-					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
-				}
-				if ( ! LineItem.Alphas( 4 ).empty() ) {
-					++LineItem.NumAlphas;
-					LineItem.Alphas( 3 ) = LineItem.Alphas( 4 );
-				}
-
-			} else if ( surfacesTransition == "LINES" || surfacesTransition == "DETAILS" || surfacesTransition == "VERTICES" || surfacesTransition == "DETAILSWITHVERTICES" || surfacesTransition == "VIEWFACTORINFO" || surfacesTransition == "COSTINFO" ) {
-				LineItem.Name = "OUTPUT:SURFACES:LIST";
-				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
-				LineItem.NumAlphas = 1;
-				if ( ! LineItem.Alphas( 3 ).empty() ) {
-					++LineItem.NumAlphas;
-					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
-				}
-
-			} else {
-				ShowSevereError( "MakeTransition: Cannot transition=" + LineItem.Name + ", first field=" + LineItem.Alphas( 1 ) + ", second field=" + LineItem.Alphas( 2 ) );
-
-			}}
-
-		} else if ( makeTransition == "CONSTRUCTIONS" || makeTransition == "CONSTRUCTION" ) {
-			LineItem.Name = "OUTPUT:CONSTRUCTIONS";
-			LineItem.Alphas( 1 ) = "CONSTRUCTIONS";
-			LineItem.NumAlphas = 1;
-
-		} else if ( makeTransition == "MATERIALS" || makeTransition == "MATERIAL" ) {
-			LineItem.Name = "OUTPUT:CONSTRUCTIONS";
-			LineItem.Alphas( 1 ) = "MATERIALS";
-			LineItem.NumAlphas = 1;
-
-		} else if ( makeTransition == "SCHEDULES" ) {
-			LineItem.Name = "OUTPUT:SCHEDULES";
-			LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
-			LineItem.NumAlphas = 1;
-
-		} else {
-			ShowSevereError( "MakeTransition: Cannot transition=" + LineItem.Name + ", first field=" + LineItem.Alphas( 1 ) );
-
-		}}
-
-		--ObjectDef( ObjPtr ).NumFound;
-		ObjPtr = FindItemInList( LineItem.Name, ListOfObjects, NumObjectDefs );
-		ObjPtr = iListOfObjects( ObjPtr );
-
-		if ( ObjPtr == 0 ) ShowFatalError( "No Object Def for " + LineItem.Name );
-		++ObjectDef( ObjPtr ).NumFound;
-
-	}
-
-	void
-	AddRecordFromSection( int const Which ) // Which object was matched
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   March 2009
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// When an object is entered like a section (i.e., <objectname>;), try to add a record
-		// of the object using minfields, etc.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumArg;
-		int NumAlpha;
-		int NumNumeric;
-		int Count;
-		std::string String;
-
-		NumArg = 0;
-		LineItem.Name = ObjectDef( Which ).Name;
-		LineItem.Alphas = BlankString;
-		LineItem.AlphBlank = false;
-		LineItem.NumAlphas = 0;
-		LineItem.Numbers = 0.0;
-		LineItem.NumNumbers = 0;
-		LineItem.NumBlank = false;
-		LineItem.ObjectDefPtr = Which;
-
-		++ObjectDef( Which ).NumFound;
-
-		// Check out MinimumNumberOfFields
-		if ( NumArg < ObjectDef( Which ).MinNumFields ) {
-			if ( ObjectDef( Which ).NameAlpha1 ) {
-				ShowAuditErrorMessage( " ** Warning ** ", "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Which ).Name + ", name=" + LineItem.Alphas( 1 ) + ", entered with less than minimum number of fields." );
-			} else {
-				ShowAuditErrorMessage( " ** Warning ** ", "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Which ).Name + ", entered with less than minimum number of fields." );
-			}
-			ShowAuditErrorMessage( " **   ~~~   ** ", "Attempting fill to minimum." );
-			NumAlpha = 0;
-			NumNumeric = 0;
-			if ( ObjectDef( Which ).MinNumFields > ObjectDef( Which ).NumParams ) {
-				ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object \\min-fields > number of fields specified, Object=" + ObjectDef( Which ).Name );
-				ShowContinueError( "..\\min-fields=" + IPTrimSigDigits( ObjectDef( Which ).MinNumFields ) + ", total number of fields in object definition=" + IPTrimSigDigits( ObjectDef( Which ).NumParams ) );
-				//      errFlag=.TRUE.
-			} else {
-				for ( Count = 1; Count <= ObjectDef( Which ).MinNumFields; ++Count ) {
-					if ( ObjectDef( Which ).AlphaOrNumeric( Count ) ) {
-						++NumAlpha;
-						if ( NumAlpha <= LineItem.NumAlphas ) continue;
-						++LineItem.NumAlphas;
-						if ( ! ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ).empty() ) {
-							LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas );
-							ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
-						} else if ( ObjectDef( Which ).ReqField( Count ) ) {
-							if ( ObjectDef( Which ).NameAlpha1 ) {
-								ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Which ).Name + ", name=" + LineItem.Alphas( 1 ) + ", Required Field=[" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) + "] was blank.", EchoInputFile );
-							} else {
-								ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Which ).Name + ", Required Field=[" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) + "] was blank.", EchoInputFile );
-							}
-							//            errFlag=.TRUE.
-						} else {
-							LineItem.Alphas( LineItem.NumAlphas ).clear();
-							LineItem.AlphBlank( LineItem.NumAlphas ) = true;
-							ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
-						}
-					} else {
-						++NumNumeric;
-						if ( NumNumeric <= LineItem.NumNumbers ) continue;
-						++LineItem.NumNumbers;
-						LineItem.NumBlank( NumNumeric ) = true;
-						if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefaultChk ) {
-							if ( ! ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
-								LineItem.Numbers( NumNumeric ) = ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
-								gio::write( String, fmtLD ) << ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
-								strip( String );
-								ShowAuditErrorMessage( " **   Add   ** ", String + "   ! field=>" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName );
-							} else if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoSize ) {
-								LineItem.Numbers( NumNumeric ) = ObjectDef( Which ).NumRangeChks( NumNumeric ).AutoSizeValue;
-								ShowAuditErrorMessage( " **   Add   ** ", "autosize    ! field=>" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName );
-							} else if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
-								LineItem.Numbers( NumNumeric ) = ObjectDef( Which ).NumRangeChks( NumNumeric ).AutoCalculateValue;
-								ShowAuditErrorMessage( " **   Add   ** ", "autocalculate    ! field=>" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName );
-							}
-						} else if ( ObjectDef( Which ).ReqField( Count ) ) {
-							if ( ObjectDef( Which ).NameAlpha1 ) {
-								ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Which ).Name + ", name=" + LineItem.Alphas( 1 ) + ", Required Field=[" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName + "] was blank.", EchoInputFile );
-							} else {
-								ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Object=" + ObjectDef( Which ).Name + ", Required Field=[" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName + "] was blank.", EchoInputFile );
-							}
-							//            errFlag=.TRUE.
-						} else {
-							LineItem.Numbers( NumNumeric ) = 0.0;
-							LineItem.NumBlank( NumNumeric ) = true;
-							ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName );
-						}
-					}
-				}
-			}
-		}
-
-		//  IF (TransitionDefer) THEN
-		//    CALL MakeTransition(Which)
-		//  ENDIF
-		++NumIDFRecords;
-		if ( ObjectStartRecord( Which ) == 0 ) ObjectStartRecord( Which ) = NumIDFRecords;
-		MaxAlphaIDFArgsFound = max( MaxAlphaIDFArgsFound, LineItem.NumAlphas );
-		MaxNumericIDFArgsFound = max( MaxNumericIDFArgsFound, LineItem.NumNumbers );
-		MaxAlphaIDFDefArgsFound = max( MaxAlphaIDFDefArgsFound, ObjectDef( Which ).NumAlpha );
-		MaxNumericIDFDefArgsFound = max( MaxNumericIDFDefArgsFound, ObjectDef( Which ).NumNumeric );
-		IDFRecords( NumIDFRecords ).Name = LineItem.Name;
-		IDFRecords( NumIDFRecords ).NumNumbers = LineItem.NumNumbers;
-		IDFRecords( NumIDFRecords ).NumAlphas = LineItem.NumAlphas;
-		IDFRecords( NumIDFRecords ).ObjectDefPtr = LineItem.ObjectDefPtr;
-		IDFRecords( NumIDFRecords ).Alphas.allocate( LineItem.NumAlphas );
-		IDFRecords( NumIDFRecords ).Alphas = LineItem.Alphas( {1,LineItem.NumAlphas} );
-		IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
-		IDFRecords( NumIDFRecords ).AlphBlank = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
-		IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
-		IDFRecords( NumIDFRecords ).Numbers = LineItem.Numbers( {1,LineItem.NumNumbers} );
-		IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
-		IDFRecords( NumIDFRecords ).NumBlank = LineItem.NumBlank( {1,LineItem.NumNumbers} );
-		if ( LineItem.NumNumbers > 0 ) {
-			for ( Count = 1; Count <= LineItem.NumNumbers; ++Count ) {
-				if ( ObjectDef( Which ).NumRangeChks( Count ).MinMaxChk && ! LineItem.NumBlank( Count ) ) {
-					InternalRangeCheck( LineItem.Numbers( Count ), Count, Which, LineItem.Alphas( 1 ), ObjectDef( Which ).NumRangeChks( Count ).AutoSizable, ObjectDef( Which ).NumRangeChks( Count ).AutoCalculatable );
-				}
-			}
-		}
-
-	}
-
-	void
-	PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error
+	InputProcessor::PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -5095,19 +2270,6 @@ namespace InputProcessor {
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve rNumericArgs from IDF
 		int IOStat; // Could be used in the Get Routines, not currently checked
@@ -5118,12 +2280,14 @@ namespace InputProcessor {
 		std::string Multiples;
 
 		cCurrentModuleObject = "Output:PreprocessorMessage";
-		NumPrePM = GetNumObjectsFound( cCurrentModuleObject );
+		NumPrePM = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumPrePM > 0 ) {
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNumbers );
-			cAlphaArgs( {1,NumAlphas} ) = BlankString;
+			cAlphaArgs( { 1, NumAlphas } ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
-				GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs,
+											   NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
+											   cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ).empty() ) cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
@@ -5131,22 +2295,36 @@ namespace InputProcessor {
 					Multiples = BlankString;
 				}
 				if ( cAlphaArgs( 2 ).empty() ) cAlphaArgs( 2 ) = "Unknown";
-				{ auto const errorType( uppercased( cAlphaArgs( 2 ) ) );
-				if ( errorType == "INFORMATION" ) {
-					ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Information message" + Multiples + ':' );
-				} else if ( errorType == "WARNING" ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Warning condition" + Multiples + ':' );
-				} else if ( errorType == "SEVERE" ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Severe condition" + Multiples + ':' );
-				} else if ( errorType == "FATAL" ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Fatal condition" + Multiples + ':' );
-					PreP_Fatal = true;
-				} else {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following " + cAlphaArgs( 2 ) + " condition" + Multiples + ':' );
-				}}
+				{
+					auto const errorType( uppercased( cAlphaArgs( 2 ) ) );
+					if ( errorType == "INFORMATION" ) {
+						ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+									 "\" has the following Information message" + Multiples + ':' );
+					} else if ( errorType == "WARNING" ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+										  "\" has the following Warning condition" + Multiples + ':' );
+					} else if ( errorType == "SEVERE" ) {
+						ShowSevereError(
+						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+						"\" has the following Severe condition" +
+						Multiples + ':' );
+					} else if ( errorType == "FATAL" ) {
+						ShowSevereError(
+						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+						"\" has the following Fatal condition" +
+						Multiples + ':' );
+						PreP_Fatal = true;
+					} else {
+						ShowSevereError(
+						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following " +
+						cAlphaArgs( 2 ) +
+						" condition" + Multiples + ':' );
+					}
+				}
 				CountM = 3;
 				if ( CountM > NumAlphas ) {
-					ShowContinueError( cCurrentModuleObject + " was blank.  Check " + cAlphaArgs( 1 ) + " audit trail or error file for possible reasons." );
+					ShowContinueError( cCurrentModuleObject + " was blank.  Check " + cAlphaArgs( 1 ) +
+									   " audit trail or error file for possible reasons." );
 				}
 				while ( CountM <= NumAlphas ) {
 					if ( len( cAlphaArgs( CountM ) ) == MaxNameLength ) {
@@ -5163,117 +2341,10 @@ namespace InputProcessor {
 	}
 
 	void
-	CompactObjectsCheck()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   December 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Check to see if Compact Objects (i.e. CompactHVAC and its ilk) exist in the
-		// input file.  If so, expandobjects was not run and there's a possible problem.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool CompactObjectsFound;
-
-		CompactObjectsFound = false;
-
-		for ( int i = IDFRecords.l(), e = IDFRecords.u(); i <= e; ++i ) {
-			auto const & Name( IDFRecords( i ).Name );
-			if ( ( has_prefix( Name, "HVACTEMPLATE:" ) ) || ( has_prefix( Name, "HVACTemplate:" ) ) ) {
-				ShowSevereError( "HVACTemplate objects are found in the IDF File." );
-				CompactObjectsFound = true;
-				break;
-			}
-		}
-
-		if ( CompactObjectsFound ) {
-			ShowFatalError( "Program Terminates: The ExpandObjects program has not been run or is not in your EnergyPlus.exe folder." );
-		}
-
-	}
-
-	void
-	ParametricObjectsCheck()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Jason Glazer (based on CompactObjectsCheck by Linda Lawrie)
-		//       DATE WRITTEN   September 2009
-		//       MODIFIED
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Check to see if Parametric Objects exist in the input file.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( int i = IDFRecords.l(), e = IDFRecords.u(); i <= e; ++i ) {
-			auto const & Name( IDFRecords( i ).Name );
-			if ( has_prefixi( Name, "Parametric:" ) ) {
-				ShowSevereError( "Parametric objects are found in the IDF File." );
-				ShowFatalError( "Program Terminates: The ParametricPreprocessor program has not been run." );
-				break;
-			}
-		}
-
-	}
-
-	void
-	PreScanReportingVariables()
-	{
-
+	InputProcessor::PreScanReportingVariables() {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine scans the input records and determines which output variables
@@ -5294,165 +2365,189 @@ namespace InputProcessor {
 		// EnergyManagementSystem:Sensor
 		// EnergyManagementSystem:OutputVariable
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataOutputs;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const OutputVariable( "OUTPUT:VARIABLE" );
-		static std::string const MeterCustom( "METER:CUSTOM" );
-		static std::string const MeterCustomDecrement( "METER:CUSTOMDECREMENT" );
-		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
-		static std::string const OutputTableMonthly( "OUTPUT:TABLE:MONTHLY" );
-		static std::string const OutputTableAnnual( "OUTPUT:TABLE:ANNUAL" );
-		static std::string const OutputTableTimeBins( "OUTPUT:TABLE:TIMEBINS" );
-		static std::string const OutputTableSummaries( "OUTPUT:TABLE:SUMMARYREPORTS" );
-		static std::string const EMSSensor( "ENERGYMANAGEMENTSYSTEM:SENSOR" );
-		static std::string const EMSOutputVariable( "ENERGYMANAGEMENTSYSTEM:OUTPUTVARIABLE" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		static std::string const OutputVariable( "Output:Variable" );
+		static std::string const MeterCustom( "Meter:Custom" );
+		static std::string const MeterCustomDecrement( "Meter:CustomDecrement" );
+//		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
+		static std::string const OutputTableMonthly( "Output:Table:Monthly" );
+		static std::string const OutputTableAnnual( "Output:Table:Annual" );
+		static std::string const OutputTableTimeBins( "Output:Table:TimeBins" );
+		static std::string const OutputTableSummaries( "Output:Table:SummaryReports" );
+		static std::string const EMSSensor( "EnergyManagementSystem:Sensor" );
+		static std::string const EMSOutputVariable( "EnergyManagementSystem:OutputVariable" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CurrentRecord;
-		int Loop;
-		int Loop1;
-
+		std::string extension_key;
 		OutputVariablesForSimulation.allocate( 10000 );
 		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
-		CurrentRecord = FindFirstRecord( OutputVariable );
-		while ( CurrentRecord != 0 ) {
-			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue; // signals error condition for later on
-			if ( ! IDFRecords( CurrentRecord ).AlphBlank( 1 ) ) {
-				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 1 ), IDFRecords( CurrentRecord ).Alphas( 2 ) );
-			} else {
-				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 2 ) );
-			}
-			CurrentRecord = FindNextRecord( OutputVariable, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( MeterCustom );
-		while ( CurrentRecord != 0 ) {
-			for ( Loop = 3; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-				if ( Loop > IDFRecords( CurrentRecord ).NumAlphas || Loop + 1 > IDFRecords( CurrentRecord ).NumAlphas ) continue; // error condition
-				if ( ! IDFRecords( CurrentRecord ).AlphBlank( Loop ) ) {
-					AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( Loop ), IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
+		auto jdf_objects = jdf.find( OutputVariable );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				if ( !fields.at( "key_value" ).empty() ) {
+					InputProcessor::AddRecordToOutputVariableStructure( fields.at( "key_value" ),
+																		fields.at( "variable_name" ) );
 				} else {
-					AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
+					InputProcessor::AddRecordToOutputVariableStructure( "*", fields.at( "variable_name" ) );
 				}
 			}
-			CurrentRecord = FindNextRecord( MeterCustom, CurrentRecord );
 		}
 
-		CurrentRecord = FindFirstRecord( MeterCustomDecrement );
-		while ( CurrentRecord != 0 ) {
-			for ( Loop = 4; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-				if ( Loop > IDFRecords( CurrentRecord ).NumAlphas || Loop + 1 > IDFRecords( CurrentRecord ).NumAlphas ) continue; // error condition
-				if ( ! IDFRecords( CurrentRecord ).AlphBlank( Loop ) ) {
-					AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( Loop ), IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-				} else {
-					AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-				}
+		jdf_objects = jdf.find( MeterCustom );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			auto const & legacy_idd = schema[ "properties" ][ MeterCustom ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if ( key != legacy_idd.end() ) {
+				extension_key = key.value();
 			}
-			CurrentRecord = FindNextRecord( MeterCustomDecrement, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( MeterCustomDifference );
-		while ( CurrentRecord != 0 ) {
-			for ( Loop = 4; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-				if ( Loop > IDFRecords( CurrentRecord ).NumAlphas || Loop + 1 > IDFRecords( CurrentRecord ).NumAlphas ) continue; // error condition
-				if ( ! IDFRecords( CurrentRecord ).AlphBlank( Loop ) ) {
-					AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( Loop ), IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-				} else {
-					AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop + 1 ) );
-				}
-			}
-			CurrentRecord = FindNextRecord( MeterCustomDifference, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( EMSSensor );
-		while ( CurrentRecord != 0 ) {
-			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-			if ( ! IDFRecords( CurrentRecord ).Alphas( 2 ).empty() ) {
-				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 2 ), IDFRecords( CurrentRecord ).Alphas( 3 ) );
-			} else {
-				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 3 ) );
-			}
-			CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( EMSOutputVariable );
-		while ( CurrentRecord != 0 ) {
-			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSOutputVariable, CurrentRecord );
-			AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 1 ) );
-			CurrentRecord = FindNextRecord( EMSOutputVariable, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( OutputTableTimeBins );
-		while ( CurrentRecord != 0 ) {
-			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( OutputTableTimeBins, CurrentRecord );
-			if ( ! IDFRecords( CurrentRecord ).AlphBlank( 1 ) ) {
-				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 1 ), IDFRecords( CurrentRecord ).Alphas( 2 ) );
-			} else {
-				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 2 ) );
-			}
-			CurrentRecord = FindNextRecord( OutputTableTimeBins, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( OutputTableMonthly );
-		while ( CurrentRecord != 0 ) {
-			for ( Loop = 2; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-				if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
-				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
-			}
-			CurrentRecord = FindNextRecord( OutputTableMonthly, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( OutputTableAnnual );
-		while ( CurrentRecord != 0 ) {
-			for ( Loop = 5; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
-				if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
-				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
-			}
-			CurrentRecord = FindNextRecord( OutputTableAnnual, CurrentRecord );
-		}
-
-		CurrentRecord = FindFirstRecord( OutputTableSummaries ); // summary tables, not all add to variable structure
-		while ( CurrentRecord != 0 ) {
-			for ( Loop = 1; Loop <= IDFRecords( CurrentRecord ).NumAlphas; ++Loop ) {
-				if ( IDFRecords( CurrentRecord ).Alphas( Loop ) == "ALLMONTHLY" || IDFRecords( CurrentRecord ).Alphas( Loop ) == "ALLSUMMARYANDMONTHLY" ) {
-					for ( Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1 ) {
-						AddVariablesForMonthlyReport( MonthlyNamedReports( Loop1 ) );
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				for ( auto const & extensions : fields[ extension_key ] ) {
+					if ( !obj.key().empty() ) {
+						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
+																			extensions.at(
+																			"output_variable_or_meter_name" ) );
+					} else {
+						InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
+						"output_variable_or_meter_name" ) );
 					}
-				} else {
-					AddVariablesForMonthlyReport( IDFRecords( CurrentRecord ).Alphas( Loop ) );
 				}
-
 			}
-			CurrentRecord = FindNextRecord( OutputTableSummaries, CurrentRecord );
+		}
+
+		jdf_objects = jdf.find( MeterCustomDecrement );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			auto const & legacy_idd = schema[ "properties" ][ MeterCustomDecrement ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if ( key != legacy_idd.end() ) {
+				extension_key = key.value();
+			}
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				for ( auto const & extensions : fields[ extension_key ] ) {
+					if ( !obj.key().empty() ) {
+						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
+																			extensions.at(
+																			"output_variable_or_meter_name" ) );
+					} else {
+						InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
+						"output_variable_or_meter_name" ) );
+					}
+				}
+			}
+		}
+
+		jdf_objects = jdf.find( EMSSensor );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				if ( !fields.at( "output_variable_or_output_meter_index_key_name" ).empty() ) {
+					InputProcessor::AddRecordToOutputVariableStructure(
+					fields.at( "output_variable_or_output_meter_index_key_name" ),
+					fields.at( "output_variable_or_output_meter_name" ) );
+				} else {
+					InputProcessor::AddRecordToOutputVariableStructure( "*", fields.at(
+					"output_variable_or_output_meter_name" ) );
+				}
+			}
+		}
+
+		jdf_objects = jdf.find( EMSOutputVariable );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				InputProcessor::AddRecordToOutputVariableStructure( "*", obj.key() );
+			}
+		}
+
+		jdf_objects = jdf.find( OutputTableTimeBins );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				if ( !obj.key().empty() ) {
+					InputProcessor::AddRecordToOutputVariableStructure( obj.key(), fields.at( "key_value" ) );
+				} else {
+					InputProcessor::AddRecordToOutputVariableStructure( "*", fields.at( "key_value" ) );
+				}
+			}
+		}
+
+		jdf_objects = jdf.find( OutputTableMonthly );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			auto const & legacy_idd = schema[ "properties" ][ OutputTableMonthly ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if ( key != legacy_idd.end() ) {
+				extension_key = key.value();
+			}
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				for ( auto const & extensions : fields[ extension_key ] ) {
+					InputProcessor::AddRecordToOutputVariableStructure( "*",
+																		extensions.at( "variable_or_meter_name" ) );
+				}
+			}
+		}
+
+		jdf_objects = jdf.find( OutputTableAnnual );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			auto const & legacy_idd = schema[ "properties" ][ OutputTableAnnual ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if ( key != legacy_idd.end() ) {
+				extension_key = key.value();
+			}
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				for ( auto const & extensions : fields[ extension_key ] ) {
+					InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
+					"variable_or_meter_or_ems_variable_or_field_name" ) );
+				}
+			}
+		}
+
+		jdf_objects = jdf.find( OutputTableSummaries );
+		if ( jdf_objects != jdf.end() ) {
+			auto const & jdf_object = jdf_objects.value();
+			auto const & legacy_idd = schema[ "properties" ][ OutputTableSummaries ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if ( key != legacy_idd.end() ) {
+				extension_key = key.value();
+			}
+			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+				json const & fields = obj.value();
+				for ( auto const & extensions : fields[ extension_key ] ) {
+					auto const report_name = MakeUPPERCase( extensions.at( "report_name" ) );
+					if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
+						for ( int i = 1; i <= NumMonthlyReports; ++i ) {
+							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( i ) );
+						}
+					} else {
+						InputProcessor::AddVariablesForMonthlyReport( report_name );
+					}
+				}
+			}
 		}
 
 		if ( NumConsideredOutputVariables > 0 ) {
 			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
 			MaxConsideredOutputVariables = NumConsideredOutputVariables;
 		}
-
 	}
 
 	void
-	AddVariablesForMonthlyReport( std::string const & reportName )
-	{
+	InputProcessor::AddVariablesForMonthlyReport( std::string const & reportName ) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
@@ -5464,30 +2559,6 @@ namespace InputProcessor {
 		// This routine adds specific variables to the Output Variables for Simulation
 		// Structure. Note that only non-metered variables need to be added here.  Metered
 		// variables are automatically included in the minimized output variable structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( reportName == "ZONECOOLINGSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
@@ -5547,10 +2618,13 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME" );
 
 		} else if ( reportName == "COMFORTREPORTSIMPLE55MONTHLY" ) {
-			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
-			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
 
 		} else if ( reportName == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" );
@@ -5624,19 +2698,27 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 
 		} else if ( reportName == "WINDOWENERGYZONESUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 
 		} else if ( reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
@@ -5732,12 +2814,16 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX" );
-			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" );
-			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX" );
-			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
-			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
+			AddRecordToOutputVariableStructure( "*",
+												"DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 
 		} else if ( reportName == "COILREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING ENERGY" );
@@ -5810,11 +2896,13 @@ namespace InputProcessor {
 		} else if ( reportName == "MECHANICALVENTILATIONLOADSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" );
+			AddRecordToOutputVariableStructure( "*",
+												"ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR" );
 
@@ -5824,127 +2912,14 @@ namespace InputProcessor {
 
 	}
 
-	int
-	FindFirstRecord( std::string const & UCObjType )
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Finds next record of Object Name
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		int Found;
-		if ( SortedIDD ) {
-			Found = FindItemInSortedList( UCObjType, ListOfObjects, NumObjectDefs );
-			if ( Found != 0 ) Found = iListOfObjects( Found );
-		} else {
-			Found = FindItemInList( UCObjType, ListOfObjects, NumObjectDefs );
-		}
-
-		int StartPointer;
-		if ( Found != 0 ) {
-			StartPointer = ObjectStartRecord( Found );
-		} else {
-			StartPointer = 0;
-		}
-
-		return StartPointer;
-
-	}
-
-	int
-	FindNextRecord(
-		std::string const & UCObjType,
-		int const StartPointer
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Finds next record of Object Name
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		int NextPointer = 0;
-		for ( int ObjNum = StartPointer + 1; ObjNum <= NumIDFRecords; ++ObjNum ) {
-			if ( IDFRecords( ObjNum ).Name != UCObjType ) continue;
-			NextPointer = ObjNum;
-			break;
-		}
-
-		return NextPointer;
-
-	}
-
 	void
-	AddRecordToOutputVariableStructure(
+	InputProcessor::AddRecordToOutputVariableStructure(
 		std::string const & KeyValue,
 		std::string const & VariableName
-	)
-	{
-
+	) {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adds a new record (if necessary) to the Output Variable
@@ -5954,25 +2929,9 @@ namespace InputProcessor {
 		// OutputVariablesForSimulation is a linked list structure for later
 		// semi-easy perusal.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataOutputs;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CurNum;
 		int NextNum;
 		bool FoundOne;
@@ -5994,7 +2953,7 @@ namespace InputProcessor {
 			}
 		}
 
-		if ( ! FoundOne ) {
+		if ( !FoundOne ) {
 			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
 				ReAllocateAndPreserveOutputVariablesForSimulation();
 			}
@@ -6031,196 +2990,58 @@ namespace InputProcessor {
 				}
 			}
 		}
-
 	}
 
 	void
-	ReAllocateAndPreserveOutputVariablesForSimulation()
-	{
-
+	InputProcessor::ReAllocateAndPreserveOutputVariablesForSimulation() {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   April 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
 		// the data that is already in the structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataOutputs;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const OutputVarAllocInc( ObjectsIDFAllocInc );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		int const OutputVarAllocInc( 500 );
 
 		// up allocation by OutputVarAllocInc
 		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
 	}
 
-	void
-	DumpCurrentLineBuffer(
-		int const StartLine,
-		std::string const & cStartLine,
-		std::string const & cStartName,
-		int const CurLine,
-		int const NumConxLines,
-		Array1S_string const LineBuf,
-		int const CurQPtr
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   February 2003
-		//       MODIFIED       March 2012 - Que lines instead of holding all.
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine dumps the "context" lines for error messages detected by
-		// the input processor.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Line;
-		//  INTEGER PLine
-		int SLine;
-		int CurPos;
-		std::string cLineNo;
-		std::string TextLine;
-
-		ShowMessage( "IDF Context for following error/warning message:" );
-		ShowMessage( "Note -- lines truncated at 300 characters, if necessary..." );
-		if ( StartLine <= 99999 ) {
-			gio::write( TextLine, "(1X,I5,1X,A)" ) << StartLine << cStartLine;
-		} else {
-			gio::write( cLineNo, fmtLD ) << StartLine;
-			strip( cLineNo );
-			gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << cStartLine;
-		}
-		ShowMessage( TextLine );
-		if ( ! cStartName.empty() ) {
-			ShowMessage( "indicated Name=" + cStartName );
-		}
-		ShowMessage( "Only last " + IPTrimSigDigits( NumConxLines ) + " lines before error line shown....." );
-		SLine = CurLine - NumConxLines + 1;
-		if ( NumConxLines == isize( LineBuf ) ) {
-			CurPos = CurQPtr + 1;
-			if ( CurQPtr + 1 > isize( LineBuf ) ) CurPos = 1;
-		} else {
-			CurPos = 1;
-		}
-		for ( Line = 1; Line <= NumConxLines; ++Line ) {
-			if ( SLine <= 99999 ) {
-				gio::write( TextLine, "(1X,I5,1X,A)" ) << SLine << LineBuf( CurPos );
-			} else {
-				gio::write( cLineNo, fmtLD ) << SLine;
-				strip( cLineNo );
-				gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << LineBuf( CurPos );
-			}
-			ShowMessage( TextLine );
-			++CurPos;
-			if ( CurPos > isize( LineBuf ) ) CurPos = 1;
-			++SLine;
-		}
-
-	}
-
-	void
-	ShowAuditErrorMessage(
-		std::string const & Severity, // if blank, does not add to sum
-		std::string const & ErrorMessage
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   March 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is just for messages that will be displayed on the audit trail
-		// (echo of the input file).  Errors are counted and a summary is displayed after
-		// finishing the scan of the input file.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt ErrorFormat( "(2X,A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( ! Severity.empty() ) {
-			++TotalAuditErrors;
-			gio::write( EchoInputFile, ErrorFormat ) << Severity + ErrorMessage;
-		} else {
-			gio::write( EchoInputFile, ErrorFormat ) << " ************* " + ErrorMessage;
-		}
-
-	}
+//void
+//ShowAuditErrorMessage(
+//		std::string const & Severity, // if blank, does not add to sum
+//		std::string const & ErrorMessage
+//		)
+//{
+//
+//	// SUBROUTINE INFORMATION:
+//	//       AUTHOR         Linda K. Lawrie
+//	//       DATE WRITTEN   March 2003
+//	//       MODIFIED       na
+//	//       RE-ENGINEERED  na
+//
+//	// PURPOSE OF THIS SUBROUTINE:
+//	// This subroutine is just for messages that will be displayed on the audit trail
+//	// (echo of the input file).  Errors are counted and a summary is displayed after
+//	// finishing the scan of the input file.
+//
+//	// SUBROUTINE PARAMETER DEFINITIONS:
+//	static gio::Fmt ErrorFormat( "(2X,A)" );
+//
+//	if ( ! Severity.empty() ) {
+//		++TotalAuditErrors;
+//		gio::write( EchoInputFile, ErrorFormat ) << Severity + ErrorMessage;
+//	} else {
+//		gio::write( EchoInputFile, ErrorFormat ) << " ************* " + ErrorMessage;
+//	}
+//
+//}
 
 	std::string
-	IPTrimSigDigits( int const IntegerValue )
-	{
+	InputProcessor::IPTrimSigDigits( int const IntegerValue ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -6233,29 +3054,6 @@ namespace InputProcessor {
 		// significant digits after the decimal point to report and returns a string
 		// that is appropriate.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string String; // Working string
 
@@ -6263,7 +3061,4 @@ namespace InputProcessor {
 		return stripped( String );
 
 	}
-
-} // InputProcessor
-
-} // EnergyPlus
+}

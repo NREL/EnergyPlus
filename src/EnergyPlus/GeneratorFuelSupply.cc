@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -147,20 +135,7 @@ namespace GeneratorFuelSupply {
 		//       RE-ENGINEERED  this module extracted from older SOFC module for
 		//                      reuse with both Annex 42 models,
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound; // might also use FindItemInList
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
@@ -170,19 +145,6 @@ namespace GeneratorFuelSupply {
 		using DataLoopNode::ObjectIsNotParent;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER                     :: GeneratorNum !Generator counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -191,8 +153,6 @@ namespace GeneratorFuelSupply {
 		Array1D_string AlphArray( 25 ); // character string data
 		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int FuelSupNum;
 		static bool MyOneTimeFlag( true );
 		std::string ObjMSGName;
@@ -200,7 +160,7 @@ namespace GeneratorFuelSupply {
 
 		if ( MyOneTimeFlag ) {
 			cCurrentModuleObject = "Generator:FuelSupply";
-			NumGeneratorFuelSups = GetNumObjectsFound( cCurrentModuleObject );
+			NumGeneratorFuelSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumGeneratorFuelSups <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -210,21 +170,14 @@ namespace GeneratorFuelSupply {
 			FuelSupply.allocate( NumGeneratorFuelSups );
 
 			for ( FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum ) {
-				GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelSupply, FuelSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				FuelSupply( FuelSupNum ).Name = AlphArray( 1 );
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
-				if ( SameString( "TemperatureFromAirNode", AlphArray( 2 ) ) ) {
+				if ( InputProcessor::SameString( "TemperatureFromAirNode", AlphArray( 2 ) ) ) {
 					FuelSupply( FuelSupNum ).FuelTempMode = FuelInTempFromNode;
-				} else if ( SameString( "Scheduled", AlphArray( 2 ) ) ) {
+				} else if ( InputProcessor::SameString( "Scheduled", AlphArray( 2 ) ) ) {
 					FuelSupply( FuelSupNum ).FuelTempMode = FuelInTempSchedule;
 				} else {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
@@ -253,9 +206,9 @@ namespace GeneratorFuelSupply {
 
 				for ( auto & e : FuelSupply ) e.CompPowerLossFactor = NumArray( 1 );
 
-				if ( SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
+				if ( InputProcessor::SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGaseousConstituents;
-				} else if ( SameString( AlphArray( 6 ), "LiquidGeneric" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 6 ), "LiquidGeneric" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGenericLiquid;
 				} else {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + AlphArray( 6 ) );
@@ -333,27 +286,6 @@ namespace GeneratorFuelSupply {
 
 		// METHODOLOGY EMPLOYED:
 		// Hardcoded data from NIST is filled into data structure one time only
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumHardCodedConstituents; // number of gases included in data
@@ -703,7 +635,7 @@ namespace GeneratorFuelSupply {
 			for ( i = 1; i <= FuelSupply( FuelSupplyNum ).NumConstituents; ++i ) {
 
 				thisName = FuelSupply( FuelSupplyNum ).ConstitName( i );
-				thisGasID = FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
+				thisGasID = InputProcessor::FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
 				FuelSupply( FuelSupplyNum ).GasLibID( i ) = thisGasID;
 
 				if ( thisGasID == 0 ) {

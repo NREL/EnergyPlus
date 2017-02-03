@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -449,27 +437,16 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  CHARACTER(len=MaxNameLength), &
 		//                   DIMENSION(20) :: Alphas                ! Alpha items for object
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		//unused1208  REAL(r64), DIMENSION(9)             :: Numbers               ! Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -481,25 +458,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Tubular";
-		NumOfTDDPipes = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfTDDPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfTDDPipes > 0 ) {
 			TDDPipe.allocate( NumOfTDDPipes );
 
 			for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
-				GetObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Pipe name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), TDDPipe, PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				TDDPipe( PipeNum ).Name = cAlphaArgs( 1 );
 
 				// Get TDD:DOME object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " not found." );
@@ -544,7 +515,7 @@ namespace DaylightingDevices {
 				}
 
 				// Get TDD:DIFFUSER object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
+				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " not found." );
@@ -603,7 +574,7 @@ namespace DaylightingDevices {
 				}
 
 				// Construction
-				TDDPipe( PipeNum ).Construction = FindItemInList( cAlphaArgs( 4 ), Construct );
+				TDDPipe( PipeNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Construct );
 
 				if ( TDDPipe( PipeNum ).Construction == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe construction " + cAlphaArgs( 4 ) + " not found." );
@@ -664,7 +635,7 @@ namespace DaylightingDevices {
 
 					for ( TZoneNum = 1; TZoneNum <= TDDPipe( PipeNum ).NumOfTZones; ++TZoneNum ) {
 						TZoneName = cAlphaArgs( TZoneNum + 4 );
-						TDDPipe( PipeNum ).TZone( TZoneNum ) = FindItemInList( TZoneName, Zone );
+						TDDPipe( PipeNum ).TZone( TZoneNum ) = InputProcessor::FindItemInList( TZoneName, Zone );
 						if ( TDDPipe( PipeNum ).TZone( TZoneNum ) == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Transition zone " + TZoneName + " not found." );
 							ErrorsFound = true;
@@ -701,23 +672,12 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int ShelfNum; // Daylighting shelf object number
@@ -726,25 +686,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Shelf";
-		NumOfShelf = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfShelf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfShelf > 0 ) {
 			Shelf.allocate( NumOfShelf );
 
 			for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
-				GetObjectItem( "DaylightingDevice:Shelf", ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Shelf name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Shelf, ShelfNum - 1, IsNotOK, IsBlank, "DaylightingDevice:Shelf" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				Shelf( ShelfNum ).Name = cAlphaArgs( 1 );
 
 				// Get window object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " not found." );
@@ -785,7 +739,7 @@ namespace DaylightingDevices {
 
 				// Get inside shelf heat transfer surface (optional)
 				if ( cAlphaArgs( 3 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
+					SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Inside shelf " + cAlphaArgs( 3 ) + " not found." );
@@ -809,7 +763,7 @@ namespace DaylightingDevices {
 
 				// Get outside shelf attached shading surface (optional)
 				if ( cAlphaArgs( 4 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 4 ), Surface );
+					SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf " + cAlphaArgs( 4 ) + " not found." );
@@ -834,7 +788,7 @@ namespace DaylightingDevices {
 
 						// Get outside shelf construction (required if outside shelf is specified)
 						if ( cAlphaArgs( 5 ) != "" ) {
-							ConstrNum = FindItemInList( cAlphaArgs( 5 ), Construct );
+							ConstrNum = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Construct );
 
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
@@ -1365,7 +1319,7 @@ namespace DaylightingDevices {
 		// Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
 
 		// METHODOLOGY EMPLOYED:
-		// Similar to FindItemInList defined in InputProcessor.
+		// Similar to InputProcessor::FindItemInList( defined in InputProcessor.
 
 		// REFERENCES: na
 		// Using/Aliasing

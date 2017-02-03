@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <string>
@@ -352,7 +340,7 @@ namespace ReportSizingManager {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using General::SolveRegulaFalsi;
-		using InputProcessor::SameString;
+
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdpPb;
@@ -489,7 +477,7 @@ namespace ReportSizingManager {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
 				if ( PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON ) {
-					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+					if ( InputProcessor::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 						SizingResult *= ( 1 - DataBypassFrac ); // now reapply for second message and remianing simulation calcs
@@ -852,7 +840,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 					}
-					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && SameString( CompType, "COIL:COOLING:WATER" ) ) { // zone coil uses mDot>0, sys coil uses cap > 0
+					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) ) { // zone coil uses mDot>0, sys coil uses cap > 0
 						ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 						ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 						ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -869,7 +857,7 @@ namespace ReportSizingManager {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( DataDesInletWaterTemp, PsyWFnTdpPb( DataDesInletWaterTemp, StdBaroPress ) );
 					DesHumRatAtWaterInTemp = PsyWFnTdbH( DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine );
 					if ( AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) {
-						if ( DataDesInletAirHumRat > AutosizeDes && SameString( CompType, "COIL:COOLING:WATER" ) ) {
+						if ( DataDesInletAirHumRat > AutosizeDes && InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) ) {
 							ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 							ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 							ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -918,7 +906,7 @@ namespace ReportSizingManager {
 						AutosizeDes = ZoneEqSizing ( CurZoneEqNum ).DesCoolingLoad;
 						DesVolFlow = DataFlowUsedForSizing;
 					} else {
-						if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
+						if ( InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) || InputProcessor::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || InputProcessor::SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
 							if ( TermUnitIU ) {
 								AutosizeDes = TermUnitSizing( CurZoneEqNum ).DesCoolingLoad;
 							} else if ( ZoneEqFanCoil ) {
@@ -995,7 +983,7 @@ namespace ReportSizingManager {
 						if ( ZoneEqSizing( CurZoneEqNum ).CoolingCapacity ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						} else {
-							if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
+							if ( InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) || InputProcessor::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || InputProcessor::SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
 								if ( TermUnitIU || ZoneEqFanCoil ) {
 									ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 								} else {
@@ -1260,7 +1248,7 @@ namespace ReportSizingManager {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
 				if ( PrintWarningFlag && SizingResult > 0.0 ) {
-					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing && DataIsDXCoil ) {
+					if ( InputProcessor::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 						SizingResult *= ( 1 - DataBypassFrac ); // now reapply for second message and remianing simulation calcs
@@ -1321,7 +1309,7 @@ namespace ReportSizingManager {
 							AutosizeDes = UnitarySysEqSizing(CurSysNum).HeatingAirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
+								if ( InputProcessor::SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && ! DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
 									} else {
@@ -1331,7 +1319,7 @@ namespace ReportSizingManager {
 									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
 							} else if ( CurDuctType == Cooling ) {
-								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
+								if ( InputProcessor::SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 									} else {
@@ -1530,7 +1518,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 					}
-					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && SameString( CompType, "COIL:COOLING:WATER" ) ) { // flow here is water vol flow rate
+					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) ) { // flow here is water vol flow rate
 						ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 						ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 						ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1547,7 +1535,7 @@ namespace ReportSizingManager {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( DataDesInletWaterTemp, PsyWFnTdpPb( DataDesInletWaterTemp, StdBaroPress ) );
 					DesHumRatAtWaterInTemp = PsyWFnTdbH( DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine );
 					if ( AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) { // flow here is water vol flow rate
-						if ( DataDesInletAirHumRat > AutosizeDes && SameString( CompType, "COIL:COOLING:WATER" ) ) {
+						if ( DataDesInletAirHumRat > AutosizeDes && InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) ) {
 							ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 							ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 							ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1676,7 +1664,7 @@ namespace ReportSizingManager {
 								}
 							}
 							OutTemp = FinalSysSizing ( CurSysNum ).OutTempAtCoolPeak;
-							if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
+							if ( InputProcessor::SameString( CompType, "COIL:COOLING:WATER" ) || InputProcessor::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
 								rhoair = StdRhoAir;
 							} else {
 								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
@@ -1814,7 +1802,7 @@ namespace ReportSizingManager {
 							// TRUE for all air loop parent equipment except UnitarySystem where flag is reset to FALSE after simulating
 							// This method allows downstream heating coils to size individually.Probably should do this for all air loop equipment
 							// ChangoverBypass model always sets AirLoopControlInfo%UnitarySys to FALSE so heating coil can individually size
-							if ( AirLoopControlInfo( CurSysNum ).UnitarySysSimulating && ! SameString( CompType, "COIL:HEATING:WATER" ) ) {
+							if ( AirLoopControlInfo( CurSysNum ).UnitarySysSimulating && ! InputProcessor::SameString( CompType, "COIL:HEATING:WATER" ) ) {
 								NominalCapacityDes = UnitaryHeatCap;
 							} else {
 								if ( DesCoilLoad >= SmallLoad ) {
@@ -2068,11 +2056,11 @@ namespace ReportSizingManager {
 			if ( !HardSizeNoDesRun || DataScalableSizingON || DataScalableCapSizingON ) {
 				if ( IsAutoSize ) { // Design Size values are available for both autosized and hard - sized
 					// check capacity to make sure design volume flow per total capacity is within range
-					
+
 					// Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and determines capacity using physical calculations instead of emperical curves
 					bool FlagCheckVolFlowPerRatedTotCap = true;
-					if ( SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
-						
+					if ( InputProcessor::SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || InputProcessor::SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
+
 					if ( DataIsDXCoil && FlagCheckVolFlowPerRatedTotCap && ( SizingType == CoolingCapacitySizing || SizingType == HeatingCapacitySizing ) ) {
 						if ( SizingResult > 0.0 ) {
 							RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;
@@ -2109,7 +2097,7 @@ namespace ReportSizingManager {
 						}
 					}
 					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( InputProcessor::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							AutosizeUser *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
@@ -2127,7 +2115,7 @@ namespace ReportSizingManager {
 							}
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 && PrintWarningFlag ) {
-						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
+						if (InputProcessor::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
@@ -2135,7 +2123,7 @@ namespace ReportSizingManager {
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else if (PrintWarningFlag ) {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( InputProcessor::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", SizingResult );
@@ -2167,7 +2155,7 @@ namespace ReportSizingManager {
 							}
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 && PrintWarningFlag ) {
-						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
+						if (InputProcessor::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
@@ -2175,7 +2163,7 @@ namespace ReportSizingManager {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeUser > 0.0 && PrintWarningFlag ) {
-						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
+						if (InputProcessor::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
@@ -2183,7 +2171,7 @@ namespace ReportSizingManager {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else if ( PrintWarningFlag ) {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( InputProcessor::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString + " (non-bypassed)", SizingResult );

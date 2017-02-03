@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -148,8 +136,6 @@ namespace ThermalComfort {
 	using DataRoomAirModel::IsZoneUI;
 	using DataRoomAirModel::VComfort_Jet;
 	using DataRoomAirModel::VComfort_Recirculation;
-
-	//Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyRhFnTdbWPb;
 
 	namespace {
@@ -1834,34 +1820,16 @@ namespace ThermalComfort {
 
 		// PURPOSE OF THIS SUBROUTINE:
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataGlobals;
 		using namespace DataHeatBalance;
 		using DataSurfaces::Surface;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const AngleFacLimit( 0.01 ); // To set the limit of sum of angle factors
 		int const MaxSurfaces( 20 ); // Maximum number of surfaces in each AngleFactor List
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  CHARACTER(len=MaxNameLength),  &
@@ -1878,7 +1846,7 @@ namespace ThermalComfort {
 		int WhichAFList; // Used in validating AngleFactorList
 
 		cCurrentModuleObject = "ComfortViewFactorAngles";
-		NumOfAngleFactorLists = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAngleFactorLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		AngleFactorList.allocate( NumOfAngleFactorLists );
 		for ( auto & e : AngleFactorList ) {
 			e.Name.clear();
@@ -1890,11 +1858,11 @@ namespace ThermalComfort {
 
 			AllAngleFacSummed = 0.0;
 
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			AngleFactorList( Item ).Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
 			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
-			AngleFactorList( Item ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			AngleFactorList( Item ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -1913,7 +1881,7 @@ namespace ThermalComfort {
 
 			for ( SurfNum = 1; SurfNum <= AngleFactorList( Item ).TotAngleFacSurfaces; ++SurfNum ) {
 				AngleFactorList( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				AngleFactorList( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
+				AngleFactorList( Item ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
 				AngleFactorList( Item ).AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( AngleFactorList( Item ).SurfacePtr( SurfNum ) == 0 ) {
@@ -1947,7 +1915,7 @@ namespace ThermalComfort {
 
 		for ( Item = 1; Item <= TotPeople; ++Item ) {
 			if ( People( Item ).MRTCalcType != AngleFactor ) continue;
-			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
+			People( Item ).AngleFactorListPtr = InputProcessor::FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
 			WhichAFList = People( Item ).AngleFactorListPtr;
 			if ( WhichAFList == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );
@@ -2113,6 +2081,7 @@ namespace ThermalComfort {
 		using DataHeatBalFanSys::QHWBaseboardToPerson;
 		using DataHeatBalFanSys::QSteamBaseboardToPerson;
 		using DataHeatBalFanSys::QElecBaseboardToPerson;
+		using DataHeatBalFanSys::QCoolingPanelToPerson;
 		using DataHeatBalSurface::TH;
 
 		// Return value
@@ -2151,9 +2120,9 @@ namespace ThermalComfort {
 		}}
 
 		// If high temperature radiant heater present and on, then must account for this in MRT calculation
-		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
+		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QCoolingPanelToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
 			RadTemp += KelvinConv; // Convert to Kelvin
-			RadTemp = root_4( pow_4( RadTemp ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) );
+			RadTemp = root_4( pow_4( RadTemp ) + ( ( QHTRadSysToPerson( ZoneNum ) + QCoolingPanelToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) );
 			RadTemp -= KelvinConv; // Convert back to Celsius
 		}
 

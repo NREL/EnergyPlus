@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -286,12 +274,6 @@ namespace RoomAirModelAirflowNetwork {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Perform one-time checking and term calculations
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -311,7 +293,6 @@ namespace RoomAirModelAirflowNetwork {
 		using DataZoneEquipment::ZoneEquipList;
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -410,7 +391,7 @@ namespace RoomAirModelAirflowNetwork {
 						for ( EquipLoop = 1; EquipLoop <= RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).NumHVACs; ++EquipLoop ) { //loop over all the equip for a single room air node
 							// Check zone equipment name
 							for ( I = 1; I <= ZoneEquipList( LoopZone ).NumOfEquipTypes; ++I ) { //loop over all equip types
-								if ( SameString( ZoneEquipList( LoopZone ).EquipName( I ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).Name ) ) {
+								if ( InputProcessor::SameString( ZoneEquipList( LoopZone ).EquipName( I ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).Name ) ) {
 									if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).EquipConfigIndex == 0 )
 										RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).EquipConfigIndex = I;
 									EquipFound( I ) = true;
@@ -419,7 +400,7 @@ namespace RoomAirModelAirflowNetwork {
 								}
 							}
 							for ( IdNode = 1; IdNode <= NumOfNodes; ++IdNode ) { //loop over all nodes to find supply node ID
-								if ( SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyNodeName ) ) {
+								if ( InputProcessor::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyNodeName ) ) {
 									RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum = IdNode;
 									break;
 								}
@@ -432,12 +413,12 @@ namespace RoomAirModelAirflowNetwork {
 								}
 							}
 
-							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum > 0 && SameString( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName, "" ) ) {
+							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum > 0 && InputProcessor::SameString( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName, "" ) ) {
 								RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName = NodeID( ZoneEquipConfig( LoopZone ).ReturnAirNode ); // Zone return node
 							}
 
 							for ( IdNode = 1; IdNode <= NumOfNodes; ++IdNode ) { //loop over all nodes to find return node ID
-								if ( SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
+								if ( InputProcessor::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
 									RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).RetNodeNum = IdNode;
 									break;
 								}
@@ -1154,7 +1135,7 @@ namespace RoomAirModelAirflowNetwork {
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyRhFnTdbRhov;
 		using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
-		using DataMoistureBalanceEMPD::MoistEMPDNew;
+		using DataMoistureBalanceEMPD::RVSurface;
 		using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
 		using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
 		using DataEnvironment::OutBaroPress;
@@ -1209,7 +1190,7 @@ namespace RoomAirModelAirflowNetwork {
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 
 				UpdateMoistureBalanceEMPD( SurfNum );
-				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
+				RhoVaporSurfIn( SurfNum ) = RVSurface( SurfNum );
 
 				SumHmAW = SumHmAW + HMassConvInFD( SurfNum )*Surface( SurfNum ).Area* ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 				SumHmARa = SumHmARa + HMassConvInFD( SurfNum )*Surface( SurfNum ).Area* PsyRhoAirFnPbTdbW( OutBaroPress, TempSurfInTmp( SurfNum ),

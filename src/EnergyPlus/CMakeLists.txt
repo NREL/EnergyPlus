@@ -10,6 +10,8 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
   Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
@@ -30,6 +32,8 @@ SET( SRC
   BranchNodeConnections.hh
   CTElectricGenerator.cc
   CTElectricGenerator.hh
+  ChilledCeilingPanelSimple.cc
+  ChilledCeilingPanelSimple.hh
   ChillerAbsorption.cc
   ChillerAbsorption.hh
   ChillerElectricEIR.cc
@@ -324,6 +328,8 @@ SET( SRC
   IceThermalStorage.hh
   InputProcessor.cc
   InputProcessor.hh
+  IntegratedHeatPump.cc
+  IntegratedHeatPump.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
@@ -572,9 +578,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight jsoncpp cJSON)
-
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight ModernJSON cJSON)
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()
@@ -594,6 +598,7 @@ set_target_properties(
 install( TARGETS energyplusapi
   RUNTIME DESTINATION ./
   LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
 )
 
 if (MINGW)

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // CLI Headers
 #include <ezOptionParser.hpp>
@@ -70,7 +58,6 @@
 #include <DisplayRoutines.hh>
 #include <EnergyPlus.hh>
 #include <FileSystem.hh>
-#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReports.hh>
@@ -86,7 +73,6 @@ using namespace DataGlobals;
 using namespace DataStringGlobals;
 using namespace DataSystemVariables;
 using namespace FileSystem;
-using namespace InputProcessor;
 using namespace SimulationManager;
 using namespace OutputReportTabular;
 using namespace OutputProcessor;
@@ -154,6 +140,8 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Display help information", "-h", "--help");
 
+	opt.add("Energy+.jdd", 0, 1, 0, "JSON input data dictionary path (default: Energy+.jdd in executable directory)", "-j", "--jdd");
+
 	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
 
 	opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
@@ -161,6 +149,8 @@ ProcessArgs(int argc, const char * argv[])
 	opt.add("", 0, 1, 0, "Prefix for output file names (default: eplus)", "-p", "--output-prefix");
 
 	opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
+
+	opt.add("", 0, 0, 0, "Output IDF->JDF or JDF->IDF, dependent on input file type", "-c", "--convert");
 
 	opt.add("L", 0, 1, 0, "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: Dash (e.g., eplus-table.csv)", "-s", "--output-suffix");
 
@@ -190,7 +180,12 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-w")->getString(inputWeatherFileName);
 
+	opt.get("-j")->getString(inputJddFileName);
+
 	opt.get("-i")->getString(inputIddFileName);
+
+	if (!opt.isSet("-j") && !legacyMode)
+		inputJddFileName = exeDirectory + inputJddFileName;
 
 	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
@@ -204,6 +199,8 @@ ProcessArgs(int argc, const char * argv[])
 	DDOnlySimulation = opt.isSet("-D");
 
 	AnnualSimulation = opt.isSet("-a");
+
+	outputJDFConversion = opt.isSet("-c");
 
 	// Process standard arguments
 	if (opt.isSet("-h")) {
@@ -219,14 +216,15 @@ ProcessArgs(int argc, const char * argv[])
 	if (opt.lastArgs.size() == 1) {
 		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
 			std::string const & arg( *opt.lastArgs[i] );
-			inputIdfFileName = arg;
+			inputFileName = arg;
 		}
 	}
-	if (opt.lastArgs.size() == 0) inputIdfFileName = "in.idf";
+	if (opt.lastArgs.size() == 0) inputFileName = "in.idf";
 
 	// Convert all paths to native paths
-	makeNativePath(inputIdfFileName);
+	makeNativePath(inputFileName);
 	makeNativePath(inputWeatherFileName);
+	makeNativePath(inputJddFileName);
 	makeNativePath(inputIddFileName);
 	makeNativePath(dirPathName);
 
@@ -254,8 +252,20 @@ ProcessArgs(int argc, const char * argv[])
 		}
 	}
 
-	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
-	idfDirPathName = getParentDirectoryPath(inputIdfFileName);
+	inputFileNameOnly = removeFileExtension(getFileName(inputFileName));
+	inputDirPathName = getParentDirectoryPath(inputFileName);
+
+	auto inputFileExt = getFileExtension( inputFileName );
+	std::transform( inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper );
+
+	if ( inputFileExt == "JDF" ) {
+		isJDF = true;
+	} else if ( inputFileExt == "IDF" ) {
+		isJDF = false;
+	} else {
+		DisplayString("ERROR: Input file must have IDF or JDF extension.");
+		exit(EXIT_FAILURE);
+	}
 
 	std::string weatherFilePathWithoutExtension = removeFileExtension(inputWeatherFileName);
 
@@ -275,6 +285,8 @@ ProcessArgs(int argc, const char * argv[])
 		// Create directory if it doesn't already exist
 		makeDirectory(dirPathName);
 	}
+
+	outputDirPathName = dirPathName;
 
 	// File naming scheme
 	std::string outputFilePrefix;
@@ -399,7 +411,7 @@ ProcessArgs(int argc, const char * argv[])
 	EnergyPlusIniFileName = "Energy+.ini";
 	inStatFileName = weatherFilePathWithoutExtension + ".stat";
 	TarcogIterationsFileName = "TarcogIterations.dbg";
-	eplusADSFileName = idfDirPathName+"eplusADS.inp";
+	eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
 	// Readvars files
 	outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
@@ -482,10 +494,19 @@ ProcessArgs(int argc, const char * argv[])
 
 		gio::close( LFN );
 
+		inputJddFileName = ProgramPath + "Energy+.jdd";
+
 		inputIddFileName = ProgramPath + "Energy+.idd";
 	}
 
 	// Check if specified files exist
+	{ IOFlags flags; gio::inquire( inputJddFileName, flags ); FileExists = flags.exists(); }
+	if ( ! FileExists ) {
+		DisplayString("ERROR: Could not find JSON input data dictionary: " + getAbsolutePath(inputJddFileName) + "." );
+		DisplayString(errorFollowUp);
+		exit(EXIT_FAILURE);
+	}
+
 	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
 		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
@@ -493,9 +514,9 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
+	{ IOFlags flags; gio::inquire( inputFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputIdfFileName) + "." );
+		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + "." );
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
@@ -516,6 +537,8 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	//TODO: might be able to convert JDF->IDF, run preprocessors, then go back IDF->JDF
+
 	// Preprocessors (These will likely move to a new file)
 	if (runEPMacro) {
 		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
@@ -526,15 +549,15 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		std::string epMacroCommand = "\"" + epMacroPath + "\"";
 		bool inputFileNamedIn =
-				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
+				(getAbsolutePath(inputFileName) == getAbsolutePath("in.imf"));
 
-		if (!inputFileNamedIn) linkFile(inputIdfFileName.c_str(), "in.imf");
+		if (!inputFileNamedIn) linkFile(inputFileName.c_str(), "in.imf");
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
 		if (!inputFileNamedIn) removeFile("in.imf");
 		moveFile("audit.out",outputEpmdetFileName);
 		moveFile("out.idf",outputEpmidfFileName);
-	   inputIdfFileName = outputEpmidfFileName;
+		inputFileName = outputEpmidfFileName;
 	}
 
 	if (runExpandObjects) {
@@ -546,13 +569,13 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
 		bool inputFileNamedIn =
-				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.idf"));
+				(getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
 
 		bool iddFileNamedEnergy =
 				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
 		if (!inputFileNamedIn)
-			linkFile(inputIdfFileName.c_str(), "in.idf");
+			linkFile(inputFileName.c_str(), "in.idf");
 		if (!iddFileNamedEnergy)
 			linkFile(inputIddFileName,"Energy+.idd");
 		systemCall(expandObjectsCommand);
@@ -564,7 +587,7 @@ ProcessArgs(int argc, const char * argv[])
 		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
 		if (FileExists) {
 			moveFile("expanded.idf", outputExpidfFileName);
-		    inputIdfFileName = outputExpidfFileName;
+		    inputFileName = outputExpidfFileName;
 		}
 	}
 

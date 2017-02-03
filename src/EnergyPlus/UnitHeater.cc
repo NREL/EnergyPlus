@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -136,8 +124,6 @@ namespace UnitHeater {
 	using DataHVACGlobals::cFanTypes;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbW;
@@ -216,26 +202,10 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::ZoneHeatingOnlyFan;
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqUnitHeater;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitHeatNum; // index of unit heater being simulated
@@ -248,7 +218,7 @@ namespace UnitHeater {
 
 		// Find the correct Unit Heater Equipment
 		if ( CompIndex == 0 ) {
-			UnitHeatNum = FindItemInList( CompName, UnitHeat );
+			UnitHeatNum = InputProcessor::FindItemInList( CompName, UnitHeat );
 			if ( UnitHeatNum == 0 ) {
 				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );
 			}
@@ -305,12 +275,6 @@ namespace UnitHeater {
 		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanType;
@@ -332,23 +296,9 @@ namespace UnitHeater {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataSizing::ZoneHVACSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		static bool errFlag( false ); // interim error flag
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -372,8 +322,8 @@ namespace UnitHeater {
 
 		// Figure out how many unit heaters there are in the input file
 		CurrentModuleObject = cMO_UnitHeater;
-		NumOfUnitHeats = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfUnitHeats = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -392,19 +342,12 @@ namespace UnitHeater {
 
 		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) { // Begin looping over all of the unit heaters found in the input file...
 
-			GetObjectItem( CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames.allocate( NumNumbers );
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = "";
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitHeat, UnitHeatNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitHeat( UnitHeatNum ).Name = Alphas( 1 );
 			UnitHeat( UnitHeatNum ).SchedName = Alphas( 2 );
@@ -483,7 +426,7 @@ namespace UnitHeater {
 				UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 			} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = ElectricCoil;
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = GasCoil;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
@@ -545,11 +488,11 @@ namespace UnitHeater {
 			}
 
 			UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating = Alphas( 10 );
-			if ( ( ! SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
+			if ( ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
 				ErrorsFound = true;
 				ShowSevereError( "Illegal " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + '=' + UnitHeat( UnitHeatNum ).Name );
-			} else if ( SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
+			} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
 				UnitHeat( UnitHeatNum ).FanOffNoHeating = true;
 			}
 
@@ -570,7 +513,7 @@ namespace UnitHeater {
 
 			UnitHeat( UnitHeatNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 12 )) {
-				UnitHeat( UnitHeatNum ).HVACSizingIndex = FindItemInList( Alphas( 12 ), ZoneHVACSizing );
+				UnitHeat( UnitHeatNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 12 ), ZoneHVACSizing );
 				if (UnitHeat( UnitHeatNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 12 ) + " = " + Alphas( 12 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
@@ -877,7 +820,6 @@ namespace UnitHeater {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
@@ -1057,6 +999,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
@@ -1154,6 +1097,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							}

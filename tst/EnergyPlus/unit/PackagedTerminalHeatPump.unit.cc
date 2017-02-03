@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::VariableSpeedCoils Unit Tests
 
@@ -64,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -216,7 +205,7 @@ namespace EnergyPlus {
 		"    0.0,                  !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}",
 		"    BiquadraticCurve,     !- Speed 5 Waste Heat Function of Temperature Curve Name",
 		"    10734.02101,          !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}",
-		"    0.816,                !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",	
+		"    0.816,                !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
 		"    7.661685232,          !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}",
 		"    0.652231367,          !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
 		"    0.0008201726 ,        !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}",
@@ -267,7 +256,7 @@ namespace EnergyPlus {
 		"    CubicCurve,           !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name",
 		"    0.0,                  !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}",
 		"    BiquadraticCurve;     !- Speed 9 Waste Heat Function of Temperature Curve Name",
-    
+
 		"  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,",
 		"    Lobby_ZN_1_FLR_2 WSHP Heating Mode,                    !- Name",
 		"    Lobby_ZN_1_FLR_2 WSHP Heating Source Side Inlet Node,  !- Water-to-Refrigerant HX Water Inlet Node Name",
@@ -388,7 +377,7 @@ namespace EnergyPlus {
 		"    CubicCurve,           !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name",
 		"    0.0,                  !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}",
 		"    BiquadraticCurve;     !- Speed 9 Waste Heat Function of Temperature Curve Name",
- 
+
 		"  Fan:OnOff,",
 		"    Lobby_ZN_1_FLR_2 WSHP Fan,              !- Name",
 		"    OnSched,    !- Availability Schedule Name",
@@ -413,7 +402,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );

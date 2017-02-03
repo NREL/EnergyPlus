@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -178,28 +166,9 @@ namespace HVACSingleDuctInduc {
 		// Manages the simulation of a passive (no fan) induction terminal unit.
 		// Called from SimZoneAirLoopEquipment in module ZoneAirLoopEquipmentManager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::TermUnitIU;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IUNum; // index of terminal unit being simulated
@@ -212,7 +181,7 @@ namespace HVACSingleDuctInduc {
 
 		// Get the induction unit index
 		if ( CompIndex == 0 ) {
-			IUNum = FindItemInList( CompName, IndUnit );
+			IUNum = InputProcessor::FindItemInList( CompName, IndUnit );
 			if ( IUNum == 0 ) {
 				ShowFatalError( "SimIndUnit: Induction Unit not found=" + CompName );
 			}
@@ -278,15 +247,7 @@ namespace HVACSingleDuctInduc {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -301,21 +262,8 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using MixerComponent::GetZoneMixerIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetIndUnits " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		int IUIndex; // loop index
 		int IUNum; // current fan coil number
@@ -333,7 +281,6 @@ namespace HVACSingleDuctInduc {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zome do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
@@ -342,13 +289,13 @@ namespace HVACSingleDuctInduc {
 
 		// find the number of each type of induction unit
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
-		NumFourPipes = GetNumObjectsFound( CurrentModuleObject );
+		NumFourPipes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		NumIndUnits = NumFourPipes;
 		// allocate the data structures
 		IndUnit.allocate( NumIndUnits );
 		CheckEquipName.dimension( NumIndUnits, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -360,16 +307,11 @@ namespace HVACSingleDuctInduc {
 		// loop over Series PIUs; get and load the input data
 		for ( IUIndex = 1; IUIndex <= NumFourPipes; ++IUIndex ) {
 
-			GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IUNum = IUIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), IndUnit, IUNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 			IndUnit( IUNum ).Name = Alphas( 1 );
 			IndUnit( IUNum ).UnitType = CurrentModuleObject;
 			IndUnit( IUNum ).UnitType_Num = SingleDuct_CV_FourPipeInduc;
@@ -392,7 +334,7 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).OutAirNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 5 ) );
 
 			IndUnit( IUNum ).HCoilType = Alphas( 6 ); // type (key) of heating coil
-			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				IndUnit( IUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
 			}
 
@@ -412,9 +354,9 @@ namespace HVACSingleDuctInduc {
 
 			IndUnit( IUNum ).CCoilType = Alphas( 8 ); // type (key) of cooling coil
 
-			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) ) {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-			} else if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			} else if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 			}
 
@@ -533,7 +475,6 @@ namespace HVACSingleDuctInduc {
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
-		using InputProcessor::SameString;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -624,7 +565,7 @@ namespace HVACSingleDuctInduc {
 			OutletNode = IndUnit( IUNum ).OutAirNode;
 			IndRat = IndUnit( IUNum ).InducRatio;
 			// set the mass flow rates from the input volume flow rates
-			if ( SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 				IndUnit( IUNum ).MaxTotAirMassFlow = RhoAir * IndUnit( IUNum ).MaxTotAirVolFlow;
 				IndUnit( IUNum ).MaxPriAirMassFlow = IndUnit( IUNum ).MaxTotAirMassFlow / ( 1.0 + IndRat );
 				IndUnit( IUNum ).MaxSecAirMassFlow = IndRat * IndUnit( IUNum ).MaxTotAirMassFlow / ( 1.0 + IndRat );
@@ -670,7 +611,7 @@ namespace HVACSingleDuctInduc {
 		if ( FirstHVACIteration ) {
 			// check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
 			if ( GetCurrentScheduleValue( IndUnit( IUNum ).SchedPtr ) > 0.0 && Node( PriNode ).MassFlowRate > 0.0 ) {
-				if ( SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 					Node( PriNode ).MassFlowRate = IndUnit( IUNum ).MaxPriAirMassFlow;
 					Node( SecNode ).MassFlowRate = IndUnit( IUNum ).MaxSecAirMassFlow;
 				}
@@ -680,7 +621,7 @@ namespace HVACSingleDuctInduc {
 			}
 			// reset the max and min avail flows
 			if ( GetCurrentScheduleValue( IndUnit( IUNum ).SchedPtr ) > 0.0 && Node( PriNode ).MassFlowRateMaxAvail > 0.0 ) {
-				if ( SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 					Node( PriNode ).MassFlowRateMaxAvail = IndUnit( IUNum ).MaxPriAirMassFlow;
 					Node( PriNode ).MassFlowRateMinAvail = IndUnit( IUNum ).MaxPriAirMassFlow;
 					Node( SecNode ).MassFlowRateMaxAvail = IndUnit( IUNum ).MaxSecAirMassFlow;
@@ -716,11 +657,9 @@ namespace HVACSingleDuctInduc {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
-		//  USE BranchInputManager,  ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -813,7 +752,7 @@ namespace HVACSingleDuctInduc {
 			} else {
 				CheckZoneSizing( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name );
 
-				if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", IndUnit( IUNum ).HCoil, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", IndUnit( IUNum ).HCoil, ErrorsFound );
@@ -885,7 +824,7 @@ namespace HVACSingleDuctInduc {
 			} else {
 				CheckZoneSizing( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name );
 
-				if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) || SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+				if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) || InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, ErrorsFound );
@@ -954,10 +893,10 @@ namespace HVACSingleDuctInduc {
 			TermUnitSizing( CurZoneEqNum ).DesHeatingLoad = IndUnit( IUNum ).DesHeatingLoad;
 			// save the induction ratio for use in subsequent sizing calcs
 			TermUnitSizing( CurZoneEqNum ).InducRat = IndUnit( IUNum ).InducRatio;
-			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				SetCoilDesFlow( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
 			}
-			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			if ( InputProcessor::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 				SetCoilDesFlow( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
 			}
 		}
@@ -1397,29 +1336,8 @@ namespace HVACSingleDuctInduc {
 		// Given a mixer name, this routine determines if that mixer is found on
 		// PIUnits.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		bool YesNo; // True if found
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ItemNum;
@@ -1431,7 +1349,7 @@ namespace HVACSingleDuctInduc {
 
 		YesNo = false;
 		if ( NumIndUnits > 0 ) {
-			ItemNum = FindItemInList( CompName, IndUnit, &IndUnitData::MixerName );
+			ItemNum = InputProcessor::FindItemInList( CompName, IndUnit, &IndUnitData::MixerName );
 			if ( ItemNum > 0 ) YesNo = true;
 		}
 

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -80,6 +68,7 @@
 #include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -124,8 +113,6 @@ namespace FluidCoolers {
 	using DataEnvironment::OutWetBulbTemp;
 	using DataPlant::PlantLoop;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbRhPb;
@@ -140,6 +127,7 @@ namespace FluidCoolers {
 	std::string const cFluidCooler_SingleSpeed( "FluidCooler:SingleSpeed" );
 	std::string const cFluidCooler_TwoSpeed( "FluidCooler:TwoSpeed" );
 
+	bool GetFluidCoolerInputFlag( true );
 	int const PIM_NominalCapacity( 1 );
 	int const PIM_UFactor( 2 );
 
@@ -182,6 +170,7 @@ namespace FluidCoolers {
 
 	// Object Data
 	Array1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
+	std::unordered_map< std::string, std::string > UniqueSimpleFluidCoolerNames;
 	Array1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
@@ -223,34 +212,18 @@ namespace FluidCoolers {
 		// REFERENCES:
 		// Based on SimTowers subroutine by Fred Buhl, May 2002; Richard Raustad, FSEC, Feb 2005
 
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
 		int FluidCoolerNum;
 
 		// GET INPUT
-		if ( GetInput ) {
+		if ( GetFluidCoolerInputFlag ) {
 			GetFluidCoolerInput();
-			GetInput = false;
+			GetFluidCoolerInputFlag = false;
 		}
 		// INITIALIZE
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			FluidCoolerNum = FindItemInList( FluidCoolerName, SimpleFluidCooler );
+			FluidCoolerNum = InputProcessor::FindItemInList( FluidCoolerName, SimpleFluidCooler );
 			if ( FluidCoolerNum == 0 ) {
 				ShowFatalError( "SimFluidCoolers: Unit not found = " + FluidCoolerName );
 			}
@@ -334,10 +307,6 @@ namespace FluidCoolers {
 		// Based on GetTowerInput subroutine from Don Shirey, Jan 2001 and Sept/Oct 2002;
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -349,19 +318,6 @@ namespace FluidCoolers {
 		using FluidProperties::CheckFluidPropertyName;
 		using FluidProperties::FindGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FluidCoolerNum; // Fluid cooler number, reference counter for SimpleFluidCooler data array
 		int NumSingleSpeedFluidCoolers; // Total number of single-speed Fluid Coolers
@@ -371,8 +327,6 @@ namespace FluidCoolers {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		Array1D< Real64 > NumArray( 16 ); // Numeric input data array
 		Array1D_string AlphArray( 5 ); // Character string input data array
@@ -380,17 +334,19 @@ namespace FluidCoolers {
 		//! LKL - still more renaming stuff to go.
 
 		// Get number of all Fluid Coolers specified in the input data file (idf)
-		NumSingleSpeedFluidCoolers = GetNumObjectsFound( "FluidCooler:SingleSpeed" );
-		NumTwoSpeedFluidCoolers = GetNumObjectsFound( "FluidCooler:TwoSpeed" );
+		NumSingleSpeedFluidCoolers = InputProcessor::GetNumObjectsFound( "FluidCooler:SingleSpeed" );
+		NumTwoSpeedFluidCoolers = InputProcessor::GetNumObjectsFound( "FluidCooler:TwoSpeed" );
 		NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
 		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. Search the input for fluid cooler to determine the cause for this error." );
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleFluidCooler ) ) return;
+		GetFluidCoolerInputFlag = false;
 
 		// Allocate data structures to hold fluid cooler input data, report data and fluid cooler inlet conditions
 		SimpleFluidCooler.allocate( NumSimpleFluidCoolers );
+		UniqueSimpleFluidCoolerNames.reserve( NumSimpleFluidCoolers );
 		SimpleFluidCoolerReport.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerInlet.allocate( NumSimpleFluidCoolers );
 		CheckEquipName.dimension( NumSimpleFluidCoolers, true );
@@ -399,14 +355,9 @@ namespace FluidCoolers {
 		cCurrentModuleObject = cFluidCooler_SingleSpeed;
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
-			GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleFluidCooler, FluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_SingleSpeed;
@@ -451,14 +402,9 @@ namespace FluidCoolers {
 		cCurrentModuleObject = cFluidCooler_TwoSpeed;
 		for ( TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
-			GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleFluidCooler, FluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_TwoSpeed;
@@ -575,7 +521,6 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using DataSizing::AutoSize;
-		using InputProcessor::SameString;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -625,14 +570,14 @@ namespace FluidCoolers {
 		}
 
 		//   Check various inputs for both the performance input methods
-		if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA != AutoSize ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 1 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 				ErrorsFound = true;
 			}
 		}
-		else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+		else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity <= 0.0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 2 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -683,7 +628,6 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using DataSizing::AutoSize;
-		using InputProcessor::SameString;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -752,7 +696,7 @@ namespace FluidCoolers {
 			ErrorsFound = true;
 		}
 
-		if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+		if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA <= 0.0 && ! SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUAWasAutoSized ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 1 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -766,7 +710,7 @@ namespace FluidCoolers {
 				ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Fluid cooler UA at low fan speed must be less than the fluid cooler UA at high fan speed." );
 				ErrorsFound = true;
 			}
-		} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+		} else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity <= 0.0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 4 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + "= \"" + AlphArray( 4 ) + "\"." );
@@ -891,7 +835,6 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using InputProcessor::SameString;
 		using DataPlant::TypeOf_FluidCooler_SingleSpd;
 		using DataPlant::TypeOf_FluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -900,17 +843,8 @@ namespace FluidCoolers {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
@@ -1029,7 +963,6 @@ namespace FluidCoolers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2217,6 +2150,12 @@ namespace FluidCoolers {
 
 		}
 
+	}
+
+	void
+	clear_state() {
+		UniqueSimpleFluidCoolerNames.clear();
+		GetFluidCoolerInputFlag = true;
 	}
 
 } // FluidCoolers

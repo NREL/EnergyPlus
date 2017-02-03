@@ -132,10 +132,14 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
+# temporary json
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/cJSON )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
+INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus )  # so that any source can #include <ConfiguredFunctions.hh>
+
+#### Create interface for JSON for Modern C++ so we can include it in targets
+add_library( ModernJSON INTERFACE )
+target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
@@ -156,7 +160,6 @@ ADD_SUBDIRECTORY(third_party/cJSON)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
-ADD_SUBDIRECTORY(third_party/jsoncpp)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
@@ -165,7 +168,6 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
-  ADD_SUBDIRECTORY(tst/jsoncpp/unit)
 
   option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
 
@@ -182,7 +184,9 @@ if( BUILD_TESTING )
   endif()
 endif()
 
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${EnergyPlus_SOURCE_DIR}/scripts/dev/generate_jdd_schema/generate_jdd.py" "${EnergyPlus_SOURCE_DIR}")
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
+configure_file( idd/Energy+.jdd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" )
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
 configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
@@ -201,6 +205,7 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/AppGPostProcess PROJECT AppGPostProcess NO_EXTERNAL_INSTALL )
 endif()
 
 if( BUILD_PACKAGE )

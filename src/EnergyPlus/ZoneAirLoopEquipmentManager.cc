@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -119,8 +107,6 @@ namespace ZoneAirLoopEquipmentManager {
 	using DataGlobals::SecInHour;
 	using DataHVACGlobals::FirstTimeStepSysFlag;
 	using namespace DataDefineEquip;
-
-	// Use statements for access to subroutines in other modules
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -193,7 +179,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -217,7 +202,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// Find the correct Zone Air Distribution Unit Equipment
 		if ( CompIndex == 0 ) {
-			AirDistUnitNum = FindItemInList( ZoneAirLoopEquipName, AirDistUnit );
+			AirDistUnitNum = InputProcessor::FindItemInList( ZoneAirLoopEquipName, AirDistUnit );
 			if ( AirDistUnitNum == 0 ) {
 				ShowFatalError( "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName );
 			}
@@ -265,17 +250,15 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DualDuct::GetDualDuctOutdoorAirRecircUse;
 		using SingleDuct::GetATMixerPriNode;
+		using SingleDuct::GetATMixerTypeNum;
+		using DataHVACGlobals::ATMixer_InletSide;
+		using DataHVACGlobals::ATMixer_SupplySide;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -303,14 +286,13 @@ namespace ZoneAirLoopEquipmentManager {
 		static Array1D< Real64 > NumArray( 2 ); //Tuned Made static
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static Array1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
 		static Array1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
 		static Array1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
 		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
 		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
-
+		static int ATMixerTypeNum( 0 ); // terminal mixer type number
 		// make sure the input data is read in only once
 		if ( ! GetAirDistUnitsFlag ) {
 			return;
@@ -318,22 +300,16 @@ namespace ZoneAirLoopEquipmentManager {
 			GetAirDistUnitsFlag = false;
 		}
 
-		NumAirDistUnits = GetNumObjectsFound( CurrentModuleObject );
+		NumAirDistUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		AirDistUnit.allocate( NumAirDistUnits );
 
 		if ( NumAirDistUnits > 0 ) {
 
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
-				GetObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+				InputProcessor::GetObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), AirDistUnit, AirDistUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				AirDistUnit( AirDistUnitNum ).Name = AlphArray( 1 );
 				//Input Outlet Node Num
 				AirDistUnit( AirDistUnitNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
@@ -375,7 +351,7 @@ namespace ZoneAirLoopEquipmentManager {
 				}
 
 				// Validate EquipType for Air Distribution Unit
-				if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:ConstantVolume" ) ) {
+				if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:ConstantVolume" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctConstVolume;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -383,7 +359,7 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:VAV" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:VAV" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctVAV;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -391,7 +367,7 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:VAV:OutdoorAir" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:VAV:OutdoorAir" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctVAVOutdoorAir;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -399,22 +375,22 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctConstVolReheat;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctVAVReheat;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:NoReheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:NoReheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctVAVNoReheat;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctCBVAVReheat;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctCBVAVNoReheat;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:SeriesPIU:Reheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:SeriesPIU:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuct_SeriesPIU_Reheat;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -422,7 +398,7 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ParallelPIU:Reheat" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ParallelPIU:Reheat" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuct_ParallelPIU_Reheat;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -430,7 +406,7 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuct_ConstVol_4PipeInduc;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -438,7 +414,7 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctVAVReheatVSFan;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -446,14 +422,14 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					}
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:CooledBeam" ) ) {
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:CooledBeam" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctConstVolCooledBeam;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
 						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam" ) ) {
+				} else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctConstVolFourPipeBeam;
 					AirDistUnit( AirDistUnitNum ).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory( SingleDuctConstVolFourPipeBeam, AirDistUnit( AirDistUnitNum ).EquipName( 1 ) );
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
@@ -461,21 +437,13 @@ namespace ZoneAirLoopEquipmentManager {
 						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
+				} else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctUserDefined;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:InletSideMixer" ) ) {
-					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctInletATMixer;
-					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
-					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
-					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
-						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
-						ErrorsFound = true;
-					}
-				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:SupplySideMixer" ) ) {
-					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctSupplyATMixer;
+				else if ( InputProcessor::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {
+					GetATMixerTypeNum( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerTypeNum );
+					if ( ATMixerTypeNum == ATMixer_InletSide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctInletATMixer;
+					if ( ATMixerTypeNum == ATMixer_SupplySide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctSupplyATMixer;
 					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
 					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
@@ -553,30 +521,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is left for Module format consistency -- not needed in this module.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// using DataSizing::FinalZoneSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Do the Begin Simulation initializations
 		if ( InitAirDistUnitsFlag ) {

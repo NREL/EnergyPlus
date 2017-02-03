@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -190,28 +178,11 @@ namespace HWBaseboardRadiator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the Baseboard Radiators.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // Index of unit in baseboard array
@@ -227,7 +198,7 @@ namespace HWBaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, HWBaseboard, &HWBaseboardParams::EquipID );
+			BaseboardNum = InputProcessor::FindItemInList( EquipName, HWBaseboard, &HWBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimHWBaseboard: Unit not found=" + EquipName );
 			}
@@ -300,21 +271,12 @@ namespace HWBaseboardRadiator {
 		// METHODOLOGY EMPLOYED:
 		// Standard input processor calls.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::NodeConnectionType_Outlet;
 		using DataLoopNode::ObjectIsNotParent;
-		//unused0909    USE DataGlobals,           ONLY: NumOfZones
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
@@ -328,10 +290,6 @@ namespace HWBaseboardRadiator {
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHWBaseboardInput:" );
@@ -351,13 +309,6 @@ namespace HWBaseboardRadiator {
 		int const iHeatCapacityPerFloorAreaNumericNum( 4 ); // get input index to HW baseboard heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 5 ); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int BaseboardNum; // Baseboard number
@@ -366,11 +317,9 @@ namespace HWBaseboardRadiator {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumHWBaseboards = GetNumObjectsFound( cCMO_BBRadiator_Water );
+		NumHWBaseboards = InputProcessor::GetNumObjectsFound( cCMO_BBRadiator_Water );
 
 		// Count total number of baseboard units
 
@@ -382,19 +331,13 @@ namespace HWBaseboardRadiator {
 		// Get the data from the user input related to baseboard heaters
 		for ( BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum ) {
 
-			GetObjectItem( cCMO_BBRadiator_Water, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCMO_BBRadiator_Water, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HWBaseboard, &HWBaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Water + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
 			VerifyUniqueBaseboardName( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), errFlag, cCMO_BBRadiator_Water + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -441,7 +384,7 @@ namespace HWBaseboardRadiator {
 			}
 
 			// Determine HW radiant baseboard heating design capacity sizing method
-			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 				HWBaseboard( BaseboardNum ).HeatingCapMethod = HeatingDesignCapacity;
 
 				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
@@ -457,7 +400,7 @@ namespace HWBaseboardRadiator {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 				HWBaseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					HWBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
@@ -478,7 +421,7 @@ namespace HWBaseboardRadiator {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				HWBaseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					HWBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -578,7 +521,7 @@ namespace HWBaseboardRadiator {
 			AllFracsSummed = HWBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= HWBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
 				HWBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 5 );
-				HWBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface );
+				HWBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface );
 				HWBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
 				if ( HWBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 5 ) + "=\"" + cAlphaArgs( SurfNum + 5 ) + "\" invalid - not found." );
@@ -608,6 +551,14 @@ namespace HWBaseboardRadiator {
 			if ( ( AllFracsSummed < ( MaxFraction - 0.01 ) ) && ( HWBaseboard( BaseboardNum ).FracRadiant > MinFraction ) ) { // User didn't distribute all of the | radiation warn that some will be lost
 				ShowWarningError( RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
+			}
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == HWBaseboard( BaseboardNum ).EquipID ) {
+						HWBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
 			}
 		}
 
@@ -952,6 +903,7 @@ namespace HWBaseboardRadiator {
 					HWBaseboard( BaseboardNum ).RatedCapacity = TempSize;
 				}
 				RatedCapacityDes = TempSize;
+				DataScalableCapSizingON = false;
 			}
 		}
 
@@ -1634,9 +1586,6 @@ namespace HWBaseboardRadiator {
 		// METHODOLOGY EMPLOYED:
 		// check input, provide comp index, call utility routines
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using PlantUtilities::PullCompInterconnectTrigger;
 		using DataPlant::ccSimPlantEquipTypes;
@@ -1644,22 +1593,8 @@ namespace HWBaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1667,7 +1602,7 @@ namespace HWBaseboardRadiator {
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, HWBaseboard, &HWBaseboardParams::EquipID );
+			BaseboardNum = InputProcessor::FindItemInList( BaseboardName, HWBaseboard, &HWBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateHWBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );
 			}

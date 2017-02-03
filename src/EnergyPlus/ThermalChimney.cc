@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -208,32 +196,13 @@ namespace ThermalChimney {
 		// This subroutine obtains input data for ThermalChimney units and
 		// stores it in the ThermalChimney data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    CHARACTER(len=MaxNameLength), DIMENSION(23) :: AlphaName
@@ -246,8 +215,6 @@ namespace ThermalChimney {
 		int IOStat;
 		int Loop;
 		int Loop1;
-		bool IsNotOK;
-		bool IsBlank;
 
 		//  ALLOCATE(MCPTThermChim(NumOfZones))
 		//  MCPTThermChim=0.0
@@ -260,31 +227,23 @@ namespace ThermalChimney {
 		ZnRptThermChim.allocate( NumOfZones );
 
 		cCurrentModuleObject = "ZoneThermalChimney";
-		TotThermalChimney = GetNumObjectsFound( cCurrentModuleObject );
+		TotThermalChimney = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		ThermalChimneySys.allocate( TotThermalChimney );
 		ThermalChimneyReport.allocate( TotThermalChimney );
 
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 
 			// First Alpha is Thermal Chimney Name
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys, Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) {
-					continue;
-				} else {
-					cAlphaArgs( 1 ) = cAlphaArgs( 1 ) + "--dup";
-				}
-			}
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name
-			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			ThermalChimneySys( Loop ).RealZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ThermalChimneySys( Loop ).RealZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
 				ShowContinueError( "invalid - not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -337,7 +296,7 @@ namespace ThermalChimney {
 			AllRatiosSummed = 0.0;
 			for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 				ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) = cAlphaArgs( TCZoneNum + 3 );
-				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
+				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = InputProcessor::FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
 				ThermalChimneySys( Loop ).DistanceThermChimInlet( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 1 );
 				ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 2 );
 				if ( lNumericFieldBlanks( 3 * TCZoneNum + 2 ) ) ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = 1.0;

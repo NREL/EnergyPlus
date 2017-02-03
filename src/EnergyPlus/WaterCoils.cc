@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -146,8 +134,6 @@ namespace WaterCoils {
 	using DataPlant::TypeOf_CoilWaterSimpleHeating;
 	using DataPlant::PlantLoop;
 	using DataPlant::MyPlantSizingIndex;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
 	// Data
@@ -273,27 +259,8 @@ namespace WaterCoils {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages WaterCoil component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilNum; // The WaterCoil that you are currently loading input into
@@ -310,7 +277,7 @@ namespace WaterCoils {
 
 		// Find the correct WaterCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, WaterCoil );
+			CoilNum = InputProcessor::FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + CompName );
 			}
@@ -384,12 +351,8 @@ namespace WaterCoils {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSizing::AutoSize;
-		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankSupplyComponent;
@@ -398,18 +361,8 @@ namespace WaterCoils {
 		using SetPointManager::NodeHasSPMCtrlVarType;
 		using namespace FaultsManager;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWaterCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilNum; // The WaterCoil that you are currently loading input into
@@ -434,15 +387,13 @@ namespace WaterCoils {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		static int j1( 0 );
 
 		// Flow
-		NumSimpHeat = GetNumObjectsFound( "Coil:Heating:Water" );
-		NumFlatFin = GetNumObjectsFound( "Coil:Cooling:Water:DetailedGeometry" );
-		NumCooling = GetNumObjectsFound( "Coil:Cooling:Water" );
+		NumSimpHeat = InputProcessor::GetNumObjectsFound( "Coil:Heating:Water" );
+		NumFlatFin = InputProcessor::GetNumObjectsFound( "Coil:Cooling:Water:DetailedGeometry" );
+		NumCooling = InputProcessor::GetNumObjectsFound( "Coil:Cooling:Water" );
 		NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
 		if ( NumWaterCoils > 0 ) {
@@ -453,13 +404,13 @@ namespace WaterCoils {
 			CheckEquipName.dimension( NumWaterCoils, true );
 		}
 
-		GetObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums );
+		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -476,19 +427,13 @@ namespace WaterCoils {
 
 			CoilNum = SimpHeatNum;
 
-			GetObjectItem( CurrentModuleObject, SimpHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, SimpHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
 			WaterCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -577,19 +522,12 @@ namespace WaterCoils {
 
 			CoilNum = NumSimpHeat + FlatFinNum;
 
-			GetObjectItem( CurrentModuleObject, FlatFinNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, FlatFinNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
 			WaterCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -687,19 +625,13 @@ namespace WaterCoils {
 
 			CoilNum = NumSimpHeat + NumFlatFin + CoolingNum;
 
-			GetObjectItem( CurrentModuleObject, CoolingNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CoolingNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
 			WaterCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -799,7 +731,7 @@ namespace WaterCoils {
 		for ( CoilNum = 1; CoilNum <= NumWaterCoils; ++CoilNum ) {
 			if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_Cooling || WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) {
 				for ( j1 = 1; j1 <= NumFouledCoil; ++j1 ) {
-					if ( SameString( WaterCoil( CoilNum ).Name, FouledCoils( j1 ).FouledCoilName ) ) {
+					if ( InputProcessor::SameString( WaterCoil( CoilNum ).Name, FouledCoils( j1 ).FouledCoilName ) ) {
 						FouledCoils( j1 ).FouledCoilID = CoilNum;
 						break;
 					}
@@ -4881,27 +4813,8 @@ Label10: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilNum;
@@ -4914,7 +4827,7 @@ Label10: ;
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, WaterCoil );
+			CoilNum = InputProcessor::FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + CompName );
 			}
@@ -4952,30 +4865,8 @@ Label10: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -4987,8 +4878,8 @@ Label10: ;
 		}
 
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = WaterCoil( WhichCoil ).MaxWaterVolFlowRate;
@@ -5027,30 +4918,8 @@ Label10: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5063,8 +4932,8 @@ Label10: ;
 
 		NodeNumber = 0;
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -5101,30 +4970,8 @@ Label10: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5137,8 +4984,8 @@ Label10: ;
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -5175,30 +5022,8 @@ Label10: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5211,8 +5036,8 @@ Label10: ;
 
 		NodeNumber = 0;
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).WaterInletNodeNum;
 			}
@@ -5249,30 +5074,8 @@ Label10: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -5285,8 +5088,8 @@ Label10: ;
 
 		NodeNumber = 0;
 		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).WaterOutletNodeNum;
 			}
@@ -5324,28 +5127,6 @@ Label10: ;
 		// water coil data structure. Some of the coil types do not have this datum as
 		// an input parameter and it is needed for calculating capacity for output reporting.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil; // index to coil
 
@@ -5354,10 +5135,10 @@ Label10: ;
 			GetWaterCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
-				if ( SameString( CoilType, "Coil:Cooling:Water" ) && WaterCoil( WhichCoil ).DesAirVolFlowRate < 0.0 ) {
+				if ( InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) && WaterCoil( WhichCoil ).DesAirVolFlowRate < 0.0 ) {
 					WaterCoil( WhichCoil ).DesAirVolFlowRate = CoilDesFlow;
 				} else {
 					WaterCoil( WhichCoil ).DesAirVolFlowRate = CoilDesFlow;
@@ -5389,28 +5170,6 @@ Label10: ;
 		// water coil data structure. Some of the coil types do not have this datum as
 		// an input parameter and it is needed for calculating capacity for output reporting.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil; // index to coil
 		Real64 CoilDesAirFlow;
@@ -5422,8 +5181,8 @@ Label10: ;
 			GetWaterCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				CoilDesAirFlow = WaterCoil( WhichCoil ).DesAirVolFlowRate;
 			} else {
@@ -5846,32 +5605,8 @@ Label10: ;
 		// type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int IndexNum; // returned coil index if matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and allocates WaterCoil related parameters from input file
 		if ( GetWaterCoilsInputFlag ) {
@@ -5881,11 +5616,11 @@ Label10: ;
 
 		IndexNum = 0;
 		if ( CoilType == "COIL:HEATING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 		} else if ( CoilType == "COIL:COOLING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 		} else if ( CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -5918,29 +5653,8 @@ Label10: ;
 		// type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		Real64 Capacity; // returned coil capacity if matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int IndexNum; // index to water coil
@@ -5954,13 +5668,13 @@ Label10: ;
 		Capacity = -1.0;
 
 		if ( CoilType == "COIL:HEATING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterHeatingCoilRate;
 		} else if ( CoilType == "COIL:COOLING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterCoolingCoilRate;
 		} else if ( CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil );
+			IndexNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterCoolingCoilRate;
 		} else {
 			IndexNum = 0;
@@ -5996,33 +5710,14 @@ Label10: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// update sim routine called from plant
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::KickOffSimulation;
 		using DataLoopNode::Node;
 		using DataPlant::ccSimPlantEquipTypes;
 		using DataPlant::PlantLoop;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataHVACGlobals::SimAirLoopsFlag;
 		using DataHVACGlobals::SimZoneEquipmentFlag;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -6033,7 +5728,7 @@ Label10: ;
 
 		// Find the correct water coil
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CoilName, WaterCoil );
+			CoilNum = InputProcessor::FindItemInList( CoilName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName );
 			}
@@ -6105,30 +5800,8 @@ Label10: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int AvailSchIndex; // returned availability schedule of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -6143,8 +5816,8 @@ Label10: ;
 		WhichCoil = 0;
 		AvailSchIndex = 0;
 
-		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
+		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water" ) || InputProcessor::SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			WhichCoil = InputProcessor::FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = WaterCoil( WhichCoil ).SchedPtr;
 			}
@@ -6166,7 +5839,7 @@ Label10: ;
 		int const CoilNum, // Number of hot water heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used
 		) {
 
 		// FUNCTION INFORMATION:

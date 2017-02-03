@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <string>
@@ -80,6 +68,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HVACManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -130,6 +119,8 @@ namespace HeatBalanceAirManager {
 	using Psychrometrics::PsyTdbFnHW;
 
 	// Data
+	std::unordered_set< std::string > UniqueZoneNames;
+	std::unordered_map< std::string, std::string > UniqueInfiltrationNames;
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
@@ -160,6 +151,8 @@ namespace HeatBalanceAirManager {
 	clear_state()
 	{
 		ManageAirHeatBalanceGetInputFlag =  true;
+		UniqueZoneNames.clear();
+		UniqueInfiltrationNames.clear();
 	}
 
 
@@ -295,30 +288,11 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Modelled after 'Modual Example' in Guide for Module Developers
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// Formats
 		static gio::Fmt Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -346,32 +320,12 @@ namespace HeatBalanceAirManager {
 			// PURPOSE OF THIS SUBROUTINE :
 			// This subroutine sets the zone mass conservation flag to true.
 
-			// METHODOLOGY EMPLOYED :
-			// na
-
-			// REFERENCES :
-			// na
-
 			// Using/Aliasing
 			using DataHeatBalance::TotMixing;
 			using DataHeatBalance::Mixing;
 			using DataHeatBalance::ZoneAirMassFlow;
 			using DataHeatBalFanSys::MixingMassFlowZone;
 			using DataHeatBalFanSys::ZoneMassBalanceFlag;
-
-
-			// locals
-			// SUBROUTINE ARGUMENT DEFINITIONS :
-			// na
-
-			// SUBROUTINE PARAMETER DEFINITIONS :
-			// na
-
-			// INTERFACE BLOCK SPECIFICATIONS :
-			// na
-
-			// DERIVED TYPE DEFINITIONS :
-			// na
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS :
 			int Loop;
@@ -403,9 +357,6 @@ namespace HeatBalanceAirManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the "simple" air flow model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// IDD Statements
 		// INFILTRATION,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design level KW],
@@ -419,11 +370,6 @@ namespace HeatBalanceAirManager {
 		//     A3 [Source Zone Name], N2 [Delta Temperature delta C];
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using ScheduleManager::CheckScheduleValueMinMax;
@@ -431,11 +377,8 @@ namespace HeatBalanceAirManager {
 		using ScheduleManager::GetScheduleName;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
-		//  USE DataIPShortCuts
 		using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 		using DataGlobals::NumOfZones;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
@@ -447,11 +390,6 @@ namespace HeatBalanceAirManager {
 		Real64 const RefDoorNone( 0.0 );
 		Real64 const RefDoorAirCurtain( 0.5 );
 		Real64 const RefDoorStripCurtain( 0.9 );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array2D< Real64 > SVals1;
@@ -475,7 +413,7 @@ namespace HeatBalanceAirManager {
 		int Loop1;
 		Array1D_bool RepVarSet;
 		bool IsNotOK;
-		bool IsBlank;
+
 		int ZoneNum;
 		std::string StringOut;
 		std::string NameThisObject;
@@ -502,11 +440,11 @@ namespace HeatBalanceAirManager {
 		int IsSourceZone;
 
 		// Formats
-		static gio::Fmt Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
+		static gio::Fmt Format_720( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
 		static gio::Fmt Format_722( "(' ',A,', ',A)" );
-		static gio::Fmt Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
+		static gio::Fmt Format_723( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_724( "('! <',A,' Airflow Stats Nominal>, ',A)" );
 
 		RepVarSet.dimension( NumOfZones, true );
 
@@ -532,39 +470,39 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = NumAlpha;
 		maxNumber = NumNumber;
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneMixing";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneCrossMixing";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 
@@ -576,27 +514,22 @@ namespace HeatBalanceAirManager {
 		lNumericFieldBlanks.dimension( maxNumber, true );
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-		TotZoneAirBalance = GetNumObjectsFound( cCurrentModuleObject );
+		TotZoneAirBalance = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		ZoneAirBalance.allocate( TotZoneAirBalance );
 
 		for ( Loop = 1; Loop <= TotZoneAirBalance; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
-			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			ZoneAirBalance( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneAirBalance( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance, &ZoneAirBalanceData::ZoneName, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 2 ), cCurrentModuleObject, cAlphaFieldNames( 2 ), UniqueZoneNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -611,7 +544,7 @@ namespace HeatBalanceAirManager {
 			} else {
 				ZoneAirBalance( Loop ).BalanceMethod = AirBalanceNone;
 				ShowWarningError( RoutineName + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not valid choice for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "The dafualt choice \"NONE\" is assigned" );
+				ShowContinueError( "The default choice \"NONE\" is assigned" );
 			}}
 
 			ZoneAirBalance( Loop ).InducedAirRate = rNumericArgs( 1 );
@@ -663,32 +596,26 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-		TotShermGrimsInfiltration = GetNumObjectsFound( cCurrentModuleObject );
+		TotShermGrimsInfiltration = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-		TotAIM2Infiltration = GetNumObjectsFound( cCurrentModuleObject );
+		TotAIM2Infiltration = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-		NumInfiltrationStatements = GetNumObjectsFound( cCurrentModuleObject );
+		NumInfiltrationStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		InfiltrationObjects.allocate( NumInfiltrationStatements );
 
 		TotDesignFlowInfiltration = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				InfiltrationObjects( Item ).StartPtr = TotDesignFlowInfiltration + 1;
 				++TotDesignFlowInfiltration;
@@ -717,13 +644,14 @@ namespace HeatBalanceAirManager {
 		TotInfiltration = TotDesignFlowInfiltration + TotShermGrimsInfiltration + TotAIM2Infiltration;
 
 		Infiltration.allocate( TotInfiltration );
+		UniqueInfiltrationNames.reserve( static_cast< unsigned > ( TotInfiltration ) );
 
 		if ( TotDesignFlowInfiltration > 0 ) {
 			Loop = 0;
 			cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
 			for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
 
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= InfiltrationObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -875,19 +803,12 @@ namespace HeatBalanceAirManager {
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
 		InfiltCount = TotDesignFlowInfiltration;
 		for ( Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -930,18 +851,12 @@ namespace HeatBalanceAirManager {
 
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
 		for ( Loop = 1; Loop <= TotAIM2Infiltration; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1016,10 +931,10 @@ namespace HeatBalanceAirManager {
 		RepVarSet = true;
 
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-		NumVentilationStatements = GetNumObjectsFound( cCurrentModuleObject );
+		NumVentilationStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-		TotWindAndStackVentilation = GetNumObjectsFound( cCurrentModuleObject );
+		TotWindAndStackVentilation = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		VentilationObjects.allocate( NumVentilationStatements );
 
@@ -1027,20 +942,15 @@ namespace HeatBalanceAirManager {
 		errFlag = false;
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 		for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentilationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
+
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				VentilationObjects( Item ).StartPtr = TotDesignFlowVentilation + 1;
 				++TotDesignFlowVentilation;
@@ -1074,7 +984,7 @@ namespace HeatBalanceAirManager {
 			cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 			for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
 
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= VentilationObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1469,20 +1379,15 @@ namespace HeatBalanceAirManager {
 		VentiCount = TotDesignFlowVentilation;
 		for ( Loop = 1; Loop <= TotWindAndStackVentilation; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
 			VentiCount = TotDesignFlowVentilation + Loop;
-			VerifyName( cAlphaArgs( 1 ), Ventilation, VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
-			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Ventilation( VentiCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Ventilation( VentiCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1722,23 +1627,17 @@ namespace HeatBalanceAirManager {
 		RepVarSet = true;
 
 		cCurrentModuleObject = "ZoneMixing";
-		TotMixing = GetNumObjectsFound( cCurrentModuleObject );
+		TotMixing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		Mixing.allocate( TotMixing );
 
 		for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Mixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
-			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Mixing( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Mixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1816,7 +1715,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
+			Mixing( Loop ).FromZone = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( Mixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cAlphaFieldNames( 5 ) + " not found=" + cAlphaArgs( 5 ) + " for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -2045,24 +1944,17 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneCrossMixing";
-		TotCrossMixing = GetNumObjectsFound( cCurrentModuleObject );
+		TotCrossMixing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		CrossMixing.allocate( TotCrossMixing );
 
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CrossMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
-			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			CrossMixing( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( CrossMixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -2139,7 +2031,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
+			CrossMixing( Loop ).FromZone = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( CrossMixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
@@ -2308,33 +2200,27 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-		TotRefDoorMixing = GetNumObjectsFound( cCurrentModuleObject );
+		TotRefDoorMixing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotRefDoorMixing > 0 ) {
 			RefDoorMixing.allocate( NumOfZones );
 			for ( auto & e : RefDoorMixing ) e.NumRefDoorConnections = 0;
 
 			for ( Loop = 1; Loop <= TotRefDoorMixing; ++Loop ) {
 
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RefDoorMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;
-				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
+				Zone1Num = InputProcessor::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone1Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				++AlphaNum; //3
-				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
+				Zone2Num = InputProcessor::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone2Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
@@ -2533,7 +2419,7 @@ namespace HeatBalanceAirManager {
 		TotInfilVentFlow.dimension( NumOfZones, 0.0 );
 
 		for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Infiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneInfiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
 
 			ZoneNum = Infiltration( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
@@ -2810,13 +2696,7 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		//     Use input processer to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts;
 		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Zone;
@@ -2836,18 +2716,9 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
 		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
 		static gio::Fmt RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // States which alpha value to read from a
@@ -2868,15 +2739,15 @@ namespace HeatBalanceAirManager {
 		ErrorsFound = false;
 
 		cCurrentModuleObject = "RoomAirModelType";
-		NumOfAirModels = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAirModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumOfAirModels > NumOfZones ) {
 			ShowSevereError( "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones." );
 			ErrorsFound = true;
 		}
 
 		for ( AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum ) {
-			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum != 0 ) {
 				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -2898,7 +2769,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					MundtModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:OneNodeDisplacementVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:OneNodeDisplacementVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2908,7 +2779,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:ThreeNodeDisplacementVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:ThreeNodeDisplacementVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2918,7 +2789,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:CrossVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:CrossVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2927,7 +2798,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UCSDUFI;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
-					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionInterior", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionInterior","zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2936,7 +2807,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UCSDUFE;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
-					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionExterior", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionExterior", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2948,7 +2819,7 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:AirflowNetwork", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;

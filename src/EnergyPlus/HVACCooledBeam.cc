@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -128,7 +116,6 @@ namespace HVACCooledBeam {
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -183,27 +170,8 @@ namespace HVACCooledBeam {
 		// Manages the simulation of a cooled beam unit.
 		// Called from SimZoneAirLoopEquipment in module ZoneAirLoopEquipmentManager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBNum; // index of cooled beam unit being simulated
@@ -217,7 +185,7 @@ namespace HVACCooledBeam {
 
 		// Get the  unit index
 		if ( CompIndex == 0 ) {
-			CBNum = FindItemInList( CompName, CoolBeam );
+			CBNum = InputProcessor::FindItemInList( CompName, CoolBeam );
 			if ( CBNum == 0 ) {
 				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
 			}
@@ -268,15 +236,7 @@ namespace HVACCooledBeam {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -287,21 +247,8 @@ namespace HVACCooledBeam {
 		using WaterCoils::GetCoilWaterInletNode;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetCoolBeams " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		int CBIndex; // loop index
 		int CBNum; // current fan coil number
@@ -318,8 +265,6 @@ namespace HVACCooledBeam {
 		//  certain object in the input file
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zome do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
@@ -327,12 +272,12 @@ namespace HVACCooledBeam {
 
 		// find the number of cooled beam units
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-		NumCB = GetNumObjectsFound( CurrentModuleObject );
+		NumCB = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		// allocate the data structures
 		CoolBeam.allocate( NumCB );
 		CheckEquipName.dimension( NumCB, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		NumAlphas = 7;
 		NumNumbers = 16;
 		TotalArgs = 23;
@@ -347,22 +292,17 @@ namespace HVACCooledBeam {
 		// loop over cooled beam units; get and load the input data
 		for ( CBIndex = 1; CBIndex <= NumCB; ++CBIndex ) {
 
-			GetObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBNum = CBIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), CoolBeam, CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 			CoolBeam( CBNum ).Name = Alphas( 1 );
 			CoolBeam( CBNum ).UnitType = CurrentModuleObject;
 			CoolBeam( CBNum ).UnitType_Num = 1;
 			CoolBeam( CBNum ).CBType = Alphas( 3 );
-			if ( SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
+			if ( InputProcessor::SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Passive_Cooled_Beam;
-			} else if ( SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
+			} else if ( InputProcessor::SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Active_Cooled_Beam;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFields( 3 ) + " = " + CoolBeam( CBNum ).CBType + '.' );
@@ -485,7 +425,6 @@ namespace HVACCooledBeam {
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
-		using InputProcessor::SameString;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CooledBeamAirTerminal;
@@ -637,7 +576,6 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using DataGlobals::AutoCalculate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;

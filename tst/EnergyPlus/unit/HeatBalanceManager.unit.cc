@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HeatBalanceManager Unit Tests
 
@@ -94,6 +82,115 @@ using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir) {
+		std::string const idf_objects = delimited_string(
+				{
+						"ZoneAirBalance:OutdoorAir,\n",
+						"    LIVING ZONE Balance 1,   !- Name\n",
+						"    LIVING ZONE,             !- Zone Name\n",
+						"    Quadrature,              !- Air Balance Method\n",
+						"    0.01,                    !- Induced Outdoor Air Due to Unbalanced Duct Leakage {m3/s}\n",
+						"    INF-SCHED;               !- Induced Outdoor Air Schedule Name",
+						"ZoneAirBalance:OutdoorAir,\n",
+						"    LIVING ZONE Balance 2,   !- Name\n",
+						"    LIVING ZONE,             !- Zone Name\n",
+						"    Quadrature,              !- Air Balance Method\n",
+						"    0.01,                    !- Induced Outdoor Air Due to Unbalanced Duct Leakage {m3/s}\n",
+						"    INF-SCHED2;              !- Induced Outdoor Air Schedule Name",
+						"Zone,",
+						"LIVING ZONE,             !- Name",
+						"0,                       !- Direction of Relative North {deg}",
+						"0,                       !- X Origin {m}",
+						"0,                       !- Y Origin {m}",
+						"0,                       !- Z Origin {m}",
+						"1,                       !- Type",
+						"1,                       !- Multiplier",
+						"autocalculate,           !- Ceiling Height {m}",
+						"autocalculate;           !- Volume {m3}",
+
+				}
+		);
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		bool ErrorsFound = false;
+		auto numZones = InputProcessor::GetNumObjectsFound( "Zone" );
+		ZoneReOrder.allocate( numZones );
+		GetZoneData( ErrorsFound );
+		GetAirFlowFlag( ErrorsFound );
+		EXPECT_TRUE( ErrorsFound );
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0127,                  !- Thickness {m}",
+			"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+			"  WindowGap:DeflectionState,",
+			"    DeflectionState_813_Measured_Gap_1,  !- Name",
+			"    0.0120;                  !- Deflected Thickness {m}",
+			"  WindowMaterial:Gap,",
+			"    Gap_6_Layer,             !- Name",
+			"    0.0060,                  !- Thickness {m}",
+			"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+			"    101300.0000,             !- Pressure {Pa}",
+			"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+		    "  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0100,                  !- Thickness {m}",
+			"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+		} );
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_FALSE( ErrorsFound );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2 )
+	{
+		std::string const idf_objects = delimited_string(
+			{
+				"Version,8.6;",
+				"  WindowGap:DeflectionState,",
+				"    DeflectionState_813_Measured_Gap_1,  !- Name",
+				"    0.0120;                  !- Deflected Thickness {m}",
+				"  WindowMaterial:Gap,",
+				"    Gap_6_Layer,             !- Name",
+				"    0.0060,                  !- Thickness {m}",
+				"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+				"    101300.0000,             !- Pressure {Pa}",
+				"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0127,                  !- Thickness {m}",
+				"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0100,                  !- Thickness {m}",
+				"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+			}
+		);
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_FALSE( ErrorsFound );
+
+	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ProcessZoneData )
 	{
@@ -190,7 +287,7 @@ namespace EnergyPlus {
 			" GLASS;        !- Layer 3",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -221,10 +318,10 @@ namespace EnergyPlus {
 		Construct.deallocate();
 
 		// call to get invalid window material type
-		Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
-		ErrorsFound = false;
-		GetConstructData( ErrorsFound ); // returns ErrorsFound as true since layer 2 is invalid
-		EXPECT_TRUE( ErrorsFound );
+//		Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
+//		ErrorsFound = false;
+//		GetConstructData( ErrorsFound ); // returns ErrorsFound as true since layer 2 is invalid
+//		EXPECT_TRUE( ErrorsFound );
 
 	}
 
@@ -249,7 +346,7 @@ namespace EnergyPlus {
 			"MixingSourceZoneOnly; !- Infiltration Balancing Zones",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -313,7 +410,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -428,7 +525,7 @@ namespace EnergyPlus {
 			"Ignored;                !- Infiltration Balancing Zones"
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -490,7 +587,7 @@ namespace EnergyPlus {
 			"   hourly;                  !- Reporting Frequency",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 
@@ -507,8 +604,9 @@ namespace EnergyPlus {
 		GetSimpleAirModelInputs( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
-		EXPECT_EQ( "WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 1 ).VarName );
-		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
+		// first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
+		EXPECT_EQ( "WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
+		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 1 ).VarName );
 		EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
 		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
 

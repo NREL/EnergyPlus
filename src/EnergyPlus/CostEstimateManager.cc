@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -193,29 +181,8 @@ namespace CostEstimateManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Get Cost Estimation object input.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound; // might also use FindItemInList
-		using InputProcessor::GetObjectItem;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -226,7 +193,7 @@ namespace CostEstimateManager {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 
-		NumLineItems = GetNumObjectsFound( "ComponentCost:LineItem" );
+		NumLineItems = InputProcessor::GetNumObjectsFound( "ComponentCost:LineItem" );
 
 		if ( NumLineItems == 0 ) {
 			DoCostEstimate = false;
@@ -243,7 +210,7 @@ namespace CostEstimateManager {
 		cCurrentModuleObject = "ComponentCost:LineItem";
 
 		for ( Item = 1; Item <= NumLineItems; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			CostLineItem( Item ).LineName = cAlphaArgs( 1 );
 			CostLineItem( Item ).LineType = cAlphaArgs( 2 );
 			CostLineItem( Item ).ParentObjType = cAlphaArgs( 3 );
@@ -269,9 +236,9 @@ namespace CostEstimateManager {
 		//most input error checking to be performed later within Case construct in Calc routine.
 
 		cCurrentModuleObject = "ComponentCost:Adjustments";
-		NumCostAdjust = GetNumObjectsFound( cCurrentModuleObject );
+		NumCostAdjust = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumCostAdjust == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			CurntBldg.MiscCostperSqMeter = rNumericArgs( 1 );
 			CurntBldg.DesignFeeFrac = rNumericArgs( 2 );
 			CurntBldg.ContractorFeeFrac = rNumericArgs( 3 );
@@ -286,9 +253,9 @@ namespace CostEstimateManager {
 		}
 
 		cCurrentModuleObject = "ComponentCost:Reference";
-		NumRefAdjust = GetNumObjectsFound( cCurrentModuleObject );
+		NumRefAdjust = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumRefAdjust == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			RefrncBldg.LineItemTot = rNumericArgs( 1 );
 			RefrncBldg.MiscCostperSqMeter = rNumericArgs( 2 );
 			RefrncBldg.DesignFeeFrac = rNumericArgs( 3 );
@@ -329,17 +296,10 @@ namespace CostEstimateManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the Cost Estimate based on inputs.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Zone;
-		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using PlantChillers::ElectricChiller;
 		using PlantChillers::ElectricChillerSpecs;
@@ -347,18 +307,6 @@ namespace CostEstimateManager {
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // do-loop counter for line items
@@ -397,7 +345,7 @@ namespace CostEstimateManager {
 				}
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
-				ThisConstructID = FindItem( ThisConstructStr, Construct );
+				ThisConstructID = InputProcessor::FindItem( ThisConstructStr, Construct );
 				if ( ThisConstructID == 0 ) { // do any surfaces have the specified construction? If not issue warning.
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\" Construction=\"" + CostLineItem( Item ).ParentObjName + "\", no surfaces have the Construction specified" );
 					ShowContinueError( "No costs will be calculated for this Construction." );
@@ -430,28 +378,28 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
+					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
 					if ( thisCoil == 0 ) {
 						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
 					}
 				}
 
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 
 				WildcardObjNames = false;
 				thisCoil = 0;
 				// test if too many pricing methods are set in user input
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerEach > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				//  check for wildcard * in object name..
@@ -459,13 +407,13 @@ namespace CostEstimateManager {
 					WildcardObjNames = true;
 
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, need to specify a Reference Object Name" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
+					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 					if ( thisCoil == 0 ) {
-						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, invalid coil specified" );
+						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
 					}
 				}
@@ -476,7 +424,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 				}
 
-				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				thisChil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( thisChil == 0 ) {
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Chiller:Electric, invalid chiller specified." );
 					ShowContinueError( "Chiller Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -491,7 +439,7 @@ namespace CostEstimateManager {
 					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Daylighting:Controls, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 				} else {
-					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
+					ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					} else {
@@ -503,9 +451,9 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "SHADING:ZONE:DETAILED" ) {
 				if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisSurfID = FindItem( CostLineItem( Item ).ParentObjName, Surface );
+					ThisSurfID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Surface );
 					if ( ThisSurfID > 0 ) {
-						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone );
+						ThisZoneID = InputProcessor::FindItem( Surface( ThisSurfID ).ZoneName, Zone );
 						if ( ThisZoneID == 0 ) {
 							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Shading:Zone:Detailed, need to specify a valid zone name" );
 							ShowContinueError( "Zone specified=\"" + Surface( ThisSurfID ).ZoneName + "\"." );
@@ -530,7 +478,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
+						ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID == 0 ) {
 							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Lights, need to specify a valid zone name" );
 							ShowContinueError( "Zone specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
@@ -546,9 +494,9 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray );
+						thisPV = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, PVarray );
 						if ( thisPV > 0 ) {
-							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
+							ThisZoneID = InputProcessor::FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
 							if ( ThisZoneID == 0 ) {
 								Multipliers = 1.0;
 							} else {
@@ -596,19 +544,12 @@ namespace CostEstimateManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the Cost Estimate based on inputs.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
 		using PlantChillers::ElectricChiller;
@@ -618,19 +559,6 @@ namespace CostEstimateManager {
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
 		using HeatingCoils::NumHeatingCoils;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // do-loop counter for line items
@@ -665,7 +593,7 @@ namespace CostEstimateManager {
 			} else if ( SELECT_CASE_var == "CONSTRUCTION" ) {
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
-				ThisConstructID = FindItem( ThisConstructStr, Construct );
+				ThisConstructID = InputProcessor::FindItem( ThisConstructStr, Construct );
 				// need to determine unique surfacs... some surfaces are shared by zones and hence doubled
 				uniqueSurfMask.dimension( TotSurfaces, true ); //init to true and change duplicates to false
 				SurfMultipleARR.dimension( TotSurfaces, 1.0 );
@@ -704,7 +632,7 @@ namespace CostEstimateManager {
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
+					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
 				}
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
@@ -747,14 +675,14 @@ namespace CostEstimateManager {
 					}
 				}
 
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 				WildcardObjNames = false;
 				thisCoil = 0;
 				//  check for wildcard * in object name..
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
+					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 				}
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
@@ -798,7 +726,7 @@ namespace CostEstimateManager {
 				}
 
 			} else if ( SELECT_CASE_var == "CHILLER:ELECTRIC" ) {
-				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				thisChil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( ( thisChil > 0 ) && ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) ) {
 					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).Base.NomCap / 1000.0;
 					CostLineItem( Item ).Units = "kW (tot cool cap.)";
@@ -825,7 +753,7 @@ namespace CostEstimateManager {
 					WildcardObjNames = true;
 					CostLineItem( Item ).Qty = sum( ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints );
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
+					ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					}
@@ -837,9 +765,9 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "SHADING:ZONE:DETAILED" ) {
 				if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisSurfID = FindItem( CostLineItem( Item ).ParentObjName, Surface );
+					ThisSurfID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Surface );
 					if ( ThisSurfID > 0 ) {
-						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone );
+						ThisZoneID = InputProcessor::FindItem( Surface( ThisSurfID ).ZoneName, Zone );
 						if ( ThisZoneID > 0 ) {
 							CostLineItem( Item ).Qty = Surface( ThisSurfID ).Area * Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier;
 							CostLineItem( Item ).Units = "m2";
@@ -860,7 +788,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
+						ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID > 0 ) {
 							Real64 Qty( 0.0 ); for ( auto const & e : Lights ) if ( e.ZonePtr == ThisZoneID ) Qty += e.DesignLevel;
 							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * Qty; // this handles more than one light object per zone.
@@ -875,9 +803,9 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray );
+						thisPV = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, PVarray );
 						if ( thisPV > 0 ) {
-							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
+							ThisZoneID = InputProcessor::FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
 							if ( ThisZoneID == 0 ) {
 								Multipliers = 1.0;
 							} else {
