@@ -1220,6 +1220,12 @@ namespace AirflowNetworkBalanceManager {
 					}
 					MultizoneExternalNodeData( i ).ExtNum = AirflowNetworkNumOfZones + i; // External node number
 					MultizoneExternalNodeData( i ).WPCName = Alphas( 2 ); // Name of Wind Pressure Coefficient Values Object
+					MultizoneExternalNodeData( i ).curve = CurveManager::GetCurveIndex( Alphas( 2 ) ); // Wind pressure curve
+					if ( MultizoneExternalNodeData( i ).curve == 0 ) {
+						ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + "=" + Alphas( 2 ) );
+						ShowContinueError( "Entered in " + CurrentModuleObject + '=' + Alphas( 1 ) );
+						ErrorsFound = true;
+					}
 					if ( NumAlphas >= 3 & !lAlphaBlanks( 3 ) ) {
 						MultizoneExternalNodeData( i ).symmetricCurve = SameString( Alphas( 3 ), "Yes"); // Symmetric curve or not
 					}
@@ -2193,6 +2199,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		// *** Read AirflowNetwork CP Array
+		/*
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
 			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
 			AirflowNetworkNumOfCPArray = GetNumObjectsFound( CurrentModuleObject );
@@ -2237,8 +2244,6 @@ namespace AirflowNetworkBalanceManager {
 		// Get the number of wind directions
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 			AirflowNetworkSimu.NWind = NumNumbers;
-		} else {
-			//    AirflowNetworkSimu%NWind = 4
 		}
 
 		// Read AirflowNetwork CP Value
@@ -2284,6 +2289,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
+		*/
 
 		// Calculate CP values
 		if ( SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
@@ -2344,6 +2350,7 @@ namespace AirflowNetworkBalanceManager {
 		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 
 		// Write wind pressure coefficients in the EIO file
+		/*
 		gio::write( OutputFileInits, fmtA ) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Direction, "; }
 		for ( i = 1; i <= AirflowNetworkSimu.NWind - 1; ++i ) {
@@ -2391,6 +2398,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
+		*/
 
 		// If no zone object, exit
 		if ( AirflowNetworkNumOfZones == 0 ) {
@@ -2473,25 +2481,25 @@ namespace AirflowNetworkBalanceManager {
 						break;
 					}
 				}
-				if ( MultizoneExternalNodeData( j ).CPVNum == 0 ) {
-					ShowSevereError( RoutineName + "AirflowNetwork:MultiZone:ExternalNode: Wind Pressure Coefficient Values Object Name is not found in " + MultizoneExternalNodeData( j ).Name );
-					ShowContinueError( "Please ensure there is a WindPressureCoefficientValues name defined as " + MultizoneExternalNodeData( j ).WPCName + " in " + CurrentModuleObject );
-					ErrorsFound = true;
-				}
+				//if ( MultizoneExternalNodeData( j ).CPVNum == 0 ) {
+				//	ShowSevereError( RoutineName + "AirflowNetwork:MultiZone:ExternalNode: Wind Pressure Coefficient Values Object Name is not found in " + MultizoneExternalNodeData( j ).Name );
+				//	ShowContinueError( "Please ensure there is a WindPressureCoefficientValues name defined as " + MultizoneExternalNodeData( j ).WPCName + " in " + CurrentModuleObject );
+				//	ErrorsFound = true;
+				//}
 			}
 			// Ensure different CPVNum is used to avoid a single side boundary condition
-			found = false;
-			for ( j = 2; j <= AirflowNetworkNumOfExtNode; ++j ) {
-				if ( MultizoneExternalNodeData( j - 1 ).CPVNum != MultizoneExternalNodeData( j ).CPVNum ) {
-					found = true;
-					break;
-				}
-			}
-			if ( ! found ) {
-				ShowSevereError( "The same Wind Pressure Coefficient Values Object name is used in all AirflowNetwork:MultiZone:ExternalNode objects." );
-				ShowContinueError( "Please input at least two different Wind Pressure Coefficient Values Object names to avoid single side boundary condition." );
-				ErrorsFound = true;
-			}
+			//found = false;
+			//for ( j = 2; j <= AirflowNetworkNumOfExtNode; ++j ) {
+			//	if ( MultizoneExternalNodeData( j - 1 ).CPVNum != MultizoneExternalNodeData( j ).CPVNum ) {
+			//		found = true;
+			//		break;
+			//	}
+			//}
+			//if ( ! found ) {
+			//	ShowSevereError( "The same Wind Pressure Coefficient Values Object name is used in all AirflowNetwork:MultiZone:ExternalNode objects." );
+			//	ShowContinueError( "Please input at least two different Wind Pressure Coefficient Values Object names to avoid single side boundary condition." );
+			//	ErrorsFound = true;
+			//}
 
 		}
 
@@ -4560,13 +4568,10 @@ namespace AirflowNetworkBalanceManager {
 				if ( i > 0 ) {
 					if ( i <= AirflowNetworkNumOfExtNode ) {
 						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).height );
-						if (MultizoneExternalNodeData(i).curve) {
-							AirflowNetworkNodeSimu(n).PZ = CalcWindPressureFromCurve(MultizoneExternalNodeData(i).curve,
-								Vref, AirflowNetworkNodeData(n).NodeHeight, 0.0, MultizoneExternalNodeData(i).symmetricCurve,
-								MultizoneExternalNodeData(i).useRelativeAngle);
-						} else {
-							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
-						}
+						AirflowNetworkNodeSimu(n).PZ = CalcWindPressureFromCurve( MultizoneExternalNodeData( i ).curve,
+							Vref, AirflowNetworkNodeData( n ).NodeHeight, MultizoneExternalNodeData( i ).azimuth, 
+							MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle);
+						//AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
 					}
 					AirflowNetworkNodeSimu( n ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( n ).NodeHeight );
 					AirflowNetworkNodeSimu( n ).WZ = OutHumRat;

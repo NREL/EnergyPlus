@@ -23354,11 +23354,13 @@ AirflowNetwork:MultiZone:ExternalNode,
       \units m
       \default 0.0
       \note Designates the reference height used to calculate relative pressure.
- A2 , \field Wind Pressure Coefficient Values Object Name
+ A2 , \field Wind Pressure Coefficient Curve Name
       \required-field
       \type object-list
       \object-list WPCValueNames
-      \note Enter the name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues object.
+      \object-list UniVariateCurves
+      \object-list UniVariateTables
+      \note The name of the curve or table object specifying the wind pressure coefficient.
  A3 , \field Symmetric Wind Pressure Coefficient Curve
       \type choice
       \key Yes
