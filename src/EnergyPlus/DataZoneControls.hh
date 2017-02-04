@@ -119,7 +119,6 @@ namespace DataZoneControls {
 
 		bool AdaptiveComfortTempControl; // flag to indicate whether control based on Operative Temp
 		int AdaptiveComfortModelTypeIndex; // index to adaptive comfort model type
-		bool AdaptiveModelAlwaysOverwrite; // flag to incate adaptive operative temperature applicability, default false
 
 		Real64 ZoneOvercoolRange; // Zone overcool temperature range (max), deg C
 		bool ZoneOvercoolControl; // Flag to indicate whether control is based on overcool
@@ -154,7 +153,6 @@ namespace DataZoneControls {
 			OpTempRadiativeFractionSched( 0 ),
 			AdaptiveComfortTempControl( false ),
 			AdaptiveComfortModelTypeIndex( 0 ),
-			AdaptiveModelAlwaysOverwrite( false ),
 			ZoneOvercoolRange( 0.0 ),
 			ZoneOvercoolControl( false ),
 			OvercoolCntrlModeScheduled( false ),

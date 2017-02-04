@@ -621,6 +621,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempZoneThermostatSetPoint.deallocate();
 		ZoneSetPointLast.deallocate();
 		Setback.deallocate();
+		AdapComfortCoolingSetPoint.deallocate();
 		ZoneThermostatSetPointLo.deallocate();
 		ZoneThermostatSetPointHi.deallocate();
 		SNLoadPredictedRate.deallocate();
@@ -719,8 +720,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 			"  CONSTANT,                              !- Radiative Fraction Input Mode",
 			"  0.0,                                   !- Fixed Radiative Fraction",
 			"  ,                                      !- Radiative Fraction Schedule Name",
-			"  AdaptiveASH55_CentralLine,             !- Adaptive Comfort Model Type",
-			"  OverwriteWhenEnergySaving;             !-          ",
+			"  AdaptiveASH55CentralLine;              !- Adaptive Comfort Model Type",
 			" ",
 			"ZoneControl:Thermostat,",
 			"  Core_middle Thermostat,                !- Name",
@@ -734,8 +734,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 			"  CONSTANT,                              !- Radiative Fraction Input Mode",
 			"  0.0,                                   !- Fixed Radiative Fraction",
 			"  ,                                      !- Radiative Fraction Schedule Name",
-			"  ThermalComfortAdaptiveCEN15251_Central,!- Adaptive Comfort Model Type",
-			"  AlwaysOverwrite;                       !-          ",
+			"  AdaptiveCEN15251CentralLine;           !- Adaptive Comfort Model Type",
 			" ",
 			"ZoneControl:Thermostat,",
 			"  Core_basement Thermostat,                   !- Name",
@@ -763,8 +762,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 			"  CONSTANT,                              !- Radiative Fraction Input Mode",
 			"  0.0,                                   !- Fixed Radiative Fraction",
 			"  ,                                      !- Radiative Fraction Schedule Name",
-			"  ThermalComfortAdaptiveASH55_Central,   !- Adaptive Comfort Model Type",
-			"  OverwriteWhenEnergySaving;             !-           ",
+			"  AdaptiveASH55CentralLine;              !- Adaptive Comfort Model Type",
 			" ",
 			"ThermostatSetpoint:SingleCooling,",
 			"  Core_middle CoolSPSched,               !- Name",
@@ -837,7 +835,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		int NoneAdapZoneNum( 3 );
 		int DualZoneNum( 4 );
 		int summerDesignDayTypeIndex( 9 );
-		int const ADAP_NONE( 1 );
 		int const ASH55_CENTRAL( 2 );
 		int const CEN15251_CENTRAL( 5 );
 
@@ -918,8 +915,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		ASSERT_EQ( 0, ZoneAirSetPoint );// Tstat should show set point is not overwritten
 
 		ZoneAirSetPoint = 26.0;
-		TempControlledZone( DualZoneNum ).AdaptiveModelAlwaysOverwrite = false;
 		AdjustOperativeSetPointsforAdapComfort( DualZoneNum, ZoneAirSetPoint );
 		ASSERT_EQ( 26.0, ZoneAirSetPoint );// Tstat should show set point is not overwritten
+
+		Environment.deallocate();
+		DesDayInput.deallocate();
+		TempControlledZone.deallocate();
 
 	}

@@ -159,7 +159,7 @@ namespace ZoneTempPredictorCorrector {
 
 	Array1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
 
-	Array1D_string const AdaptiveComfortModelTypes( 8, { "None", "AdaptiveASH55_CentralLine", "AdaptiveASH55_90PercentUpperLine", "AdaptiveASH55_80PercentUpperLine", "AdaptiveCEN15251_CentralLine", "AdaptiveCEN15251_CategoryIUpperLine", "AdaptiveCEN15251_CategoryIIUpperLine", "AdaptiveCEN15251_CategoryIIIUpperLine" } );
+	Array1D_string const AdaptiveComfortModelTypes( 8, { "None", "AdaptiveASH55CentralLine", "AdaptiveASH5590PercentUpperLine", "AdaptiveASH5580PercentUpperLine", "AdaptiveCEN15251CentralLine", "AdaptiveCEN15251CategoryIUpperLine", "AdaptiveCEN15251CategoryIIUpperLine", "AdaptiveCEN15251CategoryIIIUpperLine" } );
 
 
 	int const iZC_TStat( 1 );
@@ -1646,20 +1646,7 @@ namespace ZoneTempPredictorCorrector {
 										CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN );
 									}
 								}
-								if ( ! lAlphaFieldBlanks( 5 ) ) {
-									if ( SameString( cAlphaArgs( 5 ), "AlwaysOverwrite" ) ) {
-										TempControlledZone( TempControlledZoneNum ).AdaptiveModelAlwaysOverwrite = true;
-									}
-									else if ( SameString( cAlphaArgs( 5 ), "OverwriteWhenEnergySaving" ) ) {
-										TempControlledZone( TempControlledZoneNum ).AdaptiveModelAlwaysOverwrite = false;
-									}
-									else {
-										ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
-										ErrorsFound = true;
-									}
-								}
 							}
-
 						}
 
 						// CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
@@ -1731,18 +1718,6 @@ namespace ZoneTempPredictorCorrector {
 										Array1D< Real64 > runningAverageCEN( NumDaysInYear, 0.0 );
 										CalculateMonthlyRunningAverageDryBulb( runningAverageASH, runningAverageCEN );
 										CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN ); 
-									}
-								}
-								if ( ! lAlphaFieldBlanks( 5 ) ) {
-									if ( SameString( cAlphaArgs( 5 ), "AlwaysOverwrite" ) ) {
-										TempControlledZone(TempControlledZoneNum ).AdaptiveModelAlwaysOverwrite = true;
-									}
-									else if ( SameString( cAlphaArgs( 5 ), "OverwriteWhenEnergySaving" ) ) {
-										TempControlledZone( TempControlledZoneNum ).AdaptiveModelAlwaysOverwrite = false;
-									}
-									else {
-										ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
-										ErrorsFound = true;
 									}
 								}
 							}
@@ -2229,8 +2204,8 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void CalculateAdaptiveComfortSetPointSchl(
-		Array1D< Real64 > runningAverageASH,
-		Array1D< Real64 > runningAverageCEN
+		Array1D< Real64 > const & runningAverageASH,
+		Array1D< Real64 > const & runningAverageCEN
 	) 
 	{
 		// SUBROUTINE INFORMATION:
@@ -2374,6 +2349,7 @@ namespace ZoneTempPredictorCorrector {
 		// FLOW:
 		if ( InitZoneAirSetPointsOneTimeFlag ) {
 			TempZoneThermostatSetPoint.dimension( NumOfZones, 0.0 );
+			AdapComfortCoolingSetPoint.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointHi.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointLo.dimension( NumOfZones, 0.0 );
 
@@ -2478,7 +2454,7 @@ namespace ZoneTempPredictorCorrector {
 				SetupOutputVariable( "Zone Thermostat Control Type []", TempControlType( Loop ), "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature [C]", ZoneThermostatSetPointLo( Loop ), "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature [C]", ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
-
+				SetupOutputVariable( "Zone Adaptive Comfort Operative Temperature Set Point [C]", AdapComfortCoolingSetPoint( Loop ), "Zone", "Average", Zone( Loop ).Name);
 				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor [ ]", LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
 
 				if ( allocated( StageZoneLogic ) ) {
@@ -2539,6 +2515,7 @@ namespace ZoneTempPredictorCorrector {
 			WZoneTimeMinus3Temp = 0.0;
 			ZoneAirHumRatTemp = 0.0;
 			TempZoneThermostatSetPoint = 0.0;
+			AdapComfortCoolingSetPoint = 0.0;
 			ZoneThermostatSetPointHi = 0.0;
 			ZoneThermostatSetPointLo = 0.0;
 
@@ -3235,10 +3212,8 @@ namespace ZoneTempPredictorCorrector {
 				SchedTypeIndex = TempControlledZone( RelativeZoneNum ).ControlTypeSchIndx( SchedNameIndex );
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
-				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
-				
+				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );			
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
-
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
 
@@ -3255,7 +3230,9 @@ namespace ZoneTempPredictorCorrector {
 				//Adjust operative temperature based on adaptive comfort model
 				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
 					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
+					AdapComfortCoolingSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint ( ActualZoneNum );
 				}
+				
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -3276,7 +3253,8 @@ namespace ZoneTempPredictorCorrector {
 				//Adjust operative temperature based on adaptive comfort model
 				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
 					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
-				}
+					AdapComfortCoolingSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
+				}				
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 
@@ -3316,6 +3294,7 @@ namespace ZoneTempPredictorCorrector {
 				//Adjust operative temperature based on adaptive comfort model
 				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
 					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
+					AdapComfortCoolingSetPoint( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum );
 				}
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
@@ -6088,7 +6067,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 		}
 		// If adaptive operative temperature not applicable, set back
-		if ( ( !TempControlledZone( TempControlledZoneID ).AdaptiveModelAlwaysOverwrite ) && ZoneAirSetPoint < originZoneAirSetPoint ) {
+		if ( ZoneAirSetPoint < originZoneAirSetPoint ) {
 			ZoneAirSetPoint = originZoneAirSetPoint;
 		}
 		// If meet fault flag, set back
