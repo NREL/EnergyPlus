@@ -19,8 +19,6 @@ namespace HybridModel {
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
 	extern bool FlagHybridModel; // True if hybrid model is activated
-	extern bool FlagHMInternalThermalMass; // True if hybrid model (internal thermal mass) is activated
-	extern bool FlagHMInfiltration; // True if hybrid model (infiltration) is activated
 	extern int NumOfHybridModelZones; // Number of hybrid model zones in the model
 
 	// SUBROUTINE SPECIFICATIONS:
@@ -63,6 +61,9 @@ namespace HybridModel {
 
 	void
 	GetHybridModelZone();
+
+	void
+	clear_state();
 
 } // HybridModel
 

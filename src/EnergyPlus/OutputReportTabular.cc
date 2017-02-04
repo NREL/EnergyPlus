@@ -9386,7 +9386,6 @@ namespace OutputReportTabular {
 		using DataSurfaces::Ground;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using DataSurfaces::GroundFCfactorMethod;
-		using HybridModel::FlagHMInternalThermalMass;
 		using ScheduleManager::ScheduleAverageHoursPerWeek;
 		using ScheduleManager::GetScheduleName;
 		using ExteriorEnergyUse::ExteriorLights;
@@ -9898,7 +9897,7 @@ namespace OutputReportTabular {
 			}
 
 			//---- Hybrid Model: Internal Thermal Mass Sub-Table
-			if ( FlagHMInternalThermalMass ){
+			if ( FlagHybridModel ){
 				rowHead.allocate( NumOfZones );
 				NumOfCol = 2;
 				columnHead.allocate( NumOfCol );

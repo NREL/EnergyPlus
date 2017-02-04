@@ -39,8 +39,6 @@ namespace HybridModel {
 	using General::CheckCreatedZoneItemName;
 	
 	bool FlagHybridModel( false ); // True if hybrid model is activated
-	bool FlagHMInternalThermalMass( false ); // True if hybrid model (internal thermal mass) is activated
-	bool FlagHMInfiltration( false ); // True if hybrid model (infiltration) is activated
 	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
 	std::string CurrentModuleObject; // to assist in getting input
 
@@ -97,22 +95,16 @@ namespace HybridModel {
 					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "Yes" );
 
 					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
-					if (HybridModelZone(ZonePtr).InternalThermalMassCalc && HybridModelZone(ZonePtr).InfiltrationCalc){
-						HybridModelZone(ZonePtr).InfiltrationCalc = false;
-						ShowWarningError(CurrentModuleObject + "=\"" + HybridModelZone(ZonePtr).Name + "\" invalid " + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + ".");
-						ShowContinueError("Field " + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
-						ShowContinueError("Field " + cAlphaFieldNames(4) + "\" is changed to NO for the hybrid modeling simulations.");
+					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc && HybridModelZone( ZonePtr ).InfiltrationCalc ){
+						HybridModelZone( ZonePtr ).InfiltrationCalc = false;
+						ShowWarningError( CurrentModuleObject + "=\"" + HybridModelZone( ZonePtr ).Name + "\" invalid " + cAlphaFieldNames( 3 ) + " and " + cAlphaFieldNames( 4 ) + "." );
+						ShowContinueError( "Field " + cAlphaFieldNames( 3 ) + " and " + cAlphaFieldNames( 4 ) + "\" cannot be both set to YES." );
+						ShowContinueError( "Field " + cAlphaFieldNames( 4 ) + "\" is changed to NO for the hybrid modeling simulations." );
 					}
 
 					// Flags showing Hybrid Modeling settings
 					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ){
 						FlagHybridModel = true;
-					}
-					if ( HybridModelZone( ZonePtr ).InfiltrationCalc ) {
-						FlagHMInfiltration = true;
-					}
-					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc ) {
-						FlagHMInternalThermalMass = true;
 					}
 
 					if ( FlagHybridModel ){
@@ -156,7 +148,7 @@ namespace HybridModel {
 			}
 
 			//ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling infiltration calculations
-			if (FlagHMInfiltration && ZoneAirMassFlow.EnforceZoneMassBalance){
+			if ( HybridModelZone( ZonePtr ).InfiltrationCalc && ZoneAirMassFlow.EnforceZoneMassBalance ){
 				ZoneAirMassFlow.EnforceZoneMassBalance = false;
 				ShowWarningError( "ZoneAirMassFlowConservation is deactivated when Hybrid Modeling is performed." );
 			}
@@ -176,6 +168,17 @@ namespace HybridModel {
 			}
 		}
 	}
+
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+
+		FlagHybridModel = false;
+		NumOfHybridModelZones = 0;
+
+	}
+
 }
 
 } // EnergyPlus

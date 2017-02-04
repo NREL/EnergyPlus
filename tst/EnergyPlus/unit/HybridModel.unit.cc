@@ -217,7 +217,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	VAMFL.allocate( 1 );
 	EAMFL.allocate( 1 );EAMFL.allocate( 1 );
 	CTMFL.allocate( 1 );
-	
+
 	// Parameter setup
 	NumOfZones = 1;
 	CurZoneEqNum = 1;
@@ -244,8 +244,8 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 
 	// Case 1: Hybrid model internal thermal mass
 
-	FlagHMInfiltration = false;
-	FlagHMInternalThermalMass = true;
+	HybridModelZone( 1 ).InfiltrationCalc = false;
+	HybridModelZone( 1 ).InternalThermalMassCalc = true;
 	HybridModelZone( 1 ).HybridStartDayOfYear = 1;
 	HybridModelZone( 1 ).HybridEndDayOfYear = 2;
 	MAT( 1 ) = 0.0;
@@ -263,8 +263,8 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 
 	// Case 2: Hybrid model infiltration
 
-	FlagHMInfiltration = true;
-	FlagHMInternalThermalMass = false;
+	HybridModelZone( 1 ).InfiltrationCalc = true;
+	HybridModelZone( 1 ).InternalThermalMassCalc = false;
 	HybridModelZone( 1 ).HybridStartDayOfYear = 1;
 	HybridModelZone( 1 ).HybridEndDayOfYear = 2;
 	MAT( 1 ) = 0.0;
