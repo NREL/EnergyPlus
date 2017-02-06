@@ -50,7 +50,7 @@ This numeric field contains the minimum loop flow rate in cubic meters per secon
 
 \paragraph{Field: Plant Loop Volume}\label{field-plant-loop-volume}
 
-Volume of the plant loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e.~both the demand side and the supply side. This is used for the loop capacitance calculation.. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance \textbf{autocalculate} option gives reasonable values for most system sizes. This calculation is described in the Engineering Reference manual.
+Volume of the plant loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e.~both the demand side and the supply side. This is used for the loop capacitance calculation. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The \textbf{autocalculate} option sets the loop volume to the product of the Maximum Loop Flow Rate and the user input for Loop Circulation Time which defaults to 2 minutes (see below). This calculation is described in the Engineering Reference manual.
 
 \paragraph{Field: Plant Side Inlet Node Name}\label{field-plant-side-inlet-node-name}
 
@@ -107,6 +107,10 @@ This field specifies a primary-secondary plant loop simulation. When a common pi
 \paragraph{Field: Pressure Simulation Type}\label{field-pressure-simulation-type}
 
 This field lets user to choose if this plant loop will be involved in a pressure drop calculation.~ This requires that at least one branch on the loop have pressure drop data.~ If not, an error will be thrown due to the input mismatch.~ Currently there are two pressure drop simulation types: ``PumpPowerCorrection'' and ``LoopFlowCorrection''.~ In both of these methods, branch pressure drop data is used to calculate a dynamic loop pressure drop and is used to update pumping power accordingly.~ The flow correction method allows the user to enter information regarding the pressure curve of a constant speed pump so that the simulation can dynamically resolve the pressure vs.~flow relationship in the plant loop.~ This is limited to constant speed pumps, as the variable speed pumps are expected to resolve as if it were controlled by a variable drive, so that they can inherently meet any pressure and flow demand required by the loop.~ This is also limited to ``loop pumps'', where there is a single pump on the plant loop. Common pipe simulations and ``branch pump'' simulations are not compatible with this level of pressure simulation.~ See the documentation for the Pump:ConstantSpeed in order to determine required inputs for this pressure simulation method to be performed.~ In the pressure drop system, parallel flow rates are not resolved (to match the pressure drop for the parallel system).~ Enhancements to this calculation are planned which will allow parallel branch flow resolution.~ See the Engineering Reference document for more information on how this works.
+
+\paragraph{Field: Loop Circulation Time}\label{field-pressure-simulation-type}
+
+This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Plant Loop Volume is set to autocalculate. The default is 2 minutes. 
 
 An example of this statement used in an IDF is:
 
@@ -354,7 +358,7 @@ This numeric field contains the minimum loop flow rate in cubic meters per secon
 
 \paragraph{Field: Condenser Loop Volume}\label{field-condenser-loop-volume}
 
-Volume of the condenser loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e., both the demand side and the supply side. This is used for the loop capacitance calculation. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance \textbf{autocalculate} option gives reasonable values for most system sizes. This calculation is described in the Engineering Reference manual.
+Volume of the condenser loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e., both the demand side and the supply side. This is used for the loop capacitance calculation. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The \textbf{autocalculate} option sets the loop volume to the product of the Maximum Loop Flow Rate and the user input for Loop Circulation Time which defaults to 2 minutes (see below). This calculation is described in the Engineering Reference manual.
 
 \paragraph{Field: Condenser Side Inlet Node Name}\label{field-condenser-side-inlet-node-name}
 
@@ -397,6 +401,10 @@ Note: For all schemes, if the load for any individual component is less than the
 \paragraph{Field: Pressure Simulation Type}\label{field-pressure-simulation-type-1}
 
 This field lets user to choose if this plant loop will be involved in a pressure drop calculation.~ This requires that at least one branch on the loop have pressure drop data.~ If not, an error will be thrown due to the input mismatch.~ Currently there are two pressure drop simulation types: ``PumpPowerCorrection'' and ``LoopFlowCorrection''.~ In both of these methods, branch pressure drop data is used to calculate a dynamic loop pressure drop and is used to update pumping power accordingly.~ The flow correction method allows the user to enter information regarding the pressure curve of a constant speed pump so that the simulation can dynamically resolve the pressure vs.~flow relationship in the plant loop.~ This is limited to constant speed pumps, as the variable speed pumps are expected to resolve as if it were controlled by a variable drive, so that they can inherently meet any pressure and flow demand required by the loop.~ This is also limited to ``loop pumps'', where there is a single pump on the plant loop.~ Common pipe simulations and ``branch pump'' simulations are not compatible with this level of pressure simulation.~ See the documentation for the Pump:ConstantSpeed in order to determine required inputs for this pressure simulation method to be performed.~ In the pressure drop system, parallel flow rates are not resolved (to match the pressure drop for the parallel system).~ Enhancements to this calculation are planned which will allow parallel branch flow resolution.~ See the Engineering Reference document for more information on how this works.
+
+\paragraph{Field: Loop Circulation Time}\label{field-pressure-simulation-type}
+
+This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Condenser Loop Volume is set to autocalculate. The default is 2 minutes. 
 
 An example of this statement used in an IDF is:
 

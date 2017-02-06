@@ -278,7 +278,9 @@ namespace EnergyPlus {
 		"    TowerWaterSys Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    TowerWaterSys Demand Branches,  !- Condenser Demand Side Branch List Name",
 		"    TowerWaterSys Demand Connectors,  !- Condenser Demand Side Connector List Name",
-		"    SequentialLoad;          !- Load Distribution Scheme",
+		"    SequentialLoad,          !- Load Distribution Scheme",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  CondenserEquipmentOperationSchemes,",
 		"    TowerWaterSys Loop Operation Scheme List,  !- Name",
@@ -665,7 +667,9 @@ namespace EnergyPlus {
 		"    TowerWaterSys Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    TowerWaterSys Demand Branches,  !- Condenser Demand Side Branch List Name",
 		"    TowerWaterSys Demand Connectors,  !- Condenser Demand Side Connector List Name",
-		"    SequentialLoad;          !- Load Distribution Scheme",
+		"    SequentialLoad,          !- Load Distribution Scheme",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  CondenserEquipmentOperationSchemes,",
 		"    TowerWaterSys Loop Operation Scheme List,  !- Name",

@@ -416,7 +416,10 @@ namespace EnergyPlus {
 		"    GHEV Demand Connectors,  !- Demand Side Connector List Name",
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantLoop,",
 		"    RadHP Loop,              !- Name",
@@ -439,7 +442,10 @@ namespace EnergyPlus {
 		"    RADHP Demand Connectors, !- Demand Side Connector List Name",
 		"    Optimal,                 !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"BranchList,",
 		"    GHEV Supply Branches,    !- Name",
