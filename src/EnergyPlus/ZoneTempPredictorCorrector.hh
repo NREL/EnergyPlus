@@ -250,7 +250,7 @@ namespace ZoneTempPredictorCorrector {
 	CalculateMonthlyRunningAverageDryBulb( Array1D< Real64 > & runningAverageASH, Array1D< Real64 > & runningAverageCEN );
 
 	void
-	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > runningAverageASH, Array1D< Real64 > runningAverageCEN );
+	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
 
 	void
 	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
