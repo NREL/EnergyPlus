@@ -69401,7 +69401,7 @@ ThermalStorage:ChilledWater:Stratified,
 
 PlantLoop,
        \memo Defines a central plant loop.
-       \min-fields 18
+       \min-fields 24
   A1 , \field Name
         \required-field
        \reference PlantLoops
@@ -69503,18 +69503,25 @@ PlantLoop,
         \key TwoWayCommonPipe
         \key None
         \default None
-  A18;  \field Pressure Simulation Type
+  A18,  \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
         \key LoopFlowCorrection
         \key None
         \default None
+   N6;  \field Loop Circulation Time
+        \note This field is only used to autocalulate the Plant Loop Volume.
+        \note Loop Volume = Loop Circulation Time * Maximum Loop Flow Rate
+        \type real
+        \units minutes
+        \minimum 0.0
+        \default 2.0
 
 CondenserLoop,
        \memo Defines a central plant condenser loop. CondenserLoop and PlantLoop are nearly
        \memo identical except some components and operation schemes are applicable to only one
        \memo loop type or the other.
-       \min-fields 18
+       \min-fields 21
   A1 , \field Name
         \required-field
         \reference PlantLoops
@@ -69595,12 +69602,19 @@ CondenserLoop,
         \key UniformPLR
         \key SequentialUniformPLR
         \default SequentialLoad
-  A15; \field Pressure Simulation Type
+  A15, \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
         \key LoopFlowCorrection
         \key None
         \default None
+   N6;  \field Loop Circulation Time
+        \note This field is only used to autocalulate the Condenser Loop Volume.
+        \note Loop Volume = Loop Circulation Time * Maximum Loop Flow Rate
+        \type real
+        \units minutes
+        \minimum 0.0
+        \default 2.0
 
 \group Plant-Condenser Control
 
