@@ -2578,8 +2578,8 @@
     AllControlledZones Thermostat,  !- Thermostat Name
     CONSTANT,                                !- Radiative Fraction Input Mode
     0.4,                                     !- Fixed Radiative Fraction
-	,                                        !- Radiative Fraction Schedule Name
-	AdaptiveASH55_CentralLine;               !- Adaptive Comfort Model Type
+    ,                                        !- Radiative Fraction Schedule Name
+    AdaptiveASH55CentralLine;               !- Adaptive Comfort Model Type
 
   ThermostatSetpoint:SingleHeating,
     HeatingSetpoint,         !- Name
