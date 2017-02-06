@@ -71,12 +71,15 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace DataGlobals;
+using namespace DataStringGlobals;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -92,6 +95,7 @@ using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
+using namespace SimulationManager;
 
 TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 {
@@ -617,6 +621,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempZoneThermostatSetPoint.deallocate();
 		ZoneSetPointLast.deallocate();
 		Setback.deallocate();
+		AdapComfortCoolingSetPoint.deallocate();
 		ZoneThermostatSetPointLo.deallocate();
 		ZoneThermostatSetPointHi.deallocate();
 		SNLoadPredictedRate.deallocate();
@@ -627,5 +632,294 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempIndZnLd.deallocate();
 		OccRoomTSetPointHeat.deallocate();
 		OccRoomTSetPointCool.deallocate();
+
+	}
+
+
+	TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat )
+	{
+		// AUTHOR: Xuan Luo
+		// DATE WRITTEN: Jan 2017
+		using DataEnvironment::DayOfYear;
+		using WeatherManager::DesDayInput;
+		using WeatherManager::Envrn;
+		using WeatherManager::Environment;
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			" ",
+			"Zone,",
+			"  Core_top,                !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"Zone,",
+			"  Core_middle,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"Zone,",
+			"  Core_basement,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"Zone,",
+			"  Core_bottom,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_top Thermostat,                   !- Name",
+			"  Core_top,                              !- Zone or ZoneList Name",
+			"  Single Cooling Control Type Sched,     !- Control Type Schedule Name",
+			"  ThermostatSetpoint:SingleCooling,      !- Control 1 Object Type",
+			"  Core_top CoolSPSched;                  !- Control 1 Name",
+			" ",
+			"ZoneControl:Thermostat:OperativeTemperature,",
+			"  Core_top Thermostat,                   !- Thermostat Name",
+			"  CONSTANT,                              !- Radiative Fraction Input Mode",
+			"  0.0,                                   !- Fixed Radiative Fraction",
+			"  ,                                      !- Radiative Fraction Schedule Name",
+			"  AdaptiveASH55CentralLine;              !- Adaptive Comfort Model Type",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_middle Thermostat,                !- Name",
+			"  Core_middle,                           !- Zone or ZoneList Name",
+			"  Single Cooling Control Type Sched,     !- Control Type Schedule Name",
+			"  ThermostatSetpoint:SingleCooling,      !- Control 1 Object Type",
+			"  Core_middle CoolSPSched;               !- Control 1 Name",
+			" ",
+			"ZoneControl:Thermostat:OperativeTemperature,",
+			"  Core_middle Thermostat,                !- Thermostat Name",
+			"  CONSTANT,                              !- Radiative Fraction Input Mode",
+			"  0.0,                                   !- Fixed Radiative Fraction",
+			"  ,                                      !- Radiative Fraction Schedule Name",
+			"  AdaptiveCEN15251CentralLine;           !- Adaptive Comfort Model Type",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_basement Thermostat,                   !- Name",
+			"  Core_basement,                              !- Zone or ZoneList Name",
+			"  Single Cooling Heating Control Type Sched,  !- Control Type Schedule Name",
+			"  ThermostatSetpoint:SingleHeatingOrCooling,  !- Control 1 Object Type",
+			"  Core_basement CoolHeatSPSched;              !- Control 1 Name",
+			" ",
+			"ZoneControl:Thermostat:OperativeTemperature,",
+			"  Core_basement Thermostat,              !- Thermostat Name",
+			"  CONSTANT,                              !- Radiative Fraction Input Mode",
+			"  0.0,                                   !- Fixed Radiative Fraction",
+			"  ,                                      !- Radiative Fraction Schedule Name",
+			"  None;                                  !- Adaptive Comfort Model Type",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_bottom Thermostat,                !- Name",
+			"  Core_bottom,                           !- Zone or ZoneList Name",
+			"  Dual Zone Control Type Sched,          !- Control Type Schedule Name",
+			"  ThermostatSetpoint:DualSetpoint,       !- Control 1 Object Type",
+			"  Core_bottom DualSPSched;               !- Control 1 Name",
+			" ",
+			"ZoneControl:Thermostat:OperativeTemperature,",
+			"  Core_bottom Thermostat,                !- Thermostat Name",
+			"  CONSTANT,                              !- Radiative Fraction Input Mode",
+			"  0.0,                                   !- Fixed Radiative Fraction",
+			"  ,                                      !- Radiative Fraction Schedule Name",
+			"  AdaptiveASH55CentralLine;              !- Adaptive Comfort Model Type",
+			" ",
+			"ThermostatSetpoint:SingleCooling,",
+			"  Core_middle CoolSPSched,               !- Name",
+			"  SNGL_CLGSETP_SCH;                      !- Cooling Setpoint Temperature Schedule Name",
+			" ",
+			"ThermostatSetpoint:SingleHeatingOrCooling,",
+			"  Core_basement CoolHeatSPSched,         !- Name",
+			"  CLGHTGSETP_SCH;                        !- Heating Setpoint Temperature Schedule Name",
+			" ",
+			"ThermostatSetpoint:DualSetpoint,",
+			"  Core_bottom DualSPSched,               !- Name",
+			"  HTGSETP_SCH,                           !- Heating Setpoint Temperature Schedule Name",
+			"  CLGSETP_SCH;                           !- Cooling Setpoint Temperature Schedule Name",
+			" ",
+			"Schedule:Compact,",
+			"  Single Cooling Control Type Sched,  !- Name",
+			"  Control Type,                          !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,2;                        !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  SNGL_CLGSETP_SCH,                      !- Name",
+			"  Temperature,                           !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,24.0;                     !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  Single Cooling Heating Control Type Sched,  !- Name",
+			"  Control Type,                          !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,3;                        !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  Dual Zone Control Type Sched,          !- Name",
+			"  Control Type,                          !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,4;                        !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  CLGSETP_SCH,                           !- Name",
+			"  Temperature,                           !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,24.0;                     !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  HTGSETP_SCH,                           !- Name",
+			"  Temperature,                           !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,15.0;                     !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  CLGHTGSETP_SCH,                        !- Name",
+			"  Temperature,                           !- Schedule Type Limits Name",
+			"  Through: 12/31,                        !- Field 1",
+			"  For: AllDays,                          !- Field 2",
+			"  Until: 24:00,24.0;                     !- Field 3",
+		});
+
+		ASSERT_FALSE( process_idf( idf_objects ) ); // Tstat should show if the idf is legel
+
+		int ZoneNum( 4 );
+		int CoolZoneASHNum( 1 );
+		int CoolZoneCENNum( 2 );
+		int NoneAdapZoneNum( 3 );
+		int DualZoneNum( 4 );
+		int summerDesignDayTypeIndex( 9 );
+		int const ASH55_CENTRAL( 2 );
+		int const CEN15251_CENTRAL( 5 );
+
+		DayOfYear = 1;
+		Envrn = 1;
+		Environment.allocate( 1 );
+		DesDayInput.allocate( 1 );
+		Environment( Envrn ).KindOfEnvrn = ksRunPeriodWeather;
+		DesDayInput( Envrn ).DayType = summerDesignDayTypeIndex;
+		DesDayInput( Envrn ).MaxDryBulb = 30.0;
+		DesDayInput( Envrn ).DailyDBRange = 10.0;
+		Real64 ZoneAirSetPoint = 0.0;
+
+		bool ErrorsFound( false ); // If errors detected in input
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound ); // Tstat should show if there is error in zone processing
+		ASSERT_FALSE( AdapComfortDailySetPointSchedule.initialized ); // Tstat should show there adaptive model is not initialized
+
+		Array1D< Real64 > runningAverageASH_1( 365, 0.0 );
+		Array1D< Real64 > runningAverageCEN_1( 365, 0.0 );
+		CalculateAdaptiveComfortSetPointSchl( runningAverageASH_1, runningAverageCEN_1 );
+		// Tstat should show flage that adaptive comfort is not applicable (-1)
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear ) );
+		 
+		Array1D< Real64 > runningAverageASH_2( 365, 40.0 );
+		Array1D< Real64 > runningAverageCEN_2( 365, 40.0 );
+		CalculateAdaptiveComfortSetPointSchl( runningAverageASH_2, runningAverageCEN_2 );
+		// Tstat should show flage that adaptive comfort is not applicable (-1)
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( DayOfYear ) );
+		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear ) );
+
+		Array1D< Real64 > runningAverageASH( 365, 25.0 );
+		Array1D< Real64 > runningAverageCEN( 365, 25.0 );	
+		CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN );
+		ASSERT_TRUE( AdapComfortDailySetPointSchedule.initialized );// Tstat should show there adaptive model is initialized
+		ASSERT_EQ( 25.55, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear ) );// Tstat should show ASH 55 CENTRAL LINE model set point
+		ASSERT_EQ( 28.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( DayOfYear ) );// Tstat should show ASH 55 Upper 90 LINE model set point
+		ASSERT_EQ( 29.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( DayOfYear ) );// Tstat should show ASH 55 Upper 80 LINE model set point
+		ASSERT_EQ( 27.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( DayOfYear ) );// Tstat should show CEN 15251 CENTRAL LINE model set point
+		ASSERT_EQ( 29.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear ) );// Tstat should show CEN 15251 Upper I LINE model set point
+		ASSERT_EQ( 30.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( DayOfYear) );// Tstat should show CEN 15251 Upper II LINE model set point
+		ASSERT_EQ( 31.05, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear) );// Tstat should show CEN 15251 Upper III LINE model set point
+		ASSERT_EQ( 25.55, AdapComfortSetPointSummerDesDay( 1 ) );// Tstat should show ASH 55 CENTRAL LINE model set point
+		ASSERT_EQ( 27.05, AdapComfortSetPointSummerDesDay( 4 ) );// Tstat should show CEN 15251 CENTRAL LINE model set point
+
+		TempControlledZone.allocate( ZoneNum );
+		TempControlledZone( CoolZoneASHNum ).AdaptiveComfortTempControl = true;
+		TempControlledZone( CoolZoneASHNum ).AdaptiveComfortModelTypeIndex = ASH55_CENTRAL;
+		TempControlledZone( CoolZoneCENNum ).AdaptiveComfortTempControl = true;
+		TempControlledZone( CoolZoneCENNum ).AdaptiveComfortModelTypeIndex = CEN15251_CENTRAL;
+		TempControlledZone( NoneAdapZoneNum ).AdaptiveComfortTempControl = true;
+		TempControlledZone( NoneAdapZoneNum ).AdaptiveComfortModelTypeIndex = ASH55_CENTRAL;
+		TempControlledZone( DualZoneNum ).AdaptiveComfortTempControl = true;
+		TempControlledZone( DualZoneNum ).AdaptiveComfortModelTypeIndex = ASH55_CENTRAL;
+
+		ZoneAirSetPoint = 0.0;
+		AdjustOperativeSetPointsforAdapComfort( CoolZoneASHNum, ZoneAirSetPoint );
+		ASSERT_EQ( 25.55, ZoneAirSetPoint );// Tstat should show set point overwritten by ASH 55 CENTRAL LINE model
+
+		ZoneAirSetPoint = 0.0;
+		AdjustOperativeSetPointsforAdapComfort( CoolZoneCENNum, ZoneAirSetPoint );
+		ASSERT_EQ( 27.05, ZoneAirSetPoint );// Tstat should show set point overwritten by CEN 15251 CENTRAL LINE model
+
+		ZoneAirSetPoint = 0.0;
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear ) = -1;
+		AdjustOperativeSetPointsforAdapComfort( NoneAdapZoneNum, ZoneAirSetPoint );
+		ASSERT_EQ( 0, ZoneAirSetPoint );// Tstat should show set point is not overwritten
+
+		ZoneAirSetPoint = 26.0;
+		AdjustOperativeSetPointsforAdapComfort( DualZoneNum, ZoneAirSetPoint );
+		ASSERT_EQ( 26.0, ZoneAirSetPoint );// Tstat should show set point is not overwritten
+
+		Environment.deallocate();
+		DesDayInput.deallocate();
+		TempControlledZone.deallocate();
 
 	}
