@@ -215,7 +215,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	SumLatentPool( 1 ) = 0.0;
 	OAMFL.allocate( 1 );
 	VAMFL.allocate( 1 );
-	EAMFL.allocate( 1 );EAMFL.allocate( 1 );
+	EAMFL.allocate( 1 );
 	CTMFL.allocate( 1 );
 
 	// Parameter setup
