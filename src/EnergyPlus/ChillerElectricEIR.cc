@@ -1378,6 +1378,7 @@ namespace ChillerElectricEIR {
 		//       DATE WRITTEN   July 2004
 		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
 		//                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1412,6 +1413,7 @@ namespace ChillerElectricEIR {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -1576,7 +1578,20 @@ namespace ChillerElectricEIR {
 		EvapOutletTemp = Node( ElectricEIRChiller( EIRChillNum ).EvapOutletNodeNum ).Temp;
 		TempLowLimitEout = ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElectricEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
-
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerRefCap;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			
+			//update the Chiller nominal capacity at faulty cases
+			ChillerRefCap = NomCap_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			
+		}
+		
 		// Set mass flow rates
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
 			CondMassFlowRate = ElectricEIRChiller( EIRChillNum ).CondMassFlowRateMax;
