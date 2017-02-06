@@ -96,6 +96,7 @@ set( test_src
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
