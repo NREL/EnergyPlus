@@ -67,6 +67,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <DataWater.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -3591,12 +3592,14 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       T Hong, Aug. 2008. Added fluid bypass for single speed cooling tower
+		//       MODIFIED       Aug. 2008, T Hong, Added fluid bypass for single speed cooling tower
 		//                      The OutletWaterTemp from SimSimpleTower can be lower than 0 degreeC
 		//                      which may not be allowed in practice if water is the tower fluid.
 		//                      Chandan Sharma, FSEC, February 2010, Added basin heater
-		//                      A Flament, July 2010, added multi-cell capability for the 3 types of cooling tower
-		//       RE-ENGINEERED  Jan 2001, Richard Raustad
+		//                      Jul. 2010, A Flament, added multi-cell capability for the 3 types of cooling tower
+		//                      Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
+		//                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
+		//       RE-ENGINEERED  Jan. 2001, Richard Raustad
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To simulate the operation of a single-speed fan cooling tower.
@@ -3649,10 +3652,15 @@ namespace CondenserLoopTowers {
 		// ASHRAE HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculation. 1999.
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using FaultsManager::FaultsCondenserSWTSensor;
+		using FaultsManager::FaultsTowerFouling;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3712,6 +3720,11 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
+		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+
+		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
 			if ( SimpleTower( TowerNum ).SetpointIsOnOutlet ) {
@@ -3726,6 +3739,33 @@ namespace CondenserLoopTowers {
 				TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPointHi;
 			}
 		}}
+
+		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
+			Real64 TowerOutletTemp_ff = TempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
+			
+		}
+
+		//If there is a fault of cooling tower fouling (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
+			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
+			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
+			
+			//calculate the Faulty Tower Fouling Factor using fault information
+			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
+			
+			//update the tower UA values at faulty cases
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			
+		}
 
 		// Added for fluid bypass. First assume no fluid bypass
 		BypassFlag = 0;
@@ -3772,7 +3812,7 @@ namespace CondenserLoopTowers {
 			IncrNumCellFlag = false;
 
 			//   Initialize local variables to the free convection design values
-			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
+			UAdesign = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
@@ -3787,7 +3827,7 @@ namespace CondenserLoopTowers {
 
 			if ( OutletWaterTempOFF > TempSetPoint ) {
 				//     Setpoint was not met (or free conv. not used), turn on cooling tower fan
-				UAdesign = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+				UAdesign = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 				AirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 
 				// The fan power is for all cells operating
@@ -3913,8 +3953,10 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
-		//                      A Flament, July 2010, added multi-cell capability for the 3 types of cooling tower
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
+		//                      Jul. 2010, A Flament, added multi-cell capability for the 3 types of cooling tower
+		//                      Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
+		//                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -3972,10 +4014,15 @@ namespace CondenserLoopTowers {
 		// ASHRAE HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculation. 1999.
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using FaultsManager::FaultsCondenserSWTSensor;
+		using FaultsManager::FaultsTowerFouling;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4025,6 +4072,11 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
+		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+		
+		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
 			if ( SimpleTower( TowerNum ).SetpointIsOnOutlet ) {
@@ -4039,6 +4091,33 @@ namespace CondenserLoopTowers {
 				TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPointHi;
 			}
 		}}
+
+		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
+			Real64 TowerOutletTemp_ff = TempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
+			
+		}
+
+		//If there is a fault of cooling tower fouling (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
+			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
+			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
+			
+			//calculate the Faulty Tower Fouling Factor using fault information
+			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
+			
+			//update the tower UA values at faulty cases
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			
+		}
 
 		// Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 0 ) return;
@@ -4077,7 +4156,7 @@ namespace CondenserLoopTowers {
 			IncrNumCellFlag = false;
 
 			//set local variable for tower
-			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
+			UAdesign = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate; // ??useless subroutine variable??
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
@@ -4110,7 +4189,7 @@ namespace CondenserLoopTowers {
 					SpeedSel = 1;
 				} else {
 					//         Setpoint was not met, turn on cooling tower 2nd stage fan
-					UAdesign = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+					UAdesign = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 					AirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 					FanPowerHigh = SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 
@@ -4162,7 +4241,8 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B.Griffith
 		//       DATE WRITTEN   August 2013
-		//       MODIFIED       na
+		//       MODIFIED       Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
+		//                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4176,9 +4256,14 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using FaultsManager::FaultsCondenserSWTSensor;
+		using FaultsManager::FaultsTowerFouling;
 		using General::SolveRegulaFalsi;
 		using General::RoundSigDigits;
 
@@ -4232,6 +4317,11 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
+		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+		
+		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
 			if ( SimpleTower( TowerNum ).SetpointIsOnOutlet ) {
@@ -4246,6 +4336,33 @@ namespace CondenserLoopTowers {
 				TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPointHi;
 			}
 		}}
+
+		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
+			Real64 TowerOutletTemp_ff = TempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
+			
+		}
+
+		//If there is a fault of cooling tower fouling (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
+			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
+			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
+			
+			//calculate the Faulty Tower Fouling Factor using fault information
+			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
+			
+			//update the tower UA values at faulty cases
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			
+		}
 
 		// Added for multi-cell. Determine the number of cells operating
 		if ( SimpleTower( TowerNum ).DesWaterMassFlowRate > 0.0 ) {
@@ -4287,7 +4404,7 @@ namespace CondenserLoopTowers {
 		}
 
 		// first find free convection cooling rate
-		UAdesignPerCell = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
+		UAdesignPerCell = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 		OutletWaterTempOFF = Node( WaterInletNode ).Temp;
 		WaterMassFlowRate = Node( WaterInletNode ).MassFlowRate;
@@ -4308,7 +4425,7 @@ namespace CondenserLoopTowers {
 		}
 
 		// next find full fan speed cooling rate
-		UAdesignPerCell = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+		UAdesignPerCell = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 		AirFlowRateRatio = 1.0;
 		WaterFlowRateRatio = WaterMassFlowRatePerCell / SimpleTower( TowerNum ).DesWaterMassFlowRatePerCell;
@@ -4517,8 +4634,10 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   Feb 2005
-		//       MODIFIED       A Flament, July 2010, added multi-cell capability for the 3 types of cooling tower
-		//                      B Griffith, general fluid props
+		//       MODIFIED       Jul. 2010, A Flament, added multi-cell capability for the 3 types of cooling tower
+		//                      Jul. 2010, B Griffith, general fluid props
+		//                      Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
+		//                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4562,11 +4681,15 @@ namespace CondenserLoopTowers {
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataGlobals::CurrentTime;
-		using General::CreateSysTimeIntervalString;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using FaultsManager::FaultsCondenserSWTSensor;
+		using General::CreateSysTimeIntervalString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4663,6 +4786,8 @@ namespace CondenserLoopTowers {
 		TwbCapped = SimpleTowerInlet( TowerNum ).AirWetBulb;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
+		
+		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
 			TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
@@ -4671,6 +4796,18 @@ namespace CondenserLoopTowers {
 		} else {
 			assert( false );
 		}}
+
+		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
+			Real64 TowerOutletTemp_ff = TempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
+			
+		}
 
 		Tr = Node( WaterInletNode ).Temp - TempSetPoint;
 		Ta = TempSetPoint - SimpleTowerInlet( TowerNum ).AirWetBulb;

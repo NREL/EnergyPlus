@@ -58,25 +58,32 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <CurveManager.hh>
+#include <DataLoopNode.hh>
 #include <Fans.hh>
 #include <FaultsManager.hh>
+#include <HVACControllers.hh>
+#include <SetPointManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace FaultsManager;
 using namespace CurveManager;
+using namespace DataLoopNode;
 using namespace Fans;
+using namespace FaultsManager;
+
+namespace EnergyPlus {
 
 TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
 {
 	// PURPOSE OF THIS SUBROUTINE:
-	// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
-	// covers the rated operational point of the corresponding fan
-	// Return true if the curve covers the fan rated operational point
+	//     To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
+	//     covers the rated operational point of the corresponding fan
+	//     Return true if the curve covers the fan rated operational point
 
 	int CurveNum;
 	int FanNum;
@@ -141,8 +148,8 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFi
 TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction )
 {
 	// PURPOSE OF THIS SUBROUTINE:
-	// Calculate the decrease of the fan air flow rate, given the fan curve
-	// and the increase of fan pressure rise due to fouling air filters
+	//     Calculate the decrease of the fan air flow rate, given the fan curve
+	//     and the increase of fan pressure rise due to fouling air filters
 
 	int CurveNum;
 	int FanNum;
@@ -186,6 +193,97 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirF
 	// Clean up
 	PerfCurve.deallocate();
 	Fan.deallocate();
+
+}
+
+TEST_F( EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT ) {
+	// PURPOSE OF THIS SUBROUTINE:
+	//     Test the assignment of coil supply air temperature sensor offset fault information
+	//     to the corresponding coil controller
+	
+	std::string const idf_objects = delimited_string( {
+		"Version,                                                      ",
+		"   8.6;                !- Version Identifier                  ",
+		"                                                              ",
+		"FaultModel:TemperatureSensorOffset:CoilSupplyAir,             ",
+		"   Fault_SAT_CoolCoil1,!- Name                                ",
+		"   ,                   !- Availability Schedule Name          ",
+		"   ,                   !- Severity Schedule Name              ",
+		"   Coil:Cooling:Water, !- Coil Object Type                    ",
+		"   Chilled Water Coil, !- Coil Object Name                    ",
+		"   CW Coil Controller, !- Water Coil Controller Name          ",
+		"   2.0;                !- Reference Sensor Offset {deltaC}    ",
+		"                                                              ",
+		"Coil:Cooling:Water,                                           ",
+		"   Chilled Water Coil, !- Name                                ",
+		"   AvailSched,         !- Availability Schedule Name          ",
+		"   autosize,           !- Design Water Flow Rate {m3/s}       ",
+		"   autosize,           !- Design Air Flow Rate {m3/s}         ",
+		"   autosize,           !- Design Inlet Water Temperature {C}  ",
+		"   autosize,           !- Design Inlet Air Temperature {C}    ",
+		"   autosize,           !- Design Outlet Air Temperature {C}   ",
+		"   autosize,           !- Design Inlet Air Humidity Ratio {-} ",
+		"   autosize,           !- Design Outlet Air Humidity Ratio {-}",
+		"   Water Inlet Node,   !- Water Inlet Node Name               ",
+		"   Water Outlet Node,  !- Water Outlet Node Name              ",
+		"   Air Inlet Node,     !- Air Inlet Node Name                 ",
+		"   Air Outlet Node,    !- Air Outlet Node Name                ",
+		"   SimpleAnalysis,     !- Type of Analysis                    ",
+		"   CrossFlow;          !- Heat Exchanger Configuration        ",
+		"                                                              ",
+		"Controller:WaterCoil,                                         ",
+		"   CW Coil Controller, !- Name                                ",
+		"   HumidityRatio,      !- Control Variable                    ",
+		"   Reverse,            !- Action                              ",
+		"   FLOW,               !- Actuator Variable                   ",
+		"   Air Outlet Node,    !- Sensor Node Name                    ",
+		"   Water Inlet Node,   !- Actuator Node Name                  ",
+		"   autosize,           !- Controller Convergence Tolerance {C}",
+		"   autosize,           !- Maximum Actuated Flow {m3/s}        ",
+		"   0.0;                !- Minimum Actuated Flow {m3/s}        ",
+		"                                                              ",
+		"SetpointManager:Scheduled,                                    ",
+		"   HumRatSPManager,    !- Name                                ",
+		"   HumidityRatio,      !- Control Variable                    ",
+		"   HumRatioSched,      !- Schedule Name                       ",
+		"   Air Outlet Node;    !- Setpoint Node or NodeList Name      ",
+		"                                                              ",
+		"Schedule:Compact,                                             ",
+		"   HumRatioSched,      !- Name                                ",
+		"   Any Number,         !- Schedule Type Limits Name           ",
+		"   Through: 12/31,     !- Field 1                             ",
+		"   For: AllDays,       !- Field 2                             ",
+		"   Until: 24:00, 0.015;!- Field 3                             ",
+		"Schedule:Compact,                                             ",
+		"   AvailSched,         !- Name                                ",
+		"   Fraction,           !- Schedule Type Limits Name           ",
+		"   Through: 12/31,     !- Field 1                             ",
+		"   For: AllDays,       !- Field 2                             ",
+		"   Until: 24:00, 1.0;  !- Field 3                             ",
+		"                                                              ",
+		"AirLoopHVAC:ControllerList,                                   ",
+		"   CW Coil Controller, !- Name                                ",
+		"   Controller:WaterCoil,!- Controller 1 Object Type           ",
+		"   CW Coil Controller; !- Controller 1 Name                   ",
+	});
+
+	// Process inputs
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	// Readin inputs
+	SetPointManager::GetSetPointManagerInputs();
+	HVACControllers::GetControllerInput();
+
+	// Run 
+	CheckAndReadFaults();
+
+	// Check
+	EXPECT_EQ( 2.0, FaultsCoilSATSensor( 1 ).Offset );
+	EXPECT_EQ( "COIL:COOLING:WATER", FaultsCoilSATSensor( 1 ).CoilType );
+	EXPECT_TRUE( HVACControllers::ControllerProps( 1 ).FaultyCoilSATFlag );
+	EXPECT_EQ( 1, HVACControllers::ControllerProps( 1 ).FaultyCoilSATIndex );
+
+}
 
 }
 

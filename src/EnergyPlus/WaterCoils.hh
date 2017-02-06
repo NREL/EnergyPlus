@@ -375,6 +375,7 @@ namespace WaterCoils {
 		{}
 
 	};
+
 	struct WaterCoilNumericFieldData
 	{
 		// Members

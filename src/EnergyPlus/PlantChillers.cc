@@ -4084,8 +4084,9 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher / Brandon Anderson
 		//       DATE WRITTEN   Sept. 2000
-		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
-		//                      Jun. 2016, Rongpeng Zhang, LBNL, Applied the chiller supply water temperature sensor fault model
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4101,10 +4102,10 @@ namespace PlantChillers {
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -4120,6 +4121,7 @@ namespace PlantChillers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
@@ -4285,6 +4287,19 @@ namespace PlantChillers {
 		LoopNum = ElectricChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ElectricChiller( ChillNum ).Base.CWLoopSideNum;
 
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			
+			//update the Chiller nominal capacity at faulty cases
+			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
+		
 		// initialize outlet air humidity ratio of air or evap cooled chillers
 		CondOutletHumRat = Node( CondInletNode ).HumRat;
 
@@ -4672,8 +4687,9 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher / Brandon Anderson
 		//       DATE WRITTEN   Sept. 2000
-		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
-		//                      Jun. 2016, Rongpeng Zhang, LBNL, Applied the chiller supply water temperature sensor fault model
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4688,10 +4704,10 @@ namespace PlantChillers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -4708,6 +4724,7 @@ namespace PlantChillers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
@@ -4932,6 +4949,19 @@ namespace PlantChillers {
 		LoopNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopSideNum;
 		EvapMassFlowRateMax = EngineDrivenChiller( ChillerNum ).Base.EvapMassFlowRateMax;
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			
+			//update the Chiller nominal capacity at faulty cases
+			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
 
 		//*********************************
 
@@ -5316,8 +5346,9 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher / Brandon Anderson
 		//       DATE WRITTEN   Sept. 2000
-		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
-		//                      Jun. 2016, Rongpeng Zhang, LBNL, Applied the chiller supply water temperature sensor fault model
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -5332,10 +5363,10 @@ namespace PlantChillers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -5352,6 +5383,7 @@ namespace PlantChillers {
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
@@ -5567,6 +5599,19 @@ namespace PlantChillers {
 		EvapMassFlowRateMax = GTChiller( ChillerNum ).Base.EvapMassFlowRateMax;
 		LoopNum = GTChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = GTChiller( ChillerNum ).Base.CWLoopSideNum;
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			
+			//update the Chiller nominal capacity at faulty cases
+			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
 
 		//*********************************
 
@@ -6036,8 +6081,9 @@ namespace PlantChillers {
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
 		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen 
-		//                      Feb. 2010, Chandan Sharma, FSEC, Added basin heater
-		//                      Jun. 2016, Rongpeng Zhang, LBNL, Applied the chiller supply water temperature sensor fault model
+		//                      Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -6047,10 +6093,10 @@ namespace PlantChillers {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -6066,6 +6112,7 @@ namespace PlantChillers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
@@ -6099,12 +6146,27 @@ namespace PlantChillers {
 		static std::string OutputChar; // character string for warning messages
 		Real64 Cp; // local for fluid specif heat, for evaporator
 		Real64 CpCond; // local for fluid specif heat, for condenser
+		Real64 ChillerNomCap; // chiller nominal capacity
 
+		ChillerNomCap = ConstCOPChiller( ChillNum ).Base.NomCap;
 		EvapInletNode = ConstCOPChiller( ChillNum ).Base.EvapInletNodeNum;
 		EvapOutletNode = ConstCOPChiller( ChillNum ).Base.EvapOutletNodeNum;
 		CondInletNode = ConstCOPChiller( ChillNum ).Base.CondInletNodeNum;
 		CondOutletNode = ConstCOPChiller( ChillNum ).Base.CondOutletNodeNum;
 
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFaultyFoulingCapReductionFactor();
+			
+			//update the Chiller nominal capacity at faulty cases
+			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
+		
 		//set module level chiller inlet and temperature variables
 		LoopNum = ConstCOPChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ConstCOPChiller( ChillNum ).Base.CWLoopSideNum;
@@ -6382,9 +6444,9 @@ namespace PlantChillers {
 			}
 
 			// Checks QEvaporator on the basis of the machine limits.
-			if ( QEvaporator > ConstCOPChiller( ChillNum ).Base.NomCap ) {
+			if ( QEvaporator > ChillerNomCap ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
-					QEvaporator = ConstCOPChiller( ChillNum ).Base.NomCap;
+					QEvaporator = ChillerNomCap;
 					EvapDeltaTemp = QEvaporator / EvapMassFlowRate / Cp;
 					EvapOutletTemp = Node( EvapInletNode ).Temp - EvapDeltaTemp;
 				} else {

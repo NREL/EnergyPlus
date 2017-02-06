@@ -521,3 +521,149 @@ This field defines the reference offset of the temperature sensor. A positive va
     2.0;                     !- Reference Sensor Offset {deltaC}
 
 \end{lstlisting}
+
+
+\subsection{FaultModel:TemperatureSensorOffset:CondenserSupplyWater}\label{faultmodeltemperaturesensoroffsetcondensersupplywater}
+
+This object defines the operational fault of condenser supply water temperature sensor offset.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
+
+This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, CoolingTower:VariableSpeed, and CoolingTower:VariableSpeed:MERKEL.
+
+\paragraph{Field: Cooling Tower Object Name}\label{field-tower-object-name}
+
+This field defines the name of the cooling tower object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
+
+This field defines the reference offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the condenser supply water temperature sensor offset
+
+  FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
+    Fault_SWT_CoolTower,     !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    CoolingTower:SingleSpeed,!- Cooling Tower Object Type
+    MTowerWaterSys CoolTower,!- Cooling Tower Object Name
+    1.0;                     !- Reference Sensor Offset {deltaC}
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:Fouling:CoolingTower}\label{faultmodelfoulingcoolingtower}
+
+This object defines the operational fault of fouling cooling towers.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
+
+This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, and CoolingTower:VariableSpeed:MERKEL.
+
+\paragraph{Field: Cooling Tower Object Name}\label{field-tower-object-name}
+
+This field defines the name of the cooling tower object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: UA Reduction Factor}\label{field-ua-reduction-factor}
+
+This field defines the UA reduction factor of the faulty cooling tower. The factor describes the tower UA reduction due to fouling. It is the ratio between the UA value at fouling case and that at fault free case. It is applicable to both the Design UA and Free Convection UA of the tower.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the condenser supply water temperature sensor offset
+
+  FaultModel:Fouling:CoolingTower,
+    Fault_fouling_CoolTower, !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    CoolingTower:SingleSpeed,!- Cooling Tower Object Type
+    MTowerWaterSys CoolTower,!- Cooling Tower Object Name
+    0.7;                     !- UA Reduction Factor
+
+\end{lstlisting}
+
+\subsection{FaultModel:TemperatureSensorOffset:CoilSupplyAir}\label{faultmodeltemperaturesensoroffsetcoilsupplyair}
+
+This object defines the operational fault of supply air temperature sensor offset for the coils with temperature-based control.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Coil Object Type}\label{field-coil-object-type}
+
+This field defines the coil object type that this fault is associated with. Choices are from a list of applicable coils with temperature-based control, including Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam, Coil:Heating:Desuperheater, Coil:Heating:Water, Coil:Cooling:Water, and Coil:Cooling:Water:Detailedgeometry.
+
+\paragraph{Field: Coil Object Name}\label{field-coil-object-name}
+
+This field defines the name of the coil associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Water Coil Controller Name}\label{field-water-coil-controller-name}
+
+This field defines the name of the water coil controller associated with the faulty water coil. This field is only required for the water coils, i.e., the coil type is Coil:Heating:Water, Coil:Cooling:Water, or Coil:Cooling:Water:Detailedgeometry.
+
+\paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
+
+This field defines the reference offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the coil supply air temperature sensor offset
+
+  FaultModel:TemperatureSensorOffset:CoilSupplyAir,
+    Fault_SAT_CoolCoil1,     !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Coil:Cooling:Water,      !- Coil Object Type
+    Main Cooling Coil 1,     !- Coil Object Name
+    Central Cooling Coil Controller 1, !- Water Coil Controller Name
+    2.0;                     !- Reference Sensor Offset {deltaC}
+
+\end{lstlisting}
+
