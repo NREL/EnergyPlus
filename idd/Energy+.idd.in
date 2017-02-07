@@ -6977,6 +6977,73 @@ MaterialProperty:PhaseChange,
        \units J/kg
        \type real
 
+MaterialProperty:PhaseChangeHysteresis,
+    \memo Additional properties for temperature dependent thermal conductivity
+    \memo and enthalpy for Phase Change Materials (PCM) with separate melting and freezing curves.
+    \memo HeatBalanceAlgorithm = CondFD(ConductionFiniteDifference) solution algorithm only.
+    \memo Constructions with this should use the detailed CondFD process.
+    \memo Has no effect with other HeatBalanceAlgorithm solution algorithms.
+    \format singleLine
+  A1,  \field Name
+       \required-field
+       \type object-list
+       \object-list MaterialName
+       \note Regular Material Name to which the additional properties will be added.
+       \note this the material name for the basic material properties.
+  N1 , \field Temperature Coefficient for Thermal Conductivity
+       \note The base temperature is 20C.
+       \note This is the thermal conductivity change per degree excursion from 20C.
+       \note This variable conductivity function is overridden by the VariableThermalConductivity object, if present.
+       \units W/m-K2
+       \type real
+       \default 0.0
+  N2 , \field Latent Heat of Fusion
+       \required-field
+       \units J/kg
+       \type real
+  N3 , \field Liquid State Specific Heat
+       \required-field
+       \units J/kg-K
+       \type real
+  N4 , \field High Temperature Difference of Melting Curve
+       \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
+       \required-field
+       \units deltaC
+       \type real
+  N5 , \field Peak Melting Temperature
+       \required-field
+       \units C
+       \type real
+       \note Must be different than Peak Freezing Temperature
+  N6 , \field Low Temperature Difference of Melting Curve
+       \note Note: The total melting range of the material is the sum of low and high temperature difference of melting curve.
+       \required-field
+       \units deltaC
+       \type real
+  N7 , \field Latent Heat of Solidification
+       \required-field
+       \units J/kg
+       \type real
+  N8 , \field Solid State Specific Heat
+       \required-field
+       \units J/kg-K
+       \type real
+  N9 , \field High Temperature Difference of Freezing Curve
+       \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
+       \required-field
+       \units deltaC
+       \type real
+ N10 , \field Peak Freezing Temperature
+       \required-field
+       \units C
+       \type real
+       \note Must be different than Peak Melting Temperature
+ N11 ; \field Low Temperature Difference of Freezing Curve
+       \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
+       \required-field
+       \units deltaC
+       \type real
+
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
     \memo using piecewise linear temperature-conductivity function.
@@ -20619,7 +20686,7 @@ SwimmingPool:Indoor,
        \required-field
        \type alpha
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2,  \field Surface Name
        \required-field
        \note Name of the floor surface where the pool is located.
@@ -34294,7 +34361,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
   A1,  \field Name
        \required-field
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -35090,7 +35157,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
   A1,  \field Name
        \required-field
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37433,7 +37500,7 @@ ZoneHVAC:Baseboard:Convective:Water,
   A1 , \field Name
        \required-field
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37548,7 +37615,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
    A1 , \field Name
         \required-field
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -37708,7 +37775,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
    A1 , \field Name
         \required-field
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -40240,7 +40307,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \type alpha
        \required-field
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Primary Air Availability Schedule Name
        \note Primary air is supplied by central air handling unit and must be on for heating or cooling.
        \note Schedule value > 0 means the primary air supply is available.
@@ -40409,7 +40476,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
        \type alpha
        \required-field
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41576,7 +41643,7 @@ Fan:ConstantVolume,
        \reference FansCVandVAV
        \reference FansCVandOnOffandVAV
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -41631,7 +41698,7 @@ Fan:VariableVolume,
        \reference FansOnOffandVAV
        \reference FansCVandOnOffandVAV
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -41854,7 +41921,7 @@ Fan:ComponentModel,
        \required-field
        \reference Fans
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Air Inlet Node Name
@@ -42091,7 +42158,7 @@ Coil:Cooling:Water,
        \reference AFNCoilNames
        \reference SimpleCoils
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -42171,7 +42238,7 @@ Coil:Cooling:Water:DetailedGeometry,
        \reference CoolingCoilsWaterNoHX
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -44706,7 +44773,7 @@ Coil:Heating:Water,
        \reference AFNCoilNames
        \reference SimpleCoils
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -44776,7 +44843,7 @@ Coil:Heating:Steam,
        \type alpha
        \reference HeatingCoilName
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -44833,7 +44900,7 @@ Coil:Heating:Electric,
        \reference HeatingCoilsElectric
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -44944,7 +45011,7 @@ Coil:Heating:Fuel,
        \reference HeatingCoilName
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -45130,7 +45197,7 @@ Coil:Heating:Desuperheater,
        \reference HeatingCoilsDesuperheater
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -46651,7 +46718,7 @@ Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
         \type alpha
         \reference CoolingCoilsWaterToAirHP
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2 , \field Compressor Type
         \required-field
         \type choice
@@ -46822,7 +46889,7 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
         \type alpha
         \reference HeatingCoilsWaterToAirHP
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2 , \field Compressor Type
         \required-field
         \type choice
@@ -46968,7 +47035,7 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
         \type alpha
         \reference CoolingCoilsWaterToAirHP
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Water Inlet Node Name
         \required-field
         \type node
@@ -47094,7 +47161,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \type alpha
         \reference CoolingCoilsWaterToAirVSHP
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Water-to-Refrigerant HX Water Inlet Node Name
         \required-field
         \type node
@@ -47998,7 +48065,7 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \type alpha
         \reference HeatingCoilsWaterToAirHP
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Water Inlet Node Name
         \required-field
         \type node
@@ -48077,7 +48144,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \type alpha
         \reference HeatingCoilsWaterToAirVSHP
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Water-to-Refrigerant HX Water Inlet Node Name
         \required-field
         \type node
@@ -50413,7 +50480,7 @@ CoilSystem:Cooling:DX,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
         \reference-class-name validOASysEquipmentTypes
         \reference validOASysEquipmentNames
    A2 , \field Availability Schedule Name
@@ -50514,7 +50581,7 @@ CoilSystem:Heating:DX,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
         \reference-class-name validOASysEquipmentTypes
         \reference validOASysEquipmentNames
    A2 , \field Availability Schedule Name
@@ -50544,7 +50611,7 @@ CoilSystem:Cooling:Water:HeatExchangerAssisted,
        \required-field
        \reference CoolingCoilsWater
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Heat Exchanger Object Type
@@ -50710,7 +50777,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \reference CoolingCoilsDXMultiModeOrSingleSpeed
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51501,7 +51568,7 @@ EvaporativeCooler:Direct:CelDekPad,
        \type alpha
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -51545,7 +51612,7 @@ EvaporativeCooler:Indirect:CelDekPad,
        \type alpha
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -51613,7 +51680,7 @@ EvaporativeCooler:Indirect:WetCoil,
        \type alpha
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -51671,7 +51738,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type alpha
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -51867,7 +51934,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \type alpha
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
@@ -51983,7 +52050,7 @@ Humidifier:Steam:Electric,
   A1, \field Name
       \required-field
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
       \reference-class-name validOASysEquipmentTypes
       \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
@@ -52420,7 +52487,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \reference HXAirToAirNames
       \reference AFNHeatExchangerNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
       \reference-class-name validOASysEquipmentTypes
       \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
@@ -52497,7 +52564,7 @@ HeatExchanger:AirToAir:SensibleAndLatent,
       \reference HXAirToAirSensibleAndLatentNames
       \reference AFNHeatExchangerNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
       \reference-class-name validOASysEquipmentTypes
       \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
@@ -53488,7 +53555,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53564,7 +53631,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53701,7 +53768,7 @@ AirLoopHVAC:UnitaryHeatOnly,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53777,7 +53844,7 @@ AirLoopHVAC:UnitaryHeatCool,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53914,7 +53981,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54070,7 +54137,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54235,7 +54302,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \type alpha
         \note Enter a unique name for this unitary system.
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54663,7 +54730,7 @@ AirConditioner:VariableRefrigerantFlow,
        \required-field
        \type alpha
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \note Enter a unique name for this variable refrigerant flow heat pump.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -57201,7 +57268,7 @@ AirLoopHVAC:OutdoorAirSystem,
        \required-field
        \type alpha
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
    A2, \field Controller List Name
        \note Enter the name of an AirLoopHVAC:ControllerList object.
        \required-field
@@ -58675,11 +58742,11 @@ Branch,
    A3,  \field Component 1 Object Type
         \begin-extensible
         \required-field
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A4,  \field Component 1 Name
         \required-field
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A5,  \field Component 1 Inlet Node Name
         \required-field
@@ -58688,100 +58755,100 @@ Branch,
         \required-field
         \type node
    A7,  \field Component 2 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A8,  \field Component 2 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A9,  \field Component 2 Inlet Node Name
         \type node
    A10, \field Component 2 Outlet Node Name
         \type node
    A11, \field Component 3 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A12, \field Component 3 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A13, \field Component 3 Inlet Node Name
         \type node
    A14, \field Component 3 Outlet Node Name
         \type node
    A15, \field Component 4 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A16, \field Component 4 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A17, \field Component 4 Inlet Node Name
         \type node
    A18, \field Component 4 Outlet Node Name
         \type node
    A19, \field Component 5 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A20, \field Component 5 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A21, \field Component 5 Inlet Node Name
         \type node
    A22, \field Component 5 Outlet Node Name
         \type node
    A23, \field Component 6 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A24, \field Component 6 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A25, \field Component 6 Inlet Node Name
         \type node
    A26, \field Component 6 Outlet Node Name
         \type node
    A27, \field Component 7 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A28, \field Component 7 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A29, \field Component 7 Inlet Node Name
         \type node
    A30, \field Component 7 Outlet Node Name
         \type node
    A31, \field Component 8 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A32, \field Component 8 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A33, \field Component 8 Inlet Node Name
         \type node
    A34, \field Component 8 Outlet Node Name
         \type node
    A35, \field Component 9 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A36, \field Component 9 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A37, \field Component 9 Inlet Node Name
         \type node
    A38, \field Component 9 Outlet Node Name
         \type node
    A39, \field Component 10 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A40, \field Component 10 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A41, \field Component 10 Inlet Node Name
         \type node
    A42, \field Component 10 Outlet Node Name
         \type node
    A43, \field Component 11 Object Type
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentTypes
    A44, \field Component 11 Name
-        \type object-list 
+        \type object-list
         \object-list validBranchEquipmentNames
    A45, \field Component 11 Inlet Node Name
         \type node
@@ -60740,7 +60807,7 @@ PipingSystem:Underground:PipeCircuit,
         \reference-class-name validCondenserEquipmentTypes
         \reference validCondenserEquipmentNames
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    N1,  \field Pipe Thermal Conductivity
         \required-field
         \type real
@@ -61445,7 +61512,7 @@ TemperingValve,
       \reference-class-name validCondenserEquipmentTypes
       \reference validCondenserEquipmentNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   A2, \field Inlet Node Name
       \required-field
       \type node
@@ -61596,7 +61663,7 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
        \type object-list
        \object-list AllShadingAndHTSurfNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A3 , \field Photovoltaic-Thermal Model Performance Name
        \type object-list
        \object-list FlatPlatePVTParameters
@@ -62062,7 +62129,7 @@ Boiler:HotWater,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Fuel Type
        \required-field
        \type choice
@@ -62171,7 +62238,7 @@ Boiler:Steam,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Fuel Type
        \required-field
        \type choice
@@ -62227,7 +62294,7 @@ Chiller:Electric:EIR,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Reference Capacity
        \type real
        \units W
@@ -62436,7 +62503,7 @@ Chiller:Electric:ReformulatedEIR,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
    N1 , \field Reference Capacity
        \type real
        \units W
@@ -62632,7 +62699,7 @@ Chiller:Electric,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -62778,7 +62845,7 @@ Chiller:Absorption:Indirect,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Nominal Capacity
        \type real
        \required-field
@@ -62954,7 +63021,7 @@ Chiller:Absorption,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Nominal Capacity
        \type real
        \units W
@@ -63064,7 +63131,7 @@ Chiller:ConstantCOP,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Nominal Capacity
        \type real
        \autosizable
@@ -63159,7 +63226,7 @@ Chiller:EngineDriven,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -63351,7 +63418,7 @@ Chiller:CombustionTurbine,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -63522,7 +63589,7 @@ ChillerHeater:Absorption:DirectFired,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Nominal Cooling Capacity
        \autosizable
        \default autosize
@@ -63733,7 +63800,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Nominal Cooling Capacity
        \autosizable
        \default autosize
@@ -63935,7 +64002,7 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Source Side Inlet Node Name
         \required-field
         \type node
@@ -64009,7 +64076,7 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2,  \field Source Side Inlet Node Name
         \required-field
         \type node
@@ -64083,7 +64150,7 @@ HeatPump:WaterToWater:ParameterEstimation:Cooling,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2,\field Source Side Inlet Node Name
        \required-field
        \type node
@@ -64157,7 +64224,7 @@ HeatPump:WaterToWater:ParameterEstimation:Heating,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2,\field Source Side Inlet Node Name
        \required-field
        \type node
@@ -64232,7 +64299,7 @@ DistrictCooling,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Chilled Water Inlet Node Name
        \required-field
        \type node
@@ -64257,7 +64324,7 @@ DistrictHeating,
        \reference-class-name validBranchEquipmentTypes
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Hot Water Inlet Node Name
        \required-field
        \type node
@@ -64287,7 +64354,7 @@ PlantComponent:TemperatureSource,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node
        \required-field
        \type node
@@ -64330,7 +64397,7 @@ CentralHeatPumpSystem,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2,  \field Control Method
        \type choice
        \key SmartMixing
@@ -64880,7 +64947,7 @@ CoolingTower:SingleSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -65093,7 +65160,7 @@ CoolingTower:TwoSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -65365,7 +65432,7 @@ CoolingTower:VariableSpeed:Merkel,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -65645,7 +65712,7 @@ CoolingTower:VariableSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66145,7 +66212,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66320,7 +66387,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66558,7 +66625,7 @@ FluidCooler:SingleSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66648,7 +66715,7 @@ FluidCooler:TwoSpeed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66787,7 +66854,7 @@ GroundHeatExchanger:Vertical,
         \reference-class-name validCondenserEquipmentTypes
         \reference validCondenserEquipmentNames
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
   A2,   \field Inlet Node Name
         \required-field
         \type node
@@ -68480,7 +68547,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -68743,7 +68810,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -68992,7 +69059,7 @@ ThermalStorage:Ice:Simple,
       \required-field
       \reference IceThermalStorageEquipment
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   A2, \field Ice Storage Type
       \note IceOnCoilInternal = Ice-on-Coil, internal melt
       \note IceOnCoilExternal = Ice-on-Coil, external melt
@@ -69022,7 +69089,7 @@ ThermalStorage:Ice:Detailed,
        \required-field
        \reference IceThermalStorageEquipment
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -69092,7 +69159,7 @@ ThermalStorage:ChilledWater:Mixed,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Tank Volume
        \type real
        \units m3
@@ -69194,7 +69261,7 @@ ThermalStorage:ChilledWater:Stratified,
        \reference-class-name validCondenserEquipmentTypes
        \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
+       \reference validBranchEquipmentNames
   N1 , \field Tank Volume
        \required-field
        \type real
@@ -69615,64 +69682,64 @@ PlantEquipmentList,
         \required-field
         \reference PlantAndCondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A3 , \field Equipment 1 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A4 , \field Equipment 2 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A5 , \field Equipment 2 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A6 , \field Equipment 3 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A7 , \field Equipment 3 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A8 , \field Equipment 4 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A9 , \field Equipment 4 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A10, \field Equipment 5 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A11, \field Equipment 5 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A12, \field Equipment 6 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A13, \field Equipment 6 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A14, \field Equipment 7 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A15, \field Equipment 7 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A16, \field Equipment 8 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A17, \field Equipment 8 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A18, \field Equipment 9 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A19, \field Equipment 9 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
   A20, \field Equipment 10 Object Type
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentTypes
   A21; \field Equipment 10 Name
-       \type object-list 
+       \type object-list
        \object-list validPlantEquipmentNames
 
 
@@ -69689,66 +69756,66 @@ CondenserEquipmentList,
         \reference PlantAndCondenserEquipmentLists
         \reference CondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A3 , \field Equipment 1 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A4 , \field Equipment 2 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A5 , \field Equipment 2 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A6 , \field Equipment 3 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A7 , \field Equipment 3 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A8 , \field Equipment 4 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A9 , \field Equipment 4 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A10, \field Equipment 5 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A11, \field Equipment 5 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A12, \field Equipment 6 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A13, \field Equipment 6 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A14, \field Equipment 7 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A15, \field Equipment 7 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A16, \field Equipment 8 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A17, \field Equipment 8 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A18, \field Equipment 9 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A19, \field Equipment 9 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
   A20, \field Equipment 10 Object Type
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentTypes
   A21; \field Equipment 10 Name
-       \type object-list 
+       \type object-list
        \object-list validCondenserEquipmentNames
-   
+
 !Plant Control Schemes:
 
 PlantEquipmentOperation:Uncontrolled,
@@ -72609,7 +72676,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
         \note This is the name of the zone unit
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -72669,7 +72736,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
         \note This is the name of the air terminal
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -72729,7 +72796,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \reference UserDefinedCoil
         \note This is the name of the coil
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
         \reference-class-name validOASysEquipmentTypes
         \reference validOASysEquipmentNames
    A2 , \field Overall Model Simulation Program Calling Manager Name
@@ -72792,7 +72859,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \reference-class-name validCondenserEquipmentTypes
         \reference validCondenserEquipmentNames
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
    A2 , \field Main Model Program Calling Manager Name
         \type object-list
         \object-list ProgramNames
@@ -74665,7 +74732,7 @@ Refrigeration:CompressorRack,
         \type alpha
         \reference DesuperHeatingCoilSources
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
   A2 ,  \field Heat Rejection Location
         \type choice
         \key Outdoors
@@ -75207,7 +75274,7 @@ Refrigeration:Condenser:WaterCooled,
         \reference RefrigerationAllTypesCondenserNames
         \reference DesuperHeatingCoilSources
         \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames 
+        \reference validBranchEquipmentNames
   N1 ,  \field Rated Effective Total Heat Rejection Rate
         \note Rating as per ARI 450
         \note Be sure the rating corresponds to the correct refrigerant
@@ -77490,7 +77557,7 @@ Generator:InternalCombustionEngine,
       \required-field
       \reference GeneratorNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   N1, \field Rated Power Output
        \units W
   A2, \field Electric Circuit Node Name
@@ -77580,7 +77647,7 @@ Generator:CombustionTurbine,
       \required-field
       \reference GeneratorNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   N1, \field Rated Power Output
       \units W
   A2, \field Electric Circuit Node Name
@@ -77690,7 +77757,7 @@ Generator:MicroTurbine,
       \reference GeneratorNames
       \reference MicroTurbineGeneratorNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   N1, \field Reference Electrical Power Output
       \required-field
       \type real
@@ -78555,7 +78622,7 @@ Generator:FuelCell:ExhaustGasToWaterHeatExchanger,
       \reference-class-name validPlantEquipmentTypes
       \reference validPlantEquipmentNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   A2, \field Heat Recovery Water Inlet Node Name
       \type node
   A3, \field Heat Recovery Water Outlet Node Name
@@ -78645,7 +78712,7 @@ Generator:FuelCell:Inverter,
       \type alpha
       \reference FCStackCoolerNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   A2, \field Heat Recovery Water Inlet Node Name
       \type node
   A3, \field Heat Recovery Water Outlet Node Name
@@ -78689,7 +78756,7 @@ Generator:MicroCHP,
       \reference-class-name validPlantEquipmentTypes
       \reference validPlantEquipmentNames
       \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+      \reference validBranchEquipmentNames
   A2, \field Performance Parameters Name
       \note Enter the name of a Generator:MicroCHP:NonNormalizedParameters object.
       \type object-list
@@ -81015,7 +81082,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
-   
+
 FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
    \memo This object describes fault of chiller supply water temperature sensor offset
    \min-fields 6

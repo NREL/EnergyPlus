@@ -5162,11 +5162,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	int OtherSideZoneNum; // Zone Number index for other side of an interzone partition HAMT
 	static int WarmupSurfTemp;
 	static int TimeStepInDay( 0 ); // time step number
+	static Array1D< Real64 > SurfaceEnthalpyRead; // ! True if EnthalpyM and EnthalpyH are read
 
 	// FLOW:
 	if ( calcHeatBalanceInsideSurfFirstTime ) {
 		TempInsOld.allocate( TotSurfaces );
 		RefAirTemp.allocate( TotSurfaces );
+		SurfaceEnthalpyRead.allocate( TotSurfaces );
 		if ( any_eq( HeatTransferAlgosUsed, UseEMPD ) ) {
 			MinIterations = MinEMPDIterations;
 		} else {
@@ -5188,6 +5190,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	}
 
 	bool const PartialResimulate( present( ZoneToResimulate ) );
+	SurfaceEnthalpyRead = .False.
+	ZnAirRpt.SumEnthalpyM = 0.0
+	ZnAirRpt.SumEnthalpyH = 0.0
 
 	//Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
 	std::vector< int > SurfToResimulate;
@@ -5412,7 +5417,16 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 					if ( surface.HeatTransferAlgorithm == HeatTransferModel_HAMT ) ManageHeatBalHAMT( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp ); //HAMT
 
-					if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) ManageHeatBalFiniteDiff( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp );
+					if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
+						ManageHeatBalFiniteDiff( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp );
+						if ( !SurfaceEnthalpyRead( SurfNum ) ) {
+							ZnAirRpt( ZoneNum ).SumEnthalpyM = 0.0;
+							ZnAirRpt( ZoneNum ).SumEnthalpyH = 0.0;
+							SurfaceEnthalpyRead( SurfNum ) = true;
+						}
+						ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
+						ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
+					}
 
 					TH11 = TempSurfOutTmp;
 
