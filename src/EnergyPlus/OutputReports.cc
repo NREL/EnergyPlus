@@ -1738,16 +1738,15 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	std::string AlgoName;
 
 	// Formats
-	static gio::Fmt Format_700( "('! <Zone Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
-	static gio::Fmt Format_700b( "('! <Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_700( "('! <Zone Surfaces>,Zone Name,# Surfaces')" );
+	static gio::Fmt Format_700b( "('! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces')" );
 	static gio::Fmt Format_701( "('! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_701b( "('! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_701c( "('! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
-	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
+	static gio::Fmt Format_7011( "(',Construction,Nominal U (w/o film coefs)/Min Schedule Value {W/m2-K},','Nominal U (with film coefs)/Max Schedule Value {W/m2-K},Solar Diffusing,','Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},','ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
+	static gio::Fmt Format_7011b( "(',Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value {W/m2-K},','Nominal U (with film coefs)/Max Schedule Value {W/m2-K},Solar Diffusing,','Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},','ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
+	static gio::Fmt Format_7011c( "(',Construction,Nominal U (w/o film coefs)/Min Schedule Value {W/m2-K},Nominal U (with film coefs)/Max Schedule Value {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}')" );
 	static gio::Fmt Format_7012( "(',#Sides')" );
-	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
-	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
-	static gio::Fmt Format_7022( "(',')" );
 	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
 	static gio::Fmt Format_704( "(A,' Surface,',A,',',A,',',A,',',A)" );
 	static gio::Fmt Format_7041( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','),A)" );
@@ -1757,8 +1756,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	static gio::Fmt Format_705( "(',',A)" );
 	static gio::Fmt Format_706( "(4(',',A),',',A)" );
 	static gio::Fmt Format_7061( "(',,,,,,,,,,',A)" );
-	static gio::Fmt Format_707( "(',{Vertex 1},,,{Vertex 2},,,{Vertex 3},,,{Vertex 4},,,{etc}')" );
-	static gio::Fmt Format_708( "(4(',X {m},Y {m},Z {m}'))" );
+	static gio::Fmt Format_707( "(',Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y {m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}')" );
 	static gio::Fmt Format_709( "(3(',',A))" );
 	static gio::Fmt Format_710( "(', Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates')" );
 	static gio::Fmt Format_711( "(1X)" );
@@ -1777,40 +1775,35 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
 		gio::write( unit, Format_7011 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
-		gio::write(unit, Format_7011);
+		gio::write(unit, Format_7011b);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
-		gio::write(unit, Format_7011);
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
-		gio::write( unit, Format_7021 );
+		gio::write(unit, Format_7011c);
 	} else if ( RptType == 11 ) { // Details with Vertices
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
 		gio::write( unit, Format_710 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700b, flags); }
 		gio::write(unit, Format_710);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
-		gio::write(unit, Format_7011);
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
-		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7011, flags ); }
 		gio::write( unit, Format_707 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7021, flags ); }
-		gio::write( unit, Format_708 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7011b, flags ); }
+		gio::write( unit, Format_707 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		// Vertices are not applicable for window frame and divider, so skip 707
+		gio::write(unit, Format_7011c);
 	} else { // Vertices only
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
 		gio::write( unit, Format_710 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700b, flags); }
 		gio::write(unit, Format_710);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
-		gio::write(unit, Format_7011);
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
-		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7012, flags ); }
 		gio::write( unit, Format_707 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
-		gio::write( unit, Format_708 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7012, flags ); }
+		gio::write( unit, Format_707 );
+		// Vertices are not applicable for window frame and divider, so skip 701c here
 	}
 
 	// Do just "detached" shading first
@@ -1903,6 +1896,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 				// prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
 				if ( Surface( surf ).Construction > 0 && Surface( surf ).Construction <= TotConstructs ) {
 					cNominalUwithConvCoeffs = "";
+					ConstructionName = Construct( Surface( surf ).Construction ).Name;
 					{ auto const SELECT_CASE_var( Surface( surf ).Class );
 					if ( SELECT_CASE_var == SurfaceClass_Wall ) {
 						// Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
