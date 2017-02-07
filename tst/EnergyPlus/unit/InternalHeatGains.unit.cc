@@ -245,6 +245,13 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortM
 		"    For: AllDays,            !- Field 2",
 		"    Until: 24:00,1.0;        !- Field 3",
 
+		"  Schedule:Compact,",
+		"    Activity Sch,    !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,           !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,1.0;        !- Field 3",
+
 		"Zone,LIVING ZONE;",
 
 		"People,",
@@ -257,7 +264,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortM
 		", !- Zone Floor Area per Person{ m2 / person }",
 		"0.3000000, !- Fraction Radiant",
 		", !- Sensible Heat Fraction",
-		", !- Activity Level Schedule Name",
+		"Activity Sch, !- Activity Level Schedule Name",
 		"3.82E-8, !- Carbon Dioxide Generation Rate{ m3 / s - W }",
 		", !- Enable ASHRAE 55 Comfort Warnings",
 		"zoneaveraged, !- Mean Radiant Temperature Calculation Type",
@@ -285,6 +292,11 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortM
 	ScheduleManager::Schedule( 1 ).MinValue = 1.0;
 	ScheduleManager::Schedule( 1 ).MaxValue = 1.0;
 	ScheduleManager::Schedule( 1 ).MaxMinSet = true;
+	ScheduleManager::Schedule( 2 ).Used = true;;
+	ScheduleManager::Schedule( 2 ).CurrentValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MinValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MaxValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MaxMinSet = true;
 	InternalHeatGains::GetInternalHeatGainsInput( );
 
 	EXPECT_FALSE( InternalHeatGains::ErrorsFound );

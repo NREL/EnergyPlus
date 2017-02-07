@@ -19678,11 +19678,11 @@ People,
        \minimum 0.0
        \maximum 1.0
   A5 , \field Activity Level Schedule Name
+       \required-field
        \note Note that W has to be converted to mets in TC routine
        \type object-list
        \note units in schedule are W/person
        \object-list ScheduleNames
-       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   N6 , \field Carbon Dioxide Generation Rate
        \note CO2 generation rate per unit of activity level.
        \type real
@@ -19732,7 +19732,7 @@ People,
        \type object-list
        \object-list ScheduleNames
        \note units in the schedule are m/s
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A14, \field Thermal Comfort Model 1 Type
        \type choice
        \key Fanger
