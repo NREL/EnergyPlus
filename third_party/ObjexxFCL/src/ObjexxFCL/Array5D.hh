@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -73,12 +73,9 @@ public: // Types
 
 	typedef  std::function< void( Array5D< T > & ) >  InitializerFunction;
 
-	using Super::assign;
-	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
 	using Super::index;
-	using Super::initialize;
 	using Super::isize1;
 	using Super::isize2;
 	using Super::isize3;
@@ -89,24 +86,31 @@ public: // Types
 	using Super::l3;
 	using Super::l4;
 	using Super::l5;
-	using Super::move_if;
 	using Super::operator ();
 	using Super::operator [];
-	using Super::resize;
-	using Super::shift_set;
-	using Super::shift_only_set;
 	using Super::size1;
 	using Super::size2;
 	using Super::size3;
 	using Super::size4;
 	using Super::size5;
-	using Super::size_of;
-	using Super::swap5;
 	using Super::u1;
 	using Super::u2;
 	using Super::u3;
 	using Super::u4;
 	using Super::u5;
+
+protected: // Types
+
+	using Super::assign;
+	using Super::clear_move;
+	using Super::initialize;
+	using Super::move_if;
+	using Super::resize;
+	using Super::shift_set;
+	using Super::shift_only_set;
+	using Super::size_of;
+	using Super::swap5;
+
 	using Super::data_;
 	using Super::I1_;
 	using Super::I2_;
