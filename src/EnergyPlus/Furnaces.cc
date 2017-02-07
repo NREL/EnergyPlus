@@ -6369,7 +6369,7 @@ namespace Furnaces {
 							//  because Node(FurnaceOutletNode)%Temp will have been calc'd with full DX heat in last faux call to CalcFurnaceOutput
 
 							deltaT = ( Furnace( FurnaceNum ).DesignMaxOutletTemp - TempOutHeatingCoil );
-							HeatCoilLoad -= ( Node( FurnaceInletNode ).MassFlowRate * cpair * deltaT );
+							HeatCoilLoad += ( Node( FurnaceInletNode ).MassFlowRate * cpair * deltaT );
 							HeatCoilLoad = max( 0.0, HeatCoilLoad );
 						}
 					} else {
