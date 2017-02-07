@@ -60,10 +60,8 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -280,5 +278,84 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 
 	CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 	EXPECT_NEAR( 0.2444, Zone( 1 ).InfilOAAirChangeRateHM, 0.01 );
+
+	// Deallocate everything
+	Zone.deallocate();
+	HybridModelZone.deallocate();
+	AirModel.deallocate();
+	ZTM1.deallocate();
+	ZTM2.deallocate();
+	ZTM3.deallocate();
+	XMAT.deallocate();
+	XM2T.deallocate();
+	XM3T.deallocate();
+	ZTOC.deallocate();
+	ZTOC.deallocate();
+	ZTMX.deallocate();
+	ZTM1MX.deallocate();
+	ZTM1.deallocate();
+	WZoneTimeMinus1Temp.deallocate();
+	WZoneTimeMinus2Temp.deallocate();
+	WZoneTimeMinus3Temp.deallocate();
+	WZoneTimeMinus1.deallocate();
+	WZoneTimeMinus2.deallocate();
+	WZoneTimeMinus3.deallocate();
+	AIRRAT.deallocate();
+	ZoneAirHumRat.deallocate();
+	NonAirSystemResponse.deallocate();
+	SysDepZoneLoadsLagged.deallocate();
+	AirflowNetworkExchangeData.deallocate();
+	Node.deallocate();
+	TempTstatAir.deallocate();
+	LoadCorrectionFactor.deallocate();
+	MAT.deallocate();
+	ZT.deallocate();
+	PreviousMeasuredZT1.deallocate();
+	PreviousMeasuredZT2.deallocate();
+	PreviousMeasuredZT3.deallocate();
+	MCPI.deallocate();
+	MCPV.deallocate();
+	MCPM.deallocate();
+	MCPE.deallocate();
+	MCPC.deallocate();
+	MDotCPOA.deallocate();
+	MDotOA.deallocate();
+	MCPTI.deallocate();
+	MCPTV.deallocate();
+	MCPTM.deallocate();
+	MCPTE.deallocate();
+	MCPTC.deallocate();
+	SurfaceWindow.deallocate();
+	Surface.deallocate();
+	HConvIn.deallocate();
+	SNLoadHeatRate.deallocate();
+	SNLoadCoolRate.deallocate();
+	SNLoadHeatEnergy.deallocate();
+	SNLoadCoolEnergy.deallocate();
+	ZoneAirRelHum.deallocate();
+	IsZoneDV.deallocate();
+	ZoneDVMixedFlag.deallocate();
+	ZnAirRpt.deallocate();
+	ZoneEquipConfig.deallocate();
+	ZoneIntGain.deallocate();
+	ZoneEqSizing.deallocate();
+	ZoneLatentGain.deallocate();
+	SumLatentHTRadSys.deallocate();
+	SumHmARaW.deallocate();
+	SumConvHTRadSys.deallocate();
+	SumConvPool.deallocate();
+	SumHmARa.deallocate();
+	MixingMassFlowXHumRat.deallocate();
+	MixingMassFlowZone.deallocate();
+	ZoneW1.deallocate();
+	ZoneAirHumRatTemp.deallocate();
+	WZoneTimeMinus1Temp.deallocate();
+	WZoneTimeMinus2Temp.deallocate();
+	WZoneTimeMinus3Temp.deallocate();
+	SumLatentPool.deallocate();
+	OAMFL.deallocate();
+	VAMFL.deallocate();
+	EAMFL.deallocate();
+	CTMFL.deallocate();
 
 }
