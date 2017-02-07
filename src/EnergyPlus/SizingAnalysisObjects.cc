@@ -603,7 +603,8 @@ namespace EnergyPlus {
 				PlantLoop( plantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
 			}
 			if ( PlantLoop( plantLoopIndex ).VolumeWasAutoSized ) {
-				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+				// Note this calculation also appears in PlantManager::SizePlantLoop and PlantManager::ResizePlantLoopLevelSizes
+				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * PlantLoop( plantLoopIndex ).CirculationTime * 60.0;
 				PlantLoop( plantLoopIndex ).Mass = PlantLoop( plantLoopIndex ).Volume* densityForSizing;
 			}
 

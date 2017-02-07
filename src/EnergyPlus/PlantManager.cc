@@ -3281,6 +3281,7 @@ namespace PlantManager {
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
 			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::ResizePlantLoopLevelSizes and SizingAnalysisObjects::ResolveDesignFlowRate 
 			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if (PlantFinalSizesOkayToReport) {
 				if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
@@ -3445,6 +3446,7 @@ namespace PlantManager {
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
 			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::SizePlantLoop and SizingAnalysisObjects::ResolveDesignFlowRate 
 			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 				// condenser loop vs plant loop breakout needed.
