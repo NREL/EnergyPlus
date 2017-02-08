@@ -50,6 +50,7 @@
 #include <ChillerElectricEIR.hh>
 #include <ChillerIndirectAbsorption.hh>
 #include <ChillerReformulatedEIR.hh>
+#include <CondenserLoopTowers.hh>
 #include <CurveManager.hh>
 #include <DataPrecisionGlobals.hh>
 #include <Fans.hh>
@@ -127,8 +128,8 @@ namespace FaultsManager {
 	int const iFault_Fouling_AirFilter( 109 );
 	int const iFault_TemperatureSensorOffset_ChillerSupplyWater( 110 );
 	int const iFault_TemperatureSensorOffset_CondenserSupplyWater( 111 );
-	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 112 );
-	int const iFault_Fouling_Tower( 113 );
+	int const iFault_Fouling_Tower( 112 );
+	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 113 );
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -163,8 +164,8 @@ namespace FaultsManager {
 	"FaultModel:Fouling:AirFilter",
 	"FaultModel:TemperatureSensorOffset:ChillerSupplyWater",
 	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
-	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
-	"FaultModel:Fouling:tower"
+	"FaultModel:Fouling:CoolingTower",
+	"FaultModel:TemperatureSensorOffset:CoilSupplyAir"
 	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -201,7 +202,7 @@ namespace FaultsManager {
 	int NumFaultyAirFilter( 0 ); // Total number of fouled air filters
 	int NumFaultyChillerSWTSensor( 0 );  // Total number of faulty Chillers Supply Water Temperature Sensor
 	int NumFaultyCondenserSWTSensor( 0 );  // Total number of faulty Condenser Supply Water Temperature Sensor
-	int NumFaultyTowerScaling( 0 );  // Total number of faulty Towers with Scaling
+	int NumFaultyTowerFouling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
 	
 	// SUBROUTINE SPECIFICATIONS:
@@ -213,8 +214,8 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
-	Array1D< FaultProperties > FaultsCondenserSWTSensor;
-	Array1D< FaultProperties > FaultsTowerScaling;
+	Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
+	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	Array1D< FaultProperties > FaultsCoilSATSensor;
 
 	// Functions
@@ -280,7 +281,7 @@ namespace FaultsManager {
 		// check number of faults
 		NumFaults = 0;
 		NumFaultyEconomizer = 0;
-		for ( int NumFaultsTemp = 0, i = 1; i <= 10; ++i ){ //@@ i <= NumFaultTypes
+		for ( int NumFaultsTemp = 0, i = 1; i <= 12; ++i ){ //@@ i <= NumFaultTypes
 			NumFaultsTemp = GetNumObjectsFound( cFaults( i ) );
 			NumFaults += NumFaultsTemp;
 			
@@ -307,7 +308,7 @@ namespace FaultsManager {
 				NumFaultyCondenserSWTSensor = NumFaultsTemp; 
 			} else if( i == 12 ) {
 				// 12th fault: Faulty Towers with Scaling
-				NumFaultyTowerScaling = NumFaultsTemp;
+				NumFaultyTowerFouling = NumFaultsTemp;
 			} else if( i == 13 ) {
 				// 13th fault: Faulty Coil Supply Air Temperature Sensor
 				NumFaultyCoilSATSensor = NumFaultsTemp;  
@@ -333,9 +334,170 @@ namespace FaultsManager {
 		if( NumFaultyAirFilter > 0 ) FaultsFouledAirFilters.allocate( NumFaultyAirFilter );
 		if( NumFaultyChillerSWTSensor > 0 ) FaultsChillerSWTSensor.allocate( NumFaultyChillerSWTSensor );
 		if( NumFaultyCondenserSWTSensor > 0 ) FaultsCondenserSWTSensor.allocate( NumFaultyCondenserSWTSensor );
-		if( NumFaultyTowerScaling > 0 ) FaultsTowerScaling.allocate( NumFaultyTowerScaling );
+		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 
+		// read faults input of Fault_type 112: Cooling tower scaling
+		for ( int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling ) {
+
+			cFaultCurrentObject = cFaults( 12 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_TowerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsTowerFouling( jFault_TowerFouling ).FaultType = cFaultCurrentObject;
+			FaultsTowerFouling( jFault_TowerFouling ).FaultTypeEnum = iFault_Fouling_Tower;
+			FaultsTowerFouling( jFault_TowerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsTowerFouling( jFault_TowerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsTowerFouling( jFault_TowerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// UAReductionFactor - degree of fault
+			FaultsTowerFouling( jFault_TowerFouling ).UAReductionFactor = rNumericArgs( 1 );
+			
+			// Cooling tower type
+			FaultsTowerFouling( jFault_TowerFouling ).TowerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Cooling tower name
+			FaultsTowerFouling( jFault_TowerFouling ).TowerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Tower check and link
+			{
+				// Read in tower input if not done yet
+				if ( CondenserLoopTowers::GetInput ) {
+					CondenserLoopTowers::GetTowerInput();
+					CondenserLoopTowers::GetInput = false;
+				}
+				// Check the tower name and tower type
+				int TowerNum = FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower );
+				if ( TowerNum <= 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+					ErrorsFound = true;
+				} else {
+				// Link the tower with the fault model
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = true;
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingIndex = jFault_TowerFouling;
+					
+					// Check the faulty tower type
+					if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
+						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type in the fault model is updated. " );
+						FaultsTowerFouling( jFault_TowerFouling ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
+					}
+					
+					// Check the tower model
+					// Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
+					if ( CondenserLoopTowers::SimpleTower( TowerNum ).PerformanceInputMethod_Num != CondenserLoopTowers::PIM_UFactor ) {
+						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaFieldNames( 5 ) + ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " + "The tower fouling fault model will not be applied to the tower. " );
+						CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = false;
+					}
+				}
+			}
+		}
+		
+		// read faults input of Fault_type 111: Condenser SWT Sensor Offset
+		for ( int jFault_CondenserSWT = 1; jFault_CondenserSWT <= NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT ) {
+
+			cFaultCurrentObject = cFaults( 11 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_CondenserSWT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).FaultType = cFaultCurrentObject;
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).FaultTypeEnum = iFault_TemperatureSensorOffset_CondenserSupplyWater;
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsCondenserSWTSensor( jFault_CondenserSWT ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsCondenserSWTSensor( jFault_CondenserSWT ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsCondenserSWTSensor( jFault_CondenserSWT ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsCondenserSWTSensor( jFault_CondenserSWT ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsCondenserSWTSensor( jFault_CondenserSWT ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsCondenserSWTSensor( jFault_CondenserSWT ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// offset - degree of fault
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).Offset = rNumericArgs( 1 );
+			
+			// Cooling tower type
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Cooling tower name
+			FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Tower check and link
+			{
+				// Read in tower input if not done yet
+				if ( CondenserLoopTowers::GetInput ) {
+					CondenserLoopTowers::GetTowerInput();
+					CondenserLoopTowers::GetInput = false;
+				}
+				// Check the tower name and tower type
+				int TowerNum = FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower );
+				if ( TowerNum <= 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+					ErrorsFound = true;
+				} else {
+				// Link the tower with the fault model
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTFlag = true;
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTIndex = jFault_CondenserSWT;
+					
+					// Check the faulty tower type
+					if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType )) {
+						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type is updated. " );
+						FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
+					}
+				}
+			}
+		}
+		
 		// read faults input of Fault_type 110: Chiller SWT Sensor Offset
 		for ( int jFault_ChillerSWT = 1; jFault_ChillerSWT <= NumFaultyChillerSWTSensor; ++jFault_ChillerSWT ) {
 
@@ -427,7 +589,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
 						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
 						ChillerReformulatedEIR::GetInputREIR = false;
@@ -872,6 +1034,45 @@ namespace FaultsManager {
 		return OffsetAct;
 	}
 
+	Real64
+	FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Jul. 2016
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To calculate the dynamic tower fouling factor based on the fault availability schedule and severity schedule.
+		// Fouling factor is the ratio between the UA value at fouling case and that at fault free case
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using ScheduleManager::GetCurrentScheduleValue;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FaultFac( 0.0 ); // fault modification factor
+		Real64 UAReductionFactorAct( 1.0 ); // actual UA Reduction Factor, ratio between the UA value at fouling case and that at fault free case
+
+		// FLOW
+		
+		// Check fault availability schedules
+		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
+		
+			// Check fault severity schedules 
+			if ( this->SeveritySchedPtr >= 0 ) {
+				FaultFac = GetCurrentScheduleValue( this->SeveritySchedPtr );
+			} else {
+				FaultFac = 1.0;
+			}
+		}
+		
+		// The more severe the fouling fault is (i.e., larger FaultFac), the less the UAReductionFactor is
+		if( FaultFac > 0.0 ) UAReductionFactorAct = min( this->UAReductionFactor / FaultFac, 1.0 );
+
+		return UAReductionFactorAct;
+	}
+
 	void
 	FaultPropertiesChillerSWT::CalFaultChillerSWT(
 		bool FlagVariableFlow, // True if chiller is variable flow and false if it is constant flow
@@ -998,7 +1199,7 @@ namespace FaultsManager {
 		NumFaultyAirFilter = 0;
 		NumFaultyChillerSWTSensor = 0;
 		NumFaultyCondenserSWTSensor = 0;
-		NumFaultyTowerScaling = 0;
+		NumFaultyTowerFouling = 0;
 		NumFaultyCoilSATSensor = 0;
 
 		FaultsEconomizer.deallocate();
@@ -1008,7 +1209,7 @@ namespace FaultsManager {
 		FaultsFouledAirFilters.deallocate();
 		FaultsChillerSWTSensor.deallocate();
 		FaultsCondenserSWTSensor.deallocate();
-		FaultsTowerScaling.deallocate();
+		FaultsTowerFouling.deallocate();
 		FaultsCoilSATSensor.deallocate();
 	}
 
