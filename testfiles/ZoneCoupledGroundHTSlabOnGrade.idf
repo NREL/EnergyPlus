@@ -239,24 +239,13 @@ Material,
 
 !- =========== ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
-<<<<<<< HEAD
   Construction,
-    Floor Construction,      !- Name
-    Insulation,              !- Outside Layer
-    Slab Material;           !- Layer 2
-
-  Construction,
-    Roof Construction,       !- Name
-    Roof Layer 1;            !- Outside Layer
-=======
-    Construction,
     Floor Construction, !- Name
     Slab Material-Top Layer; !- Layer 2
 
-    Construction,
+  Construction,
     Roof Construction, !- Name
     Roof Layer 1; !- Outside Layer
->>>>>>> 8b4bc74666a5b68f0e444491c7f8d417876b4ed6
 
 !***********************************************************
 !****** ABOVE-GROUND MATERIALS/CONSTRUCTIONS ***************
@@ -520,10 +509,6 @@ Material,
     None,                    !- Heat Recovery Type
     0.7,                     !- Sensible Heat Recovery Effectiveness {dimensionless}
     0.65;                    !- Latent Heat Recovery Effectiveness {dimensionless}
-<<<<<<< HEAD
-
-=======
->>>>>>> 8b4bc74666a5b68f0e444491c7f8d417876b4ed6
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
