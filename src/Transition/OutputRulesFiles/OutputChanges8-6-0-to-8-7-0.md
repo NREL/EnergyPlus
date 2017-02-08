@@ -38,6 +38,7 @@ Heading rows that represented multiple data rows using slashes were broken up in
 - "Zone Internal Gains/Equipment Information" changed to separate rows labeled "Zone Internal Gains Nominal" and "Equipment Gains Nominal"
 - "Zone/Shading Surfaces" changed to separate rows labeled "Zone Surfaces" and "Shading Surfaces"
 - "HeatTransfer/Shading/Frame/Divider_Surface" changed to separate rows labeled "HeatTransfer Surface", "Shading Surface" and "Frame/Divider Surface"
+- For these surface reports, the separate "Units" header has been deleted and the units are part of each heading row.
 
 Underscores were removed from row labels:
 
