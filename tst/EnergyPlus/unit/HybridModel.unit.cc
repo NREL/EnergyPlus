@@ -101,8 +101,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 {
 
 	// ZoneTempPredictorCorrector variable initialization 
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 	Zone.allocate( 1 );
 	HybridModelZone.allocate( 1 );
 	AirModel.allocate( 1 );
@@ -205,6 +203,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	NumZoneReturnPlenums = 0;
 	NumZoneSupplyPlenums = 0;
 	SimulateAirflowNetwork = 0;
+	Zone( 1 ).IsControlled = true;
 	Zone( 1 ).Multiplier = 1;
 	Zone( 1 ).SystemZoneNodeNumber = 1;
 	Zone( 1 ).SurfaceFirst = 1;
