@@ -1889,7 +1889,8 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 				IntConvCoeffCalc = ConvCoeffCalcs( Zone( ZoneNum ).InsideConvectionAlgo );
 				ExtConvCoeffCalc = ConvCoeffCalcs( Zone( ZoneNum ).OutsideConvectionAlgo );
 
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "HeatTransfer" << Surface( surf ).Name << cSurfaceClass( Surface( surf ).Class ) << BaseSurfName << AlgoName; }
+				if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "HeatTransfer Surface," << Surface( surf ).Name << "," << cSurfaceClass( Surface( surf ).Class ) << "," << BaseSurfName << "," << AlgoName << ",";
+//				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "HeatTransfer" << Surface( surf ).Name << cSurfaceClass( Surface( surf ).Class ) << BaseSurfName << AlgoName; }
 
 				// NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.cc IN SetupZoneGeometry
 				// Calculate Nominal U-value with convection/film coefficients for reporting by adding on
@@ -1951,7 +1952,8 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					ConstructionName = "**invalid**";
 				}
 
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7041, flags ) << ConstructionName << cNominalU << cNominalUwithConvCoeffs << SolarDiffusing << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ) << RoundSigDigits( Surface( surf ).Reveal, 2 ); }
+				if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << ConstructionName << "," << cNominalU << "," << cNominalUwithConvCoeffs << "," << SolarDiffusing << "," << RoundSigDigits( Surface( surf ).Area, 2 ) << "," << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << "," << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << "," << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << "," << RoundSigDigits( Surface( surf ).Tilt, 2 ) << "," << RoundSigDigits( Surface( surf ).Width, 2 ) << "," << RoundSigDigits( Surface( surf ).Height, 2 ) << "," << RoundSigDigits( Surface( surf ).Reveal, 2 ) << ",";
+//				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7041, flags ) << ConstructionName << cNominalU << cNominalUwithConvCoeffs << SolarDiffusing << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ) << RoundSigDigits( Surface( surf ).Reveal, 2 ); }
 				if ( Surface( surf ).IntConvCoeff > 0 ) {
 					{ auto const SELECT_CASE_var( UserIntConvectionCoeffs( Surface( surf ).IntConvCoeff ).OverrideType );
 					if ( SELECT_CASE_var == ConvCoefValue ) {
@@ -1981,52 +1983,67 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					ExtConvCoeffCalc = ConvCoeffCalcs( std::abs( Surface( surf ).ExtConvCoeff ) );
 				}
 				if ( Surface( surf ).ExtBoundCond == ExternalEnvironment ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "ExternalEnvironment"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << ExtConvCoeffCalc; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "ExternalEnvironment" << "," << ExtConvCoeffCalc << "," << IntConvCoeffCalc << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "ExternalEnvironment"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << ExtConvCoeffCalc; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				} else if ( Surface( surf ).ExtBoundCond == Ground ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Ground"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-Ground"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "Ground" << "," << "N/A-Ground" << "," << IntConvCoeffCalc << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Ground"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-Ground"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				} else if ( Surface( surf ).ExtBoundCond == GroundFCfactorMethod ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "FCGround"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-FCGround"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "FCGround" << "," << "N/A-FCGround" << "," << IntConvCoeffCalc << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "FCGround"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-FCGround"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCoefNoCalcExt || Surface( surf ).ExtBoundCond == OtherSideCoefCalcExt ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSC( Surface( surf ).OSCPtr ).Name; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSC"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << OSC( Surface( surf ).OSCPtr).Name << "," << "N/A-OSC" << "," << IntConvCoeffCalc << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSC( Surface( surf ).OSCPtr ).Name; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSC"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCondModeledExt ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSCM( Surface( surf ).OSCMPtr ).Name; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSCM"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << OSCM( Surface( surf ).OSCMPtr).Name << "," << "N/A-OSCM" << "," << IntConvCoeffCalc << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSCM( Surface( surf ).OSCMPtr ).Name; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSCM"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << Surface( surf ).ExtBoundCondName; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Other/Same Surface Int Conv"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << Surface( surf ).ExtBoundCondName << "," << "Other/Same Surface Int Conv" << "," << IntConvCoeffCalc << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << Surface( surf ).ExtBoundCondName; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Other/Same Surface Int Conv"; }
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				}
 				if ( Surface( surf ).ExtSolar ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "SunExposed"; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "SunExposed" << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "SunExposed"; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "NoSun"; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "NoSun" << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "NoSun"; }
 				}
 				if ( Surface( surf ).ExtWind ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "WindExposed"; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "WindExposed" << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "WindExposed"; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "NoWind"; }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << "NoWind" << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "NoWind"; }
 				}
 				if ( RptType == 10 ) {
-					gio::write( unit, Format_706 ) << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << TrimSigDigits( Surface( surf ).Sides );
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << "," << TrimSigDigits( Surface( surf ).Sides ) << DataStringGlobals::NL;
+//					gio::write( unit, Format_706 ) << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << TrimSigDigits( Surface( surf ).Sides );
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_706, flags ) << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << TrimSigDigits( Surface( surf ).Sides ); }
+					if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << "," << TrimSigDigits( Surface( surf ).Sides ) << ",";
+//					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_706, flags ) << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << TrimSigDigits( Surface( surf ).Sides ); }
 					for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 						if ( vert != Surface( surf ).Sides ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_709, flags ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ); }
+						if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << ",";
+//							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_709, flags ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ); }
 						} else {
-							gio::write( unit, Format_709 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 );
+							if ( DataGlobals::eio_stream ) *DataGlobals::eio_stream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << DataStringGlobals::NL;
+//							gio::write( unit, Format_709 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 );
 						}
 					}
-					if ( Surface( surf ).Sides == 0 ) gio::write( unit, Format_711 );
+					if ( (Surface(surf).Sides == 0) && ( DataGlobals::eio_stream ) ) *DataGlobals::eio_stream << DataStringGlobals::NL;
+//					if ( Surface( surf ).Sides == 0 ) gio::write( unit, Format_711 );
 				}
 				// if window, report frame/divider as appropriate
 				if ( Surface( surf ).FrameDivider > 0 ) {

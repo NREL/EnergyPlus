@@ -1329,6 +1329,7 @@ namespace SimulationManager {
 		if ( write_stat != 0 ) {
 			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );
 		}
+		eio_stream = gio::out_stream( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
 
 		// Open the Meters Output File
@@ -1533,6 +1534,7 @@ namespace SimulationManager {
 		// Close the Initialization Output File
 		gio::write( OutputFileInits, EndOfDataFormat );
 		gio::close( OutputFileInits );
+		eio_stream = nullptr;
 
 		// Close the Meters Output File
 		gio::write( OutputFileMeters, EndOfDataFormat );
