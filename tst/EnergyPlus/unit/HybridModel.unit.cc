@@ -125,10 +125,8 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	XM2T.allocate( 1 );
 	XM3T.allocate( 1 );
 	ZTOC.allocate( 1 );
-	ZTOC.allocate( 1 );
 	ZTMX.allocate( 1 );
 	ZTM1MX.allocate( 1 );
-	ZTM1.allocate( 1 );
 	WZoneTimeMinus1Temp.allocate( 1 );
 	WZoneTimeMinus2Temp.allocate( 1 );
 	WZoneTimeMinus3Temp.allocate( 1 );
@@ -206,9 +204,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	MixingMassFlowZone.allocate( 1 );
 	ZoneW1.allocate( 1 );
 	ZoneAirHumRatTemp.allocate( 1 );
-	WZoneTimeMinus1Temp.allocate( 1 );
-	WZoneTimeMinus2Temp.allocate( 1 );
-	WZoneTimeMinus3Temp.allocate( 1 );
 	SumLatentPool.allocate( 1 );
 	SumLatentPool( 1 ) = 0.0;
 	OAMFL.allocate( 1 );
@@ -290,10 +285,8 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	XM2T.deallocate();
 	XM3T.deallocate();
 	ZTOC.deallocate();
-	ZTOC.deallocate();
 	ZTMX.deallocate();
 	ZTM1MX.deallocate();
-	ZTM1.deallocate();
 	WZoneTimeMinus1Temp.deallocate();
 	WZoneTimeMinus2Temp.deallocate();
 	WZoneTimeMinus3Temp.deallocate();
@@ -349,9 +342,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	MixingMassFlowZone.deallocate();
 	ZoneW1.deallocate();
 	ZoneAirHumRatTemp.deallocate();
-	WZoneTimeMinus1Temp.deallocate();
-	WZoneTimeMinus2Temp.deallocate();
-	WZoneTimeMinus3Temp.deallocate();
 	SumLatentPool.deallocate();
 	OAMFL.deallocate();
 	VAMFL.deallocate();
