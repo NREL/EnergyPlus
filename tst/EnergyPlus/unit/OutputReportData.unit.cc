@@ -109,23 +109,24 @@ TEST_F( EnergyPlusFixture, OutputReportData_getVariableKeys )
 TEST_F( EnergyPlusFixture, OutputReportData_Regex )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "Outside Air Inlet Node,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "Relief Air Outlet Node,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "(Relief|Outside) Air (Outlet|Inlet) Node,", "System Node Temperature,", "timestep;",
-			                                                 " Output:Variable,", "Mixed Air Node,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "(Mixed|Single) Air Node,", "System Node Temperature,", "timestep;",
-			                                                 " Output:Variable,", "*,", "Unitary System Compressor Part Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", ".*,", "Zone Air System Sensible Heating Rate,", "timestep;",
-			                                                 " Output:Variable,", "SALESFLOOR OUTLET NODE,", "System Node Temperature,", "timestep;",
-			                                                 " Output:Variable,", "BackRoom(.*),", "System Node Temperature,", "timestep;",
-			                                                 " Output:Variable,", "(.*)N(ode|ODE),", "System Node Humidity Ratio,", "timestep;",
-	                                                 });
-	ASSERT_TRUE( process_idf( idf_objects ) );
+		"Version,8.6;",
+		" Output:Variable,", "Outside Air Inlet Node,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "Relief Air Outlet Node,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "(Relief|Outside) Air (Outlet|Inlet) Node,", "System Node Temperature,", "timestep;",
+		" Output:Variable,", "Mixed Air Node,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "(Mixed|Single) Air Node,", "System Node Temperature,", "timestep;",
+		" Output:Variable,", "*,", "Unitary System Compressor Part Load Ratio,", "timestep;",
+		" Output:Variable,", ".*,", "Zone Air System Sensible Heating Rate,", "timestep;",
+		" Output:Variable,", "SALESFLOOR OUTLET NODE,", "System Node Temperature,", "timestep;",
+		" Output:Variable,", "BackRoom(.*),", "System Node Temperature,", "timestep;",
+		" Output:Variable,", "(.*)N(ode|ODE),", "System Node Humidity Ratio,", "timestep;",
+	});
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	// EnergyPlus::InputProcessor::PreScanReportingVariables();
 	bool OnTheList;
 
-	EXPECT_EQ( (int)OutputVariablesNames.size(), 5);
-	EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 10);
+	EXPECT_EQ( OutputVariablesNames.size(), 5u );
+	EXPECT_EQ( OutputVariablesForSimulation.size(), 10u );
 
 	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
@@ -162,19 +163,20 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex )
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "(.+)Inlet(.+),", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "(.+)Inlet,", "System Node Humidity Ratio,", "timestep;",
-			                                                 " Output:Variable,", "(.+)Node,", "Zone Air System Sensible Heating Rate,", "timestep;",
-			                                                 " Output:Variable,", "Outside Air (.+) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", "Outside Air .+ Node,", "Unitary System Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", ".+,", "System Node Temperature,", "timestep;",
-	                                                 });
-	ASSERT_TRUE( process_idf( idf_objects ) );
+		"Version,8.6;",
+		" Output:Variable,", "(.+)Inlet(.+),", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "(.+)Inlet,", "System Node Humidity Ratio,", "timestep;",
+		" Output:Variable,", "(.+)Node,", "Zone Air System Sensible Heating Rate,", "timestep;",
+		" Output:Variable,", "Outside Air (.+) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
+		" Output:Variable,", "Outside Air .+ Node,", "Unitary System Load Ratio,", "timestep;",
+		" Output:Variable,", ".+,", "System Node Temperature,", "timestep;",
+	});
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	// EnergyPlus::InputProcessor::PreScanReportingVariables();
 	bool OnTheList;
 
-	EXPECT_EQ( (int)OutputVariablesNames.size(), 6);
-	EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 6);
+	EXPECT_EQ( OutputVariablesNames.size(), 6u );
+	EXPECT_EQ( OutputVariablesForSimulation.size(), 6u );
 
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
@@ -199,20 +201,21 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "(.*)Inlet(.*),", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "(.*)Inlet,", "System Node Humidity Ratio,", "timestep;",
-			                                                 " Output:Variable,", "(.*)Node,", "Zone Air System Sensible Heating Rate,", "timestep;",
-			                                                 " Output:Variable,", "Outside Air(.*) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", "Outside Air.* Node,", "Unitary System Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", ".*,", "System Node Temperature,", "timestep;",
-			                                                 " Output:Variable,", "*,", "Refrigeration Compressor Rack Electric Power,", "timestep;",
-	                                                 });
-	ASSERT_TRUE( process_idf( idf_objects ) );
+		"Version,8.6;",
+		" Output:Variable,", "(.*)Inlet(.*),", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "(.*)Inlet,", "System Node Humidity Ratio,", "timestep;",
+		" Output:Variable,", "(.*)Node,", "Zone Air System Sensible Heating Rate,", "timestep;",
+		" Output:Variable,", "Outside Air(.*) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
+		" Output:Variable,", "Outside Air.* Node,", "Unitary System Load Ratio,", "timestep;",
+		" Output:Variable,", ".*,", "System Node Temperature,", "timestep;",
+		" Output:Variable,", "*,", "Refrigeration Compressor Rack Electric Power,", "timestep;",
+	});
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	// EnergyPlus::InputProcessor::PreScanReportingVariables();
 	bool OnTheList;
 
-	EXPECT_EQ( (int)OutputVariablesNames.size(), 7);
-	EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 7);
+	EXPECT_EQ( OutputVariablesNames.size(), 7u );
+	EXPECT_EQ( OutputVariablesForSimulation.size(), 7u );
 
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
@@ -259,17 +262,18 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Pipe )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "SalesFloor I(nlet|NLET) Node,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "SalesFloor O(utlet|UTLET) Node,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "System (Inlet|Outlet) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", "(BackRoom|BACKROOM|SALESFLOOR|SalesFloor) (Outlet|OUTLET) (NODE|Node),", "System Node Humidity Ratio,", "timestep;",
-	                                                 });
-	ASSERT_TRUE( process_idf( idf_objects ) );
+		"Version,8.6;",
+		" Output:Variable,", "SalesFloor I(nlet|NLET) Node,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "SalesFloor O(utlet|UTLET) Node,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "System (Inlet|Outlet) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
+		" Output:Variable,", "(BackRoom|BACKROOM|SALESFLOOR|SalesFloor) (Outlet|OUTLET) (NODE|Node),", "System Node Humidity Ratio,", "timestep;",
+	});
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	// EnergyPlus::InputProcessor::PreScanReportingVariables();
 	bool OnTheList;
 
-	EXPECT_EQ( (int)OutputVariablesNames.size(), 3);
-	EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 4);
+	EXPECT_EQ( OutputVariablesNames.size(), 3u );
+	EXPECT_EQ( OutputVariablesForSimulation.size(), 4u );
 
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
@@ -298,17 +302,18 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Pipe )
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,", "timestep;",
-			                                                 " Output:Variable,", "[A-Z]{4},", "Unitary System Compressor Part Load Ratio,", "timestep;",
-			                                                 " Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
-	                                                 });
-	ASSERT_TRUE( process_idf( idf_objects ) );
+		"Version,8.6;",
+		" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,", "timestep;",
+		" Output:Variable,", "[A-Z]{4},", "Unitary System Compressor Part Load Ratio,", "timestep;",
+		" Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
+	});
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	// EnergyPlus::InputProcessor::PreScanReportingVariables();
 	bool OnTheList;
 
-	EXPECT_EQ( (int)OutputVariablesNames.size(), 4);
-	EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 4);
+	EXPECT_EQ( OutputVariablesNames.size(), 4u );
+	EXPECT_EQ( OutputVariablesForSimulation.size(), 4u );
 
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);

@@ -49,6 +49,7 @@
 
 // EnergyPlus Headers
 #include <DataOutputs.hh>
+#include <InputProcessor.hh>
 #include "internal/regex.h"
 #include "UtilityRoutines.hh"
 
@@ -142,32 +143,33 @@ namespace DataOutputs {
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		bool InVariableList = false;
 		int Found = 0;
-		auto const FirstIndex = OutputVariablesNames.find(VariableName);
+		std::string const uppercaseVariableName = InputProcessor::MakeUPPERCase( VariableName );
+		auto const FirstIndex = OutputVariablesNames.find( uppercaseVariableName );
 
-		if ( FirstIndex != OutputVariablesNames.end() ) Found = FirstIndex->second;
-			if ( Found != 0 ) {
-			do{
+		if ( FirstIndex != OutputVariablesNames.end() ) {
+			Found = FirstIndex->second;
+		}
+		if ( Found != 0 ) {
+			std::string const uppercaseKeyedValue = InputProcessor::MakeUPPERCase( KeyedValue );
+			do {
 				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
-					InVariableList = true;
-					break;
-				}else{
+					return true;
+				} else {
 					regex KeyRegex( OutputVariablesForSimulation( Found ).Key.c_str() );
 					if ( ! KeyRegex.IsValid() ) {
-						ShowFatalError("Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect");
+						ShowFatalError( "Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
 						break;
 					}
 					regex_search KeySearch( KeyRegex );
-					if ( KeySearch.Match( KeyedValue.c_str()) || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key) ) { //need to resolve lower/uppercase
-						InVariableList = true;
-						break;
+					if ( KeySearch.Match( uppercaseKeyedValue.c_str() ) || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) { //need to resolve lower/uppercase
+						return true;
 					}
 				}
 				Found = OutputVariablesForSimulation( Found ).Next;
-			}while( Found != 0 );
+			} while ( Found != 0 );
 		}
-		return InVariableList;
+		return false;
 	}
 
 } // DataOutputs
