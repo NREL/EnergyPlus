@@ -237,37 +237,37 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 		"    Until: 24:00, 0.0;       !- Field 11",
 	});
 
-	ASSERT_FALSE (process_idf (idf_objects));	
+	ASSERT_FALSE ( process_idf ( idf_objects ) );	
 
 	Real64 facilUse;
-	SetupOutputVariable ("Misc Facility Electric Energy [J]", facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility", "General"); //create an electric meter
+	SetupOutputVariable ( "Misc Facility Electric Energy [J]", facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility", "General" ); //create an electric meter
 
 	OutputProcessor::NumEnergyMeters = 2;
-	OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
-	OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
-	OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
+	OutputProcessor::EnergyMeters.allocate( OutputProcessor::NumEnergyMeters );
+	OutputProcessor::EnergyMeters( 1 ).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
+	OutputProcessor::EnergyMeters( 2 ).Name = "ELECTRICITY:LIGHTING";
 
 	DataGlobals::DoWeathSim = true;
 
 	OutputReportTabularAnnual::GetInputTabularAnnual();
 
-	EXPECT_EQ (OutputReportTabularAnnual::annualTables.size (), 1u);
+	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size (), 1u );
 
-	std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin ();
+	std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
 
 	firstTable->columnHeadersToTitleCase();
 
-	std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets (0);
-	EXPECT_EQ (fieldSetParams[ 0 ], "ONPEAKTIME"); //m_colHead
-	EXPECT_EQ (fieldSetParams[ 4 ], "4"); // m_typeOfVar = OutputProcessor::VarType_Schedule
+	std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets( 0 );
+	EXPECT_EQ ( fieldSetParams[ 0 ], "ONPEAKTIME" ); //m_colHead
+	EXPECT_EQ ( fieldSetParams[ 4 ], "4" ); // m_typeOfVar = OutputProcessor::VarType_Schedule
 
-	fieldSetParams = firstTable->inspectTableFieldSets (1);
-	EXPECT_EQ (fieldSetParams[ 0 ], "Electricity:Facility"); //m_colHead
-	EXPECT_EQ (fieldSetParams[ 4 ], "3"); // m_typeOfVar = OutputProcessor::VarType_Meter
+	fieldSetParams = firstTable->inspectTableFieldSets( 1 );
+	EXPECT_EQ ( fieldSetParams[ 0 ], "Electricity:Facility" ); //m_colHead
+	EXPECT_EQ ( fieldSetParams[ 4 ], "3" ); // m_typeOfVar = OutputProcessor::VarType_Meter
 
-	fieldSetParams = firstTable->inspectTableFieldSets (2);
-	EXPECT_EQ (fieldSetParams[ 0 ], "Misc Facility Electric Energy"); //m_colHead
-	EXPECT_EQ (fieldSetParams[ 4 ], "2"); // m_typeOfVar = OutputProcessor::VarType_Real
+	fieldSetParams = firstTable->inspectTableFieldSets( 2 );
+	EXPECT_EQ ( fieldSetParams[ 0 ], "Misc Facility Electric Energy" ); //m_colHead
+	EXPECT_EQ ( fieldSetParams[ 4 ], "2" ); // m_typeOfVar = OutputProcessor::VarType_Real
 
 
 }
