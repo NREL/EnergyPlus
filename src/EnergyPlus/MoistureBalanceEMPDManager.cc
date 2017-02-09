@@ -125,6 +125,7 @@ namespace MoistureBalanceEMPDManager {
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
 	Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
+	bool InitEnvrnFlag( true );
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 	//******************************************************************************
@@ -135,6 +136,7 @@ namespace MoistureBalanceEMPDManager {
 	clear_state()
 	{
 		EMPDReportVars.deallocate();
+		InitEnvrnFlag = true;
 	}
 
 	Real64
@@ -386,7 +388,6 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
 		int SurfNum;
-		static bool InitEnvrnFlag( true );
 
 		if ( InitEnvrnFlag ) {
 			RVSurfaceOld.allocate( TotSurfaces );
@@ -599,7 +600,7 @@ namespace MoistureBalanceEMPDManager {
 		}
 		// Calculate resistance between surface-layer/air interface and center of surface layer. [s/m]
 		// This is the physical surface of the material.
-		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd - Rcoating;
+		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd;
 
 		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
 		mass_flux_surf_deep_max = material.EMPDDeepDepth*material.Density*dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (TimeStepZone * 3600.0);
