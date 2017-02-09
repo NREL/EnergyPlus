@@ -148,7 +148,20 @@ TEST_F( EnergyPlusFixture, OutputReports_SurfaceDetailsReport )
 	SurfaceGeometry::GetSurfaceData( foundErrors ); // setup zone geometry and get zone data
 	EXPECT_FALSE( foundErrors ); // expect no errors
 
+	// reset eio stream
+	compare_eio_stream("", true);
+
 	DetailsForSurfaces( 10 ); // 10 = Details Only, Surface details report
-	EXPECT_TRUE( compare_eio_stream( "HeatTransfer Surface,FRONT-1,Wall,,CTF - ConductionTransferFunction,INT-WALL-1,2.811,1.978,,73.20,73.20,73.20,180.00,90.00,30.50,2.40,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"+DataStringGlobals::NL ) );
+	std::string const eiooutput = delimited_string({
+		"! <Zone Surfaces>,Zone Name,# Surfaces",
+		"! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
+		"! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs)/Min Schedule Value {W/m2-K},Nominal U (with film coefs)/Max Schedule Value {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides",
+		"! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value {W/m2-K},Nominal U (with film coefs)/Max Schedule Value {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides",
+		"! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs)/Min Schedule Value {W/m2-K},Nominal U (with film coefs)/Max Schedule Value {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}",
+		"Zone Surfaces,SPACE1,1",
+		"HeatTransfer Surface,FRONT-1,Wall,,CTF - ConductionTransferFunction,INT-WALL-1,2.811,1.978,,73.20,73.20,73.20,180.00,90.00,30.50,2.40,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"
+	});
+
+	EXPECT_TRUE( compare_eio_stream( eiooutput, true ) );
 
 }
