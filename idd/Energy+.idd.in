@@ -23313,6 +23313,7 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
       \required-field
       \type object-list
       \object-list FansZoneExhaust
+      \reference SurfaceAirflowLeakageNames
       \note Enter the name of a Fan:ZoneExhaust object.
  N1 , \field Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
       \required-field

@@ -538,7 +538,43 @@ The name of a controlled zone served by the air loop defined in the previous fie
 
 \paragraph{Field: Ventilation Control Mode Schedule Name}\label{field-ventilation-control-mode-schedule-name}
 
-The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time the hybrid ventilation control mode is to be applied. Schedule values equal to zero indicate no ventilation control, resulting in natural ventilation and HVAC system operation being performed based on their own controls. Schedule values equal to one denote temperature control for either cooling or heating, which is determined internally based on thermostat set point and temperature control type. The temperature control is restricted between the minimum and maximum outdoor temperatures provided in two additional input fields (below). Schedule values equal to two denote enthalpy control, which is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields (below). Schedule values equal to three denote dewpoint control for either dehumidification or humidification. Schedule values equal to four represent outdoor ventilation air control. The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects. Schedule values equal to five represent operative temperature control using 80\% acceptability limits. If the operative temperature is within the upper and lower 80\% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. Schedule values equal to six also represent operative temperature control using 90\% acceptability limits. If the operative temperature is within the upper and lower 90\% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. Schedule values equal to seven represent carbon dioxide (CO2) control. If the zone CO2 level is above the setpoint, the program will check the HVAC system availability first. If available, HVAC operation will be allowed, and natural ventilation is shut off. If the system is not available, the natural ventilation will be allowed.
+The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time the hybrid ventilation control mode is to be applied. The integer values are required in the schedule and should be varied between 0 and 7. The following bullets show each schedule value and its corresponding control mode:
+
+\begin{description}
+  \item
+  0 = No ventilation control
+  
+  Natural ventilation and HVAC system operation are performed based on their own controls.
+  \item
+  1 = Temperature control for either cooling or heating
+  
+  The control mode is determined internally based on thermostat set point and temperature control type and is restricted between the minimum and maximum outdoor temperatures provided in two additional input fields: Minimum Outdoor Temperature and Maximum Outdoor Temperature.
+  \item
+  2 = Enthalpy control
+  
+  The control is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields: Minimum Outdoor Enthalpy and Maximum Outdoor Enthalpy.
+  \item
+  3 = Dewpoint control for either dehumidification or humidification
+  \item
+  4 = Outdoor ventilation air control
+  
+  The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects.
+  \item
+  5 = Operative temperature control using adaptive comfort 80\% acceptability limits
+  
+  If the operative temperature is within the upper and lower 80\% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off.
+  This control model requires the choice = AdaptiveASH55 in one of Thermal Comfort Model Type fields of the People object in the same controlled zone.
+  \item
+  6 = Operative temperature control using adaptive comfort 90\% acceptability limits
+  
+  If the operative temperature is within the upper and lower 90\% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off.
+  This control model requires the choice = AdaptiveASH55 in one of Thermal Comfort Model Type fields of the People object in the same controlled zone.
+  \item
+  7 = Carbon dioxide (CO2) control
+   
+  If the zone CO2 level is above the setpoint, the program will check the HVAC system availability first. If available, HVAC operation will be allowed, and natural ventilation is shut off. If the system is not available, the natural ventilation will be allowed.
+  The CO2 setpoint is provided in the ZoneControl:ContaminantController object in the same controlled zone.
+\end{description}
 
 The detailed control logic is given in the EnergyPlus Engineering Reference.
 
@@ -600,13 +636,13 @@ The name of a ZoneVentilation:* object whose zone name is the controlled zone na
 
 \textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{ZoneInfiltration:DesignFlowRate}, \textbf{ZoneInfiltration:EffectiveLeakageArea},and \textbf{ZoneInfiltration:FlowCoefficient} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{ZoneVentilation:DesignFlowRate} and \textbf{ZoneVentilation:WindandStackOpenArea} objects.
 
-\paragraph{Field:Minimum HVAC Operation Time}\label{field-minimum-hvac-operation-time}
+\paragraph{Field: Minimum HVAC Operation Time}\label{field-minimum-hvac-operation-time}
 
- The field represents the minimum time that HVAC system operation will be allowed. If accumulated system operation time is less than this value, the system operation status will be forced regardless of other operation conditions, and natural ventilation will shut off. 
+ The field represents the minimum time that HVAC system operation will be forced on, and the natural ventilation will be off. If accumulated system operation time is less than this value, the system operation status will be forced regardless of other operation conditions, and natural ventilation will shut off. 
 
-\paragraph{Field:Minimum Ventilation Time}\label{field-minimum-ventilation-time}
+\paragraph{Field: Minimum Ventilation Time}\label{field-minimum-ventilation-time}
 
- The field represents the minimum time that natural ventilation will remain. If accumulated ventilation time is less than this value, the natural ventilation will be forced regardless of other operation conditions. 
+ The field represents the minimum time that natural ventilation will be forced on regardless of other operation conditions, and the HVAC system will be off. If accumulated ventilation time is less than this value, the natural ventilation will be forced regardless of other operation conditions. 
 
 
 An example of this object in an input file:
@@ -627,19 +663,26 @@ AvailabilityManager:HybridVentilation,
   15.0,                    !- Minimum Outdoor Dewpoint {C}
   30.0,                    !- Maximum Outdoor Dewpoint {C}
   Outdoor air Schedule;    !- Minimum Outdoor Ventilation Air Schedule Name
+  ,                        !- Opening Factor Function of Wind Speed Curve Name
+  ,                        !- AirflowNetwork Control Type Schedule Name
+  ,                        !- Simple Airflow Control Type Schedule Name
+  ,                        !- ZoneVentilation Object Name
+  0.0,                     !- Minimum HVAC Operation Time
+  0.0;                     !- Minimum Ventilation Time
+
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-9-008}
 
-The hybrid ventilation availability manager has two output variables.
+The hybrid ventilation availability manager has the following output variables.
 
 HVAC,Average,Availability Manager Hybrid Ventilation Control Mode {[]}
 
 HVAC,Average,Availability Manager Hybrid Ventilation Control Status {[]}
 
-HVAC,Average,Hybrid Ventilation Control HVAC System Opration Elapsed Time {[min]}
+HVAC,Average,Hybrid Ventilation Control HVAC System Operation Elapsed Time {[min]}
 
-HVAC,Average,Hybrid Ventilation Control Natual Ventilation Elapsed Time {[min]}
+HVAC,Average,Hybrid Ventilation Control Natural Ventilation Elapsed Time {[min]}
 
 HVAC,Average,Hybrid Ventilation Operative Temperature {[C]}
 
@@ -655,25 +698,25 @@ This is the hybrid ventilation control mode given in the Ventilation Control Mod
 
 This is the hybrid ventilation control status, which can have three integer values: 0, 1, and 2. A zero value indicates no hybrid ventilation control, corresponding to zero value defined in the previous output variable. A value of one indicates that natural ventilation is allowed. A value of two denotes that the natural ventilation is not allowed, so all window/door openings are closed.
 
-\paragraph{Hybrid Ventilation Control HVAC System Opration Elapsed Time {[min]}}\label{hybrid-ventilation-control-hvac-system-opration-elapsed-time}
+\paragraph{Hybrid Ventilation Control HVAC System Operation Elapsed Time {[min]}}\label{hybrid-ventilation-control-hvac-system-operation-elapsed-time}
 
 This output is the HVAC system operation elapsed time in the units of minutes since the HVAC system starts.
 
-\paragraph{Hybrid Ventilation Control Natual Ventilation Elapsed Time {[min]}}\label{hybrid-ventilation-control-natual-ventilation-elapsed-time}
+\paragraph{Hybrid Ventilation Control Natural Ventilation Elapsed Time {[min]}}\label{hybrid-ventilation-control-natural-ventilation-elapsed-time}
 
 This output is the natural ventilation elapsed time in the units of minutes since the natural ventilation starts.
 
 \paragraph{Hybrid Ventilation Operative Temperature {[C]}}\label{hybrid-ventilation-operative-temperature}
 
-This output is the average of Mean Air Temperature and Mean Radiant Temperature in a thermal zone.
+This output is the average of Mean Air Temperature and Mean Radiant Temperature in the hybrid ventilation control zone.
 
 \paragraph{Hybrid Ventilation Lower Limit Operative Temperature {[C]}}\label{hybrid-ventilation-lower-limit-operative-temperature}
 
-The output is the lower acceptability limits in degree of C based on user input selection of either 80\% or 90\%.
+This output is the lower acceptability limit in degrees C based on user input selection of either 80\% or 90\%.
 
 \paragraph{Hybrid Ventilation Upper Limit Operative Temperature {[C]}}\label{hybrid-ventilation-upper-limit-operative-temperature}
 
-The output is the upper acceptability limits in degree of C based on user input selection of either 80\% or 90\%.
+This output is the upper acceptability limit in degrees C based on user input selection of either 80\% or 90\%.
 
 \subsection{AvailabilityManager:OptimumStart}\label{availabilitymanageroptimumstart}
 

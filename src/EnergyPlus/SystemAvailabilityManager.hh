@@ -459,14 +459,14 @@ namespace SystemAvailabilityManager {
 		// manager is connected to air loop
 		bool SimHybridVentSysAvailMgr; // Set to false when a zone has two hybrid ventilation
 		// managers, one with air loop and one without
-		Real64 OperativeTemp; // Zone air operative temperature
-		Real64 CO2; // Zone air CO2 temperature
-		Real64 MinOperTime; // Minimum HVAC Operation Time
-		Real64 MinVentTime; // Minimum Ventilation Time
-		Real64 TimeOperDuration; // Time duration with continuous HVAC operation
-		Real64 TimeVentDuration; // Time duration with continuous ventilation
-		Real64 minAdaTem; // minimum adaptive temperature for adaptive temperature control
-		Real64 maxAdaTem; // maximum adaptive temperature for adaptive temperature control
+		Real64 OperativeTemp; // Zone air operative temperature [C]
+		Real64 CO2; // Zone air CO2 [ppm]
+		Real64 MinOperTime; // Minimum HVAC Operation Time [minutes]
+		Real64 MinVentTime; // Minimum Ventilation Time [minutes]
+		Real64 TimeOperDuration; // Time duration with continuous HVAC operation [minutes]
+		Real64 TimeVentDuration; // Time duration with continuous ventilation [minutes]
+		Real64 minAdaTem; // minimum adaptive temperature for adaptive temperature control [C]
+		Real64 maxAdaTem; // maximum adaptive temperature for adaptive temperature control [C]
 
 		// Default Constructor
 		DefineHybridVentSysAvailManager() :

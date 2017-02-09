@@ -4224,7 +4224,7 @@ namespace SystemAvailabilityManager {
 			}
 			if ( SchedMax == 7.0 && !Contaminant.CO2Simulation ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\", When the maximum schedule value is 7, carbon dioxide (CO_2) control is requested. " );
+				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. " );
 				ShowContinueError( "However, CO2 simulation is not enabled. Please use ZoneAirContaminantBalance object to simulate CO2." );
 				ErrorsFound = true;
 			}
@@ -4531,17 +4531,22 @@ namespace SystemAvailabilityManager {
 			}
 
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime > 0 ) {
-				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Opration Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Oepration Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime > 0 ) {
-				SetupOutputVariable( "Hybrid Ventilation Control Natual Ventilation Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Control Natural Ventilation Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 
-			SetupOutputVariable( "Hybrid Ventilation Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
-			SetupOutputVariable( "Hybrid Ventilation Lower Limit Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
-			SetupOutputVariable( "Hybrid Ventilation Upper Limit Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+			if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_OperT80 ) || CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_OperT90 ) ) {
+				SetupOutputVariable( "Hybrid Ventilation Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Lower Limit Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Upper Limit Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+			}
 
+			if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_CO2 ) ) {
+				SetupOutputVariable( "Hybrid Ventilation CO2 Concentration [ppm]", HybridVentSysAvailMgrData( SysAvailNum ).CO2, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+			}
 		}
 
 	}
@@ -4572,7 +4577,7 @@ namespace SystemAvailabilityManager {
 		using DataHeatBalance::TotVentilation;
 		using DataHeatBalance::Ventilation;
 		using InputProcessor::FindItemInList;
-		using ThermalComfort::ASH55Flag;
+		using DataHeatBalance::AdaptiveComfortRequested_ASH55;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4664,7 +4669,7 @@ namespace SystemAvailabilityManager {
 				}
 				// check schedule value for adaptive temperature control
 				if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, 5.0 ) || CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, 6.0 ) ) {
-					if ( !ASH55Flag ) {
+					if ( !AdaptiveComfortRequested_ASH55 ) {
 						ShowSevereError( "GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\"" );
 						ShowContinueError( "Ventilation Control Mode Schedule Name =\"" + Schedule( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr ).Name + "\", When the schedule schedule value is 5 or 6, operative temperature control is requested. " );
 						ShowContinueError( "However, AdaptiveASH55 is not entered in the Thermal Comfort Model Type fields in the People object." );
@@ -4957,6 +4962,7 @@ namespace SystemAvailabilityManager {
 				}
 
 			} else if ( SELECT_CASE_var == HybridVentMode_CO2 ) {
+				HybridVentSysAvailMgrData( SysAvailNum ).CO2 = ZoneAirCO2( ZoneNum );
 				if ( ZoneAirCO2( ZoneNum ) > ZoneCO2SetPoint( ZoneNum ) ) {
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
 						AirLoopNum = HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum;
