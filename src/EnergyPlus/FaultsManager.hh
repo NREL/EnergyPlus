@@ -292,7 +292,23 @@ namespace FaultsManager {
 		public:
 			bool CheckFaultyAirFilterFanCurve();
 	};
-
+	
+	struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
+	{
+		// Members
+		std::string CoilType; // Coil type
+		std::string CoilName; // Coil name
+		std::string WaterCoilControllerName; // Water coil controller name
+	
+		// Default Constructor
+		FaultPropertiesCoilSAT():
+			CoilType( "" ),
+			CoilName( "" ),
+			WaterCoilControllerName( "" )
+		{}
+			
+	};
+	
 	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
 	{
 		// Members
@@ -363,7 +379,7 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
 	extern Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
 	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
-	extern Array1D< FaultProperties > FaultsCoilSATSensor;
+	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 
 	// Functions
 
