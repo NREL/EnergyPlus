@@ -790,6 +790,7 @@ namespace HeatBalanceSurfaceManager {
 		QElecBaseboardSurf = 0.0;
 		QCoolingPanelSurf = 0.0;
 		QPoolSurfNumerator = 0.0;
+		QRadSurfAFNDuct = 0.0;
 		PoolHeatTransCoefs = 0.0;
 
 		if ( ZoneSizingCalc ) GatherComponentLoadsSurfAbsFact();
@@ -1394,6 +1395,7 @@ namespace HeatBalanceSurfaceManager {
 		QSteamBaseboardSurf.dimension( TotSurfaces, 0.0 );
 		QElecBaseboardSurf.dimension( TotSurfaces, 0.0 );
 		QCoolingPanelSurf.dimension( TotSurfaces, 0.0 );
+		QRadSurfAFNDuct.dimension( TotSurfaces, 0.0 );
 
 		// allocate terms used for pool surface heat balance
 		QPoolSurfNumerator.dimension( TotSurfaces, 0.0 );
@@ -5134,7 +5136,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
-	Real64 TempSurfInSat; // Local temperary surface dew point temperature
+	Real64 TempSurfInSat; // Local temporary surface dew point temperature
 
 	int OtherSideSurfNum; // Surface number index for other side of an interzone partition
 	static int MinIterations; // Minimum number of iterations for the inside heat balance
@@ -5377,7 +5379,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), MAT_zone, TempSurfInSat );
 					}
 					//Pre-calculate a few terms
-					Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) );
+					Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) + QRadSurfAFNDuct( SurfNum ) );
 					Real64 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf + IterDampConst ) );
 					// Calculate the current inside surface temperature
 					if ( ( ! surface.IsPool ) || ( ( surface.IsPool ) && ( abs( QPoolSurfNumerator( SurfNum ) ) < SmallNumber ) && ( abs( PoolHeatTransCoefs( SurfNum ) ) < SmallNumber ) ) ) {

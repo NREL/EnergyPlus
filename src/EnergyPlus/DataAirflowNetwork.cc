@@ -137,15 +137,15 @@ namespace DataAirflowNetwork {
 	//  NONE           NONE           0      No AirflowNetwork and SIMPLE
 	//  SIMPLE         NONE           1      Simple calculations only
 	//  MULTIZONE      NONE           2      Perform multizone calculations only
-	//  NONE           DISTSYS        3      Perform distribution system durin system on time only
-	//  SIMPLE         DISTSYS        4      Perform distribution system durin system on time and simple calculations during off time
-	//  MULTIZONE      DISTSYS        5      Perform distribution system durin system on time and multizone calculations during off time
+	//  NONE           DISTSYS        3      Perform distribution system during system on time only
+	//  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
+	//  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
 
 	int const AirflowNetworkControlSimple( 1 ); // Simple calculations only
 	int const AirflowNetworkControlMultizone( 2 ); // Perform multizone calculations only
-	int const AirflowNetworkControlSimpleADS( 4 ); // Perform distribution system durin system
+	int const AirflowNetworkControlSimpleADS( 4 ); // Perform distribution system during system
 	// on time and simple calculations during off time
-	int const AirflowNetworkControlMultiADS( 5 ); // Perform distribution system durin system on time
+	int const AirflowNetworkControlMultiADS( 5 ); // Perform distribution system during system on time
 	// and multizone calculations during off time
 
 	Array1D_bool AirflowNetworkZoneFlag;

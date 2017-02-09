@@ -92,7 +92,7 @@ namespace DataAirflowNetwork {
 	extern int const EPlusTypeNum_RHT; // Reheat terminal
 	extern int const EPlusTypeNum_FAN; // Fan
 	extern int const EPlusTypeNum_COI; // Heating or cooling coil
-	extern int const EPlusTypeNum_HEX; // Heat ecxchanger
+	extern int const EPlusTypeNum_HEX; // Heat exchanger
 	extern int const EPlusTypeNum_RVD; // Reheat VAV terminal damper
 
 	// EPlus node type
@@ -129,15 +129,15 @@ namespace DataAirflowNetwork {
 	//  NONE           NONE           0      No AirflowNetwork and SIMPLE
 	//  SIMPLE         NONE           1      Simple calculations only
 	//  MULTIZONE      NONE           2      Perform multizone calculations only
-	//  NONE           DISTSYS        3      Perform distribution system durin system on time only
-	//  SIMPLE         DISTSYS        4      Perform distribution system durin system on time and simple calculations during off time
-	//  MULTIZONE      DISTSYS        5      Perform distribution system durin system on time and multizone calculations during off time
+	//  NONE           DISTSYS        3      Perform distribution system during system on time only
+	//  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
+	//  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
 
 	extern int const AirflowNetworkControlSimple; // Simple calculations only
 	extern int const AirflowNetworkControlMultizone; // Perform multizone calculations only
-	extern int const AirflowNetworkControlSimpleADS; // Perform distribution system durin system
+	extern int const AirflowNetworkControlSimpleADS; // Perform distribution system during system
 	// on time and simple calculations during off time
-	extern int const AirflowNetworkControlMultiADS; // Perform distribution system durin system on time
+	extern int const AirflowNetworkControlMultiADS; // Perform distribution system during system on time
 	// and multizone calculations during off time
 
 	extern Array1D_bool AirflowNetworkZoneFlag;
@@ -158,7 +158,7 @@ namespace DataAirflowNetwork {
 	extern int AirflowNetworkNumOfSurfaces; // The number of surfaces for multizone calculation
 	extern int AirflowNetworkNumOfZones; // The number of zones for multizone calculation
 
-	extern bool RollBackFlag; // Roll back flag when system time steo down shifting
+	extern bool RollBackFlag; // Roll back flag when system time step down shifting
 	extern Array1D< Real64 > ANZT; // Local zone air temperature for roll back use
 	extern Array1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
 	extern Array1D< Real64 > ANCO; // Local zone air CO2 for roll back use
@@ -191,7 +191,7 @@ namespace DataAirflowNetwork {
 		std::string CpArrayName; // CP Array name at WPCCntr = "INPUT"
 		std::string BldgType; // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
 		std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-		int MaxIteration; // Maximum number of iteration, defualt 500
+		int MaxIteration; // Maximum number of iteration, default 500
 		int InitFlag; // Initialization flag
 		Real64 RelTol; // Relative airflow convergence
 		Real64 AbsTol; // Absolute airflow convergence
@@ -240,7 +240,7 @@ namespace DataAirflowNetwork {
 			std::string const & CpArrayName, // CP Array name at WPCCntr = "INPUT"
 			std::string const & BldgType, // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
 			std::string const & HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-			int const MaxIteration, // Maximum number of iteration, defualt 500
+			int const MaxIteration, // Maximum number of iteration, default 500
 			int const InitFlag, // Initialization flag
 			Real64 const RelTol, // Relative airflow convergence
 			Real64 const AbsTol, // Absolute airflow convergence
@@ -447,7 +447,7 @@ namespace DataAirflowNetwork {
 		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		std::string TypeName; // Name of Large vertical opening type
 		int LVOType; // Large vertical opening type number
-		Real64 LVOValue; // Extra crack length for LVO type 1 with multiple openable parts,
+		Real64 LVOValue; // Extra crack length for LVO type 1 with multiple operable parts,
 		// or Height of pivoting axis for LVO type 2
 		int NumFac; // Number of Opening Factor Values
 		Real64 OpenFac1; // Opening factor #1
@@ -558,7 +558,7 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of standard conditions component
 		Real64 StandardT; // Standard temperature for crack data
-		Real64 StandardP; // Standard borometric pressure for crack data
+		Real64 StandardP; // Standard barometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
 
 		// Default Constructor
@@ -574,11 +574,11 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of crack component
-		std::string ExternalNodeNames; // Name of external node.Not requird for internal surface
+		std::string ExternalNodeNames; // Name of external node.Not required for internal surface
 		Real64 FlowCoef; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
 		Real64 FlowExpo; // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data
-		Real64 StandardP; // Standard borometric pressure for crack data
+		Real64 StandardP; // Standard barometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
 
 		// Default Constructor
@@ -624,7 +624,7 @@ namespace DataAirflowNetwork {
 		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
 		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data
-		Real64 StandardP; // Standard borometric pressure for crack data
+		Real64 StandardP; // Standard barometric pressure for crack data
 		Real64 StandardW; // Standard humidity ratio for crack data
 		int InletNode; // Inlet node number
 		int OutletNode; // Outlet node number
@@ -922,7 +922,7 @@ namespace DataAirflowNetwork {
 		Real64 TranRat; // Flow coefficient at laminar/turbulent transition
 		int n; // Number of ranges for fan performance curve
 		Array1D< Real64 > Coeff; // Coefficients of fan performance curve.
-		//Each range has a min flow rate and 4 coeffieincts
+		//Each range has a min flow rate and 4 coefficients
 
 		// Default Constructor
 		DisSysCompDetFanProp() :
@@ -970,7 +970,7 @@ namespace DataAirflowNetwork {
 
 	};
 
-	struct DisSysCompTermUnitProp // Turminal unit component
+	struct DisSysCompTermUnitProp // Terminal unit component
 	{
 		// Members
 		std::string Name; // Name of coil component
@@ -1010,13 +1010,11 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string ZoneName; // Name of zone
 		int ZoneNum; // Zone Number
-		int viewFactorID; // ID of the duct view factor object
 
 		// Default Constructor
 		DisSysLinkageProp() :
 			AirflowNetworkLinkage(),
-			ZoneNum( 0 ),
-			viewFactorID( 0 )
+			ZoneNum( 0 )
 		{}
 
 	};
@@ -1085,7 +1083,6 @@ namespace DataAirflowNetwork {
 		int ConnectionFlag; // Return and supply connection flag
 		bool VAVTermDamper; // True if this component is a damper for a VAV terminal
 		int LinkageViewFactorObjectNum;
-		Real64 LinkageSurfaceTemp;
 
 		// Default Constructor
 		AirflowNetworkLinkageProp() :
@@ -1094,8 +1091,7 @@ namespace DataAirflowNetwork {
 			DetOpenNum( 0 ),
 			ConnectionFlag( 0 ),
 			VAVTermDamper( false ),
-			LinkageViewFactorObjectNum( 0 ),
-			LinkageSurfaceTemp( 0.0 )
+			LinkageViewFactorObjectNum( 0 )
 		{}
 
 	};
@@ -1132,7 +1128,7 @@ namespace DataAirflowNetwork {
 		Real64 FlowCoef; // Air Mass Flow Coefficient [kg/s at 1Pa]
 		Real64 FlowExpo; // Air Mass Flow exponent [dimensionless]
 		Real64 StandardT; // Standard temperature for crack data [C]
-		Real64 StandardP; // Standard borometric pressure for crack data [Pa]
+		Real64 StandardP; // Standard barometric pressure for crack data [Pa]
 		Real64 StandardW; // Standard humidity ratio for crack data [kg/kg]
 		int InletNode; // Inlet node number
 		int OutletNode; // Outlet node number
@@ -1267,7 +1263,6 @@ namespace DataAirflowNetwork {
 		Real64 SumMHrGC;
 		Real64 SumMMHrGC;
 		Real64 TotalGC;
-		Real64 DuctRadEnergy;
 
 		// Default Constructor
 		AirflowNetworkExchangeProp() :
@@ -1293,8 +1288,7 @@ namespace DataAirflowNetwork {
 			TotalCO2( 0.0 ),
 			SumMHrGC( 0.0 ),
 			SumMMHrGC( 0.0 ),
-			TotalGC( 0.0 ),
-			DuctRadEnergy( 0.0 )
+			TotalGC( 0.0 )
 		{}
 
 	};
@@ -1421,11 +1415,17 @@ namespace DataAirflowNetwork {
 		Real64 surfaceEmittance;
 		Array1D< LinkageSurfaceProp > linkageSurfaceData;
 		int objectNum;
+		Real64 UThermalRad;
+		Real64 QRad;
+		Real64 TSurr;
 
 		AirflowNetworkLinkageViewFactorProp() :
 			surfaceExposureFraction( 0 ),
 			surfaceEmittance( 0 ),
-			objectNum( 0 )
+			objectNum( 0 ),
+			UThermalRad( 0 ),
+			QRad( 0 ),
+			TSurr( 0 )
 		{}
 	};
 
@@ -1454,12 +1454,12 @@ namespace DataAirflowNetwork {
 	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
 	extern Array1D< MultizoneCPValueProp > MultizoneCPValueData;
 	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
+	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modification factor
 	extern Array1D< DeltaCpProp > DeltaCp;
 	extern Array1D< DeltaCpProp > EPDeltaCP;
 	extern Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
 	extern Array1D< IntraZoneNodeProp > IntraZoneNodeData; //Intra zone data set
-	extern Array1D< IntraZoneLinkageProp > IntraZoneLinkageData; //Intra zone linakge adat set
+	extern Array1D< IntraZoneLinkageProp > IntraZoneLinkageData; //Intra zone linkage adat set
 	extern Array1D< DisSysNodeProp > DisSysNodeData;
 	extern Array1D< DisSysCompLeakProp > DisSysCompLeakData;
 	extern Array1D< DisSysCompELRProp > DisSysCompELRData;

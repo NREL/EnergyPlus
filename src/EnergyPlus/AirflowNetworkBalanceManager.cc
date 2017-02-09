@@ -239,7 +239,6 @@ namespace AirflowNetworkBalanceManager {
 	// Inverse matrix
 	Array1D< Real64 > MA;
 	Array1D< Real64 > MV;
-	Array1D< Real64 > MV_rad;
 	Array1D_int IVEC;
 	Array1D_int SplitterNodeNumbers;
 
@@ -1427,7 +1426,7 @@ namespace AirflowNetworkBalanceManager {
 							if ( DisplayExtraWarnings ) {
 								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
 								ShowContinueError( "The entered choice of Equivalent Rectangle Method is PolygonHeight. This choice is not valid for a horizontal surface with a polygonal base surface." );
-								ShowContinueError( "The deafula aspect ratio at 1 is used. Simulation continues." );
+								ShowContinueError( "The default aspect ratio at 1 is used. Simulation continues." );
 							}
 						}
 					} else {
@@ -1471,7 +1470,7 @@ namespace AirflowNetworkBalanceManager {
 							if ( DisplayExtraWarnings ) {
 								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
 								ShowContinueError( "The entered choice of Equivalent Rectangle Method is BaseSurfaceAspectRatio. This choice is not valid for a horizontal surface with a polygonal base surface." );
-								ShowContinueError( "The deafula aspect ratio at 1 is used. Simulation continues." );
+								ShowContinueError( "The default aspect ratio at 1 is used. Simulation continues." );
 							}
 						}
 					}
@@ -2537,7 +2536,7 @@ namespace AirflowNetworkBalanceManager {
 		// check model compatibility
 		if ( IntraZoneNumOfNodes > 0 ) {
 			if ( !SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " model requies Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
+				ShowSevereError( RoutineName + CurrentModuleObject + " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
 				ErrorsFound = true;
 				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );
 			}
@@ -4043,7 +4042,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Ensure the name of each heat exchanger is shown either once ot twice in the field of
+		// Ensure the name of each heat exchanger is shown either once or twice in the field of
 		if ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ) {
 			for ( i = 1; i <= DisSysNumOfHXs; ++i ) {
 				count = 0;
@@ -4280,6 +4279,7 @@ namespace AirflowNetworkBalanceManager {
 			e.LeakLat = 0.0;
 			e.CondSen = 0.0;
 			e.DiffLat = 0.0;
+			e.RadGain = 0.0;
 		}
 		if ( Contaminant.CO2Simulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalCO2 = 0.0;
 		if ( Contaminant.GenericContamSimulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalGC = 0.0;
@@ -4374,7 +4374,6 @@ namespace AirflowNetworkBalanceManager {
 
 		MA.allocate( AirflowNetworkNumOfNodes * AirflowNetworkNumOfNodes );
 		MV.allocate( AirflowNetworkNumOfNodes );
-		MV_rad.allocate( AirflowNetworkNumOfNodes );
 		IVEC.allocate( AirflowNetworkNumOfNodes + 20 );
 
 		AirflowNetworkReportData.allocate( NumOfZones ); // Report variables
@@ -5238,10 +5237,6 @@ namespace AirflowNetworkBalanceManager {
 		using DataGlobals::StefanBoltzmann;
 		using DataHeatBalSurface::TH;
 
-		Real64 tolerance = 0.0001;
-
-		MV_rad = 0;
-
 		for ( int i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			int CompNum = AirflowNetworkLinkageData( i ).CompNum;
 			int CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
@@ -5271,6 +5266,10 @@ namespace AirflowNetworkBalanceManager {
 				auto & DuctObj( DisSysCompDuctData( TypeNum ) );
 				auto & LinkageObj( AirflowNetworkLinkSimu( i ) );
 
+				VFObj.TSurr = 0;
+				VFObj.UThermalRad = 0;
+				VFObj.QRad = 0;
+
 				Real64 DuctSurfaceArea = DuctObj.L * DuctObj.D * Pi;
 
 				Real64 Tamb;
@@ -5286,7 +5285,7 @@ namespace AirflowNetworkBalanceManager {
 				Real64 Ei = std::exp( -DuctObj.UThermal * DuctSurfaceArea / ( DirSign * LinkageObj.FLOW * CpAir ) );
 				Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
 
-				Real64 FracOutsideConvectRes = 0.1;	// For now, assume 10 percent of outside convection is 10 percent of air-to-air duct resistance
+				Real64 FracOutsideConvectRes = 0.1;	// For now, assume outside convection is 10 percent of air-to-air duct resistance
 
 				Real64 Rtot = 1 / DuctObj.UThermal;
 
@@ -5301,6 +5300,7 @@ namespace AirflowNetworkBalanceManager {
 
 				Real64 TDuctSurf_iter = 0;
 
+				Real64 tolerance = 0.0001;
 				while ( std::abs( TDuctSurf - TDuctSurf_iter ) > tolerance ) {
 
 					TDuctSurf_iter = TDuctSurf;
@@ -5331,11 +5331,16 @@ namespace AirflowNetworkBalanceManager {
 
 				}
 
+				Real64 TotalRadHT = 0;
 				for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
 					Real64 surfaceRadFlux = StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurr_K ) );
 					VFObj.linkageSurfaceData( j ).surfaceRadLoad = surfaceRadFlux * DuctSurfaceArea * VFObj.surfaceEmittance * VFObj.surfaceExposureFraction;
-					MV_rad( LT ) += VFObj.linkageSurfaceData( j ).surfaceRadLoad;
+					TotalRadHT += VFObj.linkageSurfaceData( j ).surfaceRadLoad;
 				}
+
+				VFObj.TSurr = TSurr;
+				VFObj.UThermalRad = TotalRadHT / ( DuctSurfaceArea * ( Node( LF ).Temp - TSurr ) );
+				VFObj.QRad = TotalRadHT;
 			}
 		}
 	}
@@ -5431,10 +5436,20 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					Tamb = ANZT( AirflowNetworkLinkageData( i ).ZoneNum );
 				}
-				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
+ 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * Ei;
 				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
-				MV( LT ) += MV_rad( LT ); // Duct radiation effects added in here
+
+				// Duct-surface radiation
+				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum != 0 ) {
+					auto & DuctRadObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
+					if ( std::abs( DuctRadObj.QRad ) > 0 ) {
+						Real64 EiDuctRad = std::exp( -DuctRadObj.UThermalRad * DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
+						MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
+						MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) += -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * EiDuctRad;
+						MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * DuctRadObj.TSurr * ( 1.0 - EiDuctRad ) * CpAir;
+					}
+				}
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
@@ -6990,6 +7005,7 @@ namespace AirflowNetworkBalanceManager {
 			e.DiffLat = 0.0;
 			e.MultiZoneSen = 0.0;
 			e.MultiZoneLat = 0.0;
+			e.RadGain = 0.0;
 		}
 
 		// Rewrite AirflowNetwork airflow rate
@@ -7215,9 +7231,12 @@ namespace AirflowNetworkBalanceManager {
 			// Calculate sensible loads from duct conduction losses and loads from duct radiation
 			if ( AirflowNetworkLinkageData( i ).ZoneNum > 0 && AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_DWC ) {
 				Qsen = AirflowNetworkLinkSimu( i ).FLOW * CpAir * ( AirflowNetworkNodeSimu( Node2 ).TZ - AirflowNetworkNodeSimu( Node1 ).TZ );
-				Qsen -= MV_rad( Node2 );
+				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum != 0 ) {
+					auto & DuctRadObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
+					Qsen -= DuctRadObj.QRad;
+					AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain -= DuctRadObj.QRad;
+				}
 				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).CondSen -= Qsen;
-				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain += MV_rad( Node2 );
 			}
 			// Calculate sensible leakage losses
 			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_PLR || AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_ELR ) {
@@ -7740,11 +7759,11 @@ namespace AirflowNetworkBalanceManager {
 				//     this same node is specified in a Coil:DX:CoolingBypassFactorEmpirical object (and classified with
 				//     NodeConnectionType as OutsideAirReference). In the NodeConnectionType structure, both of these nodes have a
 				//     unique index but have the same node number. The Outside Air Node will usually be listed first. Search for all
-				//     indexs with the same node number and check if it is classified as NodeConnectionType = OutsideAirReference.
+				//     indexes with the same node number and check if it is classified as NodeConnectionType = OutsideAirReference.
 				//     Mark this node as found since it is not used in an airflownetwork simulation.
 				//     Example (using AirflowNetwork_MultiZone_SmallOffice.idf with a single OA Mixer):
 				//             (the example shown below is identical to AirflowNetwork_SimpleHouse.idf with no OA Mixer except
-				//              that the NodeConnections indexs are (7) and (31), respectively and the NodeNumber = 6)
+				//              that the NodeConnections indexes are (7) and (31), respectively and the NodeNumber = 6)
 				//   The GetNodeConnectionType CALL below returns NodeConnectionType_OutsideAir = 7 and NodeConnectionType_OutsideAirReference = 14.
 				//     NodeConnections info from OUTSIDE AIR NODE object read:
 				//     NodeConnections(9)NodeNumber      = 10
@@ -8403,7 +8422,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 ZoneAngDiff;
 		Array1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
 		Array1D< Real64 > PiFormula; // Formula for the mean pressure difference
-		Array1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
+		Array1D< Real64 > SigmaFormula; // Formula for the fluctuating pressure difference
 		Array1D< Real64 > Sprime; // The dimensionless ratio of the window separation to the building width
 		Array1D< Real64 > CPV1; // Wind pressure coefficient for the first opening in the zone
 		Array1D< Real64 > CPV2; // Wind pressure coefficient for the second opening in the zone

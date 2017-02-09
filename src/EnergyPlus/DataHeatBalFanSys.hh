@@ -165,7 +165,7 @@ namespace DataHeatBalFanSys {
 	//REAL Variables for the Heat Balance Simulation
 
 	extern Array1D< Real64 > QRadSysSource; // Current source/sink for a particular surface (radiant sys)
-	extern Array1D< Real64 > TCondFDSourceNode; // Temperature of sourc/sink location in surface from CondFD algo
+	extern Array1D< Real64 > TCondFDSourceNode; // Temperature of source/sink location in surface from CondFD algo
 	extern Array1D< Real64 > QPVSysSource; // Current source/sink for a surface (integrated PV sys)
 
 	extern Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
@@ -182,6 +182,7 @@ namespace DataHeatBalFanSys {
 	// of electric baseboard heaters
 	extern Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
 	// of simple cooling panels
+	extern Array1D< Real64 > QRadSurfAFNDuct; // Current radiant heat flux at a surface due to radiation from AFN ducts
 	extern Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	extern Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	extern Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
