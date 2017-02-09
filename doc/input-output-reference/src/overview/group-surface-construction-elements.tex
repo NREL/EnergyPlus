@@ -2064,9 +2064,9 @@ Transmittance averaged over the solar spectrum and weighted by the response of t
 
 Reflectance averaged over the solar spectrum and weighted by the response of the human eye. Assumed same on both side of shade and independent of incidence angle.
 
-\paragraph{Field: Thermal Hemispherical Emissivity}\label{field-thermal-hemispherical-emissivity}
+\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity}
 
-Effective long-wave emissivity. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
+Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
 \begin{equation}
 {\varepsilon_{{\rm{eff}}}} \approx \varepsilon \left( {1 - \eta } \right)
@@ -2074,9 +2074,9 @@ Effective long-wave emissivity. Thermal means the long-wave radiation or sometim
 
 For most non-metallic materials \(\varepsilon\) is about 0.9.
 
-\paragraph{Field: Thermal Transmittance}\label{field-thermal-transmittance}
+\paragraph{Field: Infrared Transmittance}\label{field-infrared-transmittance}
 
-Effective long-wave transmittance. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Assumed independent of incidence angle. We can approximate this effective long-wave transmittance, \(T_{\rm{eff}}\) as follows. Let \(\eta\) be the ``openness'' of the shade, i.e., the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \(T\). Then
+Effective long-wave transmittance. Assumed independent of incidence angle. We can approximate this effective long-wave transmittance, \(T_{\rm{eff}}\) as follows. Let \(\eta\) be the ``openness'' of the shade, i.e., the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \(T\). Then
 
 \begin{equation}
 T_{\rm{eff}} \approx \eta + T \left( 1 - \eta \right)
@@ -2275,17 +2275,17 @@ The front-side slat reflectance for hemispherically diffuse visible radiation. T
 
 The back-side slat reflectance for hemispherically diffuse visible radiation. This value should equal ``Back Side Slat Beam Visible Reflectance..''
 
-\paragraph{Field: Slat Thermal Hemispherical Transmittance}\label{field-slat-thermal-hemispherical-transmittance}
+\paragraph{Field: Slat Infrared Hemispherical Transmittance}\label{field-slat-infrared-hemispherical-transmittance}
 
-The slat Infrared transmittance. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. It is zero for solid metallic, wooden or glass slats, but may be non-zero in some cases (e.g., thin plastic slats).
+The slat Infrared transmittance. It is zero for solid metallic, wooden or glass slats, but may be non-zero in some cases (e.g., thin plastic slats).
 
-\paragraph{Field: Front Side Slat Thermal~ Hemispherical Emissivity}\label{field-front-side-slat-thermal-hemispherical-emissivity}
+\paragraph{Field: Front Side Slat Infrared Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
 
-Front-side hemispherical emissivity of the slat. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
+Front-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
-\paragraph{Field: Back Side Slat Thermal~ Hemispherical Emissivity}\label{field-back-side-slat-thermal-hemispherical-emissivity}
+\paragraph{Field: Back Side Slat Infrared Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
 
-Back-side hemispherical emissivity of the slat. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
+Back-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
 \paragraph{Field: Blind to Glass Distance}\label{field-blind-to-glass-distance}
 
@@ -2768,17 +2768,17 @@ This value is the beam-diffuse transmittance at normal incidence averaged over t
 
 This value is the beam-diffuse reflectance at normal incidence averaged over the visible spectrum of solar radiation. Assumed to be the same for front and back sides. The minimum value is 0.0 and maximum value is less than 1.0.~ Currently this input field is not used.
 
-\paragraph{Field: Shade Material Thermal Transmittance}\label{field-shade-material-thermal-transmittance}
+\paragraph{Field: Shade Material Infrared Transmittance}\label{field-shade-material-infrared-transmittance}
 
-This value is the long-wave transmittance of the shade material and assumed to be the same for front and back sides of the shade. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0 and maximum value is less than 1.0. Default value is 0.05.
+This value is the long-wave transmittance of the shade material and assumed to be the same for front and back sides of the shade. The minimum value is 0.0 and maximum value is less than 1.0. Default value is 0.05.
 
-\paragraph{Field: Front Side Shade Material Thermal Emissivity}\label{field-front-side-shade-material-thermal-emissivity}
+\paragraph{Field: Front Side Shade Material Infrared Emissivity}\label{field-front-side-shade-material-infrared-emissivity}
 
-This value is the front side long-wave hemispherical emissivity of shade material. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0 and maximum value is less than 1.0. Default value is 0.91. The front side effective emissivity of the shade layer is calculated using this value and the material openness specified above.
+This value is the front side long-wave hemispherical emissivity of shade material. The minimum value is 0.0 and maximum value is less than 1.0. Default value is 0.91. The front side effective emissivity of the shade layer is calculated using this value and the material openness specified above.
 
-\paragraph{Field: Back Side Shade Material Thermal Emissivity}\label{field-back-side-shade-material-thermal-emissivity}
+\paragraph{Field: Back Side Shade Material Infrared Emissivity}\label{field-back-side-shade-material-infrared-emissivity}
 
-This value is the back side long-wave hemispherical emissivity of shade material. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0 and maximum value is less than 1.0. Default value is 0.91. The back side effective emissivity of the shade is calculated using this value and the material openness specified above.
+This value is the back side long-wave hemispherical emissivity of shade material. The minimum value is 0.0 and maximum value is less than 1.0. Default value is 0.91. The back side effective emissivity of the shade is calculated using this value and the material openness specified above.
 
 An IDF example for this object is shown below:
 
@@ -2849,17 +2849,17 @@ This value is the front side drape fabric beam-diffuse visible reflectance at no
 
 This value is the back side drape fabric diffuse-diffuse visible reflectance at normal incidence averaged over the visible spectrum range of solar radiation.~ Assumed to be the same for front and back sides of the drape.~ The minimum value is 0.0 and maximum value is less than 1.0.~ The default value is 0.0.~ This input field is not used currently.
 
-\paragraph{Field: Drape Material Thermal Transmittance}\label{field-drape-material-thermal-transmittance}
+\paragraph{Field: Drape Material Infrared Transmittance}\label{field-drape-material-infrared-transmittance}
 
-This value is the long-wave hemispherical transmittance of the fabric material at zero fabric openness fraction.~ Assumed to be the same for front and back sides of the drape fabric material layer. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0 and maximum value is less than 1.0.~ The default value is 0.05.
+This value is the long-wave hemispherical transmittance of the fabric material at zero fabric openness fraction.~ Assumed to be the same for front and back sides of the drape fabric material layer. The minimum value is 0.0 and maximum value is less than 1.0.~ The default value is 0.05.
 
-\paragraph{Field: Front Side Drape Material Thermal Emissivity}\label{field-front-side-drape-material-thermal-emissivity}
+\paragraph{Field: Front Side Drape Material Infrared Emissivity}\label{field-front-side-drape-material-infrared-emissivity}
 
-This value is the front side long-wave hemispherical emissivity of fabric material at zero shade openness. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0 and maximum value is less than 1.0. the default value is 0.87. The front side effective emissivity of the drape fabric layer is calculated using this value and the fabric openness area fraction specified above.
+This value is the front side long-wave hemispherical emissivity of fabric material at zero shade openness. The minimum value is 0.0 and maximum value is less than 1.0. the default value is 0.87. The front side effective emissivity of the drape fabric layer is calculated using this value and the fabric openness area fraction specified above.
 
-\paragraph{Field: Back Side Drape Material Thermal Emissivity}\label{field-back-side-drape-material-thermal-emissivity}
+\paragraph{Field: Back Side Drape Material Infrared Emissivity}\label{field-back-side-drape-material-infrared-emissivity}
 
-This value is the back side long-wave hemispherical emissivity of fabric material at zero fabric openness fraction. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0 and maximum value is less than 1.0. The default value is 0.87. The back side effective emissivity of the drape fabric layer is calculated using this value and the fabric openness area fraction specified above.
+This value is the back side long-wave hemispherical emissivity of fabric material at zero fabric openness fraction. The minimum value is 0.0 and maximum value is less than 1.0. The default value is 0.87. The back side effective emissivity of the drape fabric layer is calculated using this value and the fabric openness area fraction specified above.
 
 \paragraph{Field: Width of Pleated Fabric}\label{field-width-of-pleated-fabric}
 
@@ -2983,17 +2983,17 @@ This value is the slat front side diffuse-diffuse visible reflectance for hemisp
 
 This value is the slat back side diffuse-diffuse visible reflectance for hemispherically diffuse visible spectrum range of solar radiation. Minimum value is 0.0, and the maximum value is less than 1.0.~ This input field is not used currently.
 
-\paragraph{Field: Slat Thermal Transmittance}\label{field-slat-thermal-transmittance}
+\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-Infrared-transmittance}
 
-This value is the long-wave hemispherical transmittance of the slat material. Assumed to be the same for both sides of the slat. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
+This value is the long-wave hemispherical transmittance of the slat material. Assumed to be the same for both sides of the slat. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
 
-\paragraph{Field: Front Side Slat Thermal Emissivity}\label{field-front-side-slat-thermal-emissivity}
+\paragraph{Field: Front Side Slat Infrared Emissivity}\label{field-front-side-slat-infrared-emissivity}
 
-This value is the front side long-wave hemispherical emissivity of the slat material. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0, the maximum value is less than 1.0. The default value is 0.9.
+This value is the front side long-wave hemispherical emissivity of the slat material. The minimum value is 0.0, the maximum value is less than 1.0. The default value is 0.9.
 
-\paragraph{Field: Back Side Slat Thermal Emissivity}\label{field-back-side-slat-thermal-emissivity}
+\paragraph{Field: Back Side Slat Infrared Emissivity}\label{field-back-side-slat-infrared-emissivity}
 
-This value is the back side long-wave hemispherical emissivity of the slat material. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.9.
+This value is the back side long-wave hemispherical emissivity of the slat material. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.9.
 
 \paragraph{Field: Slat Angle Control}\label{field-slat-angle-control}
 
@@ -3072,13 +3072,13 @@ This value is the beam-diffuse visible reflectance of the screen material at nor
 
 This value is the beam-diffuse visible reflectance of the screen material at normal incidence averaged over the visible spectrum range of solar radiation. Assumed to be the same for both sides of the screen. The minimum value is 0.0, and the maximum value is less than 1.0. This input input field is not used currently.
 
-\paragraph{Field: Screen Thermal Transmittance}\label{field-screen-thermal-transmittance}
+\paragraph{Field: Screen Infrared Transmittance}\label{field-screen-infrared-transmittance}
 
-This value is the long-wave hemispherical transmittance of the the screen material. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Assumed to be the same for both sides of the screen material. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.02
+This value is the long-wave hemispherical transmittance of the the screen material. Assumed to be the same for both sides of the screen material. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.02
 
-\paragraph{Field: Screen Thermal Emissivity}\label{field-screen-thermal-emissivity}
+\paragraph{Field: Screen Infrared Emissivity}\label{field-screen-infrared-emissivity}
 
-This value is the long-wave hemispherical emissivity of the screen material. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Assumed to be the same for both sides of the screen material. The minimum value is 0.0, the maximum value is less than 1.0. The default value is 0.93.
+This value is the long-wave hemispherical emissivity of the screen material. Assumed to be the same for both sides of the screen material. The minimum value is 0.0, the maximum value is less than 1.0. The default value is 0.93.
 
 \paragraph{Field: Screen Wire Spacing}\label{field-screen-wire-spacing}
 
@@ -3212,17 +3212,17 @@ This value is the front side diffuse-diffuse visible reflectance of the glazing 
 
 This value is the back side diffuse-diffuse visible reflectance of the glazing averaged over the visible spectrum range of solar radiation.~ Used only when Optical Data Type = SpectralAverage. EnergyPlus automatically estimates the back side diffuse-diffuse visible reflectance from back side beam-beam visible reflectance at normal incidence specified above. If this input field is specified as ``Autocalculate'', then the calculated reflectance will be used. The minimum value is 0.0, and the maximum value is less than 1.0. This input field is not used currently.
 
-\paragraph{Field: Thermal Transmittance (applies to front and back)}\label{field-thermal-transmittance-applies-to-front-and-back}
+\paragraph{Field: Infrared Transmittance (applies to front and back)}\label{field-infrared-transmittance-applies-to-front-and-back}
 
-This value is the long-wave hemispherical transmittance of the glazing. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. Assumed to be the same for both sides of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
+This value is the long-wave hemispherical transmittance of the glazing. Assumed to be the same for both sides of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
 
-\paragraph{Field: Front Side Thermal Emissivity}\label{field-front-side-thermal-emissivity}
+\paragraph{Field: Front Side Infrared Emissivity}\label{field-front-side-infrared-emissivity}
 
-This value is the front side long-wave hemispherical emissivity of the glazing. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
+This value is the front side long-wave hemispherical emissivity of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
 
-\paragraph{Field: Back Side Thermal Emissivity}\label{field-back-side-thermal-emissivity}
+\paragraph{Field: Back Side Infrared Emissivity}\label{field-back-side-infrared-emissivity}
 
-This value is the back side long-wave hemispherical emissivity of the glazing. Thermal means the long-wave radiation or sometimes it is also defined as the infrared wave-length range radiation. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
+This value is the back side long-wave hemispherical emissivity of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
 
 An IDF example for this object, is shown below:
 

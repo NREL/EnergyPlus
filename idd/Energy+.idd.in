@@ -4808,27 +4808,21 @@ WindowMaterial:Glazing,
        \type real
        \minimum 0.0
        \maximum 1.0
-  N8 , \field Thermal Transmittance at Normal Incidence
+  N8 , \field Infrared Transmittance at Normal Incidence
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0.0
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
-  N9 , \field Front Side Thermal Hemispherical Emissivity
+  N9 , \field Front Side Infrared Hemispherical Emissivity
        \type real
        \minimum> 0.0
        \maximum< 1.0
        \default 0.84
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
-  N10, \field Back Side Thermal Hemispherical Emissivity
+  N10, \field Back Side Infrared Hemispherical Emissivity
        \type real
        \minimum> 0.0
        \maximum< 1.0
        \default 0.84
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
   N11, \field Conductivity
        \units W/m-K
        \type real
@@ -5220,21 +5214,17 @@ WindowMaterial:Glazing:RefractionExtinctionMethod,
        \units 1/m
        \type real
        \minimum> 0.0
-  N6 , \field Thermal Transmittance at Normal Incidence
+  N6 , \field Infrared Transmittance at Normal Incidence
        \type real
        \maximum< 1.0
        \minimum 0.0
        \default 0.0
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
-  N7 , \field Thermal Hemispherical Emissivity
+  N7 , \field Infrared Hemispherical Emissivity
        \note Emissivity of front and back side assumed equal
        \type real
        \maximum< 1.0
        \minimum> 0.0
        \default 0.84
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
   N8 , \field Conductivity
        \units W/m-K
        \type real
@@ -5502,22 +5492,18 @@ WindowMaterial:Shade,
        \units dimensionless
        \minimum 0
        \maximum< 1
-  N5 , \field Thermal Hemispherical Emissivity
+  N5 , \field Infrared Hemispherical Emissivity
        \required-field
        \type real
        \units dimensionless
        \maximum< 1
        \minimum> 0
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
-  N6 , \field Thermal Transmittance
+  N6 , \field Infrared Transmittance
        \required-field
        \type real
        \units dimensionless
        \maximum< 1
        \minimum 0
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
   N7 , \field Thickness
        \required-field
        \type real
@@ -5792,27 +5778,21 @@ WindowMaterial:Blind,
        \type real
        \maximum< 1
        \minimum 0
-  N18, \field Slat Thermal Hemispherical Transmittance
+  N18, \field Slat Infrared Hemispherical Transmittance
        \type real
        \maximum< 1
        \minimum 0
        \default 0
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
-  N19, \field Front Side Slat Thermal Hemispherical Emissivity
+  N19, \field Front Side Slat Infrared Hemispherical Emissivity
        \type real
        \maximum< 1
        \minimum 0
        \default 0.9
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
-  N20, \field Back Side Slat Thermal Hemispherical Emissivity
+  N20, \field Back Side Slat Infrared Hemispherical Emissivity
        \type real
        \maximum< 1
        \minimum 0
        \default 0.9
-       \note Thermal means the long-wave radiation or sometimes it is also defined as the 
-       \note the Infrared wave-length range radiation.
   N21, \field Blind to Glass Distance
        \type real
        \units m
@@ -6051,7 +6031,7 @@ WindowMaterial:Shade:EquivalentLayer,
        \units dimensionless
        \minimum 0
        \maximum< 1
-  N9 , \field Shade Material Thermal Transmittance
+  N9 , \field Shade Material Infrared Transmittance
        \note The long-wave transmittance of the shade material at zero shade openness.
        \note Assumed to be the same for front and back sides of the shade.
        \type real
@@ -6059,7 +6039,7 @@ WindowMaterial:Shade:EquivalentLayer,
        \maximum< 1
        \minimum 0
        \default 0.05
-  N10, \field Front Side Shade Material Thermal Emissivity
+  N10, \field Front Side Shade Material Infrared Emissivity
        \note The front side long-wave emissivity of the shade material at zero shade
        \note openness. Openness fraction is used to calculate the effective emissivity
        \note value.
@@ -6068,7 +6048,7 @@ WindowMaterial:Shade:EquivalentLayer,
        \maximum< 1
        \minimum> 0
        \default 0.91
-  N11; \field Back Side Shade Material Thermal Emissivity
+  N11; \field Back Side Shade Material Infrared Emissivity
        \note The back side long-wave emissivity of the shade material at zero shade
        \note openness. Openness fraction is used to calculate the effective emissivity
        \note value.
@@ -6154,7 +6134,7 @@ WindowMaterial:Drape:EquivalentLayer,
        \units dimensionless
        \minimum 0
        \maximum< 1
-  N9 , \field Drape Material Thermal Transmittance
+  N9 , \field Drape Material Infrared Transmittance
        \note Long-wave transmittance of the drape fabric at zero openness fraction.
        \note Assumed same for front and back sides.
        \type real
@@ -6162,7 +6142,7 @@ WindowMaterial:Drape:EquivalentLayer,
        \maximum< 1
        \minimum 0
        \default 0.05
-  N10, \field Front Side Drape Material Thermal Emissivity
+  N10, \field Front Side Drape Material Infrared Emissivity
        \note Front side long-wave emissivity of the drape fabric at zero shade openness.
        \note Openness fraction specified above is used to calculate the effective
        \note emissivity value.
@@ -6171,7 +6151,7 @@ WindowMaterial:Drape:EquivalentLayer,
        \maximum< 1
        \minimum> 0
        \default 0.87
-  N11, \field Back Side Drape Material Thermal Emissivity
+  N11, \field Back Side Drape Material Infrared Emissivity
        \note Back side long-wave emissivity of the drape fabric at zero shade openness.
        \note Openness fraction specified above is used to calculate the effective
        \note emissivity value.
@@ -6352,21 +6332,21 @@ WindowMaterial:Blind:EquivalentLayer,
        \units dimensionless
        \maximum< 1
        \minimum 0
-  N19, \field Slat Thermal Transmittance
+  N19, \field Slat Infrared Transmittance
        \note Long-wave hemispherical transmittance of the slat material.
        \note Assumed to be the same for both sides of the slat.
        \type real
        \maximum< 1
        \minimum 0
        \default 0
-  N20, \field Front Side Slat Thermal Emissivity
+  N20, \field Front Side Slat Infrared Emissivity
        \note Front side long-wave hemispherical emissivity of the slat material.
        \type real
        \units dimensionless
        \maximum< 1
        \minimum 0
        \default 0.9
-  N21, \field Back Side Slat Thermal Emissivity
+  N21, \field Back Side Slat Infrared Emissivity
        \note Back side long-wave hemispherical emissivity of the slat material.
        \type real
        \units dimensionless
@@ -6449,7 +6429,7 @@ WindowMaterial:Screen:EquivalentLayer,
        \units dimensionless
        \minimum 0
        \maximum< 1
-  N7 , \field Screen Thermal Transmittance
+  N7 , \field Screen Infrared Transmittance
        \note The long-wave hemispherical transmittance of the screen material.
        \note Assumed to be the same for both sides of the screen.
        \type real
@@ -6457,7 +6437,7 @@ WindowMaterial:Screen:EquivalentLayer,
        \minimum 0
        \maximum< 1
        \default 0.02
-  N8 , \field Screen Thermal Emissivity
+  N8 , \field Screen Infrared Emissivity
        \note The long-wave hemispherical emissivity of the screen material.
        \note Assumed to be the same for both sides of the screen.
        \type real
@@ -6677,7 +6657,7 @@ WindowMaterial:Glazing:EquivalentLayer,
        \maximum 1.0
        \autocalculatable
        \default autocalculate
-  N23, \field Thermal Transmittance (applies to front and back)
+  N23, \field Infrared Transmittance (applies to front and back)
        \note The long-wave hemispherical transmittance of the glazing.
        \note Assumed to be the same for both sides of the glazing.
        \type real
@@ -6685,14 +6665,14 @@ WindowMaterial:Glazing:EquivalentLayer,
        \minimum 0.0
        \maximum 1.0
        \default 0.0
-  N24, \field Front Side Thermal Emissivity
+  N24, \field Front Side Infrared Emissivity
        \note The front side long-wave hemispherical emissivity of the glazing.
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum< 1.0
        \default 0.84
-  N25; \field Back Side Thermal Emissivity
+  N25; \field Back Side Infrared Emissivity
        \note The back side long-wave hemispherical emissivity of the glazing.
        \type real
        \units dimensionless
@@ -39662,8 +39642,8 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
        \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note ”Cooling Minimum Air Flow per Zone Floor Area”, ”Cooling Minimum Air Flow”, and 
-       \note ”Cooling Minimum Air Flow Fraction”. If there is no sizing calculation a default of 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
@@ -39675,8 +39655,8 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
        \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note ”Cooling Minimum Air Flow per Zone Floor Area”, ”Cooling Minimum Air Flow”, and 
-       \note ”Cooling Minimum Air Flow Fraction”. If there is no sizing calculation a default of 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
@@ -39738,8 +39718,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
        \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note ”Cooling Minimum Air Flow per Zone Floor Area”, ”Cooling Minimum Air Flow”, and 
-       \note ”Cooling Minimum Air Flow Fraction”. If there is no sizing calculation a default of 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
@@ -39751,8 +39731,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
        \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note ”Cooling Minimum Air Flow per Zone Floor Area”, ”Cooling Minimum Air Flow”, and 
-       \note ”Cooling Minimum Air Flow Fraction”. If there is no sizing calculation a default of 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
