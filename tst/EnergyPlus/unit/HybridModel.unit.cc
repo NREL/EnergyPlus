@@ -167,6 +167,8 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	SNLoadCoolEnergy.allocate( 1 );
 	ZoneAirRelHum.allocate( 1 );
 	IsZoneDV.allocate( 1 );
+	IsZoneCV.allocate( 1 );
+	IsZoneUI.allocate( 1 );
 	ZoneDVMixedFlag.allocate( 1 );
 	ZnAirRpt.allocate( 1 );
 	ZoneEquipConfig.allocate( 1 );
@@ -311,6 +313,8 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	SNLoadCoolEnergy.deallocate();
 	ZoneAirRelHum.deallocate();
 	IsZoneDV.deallocate();
+	IsZoneCV.deallocate();
+	IsZoneUI.deallocate();
 	ZoneDVMixedFlag.deallocate();
 	ZnAirRpt.deallocate();
 	ZoneEquipConfig.deallocate();
