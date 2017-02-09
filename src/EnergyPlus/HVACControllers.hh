@@ -228,6 +228,10 @@ namespace HVACControllers {
 		bool FirstTraceFlag; // To detect first individual write operation to individual controller trace file
 		int BadActionErrCount; // Counts number of incorrect action errors
 		int BadActionErrIndex; // index to recurring error structure for bad action error
+		// Fault model for water coil supply air temperature sensor offset
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		ControllerPropsType() :
@@ -268,7 +272,10 @@ namespace HVACControllers {
 			TraceFileUnit( 0 ),
 			FirstTraceFlag( true ),
 			BadActionErrCount( 0 ),
-			BadActionErrIndex( 0 )
+			BadActionErrIndex( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};
