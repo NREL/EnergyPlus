@@ -154,7 +154,7 @@ namespace DataOutputs {
 		}
 		if ( Found != 0 ) {
 			// TODO: take this out in the future InputProcessor
-			std::string const uppercaseKeyedValue = InputProcessor::MakeUPPERCase( KeyedValue );
+//			std::string const uppercaseKeyedValue = InputProcessor::MakeUPPERCase( KeyedValue );
 			do {
 				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
 					return true;
@@ -165,7 +165,7 @@ namespace DataOutputs {
 						break;
 					}
 					regex_search KeySearch( KeyRegex );
-					if ( KeySearch.Match( uppercaseKeyedValue.c_str() ) || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
+					if ( KeySearch.Match( KeyedValue.c_str() ) || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
 						return true;
 					}
 				}
