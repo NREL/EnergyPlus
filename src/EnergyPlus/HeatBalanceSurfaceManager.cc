@@ -1721,7 +1721,7 @@ namespace HeatBalanceSurfaceManager {
 
 		}
 
-		if ( TotOSCM > 1 ) {
+		if ( TotOSCM >= 1 ) {
 			for ( OSCMnum = 1; OSCMnum <= TotOSCM; ++OSCMnum ) {
 				OSCM( OSCMnum ).TConv = 20.0;
 				OSCM( OSCMnum ).HConv = 4.0;

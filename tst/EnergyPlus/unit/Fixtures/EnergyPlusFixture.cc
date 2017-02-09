@@ -91,7 +91,6 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPlantPipingSystems.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -156,6 +155,7 @@
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
@@ -295,7 +295,6 @@ namespace EnergyPlus {
 		DataMoistureBalanceEMPD::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
-		DataPlantPipingSystems::clear_state();
 		DataRoomAirModel::clear_state();
 		DataRuntimeLanguage::clear_state();
 		DataSizing::clear_state();
@@ -358,6 +357,7 @@ namespace EnergyPlus {
 		PlantLoadProfile::clear_state();
 		PlantLoopSolver::clear_state();
 		PlantManager::clear_state();
+		PlantPipingSystemsManager::clear_state();
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
