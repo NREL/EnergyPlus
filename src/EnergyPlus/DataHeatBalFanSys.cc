@@ -206,6 +206,7 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > SumHmARaZ;
 
 	Array1D< Real64 > TempZoneThermostatSetPoint;
+	Array1D< Real64 > AdapComfortCoolingSetPoint;
 	Array1D< Real64 > ZoneThermostatSetPointHi;
 	Array1D< Real64 > ZoneThermostatSetPointLo;
 
@@ -330,6 +331,7 @@ namespace DataHeatBalFanSys {
 		SumHmARa.deallocate();
 		SumHmARaW.deallocate(); 
 		TempZoneThermostatSetPoint.deallocate();
+		AdapComfortCoolingSetPoint.deallocate();
 		ZoneThermostatSetPointHi.deallocate();
 		ZoneThermostatSetPointLo.deallocate();
 		LoadCorrectionFactor.deallocate(); 
