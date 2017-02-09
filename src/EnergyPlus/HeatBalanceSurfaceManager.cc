@@ -1720,7 +1720,7 @@ namespace HeatBalanceSurfaceManager {
 
 		}
 
-		if ( TotOSCM > 1 ) {
+		if ( TotOSCM >= 1 ) {
 			for ( OSCMnum = 1; OSCMnum <= TotOSCM; ++OSCMnum ) {
 				OSCM( OSCMnum ).TConv = 20.0;
 				OSCM( OSCMnum ).HConv = 4.0;
@@ -5134,7 +5134,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
-	Real64 TempSurfInSat; // Local temperary surface dew point temperature
+	Real64 TempSurfInSat; // Local temporary surface dew point temperature
 
 	int OtherSideSurfNum; // Surface number index for other side of an interzone partition
 	static int MinIterations; // Minimum number of iterations for the inside heat balance
