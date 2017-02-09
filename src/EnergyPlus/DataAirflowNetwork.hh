@@ -1397,13 +1397,13 @@ namespace DataAirflowNetwork {
 		std::string surfaceName;
 		int surfaceNum;		// Name of surface referenced by view factor
 		Real64 viewFactor;	// View factor
-		Real64 surfaceRadLoad;	// Duct radiation load from surface [W]
+		Real64 DuctRadLoad;	// Duct radiation load from surface [W]
 
 		// Default constructor
 		LinkageSurfaceProp() :
 			surfaceNum( 0 ),
 			viewFactor( 0 ),
-			surfaceRadLoad( 0 )
+			DuctRadLoad( 0 )
 		{}
 	};
 

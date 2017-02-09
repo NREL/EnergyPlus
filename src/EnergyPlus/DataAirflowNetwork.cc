@@ -177,7 +177,7 @@ namespace DataAirflowNetwork {
 	bool AirflowNetworkUnitarySystem( false ); // set to TRUE for unitary systems (to make answers equal, will remove eventually)
 	// Multispeed HP only
 	int MultiSpeedHPIndicator( 0 ); // Indicator for multispeed heat pump use
-	// Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
+	// Additional airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
 	Real64 VAVTerminalRatio( 0.0 ); // The terminal flow ratio when a supply VAV fan reach its max flow rate
 	bool VAVSystem( false ); // This flag is used to represent a VAV system
 	Real64 ExhaustFanMassFlowRate( 0.0 ); // Exhaust fan flow rate used in PressureStat

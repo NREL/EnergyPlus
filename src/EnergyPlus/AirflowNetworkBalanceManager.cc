@@ -2881,8 +2881,32 @@ namespace AirflowNetworkBalanceManager {
 				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
 
 				this_VF_object.linkageName = Alphas( 1 ); // Name of linkage
-				this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction
-				this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
+
+				// Surface exposure fraction
+				if ( Numbers( 2 ) > 1 ) {
+					ShowContinueError( "Duct surface exposure fraction greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+					ShowContinueError( "Using value of 1 for surface exposure fraction" );
+					this_VF_object.surfaceExposureFraction = 1;
+				} else if ( Numbers( 2 ) < 0 ) {
+					ShowContinueError( "Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+					ShowContinueError( "Using value of 0 for surface exposure fraction" );
+					this_VF_object.surfaceExposureFraction = 0;
+				} else {
+					this_VF_object.surfaceExposureFraction = Numbers( 1 );
+				}
+
+				// Duct surface emittance
+				if ( Numbers( 2 ) > 1 ) {
+					ShowContinueError( "Duct surface emittance greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+					ShowContinueError( "Using value of 1 for surface emittance" );
+					this_VF_object.surfaceEmittance = 1;
+				} else if ( Numbers( 2 ) < 0 ) {
+					ShowContinueError( "Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+					ShowContinueError( "Using value of 0 for surface exposure fraction" );
+					this_VF_object.surfaceEmittance = 0;
+				} else {
+					this_VF_object.surfaceEmittance = Numbers( 2 );
+				}
 
 				this_VF_object.objectNum = i;
 
@@ -2899,7 +2923,18 @@ namespace AirflowNetworkBalanceManager {
 						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.linkageName );
 					}
 
-					this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 ); // Surface view factor
+					// Surface view factor
+					if ( Numbers( surfNum + 2 ) > 1 ) {
+						ShowContinueError( "View factor for surface " + Alphas( surfNum + 1 ) + " greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+						ShowContinueError( "Using value of 1 for view factor" );
+						this_VF_object.linkageSurfaceData( surfNum ).viewFactor = 1;
+					} else if ( Numbers( surfNum + 2 ) < 0 ) {
+						ShowContinueError( "View factor for surface " + Alphas( surfNum + 1 ) + " less than 0. Check input in: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+						ShowContinueError( "Using value of 0 for view factor" );
+						this_VF_object.linkageSurfaceData( surfNum ).viewFactor = 0;
+					} else {
+						this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 );
+					}
 				}
 			}
 		}
@@ -5335,10 +5370,12 @@ namespace AirflowNetworkBalanceManager {
 
 				Real64 TotalRadHT = 0;
 				for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
-					Real64 surfaceRadFlux = StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurr_K ) );
-					VFObj.linkageSurfaceData( j ).surfaceRadLoad = surfaceRadFlux * DuctSurfaceArea * VFObj.surfaceEmittance * VFObj.surfaceExposureFraction;
-					QRadSurfAFNDuct( VFObj.linkageSurfaceData( j ).surfaceNum ) += VFObj.linkageSurfaceData( j ).surfaceRadLoad * TimeStepSys * SecInHour; // Heat load to each surface [J]
-					TotalRadHT += VFObj.linkageSurfaceData( j ).surfaceRadLoad;
+					Real64 DuctRadFlux = StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurr_K ) );
+					VFObj.linkageSurfaceData( j ).DuctRadLoad = DuctRadFlux * DuctSurfaceArea * VFObj.surfaceEmittance * VFObj.surfaceExposureFraction;
+					int SurfNum = VFObj.linkageSurfaceData( j ).surfaceNum;
+					Real64 SurfArea = Surface( SurfNum ).Area;
+					QRadSurfAFNDuct( SurfNum ) += VFObj.linkageSurfaceData( j ).DuctRadLoad / SurfArea;
+					TotalRadHT += VFObj.linkageSurfaceData( j ).DuctRadLoad;
 				}
 
 				VFObj.TSurr = TSurr;
