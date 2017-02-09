@@ -5235,7 +5235,9 @@ namespace AirflowNetworkBalanceManager {
 
 		using DataGlobals::KelvinConv;
 		using DataGlobals::StefanBoltzmann;
+		using DataHVACGlobals::TimeStepSys;
 		using DataHeatBalSurface::TH;
+		using DataHeatBalFanSys::QRadSurfAFNDuct;
 
 		for ( int i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			int CompNum = AirflowNetworkLinkageData( i ).CompNum;
@@ -5335,6 +5337,7 @@ namespace AirflowNetworkBalanceManager {
 				for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
 					Real64 surfaceRadFlux = StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurr_K ) );
 					VFObj.linkageSurfaceData( j ).surfaceRadLoad = surfaceRadFlux * DuctSurfaceArea * VFObj.surfaceEmittance * VFObj.surfaceExposureFraction;
+					QRadSurfAFNDuct( VFObj.linkageSurfaceData( j ).surfaceNum ) += VFObj.linkageSurfaceData( j ).surfaceRadLoad * TimeStepSys * SecInHour; // Heat load to each surface [J]
 					TotalRadHT += VFObj.linkageSurfaceData( j ).surfaceRadLoad;
 				}
 
