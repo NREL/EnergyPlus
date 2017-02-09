@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -164,7 +152,7 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::BlowThru;
 	using DataHVACGlobals::Coil_HeatingWater;
 	using DataHVACGlobals::Coil_HeatingSteam;
-	using DataHVACGlobals::Coil_HeatingGas;
+	using DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 	using DataHVACGlobals::Coil_HeatingElectric;
 	using DataHVACGlobals::Coil_HeatingGas_MultiStage;
 	using DataHVACGlobals::Coil_HeatingElectric_MultiStage;
@@ -1060,13 +1048,13 @@ namespace HVACMultiSpeedHeatPump {
 
 			// Get supplemental heating coil data
 			MSHeatPump( MSHPNum ).SuppHeatCoilName = Alphas( 15 );
-			if ( SameString( Alphas( 14 ), "Coil:Heating:Gas" ) ) {
+			if ( SameString( Alphas( 14 ), "Coil:Heating:Fuel" ) ) {
 				MSHeatPump( MSHPNum ).SuppHeatCoilType = SuppHeatingCoilGas;
 				errFlag = false;
-				MSHeatPump( MSHPNum ).SuppHeatCoilNum = GetHeatingCoilIndex( "Coil:Heating:Gas", Alphas( 15 ), errFlag );
+				MSHeatPump( MSHPNum ).SuppHeatCoilNum = GetHeatingCoilIndex( "Coil:Heating:Fuel", Alphas( 15 ), errFlag );
 				if ( MSHeatPump( MSHPNum ).SuppHeatCoilNum <= 0 || errFlag ) {
 					ShowContinueError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
-					ShowContinueError( cAlphaFields( 15 ) + " of type Coil:Heating:Gas \"" + Alphas( 15 ) + "\" not found." );
+					ShowContinueError( cAlphaFields( 15 ) + " of type Coil:Heating:Fuel \"" + Alphas( 15 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 
@@ -1095,7 +1083,7 @@ namespace HVACMultiSpeedHeatPump {
 					ErrorsFound = true;
 					LocalError = false;
 				}
-				SetUpCompSets( CurrentModuleObject, MSHeatPump( MSHPNum ).Name, "Coil:Heating:Gas", MSHeatPump( MSHPNum ).SuppHeatCoilName, "UNDEFINED", "UNDEFINED" );
+				SetUpCompSets( CurrentModuleObject, MSHeatPump( MSHPNum ).Name, "Coil:Heating:Fuel", MSHeatPump( MSHPNum ).SuppHeatCoilName, "UNDEFINED", "UNDEFINED" );
 			}
 			if ( SameString( Alphas( 14 ), "Coil:Heating:Electric" ) ) {
 				MSHeatPump( MSHPNum ).SuppHeatCoilType = SuppHeatingCoilElec;
@@ -1237,7 +1225,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( MSHeatPump( MSHPNum ).SuppHeatCoilType == 0 ) {
 				ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", " + cAlphaFields( 14 ) + " is not allowed = " + Alphas( 14 ) );
-				ShowContinueError( "Valid choices are Coil:Heating:Gas,Coil:Heating:Electric,Coil:Heating:Steam,or Coil:Heating:Water" );
+				ShowContinueError( "Valid choices are Coil:Heating:Fuel,Coil:Heating:Electric,Coil:Heating:Steam,or Coil:Heating:Water" );
 				ErrorsFound = true;
 			}
 
@@ -2374,7 +2362,7 @@ namespace HVACMultiSpeedHeatPump {
 		if ( MSHeatPump( MSHeatPumpNum ).SuppMaxAirTemp == AutoSize ) {
 			if ( CurSysNum > 0 ) {
 				if ( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilType == 1 ) { // Gas
-					CheckZoneSizing( "Coil:Heating:Gas", MSHeatPump( MSHeatPumpNum ).Name );
+					CheckZoneSizing( "Coil:Heating:Fuel", MSHeatPump( MSHeatPumpNum ).Name );
 				} else {
 					CheckZoneSizing( "Coil:Heating:Electric", MSHeatPump( MSHeatPumpNum ).Name );
 				}
@@ -2386,7 +2374,7 @@ namespace HVACMultiSpeedHeatPump {
 		if ( MSHeatPump( MSHeatPumpNum ).DesignSuppHeatingCapacity == AutoSize ) {
 			if ( CurSysNum > 0 ) {
 				if ( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilType == 1 ) { // Gas
-					CheckSysSizing( "Coil:Heating:Gas", MSHeatPump( MSHeatPumpNum ).Name );
+					CheckSysSizing( "Coil:Heating:Fuel", MSHeatPump( MSHeatPumpNum ).Name );
 				} else {
 					CheckSysSizing( "Coil:Heating:Electric", MSHeatPump( MSHeatPumpNum ).Name );
 				}

@@ -99,7 +99,7 @@ This alpha field contains the identifying name given to the unitary system fan.
 
 This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. The first choice stands for ``blow through fan''. This means that the unit consists of a fan followed by the main cooling and heating coils and supplemental heating coil. The fan ``blows through'' the cooling and heating coils. The second choice stands for ``draw through fan''. This means that the unit consists of the main cooling/heating coil(s) followed by a fan, with the supplemental heater located at the outlet of the fan. The fan ``draws air through'' the cooling/heating coil(s). If this field is left blank, the default is blow through.
 
-\textbf{\emph{Field: Supply Air Fan Operating Mode Schedule Name}}
+\paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{supply-air-fan-operating-mode-schedule-name}
 
 This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
 
@@ -123,7 +123,7 @@ This alpha field contains the identifying type of heating coil specified in the 
 \item
   Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Gas:MultiStage
 \item
@@ -207,7 +207,7 @@ This alpha field contains the identifying type of supplemental heating coil spec
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Desuperheater
 \item
@@ -408,7 +408,7 @@ AirLoopHVAC:UnitarySystem,
   ,                        !- Use DOAS DX Cooling Coil
   ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature
   ,                        !- Latent Load Control
-  Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+  Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
   Supp Gas Heating Coil 1, !- Supplemental Heating Coil Name
   SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
   1.7,                     !- Cooling Supply Air Flow Rate {m3/s}
@@ -670,7 +670,7 @@ This field specifies the coil operation mode for multiple speed DX cooling and h
 
 The allowed cooling and heating coil types are restricted to the following combinations:
 
-Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:MultiSpeed and Coil:Heating:Gas. 
+Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:MultiSpeed and Coil:Heating:Fuel. 
 
 \paragraph{Field: Heating Speed 1 Supply Air Flow Ratio}\label{field-heating-speed-1-supply-air-flow-ratio}
 
@@ -780,7 +780,7 @@ This alpha field contains the identifying type of heating coil specified in the 
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -831,7 +831,7 @@ This alpha field contains the identifying type of reheat coil specified in the f
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Desuperheater
 \item
@@ -853,9 +853,9 @@ As shown in the example below, correct specification of the heat/cool furnace re
 \item
   cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 \item
-  heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+  heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
 \item
-  reheat coil (optional, Coil:Heating:Gas, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
+  reheat coil (optional, Coil:Heating:Fuel, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
 \item
   terminal unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
 \end{enumerate}
@@ -878,16 +878,17 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   Fan:OnOff,              !- Supply fan type
   Supply Fan 1,           !- Supply fan name
   BlowThrough,            !- Fan Placement
-  Coil:Heating:Gas,       !- Heating coil type
+  Coil:Heating:Fuel,       !- Heating coil type
   Furnace Heating Coil 1, !- Heating coil name
   Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
   Furnace ACDXCoil 1,     !- Cooling coil name
   None;                   !- Dehumidificatioin Control Type
 
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
       Furnace Heating Coil 1,         !- Coil Name
       FanAndCoilAvailSched,           !- Availability Schedule Name
+      NaturalGas,                     !- Fuel Type
       0.8,    !- Gas Burner Efficiency of the Coil
       25000,  !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
@@ -1027,7 +1028,7 @@ This alpha field contains the identifying type of heating coil specified in the 
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -1078,7 +1079,7 @@ This alpha field contains the identifying type of reheat coil specified in the u
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Desuperheater
 \item
@@ -1097,9 +1098,9 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 
 2)~~~Cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 
-3)~~~Heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+3)~~~Heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
 
-4)~~~Reheat coil (optional, Coil:Heating:Gas, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
+4)~~~Reheat coil (optional, Coil:Heating:Fuel, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
 
 5)~~~Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system
 
@@ -1121,15 +1122,16 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   Fan:OnOff,              !- Supply fan type
   Supply Fan 1,           !- Supply fan name
   BlowThrough,            !- Fan Placement
-  Coil:Heating:Gas,       !- Heating coil type
+  Coil:Heating:Fuel,       !- Heating coil type
   Unitary System Heating Coil 1,   !- Heating coil name
   Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
   Unitary System ACDXCoil 1,       !- Cooling coil name
   None;        !- High humidity control
 
-    Coil:Heating:Gas,
+    Coil:Heating:Fuel,
       Unitary System Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,           !- Availability Schedule Name
+      NaturalGas,                     !- Fuel Type
       0.8,    !- Gas Burner Efficiency of the Coil
       25000,  !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
@@ -1289,7 +1291,7 @@ This alpha field contains the identifying type of supplemental heating coil spec
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -1324,7 +1326,7 @@ As shown in the example below, correct specification of the air-to-air heat pump
 
 3)~~~Cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 
-4)~~~Supplemental heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+4)~~~Supplemental heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
 
 5)~~~Direct air unit (AirTerminal:SingleDuct:Uncontrolled)for each zone served by the unitary system
 
@@ -1364,7 +1366,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         Heat Pump DX Heating Coil 1, ! Heating coil name –- same name used in DX heating coil object
         Coil:Cooling:DX:SingleSpeed, !  Cooling coil type
         Heat Pump ACDXCoil 1,        ! Cooling coil name –- same name used in DX cooling coil object
-        Coil:Heating:Gas,            ! Supplemental heating coil type
+        Coil:Heating:Fuel,            ! Supplemental heating coil type
         Heat Pump DX Supp Heating Coil 1, ! Supplemental heating coil name–- same as in heating coil object
         50,                          ! Maximum supply air temperature from supplemental heater [C]
         21,                      ! Maximum outdoor dry-bulb temp for supplemental heating coil operation [C]
@@ -1412,9 +1414,10 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         HPACCoolPLFFPLR,                 ! Part load factor modifier curve (function of part-load ratio)
         CyclingFanAndCompressor;                   ! Operation mode (cycling fan, cycling compressor)
 
-     Coil:Heating:Gas,
+     Coil:Heating:Fuel,
         Heat Pump DX Supp Heating Coil 1, ! Name of heating coil
         FanAndCoilAvailSched,             ! Availability schedule
+        NaturalGas,                       ! Fuel Type
         0.8 ,                             ! Gas Burner Efficiency of the Coil
         32000,                            ! Nominal Capacity of the Coil [W]
         SuppHeating Coil Air Inlet Node,  ! Supplementary heating coil air side inlet node
@@ -1557,7 +1560,7 @@ This alpha field contains the identifying type of supplemental heating coil spec
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -1665,7 +1668,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
   Coil:Heating:DX:MultiSpeed, Heat Pump DX Heating Coil 1,  !- Heating coil type & name
   -8.0,                    !- Minimum outdoor dry-bulb temperature for compressor operation
   Coil:Cooling:DX:MultiSpeed, Heat Pump ACDXCoil 1,    !- Cooling coil type & name
-  Coil:Heating:Gas,        !- Supplemental heating coil type
+  Coil:Heating:Fuel,        !- Supplemental heating coil type
   Supp Gas Heating Coil 1, !- Supplemental heating coil name
   50.0,                    !- Maximum supply air temperature from supplemental heater
   21,                      !- Maximum outdoor dry-bulb temperature for supplemental heater operation
@@ -1835,9 +1838,10 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       0.3,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 4 {m3/s}
       100;                     !- Evaporative Condenser Pump Rated Power Consumption, Speed 4 {W}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
       Supp Gas Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency of the Coil
       45000,                   !- Nominal Capacity of the Coil {W}
       SuppHeating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
@@ -2075,7 +2079,7 @@ This alpha field contains the identifying type of heating coil specified in the 
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -2090,7 +2094,7 @@ As shown in the example below, correct specification of the furnace requires spe
 
 1)~~~fan (Fan:OnOff or Fan:ConstantVolume)
 
-2)~~~heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+2)~~~heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
 
 3)~~~direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
 
@@ -2110,13 +2114,14 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
       Fan:OnOff,            !- Supply Fan Object Type
       Supply Fan 1,         !- Supply Fan Fame
       BlowThrough,          !- Fan Placement
-      Coil:Heating:Gas,     !- Heating Coil Object Type
+      Coil:Heating:Fuel,     !- Heating Coil Object Type
       Furnace Coil;         !- Heating Coil Name
 
 
-    Coil:Heating:Gas,
+    Coil:Heating:Fuel,
       Furnace Coil,          !- Coil Name
       FanAndCoilAvailSched,  !- Availability Schedule Name
+      NaturalGas,            !- Fuel Type
       0.8,                   !- Gas Burner Efficiency of the Coil
       20000,                 !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
@@ -2250,7 +2255,7 @@ This alpha field contains the identifying type of heating coil specified in the 
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -2265,7 +2270,7 @@ As shown in the example below, correct specification of the heat-only unitary sy
 
 1)~~~fan (Fan:OnOff or Fan:ConstantVolume)
 
-2)~~~heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+2)~~~heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
 
 3)~~~direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
 
@@ -2285,13 +2290,14 @@ AirLoopHVAC:UnitaryHeatOnly,
       Fan:OnOff,            !- Supply Fan Object Type
       Supply Fan 1,         !- Supply Fan Name
       BlowThrough,          !- Fan Placement
-      Coil:Heating:Gas,     !- Heating Coil Object Type
+      Coil:Heating:Fuel,     !- Heating Coil Object Type
       Unitary System Heating Coil; !- Heating Coil Name
 
 
-    Coil:Heating:Gas,
+    Coil:Heating:Fuel,
       Unitary System Heating Coil, !- Coil Name
       FanAndCoilAvailSched,        !- Availability Schedule Name
+      NaturalGas,                 !- Fuel Type
       0.8,                         !- Gas Burner Efficiency of the Coil
       20000,                       !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
@@ -2506,7 +2512,7 @@ This is the object type of the supplemental heating coil. The hot water and stea
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -2608,7 +2614,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
       60, !- Heat Pump Time Constant {s}
       0.01, !- Fraction of On-Cycle Power Use
       60,    !- Heat Pump Fan Delay Time {s}
-      Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+      Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
       Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
       50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
       21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2680,9 +2686,10 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
 
 
 
-    Coil:Heating:Gas,
+    Coil:Heating:Fuel,
       Heat Pump DX Supp Heating Coil 1,  !- Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency
       32000,                   !- Nominal Capacity {W}
       SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -2693,24 +2700,20 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
 
     BRANCH,
       Gshp Cooling Condenser Branch,  !- Name
-      0,  !- Maximum Flow Rate {m3/s}
-       , !- Pressure Drop Curve Name
+      , !- Pressure Drop Curve Name
       Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Cooling Mode,  !- Component 1 Name
       Water to Air Heat Pump Source Side1 Inlet Node, !- Component 1 Inlet Node Name
-      Water to Air Heat Pump Source Side1 Outlet Node, !- Component 1 Outlet Node Name
-      ACTIVE;  !- Component 1 Branch Control Type
+      Water to Air Heat Pump Source Side1 Outlet Node; !- Component 1 Outlet Node Name
 
 
     BRANCH,
       Gshp Heating Condenser Branch,  !- Name
-      0,  !- Maximum Flow Rate {m3/s}
       , !- Pressure Drop Curve Name
       Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
       Heat Pump Heating Mode,  !- Component 1 Name
       Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-      Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-      ACTIVE;  !- Component 1 Branch Control Type
+      Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
 
 
@@ -2933,7 +2936,7 @@ This alpha field defines the type of heating coil used by this unitary system. T
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:DX:SingleSpeed
 \item
@@ -3002,7 +3005,7 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 3)~~~cooling coil (Coil:Cooling:DX:SingleSpeed, CoilSystem:Cooling:DX:HeatExchangerAssisted, or Coil:Cooling:DX:TwoStageWithHumidityControlMode)
 
-4)~~~heating coil (Coil:Heating:Gas, Coil:Heating:Electric, or Coil:Heating:DX:SingleSpeed)
+4)~~~heating coil (Coil:Heating:Fuel, Coil:Heating:Electric, or Coil:Heating:DX:SingleSpeed)
 
 5)~~~terminal unit for each zone being served by this system (AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat)
 
@@ -3032,7 +3035,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   Fan OpMode Schedule,     !- Supply air fan operating mode schedule name
   Coil:Cooling:DX:TwoStageWithHumidityControlMode,  !- Cooling coil type
   ACDXCoil 2,              !- Cooling coil name
-  Coil:Heating:Gas,        !- Heating coil type
+  Coil:Heating:Fuel,        !- Heating coil type
   Furnace Heating Coil 1,  !- Heating coil name
   CoolingPriority,        !- Priority control mode
   10.0,                    !- Minimum outlet air temperature during cooling operation {C}
@@ -3071,9 +3074,10 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
       CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
       ACDXCoil 2 Standard Mode-Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Object Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
       Furnace Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency of the Coil
       35000,                   !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node

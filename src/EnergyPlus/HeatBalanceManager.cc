@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -890,11 +878,8 @@ namespace HeatBalanceManager {
 				DefaultInsideConvectionAlgo = ASHRAESimple;
 				AlphaName( 1 ) = "Simple";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultInsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetInsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -931,32 +916,20 @@ namespace HeatBalanceManager {
 			GetObjectItem( "SurfaceConvectionAlgorithm:Outside", 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 
-			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
+			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAESimple;
-				if ( AlphaName( 1 ) == "SIMPLE" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to SimpleCombined, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "SimpleCombined";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
-				if ( AlphaName( 1 ) == "BLAST" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "MOWITT" ) {
 				DefaultOutsideConvectionAlgo = MoWiTTHcOutside;
 				AlphaName( 1 ) = "MoWitt";
 
-			} else if ( ( SELECT_CASE_var == "DOE-2" ) || ( SELECT_CASE_var == "DOE2" ) ) {
+			} else if ( ( SELECT_CASE_var == "DOE-2" ) ) {
 				DefaultOutsideConvectionAlgo = DOE2HcOutside;
-				if ( AlphaName( 1 ) == "DOE2" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to DOE-2, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "DOE-2";
 
 			} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
@@ -3837,6 +3810,7 @@ namespace HeatBalanceManager {
 		ConstrNum = 0;
 
 		CurrentModuleObject = "Construction:InternalSource";
+		if ( TotSourceConstructs > 0 ) AnyConstructInternalSourceInInput = true;
 		for ( Loop = 1; Loop <= TotSourceConstructs; ++Loop ) { // Loop through all constructs with sources in the input...
 
 			//Get the object names for each construction from the input processor
@@ -4390,11 +4364,7 @@ namespace HeatBalanceManager {
 				if ( SELECT_CASE_var == "SIMPLE" ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
-					if ( cAlphaArgs( 2 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -4422,22 +4392,10 @@ namespace HeatBalanceManager {
 		if ( NumAlphas > 2 && !lAlphaFieldBlanks( 3 ) ) {
 				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
-				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
-					if ( cAlphaArgs( 3 ) == "SIMPLE" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to SimpleCombined." );
-					}
+				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
-					if ( cAlphaArgs( 3 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
-					if ( cAlphaArgs( 3 ) == "BLAST" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "MOWITT" ) {
@@ -4669,6 +4627,7 @@ namespace HeatBalanceManager {
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QElecBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		QCoolingPanelToPerson.dimension( NumOfZones, 0.0 );
 		XMAT.dimension( NumOfZones, 23.0 );
 		XM2T.dimension( NumOfZones, 23.0 );
 		XM3T.dimension( NumOfZones, 23.0 );
@@ -4770,38 +4729,19 @@ namespace HeatBalanceManager {
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   April 1997
 		//       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-		//       RE-ENGINEERED  na
+		//       				July 2016, Rick Strand for movable insulation bug fix
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is the main driver for record keeping within the
 		// heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events.
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::ReportDetailedWarmupConvergence;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//  CHARACTER(len=MaxNameLength) :: ZoneName
 		int ZoneNum;
+		int SurfNum;
 		static bool FirstWarmupWrite( true );
 
 		// Formats
@@ -4810,7 +4750,6 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 
-		// Always do the following record keeping (every time step):
 		// Record Maxs & Mins for individual zone
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZTAV( ZoneNum ) > MaxTempZone( ZoneNum ) ) {
@@ -4857,13 +4796,11 @@ namespace HeatBalanceManager {
 
 		}
 
-		// There is no hourly record keeping in the heat balance.
-
-		// There is no daily record keeping in the heat balance.
-
-		// There is no environment level record keeping in the heat balance.
-
-		// There is no simulation level record keeping in the heat balance.
+		// Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
+		// exchange algorithm knows whether there has been a change in interior movable insulation or not.
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			DataSurfaces::Surface( SurfNum ).MovInsulIntPresentPrevTS = DataSurfaces::Surface( SurfNum ).MovInsulIntPresent;
+		}
 
 	}
 
@@ -5818,11 +5755,15 @@ Label20: ;
 				Material( loop ).WinShadeRightOpeningMult = 0.0;
 				Material( loop ).WinShadeAirFlowPermeability = 0.0;
 				Material( loop ).BlindDataPtr = 0;
-				Material( loop ).EMPDVALUE = 0.0;
+				Material( loop ).EMPDmu = 0.0;
 				Material( loop ).MoistACoeff = 0.0;
 				Material( loop ).MoistBCoeff = 0.0;
 				Material( loop ).MoistCCoeff = 0.0;
 				Material( loop ).MoistDCoeff = 0.0;
+				Material( loop ).EMPDSurfaceDepth = 0.0;
+				Material( loop ).EMPDDeepDepth = 0.0;
+				Material( loop ).EMPDmuCoating = 0.0;
+				Material( loop ).EMPDCoatingThickness = 0.0;
 			}
 
 			// Glass objects
@@ -7221,7 +7162,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), Material, MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );

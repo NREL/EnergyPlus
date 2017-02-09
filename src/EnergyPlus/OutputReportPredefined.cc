@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -295,8 +283,9 @@ namespace OutputReportPredefined {
 	int pdchExLtConsump;
 	int pdstDaylight;
 	int pdchDyLtZone;
+	int pdchDyLtCtrlName;
 	int pdchDyLtKind;
-	int pdchDyLtCtrl;
+	int pdchDyLtCtrlType;
 	int pdchDyLtFrac;
 	int pdchDyLtWInst;
 	int pdchDyLtWCtrl;
@@ -363,6 +352,10 @@ namespace OutputReportPredefined {
 	int pdchDCVventMechName;
 	int pdchDCVperPerson;
 	int pdchDCVperArea;
+	int pdchDCVperZone;
+	int pdchDCVperACH;
+	int pdchDCVMethod;
+	int pdchDCVOASchName;
 
 	//added for new DCV
 	int pdchDCVZoneADEffCooling;
@@ -910,8 +903,9 @@ namespace OutputReportPredefined {
 		pdchExLtConsump = 0;
 		pdstDaylight = 0;
 		pdchDyLtZone = 0;
+		pdchDyLtCtrlName = 0;
 		pdchDyLtKind = 0;
-		pdchDyLtCtrl = 0;
+		pdchDyLtCtrlType = 0;
 		pdchDyLtFrac = 0;
 		pdchDyLtWInst = 0;
 		pdchDyLtWCtrl = 0;
@@ -969,6 +963,10 @@ namespace OutputReportPredefined {
 		pdchDCVventMechName = 0;
 		pdchDCVperPerson = 0;
 		pdchDCVperArea = 0;
+		pdchDCVperZone = 0;
+		pdchDCVperACH = 0;
+		pdchDCVMethod = 0;
+		pdchDCVOASchName = 0;
 		pdchDCVZoneADEffCooling = 0;
 		pdchDCVZoneADEffHeating = 0;
 		pdchDCVZoneADEffSchName = 0;
@@ -1432,8 +1430,9 @@ namespace OutputReportPredefined {
 		pdstDaylight = newPreDefSubTable( pdrLighting, "Daylighting" );
 
 		pdchDyLtZone = newPreDefColumn( pdstDaylight, "Zone" );
-		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Type" ); //detailed or DElight
-		pdchDyLtCtrl = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
+		pdchDyLtCtrlName = newPreDefColumn (pdstDaylight, "Control Name");
+		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Method" ); //detailed or DElight
+		pdchDyLtCtrlType = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
 		pdchDyLtFrac = newPreDefColumn( pdstDaylight, "Fraction Controlled" );
 		pdchDyLtWInst = newPreDefColumn( pdstDaylight, "Lighting Installed in Zone [W]" );
 		pdchDyLtWCtrl = newPreDefColumn( pdstDaylight, "Lighting Controlled [W]" );
@@ -1476,7 +1475,7 @@ namespace OutputReportPredefined {
 
 		// o  CoilDX_HeatingEmpirical         Coil:Heating:DX:SingleSpeed            DXCoil                   HeatPumpAuto
 		// o  CoilDX_MultiSpeedHeating        Coil:Heating:DX:MultiSpeed             DXCoil                   MultispeedHeatPump
-		// o  Coil_HeatingGas                 Coil:Heating:Gas                       HVACHeatingCoils         5ZoneAutoDXVAV
+		// o  Coil_HeatingGasOrOtherFuel                 Coil:Heating:Fuel                       HVACHeatingCoils         5ZoneAutoDXVAV
 		// o  Coil_HeatingElectric            Coil:Heating:Electric                  HVACHeatingCoils         PackagedTerminalAirConditioner
 		// o  Coil_HeatingDesuperheater       Coil:Heating:Desuperheater             HVACHeatingCoils         SuperMarket_DesuperHeatingCoil
 		// o  Coil_HeatingWater               Coil:Heating:Water                     HVACWaterCoilComponent   5ZoneAirCooled
@@ -1639,11 +1638,15 @@ namespace OutputReportPredefined {
 		pdchDCVventMechName = newPreDefColumn( pdstDemCntlVent, "Controller:MechanicalVentilation Name" );
 		pdchDCVperPerson = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Person [m3/s-person]" );
 		pdchDCVperArea = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Area [m3/s-m2]" );
+		pdchDCVperZone = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Zone [m3/s]" );
+		pdchDCVperACH = newPreDefColumn( pdstDemCntlVent, "Outdoor Air ACH [ach]" );
+		pdchDCVMethod = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Method" );
+		pdchDCVOASchName = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Schedule Name" );
 
 		// added for new DCV
 		pdchDCVZoneADEffCooling = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness in Cooling Mode" );
 		pdchDCVZoneADEffHeating = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness in Heating Mode" );
-		pdchDCVZoneADEffSchName = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness Schedule" );
+		pdchDCVZoneADEffSchName = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness Schedule Name" );
 
 		pdstSimpleComfort = newPreDefSubTable( pdrSystem, "Time Not Comfortable Based on Simple ASHRAE 55-2004" );
 		pdchSCwinterClothes = newPreDefColumn( pdstSimpleComfort, "Winter Clothes [hr]" );

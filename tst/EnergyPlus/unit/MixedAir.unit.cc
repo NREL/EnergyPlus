@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::MixedAir Unit Tests
 
@@ -4065,293 +4053,235 @@ namespace EnergyPlus {
 
 			"Branch,",
 			"    SPACE1-1 Cooling Coil ChW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Cooling:Water,      !- Component 1 Object Type",
 			"    SPACE1-1 Cooling Coil,   !- Component 1 Name",
 			"    SPACE1-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE1-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE1-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE1-1 Heating Coil HW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    SPACE1-1 Heating Coil,   !- Component 1 Name",
 			"    SPACE1-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE1-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE1-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE2-1 Cooling Coil ChW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Cooling:Water,      !- Component 1 Object Type",
 			"    SPACE2-1 Cooling Coil,   !- Component 1 Name",
 			"    SPACE2-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE2-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE2-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE2-1 Heating Coil HW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    SPACE2-1 Heating Coil,   !- Component 1 Name",
 			"    SPACE2-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE2-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE2-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE3-1 Cooling Coil ChW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Cooling:Water,      !- Component 1 Object Type",
 			"    SPACE3-1 Cooling Coil,   !- Component 1 Name",
 			"    SPACE3-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE3-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE3-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE3-1 Heating Coil HW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    SPACE3-1 Heating Coil,   !- Component 1 Name",
 			"    SPACE3-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE3-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE3-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE4-1 Cooling Coil ChW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Cooling:Water,      !- Component 1 Object Type",
 			"    SPACE4-1 Cooling Coil,   !- Component 1 Name",
 			"    SPACE4-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE4-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE4-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE4-1 Heating Coil HW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    SPACE4-1 Heating Coil,   !- Component 1 Name",
 			"    SPACE4-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE4-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE4-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE5-1 Cooling Coil ChW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Cooling:Water,      !- Component 1 Object Type",
 			"    SPACE5-1 Cooling Coil,   !- Component 1 Name",
 			"    SPACE5-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE5-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE5-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    SPACE5-1 Heating Coil HW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    SPACE5-1 Heating Coil,   !- Component 1 Name",
 			"    SPACE5-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-			"    SPACE5-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    SPACE5-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    DOAS Main Branch,        !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    DOAS OA System,          !- Component 1 Name",
 			"    DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 			"    DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-			"    Passive,                 !- Component 1 Branch Control Type",
 			"    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type",
 			"    DOAS Heat Recovery,      !- Component 2 Name",
 			"    DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 			"    DOAS Heat Recovery Supply Outlet,  !- Component 2 Outlet Node Name",
-			"    Passive,                 !- Component 2 Branch Control Type",
 			"    Coil:Cooling:Water,      !- Component 3 Object Type",
 			"    DOAS Cooling Coil,       !- Component 3 Name",
 			"    DOAS Heat Recovery Supply Outlet,   !- Component 3 Inlet Node Name",
 			"    DOAS Cooling Coil Outlet,!- Component 3 Outlet Node Name",
-			"    Passive,                 !- Component 3 Branch Control Type",
 			"    Coil:Heating:Water,      !- Component 4 Object Type",
 			"    DOAS Heating Coil,       !- Component 4 Name",
 			"    DOAS Cooling Coil Outlet,!- Component 4 Inlet Node Name",
 			"    DOAS Heating Coil Outlet,!- Component 4 Outlet Node Name",
-			"    Passive,                 !- Component 4 Branch Control Type",
 			"    Fan:VariableVolume,      !- Component 5 Object Type",
 			"    DOAS Supply Fan,         !- Component 5 Name",
 			"    DOAS Heating Coil Outlet,!- Component 5 Inlet Node Name",
-			"    DOAS Supply Fan Outlet,  !- Component 5 Outlet Node Name",
-			"    Active;                  !- Component 5 Branch Control Type",
+			"    DOAS Supply Fan Outlet;  !- Component 5 Outlet Node Name",
 
 			"Branch,",
 			"    DOAS Cooling Coil ChW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Cooling:Water,      !- Component 1 Object Type",
 			"    DOAS Cooling Coil,       !- Component 1 Name",
 			"    DOAS Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-			"    DOAS Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    DOAS Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    DOAS Heating Coil HW Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    DOAS Heating Coil,       !- Component 1 Name",
 			"    DOAS Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-			"    DOAS Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    DOAS Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Main Boiler HW Branch,   !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    DistrictHeating,         !- Component 1 Object Type",
 			"    Purchased Heating,         !- Component 1 Name",
 			"    Purchased Heat Inlet Node, !- Component 1 Inlet Node Name",
-			"    Purchased Heat Outlet Node,   !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    Purchased Heat Outlet Node;   !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Main Chiller ChW Branch, !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    DistrictCooling,         !- Component 1 Object Type",
 			"    Purchased Cooling,            !- Component 1 Name",
 			"    Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name",
-			"    Purchased Cooling Outlet Node, !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    Purchased Cooling Outlet Node; !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Hot Water Loop HW Supply Bypass Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Hot Water Loop HW Supply Side Bypass Pipe,  !- Component 1 Name",
 			"    Hot Water Loop HW Supply Bypass Inlet,  !- Component 1 Inlet Node Name",
-			"    Hot Water Loop HW Supply Bypass Outlet,  !- Component 1 Outlet Node Name",
-			"    Bypass;                  !- Component 1 Branch Control Type",
+			"    Hot Water Loop HW Supply Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Hot Water Loop HW Supply Inlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 			"    Hot Water Loop HW Supply Pump,  !- Component 1 Name",
 			"    Hot Water Loop HW Supply Inlet,  !- Component 1 Inlet Node Name",
-			"    Hot Water Loop HW Pump Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    Hot Water Loop HW Pump Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Hot Water Loop HW Supply Outlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Hot Water Loop HW Supply Outlet Pipe,  !- Component 1 Name",
 			"    Hot Water Loop HW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-			"    Hot Water Loop HW Supply Outlet,  !- Component 1 Outlet Node Name",
-			"    Passive;                 !- Component 1 Branch Control Type",
+			"    Hot Water Loop HW Supply Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Hot Water Loop HW Demand Inlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Hot Water Loop HW Demand Inlet Pipe,  !- Component 1 Name",
 			"    Hot Water Loop HW Demand Inlet,  !- Component 1 Inlet Node Name",
-			"    Hot Water Loop HW Demand Inlet Pipe Outlet,  !- Component 1 Outlet Node Name",
-			"    Passive;                 !- Component 1 Branch Control Type",
+			"    Hot Water Loop HW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Hot Water Loop HW Demand Bypass Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Hot Water Loop HW Demand Side Bypass Pipe,  !- Component 1 Name",
 			"    Hot Water Loop HW Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
-			"    Hot Water Loop HW Demand Bypass Outlet,  !- Component 1 Outlet Node Name",
-			"    Bypass;                  !- Component 1 Branch Control Type",
+			"    Hot Water Loop HW Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Hot Water Loop HW Demand Outlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Hot Water Loop HW Demand Outlet Pipe,  !- Component 1 Name",
 			"    Hot Water Loop HW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-			"    Hot Water Loop HW Demand Outlet,  !- Component 1 Outlet Node Name",
-			"    Passive;                 !- Component 1 Branch Control Type",
+			"    Hot Water Loop HW Demand Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Chilled Water Loop ChW Supply Bypass Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Chilled Water Loop ChW Supply Side Bypass Pipe,  !- Component 1 Name",
 			"    Chilled Water Loop ChW Supply Bypass Inlet,  !- Component 1 Inlet Node Name",
-			"    Chilled Water Loop ChW Supply Bypass Outlet,  !- Component 1 Outlet Node Name",
-			"    Bypass;                  !- Component 1 Branch Control Type",
+			"    Chilled Water Loop ChW Supply Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Chilled Water Loop ChW Supply Inlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 			"    Chilled Water Loop ChW Supply Pump,  !- Component 1 Name",
 			"    Chilled Water Loop ChW Supply Inlet,  !- Component 1 Inlet Node Name",
-			"    Chilled Water Loop ChW Pump Outlet,  !- Component 1 Outlet Node Name",
-			"    Active;                  !- Component 1 Branch Control Type",
+			"    Chilled Water Loop ChW Pump Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Chilled Water Loop ChW Supply Outlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Chilled Water Loop ChW Supply Outlet Pipe,  !- Component 1 Name",
 			"    Chilled Water Loop ChW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-			"    Chilled Water Loop ChW Supply Outlet,  !- Component 1 Outlet Node Name",
-			"    Passive;                 !- Component 1 Branch Control Type",
+			"    Chilled Water Loop ChW Supply Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Chilled Water Loop ChW Demand Inlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Chilled Water Loop ChW Demand Inlet Pipe,  !- Component 1 Name",
 			"    Chilled Water Loop ChW Demand Inlet,  !- Component 1 Inlet Node Name",
-			"    Chilled Water Loop ChW Demand Inlet Pipe Outlet,  !- Component 1 Outlet Node Name",
-			"    Passive;                 !- Component 1 Branch Control Type",
+			"    Chilled Water Loop ChW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Chilled Water Loop ChW Demand Bypass Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Chilled Water Loop ChW Demand Side Bypass Pipe,  !- Component 1 Name",
 			"    Chilled Water Loop ChW Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
-			"    Chilled Water Loop ChW Demand Bypass Outlet,  !- Component 1 Outlet Node Name",
-			"    Bypass;                  !- Component 1 Branch Control Type",
+			"    Chilled Water Loop ChW Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 			"Branch,",
 			"    Chilled Water Loop ChW Demand Outlet Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Chilled Water Loop ChW Demand Outlet Pipe,  !- Component 1 Name",
 			"    Chilled Water Loop ChW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-			"    Chilled Water Loop ChW Demand Outlet,  !- Component 1 Outlet Node Name",
-			"    Passive;                 !- Component 1 Branch Control Type",
+			"    Chilled Water Loop ChW Demand Outlet;  !- Component 1 Outlet Node Name",
 
 			"BranchList,",
 			"    DOAS Branches,           !- Name",
@@ -4803,6 +4733,301 @@ namespace EnergyPlus {
 			EXPECT_EQ( 5, GetOAMixerIndex( "SPACE5-1 OA Mixing Box" ) );
 			EXPECT_EQ( 6, GetOAMixerIndex( "DOAS OA Mixing Box" ) );
 
+	}
+
+	TEST_F( EnergyPlusFixture, MechVentController_IAQPTests )
+	{
+		Contaminant.CO2Simulation = true;
+		Contaminant.GenericContamSimulation = true;
+
+		std::string const idf_objects = delimited_string({
+			"Version,8.6;",
+			"  Controller:MechanicalVentilation,",
+			"    DCVObject, !- Name",
+			"    , !- Availability Schedule Name",
+			"    , !- Demand Controlled Ventilation",
+			"    IndoorAirQualityProcedure, !- System Outdoor Air Method",
+			"     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }",
+			"    Zone 1, !- Zone 1 Name",
+			"    , !- Design Specification Outdoor Air Object Name 1",
+			"    , !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone 2, !- Zone 1 Name",
+			"    , !- Design Specification Outdoor Air Object Name 1",
+			"    ; !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone, Zone 1;",
+			"    Zone, Zone 2;"
+		} );
+
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+		GetZoneData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		int NumZones( 2 );
+		Real64 SysMassFlow( 0.0 ); // System supply mass flow rate [kg/s]
+		Real64 OAMassFlow( 0.0 ); // OA mass flow rate [kg/s]
+		DataContaminantBalance::ZoneSysContDemand.allocate( NumZones );
+		DataContaminantBalance::ZoneSysContDemand( 1 ).OutputRequiredToCO2SP = 0.2;
+		DataContaminantBalance::ZoneSysContDemand( 2 ).OutputRequiredToCO2SP = 0.3;
+		DataContaminantBalance::ZoneSysContDemand( 1 ).OutputRequiredToGCSP = 1.0;
+		DataContaminantBalance::ZoneSysContDemand( 2 ).OutputRequiredToGCSP = 0.5;
+
+		GetOAControllerInputs();
+
+		// Case 1 - System OA method = IndoorAirQualityProcedure, SOAM_IAQP, controls to OutputRequiredToCO2SP
+		OAMassFlow = 0.0;
+		EXPECT_EQ( SOAM_IAQP, VentilationMechanical( 1 ).SystemOAMethod );
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_EQ( 0.5, OAMassFlow );
+
+		// Case 2 - System OA method = IndoorAirQualityProcedureGenericContaminant, SOAM_IAQPGC, controls to OutputRequiredToGCSP
+		OAMassFlow = 0.0;
+		VentilationMechanical( 1 ).SystemOAMethod = SOAM_IAQPGC;
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_EQ( 1.5, OAMassFlow );
+
+		// Case 3 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, controls to greater of total OutputRequiredToCO2SP and OutputRequiredToGCSP
+		OAMassFlow = 0.0;
+		VentilationMechanical( 1 ).SystemOAMethod = SOAM_IAQPCOM;
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_EQ( 1.5, OAMassFlow );
+
+		// Case 4 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, set zone OA schedules to alwaysoff
+		ScheduleManager::Schedule.allocate( 1 );
+		ScheduleManager::Schedule( 1 ).CurrentValue = 0.0;
+		VentilationMechanical( 1 ).ZoneOASchPtr( 1 ) = 1;
+		VentilationMechanical( 1 ).ZoneOASchPtr( 2 ) = 1;
+
+		OAMassFlow = 0.0;
+		VentilationMechanical( 1 ).SystemOAMethod = SOAM_IAQPCOM;
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_EQ( 0.0, OAMassFlow );
+
+		DataContaminantBalance::ZoneSysContDemand.deallocate();
+		ScheduleManager::Schedule.deallocate();
+	}
+
+	TEST_F( EnergyPlusFixture, MechVentController_ZoneSumTests )
+	{
+		Contaminant.CO2Simulation = true;
+		Contaminant.CO2OutdoorSchedPtr = 1;
+
+		std::string const idf_objects = delimited_string({
+			"Version,8.6;",
+			"  Controller:MechanicalVentilation,",
+			"    DCVObject, !- Name",
+			"    , !- Availability Schedule Name",
+			"    Yes, !- Demand Controlled Ventilation",
+			"    ZoneSum, !- System Outdoor Air Method",
+			"     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }",
+			"    Zone 1, !- Zone 1 Name",
+			"    Zone 1 DSOA, !- Design Specification Outdoor Air Object Name 1",
+			"    , !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone 2, !- Zone 1 Name",
+			"    Zone 2 DSOA, !- Design Specification Outdoor Air Object Name 1",
+			"    , !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone 3, !- Zone 1 Name",
+			"    Zone 3 DSOA, !- Design Specification Outdoor Air Object Name 1",
+			"    , !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone 4, !- Zone 1 Name",
+			"    Zone 4 DSOA, !- Design Specification Outdoor Air Object Name 1",
+			"    , !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone 5, !- Zone 1 Name",
+			"    Zone 5 DSOA, !- Design Specification Outdoor Air Object Name 1",
+			"    , !- Design Specification Zone Air Distribution Object Name 1",
+			"    Zone 6, !- Zone 1 Name",
+			"    Zone 6 DSOA, !- Design Specification Outdoor Air Object Name 1",
+			"    ; !- Design Specification Zone Air Distribution Object Name 1",
+			"DesignSpecification:OutdoorAir,",
+			"    Zone 1 DSOA,             !- Name",
+			"    flow/person,             !- Outdoor Air Method",
+			"    0.1,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"    0.0,                     !- Outdoor Air Flow per Zone {m3/s}",
+			"    0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+			"    Zone 1 OA Schedule;      !- Outdoor Air Schedule Name",
+			"DesignSpecification:OutdoorAir,",
+			"    Zone 2 DSOA,             !- Name",
+			"    flow/area,               !- Outdoor Air Method",
+			"    0.0,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"    1.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"    0.0,                     !- Outdoor Air Flow per Zone {m3/s}",
+			"    0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+			"    Zone 2 OA Schedule;      !- Outdoor Air Schedule Name",
+			"DesignSpecification:OutdoorAir,",
+			"    Zone 3 DSOA,             !- Name",
+			"    flow/zone,               !- Outdoor Air Method",
+			"    0.0,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"    3.0,                     !- Outdoor Air Flow per Zone {m3/s}",
+			"    0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+			"    Zone 3 OA Schedule;      !- Outdoor Air Schedule Name",
+			"DesignSpecification:OutdoorAir,",
+			"    Zone 4 DSOA,             !- Name",
+			"    AirChanges/Hour,         !- Outdoor Air Method",
+			"    0.0,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"    0.0,                     !- Outdoor Air Flow per Zone {m3/s}",
+			"    5.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+			"    Zone 4 OA Schedule;      !- Outdoor Air Schedule Name",
+			"DesignSpecification:OutdoorAir,",
+			"    Zone 5 DSOA,             !- Name",
+			"    Sum,                     !- Outdoor Air Method",
+			"    0.2,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"    2.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"    5.0,                     !- Outdoor Air Flow per Zone {m3/s}",
+			"    4.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+			"    Zone 5 OA Schedule;      !- Outdoor Air Schedule Name",
+			"DesignSpecification:OutdoorAir,",
+			"    Zone 6 DSOA,             !- Name",
+			"    Maximum,                 !- Outdoor Air Method",
+			"    0.3,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"    1.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"    1.0,                     !- Outdoor Air Flow per Zone {m3/s}",
+			"    0.1,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+			"    Zone 6 OA Schedule;      !- Outdoor Air Schedule Name",
+			"Schedule:Constant, Zone 1 OA Schedule, , 0.1;",
+			"Schedule:Constant, Zone 2 OA Schedule, , 0.2;",
+			"Schedule:Constant, Zone 3 OA Schedule, , 0.3;",
+			"Schedule:Constant, Zone 4 OA Schedule, , 0.4;",
+			"Schedule:Constant, Zone 5 OA Schedule, , 0.5;",
+			"Schedule:Constant, Zone 6 OA Schedule, , 0.6;",
+			"Zone,",
+			"    Zone 1,                  !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0, 0, 0,                 !- X,Y,Z  {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    ,                        !- Volume {m3}",
+			"    100;                     !- Floor Area {m2}",
+			"Zone,",
+			"    Zone 2,                  !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0, 0, 0,                 !- X,Y,Z  {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    ,                        !- Volume {m3}",
+			"    200;                     !- Floor Area {m2}",
+			"Zone,",
+			"    Zone 3,                  !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0, 0, 0,                 !- X,Y,Z  {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    ,                        !- Volume {m3}",
+			"    300;                     !- Floor Area {m2}",
+			"Zone,",
+			"    Zone 4,                  !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0, 0, 0,                 !- X,Y,Z  {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    3600,                    !- Volume {m3}",
+			"    400;                     !- Floor Area {m2}",
+			"Zone,",
+			"    Zone 5,                  !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0, 0, 0,                 !- X,Y,Z  {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    7200,                    !- Volume {m3}",
+			"    100;                     !- Floor Area {m2}",
+			"Zone,",
+			"    Zone 6,                  !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0, 0, 0,                 !- X,Y,Z  {m}",
+			"    1,                       !- Type",
+			"    5,                       !- Multiplier",
+			"    ,                        !- Ceiling Height {m}",
+			"    3600,                    !- Volume {m3}",
+			"    600;                     !- Floor Area {m2}"
+		} );
+
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+		GetZoneData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		// Initialize schedule values
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::HourOfDay = 1;
+		DataEnvironment::DayOfWeek = 1;
+		DataEnvironment::DayOfYear_Schedule = 100;
+		ScheduleManager::UpdateScheduleValues();
+
+		// Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
+		int NumZones( 6 );
+		for ( int index = 1; index <= NumZones; ++index ) {
+			DataHeatBalance::Zone( index ).FloorArea = DataHeatBalance::Zone( index ).UserEnteredFloorArea;
+		}
+
+		Real64 SysMassFlow( 0.0 ); // System supply mass flow rate [kg/s]
+		Real64 OAMassFlow( 0.0 ); // OA mass flow rate [kg/s]
+		DataEnvironment::StdRhoAir = 1.0; // For convenience so mass flow returned will equal volume flows input
+
+		DataHeatBalance::ZoneIntGain.allocate( NumZones );
+		DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 10;
+		DataHeatBalance::ZoneIntGain( 2 ).NOFOCC = 2;
+		DataHeatBalance::ZoneIntGain( 3 ).NOFOCC = 3;
+		DataHeatBalance::ZoneIntGain( 4 ).NOFOCC = 4;
+		DataHeatBalance::ZoneIntGain( 5 ).NOFOCC = 20;
+		DataHeatBalance::ZoneIntGain( 6 ).NOFOCC = 6;
+
+		SizingManager::GetOARequirements();
+		GetOAControllerInputs();
+		EXPECT_EQ( SOAM_ZoneSum, VentilationMechanical( 1 ).SystemOAMethod );
+
+		// Summary of inputs and expected OA flow rate for each zone, StdRho = 1, so mass flow = volume flow for these tests
+		// Zone 1 - flow/person, 0.1 m3/s/person, 10 persons, OA=1 m3/s
+		// Zone 2 - flow/area, 1.0 m3/s-m2, area 200 m2, OA=200 m3/s
+		// Zone 3 - flow/zone, 3.0 m3/s-zone, OA=3.0 m3/s
+		// Zone 4 - AirChanges/Hour, 5.0 ACH, volume 3600 m3, OA=5 m3/s (ACH/3600=air change/sec)
+		// Zone 5 - Sum, 0.2 m3/s/person, 20 persons [4], 2 m3/s-m2, area 100 [200], 5 m3/s-zone [5], 4 ACH, volume 7200 m3 [8], OA=4+200+5+8=217 m3/s
+		// Zone 6 - Maximum, 0.3 m3/s/person, 6 persons [1.8], 1 m3/s-m2, area 600 [600], 1 m3/s-zone [1], 0.1 ACH, volume 3600 m3 [0.1], OA=max(1.8+600+1+0.1=600 m3/s
+
+		// Apply schedules and zone multipliers
+		// Zone 1 - schedule = 0.1, multiplier = 1.0, OA=1*0.1*1  =   0.1 m3/s
+		// Zone 2 - schedule = 0.2, multiplier = 1.0, OA=200*0.2*1=  40.0 m3/s
+		// Zone 3 - schedule = 0.3, multiplier = 1.0, OA=3*0.3*1  =   0.9 m3/s
+		// Zone 4 - schedule = 0.4, multiplier = 1.0, OA=5*0.4*1  =   2.0 m3/s
+		// Zone 5 - schedule = 0.5, multiplier = 1.0, OA=217*0.5*1= 108.5 m3/s
+		// Zone 6 - schedule = 0.6, multiplier = 5.0, OA=600*0.6*5=1800.0 m3/s
+		// Total for all zones = 1951.5 m3/s
+
+
+		// Case 1 - All zones as initially set up
+		OAMassFlow = 0.0;
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_NEAR( 1951.5, OAMassFlow, 0.00001 );
+
+		// Case 2 - Turn off Zone 4-6
+		OAMassFlow = 0.0;
+		ScheduleManager::Schedule( 4 ).CurrentValue = 0.0;
+		ScheduleManager::Schedule( 5 ).CurrentValue = 0.0;
+		ScheduleManager::Schedule( 6 ).CurrentValue = 0.0;
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_NEAR( 41.0, OAMassFlow, 0.00001 );
+
+		// Case 3 - Turn off remaining zones
+		OAMassFlow = 0.0;
+		ScheduleManager::Schedule( 1 ).CurrentValue = 0.0;
+		ScheduleManager::Schedule( 2 ).CurrentValue = 0.0;
+		ScheduleManager::Schedule( 3 ).CurrentValue = 0.0;
+		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
+		EXPECT_EQ( 0.0, OAMassFlow );
+
+		DataHeatBalance::ZoneIntGain.deallocate();
 	}
 
 }

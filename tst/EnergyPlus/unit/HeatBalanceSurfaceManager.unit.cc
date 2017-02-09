@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HeatBalanceSurfaceManager Unit Tests
 
@@ -67,6 +55,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -279,6 +268,49 @@ namespace EnergyPlus {
 		ComputeIntThermalAbsorpFactors();
 		
 		EXPECT_EQ( 0.2, DataHeatBalance::ITABSF( 1 ) );
+		
+	}
+	
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
+	{
+		DataSurfaces::TotSurfaces = 1;
+		DataGlobals::NumOfZones = 1;
+		DataHeatBalance::TotConstructs = 1;
+		DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+		DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+		DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+		DataHeatBalance::Construct.allocate(DataHeatBalance::TotConstructs);
+		DataHeatBalance::AnyConstructInternalSourceInInput = true;
+
+		AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
+		
+		DataSurfaces::Surface( 1 ).Class = DataSurfaces::SurfaceClass_Wall;
+		DataSurfaces::Surface( 1 ).HeatTransSurf = true;
+		DataSurfaces::Surface( 1 ).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+		DataSurfaces::Surface( 1 ).ExtBoundCond = 1;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+		
+		DataHeatBalance::Construct( 1 ).NumCTFTerms = 2;
+		DataHeatBalance::Construct( 1 ).SourceSinkPresent = true;
+		DataHeatBalance::Construct( 1 ).NumHistories = 1;
+		DataHeatBalance::Construct( 1 ).CTFTUserOut( 0 ) = 0.5;
+		DataHeatBalance::Construct( 1 ).CTFTUserIn( 0 ) = 0.25;
+		DataHeatBalance::Construct( 1 ).CTFTUserSource( 0 ) = 0.25;
+		
+		DataHeatBalSurface::SUMH( 1 ) = 0;
+		DataHeatBalSurface::TH( 1, 1, 1 ) = 20.0;
+		DataHeatBalSurface::TempSurfIn( 1 ) = 10.0;
+		
+		DataHeatBalFanSys::CTFTuserConstPart( 1 ) = 0.0;
+
+		UpdateThermalHistories(); // First check to see if it is calculating the user location temperature properly
+		
+		EXPECT_EQ( 12.5, DataHeatBalSurface::TempUserLoc( 1 ) );
+		EXPECT_EQ( 0.0, DataHeatBalSurface::TuserHist( 1, 3 ) );
+		
+		UpdateThermalHistories();
+
+		EXPECT_EQ( 12.5, DataHeatBalSurface::TuserHist( 1, 3 ) ); // Now check to see that it is shifting the temperature history properly
 		
 	}
 	

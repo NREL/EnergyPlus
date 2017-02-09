@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -390,7 +378,7 @@ namespace PoweredInductionUnits {
 			if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:FUEL" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
 			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
@@ -506,7 +494,7 @@ namespace PoweredInductionUnits {
 			if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:FUEL" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
 			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
@@ -1599,14 +1587,36 @@ namespace PoweredInductionUnits {
 		// Set the mass flow rates
 		if ( UnitOn ) {
 			// unit is on
+			// Special controls if FanOnFlowFrac = 0.0
+			bool ReheatRequired = false;
+			if (PIU(PIUNum).FanOnFlowFrac <= 0.0) {
+				// Calculate if reheat is needed
+				Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
+				if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
+			}
+
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				// PIU fan off if FanOnFlowFrac is 0.0 and there is no heating load, also reset fan flag if fan should be off
+				if ( ( QZnReq <= SmallLoad ) && ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) ) {
+					SecAirMassFlow = 0.0;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				}
 			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
 				// in deadband or very small load: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
+				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+					SecAirMassFlow = 0.0;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				}
 			} else if ( QZnReq > SmallLoad ) {
 				// heating: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
@@ -1625,8 +1635,12 @@ namespace PoweredInductionUnits {
 				PriAirMassFlow = QZnReq / ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
 				PriAirMassFlow = min( max( PriAirMassFlow, PriAirMassFlowMin ), PriAirMassFlowMax );
 				// check for fan on or off
-				if ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) {
+				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
+					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
 				} else {
 					// fan is on; recalc primary air flow
 					// CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) +
@@ -1645,7 +1659,7 @@ namespace PoweredInductionUnits {
 		Node( PriNode ).MassFlowRate = PriAirMassFlow;
 		Node( SecNode ).MassFlowRate = SecAirMassFlow;
 		Node( SecNode ).MassFlowRateMaxAvail = SecAirMassFlow;
-		//now that inlet airflows have been set, the terminal bos components can be simulated.
+		//now that inlet airflows have been set, the terminal box components can be simulated.
 		// fire the fan
 		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index );
 		// fire the mixer
