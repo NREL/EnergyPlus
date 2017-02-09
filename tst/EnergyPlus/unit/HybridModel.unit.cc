@@ -209,17 +209,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	Zone( 1 ).SurfaceFirst = 1;
 	Zone( 1 ).SurfaceLast = 2;
 	Zone( 1 ).Volume = 1061.88;
-	ShortenTimeStepSys = false;
 	TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
 	TimeStepSys = 10.0 / 60.0;
-	Real64 ZoneTempChange = 0.0;
-	Real64 PriorTimeStep = 10.0 / 60.0;
+	Real64 ZoneTempChange;
 
 	// Hybrid modeling trigger
 	FlagHybridModel = true;
 	WarmupFlag = false;
 	DoingSizing = false;
-	UseZoneTimeStepHistory = true;
 	DayOfYear = 1;
 
 	// Case 1: Hybrid model internal thermal mass
@@ -238,7 +235,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	MCPTV( 1 ) = -3335.10; // Assign TempIndCoef
 	OutBaroPress = 99166.67;
 
-	CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+	CorrectZoneAirTemp( ZoneTempChange, false, true, 10 / 60 );
 	EXPECT_NEAR( 15.13, Zone( 1 ).ZoneVolCapMultpSensHM, 0.01 );
 
 	// Case 2: Hybrid model infiltration
@@ -258,7 +255,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	MCPTV( 1 ) = 270.10; // Assign TempIndCoef
 	OutBaroPress = 99250;
 
-	CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+	CorrectZoneAirTemp( ZoneTempChange, false, true, 10 / 60 );
 	EXPECT_NEAR( 0.2444, Zone( 1 ).InfilOAAirChangeRateHM, 0.01 );
 
 	// Deallocate everything
