@@ -352,10 +352,6 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide ) {
 
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
@@ -676,15 +672,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -1011,16 +1001,10 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -1427,16 +1411,10 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -1846,16 +1824,10 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -2524,15 +2496,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -3203,15 +3169,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -4959,15 +4919,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 5.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 5.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -6714,15 +6668,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
-		TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide ) {
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -6951,15 +6899,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -7192,7 +7134,5 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 }
