@@ -106,8 +106,10 @@ namespace DataHVACGlobals {
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
 	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
 	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
-	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating
+	extern int const ASHRAEMinSATCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const ASHRAEMaxSATHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
 	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
 	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
 	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil

@@ -270,6 +270,7 @@ namespace DataSizing {
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
 	Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop
+	int DataZoneUsedForSizing( 0 ); // pointer to control zone for air loop equipment
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
 	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.

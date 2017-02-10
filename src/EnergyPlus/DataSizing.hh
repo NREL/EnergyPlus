@@ -260,7 +260,8 @@ namespace DataSizing {
 	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
-	extern int DataZoneNumber; // a pointer to a served by zoneHVAC equipment
+	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
+	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit

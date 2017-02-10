@@ -116,12 +116,14 @@ namespace DataHVACGlobals {
 	int const AutoCalculateSizing( 25 ); // identifies an autocalulate input
 	int const ZoneCoolingLoadSizing( 26 ); // zone cooling sensible load (zsz file)
 	int const ZoneHeatingLoadSizing( 27 ); // zome heating sensible load (zsz file)
-	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
-	int const HeatingCoilDesAirInletTempSizing( 30 ); // design inlet air temperature for heating coil
-	int const HeatingCoilDesAirOutletTempSizing( 31 ); // design outlet air temperature for heating coil
-	int const HeatingCoilDesAirInletHumRatSizing( 32 ); // design inlet air humidity ratio for heating coil
-	int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing( 33 ); // identifies desiccant performance data face velocity autosisizing input
+	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling
+	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating
+	int const ASHRAEMinSATCoolingSizing( 30 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	int const ASHRAEMaxSATHeatingSizing( 31 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	int const HeatingCoilDesAirInletTempSizing( 32 ); // design inlet air temperature for heating coil
+	int const HeatingCoilDesAirOutletTempSizing( 33 ); // design outlet air temperature for heating coil
+	int const HeatingCoilDesAirInletHumRatSizing( 34 ); // design inlet air humidity ratio for heating coil
+	int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing( 35 ); // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser

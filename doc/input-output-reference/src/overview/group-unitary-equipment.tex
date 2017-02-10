@@ -45,11 +45,11 @@ The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of
 
 Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.
 
-\subsubsection{Inputs}\label{inputs-049}
-
-\paragraph{Multi-Speed Fan and Water Coils In Unitary System}\label{multi-speed-fan-and-water-coils-in-unitary-system}
+\textbf{Multi-Speed Fan and Water Coils In Unitary System}
 
 Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying Fan:OnOff and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified. When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
+
+\subsubsection{Inputs}\label{inputs-049}
 
 \paragraph{Field: Name}\label{field-name-048}
 
@@ -57,7 +57,7 @@ This alpha field contains the identifying name for the unitary system.
 
 \paragraph{Field: Control Type}\label{field-control-type-004}
 
-This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are Load and SetPoint. Load control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended.
+This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{ASHRAE90VariableFan}. Load and ASHRAE90VariableFan control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. ASRHAE90VaribleFan also requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. ASHRAE90VariableFan allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the ASRHAE90VaribleFan control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the ASHRAE90VariableFan control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{field-controlling-zone-or-thermostat-location}
 
@@ -67,7 +67,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 This alpha field contains the type of dehumidification control. The following options are valid for this field:
 
-\textbf{None} - meet sensible load only, no active dehumidification control
+\textbf{None} - meet sensible load only, no active dehumidification control. None is required when Control Type = ASHRAE90VariableFan.
 
 \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
 
@@ -101,7 +101,7 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{supply-air-fan-operating-mode-schedule-name}
 
-This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
+This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load. The ASHRAE90VariableFan control type is only active when the supply air fan runs continuously.
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-002}
 
@@ -189,15 +189,16 @@ This alpha field contains the identifying name given to the unitary system cooli
 
 \paragraph{Field: Use DOAS DX Cooling Coil}\label{field-use-doas-dx-cooling-coil}
 
-This input field eanbles DX Cooling coils to be used for 100\% outdoor air dedicated outdor air system applications. There are two choices Yes or No. If Yes, the DX coil is used as 100\% outdoor DX coil. If No, the DX coil is used as regular DX coil. This input file d is optional and the default is No.
+This input field enables DX Cooling coils to be used for 100\% outdoor air dedicated outdoor air system applications. There are two choices Yes or No. If Yes, the DX coil is used as 100\% outdoor DX coil. If No, the DX coil is used as regular DX coil. This input field is optional and the default is No. No should be specified when selecting the ASHRAE90VaribleFan control type.
 
-\paragraph{Field: DOAS DX Cooling Coil Leaving Minimum Air Temperature}\label{field-doas-dx-cooling-coil-leaving-minimum-air-temperature}
+\paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature}
 
-This input field is DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. This input field is optional and only used along with in the input field above. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.2\(^{o}\)C, and the default value is 2.0°C.
+When Use DOAS DX Cooling Coil is specified as Yes, this input field is the DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.5\(^{o}\)C, and the default value is 2.0\(^{o}\)C. This field is not autosizable when the input for Use DOAS DX Cooling Coil = Yes. When Control Type = ASHRAE90VariableFan, enter the minimum air temperature limit for reduced fan speed in cooling mode. For ASHRAE90VariableFan, the maximum limit for the minimum supply air temperature is 20.0\(^{o}\)C. Additionally, for the ASHRAE90VariableFan model this input does not limit the minimum supply air temperature resulting from cooling coil operation at higher fan speeds.
+
 
 \paragraph{Field: Latent Load Control}\label{field-latent-load-control}
 
-This alpha field defines the latent load control method. Available choices are SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentWithSensibleLoadControl, or LatentOrSensibleLoadControl. The default choice is SensibleOnlyLoadControl. The SensibleOnlyLoadControl choice will operate to meet only a sensible load, and the LatentOnlyLoadConrol will operate to meet only a latent load. The LatentWithSensibleLoadControl will operate to meet the latent load only if there is a sensible load. The LatentOrSensibleLoadControl will operate to meet either a latent or sensible load.
+This alpha field defines the latent load control method. Available choices are SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentWithSensibleLoadControl, or LatentOrSensibleLoadControl. The default choice is SensibleOnlyLoadControl. The SensibleOnlyLoadControl choice will operate to meet only a sensible load and is also required when ASHRAE90VariableFan control is selected. The LatentOnlyLoadConrol will operate to meet only a latent load. The LatentWithSensibleLoadControl will operate to meet the latent load only if there is a sensible load. The LatentOrSensibleLoadControl will operate to meet either a latent or sensible load.
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type}
 
@@ -264,7 +265,7 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: No Load Supply Air Flow Rate Method}\label{field-no-load-supply-air-flow-rate-method}
 
-This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified.
+This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified. The following fields are also used to specify the lower air flow rate for the ASHRAE90VariableFan control method with recommendations of greater than or equal to 60\% of the Cooling or Heating Supply Air Flow Rate for DX coils and 50\% for water coils.
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
@@ -292,7 +293,8 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-000}
 
-This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C.
+This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C. When Control Type = ASHRAE90VariableFan, enter the maximum air temperature limit for reduced fan speed in heating model. For the ASHRAE90VariableFan model this input does not limit the maximum supply air temperature resulting from heating or supplemental heating coil operation at higher fan speeds.  This field is autosizable.
+
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation}
 
@@ -481,6 +483,15 @@ AirLoopHVAC:UnitarySystem,
   HVAC,Average,Unitary System Ancillary Electric Power{[}W{]}
 \end{itemize}
 
+Load based control outputs
+\begin{itemize}
+\tightlist
+\item
+HVAC,Average,Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate [W]
+\item
+HVAC,Average,Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate [W]
+\end{itemize}
+
 Two speed coil outputs
 
 \begin{itemize}
@@ -609,6 +620,15 @@ This is the auxiliary electricity consumption in Joules for the timestep being r
 \paragraph{Unitary System Heating Ancillary Electric Energy {[}J{]}}\label{unitary-system-heating-ancillary-electric-energy-j}
 
 This is the auxiliary electricity consumption in Joules for the timestep being reported. This is the auxiliary electricity consumption during periods when the unitary system is providing heating (DX heating coil is operating). This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
+
+\paragraph{Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}}\label{unitary-system-sensible-load-to-setpoint-heat-transfer-rate-w}
+
+This output variable is available only for load based control and is the adjusted sensible load requested from the zone thermostat in watts. This value is calculated by adjusting the zone predicted sensible load to setpoint heat transfer rate based on the controlling zone air flow fraction and the impact of fan heat and outdoor air so that the thermostat setpoints are met. This value is used for control purposed within the Unitary System model. Positive values denote a heating load while negative valued denote a cooling load. Positive and negative values do not necessarily represent which coil type is active (e.g., a positive heating load does not necessarily mean the heating coil will turn on). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
+
+\paragraph{Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate {[}W{]}}\label{unitary-system-predicted-moisture-load-to-setpoint-heat-transfer-rate-w}
+
+This output variable is available only for load based control and is the adjusted moisture load requested from the zone humidistat in watts. This value is calculated by adjusting the zone predicted moisture load to setpoint heat transfer rate based on the heat of vaporization of water, controlling zone air flow fraction and the dehumidification control type (i.e., the moisture load is set to 0 for non-dehumidification systems). When this value is non-zero and dehumidification is requested, the Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate is compared to the result of sensible only control and if the coil does not provide sufficient dehumidification the coil capacity is increased to meet this moisture load. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
+
 
 \paragraph{Unitary System Heat Recovery Inlet Temperature {[}C{]}}\label{unitary-system-heat-recovery-inlet-temperature-c}
 

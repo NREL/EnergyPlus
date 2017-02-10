@@ -101,7 +101,6 @@ namespace HVACUnitarySystem {
 	// System Control Type
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
-
 	extern int const CCM_ASHRAE; // capacity control based on ASHRAE Standard 90.1
 
 	// DERIVED TYPE DEFINITIONS
@@ -201,6 +200,9 @@ namespace HVACUnitarySystem {
 		int DehumidControlType_Num; // Set to Dehumid Control None, CoolReheat or MultiMode
 		int AirFlowControl; // UseCompressorOnFlow or UseCompressorOffFlow
 		int ControlType; // Setpoint or Load based control
+		bool validASHRAECoolCoil; // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
+		bool validASHRAEHeatCoil; // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
+		bool simASHRAEModel; // flag denoting that ASHRAE model should be used
 		int CapacityControlType; // operational system control
 		bool RequestAutoSize; // determines if inputs need autosizing
 		bool RunOnSensibleLoad; // logical determines if this system will run to
@@ -377,6 +379,8 @@ namespace HVACUnitarySystem {
 		Real64 SensHeatEnergyRate; // Unitary System Sensible Heating Rate [W]
 		Real64 LatHeatEnergyRate; // Unitary System Latent Heating Rate [W]
 		Real64 TotalAuxElecPower; // Unitary System Ancillary Electric Power [W]
+		Real64 SensibleLoadPredicted; // Unitary System predicted sensible load [W]
+		Real64 MoistureLoadPredicted; // Unitary System predicted moisture load [W]
 		Real64 HeatingAuxElecConsumption; // Unitary System Heating Ancillary Electric Energy [J]
 		Real64 CoolingAuxElecConsumption; // Unitary System Cooling Ancillary Electric Energy [J]
 		Real64 HeatRecoveryRate; // Unitary System Heat Recovery Rate [W]
@@ -439,7 +443,6 @@ namespace HVACUnitarySystem {
 		int MSpdCycLatPLRIter; // used in MultiSpeed calculations
 		int MSpdCycLatPLRIterIndex; // used in MultiSpeed calculations
 		int MaxIterIndex; // used in PLR calculations for sensible load
-		int MaxIterIndex2; // used in PLR calculations for sensible load
 		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
 		int LatMaxIterIndex; // used in PLR calculations for moisture load
 		int LatRegulaFalsIFailedIndex; // used in PLR calculations for moisture load
@@ -496,6 +499,9 @@ namespace HVACUnitarySystem {
 			DehumidControlType_Num( 0 ),
 			AirFlowControl( 1 ),
 			ControlType( 0 ),
+			validASHRAECoolCoil( false ),
+			validASHRAEHeatCoil( false ),
+			simASHRAEModel( false ),
 			CapacityControlType( 0 ),
 			RequestAutoSize( false ),
 			RunOnSensibleLoad( true ),
@@ -707,7 +713,6 @@ namespace HVACUnitarySystem {
 			MSpdCycLatPLRIter( 0 ),
 			MSpdCycLatPLRIterIndex( 0 ),
 			MaxIterIndex( 0 ),
-			MaxIterIndex2( 0 ),
 			RegulaFalsIFailedIndex( 0 ),
 			LatMaxIterIndex( 0 ),
 			LatRegulaFalsIFailedIndex( 0 ),

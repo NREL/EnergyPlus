@@ -1238,6 +1238,22 @@ namespace ReportSizingManager {
 						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
 						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
 					}
+				} else if( SizingType == ASHRAEMinSATCoolingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak, FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
+				} else if( SizingType == ASHRAEMaxSATHeatingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak + ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
 				} else {
 					// should never happen
 				}
@@ -2015,6 +2031,25 @@ namespace ReportSizingManager {
 						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
 						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
 					}
+				} else if( SizingType == ASHRAEMinSATCoolingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 && DataZoneUsedForSizing > 0 ) {
+						AutosizeDes = FinalZoneSizing( DataZoneUsedForSizing ).ZoneTempAtCoolPeak - ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( DataZoneUsedForSizing ).ZoneHumRatAtCoolPeak, FinalZoneSizing( DataZoneUsedForSizing ).ZoneTempAtCoolPeak ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataZoneUsedForSizing = " + TrimSigDigits( Real64( DataZoneUsedForSizing ), 0 ) );
+					}
+				} else if( SizingType == ASHRAEMaxSATHeatingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 && DataZoneUsedForSizing > 0 ) {
+						AutosizeDes = FinalZoneSizing( DataZoneUsedForSizing ).ZoneTempAtHeatPeak + ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( DataZoneUsedForSizing ).ZoneHumRatAtHeatPeak, FinalZoneSizing( DataZoneUsedForSizing ).ZoneTempAtHeatPeak ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataZoneUsedForSizing = " + TrimSigDigits( Real64( DataZoneUsedForSizing ), 0 ) );
+					}
+
 				}
 			}
 		} else {
