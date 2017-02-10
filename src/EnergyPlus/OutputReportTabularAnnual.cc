@@ -1351,8 +1351,12 @@ namespace EnergyPlus {
 			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				if ( fldStIt->m_variMeter == fldStIt->m_colHead ){
 					if ( fldStIt->m_indexesForKeyVar.size() > 0 ){
-						int varNum = fldStIt->m_indexesForKeyVar[0];
-						fldStIt->m_colHead = OutputProcessor::RVariableTypes[varNum].VarNameOnly;
+						int varNum = fldStIt->m_indexesForKeyVar[ 0 ];
+						if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Real ) {
+							fldStIt->m_colHead = OutputProcessor::RVariableTypes(varNum).VarNameOnly;
+						} else if ( fldStIt->m_typeOfVar == OutputProcessor::VarType_Meter ) {
+							fldStIt->m_colHead = OutputProcessor::EnergyMeters(varNum).Name;
+						}
 					}
 				}
 			}
