@@ -39662,6 +39662,10 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
@@ -39671,6 +39675,10 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -39730,6 +39738,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
@@ -39739,6 +39751,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -42903,17 +42919,17 @@ Coil:Cooling:DX:MultiSpeed,
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
   A12, \field Fuel Type
+       \required-field
        \type choice
        \key Electricity
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-       \default NaturalGas
   N5 , \field Number of Speeds
        \required-field
        \type integer
@@ -45529,17 +45545,17 @@ Coil:Heating:DX:MultiSpeed,
        \key No
        \default No
   A9 , \field Fuel Type
+       \required-field
        \type choice
        \key Electricity
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-       \default NaturalGas
   N8,  \field Region number for Calculating HSPF
        \type integer
        \minimum 1
@@ -87779,11 +87795,23 @@ UtilityCost:Tariff,
         \object-list ScheduleNames
         \note The name of the schedule that defines the time-of-use periods that occur each day. The values for the
         \note different variables are: 1 for Peak. 2 for Shoulder. 3 for OffPeak. 4 for MidPeak.
+        \note The following variables are created automatically if these different periods are used in the
+        \note schedule and include: TotalEnergy, TotalDemand, PeakEnergy, PeakDemand, ShoulderEnergy, ShoulderDemand, 
+        \note OffPeakEnergy, OffPeakDemand, MidPeakEnergy, MidPeakDemand
+        \note Some special variables are created that include: PeakExceedsOffPeak, OffPeakExceedsPeak,
+        \note PeakExceedsMidPeak, MidPeakExceedsPeak, PeakExceedsShoulder, ShoulderExceedsPeak, 
+        \note Others include: PeakAndShoulderEnergy, PeakAndShoulderDemand, PeakAndMidPeakEnergy,
+        \note PeakAndMidPeakDemand, ShoulderAndOffPeakEnergy, ShoulderAndOffPeakDemand, PeakAndOffPeakEnergy, 
+        \note PeakAndOffPeakDemand, RealTimePriceCosts, AboveCustomerBaseCosts, BelowCustomerBaseCosts, 
+        \note AboveCustomerBaseEnergy, BelowCustomerBaseEnergy
    A5,  \field Season Schedule Name
         \type object-list
         \object-list ScheduleNames
         \note The name of a schedule that defines the seasons.  The schedule values are: 1 for Winter. 2 for Spring.
         \note 3 for Summer. 4 for Autumn.
+        \note Variables are automatically created if a season schedule is used. These variables are set to 1 within 
+        \note the season and 0 for the months that are not in the season. The variables are: IsWinter, IsNotWinter, 
+        \note IsSpring, IsNotSpring, IsSummer, IsNotSummer, IsAutumn, IsNotAutumn.
    A6,  \field Month Schedule Name
         \type object-list
         \object-list ScheduleNames
