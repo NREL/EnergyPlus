@@ -4531,7 +4531,7 @@ namespace SystemAvailabilityManager {
 			}
 
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime > 0 ) {
-				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Oepration Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Operation Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime > 0 ) {
@@ -4671,7 +4671,7 @@ namespace SystemAvailabilityManager {
 				if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, 5.0 ) || CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, 6.0 ) ) {
 					if ( !AdaptiveComfortRequested_ASH55 ) {
 						ShowSevereError( "GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\"" );
-						ShowContinueError( "Ventilation Control Mode Schedule Name =\"" + Schedule( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr ).Name + "\", When the schedule schedule value is 5 or 6, operative temperature control is requested. " );
+						ShowContinueError( "Ventilation Control Mode Schedule Name =\"" + Schedule( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr ).Name + "\", When the schedule value is 5 or 6, operative temperature control is requested. " );
 						ShowContinueError( "However, AdaptiveASH55 is not entered in the Thermal Comfort Model Type fields in the People object." );
 						ErrorsFound = true;
 					}

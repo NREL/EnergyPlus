@@ -73295,8 +73295,8 @@ AvailabilityManager:HybridVentilation,
        \note 2 = Enthalpy control
        \note 3 = Dewpoint control
        \note 4 = Outdoor ventilation air control
-       \note 5 = Operative temperature control with 80% acceptability limits
-       \note 6 = Operative temperature control with 90% acceptability limits
+       \note 5 = Operative temperature control with 80% adaptive comfort acceptability limits
+       \note 6 = Operative temperature control with 90% adaptive comfort acceptability limits
        \note 7 = Carbon dioxide control
   A5 , \field Use Weather File Rain Indicators
        \type choice
@@ -73387,15 +73387,17 @@ AvailabilityManager:HybridVentilation,
        \note The other ZoneVentilation:* and ZoneMixing objects controlled in the same AirLoopHVAC
        \note will work in the same way as this ventilation object.
   N8 , \field Minimum HVAC Operation Time
-        \type real
-        \units minutes
-        \minimum 0.0
-        \default 0.0
+       \note Minimum operation time when HVAC system is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
   N9 ; \field Minimum Ventilation Time
-        \type real
-        \units minutes
-        \minimum 0.0
-        \default 0.0
+       \note Minimum ventilation time when natural ventilation is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
 
 AvailabilityManagerAssignmentList,
        \memo Defines the applicable managers used for an AirLoopHVAC or PlantLoop. The priority of
@@ -81114,7 +81116,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \object-list HeatingCoilsDesuperheater
    A6, \field Water Coil Controller Name
        \note Enter the name of controller for the water coil affected
-       \required for water coils
+       \note Required for water coils
        \type object-list
        \object-list WaterCoilControllers
    N1; \field Reference Sensor Offset
