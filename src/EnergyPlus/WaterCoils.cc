@@ -6246,8 +6246,6 @@ Label10: ;
 		}
 
 	}
-<<<<<<< HEAD
-=======
 
 	void
 	EstimateCoilInletWaterTemp(
@@ -6371,7 +6369,6 @@ Label10: ;
 		} 
 	}
 
->>>>>>> develop
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 
