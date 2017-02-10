@@ -1721,6 +1721,8 @@ namespace WaterCoils {
 		Real64 CpAirStd; // specific heat of air at standard conditions
 		Real64 DesCoilAirFlow; // design air flow rate for the coil [m3/s]
 		Real64 DesCoilExitTemp; // design coil exit temperature [C]
+		Real64 DesCoilWaterInTempSaved; // coil water inlet temp used for error checking UA sizing
+		Real64 DesCoilInletWaterTempUsed( 0.0 ); // coil design inlet water temp for UA sizing only
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
@@ -2137,10 +2139,26 @@ namespace WaterCoils {
 					SizingString = WaterCoilNumericFields( CoilNum ).FieldNames( FieldNum ) + " [W/K]";
 					DataCoilNum = CoilNum;
 					DataFanOpMode = ContFanCycCoil;
-					TempSize = WaterCoil( CoilNum ).UACoil;
+					TempSize = WaterCoil ( CoilNum ).UACoil;
+
+					DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
+					if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
+						// at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
+						// is estimated in "EstimateCoilInletWaterTemp" and used for UA autosizing only
+						EstimateCoilInletWaterTemp( DataCoilNum, DataFanOpMode, 1.0, DataCapacityUsedForSizing, DesCoilInletWaterTempUsed );
+						WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilInletWaterTempUsed;
+					}
 					RequestSizing( CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName );
-					WaterCoil( CoilNum ).UACoil = TempSize;
+					if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
+						ShowWarningError( "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"" );
+						ShowContinueError( " Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).ExitTemp, 2 ) + " C" );
+						ShowContinueError( " Plant design loop exit temperature is low for design load and leaving air temperature anticipated." );
+						ShowContinueError( " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits( DesCoilInletWaterTempUsed, 2 ) + " C" );
+						WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
+					}
+					WaterCoil ( CoilNum ).UACoil = TempSize;
 					WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
+					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
 				}
 				DataWaterLoopNum = 0; // reset all globals to 0 to ensure correct sizing for other child components
 				DataPltSizHeatNum = 0;
@@ -6228,6 +6246,132 @@ Label10: ;
 		}
 
 	}
+<<<<<<< HEAD
+=======
+
+	void
+	EstimateCoilInletWaterTemp(
+		int const CoilNum, // index to heating coil
+		int const FanOpMode, // fan operating mode
+		Real64 const PartLoadRatio, // part-load ratio of heating coil
+		Real64 const UAMax, // maximum UA-Value = design heating capacity
+		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature 
+	)
+	{
+		// SUBROUTINE INFORMATION:
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// returns estimated coil inlet water temperature given UA value for assumed 
+		// maximum effectiveness value for heating coil
+
+		// METHODOLOGY EMPLOYED:
+		// applies energy balance around the water coil and estimates coil water inlet temperature 
+		// assuming coil effectiveness of 0.8
+		
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "EstimateCoilInletWaterTemp" );
+		Real64 const EffectivnessMaxAssumed( 0.80 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 WaterMassFlowRate;
+		Real64 AirMassFlow;
+		Real64 TempAirIn;
+		Real64 TempAirOut; // [C]
+		Real64 Win;
+		Real64 TempWaterIn;
+		Real64 UA;
+		Real64 CapacitanceAir;
+		Real64 CapacitanceWater;
+		Real64 CapacitanceMin;
+		Real64 CapacitanceMax;
+		Real64 NTU;
+		Real64 ETA;
+		Real64 A;
+		Real64 CapRatio;
+		Real64 E1;
+		Real64 E2;
+		Real64 Effec;
+		Real64 Cp;
+
+		UA = UAMax; 
+		DesCoilInletWaterTempUsed = DesCoilHWInletTempMin;
+		TempAirIn = WaterCoil( CoilNum ).InletAirTemp;
+		Win = WaterCoil( CoilNum ).InletAirHumRat;
+		TempWaterIn = WaterCoil( CoilNum ).InletWaterTemp;
+		// adjust mass flow rates for cycling fan cycling coil operation
+		if ( FanOpMode == CycFanCycCoil ) {
+			if ( PartLoadRatio > 0.0 ) {
+				AirMassFlow = WaterCoil( CoilNum ).InletAirMassFlowRate / PartLoadRatio;
+				WaterMassFlowRate = min( WaterCoil( CoilNum ).InletWaterMassFlowRate / PartLoadRatio, WaterCoil( CoilNum ).MaxWaterMassFlowRate );
+			} else {
+				AirMassFlow = 0.0;
+				WaterMassFlowRate = 0.0;
+				return;
+			}
+		} else {
+			AirMassFlow = WaterCoil( CoilNum ).InletAirMassFlowRate;
+			WaterMassFlowRate = WaterCoil( CoilNum ).InletWaterMassFlowRate;
+		}
+		if ( WaterMassFlowRate > MassFlowTolerance ) { // if the coil is operating
+			CapacitanceAir = PsyCpAirFnWTdb( Win, 0.5 * ( TempAirIn + TempWaterIn ) ) * AirMassFlow;
+			Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, TempWaterIn, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
+			CapacitanceWater = Cp * WaterMassFlowRate;
+			CapacitanceMin = min( CapacitanceAir, CapacitanceWater );
+			CapacitanceMax = max( CapacitanceAir, CapacitanceWater );
+		} else {
+			CapacitanceAir = 0.0;
+			CapacitanceWater = 0.0;
+			return;
+		}
+		// calculate DesCoilInletWaterTempUsed
+		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) ) {
+
+			if ( UA <= 0.0 ) {
+				ShowWarningError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
+				return;
+			}
+			NTU = UA / CapacitanceMin;
+			ETA = std::pow( NTU, 0.22 );
+			CapRatio = CapacitanceMin / CapacitanceMax;
+			A = CapRatio * NTU / ETA;
+
+			if ( A > 20.0 ) {
+				A = ETA * 1.0 / CapRatio;
+			} else {
+				E1 = std::exp( -A );
+				A = ETA * ( 1.0 - E1 ) / CapRatio;
+			}
+
+			if ( A > 20.0 ) {
+				Effec = 1.0;
+			} else {
+				E2 = std::exp( -A );
+				Effec = 1.0 - E2;
+			}
+			TempAirOut = TempAirIn + Effec * CapacitanceMin * ( TempWaterIn - TempAirIn ) / CapacitanceAir;
+			// this formulation assumes coil effectiveness of 0.80 to increase the estimated coil water inlet temperatures 
+			DesCoilInletWaterTempUsed = CapacitanceAir * ( TempAirOut - TempAirIn ) / ( CapacitanceMin * EffectivnessMaxAssumed ) + TempAirIn;
+			// water coil should not be sized at coil water inlet temperature lower than 46.0C (for convergence problem in Regulafalsi)
+			DesCoilInletWaterTempUsed = max( DesCoilInletWaterTempUsed, DesCoilHWInletTempMin );
+		} 
+	}
+
+>>>>>>> develop
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 

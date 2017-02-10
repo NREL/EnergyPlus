@@ -1915,6 +1915,7 @@ namespace ReportSizingManager {
 						// Invert the simple heating coil model: given the design inlet conditions and the design load,
 						// find the design UA.
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
+
 						if ( SolFla == -1 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
 							ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
@@ -1928,6 +1929,7 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( DataDesignCoilCapacity, 3 ) + " W" );
 							ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
 							DataErrorsFound = true;
+
 						} else if ( SolFla == -2 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
 							ShowContinueError( "  Bad starting values for UA" );
