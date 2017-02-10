@@ -23,7 +23,9 @@
 **Florida Solar Energy Center**
 
  - Original: January 5, 2017
- - NA
+ - Submitted an NFP to the team
+ - First revision on Feb. 3, 2017
+ - Received comments and made initial reply before the first conference call
  
 
 ## Justification for New Feature ##
@@ -32,22 +34,118 @@ The current EnergyPlus allows user-defined spectral dependent glazing properties
 
 ## E-mail and  Conference Call Conclusions ##
 
-insert text
+###First revision
+
+#### Comments ####
+After submission of the NFP, here are comments received:
+
+From: Timmermans Tanguy [mailto:Tanguy.Timmermans@eu.agc.com] 
+Sent: Monday, January 23, 2017 4:45 AM
+To: Tianzhen Hong <thong@lbl.gov>; Neal Kruis <neal.kruis@bigladdersoftware.com>
+Cc: D. Charlie Curcija <dccurcija@lbl.gov>; Lixing Gu <gu@fsec.ucf.edu>; energyplusdevteam@googlegroups.com; Jonsson Jacob <JCJonsson@lbl.gov>; Simon Vidanovic <DVVidanovic@lbl.gov>
+Subject: RE: [energyplusdevteam] NFP for glazing enhancements
+
+Dear all,
+
+In fact the BSDF would in theory allow to do the same as what is proposed here, however with several shortcomings:
+-	Use a full system instead of a layer-by-layer approach like for every other constructions, making heavy pre-processing mandatory and evaluation of alternative solution where I only change one layer heavier.
+-	The system do not interpolate between patches, and every sun ray that falls within a patch takes the optical value assigned to the center of the patch
+-	Here we speak about specular materials, hence only the diagonal elements of the BSDF matrix are non-zero. The complex fenestration approach makes the input file unnecessarily big (especially if we increase the number of patches to overcome the previous shortcoming).
+-	Using BSDF constructions slows the calculation down a big deal (especially if we have many patches in the basis) where it’s in practice not needed as we have a simple specular glazing that could be calculated exactly like any other glazing.
+
+To answer Charlie’s comment "The existing EnergyPlus considers the glazing properties are a function of wavelength only". It’s true that EnergyPlus does consider the glazing properties as a function of angle as well, but it’s hard coded and users cannot specify the actual dependency themselves. It’s not even possible to choose which law to use (clear or bronze). The NPF could be reviewed to say that “EnergyPlus allow users to only specify the spectral dependency and not the angular one”.
+Regarding the comment “there is no evidence that optical properties angle dependence is different at different wavelenghts“, you’ll find in attachment a graph showing the spectral-angular dependency of a sample we measured. It’s clear that the angular dependency is not the same at every wavelength. It’s also a well-known effect among manufacturer of advanced solar coatings that these coatings can have a color shift in reflection at high angle of incidence. On top of this, keeping both wavelength and angular dependency is needed if we want to work in a layer-by-layer approach where the solver compute the actual spectral dependency himself. The layer-by-layer definition also allows to keep the existing approach regarding blinds and shades definition.
+
+Hopes this answer your comments, if you need additional details, let me know.
+
+Tanguy Timmermans
+Researcher, Physics of Products & Processes Department
+AGC Glass Europe
+ 
+AGC European R&D Centre
+Postal address: Rue Louis Blériot, 12 – B-6041 Gosselies – Belgium
+Visitors address: Rue Ernest-Oscar Tips – B-6041 Gosselies – Belgium
+tel. +32 (0)2 409 12 55
+tanguy.timmermans@eu.agc.com
+www.agc-glass.eu
+
+![](Angular_dependency.png)
+
+From: energyplusdevteam@googlegroups.com [mailto:energyplusdevteam@googlegroups.com] On Behalf Of Tianzhen Hong
+Sent: Friday, January 20, 2017 10:42 PM
+To: Neal Kruis <neal.kruis@bigladdersoftware.com>
+Cc: D. Charlie Curcija <dccurcija@lbl.gov>; Lixing Gu <gu@fsec.ucf.edu>; energyplusdevteam@googlegroups.com; Timmermans Tanguy <Tanguy.Timmermans@eu.agc.com>; Jonsson Jacob <JCJonsson@lbl.gov>; Simon Vidanovic <DVVidanovic@lbl.gov>
+Subject: Re: [energyplusdevteam] NFP for glazing enhancements
+
+
+We looked at this enhancement (enabling user defined angle-dependency curves) several years ago, but it did not get implemented due to priority reason. 
+Gu, I think it is good to add new and user configurable angle-dependency curves for non-BSDF glazing. 
+Tianzhen
+
+
+From: energyplusdevteam@googlegroups.com [mailto:energyplusdevteam@googlegroups.com] On Behalf Of Neal Kruis
+Sent: Friday, January 20, 2017 4:58 PM
+To: D. Charlie Curcija <dccurcija@lbl.gov>
+Cc: Lixing Gu <gu@fsec.ucf.edu>; energyplusdevteam@googlegroups.com; Timmermans Tanguy <Tanguy.Timmermans@eu.agc.com>; Jonsson Jacob <JCJonsson@lbl.gov>; Simon Vidanovic <DVVidanovic@lbl.gov>
+Subject: Re: [energyplusdevteam] NFP for glazing enhancements
+
+I agree with Charlie regarding angle-dependency curves. The only angle dependencies for a typical window model (i.e., not complex fenestration) are hard coded for coated glass deep in the EnergyPlus source code. The ability to override these relationships as a user is important.
+
+
+From: D. Charlie Curcija [mailto:dccurcija@lbl.gov] 
+Sent: Friday, January 20, 2017 4:29 PM
+To: Neal Kruis <neal.kruis@bigladdersoftware.com>
+Cc: Lixing Gu <gu@fsec.ucf.edu>; energyplusdevteam@googlegroups.com; Timmermans Tanguy <Tanguy.Timmermans@eu.agc.com>; Jonsson Jacob <JCJonsson@lbl.gov>; Simon Vidanovic <DVVidanovic@lbl.gov>
+Subject: Re: [energyplusdevteam] NFP for glazing enhancements
+
+BSDF is used for complex glazing and shading materials, where light can scatter. If light does not scatter, which is what this NFP seems to be about, there is no evidence that optical properties angle dependence is different at different wavelenghts, which would indicate that this NFP is providing solution in a search of a problem. The NFP wrongly states that "The existing EnergyPlus considers the glazing properties are a function of wavelength only". Optical properties of specular glazing can be both spectrally and angle dependent in E+. For non-coated and non-tinted glass, Fresnel formula is used, while for all others "bronze" glass formula is used. The real need in this area is to implement number of other angle-dependency curves that were published from research conducted in the past couple of decades. They better describe different classes of coated and tinted products. However, I don't think that there is implication that we need curve for each wavelength, which is basically what this NFP is trying to implement.
+
+Perhaps if Lixing can provide a clarification for the need for this feature, in light of my comments above, it would be good. 
+
+Charlie
+
+On Fri, Jan 20, 2017 at 12:01 PM, Neal Kruis <neal.kruis@bigladdersoftware.com> wrote:
+Gu,
+
+How does this relate to the existing BSDF inputs? I think there needs to be a description of how this is different from the BSDF optical input, and why it needs a different implementation. In my opinion, we should improve on the existing methodology rather than making a parallel approach. If possible, please reuse the Matrix objects established for BSDF or work with LBNL to come up with a consistent replacement. I am strongly opposed to adding the proposed objects and fields without further justification for the bifurcation.
+
+Regards,
+
+Neal
+
+#### Lixing Gu reply
+
+Tanguy Timmermans clearly addressed Neil and Charlie comments. As also indicated by Tianzhen, the proposed new feature enhances non-BSDF glazing properties. There is no need to make it as a part of complex BSDF. In addition, if data sets are red from table objects, the input changes are very minor by adding an additional choice of the 
+Optical Data Type field in the WindowMaterial:Glazing object as SpectralAndIncidentAngle, and 3 new fields of optical dataset names to represent transmittance, front reflectance, and back reflectance, respectively.  
+
+In addition, the proposed optical properties as a function of both wavelength and incident angle. The existing E+ hard-codes the properties as a function of incident angle. The proposed change will give user flexibility to input optical properties. 
+
+I will make changes in NFP based on Tnaguy's comments.
+
+I propose two choices to input optical datasets. The first choice is to add 3 new objects to read data, proposed earlier. The second choice is to use existing object of Table:TwoIndependentVariables. Minor modifications are needed. For example, two additional choice of the Input Unit Type field are added as wavelength (microns) and angle (degrees). The dimensionless of output unit type is available, there is no need to make any changes. An additional effort may be proposed to add an option to read datasets from an external file. The second choice is recommended, since no new objects will be created.  
+
+By the way, the Matrix:TwoDimension object is used in BSDF input. The object allows two-dimentional matrix of values only. The proposed datasets are three-dimentional matrix of values. Therefore, the existing object needs to be revised. Fortunately, the existing Table:TwoIndependentVariables meets input requirements with minor modification. That is why we propose to use the Table:TwoIndependentVariables as an alternative input data holder.   
 
 ## Overview ##
 
-Window glazing properties of transmittance, front reflectance, and back reflectance are a function of wavelength and incident angel. The existing EnergyPlus considers the glazing properties are a function of wavelength only. The WindowMaterial:Glazing object has a field of Optical Data Type to allow users to select a choice of Spectral and enter Window Glass Spectral Data Set Name as a data set to input glazing data under the MaterialProperty:GlazingSpectralData object. The AGC Glass Europe found the glazing properties are not only a function of wavelength, as well as a function of incident angle. These properties can be measured from testing. Therefore, the existing input structure can not meet the possible functionality. A new functionality was proposed to enhance glazing properties as a function of both wavelength and incident angle. The added new functionality will improve window heat transfer calculations with more accurate prediction. 
+Window glazing properties of transmittance, front reflectance, and back reflectance are a function of wavelength and incident angel. EnergyPlus allow users to only specify the spectral dependency and not the angular one. The optical properties are calculated based on an incident angle with hard code. The WindowMaterial:Glazing object has a field of Optical Data Type to allow users to select a choice of Spectral and enter Window Glass Spectral Data Set Name as a data set to input glazing data under the MaterialProperty:GlazingSpectralData object. The AGC Glass Europe found the glazing properties are not only a function of wavelength, as well as a function of incident angle, as shown in the above figure. These properties can be measured from testing. It is possible that these optical properties may not be covered by existing hard code as a function of incident angle. Therefore, the existing input structure can not simulate real performance using measured optical properties. A new functionality was proposed to enhance glazing properties as a function of both wavelength and incident angle. The added new functionality will improve window heat transfer calculations with more accurate prediction. 
 
-The code modification will be based on Window Calculation Engine (WCE) submitted by LBNL.   
+The code modification will be based on Window Calculation Engine (WCE) submitted by LBNL. 
 
 ## Approach ##
 
-The proposed approach will revise the existing object of WindowMaterial:Glazing, and add 3 new objects to handle data sets of the glazing properties as a function of both wavelength and incident angle. 
+The proposed approach will revise the existing object of WindowMaterial:Glazing, and select one of two alternative choices to input optical datasets.
+
+1. Add 3 new objects to handle data sets of the glazing properties as a function of both wavelength and incident angle. 
+
+2. Use existing object of Table:TwoIndependentVariables with minor modifications 
+
+Based on Neal's comments, the second choice is recommended. The first choice will be removed after the first conference call.
 
 ### Revision of WindowMaterial:Glazing object ###
 
 The WindowMaterial:Glazing object will be revised by adding an additional choice of the 
-Optical Data Type field in the WindowMaterial:Glazing object as SpectralAndIncidentAngle, and 3 new fields of optical dataset names to represent transmittance, front reflectance, and back reflectance, respectively. 
+Optical Data Type field in the WindowMaterial:Glazing object as SpectralAndIncidentAngle, and 3 new fields of optical dataset or Table names to represent transmittance, front reflectance, and back reflectance, respectively. 
 
 It is possible to combine all optical properties as a single dataset name. However, the dataset will contain 5 columns to be listed as:
 
@@ -55,9 +153,18 @@ Wavelength 1, Incident Angle 1, Transmittance 1, Front Reflectance 1, and Back R
 
 Therefore, the dataset becomes very large and not readable easily. It is better to have 3 datasets to represent transmittance, front reflectance, and back reflectance, respectively. It also provides flexibility to allow each optical property may have values at different wavelengths and incident angles. Each dataset set up 2 independent variables (wavelength and incident angle) and 1 dependent variable (optical property). 
 
-### New objects of glazing properties ###
+### New objects of glazing properties as first choice ###
 
 We proposed 3 new objects to represent optical properties of transmittance, front reflectance, and back reflectance as a function of both wavelength and incident angle. Each object contains an optical property at different wavelengths and incident angles. 
+
+### Modify existing object of Table:TwoIndependentVariables as second choice ###
+
+The existing object of Table:TwoIndependentVariables will be modified slightly to meet input requirements:
+
+1. Add two additional choices of Input Unit Type as wavelength (microns) and angle (degrees). 
+2. Allow an external file as inputs
+
+The existing object does not read data from an external file. An additional effort is proposed by adding an additional field as External File Name.    
 
 ### Calculation procedure ###
 
@@ -65,7 +172,7 @@ The calculation procedure is expanded based on the Spectral choice defined in th
 
 1. Read input objects
 
-A new function will be created to read 3 new dataset objects as GetWindowGlassSpectralAndAngleData in the HeatBalanceManager module. Its functionality is similar to GetWindowGlassSpectralData.
+A new function will be created to read 3 new dataset objects as GetWindowGlassSpectralAndAngleData in the HeatBalanceManager module. Its functionality is similar to GetWindowGlassSpectralData. The second choice will be to read inputs from Table:TwoIndependentVariables objects as an alternative choice.
 
 2. Integrate system properties with respect to wavelength for each angle of incidence
 
@@ -78,7 +185,7 @@ The difference is that the SpectralAverage provide a constant value for each inc
 3. Interpolate angular properties
 
 A new function, corresponding to the SpectralAndIncidentAngle choice, and similar to a WCE function of getPropertyAtAngle, will be generated in WCE called from the SolarShading module. Instead of calculating angular properties, the properties will be linearly interpolated between two nearest angles given in the material properties.   
- 
+
 ## Testing/Validation/Data Sources ##
 
 Optical properties from EnergyPlus will be compared with spread sheet calculation.
@@ -113,6 +220,10 @@ If Optical Data Type = Spectral, then, in the following field, you must enter th
 
 <span style="color:red;">If Optical Data Type = SpectralAndAngle, then, in the next 3 fields, you must enter the name of a spectral and angle data set defined with the WindowGlassSpectralAndAngleData object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.</span>
 
+<span style="color:red;">Alternative approach
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, then, in the next 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.</span>
+
 If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object must be used to define the window construction layers. The Construction:ComplexFenestrationState object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
 #### Field: Window Glass Spectral Data Set Name
@@ -123,13 +234,25 @@ If Optical Data Type = Spectral, this is the name of a spectral data set defined
 
 <span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of transmittance defined with a TransmittanceSpectralAndAngleDataSet object.</span>
 
+<span style="color:red;">Alternative approach
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of transmittance defined with a Table:TwoIndependentVariables object.</span>
+
 #### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Name</span>
 
 <span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a FrontReflectanceSpectralAndAngleDataSet object.</span>
 
+<span style="color:red;">Alternative approach
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of front reflectance defined with a Table:TwoIndependentVariables object.</span>
+
 #### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Name</span>
 
 <span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a BackReflectanceSpectralAndAngleDataSet object.</span>
+
+<span style="color:red;">Alternative approach
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of back reflectance defined with a Table:TwoIndependentVariables object.</span>
 
 #### Field: Thickness
 
@@ -335,7 +458,7 @@ WindowMaterial:Glazing,
   0.22;                    !-Poisson’s ratio
 ```
 
-### New objects ###
+### New objects as the first choice ###
 
 There are 3 new objects to allow users to input optical data as a function of wavelength and incident angle.
 
@@ -460,6 +583,235 @@ MaterialProperty:GlazingBackReflectanceData,
       2.450, 90.00, 0.000,
       2.500, 90.00, 0.000; 
 ```
+### Modify Table:TwoIndependentVariables object as the second choice ###
+
+\subsection{Table:TwoIndependentVariables}\label{tabletwoindependentvariables}
+
+Input for the data table consists of a table name, the curve type, the interpolation method, and the data pairs representing the polynomial equation. Optional inputs for minimum and maximum values for the independent variable, and curve minimum and maximum may be used to limit the output of the table (e.g., limit extrapolation) when evaluating the regression curve instead of the tabular data. The polynomial equations currently represented by this table object are:
+
+\begin{equation}
+BiQuadratic\,\,Curve:\,\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}y + {C_5}{y^2} + {C_6}xy
+\end{equation}
+
+\begin{equation}
+QuadraticLinear\,\,Curve:\,\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}y + {C_5}xy + {C_6}{x^2}y
+\end{equation}
+
+\subsubsection{Inputs}\label{inputs-1-029}
+
+\paragraph{Field: Name}\label{field-name-1-028}
+
+A unique user assigned name for an instance of a performance table. When a table is used, it is referenced by this name. The name of this table object may be used anywhere a valid performance curve object is allowed.
+
+\paragraph{Field: Curve Type}\label{field-curve-type-1}
+
+The form of the polynomial equation represented by the entered data. The only valid choices are \emph{BiQuadratic} and \emph{QuadraticLinear}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular equipment model (i.e., if this type of polynomial is allowed to be used as the curve type for specific input fields). A minimum of 6 data pairs are required when selecting \emph{EvaluateCurveToLimits} in the following field. This input also specifies the number of interpolation points if the next field, Interpolation Method, is set to LagrangeInterpolationLinearExtrapolation.
+
+\paragraph{Field: Interpolation Method}\label{field-interpolation-method-1}
+
+The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation,} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When Lagrange\emph{InterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid equations above, the polynomial order is fixed at 2 which infers that 3 data points will be used for interpolation. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the following fields are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+
+<span style="color:red;">When the input data are optical properties, the LinearInterpolationOfTable choice is forced.</span>
+
+\paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-1-000}
+
+The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+
+\paragraph{Field: Maximum Value of X}\label{field-maximum-value-of-x-1-000}
+
+The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+
+\paragraph{Field: Minimum Value of Y}\label{field-minimum-value-of-y-000}
+
+The minimum allowable value of Y. Values of Y less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+
+\paragraph{Field: Maximum Value of Y}\label{field-maximum-value-of-y-000}
+
+The maximum allowable value of Y. Values of Y greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+
+\paragraph{Field: Minimum Table Output}\label{field-minimum-table-output-1}
+
+The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X and Y} and \emph{Maximum Value of X and Y} determines the limit.
+
+\paragraph{Field: Maximum Table Output}\label{field-maximum-table-output-1}
+
+The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X and Y} and \emph{Maximum Value of X and Y} determines the limit.
+
+\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-000}
+
+This field is used to indicate the kind of units that may be associated with the X values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+
+<span style="color:red;">\item
+
+<span style="color:red;">  Wavelength
+
+<span style="color:red;">\item
+
+<span style="color:red;">  Angle
+
+
+\end{itemize}
+
+
+
+\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-000}
+
+This field is used to indicate the kind of units that may be associated with the Y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Temperature
+\item
+  VolumetricFlow
+\item
+  MassFlow
+\item
+  Distance
+\item
+  Power
+
+<span style="color:red;">\item
+
+<span style="color:red;">  Wavelength
+
+<span style="color:red;">\item
+
+<span style="color:red;">  Angle
+
+\end{itemize}
+
+\paragraph{Field: Output Unit Type}\label{field-output-unit-type-1-000}
+
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+
+\begin{itemize}
+\item
+  Dimensionless
+\item
+  Capacity
+\item
+  Power
+\end{itemize}
+
+\paragraph{Field: Normalization Reference}\label{field-normalization-reference-1}
+
+The normalization point for the data set. This field provides a method for automatically normalizing a set of data. Equipment performance data is typically normalized based on a specific operating condition. Both the output values and minimum/maximum curve limits are normalized as applicable. This normalization can be performed simply by entering the data at the reference point. If this field is left blank or a 1 is entered, the data set is assumed to be in the correct format.
+
+<span style="color:red;">**Field: External File Name}\label{field-external-file-name}**<span>
+
+<span style="color:red;">The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the same format as idf: X1, Y1, Z1, X2, Y2, Z2, ..., and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Data Pairs}\label{data-pairs-1}
+
+The following inputs describe the data set. Data pairs are entered as X, Y and Output pairs where X and Y are the independent variables (i.e., x and y in the equations above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. BiQuadratic and QuadraticLinear (2\(^{nd}\) order with 2 independent variables) require a minimum of 6 data pairs. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
+
+\paragraph{Field: X Value \#n}\label{field-x-value-n-1}
+
+The value of the first independent variable n (i.e., first independent variable values for data pair 1 to number of data pairs).
+
+\paragraph{Field: Y Value \#n}\label{field-y-value-n}
+
+The value of the second independent variable n (i.e., second independent variable values for data pair 1 to number of data pairs).
+
+\paragraph{Field: Output Value \#n}\label{field-output-value-n-1}
+
+The value of the dependent variable n (i.e., dependent variable values for data pair 1 to number of data pairs).
+
+Following is an example input for a Table:TwoIndependentVariable object:
+
+\begin{lstlisting}
+
+Table:TwoIndependentVariables,
+  CCOOLEIRFT,                        !- Name
+  BiQuadratic,                       !- Curve Type
+  EvaluateCurveToLimits,             !- Interpolation Type
+  5.0,                               !- Minimum Value of x,
+  60.0,                              !- Maximum Value of x,
+  5.0,                               !- Minimum Value of y,
+  70.0,                              !- Maximum Value of y,
+  0.01,                              !- Minimum Table Output
+  0.5,                               !- Maximum Table Output
+  Temperature,                       !- Input Unit Type for x
+  Temperature,                       !- Input Unit Type for y
+  Dimensionless,                     !- Output Unit Type
+  0.258266502,                       !- Normalization Point
+  17.2222222,18.3333333,0.18275919,  !-X Value #1,Y Value #1,Output #1
+  17.2222222,23.8888889,0.207383768, !-X Value #2,Y Value #2,Output #2
+  17.2222222,29.4444444,0.237525541, !-X Value #3,Y Value #3,Output #3
+  17.2222222,35,0.274217751,         !-X Value #4,Y Value #4,Output #4
+  17.2222222,40.5555556,0.318548624, !-X Value #5,Y Value #5,Output #5
+  17.2222222,46.1111111,0.374560389, !-X Value #6,Y Value #6,Output #6
+  19.4444444,18.3333333,0.172982816, !-X Value #7,Y Value #7,Output #7
+  19.4444444,23.8888889,0.19637691,  !-X Value #8,Y Value #8,Output #8
+  19.4444444,29.4444444,0.224789822, !-X Value #9,Y Value #9,Output #9
+  19.4444444,35,0.258266502,         !-X Value #10,Y Value #10,Output #10
+  19.4444444,40.5555556,0.299896794, !-X Value #11,Y Value #11,Output #11
+  19.4444444,46.1111111,0.351242021, !-X Value #12,Y Value #12,Output #12
+  21.6666667,18.3333333,0.164081122, !-X Value #13,Y Value #13,Output #13
+  21.6666667,23.8888889,0.185603303, !-X Value #14,Y Value #14,Output #14
+  21.6666667,29.4444444,0.211709812, !-X Value #15,Y Value #15,Output #15
+  21.6666667,35,0.243492052,         !-X Value #16,Y Value #16,Output #16
+  21.6666667,40.5555556,0.281757875, !-X Value #17,Y Value #17,Output #17
+  21.6666667,46.1111111,0.331185659; !-X Value #18,Y Value #18,Output #18
+\end{lstlisting}
+
+\begin{lstlisting}
+
+Table:TwoIndependentVariables,
+  Trasmittance,                        !- Name
+  BiQuadratic,                       !- Curve Type
+  LinearInterpolationOfTable,             !- Interpolation Type
+  0.2,                               !- Minimum Value of x,
+  2.5,                              !- Maximum Value of x,
+  0,                               !- Minimum Value of y,
+  90.0,                              !- Maximum Value of y,
+  0.00,                              !- Minimum Table Output
+  1.0,                               !- Maximum Table Output
+  Wavelength,                       !- Input Unit Type for x
+  Angle,                       !- Input Unit Type for y
+  Dimensionless,                     !- Output Unit Type
+  ,                       !- Normalization Point
+  .025,0,0.0,  !-X Value #1,Y Value #1,Output #1
+  0.31,0,0.7, !-X Value #2,Y Value #2,Output #2
+ ....
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-1-017}
+
+\paragraph{Performance Curve Output Value {[]}}\label{performance-curve-output-value-1}
+
+The current value of the performance table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
+
+\paragraph{Performance Curve Input Variable 1 Value {[]}}\label{performance-curve-input-variable-1-value-1}
+
+\paragraph{Performance Curve Input Variable 2 Value {[]}}\label{performance-curve-input-variable-2-value}
+
+The current value of the first and second independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
+
+\begin{itemize}
+\item
+  HVAC,Average,Performance Curve Output Value {[]}
+\item
+  HVAC,Average,Performance Curve Input Variable 1 Value {[]}
+\item
+  HVAC,Average,Performance Curve Input Variable 2 Value {[]}
+\end{itemize}
 
 ## Input Description ##
 
@@ -591,7 +943,7 @@ Any new additions will be highlighted in red.
        \maximum<  1.0
        \default 0.22
 
-### 3 New objects ###
+### 3 New objects as the first choice###
 
 There are 3 new objects to contain optical properties as a function of wavelength and incident angle: MaterialProperty:GlazingTransmittanceData, MaterialProperty:GlazingFrontReflectanceData, and MaterialProperty:GlazingBackReflectanceData.
  
@@ -674,6 +1026,139 @@ Questions:
 
 How many fields are needed in idd? I assume 1000 sets.
 
+###Revise Table:TwoIndependentVariables as the second choice###
+
+Two more choices will be added in the fields of Input Unit Type for X and Input Unit Type for Y as Wavelength (microns) and Angle (Degrees). A new field will be added to read optical data sets from an external file. The data formats are the same as idf inputs.
+
+
+	Table:TwoIndependentVariables,
+       \extensible:3 repeat last three fields
+       \min-fields 22
+       \memo Allows entry of tabular data pairs as alternate input
+       \memo for performance curve objects.
+       \memo Performance curve objects can be created using these inputs.
+       \memo BiQuadratic Table Equation: Output = a + bX + cX**2 + dY + eY**2 + fXY
+       \memo BiQuadratic solution requires a minimum of 6 data pairs
+       \memo QuadraticLinear Table Equation: Output = a + bX + cX**2 + dY + eXY + fX**2Y
+       \memo QuadraticLinear solution requires a minimum of 6 data pairs
+ 	A1 , \field Name
+       \required-field
+       \type alpha
+       \reference AllCurves
+       \reference BiVariateTables
+  	A2 , \field Curve Type
+       \required-field
+       \type choice
+       \key BiQuadratic
+       \key QuadraticLinear
+  	A3 , \field Interpolation Method
+       \type choice
+       \key LinearInterpolationOfTable
+       \key EvaluateCurveToLimits
+       \key LagrangeInterpolationLinearExtrapolation
+       \default LagrangeInterpolationLinearExtrapolation
+  	N1 , \field Minimum Value of X
+       \type real
+       \unitsBasedOnField A4
+  	N2 , \field Maximum Value of X
+       \type real
+       \unitsBasedOnField A4
+  	N3 , \field Minimum Value of Y
+       \type real
+       \unitsBasedOnField A5
+  	N4 , \field Maximum Value of Y
+       \type real
+       \unitsBasedOnField A5
+  	N5 , \field Minimum Table Output
+       \type real
+       \note Specify the minimum value calculated by this table lookup object
+       \unitsBasedOnField A6
+  	N6 , \field Maximum Table Output
+       \type real
+       \note Specify the maximum value calculated by this table lookup object
+       \unitsBasedOnField A6
+  	A4,  \field Input Unit Type for X
+       \type choice
+       \key Dimensionless
+       \key Temperature
+       \key VolumetricFlow
+       \key MassFlow
+       \key Power
+       \key Distance
+ <span style="color:red;">**\key, Wavelength**</span>
+
+ <span style="color:red;">**\key, Angle**</span>
+
+       \default Dimensionless
+  	A5,  \field Input Unit Type for Y
+       \type choice
+       \key Dimensionless
+       \key Temperature
+       \key VolumetricFlow
+       \key MassFlow
+       \key Power
+       \key Distance
+ <span style="color:red;">**\key, Wavelength**</span>
+
+ <span style="color:red;">**\key, Angle**</span>
+
+       \default Dimensionless
+  	A6,  \field Output Unit Type
+       \type choice
+       \key Dimensionless
+       \key Capacity
+       \key Power
+       \default Dimensionless
+  	N7 , \field Normalization Reference
+       \type real
+       \note This field is used to normalize the following output data.
+       \note The minimum and maximum table output fields are also normalized.
+       \note If this field is blank or 1, the table data presented below will be used.
+
+  <span style="color:red;">**A7 , \field External File Name**</span>
+
+       \type alpha
+       \retaincase
+ 	N8 , \field X Value #1
+       \required-field
+       \type real
+       \begin-extensible
+  	N9 , \field Y Value #1
+       \required-field
+       \type real
+  	N10, \field Output Value #1
+       \required-field
+       \type real
+  	N11, \field X Value #2
+       \required-field
+       \type real
+  	N12, \field Y Value #2
+       \required-field
+       \type real
+  	N13, \field Output Value #2
+       \required-field
+       \type real
+  	N14, \field X Value #3
+       \required-field
+       \type real
+  	N15, \field Y Value #3
+       \required-field
+       \type real
+  	N16, \field Output Value #3
+       \required-field
+       \type real
+  	N17, \field X Value #4
+       \required-field
+       \type real
+  	N18, \field Y Value #4
+       \required-field
+       \type real
+  	N19, \field Output Value #4
+       \required-field
+       \type real
+	....
+
+
 ## Outputs Description ##
 
 insert text
@@ -732,7 +1217,7 @@ If a glazing layer has optical properties that are roughly constant with wavelen
 
 ## Example File and Transition Changes ##
 
-An example input file with 3 new objects will be delivered.
+An example input file with the SpectralAndAngle choice will be delivered.
 
 A transition by adding 3 new extra fields are needed.
 
