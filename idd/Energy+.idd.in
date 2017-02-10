@@ -31933,10 +31933,22 @@ ZoneControl:Thermostat:OperativeTemperature,
   N1,  \field Fixed Radiative Fraction
        \minimum 0.0
        \maximum< 0.9
-  A3;  \field Radiative Fraction Schedule Name
+  A3,  \field Radiative Fraction Schedule Name
        \note Schedule values of 0.0 indicate no operative temperature control
        \type object-list
        \object-list ScheduleNames
+  A4;  \field Adaptive Comfort Model Type
+       \type choice
+       \key None
+       \key AdaptiveASH55CentralLine
+       \key AdaptiveASH5580PercentUpperLine
+       \key AdaptiveASH5590PercentUpperLine
+       \key AdaptiveCEN15251CentralLine
+       \key AdaptiveCEN15251CategoryIUpperLine
+       \key AdaptiveCEN15251CategoryIIUpperLine
+       \key AdaptiveCEN15251CategoryIIIUpperLine
+       \default None
+       \note the cooling setpoint temperature schedule of the referenced thermostat will be adjusted based on the selected adaptive comfort model type
 
 ZoneControl:Thermostat:ThermalComfort,
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies

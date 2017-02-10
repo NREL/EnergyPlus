@@ -379,7 +379,7 @@ namespace FaultsManager {
 	{
 		// Members
 		Real64 FoulingFactor; //Fouling Factor
-	
+
 		// Default Constructor
 		FaultPropertiesFouling():
 			FoulingFactor( 1.0 )
