@@ -58,6 +58,7 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/hvac-sizing-equipment-simulation-and-controls/hvac-system-types.tex
   ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/hvac-sizing-equipment-simulation-and-controls/separating-ventilation-loads-v-zone-loads.tex
   ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/hvac-sizing-equipment-simulation-and-controls/system-not-cooling.tex
+  ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/schedule-and-availability-manager.tex
   ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/schedule-and-availability-manager/schedule-and-availability-manager.tex
   ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/output.tex
   ${CMAKE_SOURCE_DIR}/doc/tips-and-tricks-using-energyplus/src/output/output-does-not-match-epw-values.tex
