@@ -1,5 +1,8 @@
 \section{Group -- Zone Forced Air Units}\label{group-zone-forced-air-units}
 
+\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+Regarding component schedules, the general rule is don't schedule any components except the supply fan and the corresponding availability manager(s). Beyond that, every component should always be available and let the controls determine what runs or doesn't run. If a component other than the supply fan is scheduled off, then it will remain off even if the night cycle manager turns on the system.
+
 \subsection{ZoneHVAC:IdealLoadsAirSystem}\label{zonehvacidealloadsairsystem}
 
 The simplest piece of zone equipment is the ZoneHVAC:IdealLoadsAirSystem component. ZoneHVAC:IdealLoadsAirSystem is used in situations where the user wishes to study the performance of a building without modeling a full HVAC system. In such a case, the Ideal Loads Air System is usually the sole conditioning component: the user does not need to specify air loops, water loops, etc. All that is needed for the ideal system are zone controls, zone equipment configurations, and the ideal loads system component.

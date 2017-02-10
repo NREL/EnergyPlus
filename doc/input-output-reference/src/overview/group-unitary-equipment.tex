@@ -45,6 +45,10 @@ The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of
 
 Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.
 
+\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+
+For unitary systems, don't use the night cycle manager. Use a scheduled availability manager and let the system be always on. Then use the Supply Air Fan Operating Mode Schedule Name in the unitary system to switch between continuous fan (for ventilation) during occupied periods and switch to cycling fan for unoccupied. The system will cycle on as the thermostat requests, and this way it will run just enough to meet the load - no need for a minimum cycle time.
+
 \subsubsection{Inputs}\label{inputs-049}
 
 \paragraph{Multi-Speed Fan and Water Coils In Unitary System}\label{multi-speed-fan-and-water-coils-in-unitary-system}
