@@ -10,6 +10,7 @@
 
 // cJSON header
 #include <cJSON.h>
+#include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,7 +18,7 @@
 #include <OutputProcessor.hh>
 
 #include <memory>
-
+using json = nlohmann::json;
 namespace EnergyPlus {
 
 	namespace ResultsFramework {
@@ -49,8 +50,8 @@ namespace EnergyPlus {
 			void setNumErrorsWarmup(const std::string  numWarningsDuringWarmup, const std::string  numSevereDuringWarmup);
 			void setNumErrorsSizing(const std::string  numWarningsDuringSizing, const std::string  numSevereDuringSizing);
 			void setNumErrorsSummary(const std::string  numWarnings, const std::string  numSevere);
-			cJSON* getJSON();
-
+			//cJSON* getJSON();
+			json getJSON();
 		protected:
 			std::string ProgramVersion;
 			std::string SimulationEnvironment;
@@ -83,7 +84,7 @@ namespace EnergyPlus {
 			void pushValue(const double val);
 			std::vector<double>& values();
 			
-			cJSON* getJSON();
+			json getJSON();
 
 		protected:
 			std::string varName;
@@ -107,7 +108,7 @@ namespace EnergyPlus {
 			bool accumulative();
 			void setAccumulative(bool state);
 
-			cJSON* getJSON();
+			json getJSON();
 
 		protected:
 			bool acc;
@@ -140,8 +141,8 @@ namespace EnergyPlus {
 			
 			Variable* lastVariable();
 			
-			cJSON *getVariablesJSON();
-			cJSON* getJSON();
+			json getVariablesJSON();
+			json getJSON();
 
 			void writeFile();
 

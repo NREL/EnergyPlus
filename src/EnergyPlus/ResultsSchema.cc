@@ -131,34 +131,30 @@ namespace EnergyPlus {
 			NumSevere = numSevere;
 		}
 
-		cJSON* SimInfo::getJSON()
+		json SimInfo::getJSON()
 		{
-			cJSON *_root, *_errsummary, *_errwarmup, *_errsizing;
-
-			_root = cJSON_CreateObject();
-			cJSON_AddItemToObject(_root, "UUID", cJSON_CreateString(uuid.c_str()));
-			cJSON_AddItemToObject(_root, "ProgramVersion", cJSON_CreateString(ProgramVersion.c_str()));
-			cJSON_AddItemToObject(_root, "SimulationEnvironment", cJSON_CreateString(SimulationEnvironment.c_str()));
-			cJSON_AddItemToObject(_root, "InputModelURI", cJSON_CreateString(InputModelURI.c_str()));
-			cJSON_AddItemToObject(_root, "StartDateTimeStamp", cJSON_CreateString(StartDateTimeStamp.c_str()));
-			cJSON_AddItemToObject(_root, "RunTime", cJSON_CreateString(RunTime.c_str()));
-
-			cJSON_AddItemToObject(_root, "ErrorSummary", _errsummary = cJSON_CreateObject());
-			cJSON_AddItemToObject(_errsummary, "NumWarnings", cJSON_CreateString(NumWarnings.c_str()));
-			cJSON_AddItemToObject(_errsummary, "NumSevere", cJSON_CreateString(NumSevere.c_str()));
-
-			cJSON_AddItemToObject(_root, "ErrorSummaryWarmup", _errwarmup = cJSON_CreateObject());
-			cJSON_AddItemToObject(_errwarmup, "NumWarnings", cJSON_CreateString(NumWarningsDuringWarmup.c_str()));
-			cJSON_AddItemToObject(_errwarmup, "NumSevere", cJSON_CreateString(NumSevereDuringWarmup.c_str()));
-
-			cJSON_AddItemToObject(_root, "ErrorSummarySizing", _errsizing = cJSON_CreateObject());
-			cJSON_AddItemToObject(_errsizing, "NumWarnings", cJSON_CreateString(NumWarningsDuringSizing.c_str()));
-			cJSON_AddItemToObject(_errsizing, "NumSevere", cJSON_CreateString(NumSevereDuringSizing.c_str()));
-
-			return _root;
+			json root = {
+					{ "UUID", uuid },
+					{ "ProgramVersion", ProgramVersion },
+					{ "SimulationEnvironment", SimulationEnvironment },
+					{ "InputModelURI", InputModelURI },
+					{ "StartDateTimeStamp", StartDateTimeStamp },
+					{ "RunTime", RunTime },
+					{ "ErrorSummary", {
+							{ "NumWarnings" , NumWarnings },
+							{ "NumSevere" , NumSevere }
+					 }},
+					{ "ErrorSummaryWarmup", {
+							{ "NumWarnings" , NumWarningsDuringWarmup },
+							{ "NumSevere" , NumSevereDuringWarmup }
+				     }},
+					{ "ErrorSummarySizing", {
+							{ "NumWarnings" , NumWarningsDuringSizing },
+							{ "NumSevere" , NumSevereDuringSizing }
+					 }}
+			};
+			return root;
 		}
-
-		
 
 		// Class Variable
 		Variable::Variable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units) {
@@ -245,16 +241,14 @@ namespace EnergyPlus {
 			return Values;
 		}
 
-		cJSON* Variable::getJSON() {
-			cJSON *_root, *_errsummary, *_errwarmup, *_errsizing;
-
-			_root = cJSON_CreateObject();
-			cJSON_AddItemToObject(_root, "UUID", cJSON_CreateString(uuid.c_str()));
-			cJSON_AddItemToObject(_root, "Name", cJSON_CreateString(varName.c_str()));
-			cJSON_AddItemToObject(_root, "Units", cJSON_CreateString(Units.c_str()));
-			cJSON_AddItemToObject(_root, "Frequency", cJSON_CreateString(sReportFreq.c_str()));
-
-			return _root;
+		json Variable::getJSON() {
+			json root = {
+					{ "UUID" , uuid },
+					{ "Name" , varName },
+					{ "Units" , Units },
+					{ "Frequency", sReportFreq }
+			};
+			return root;
 		}
 
 
@@ -279,11 +273,11 @@ namespace EnergyPlus {
 			acc = state;
 		}
 
-		cJSON* MeterVariable::getJSON() {
-			cJSON *_root = Variable::getJSON();
+		json MeterVariable::getJSON() {
+			json root = Variable::getJSON();
 			if (acc)
-				cJSON_AddItemToObject(_root, "Cumulative", cJSON_CreateString("True"));
-			return _root;
+				root[ "Cumulative" ] = "True";
+			return root;
 		}
 
 		// class DataFrame
@@ -352,29 +346,27 @@ namespace EnergyPlus {
 			variableMap[reportID]->pushValue(value); 
 		}
 
-		cJSON* DataFrame::getVariablesJSON() {
-			cJSON *arr;
-			arr = cJSON_CreateArray();
+		json DataFrame::getVariablesJSON() {
+			json arr = json::array();
+
 			//for (int i = 0; i < variables().size(); i++);
 			for (auto it = variableMap.begin(); it != variableMap.end(); ++it)
-				cJSON_AddItemToArray(arr, it->second->getJSON());
+				arr.push_back(it->second->getJSON());
 			return arr;
 		}
 
-		cJSON* DataFrame::getJSON() {
-			cJSON *_root, *_col, *_colfld, *_val, *_row, *_rowvec;
-
-			_root = cJSON_CreateObject();
-			cJSON_AddItemToObject(_root, "UUID", cJSON_CreateString(uuid.c_str()));
-			cJSON_AddItemToObject(_root, "ReportFrequency", cJSON_CreateString(ReportFrequency.c_str()));
-			cJSON_AddItemToObject(_root, "Cols", _col = cJSON_CreateArray());
-			cJSON_AddItemToObject(_root, "Rows", _row = cJSON_CreateArray());
+		json DataFrame::getJSON() {
+			json root;
+			json cols = json::array();
+			json rows = json::array();
 
 			for (auto it = variableMap.begin(); it != variableMap.end(); ++it) {
-				cJSON_AddItemToArray(_col, _colfld = cJSON_CreateObject());
-				cJSON_AddStringToObject(_colfld, "Variable", it->second->variableName().c_str());
-				cJSON_AddStringToObject(_colfld, "Units", it->second->units().c_str());
-				cJSON_AddStringToObject(_colfld, "UUID", it->second->UUID().c_str());
+				cols.push_back( {
+						               { "Variable" , it->second->variableName() },
+						               { "Units" , it->second->units() },
+						               { "UUID" , it->second->UUID() }
+				               }
+				);
 			}
 
 			std::vector <double> vals;
@@ -384,14 +376,27 @@ namespace EnergyPlus {
 			assert(TS.size() == variableMap.begin()->second->values().size());
 
 			for (int row = 0; row < TS.size(); ++row) {
+//				json rowvals = json::array();
 				vals.clear();
 				for (auto it = variableMap.begin(); it != variableMap.end(); ++it) {
 					vals.push_back(it->second->values()[row]);
 				}
-				cJSON_AddItemToArray(_row, _rowvec = cJSON_CreateObject());
-				cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
+//				for (int count = 0; count < vals.size(); count++){
+//					rowvals.push_back( &vals[0][count] );
+//				}
+				rows.push_back( { TS.at(row) , vals[0] }
+				);
+				//cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
 			}
-			return _root;
+
+			root = {
+					{ "UUID" , uuid },
+					{ "ReportFrequency" , ReportFrequency },
+					{ "Cols" , cols },
+					{ "Rows" , rows }
+			};
+
+			return root;
 		}
 
 		void DataFrame::writeFile() {
