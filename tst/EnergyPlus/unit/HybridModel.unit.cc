@@ -166,9 +166,9 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	SNLoadHeatEnergy.allocate( 1 );
 	SNLoadCoolEnergy.allocate( 1 );
 	ZoneAirRelHum.allocate( 1 );
-	IsZoneDV.allocate( 1 );
-	IsZoneCV.allocate( 1 );
-	IsZoneUI.allocate( 1 );
+	IsZoneDV.dimension( 1, false );
+	IsZoneCV.dimension( 1, false );
+	IsZoneUI.dimension( 1, false );
 	ZoneDVMixedFlag.allocate( 1 );
 	ZnAirRpt.allocate( 1 );
 	ZoneEquipConfig.allocate( 1 );
