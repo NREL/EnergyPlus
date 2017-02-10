@@ -84,6 +84,7 @@ namespace DataHVACGlobals {
 	Real64 const BlankNumeric( -99999.0 ); // indicates numeric input field was blank
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
+	Real64 const DesCoilHWInletTempMin( 46.0 ); // minimum heating water coil water inlet temp for UA sizing only. [deg C] 
 
 	// Number of Sizing types from list below
 	int const NumOfSizingTypes( 33 ); // number of sizing types

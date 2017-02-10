@@ -120,7 +120,8 @@ namespace CondenserLoopTowers {
 	extern Real64 BasinHeaterPower; // Basin heater power use (W)
 	extern Real64 WaterUsage; // Tower water usage (m3/s)
 	extern Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide to much capacity
-
+	
+	extern bool GetInput; // When TRUE, calls subroutine to read input file
 	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
@@ -268,6 +269,14 @@ namespace CondenserLoopTowers {
 		Real64 DesApproach; // design tower approach temperature (deltaC)
 		Real64 DesRange; // design tower range temperature (deltaC)
 		bool TowerInletCondsAutoSize; // true if tower inlet condition is autosized or defaulted to autosize
+		//Operational fault parameters
+		bool FaultyCondenserSWTFlag; // True if the condenser has SWT sensor fault
+		int FaultyCondenserSWTIndex;  // Index of the fault object corresponding to the condenser
+		Real64 FaultyCondenserSWTOffset; // Condenser SWT sensor offset
+		bool FaultyTowerFoulingFlag; // True if the tower has fouling fault
+		int FaultyTowerFoulingIndex;  // Index of the fouling fault object corresponding to the condenser
+		Real64 FaultyTowerFoulingFactor; // Tower fouling factor
+		
 		// Default Constructor
 		Towerspecs() :
 			TowerType_Num( 0 ),
@@ -376,7 +385,13 @@ namespace CondenserLoopTowers {
 			DesInletAirWBTemp( 0 ),
 			DesApproach( 0 ),
 			DesRange( 0 ),
-			TowerInletCondsAutoSize( false )
+			TowerInletCondsAutoSize( false ),
+			FaultyCondenserSWTFlag( false ),
+			FaultyCondenserSWTIndex( 0 ),
+			FaultyCondenserSWTOffset( 0.0 ),
+			FaultyTowerFoulingFlag( false ),
+			FaultyTowerFoulingIndex( 0 ),
+			FaultyTowerFoulingFactor( 1.0 )
 		{}
 	};
 

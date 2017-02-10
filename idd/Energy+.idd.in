@@ -1943,12 +1943,21 @@ Site:GroundDomain:Slab,
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   A12; \field Simulation Timestep
+   A12, \field Simulation Timestep
         \type choice
-        \key Hourly
         \key Timestep
+        \key Hourly
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
+   N12, \field Geometric Mesh Coefficient
+        \type real
+        \minimum 1.0
+        \maximum 2.0
+        \default 1.6
+   N13; \field Mesh Density Parameter
+        \type integer
+        \minimum 4
+        \default 6
 
 Site:GroundDomain:Basement,
         \memo Ground-coupled basement model for simulating basements
@@ -31933,10 +31942,22 @@ ZoneControl:Thermostat:OperativeTemperature,
   N1,  \field Fixed Radiative Fraction
        \minimum 0.0
        \maximum< 0.9
-  A3;  \field Radiative Fraction Schedule Name
+  A3,  \field Radiative Fraction Schedule Name
        \note Schedule values of 0.0 indicate no operative temperature control
        \type object-list
        \object-list ScheduleNames
+  A4;  \field Adaptive Comfort Model Type
+       \type choice
+       \key None
+       \key AdaptiveASH55CentralLine
+       \key AdaptiveASH5580PercentUpperLine
+       \key AdaptiveASH5590PercentUpperLine
+       \key AdaptiveCEN15251CentralLine
+       \key AdaptiveCEN15251CategoryIUpperLine
+       \key AdaptiveCEN15251CategoryIIUpperLine
+       \key AdaptiveCEN15251CategoryIIIUpperLine
+       \default None
+       \note the cooling setpoint temperature schedule of the referenced thermostat will be adjusted based on the selected adaptive comfort model type
 
 ZoneControl:Thermostat:ThermalComfort,
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
@@ -39641,6 +39662,10 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
@@ -39650,6 +39675,10 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -39709,6 +39738,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
@@ -39718,6 +39751,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields 
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -42868,17 +42905,17 @@ Coil:Cooling:DX:MultiSpeed,
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
   A12, \field Fuel Type
+       \required-field
        \type choice
        \key Electricity
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-       \default NaturalGas
   N5 , \field Number of Speeds
        \required-field
        \type integer
@@ -45487,17 +45524,17 @@ Coil:Heating:DX:MultiSpeed,
        \key No
        \default No
   A9 , \field Fuel Type
+       \required-field
        \type choice
        \key Electricity
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-       \default NaturalGas
   N8,  \field Region number for Calculating HSPF
        \type integer
        \minimum 1
@@ -50399,6 +50436,7 @@ CoilSystem:Cooling:DX,
         \min-fields 7
    A1 , \field Name
         \required-field
+        \reference CoolingCoilSystemName
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
@@ -50500,6 +50538,7 @@ CoilSystem:Heating:DX,
         \min-fields 4
    A1 , \field Name
         \required-field
+        \reference HeatingCoilSystemName
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
@@ -56241,6 +56280,7 @@ Controller:WaterCoil,
        \type alpha
        \required-field
        \reference AirLoopControllers
+       \reference WaterCoilControllers
   A2 , \field Control Variable
        \required-field
        \type choice
@@ -64862,6 +64902,7 @@ CoolingTower:SingleSpeed,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
@@ -65107,6 +65148,7 @@ CoolingTower:TwoSpeed,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
@@ -65411,6 +65453,7 @@ CoolingTower:VariableSpeed:Merkel,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
@@ -80934,7 +80977,7 @@ WaterUse:RainCollector,
 !
 FaultModel:TemperatureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -80962,7 +81005,7 @@ FaultModel:TemperatureSensorOffset:OutdoorAir,
 
 FaultModel:HumiditySensorOffset:OutdoorAir,
    \memo This object describes outdoor air humidity sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -80990,7 +81033,7 @@ FaultModel:HumiditySensorOffset:OutdoorAir,
 
 FaultModel:EnthalpySensorOffset:OutdoorAir,
    \memo This object describes outdoor air enthalpy sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81018,7 +81061,7 @@ FaultModel:EnthalpySensorOffset:OutdoorAir,
 
 FaultModel:PressureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air pressure sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81046,7 +81089,7 @@ FaultModel:PressureSensorOffset:OutdoorAir,
 
 FaultModel:TemperatureSensorOffset:ReturnAir,
    \memo This object describes return air temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81074,7 +81117,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
 
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81137,6 +81180,90 @@ FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
        \default 0.0
        \units deltaC
 
+FaultModel:TemperatureSensorOffset:CoilSupplyAir,
+   \memo This object describes fault of coil supply air temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Coil Object Type
+       \note Enter the type of the coil affected
+       \required-field
+       \type choice
+       \key AirLoopHVAC:UnitarySystem
+       \key Coil:Heating:Electric
+       \key Coil:Heating:Gas
+       \key Coil:Heating:Desuperheater
+       \key Coil:Heating:Steam
+       \key Coil:Heating:Water
+       \key Coil:Cooling:Water
+       \key Coil:Cooling:Water:Detailedgeometry
+       \key CoilSystem:Cooling:DX
+       \key CoilSystem:Heating:DX
+   A5, \field Coil Object Name
+       \note Enter the name of the coil affected
+       \required-field
+       \type object-list
+       \object-list CoolingCoilName
+       \object-list CoolingCoilSystemName
+       \object-list DOAToZonalUnit
+       \object-list HeatingCoilName
+       \object-list HeatingCoilSystemName
+       \object-list HeatingCoilsElectricMultiStage
+       \object-list HeatingCoilsGasMultiStage
+       \object-list HeatingCoilsDesuperheater
+   A6, \field Water Coil Controller Name
+       \note Enter the name of controller for the water coil affected
+       \required for water coils
+       \type object-list
+       \object-list WaterCoilControllers
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
+
+FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
+   \memo This object describes fault of condenser supply water temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Cooling Tower Object Type
+       \note Enter the type of the cooling tower affected
+       \required-field
+       \type choice
+       \key CoolingTower:SingleSpeed
+       \key CoolingTower:TwoSpeed
+       \key CoolingTower:VariableSpeed
+       \key CoolingTower:VariableSpeed:MERKEL
+   A5, \field Cooling Tower Object Name
+       \note Enter the name of the cooling tower affected
+       \required-field
+       \type object-list
+       \object-list CoolingTowers
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
+
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
    \min-fields 5
@@ -81165,7 +81292,7 @@ FaultModel:ThermostatOffset,
 
 FaultModel:HumidistatOffset,
    \memo This object describes fault of humidistat offset
-   \min-fields 4
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81206,7 +81333,7 @@ FaultModel:HumidistatOffset,
 
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
-   \min-fields 4
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81230,6 +81357,7 @@ FaultModel:Fouling:AirFilter,
        \note Enter the name of a schedule
        \note describing the variations of the fan pressure rise
        \note in terms of multipliers to the fan design pressure rise
+       \required-field
        \type object-list
        \object-list ScheduleNames
    A6; \field Fan Curve Name
@@ -81240,8 +81368,42 @@ FaultModel:Fouling:AirFilter,
        \object-list CubicCurves
        \object-list UniVariateTables
 
+FaultModel:Fouling:CoolingTower,
+   \memo This object describes the fault of fouling cooling towers
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Cooling Tower Object Type
+       \note Enter the type of the cooling tower affected
+       \required-field
+       \type choice
+       \key CoolingTower:SingleSpeed
+       \key CoolingTower:TwoSpeed
+       \key CoolingTower:VariableSpeed:MERKEL
+   A5, \field Cooling Tower Object Name
+       \note Enter the name of the cooling tower affected
+       \required-field
+       \type object-list
+       \object-list CoolingTowersWithUA
+   N1; \field UA Reduction Factor
+       \note Factor describing the tower UA reduction due to fouling
+       \note It is the ratio between the UA value at fouling case and that at fault free case
+       \note It is applicable to both the Design UA and Free Convection UA of the tower
+       \units dimensionless
+       \type real
+       \minimum> 0.0
+
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
+   \min-fields 6
    A1, \field Name
        \required-field
        \type alpha
@@ -87708,11 +87870,23 @@ UtilityCost:Tariff,
         \object-list ScheduleNames
         \note The name of the schedule that defines the time-of-use periods that occur each day. The values for the
         \note different variables are: 1 for Peak. 2 for Shoulder. 3 for OffPeak. 4 for MidPeak.
+        \note The following variables are created automatically if these different periods are used in the
+        \note schedule and include: TotalEnergy, TotalDemand, PeakEnergy, PeakDemand, ShoulderEnergy, ShoulderDemand, 
+        \note OffPeakEnergy, OffPeakDemand, MidPeakEnergy, MidPeakDemand
+        \note Some special variables are created that include: PeakExceedsOffPeak, OffPeakExceedsPeak,
+        \note PeakExceedsMidPeak, MidPeakExceedsPeak, PeakExceedsShoulder, ShoulderExceedsPeak, 
+        \note Others include: PeakAndShoulderEnergy, PeakAndShoulderDemand, PeakAndMidPeakEnergy,
+        \note PeakAndMidPeakDemand, ShoulderAndOffPeakEnergy, ShoulderAndOffPeakDemand, PeakAndOffPeakEnergy, 
+        \note PeakAndOffPeakDemand, RealTimePriceCosts, AboveCustomerBaseCosts, BelowCustomerBaseCosts, 
+        \note AboveCustomerBaseEnergy, BelowCustomerBaseEnergy
    A5,  \field Season Schedule Name
         \type object-list
         \object-list ScheduleNames
         \note The name of a schedule that defines the seasons.  The schedule values are: 1 for Winter. 2 for Spring.
         \note 3 for Summer. 4 for Autumn.
+        \note Variables are automatically created if a season schedule is used. These variables are set to 1 within 
+        \note the season and 0 for the months that are not in the season. The variables are: IsWinter, IsNotWinter, 
+        \note IsSpring, IsNotSpring, IsSummer, IsNotSummer, IsAutumn, IsNotAutumn.
    A6,  \field Month Schedule Name
         \type object-list
         \object-list ScheduleNames

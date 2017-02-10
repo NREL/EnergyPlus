@@ -375,6 +375,7 @@ namespace WaterCoils {
 		{}
 
 	};
+
 	struct WaterCoilNumericFieldData
 	{
 		// Members
@@ -761,6 +762,16 @@ namespace WaterCoils {
 		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
 	);
 
+	// estimate heating coil design inlet water temperature for autosizing UA-value 
+	void
+	EstimateCoilInletWaterTemp(
+		int const CoilNum, // index to heating coil
+		int const FanOpMode, // fan operating mode
+		Real64 const PartLoadRatio, // part-load ratio of heating coil
+		Real64 const UAMax, // maximum UA-Value
+		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
+		);
+	
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 
