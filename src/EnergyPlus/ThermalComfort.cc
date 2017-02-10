@@ -1937,11 +1937,11 @@ namespace ThermalComfort {
 			if ( People( Item ).MRTCalcType != AngleFactor ) continue;
 			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
 			WhichAFList = People( Item ).AngleFactorListPtr;
-			if ( WhichAFList == 0 ) {
+			if ( WhichAFList == 0 && ( People( Item ).Fanger || People( Item ).Pierce || People( Item ).KSU ) ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );
 				ShowSevereError( "... Angle Factor List Name not found for PEOPLE= " + People( Item ).Name );
 				ErrorsFound = true;
-			} else if ( People( Item ).ZonePtr != AngleFactorList( WhichAFList ).ZonePtr ) {
+			} else if ( People( Item ).ZonePtr != AngleFactorList( WhichAFList ).ZonePtr  && ( People( Item ).Fanger || People( Item ).Pierce || People( Item ).KSU ) ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + AngleFactorList( WhichAFList ).Name + " mismatch Zone Name" );
 				ShowContinueError( "...Zone=\"" + AngleFactorList( WhichAFList ).ZoneName + " does not match Zone=\"" + Zone( People( Item ).ZonePtr ).Name + "\" in PEOPLE=\"" + People( Item ).Name + "\"." );
 				ErrorsFound = true;

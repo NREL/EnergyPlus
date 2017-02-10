@@ -682,12 +682,12 @@ namespace InternalHeatGains {
 							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
 								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface );
-								if ( People( Loop ).SurfacePtr == 0 ) {
+								if ( People( Loop ).SurfacePtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									if ( Item1 == 1 ) {
 										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) + " invalid Surface Name=" + AlphaName( 8 ) );
 										ErrorsFound = true;
 									}
-								} else if ( Surface( People( Loop ).SurfacePtr ).Zone != People( Loop ).ZonePtr ) {
+								} else if ( Surface( People( Loop ).SurfacePtr ).Zone != People( Loop ).ZonePtr && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Surface referenced in " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 8 ) + " in different zone." );
 									ShowContinueError( "Surface is in Zone=" + Zone( Surface( People( Loop ).SurfacePtr ).Zone ).Name + " and " + CurrentModuleObject + " is in Zone=" + AlphaName( 2 ) );
 									ErrorsFound = true;
@@ -698,10 +698,10 @@ namespace InternalHeatGains {
 								People( Loop ).AngleFactorListName = AlphaName( 8 );
 
 							} else if ( mrtType == "" ) { // Blank input field--just ignore this
-								if ( MustInpSch && Item1 == 1 ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
+								if ( MustInpSch && Item1 == 1 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
 
 							} else { // An invalid keyword was entered--warn but ignore
-								if ( MustInpSch && Item1 == 1 ) {
+								if ( MustInpSch && Item1 == 1 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) );
 									ShowContinueError( "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\"." );
 								}
