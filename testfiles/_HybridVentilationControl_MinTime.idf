@@ -3132,9 +3132,9 @@
 
   Output:Variable,*,Availability Manager Hybrid Ventilation Control Mode,timestep,ReportSch;
 
-  Output:Variable,*,Hybrid Ventilation Control HVAC System Opration Elapsed Time,timestep,ReportSch;
+  Output:Variable,*,Hybrid Ventilation Control HVAC System Operation Elapsed Time,timestep,ReportSch;
 
-  Output:Variable,*,Hybrid Ventilation Control Natual Ventilation Elapsed Time,timestep,ReportSch;
+  Output:Variable,*,Hybrid Ventilation Control Natural Ventilation Elapsed Time,timestep,ReportSch;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

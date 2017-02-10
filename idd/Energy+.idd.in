@@ -23313,6 +23313,7 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
       \required-field
       \type object-list
       \object-list FansZoneExhaust
+      \reference SurfaceAirflowLeakageNames
       \note Enter the name of a Fan:ZoneExhaust object.
  N1 , \field Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
       \required-field
@@ -50411,6 +50412,7 @@ CoilSystem:Cooling:DX,
         \min-fields 7
    A1 , \field Name
         \required-field
+        \reference CoolingCoilSystemName
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
@@ -50512,6 +50514,7 @@ CoilSystem:Heating:DX,
         \min-fields 4
    A1 , \field Name
         \required-field
+        \reference HeatingCoilSystemName
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
@@ -56253,6 +56256,7 @@ Controller:WaterCoil,
        \type alpha
        \required-field
        \reference AirLoopControllers
+       \reference WaterCoilControllers
   A2 , \field Control Variable
        \required-field
        \type choice
@@ -64874,6 +64878,7 @@ CoolingTower:SingleSpeed,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
@@ -65087,6 +65092,7 @@ CoolingTower:TwoSpeed,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
@@ -65359,6 +65365,7 @@ CoolingTower:VariableSpeed:Merkel,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
@@ -80863,7 +80870,7 @@ WaterUse:RainCollector,
 !
 FaultModel:TemperatureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -80891,7 +80898,7 @@ FaultModel:TemperatureSensorOffset:OutdoorAir,
 
 FaultModel:HumiditySensorOffset:OutdoorAir,
    \memo This object describes outdoor air humidity sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -80919,7 +80926,7 @@ FaultModel:HumiditySensorOffset:OutdoorAir,
 
 FaultModel:EnthalpySensorOffset:OutdoorAir,
    \memo This object describes outdoor air enthalpy sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -80947,7 +80954,7 @@ FaultModel:EnthalpySensorOffset:OutdoorAir,
 
 FaultModel:PressureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air pressure sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -80975,7 +80982,7 @@ FaultModel:PressureSensorOffset:OutdoorAir,
 
 FaultModel:TemperatureSensorOffset:ReturnAir,
    \memo This object describes return air temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81003,7 +81010,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
 
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81066,6 +81073,90 @@ FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
        \default 0.0
        \units deltaC
 
+FaultModel:TemperatureSensorOffset:CoilSupplyAir,
+   \memo This object describes fault of coil supply air temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Coil Object Type
+       \note Enter the type of the coil affected
+       \required-field
+       \type choice
+       \key AirLoopHVAC:UnitarySystem
+       \key Coil:Heating:Electric
+       \key Coil:Heating:Gas
+       \key Coil:Heating:Desuperheater
+       \key Coil:Heating:Steam
+       \key Coil:Heating:Water
+       \key Coil:Cooling:Water
+       \key Coil:Cooling:Water:Detailedgeometry
+       \key CoilSystem:Cooling:DX
+       \key CoilSystem:Heating:DX
+   A5, \field Coil Object Name
+       \note Enter the name of the coil affected
+       \required-field
+       \type object-list
+       \object-list CoolingCoilName
+       \object-list CoolingCoilSystemName
+       \object-list DOAToZonalUnit
+       \object-list HeatingCoilName
+       \object-list HeatingCoilSystemName
+       \object-list HeatingCoilsElectricMultiStage
+       \object-list HeatingCoilsGasMultiStage
+       \object-list HeatingCoilsDesuperheater
+   A6, \field Water Coil Controller Name
+       \note Enter the name of controller for the water coil affected
+       \required for water coils
+       \type object-list
+       \object-list WaterCoilControllers
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
+
+FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
+   \memo This object describes fault of condenser supply water temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Cooling Tower Object Type
+       \note Enter the type of the cooling tower affected
+       \required-field
+       \type choice
+       \key CoolingTower:SingleSpeed
+       \key CoolingTower:TwoSpeed
+       \key CoolingTower:VariableSpeed
+       \key CoolingTower:VariableSpeed:MERKEL
+   A5, \field Cooling Tower Object Name
+       \note Enter the name of the cooling tower affected
+       \required-field
+       \type object-list
+       \object-list CoolingTowers
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
+
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
    \min-fields 5
@@ -81094,7 +81185,7 @@ FaultModel:ThermostatOffset,
 
 FaultModel:HumidistatOffset,
    \memo This object describes fault of humidistat offset
-   \min-fields 4
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81135,7 +81226,7 @@ FaultModel:HumidistatOffset,
 
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
-   \min-fields 4
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -81159,6 +81250,7 @@ FaultModel:Fouling:AirFilter,
        \note Enter the name of a schedule
        \note describing the variations of the fan pressure rise
        \note in terms of multipliers to the fan design pressure rise
+       \required-field
        \type object-list
        \object-list ScheduleNames
    A6; \field Fan Curve Name
@@ -81169,8 +81261,42 @@ FaultModel:Fouling:AirFilter,
        \object-list CubicCurves
        \object-list UniVariateTables
 
+FaultModel:Fouling:CoolingTower,
+   \memo This object describes the fault of fouling cooling towers
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Cooling Tower Object Type
+       \note Enter the type of the cooling tower affected
+       \required-field
+       \type choice
+       \key CoolingTower:SingleSpeed
+       \key CoolingTower:TwoSpeed
+       \key CoolingTower:VariableSpeed:MERKEL
+   A5, \field Cooling Tower Object Name
+       \note Enter the name of the cooling tower affected
+       \required-field
+       \type object-list
+       \object-list CoolingTowersWithUA
+   N1; \field UA Reduction Factor
+       \note Factor describing the tower UA reduction due to fouling
+       \note It is the ratio between the UA value at fouling case and that at fault free case
+       \note It is applicable to both the Design UA and Free Convection UA of the tower
+       \units dimensionless
+       \type real
+       \minimum> 0.0
+
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
+   \min-fields 6
    A1, \field Name
        \required-field
        \type alpha
