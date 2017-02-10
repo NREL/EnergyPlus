@@ -198,6 +198,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > SumHmARaZ;
 
 	extern Array1D< Real64 > TempZoneThermostatSetPoint;
+	extern Array1D< Real64 > AdapComfortCoolingSetPoint;
 	extern Array1D< Real64 > ZoneThermostatSetPointHi;
 	extern Array1D< Real64 > ZoneThermostatSetPointLo;
 

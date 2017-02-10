@@ -1873,6 +1873,7 @@ namespace FanCoilUnits {
 		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
 		bool ColdFlowLocked; // if true cold water flow is locked
 		bool HotFlowLocked; // if true Hot water flow is locked
+
 		// FLOW
 		FanElecPower = 0.0;
 		// initialize local variables
@@ -1912,6 +1913,8 @@ namespace FanCoilUnits {
 
 			if ( AirMassFlow < SmallMassFlow ) UnitOn = false;
 			// zero the hot & cold water flows
+
+			// set water coil flow rate to 0 to calculate coil off capacity (only valid while flow is unlocked)
 			mdot = 0.0;
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
 			if ( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).FlowLock == FlowLocked ) {
@@ -1926,13 +1929,14 @@ namespace FanCoilUnits {
 			}
 			// obtain unit output with no active heating/cooling
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
-			if ( FirstHVACIteration ) {
+
+			if ( ColdFlowLocked || HotFlowLocked ) {
+				QUnitOutNoHC = FanCoil( FanCoilNum ).QUnitOutNoHC;
+			} else {  // continue to update QUnitOutNoHC while flow is unlocked
 				FanCoil( FanCoilNum ).QUnitOutNoHC = QUnitOutNoHC;
 			}
-			else {
-				QUnitOutNoHC = FanCoil( FanCoilNum ).QUnitOutNoHC;
-			}
-			// get the loads at the coils
+
+			// then calculate the loads at the coils
 			QCoilHeatSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP - QUnitOutNoHC;
 			QCoilCoolSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
@@ -2035,7 +2039,7 @@ namespace FanCoilUnits {
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy = ( CWFlowBypass * Node( FanCoil( FanCoilNum ).ColdControlNode ).Enthalpy +
 							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy ) / MdotLockC;
 					} else {
-						// if MdotLockC <= HWFlow use MdotLockC as is
+						// if MdotLockC <= CWFlow use MdotLockC as is
 						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
