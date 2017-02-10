@@ -46,13 +46,16 @@
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
+#include <Boilers.hh>
 #include <ChillerAbsorption.hh>
 #include <ChillerElectricEIR.hh>
 #include <ChillerIndirectAbsorption.hh>
 #include <ChillerReformulatedEIR.hh>
 #include <CondenserLoopTowers.hh>
 #include <CurveManager.hh>
+#include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
+#include <EvaporativeCoolers.hh>
 #include <Fans.hh>
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
@@ -73,12 +76,15 @@ namespace FaultsManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
-	//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
-	//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
-	//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-	//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
-	//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
-	//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
+	//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), LBNL. Added Fouling Coil fault
+	//                      Feb. 2015, Rongpeng Zhang, LBNL. Added Thermostat/Humidistat Offset faults
+	//                      Apr. 2015, Rongpeng Zhang, LBNL. Added Fouling Air Filter fault
+	//                      May. 2016, Rongpeng Zhang, LBNL. Added Chiller/Condenser Supply Water Temperature Sensor fault 
+	//                      Jun. 2016, Rongpeng Zhang, LBNL. Added Tower Scaling fault
+	//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
+	//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
+	//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
+	//                      Jan. 2017, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -120,7 +126,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 13 );
+	int const NumFaultTypes( 16 );
 	int const NumFaultTypesEconomizer( 5 );
 
 	// FaultTypeEnum
@@ -137,6 +143,9 @@ namespace FaultsManager {
 	int const iFault_TemperatureSensorOffset_CondenserSupplyWater( 111 );
 	int const iFault_Fouling_Tower( 112 );
 	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 113 );
+	int const iFault_Fouling_Boiler( 114 );
+	int const iFault_Fouling_Chiller( 115 );
+	int const iFault_Fouling_EvapCooler( 116 );
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -172,7 +181,10 @@ namespace FaultsManager {
 	"FaultModel:TemperatureSensorOffset:ChillerSupplyWater",
 	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
 	"FaultModel:Fouling:CoolingTower",
-	"FaultModel:TemperatureSensorOffset:CoilSupplyAir"
+	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
+	"FaultModel:Fouling:Boiler",
+	"FaultModel:Fouling:Chiller",
+	"FaultModel:Fouling:EvaporativeCooler"
 	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -195,8 +207,11 @@ namespace FaultsManager {
 	iFault_Fouling_AirFilter,
 	iFault_TemperatureSensorOffset_ChillerSupplyWater,
 	iFault_TemperatureSensorOffset_CondenserSupplyWater,
+	iFault_Fouling_Tower,
 	iFault_TemperatureSensorOffset_CoilSupplyAir,
-	iFault_Fouling_Tower
+	iFault_Fouling_Boiler,
+	iFault_Fouling_Chiller,
+	iFault_Fouling_EvapCooler
 	});
 
 	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
@@ -211,6 +226,9 @@ namespace FaultsManager {
 	int NumFaultyCondenserSWTSensor( 0 );  // Total number of faulty Condenser Supply Water Temperature Sensor
 	int NumFaultyTowerFouling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
+	int NumFaultyBoilerFouling( 0 );  // Total number of faulty Boilers with Fouling
+	int NumFaultyChillerFouling( 0 );  // Total number of faulty Chillers with Fouling
+	int NumFaultyEvapCoolerFouling( 0 );  // Total number of faulty Evaporative Coolers with Fouling
 	
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -224,6 +242,9 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
 	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
+	Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
+	Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
+	Array1D< FaultPropertiesEvapCoolerFouling > FaultsEvapCoolerFouling;
 
 	// Functions
 
@@ -232,14 +253,18 @@ namespace FaultsManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Tianzhen Hong
+		//       AUTHOR         Tianzhen Hong, LBNL
 		//       DATE WRITTEN   August 2013
-		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
-		//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
-		//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-		//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
-		//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
-		//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
+		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), LBNL. Added Fouling Coil fault
+		//                      Feb. 2015, Rongpeng Zhang, LBNL. Added Thermostat/Humidistat Offset faults
+		//                      Apr. 2015, Rongpeng Zhang, LBNL. Added Fouling Air Filter fault
+		//                      May. 2016, Rongpeng Zhang, LBNL. Added Chiller/Condenser Supply Water Temperature Sensor fault 
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Added Tower Scaling fault
+		//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
+		//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
+		//                      Jan. 2017, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
+		//
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -319,6 +344,15 @@ namespace FaultsManager {
 			} else if( i == 13 ) {
 				// 13th fault: Faulty Coil Supply Air Temperature Sensor
 				NumFaultyCoilSATSensor = NumFaultsTemp;  
+			} else if( i == 14 ) {
+				// 14th fault: Faulty Boiler with Fouling
+				NumFaultyBoilerFouling = NumFaultsTemp;  
+			} else if( i == 15 ) {
+				// 15th fault: Faulty Chiller with Fouling
+				NumFaultyChillerFouling = NumFaultsTemp;  
+			} else if( i == 16 ) {
+				// 16th fault: Faulty Evaporative Cooler with Fouling
+				NumFaultyEvapCoolerFouling = NumFaultsTemp;  
 			}
 		}
 	
@@ -343,7 +377,363 @@ namespace FaultsManager {
 		if( NumFaultyCondenserSWTSensor > 0 ) FaultsCondenserSWTSensor.allocate( NumFaultyCondenserSWTSensor );
 		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
+		if( NumFaultyBoilerFouling > 0 ) FaultsBoilerFouling.allocate( NumFaultyBoilerFouling );
+		if( NumFaultyChillerFouling > 0 ) FaultsChillerFouling.allocate( NumFaultyChillerFouling );
+		if( NumFaultyEvapCoolerFouling > 0 ) FaultsEvapCoolerFouling.allocate( NumFaultyEvapCoolerFouling );
+		
+		// read faults input of Fault_type 116: Evaporative Cooler Fouling
+		for ( int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= NumFaultyEvapCoolerFouling; ++jFault_EvapCoolerFouling ) {
 
+			cFaultCurrentObject = cFaults( 16 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_EvapCoolerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).FaultType = cFaultCurrentObject;
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).FaultTypeEnum = iFault_Fouling_EvapCooler;
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// CapReductionFactor - degree of fault
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).FoulingFactor = rNumericArgs( 1 );
+			
+			// Evaporative cooler type
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Evaporative cooler name
+			FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Evaporative cooler check
+			{ auto const SELECT_CASE_VAR( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerType );
+			
+				int EvapCoolerNum; 
+				
+				if( SameString( SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil" ) ) {
+					// Read in evaporative cooler is not done yet
+					if ( EvaporativeCoolers::GetInputEvapComponentsFlag ) {
+						EvaporativeCoolers::GetEvapInput();
+						EvaporativeCoolers::GetInputEvapComponentsFlag = false;
+					}
+					
+					// Check whether the evaporative cooler  name and type match each other;
+					EvapCoolerNum = FindItemInList( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerName, EvaporativeCoolers::EvapCond, &EvaporativeCoolers::EvapConditions::EvapCoolerName );
+					if ( EvapCoolerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the boiler with the fault model
+						EvaporativeCoolers::EvapCond( EvapCoolerNum ).FaultyEvapCoolerFoulingFlag = true;
+						EvaporativeCoolers::EvapCond( EvapCoolerNum ).FaultyEvapCoolerFoulingIndex = jFault_EvapCoolerFouling;
+					}
+				}
+			}
+		}
+		
+		// read faults input of Fault_type 115: Chiller Fouling
+		for ( int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling ) {
+
+			cFaultCurrentObject = cFaults( 15 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_ChillerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsChillerFouling( jFault_ChillerFouling ).FaultType = cFaultCurrentObject;
+			FaultsChillerFouling( jFault_ChillerFouling ).FaultTypeEnum = iFault_Fouling_Chiller;
+			FaultsChillerFouling( jFault_ChillerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// CapReductionFactor - degree of fault
+			FaultsChillerFouling( jFault_ChillerFouling ).FoulingFactor = rNumericArgs( 1 );
+			
+			// Chiller type
+			FaultsChillerFouling( jFault_ChillerFouling ).ChillerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Chiller name
+			FaultsChillerFouling( jFault_ChillerFouling ).ChillerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Chiller check
+			{ auto const SELECT_CASE_VAR( FaultsChillerFouling( jFault_ChillerFouling ).ChillerType );
+			
+				int ChillerNum; 
+				
+				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+					// Read in chiller if not done yet
+					if ( PlantChillers::GetElectricInput ) {
+						PlantChillers::GetElectricChillerInput();
+						PlantChillers::GetElectricInput = false;
+					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::ElectricChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+  					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+					// Read in chiller if not done yet
+					if ( ChillerElectricEIR::GetInputEIR ) {
+						ChillerElectricEIR::GetElectricEIRChillerInput();
+						ChillerElectricEIR::GetInputEIR = false;
+  					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).CondenserType != ChillerElectricEIR::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerFoulingFlag = true;
+							ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+  					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
+				
+					// Read in chiller if not done yet
+					if ( ChillerReformulatedEIR::GetInputREIR ) {
+						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
+						ChillerReformulatedEIR::GetInputREIR = false;
+					}
+
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).CondenserType != ChillerReformulatedEIR::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerFoulingFlag = true;
+							ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+					}
+				
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
+					// Read in chiller if not done yet
+					if ( PlantChillers::GetConstCOPInput ) {
+						PlantChillers::GetConstCOPChillerInput();
+						PlantChillers::GetConstCOPInput = false;
+					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::ConstCOPChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+					}
+ 
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+					// Read in chiller if not done yet
+					if ( PlantChillers::GetEngineDrivenInput ) {
+						PlantChillers::GetEngineDrivenChillerInput();
+						PlantChillers::GetEngineDrivenInput = false;
+					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::EngineDrivenChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the fault model with the water cooled chiller
+							PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+					// Read in chiller if not done yet
+					if ( PlantChillers::GetGasTurbineInput ) {
+						PlantChillers::GetGTChillerInput();
+						PlantChillers::GetGasTurbineInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::GTChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the fault model with the water cooled chiller
+							PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+						
+					}
+				}
+			}
+		}
+				
+		// read faults input of Fault_type 114: Boiler Fouling
+		for ( int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling ) {
+
+			cFaultCurrentObject = cFaults( 14 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_BoilerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsBoilerFouling( jFault_BoilerFouling ).FaultType = cFaultCurrentObject;
+			FaultsBoilerFouling( jFault_BoilerFouling ).FaultTypeEnum = iFault_Fouling_Boiler;
+			FaultsBoilerFouling( jFault_BoilerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// CapReductionFactor - degree of fault
+			FaultsBoilerFouling( jFault_BoilerFouling ).FoulingFactor = rNumericArgs( 1 );
+			
+			// Boiler type
+			FaultsBoilerFouling( jFault_BoilerFouling ).BoilerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Boiler name
+			FaultsBoilerFouling( jFault_BoilerFouling ).BoilerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Boiler check and link
+			{
+				// Check the boiler name and boiler type
+				int BoilerNum = FindItemInList( FaultsBoilerFouling( jFault_BoilerFouling ).BoilerName, Boilers::Boiler );
+				if ( BoilerNum <= 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+					ErrorsFound = true;
+				} else {
+				// Link the boiler with the fault model
+					Boilers::Boiler( BoilerNum ).FaultyBoilerFoulingFlag = true;
+					Boilers::Boiler( BoilerNum ).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
+				}
+			}
+		}
+		
 		// read faults input of Fault_type 113: Coil SAT Sensor Offset
 		for ( int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT ) {
 
@@ -765,7 +1155,7 @@ namespace FaultsManager {
 				int ChillerNum; 
 				
 				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetElectricInput ) {
 						PlantChillers::GetElectricChillerInput();
 						PlantChillers::GetElectricInput = false;
@@ -782,7 +1172,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerElectricEIR::GetInputEIR ) {
 						ChillerElectricEIR::GetElectricEIRChillerInput();
 						ChillerElectricEIR::GetInputEIR = false;
@@ -816,7 +1206,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetEngineDrivenInput ) {
 						PlantChillers::GetEngineDrivenChillerInput();
 						PlantChillers::GetEngineDrivenInput = false;
@@ -833,7 +1223,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetGasTurbineInput ) {
 						PlantChillers::GetGTChillerInput();
 						PlantChillers::GetGasTurbineInput = false;
@@ -850,7 +1240,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( PlantChillers::GetConstCOPInput ) {
 						PlantChillers::GetConstCOPChillerInput();
 						PlantChillers::GetConstCOPInput = false;
@@ -867,7 +1257,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerAbsorption::GetInput ) {
 						ChillerAbsorption::GetBLASTAbsorberInput();
 						ChillerAbsorption::GetInput = false;
@@ -884,7 +1274,7 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
-					// Read in chiller is not done yet
+					// Read in chiller if not done yet
 					if ( ChillerIndirectAbsorption::GetInput ) {
 						ChillerIndirectAbsorption::GetIndirectAbsorberInput();
 						ChillerIndirectAbsorption::GetInput = false;
@@ -1242,6 +1632,45 @@ namespace FaultsManager {
 		OffsetAct = FaultFac * this->Offset;
 
 		return OffsetAct;
+	}
+	
+	Real64
+	FaultPropertiesFouling::CalFoulingFactor()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Nov. 2016
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To calculate the dynamic Nominal Capacity or Efficiency Reduction due to fouling, based on the fault availability schedule and severity schedule.
+		// The factor is the ratio between the nominal capacity or efficiency at fouling case and that at fault free case
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using ScheduleManager::GetCurrentScheduleValue;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FaultFac( 0.0 ); // fault modification factor
+		Real64 FoulingFactor( 1.0 ); // Actual Nominal Fouling Factor, ratio between the nominal capacity or efficiency at fouling case and that at fault free case
+
+		// FLOW
+		
+		// Check fault availability schedules
+		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
+		
+			// Check fault severity schedules 
+			if ( this->SeveritySchedPtr >= 0 ) {
+				FaultFac = GetCurrentScheduleValue( this->SeveritySchedPtr );
+			} else {
+				FaultFac = 1.0;
+			}
+		}
+		
+		// The more severe the fouling fault is (i.e., larger FaultFac), the less the FoulingFactor is
+		if( FaultFac > 0.0 ) FoulingFactor = min( this->FoulingFactor / FaultFac, 1.0 );
+
+		return FoulingFactor;
 	}
 
 	Real64
