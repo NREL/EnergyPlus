@@ -97,6 +97,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5Zone_Unitary_VSDesuperheater.idf EPW_FILE USA_IL_C
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterSystems.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AbsorptionChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ActiveTrombeWall.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE AdaptiveThermostatASH55_5Zone_Miami.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirCooledElectricChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirEconomizerFaults_RefBldgLargeOfficeNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirEconomizerWithMaxMinOAFractions.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -226,6 +227,9 @@ ADD_SIMULATION_TEST(IDF_FILE FanCoilAutoSize.idf EPW_FILE USA_CO_Golden-NREL.724
 ADD_SIMULATION_TEST(IDF_FILE FanCoilAutoSizeScalableSizing.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE FanCoilAutoSize_MultiSpeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE FanCoil_HybridVent_VentSch.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE Fault_CoilSATSensorOffset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE Fault_CoolingTowerFouling.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE Fault_CondenserSWTSensorOffset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_ChillerSWTSensorOffset_RefBldgLargeOfficeNew2004.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_FoulingAirFilter_RefBldgMediumOfficeNew2004.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_HumidistatOffset_Supermarket.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
@@ -551,7 +555,7 @@ ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2.idf EPW_FILE USA_IL_Chicago-O
 
 
 # Macro files
-ADD_SIMULATION_TEST(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -m) 
+ADD_SIMULATION_TEST(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -m)
 
 # External interface files -- note they don't work on Mac
 if ( NOT APPLE )

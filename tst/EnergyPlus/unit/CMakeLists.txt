@@ -90,6 +90,7 @@ set( test_src
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
+  OutputReports.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
   PackagedTerminalHeatPump.unit.cc
