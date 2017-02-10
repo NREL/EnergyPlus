@@ -9528,7 +9528,7 @@
     ,                        !- Severity Schedule Name
     Chiller:Electric:ReformulatedEIR, !- Chiller Object Type
     CoolSys1 Chiller 1,      !- Chiller Object Name
-    0.8;                     !- Reference Capacity Reduction Factor
+    0.8;                     !- Fouling Factor
 
   FaultModel:Fouling:Chiller,
     Fault_Fouling_Chiller2,  !- Name
@@ -9536,7 +9536,7 @@
     ,                        !- Severity Schedule Name
     Chiller:Electric:ReformulatedEIR, !- Chiller Object Type
     CoolSys1 Chiller 2,      !- Chiller Object Name
-    0.8;                     !- Reference Capacity Reduction Factor
+    0.8;                     !- Fouling Factor
 
   FaultModel:Fouling:Boiler,
     Fault_Fouling_Boiler,    !- Name
@@ -9544,4 +9544,4 @@
     ,                        !- Severity Schedule Name
     Boiler:HotWater,         !- Boiler Object Type
     HeatSys1 Boiler,         !- Boiler Object Name
-    0.8;                     !- Reference Capacity Reduction Factor
+    0.8;                     !- Fouling Factor
