@@ -9,10 +9,10 @@ endif()
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 6 )
+set( CMAKE_VERSION_MINOR 7 )
 set( CMAKE_VERSION_PATCH 0 )
 
-set( PREV_RELEASE_SHA "c87e61b" )
+set( PREV_RELEASE_SHA "198c6a3" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -260,3 +260,4 @@ if (BUILD_DOCS)
     message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
   endif()
 endif()
+
