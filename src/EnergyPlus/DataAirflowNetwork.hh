@@ -654,7 +654,7 @@ namespace DataAirflowNetwork {
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
 		int CPVNum; // CP Value number
-		int FacadeNum; // Facade number
+		int facadeNum; // Facade number
 		int curve; // Curve ID, replace with pointer after curve refactor
 		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
 		bool useRelativeAngle; // Determines whether the wind angle is relative to the surface or absolute
@@ -665,7 +665,7 @@ namespace DataAirflowNetwork {
 			height( 0.0 ),
 			ExtNum( 0 ),
 			//CPVNum( 0 ),
-			FacadeNum( 0 ),
+			facadeNum( 0 ),
 			curve( 0 ),
 			symmetricCurve( false ),
 			useRelativeAngle( false )

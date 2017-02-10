@@ -96,7 +96,6 @@ namespace AirflowNetworkBalanceManager {
 	extern int AirflowNetworkNumOfSurCracks;
 	extern int AirflowNetworkNumOfSurELA;
 	extern int AirflowNetworkNumOfExtNode;
-	extern int AirflowNetworkNumOfCPArray;
 	extern int AirflowNetworkNumOfCPValue;
 	extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
 	extern int AirflowNetworkNumofWindDir;
@@ -253,7 +252,7 @@ namespace AirflowNetworkBalanceManager {
 	HybridVentilationControl();
 
 	void
-	CalcSingleSidedCps();
+	CalcSingleSidedCps(std::vector< std::vector< Real64 > > &valsByFacade, int numWindDirs = 36);
 
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number

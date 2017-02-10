@@ -103,8 +103,8 @@ namespace EnergyPlus {
 		CalcWindPressureCoeffs();
 		EXPECT_EQ( 1, MultizoneSurfaceData( 1 ).NodeNums( 2 ) );
 		EXPECT_EQ( 2, MultizoneSurfaceData( 2 ).NodeNums( 2 ) );
-		EXPECT_EQ( 1, MultizoneExternalNodeData( 1 ).CPVNum );
-		EXPECT_EQ( 3, MultizoneExternalNodeData( 2 ).CPVNum );
+		EXPECT_EQ( 1, MultizoneExternalNodeData( 1 ).curve );
+		EXPECT_EQ( 3, MultizoneExternalNodeData( 2 ).curve );
 
 		MultizoneSurfaceData.deallocate();
 		MultizoneExternalNodeData.deallocate();
@@ -5186,10 +5186,10 @@ namespace EnergyPlus {
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).useRelativeAngle );
 		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth, 0.0 );
+		EXPECT_EQ( 0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve );
 
 		// Set up some environmental parameters
 		DataEnvironment::OutBaroPress = 101325.0;

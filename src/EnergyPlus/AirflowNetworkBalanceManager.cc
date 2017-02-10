@@ -253,7 +253,6 @@ namespace AirflowNetworkBalanceManager {
 	int AirflowNetworkNumOfSurCracks( 0 );
 	int AirflowNetworkNumOfSurELA( 0 );
 	int AirflowNetworkNumOfExtNode( 0 );
-	int AirflowNetworkNumOfCPArray( 0 );
 	int AirflowNetworkNumOfCPValue( 0 );
 	int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
 	int AirflowNetworkNumofWindDir;
@@ -319,7 +318,6 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkNumOfSurCracks = 0;
 		AirflowNetworkNumOfSurELA = 0;
 		AirflowNetworkNumOfExtNode = 0;
-		AirflowNetworkNumOfCPArray = 0;
 		AirflowNetworkNumOfCPValue = 0;
 		AirflowNetworkNumOfSingleSideZones = 0; // added default value
 		AirflowNetworkNumofWindDir = 0; // added default value
@@ -4799,30 +4797,6 @@ namespace AirflowNetworkBalanceManager {
 			CurveManager::TableData( TableNum ).Y( TableDataIndex ) = y[ TableDataIndex - 1 ];
 		}
 
-		/*
-		// Convert raw table data to multidimensional array
-		// Find number of x variables
-		MaxTableNums += 1;
-		NumXVar = 1;
-		NextXVar = 1;
-		TempTableData = TableData;
-		while (NumXVar <= MaxTableNums) {
-
-		MinTableData = minval(TempTableData(TableNum).X1);
-		for (VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex) {
-		if (TempTableData(TableNum).X1(VarIndex) == MinTableData) {
-		TableData(TableNum).X1(NumXVar) = TempTableData(TableNum).X1(VarIndex);
-		TableData(TableNum).Y(NumXVar) = TempTableData(TableNum).Y(VarIndex);
-		TempTableData(TableNum).X1(VarIndex) = 999999.0;
-		++NumXVar;
-		}
-		}
-
-		NextXVar = NumXVar;
-
-		}
-		*/
-
 		// Move table data to performance curve table data structure
 		//CurveManager::PerfCurveTableData( TableNum ).X1.allocate( N - 1 );
 		CurveManager::PerfCurveTableData( TableNum ).Y.allocate( 1, N );
@@ -4850,6 +4824,7 @@ namespace AirflowNetworkBalanceManager {
 		//       MODIFIED       Revised by L. Gu, Nov. 2005, to meet requirements of AirflowNetwork
 		//       MODIFIED       Revised by L. Gu, Dec. 2008, to set the number of external nodes based on
 		//                      the number of external surfaces
+		//       MODIFIED       Revised by J. DeGraw, Feb. 2017, to use tables
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4917,6 +4892,66 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		FacadeAng( 5 ) = AirflowNetworkSimu.Azimuth + 90.0;
+
+		// Create AirflowNetwork external node objects -- one for each of the external surfaces
+
+		MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtSurfaces );
+		AirflowNetworkNumOfExtNode = AirflowNetworkNumOfExtSurfaces;
+		NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
+		for ( ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum ) {
+			MultizoneExternalNodeData( ExtNum ).ExtNum = AirflowNetworkNumOfZones + ExtNum;
+			gio::write( Name, "('ExtNode',I4)" ) << ExtNum;
+			MultizoneExternalNodeData( ExtNum ).Name = stripped( Name );
+		}
+
+		// Associate each external node with SurfaceData
+
+		ExtNum = 0;
+		for ( SurfDatNum = 1; SurfDatNum <= AirflowNetworkNumOfSurfaces; ++SurfDatNum ) {
+			if ( SurfDatNum > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone ) {
+				continue;
+			}
+			SurfNum = MultizoneSurfaceData( SurfDatNum ).SurfNum;
+			if ( SurfNum == 0 ) {
+				continue; // Error caught earlier
+			}
+			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment
+				|| ( Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( SurfNum ).ExtWind ) ) {
+				++ExtNum;
+				if ( Surface( SurfNum ).Tilt >= 45.0 ) { // "Vertical" surface
+					SurfAng = Surface( SurfNum ).Azimuth;
+					FacadeNumThisSurf = 1;
+					AngDiffMin = std::abs(SurfAng - FacadeAng(1));
+					if ( AngDiffMin > 359.0 ) {
+						AngDiffMin = std::abs( AngDiffMin - 360.0 );
+					}
+					for ( FacadeNum = 2; FacadeNum <= 4; ++FacadeNum ) {
+						AngDiff = std::abs( SurfAng - FacadeAng( FacadeNum ) );
+						if ( AngDiff > 359.0 ) {
+							AngDiff = std::abs( AngDiff - 360.0 );
+						}
+						if (AngDiff < AngDiffMin) {
+							AngDiffMin = AngDiff;
+							FacadeNumThisSurf = FacadeNum;
+						}
+					}
+					//gio::write( Name, "('FacadeNum',I1)" ) << FacadeNumThisSurf;
+					//MultizoneExternalNodeData( ExtNum ).CPVNum = FacadeNumThisSurf;
+					//MultizoneExternalNodeData(ExtNum).curve = curveIndex[FacadeNumThisSurf - 1];
+					MultizoneExternalNodeData( ExtNum ).facadeNum = FacadeNumThisSurf;
+				} else { // "Roof" surface
+					//gio::write(Name, "('FacadeNum',I1)") << 5;
+					//MultizoneExternalNodeData( ExtNum ).CPVNum = 5;
+					MultizoneExternalNodeData( ExtNum ).facadeNum = 5;
+					//MultizoneExternalNodeData(ExtNum).curve = curveIndex[4];
+				}
+				MultizoneSurfaceData( SurfDatNum ).NodeNums(2) = MultizoneExternalNodeData( ExtNum ).ExtNum;
+				MultizoneSurfaceData( SurfDatNum ).ExternalNodeName = MultizoneExternalNodeData( ExtNum ).Name;
+			}
+			//else { // Not an exterior surface
+						 //       MultizoneSurfaceData(SurfDatNum)%ExternalNodeName = ' '
+			//}
+		}
 
 		// Check if using the advanced single sided model
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
@@ -4993,29 +5028,19 @@ namespace AirflowNetworkBalanceManager {
 				curveIndex[ FacadeNum - 1 ] = makeTable("!WPCTABLE" + std::to_string( FacadeNum ), dirs, vals);
 			} // End of facade number loop
 
-		} else { //-calculate the advanced single sided wind pressure coefficients
-
-			// Create the CP Array of wind directions
-			MultizoneCPArrayData.allocate( 1 );
-			AirflowNetworkNumOfCPArray = 1;
-			MultizoneCPArrayData( 1 ).Name = "EVERY10DEGREES";
-			AirflowNetworkSimu.CpArrayName = "EVERY10DEGREESNAME";
-			MultizoneCPArrayData( 1 ).NumWindDir = 36;
-			AirflowNetworkSimu.NWind = 36;
-			MultizoneCPArrayData( 1 ).WindDir.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPArrayData( 1 ).WindDir = 0.0;
-			for ( WindDirNum = 1; WindDirNum <= 36; ++WindDirNum ) {
-				MultizoneCPArrayData( 1 ).WindDir( WindDirNum ) = ( WindDirNum - 1 ) * 10.0;
+			// Connect the external nodes to the new curves
+			for ( ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum ) {
+				MultizoneExternalNodeData( ExtNum ).curve = curveIndex[ MultizoneExternalNodeData( ExtNum ).facadeNum - 1 ];
 			}
+
+		} else { //-calculate the advanced single sided wind pressure coefficients
+			std::vector< Real64 > dirs = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180,
+				190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360 };
+
 			// Calculate the wind pressure coefficients vs. wind direction for each external node
-			MultizoneCPValueData.allocate( 4 );
-			AirflowNetworkNumOfCPValue = 4;
-			for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
-				gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
-				MultizoneCPValueData( FacadeNum ).Name = stripped( Name );
-				MultizoneCPValueData( FacadeNum ).CPArrayName = "EVERY10DEGREES";
-				MultizoneCPValueData( FacadeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-				MultizoneCPValueData( FacadeNum ).CPValue = 0.0;
+			std::vector< std::vector< Real64 > > valsByFacade( 4 );
+			for ( FacadeNum = 0; FacadeNum < 4; ++FacadeNum ) {
+				valsByFacade[ FacadeNum ] = std::vector< Real64 >( 36 );
 			}
 			for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
 				if ( FacadeNum == 1 || FacadeNum == 3 ) {
@@ -5023,7 +5048,9 @@ namespace AirflowNetworkBalanceManager {
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) SideRatio = 1.0 / SideRatio;
+				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+					SideRatio = 1.0 / SideRatio;
+				}
 				SideRatioFac = std::log( SideRatio );
 				for ( WindDirNum = 1; WindDirNum <= 36; ++WindDirNum ) {
 					WindAng = ( WindDirNum - 1 ) * 10.0;
@@ -5034,58 +5061,10 @@ namespace AirflowNetworkBalanceManager {
 					WtAng = 1.0 - DelAng / 10.0;
 					// Wind-pressure coefficients for vertical facades, low-rise building
 					IncRad = IncAng * DegToRadians;
-					MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * std::cos( IncRad / 2.0 ) + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( std::cos( IncRad / 2.0 ) ) );
+					valsByFacade[ FacadeNum - 1 ][ WindDirNum - 1 ] = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * std::cos( IncRad / 2.0 ) + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( std::cos( IncRad / 2.0 ) ) );
 				} // End of wind direction loop
 			} // End of facade number loop
-			CalcSingleSidedCps(); //run the advanced single sided subroutine if at least one zone calls for it
-		}
-
-		// Create five AirflowNetwork external node objects -- one for each of the four facades and one for the roof
-
-		MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtSurfaces );
-		AirflowNetworkNumOfExtNode = AirflowNetworkNumOfExtSurfaces;
-		NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
-		for ( ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum ) {
-			MultizoneExternalNodeData( ExtNum ).ExtNum = AirflowNetworkNumOfZones + ExtNum;
-			gio::write( Name, "('ExtNode',I4)" ) << ExtNum;
-			MultizoneExternalNodeData( ExtNum ).Name = stripped( Name );
-		}
-
-		// Associate each SurfaceData with an external node
-
-		ExtNum = 0;
-		for ( SurfDatNum = 1; SurfDatNum <= AirflowNetworkNumOfSurfaces; ++SurfDatNum ) {
-			if ( SurfDatNum > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone ) continue;
-			SurfNum = MultizoneSurfaceData( SurfDatNum ).SurfNum;
-			if ( SurfNum == 0 ) continue; // Error caught earlier
-			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( SurfNum ).ExtWind ) ) {
-				++ExtNum;
-				if ( Surface( SurfNum ).Tilt >= 45.0 ) { // "Vertical" surface
-					SurfAng = Surface( SurfNum ).Azimuth;
-					FacadeNumThisSurf = 1;
-					AngDiffMin = std::abs( SurfAng - FacadeAng( 1 ) );
-					if ( AngDiffMin > 359.0 ) AngDiffMin = std::abs( AngDiffMin - 360.0 );
-					for ( FacadeNum = 2; FacadeNum <= 4; ++FacadeNum ) {
-						AngDiff = std::abs( SurfAng - FacadeAng( FacadeNum ) );
-						if ( AngDiff > 359.0 ) AngDiff = std::abs( AngDiff - 360.0 );
-						if ( AngDiff < AngDiffMin ) {
-							AngDiffMin = AngDiff;
-							FacadeNumThisSurf = FacadeNum;
-						}
-					}
-					gio::write( Name, "('FacadeNum',I1)" ) << FacadeNumThisSurf;
-					//MultizoneExternalNodeData( ExtNum ).CPVNum = FacadeNumThisSurf;
-					MultizoneExternalNodeData( ExtNum ).curve = curveIndex[ FacadeNumThisSurf - 1];
-				} else { // "Roof" surface
-					gio::write( Name, "('FacadeNum',I1)" ) << 5;
-					//MultizoneExternalNodeData( ExtNum ).CPVNum = 5;
-					MultizoneExternalNodeData(ExtNum).curve = curveIndex[ 4 ];
-				}
-				MultizoneSurfaceData( SurfDatNum ).NodeNums( 2 ) = MultizoneExternalNodeData( ExtNum ).ExtNum;
-				MultizoneSurfaceData( SurfDatNum ).ExternalNodeName = MultizoneExternalNodeData( ExtNum ).Name;
-			} else { // Not an exterior surface
-				//       MultizoneSurfaceData(SurfDatNum)%ExternalNodeName = ' '
-			}
+			CalcSingleSidedCps( valsByFacade ); //run the advanced single sided subroutine if at least one zone calls for it
 		}
 
 	}
@@ -8199,7 +8178,7 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	void
-	CalcSingleSidedCps()
+	CalcSingleSidedCps( std::vector< std::vector< Real64 > > &valsByFacade, int numWindDir )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Sam Brunswick
@@ -8307,9 +8286,9 @@ namespace AirflowNetworkBalanceManager {
 		// Object Data
 		Array1D< AFNExtSurfacesProp > AFNExtSurfaces; // Surface numbers of all exterior openings
 
-		//count the total number of exterior simple and detailed openings and the number in each zone
-		//verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
-		//if it doesn't have two openings, change "ADVANCED" to "STANDARD"
+		// Count the total number of exterior simple and detailed openings and the number in each zone
+		// Verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
+		// If it doesn't have two openings, change "ADVANCED" to "STANDARD"
 		NumofExtSurfInZone.dimension( AirflowNetworkNumOfZones, 0 );
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
@@ -8351,7 +8330,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 		if ( AFNNumOfExtOpenings == 0 ) return;
-		//count again the number of single sided zones
+		// Recount the number of single sided zones
 		AirflowNetworkNumOfSingleSideZones = 0;
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
@@ -8359,7 +8338,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) return; //Bail if no zones call for the advanced single sided model.
-		//count again the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
+		// Recount the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
 		AFNNumOfExtOpenings = 0;
 		for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
 			MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
@@ -8427,7 +8406,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 		//Calculate the azimuth and the coordinates of the centroid of each opening.
 		//Calculate Sprime and DeltaCp for each zone.
-		AirflowNetworkNumofWindDir = MultizoneCPArrayData( 1 ).NumWindDir;
+		AirflowNetworkNumofWindDir = numWindDir;
 		PiFormula.allocate( AirflowNetworkNumofWindDir );
 		SigmaFormula.allocate( AirflowNetworkNumofWindDir );
 		DeltaCp.allocate( AirflowNetworkNumOfZones );
@@ -8437,7 +8416,7 @@ namespace AirflowNetworkBalanceManager {
 		for ( ZnNum = 1; ZnNum <= AirflowNetworkNumOfZones; ++ZnNum ) {
 			DeltaCp( ZnNum ).WindDir.allocate( AirflowNetworkNumofWindDir );
 			EPDeltaCP( ZnNum ).WindDir.allocate( AirflowNetworkNumofWindDir );
-			for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
+			for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 				DeltaCp( ZnNum ).WindDir( WindDirNum ) = 0.0;
 				EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = 0.0;
 			}
@@ -8493,17 +8472,19 @@ namespace AirflowNetworkBalanceManager {
 		MultizoneCPValueDataTempUnMod.allocate( AirflowNetworkNumOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
 		//Copy in Cp values for the 4 main facades
 		for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
-			gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
-			MultizoneCPValueDataTemp( FacadeNum ).Name = MultizoneCPValueData( FacadeNum ).Name;
-			MultizoneCPValueDataTemp( FacadeNum ).CPArrayName = MultizoneCPValueData( FacadeNum ).CPArrayName;
-			MultizoneCPValueDataTemp( FacadeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPValueDataTemp( FacadeNum ).CPValue = MultizoneCPValueData( FacadeNum ).CPValue;
+			//gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
+			//MultizoneCPValueDataTemp( FacadeNum ).Name = MultizoneCPValueData( FacadeNum ).Name;
+			//MultizoneCPValueDataTemp( FacadeNum ).CPArrayName = MultizoneCPValueData( FacadeNum ).CPArrayName;
+			MultizoneCPValueDataTemp( FacadeNum ).CPValue.allocate( numWindDir );
+			for ( int i = 1; i <= numWindDir; ++i ) {
+				MultizoneCPValueDataTemp( FacadeNum ).CPValue( i ) = valsByFacade[ FacadeNum-1 ][ i ];
+			}
 		}
 		//Allocate the rest of the array for single sided openings
 		for ( SrfNum = 5; SrfNum <= AirflowNetworkNumOfCPValue; ++SrfNum ) {
-			MultizoneCPValueDataTemp( SrfNum ).CPArrayName = "EVERY10DEGREES";
-			MultizoneCPValueDataTemp( SrfNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
+			//MultizoneCPValueDataTemp( SrfNum ).CPArrayName = "EVERY10DEGREES";
+			MultizoneCPValueDataTemp( SrfNum ).CPValue.allocate( numWindDir );
+			MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( numWindDir );
 			MultizoneCPValueDataTemp( SrfNum ).CPValue = 0.0;
 		}
 		//Calculate the single sided Cp arrays from DeltaCp for each single sided opening
@@ -8521,7 +8502,7 @@ namespace AirflowNetworkBalanceManager {
 						Real64 const VelRatio_2( std::pow( 10.0 / AFNExtSurfaces( ExtOpenNum ).NodeHeight, 2.0 * SiteWindExp ) );
 						Real64 const AFNEExtSurface_fac( 0.5 * ( 1.0 / pow_2( AFNExtSurfaces( ExtOpenNum ).DischCoeff ) ) );
 						if ( OpenNuminZone == 1 ) {
-							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
+							for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
@@ -8533,7 +8514,7 @@ namespace AirflowNetworkBalanceManager {
 							++OpenNuminZone;
 							++SrfNum;
 						} else if ( OpenNuminZone == 2 ) {
-							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
+							for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
@@ -8556,7 +8537,7 @@ namespace AirflowNetworkBalanceManager {
 		for ( NodeNum = 1; NodeNum <= AirflowNetworkNumOfCPValue; ++NodeNum ) {
 			MultizoneCPValueData( NodeNum ).Name = MultizoneCPValueDataTemp( NodeNum ).Name;
 			MultizoneCPValueData( NodeNum ).CPArrayName = MultizoneCPValueDataTemp( NodeNum ).CPArrayName;
-			MultizoneCPValueData( NodeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
+			MultizoneCPValueData( NodeNum ).CPValue.allocate( numWindDir );
 			MultizoneCPValueData( NodeNum ).CPValue = MultizoneCPValueDataTemp( NodeNum ).CPValue;
 		}
 		//Rewrite the CPVNum for all nodes that correspond with a simple or detailed opening
