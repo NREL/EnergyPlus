@@ -262,6 +262,13 @@ namespace CondenserLoopTowers {
 		bool SetpointIsOnOutlet; // if true look to outlet node of tower, if flase look to overall loop setpoint
 		int VSMerkelAFRErrorIter; // error counter for regula falsi failed with max iterations, vs merkel model
 		int VSMerkelAFRErrorFail; // error counter for regula falsi failed with limits exceeded, vs merkel model
+		Real64 DesInletWaterTemp; // design tower inlet water temperature (C)
+		Real64 DesOutletWaterTemp; // design tower outlet water temperature (C)
+		Real64 DesInletAirDBTemp; // design tower inlet air dry-bulb temperature (C)
+		Real64 DesInletAirWBTemp; // design tower outlet air wet-bulb temperature (C)
+		Real64 DesApproach; // design tower approach temperature (deltaC)
+		Real64 DesRange; // design tower range temperature (deltaC)
+		bool TowerInletCondsAutoSize; // true if tower inlet condition is autosized or defaulted to autosize
 		//Operational fault parameters
 		bool FaultyCondenserSWTFlag; // True if the condenser has SWT sensor fault
 		int FaultyCondenserSWTIndex;  // Index of the fault object corresponding to the condenser
@@ -372,6 +379,13 @@ namespace CondenserLoopTowers {
 			SetpointIsOnOutlet( false ),
 			VSMerkelAFRErrorIter( 0 ),
 			VSMerkelAFRErrorFail( 0 ),
+			DesInletWaterTemp( 0 ),
+			DesOutletWaterTemp( 0 ),
+			DesInletAirDBTemp( 0 ),
+			DesInletAirWBTemp( 0 ),
+			DesApproach( 0 ),
+			DesRange( 0 ),
+			TowerInletCondsAutoSize( false ),
 			FaultyCondenserSWTFlag( false ),
 			FaultyCondenserSWTIndex( 0 ),
 			FaultyCondenserSWTOffset( 0.0 ),
