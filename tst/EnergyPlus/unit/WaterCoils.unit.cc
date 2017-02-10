@@ -103,7 +103,7 @@ public:
 		NumWaterCoils = 1;
 		WaterCoil.allocate( NumWaterCoils );
 		WaterCoilNumericFields.allocate( NumWaterCoils );
-		WaterCoilNumericFields(NumWaterCoils).FieldNames.allocate(7); // max N fields for water coil
+		WaterCoilNumericFields(NumWaterCoils).FieldNames.allocate(17); // max N fields for water coil
 		TotNumLoops = 1;
 		PlantLoop.allocate( TotNumLoops );
 		PlantSizData.allocate( 1 );
@@ -919,3 +919,4 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	//
  	// Close and delete eio output file
   { IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+  }

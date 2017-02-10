@@ -1771,9 +1771,9 @@ namespace WaterCoils {
 
 				TempSize = AutoSize;
 				bPRINT = true;
-				if (WaterCoil( CoilNum ).MaxWaterVolFlowRate != AutoSize) bPRINT = false;
-				if (CurSysNum == 0) bPRINT = false;
-				if (CurSysNum > 0 && CurOASysNum == 0) {
+				if ( WaterCoil( CoilNum ).MaxWaterVolFlowRate != AutoSize ) bPRINT = false;
+				if ( CurSysNum == 0 ) bPRINT = false;
+				if ( CurSysNum > 0 && CurOASysNum == 0 ) {
 					GetCoilDesFlowT( CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp );
 					DataAirFlowUsedForSizing = DesCoilAirFlow;
 					DataFlowUsedForSizing = DesCoilAirFlow;
@@ -1807,7 +1807,7 @@ namespace WaterCoils {
 				TempSize = WaterCoil( CoilNum ).DesAirVolFlowRate;
 				RequestSizing( CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesAirVolFlowRate = TempSize;
-				if (WaterCoil( CoilNum ).DesAirVolFlowRate <= 0.0) {
+				if ( WaterCoil( CoilNum ).DesAirVolFlowRate <= 0.0 ) {
 					WaterCoil( CoilNum ).DesAirVolFlowRate = 0.0;
 					ShowWarningError( "The design air flow rate is zero for Coil:Cooling:Water " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "The autosize value for max air volume flow rate is zero" );

@@ -256,9 +256,6 @@ The outlet air temperature (degrees C) corresponding to the nominal heating capa
 
 This is the ratio of convective heat transfers between air side and water side of the heating coil at the rated operating conditions. The default is .5. This ratio describes the geometry and the design of the coil and is defined by:
 
-\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
-This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{Sizing:Plant} object is used for sizing the \textit{Design Water Flow Rate}.
-
 \begin{equation}
 ratio = \frac{{{\eta_f}{{\left( {hA} \right)}_{air}}}}{{{{\left( {hA} \right)}_{water}}}}
 \end{equation}
@@ -270,6 +267,10 @@ where,
 \emph{h} is the surface convection heat transfer coefficient
 
 \emph{A} is the surface area
+
+\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+
+This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{Sizing:Plant} object is used for sizing the \textit{Design Water Flow Rate}.
 
 An example input of the object is:
 
