@@ -1,9 +1,8 @@
-! 5Zone_Unitary_VSDesuperheater.idf
-! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum. 
-!                          file derived from 5ZoneAutoDXVAV.idf
+! 5Zone_Unitary_VSDesuperheatWaterHeater.idf
+! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              packaged VAV system with setpoint-based Unitary system using variable speed air to air cooling coil model
-!                          desuperheater for supplemental coil used for humidity control. 
+! Highlights:              packaged VAV system with unitary system, desuperheat from DX cooling coil used to augment water heater.
+!                          file derived from 5ZoneAutoDXVAV.idf and similar to 5Zone_Unitary_VSDesuperheater.idf
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -75,7 +74,8 @@
 !
 ! HVAC:                           the system is a packaged VAV (DX cooling coil and gas heating coils).
 !                                 The input is fully autosized. The input uses Coil:Cooling:DX:VariableSpeed but with just one speed level.
-!                                 There is a supplemental heating coil using desuperheat from the cooling coil, for humidity
+!                                 There is a supplemental heating coil for humidity
+!                                 The DX cooling coil is connected to the service water heating water heater using Coil:WaterHeating:Desuperheater
 !                                 Terminal units are set to provide a minimum amount of outdoor air based
 !                                 on occupancy and floor area.
 !
@@ -84,7 +84,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel, Coil:Heating:Desuperheater
+! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel,  Coil:WaterHeating:Desuperheater
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -194,7 +194,7 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     yes,                      !- Run Simulation for Sizing Periods
-    no;                     !- Run Simulation for Weather File Run Periods
+    No;                     !- Run Simulation for Weather File Run Periods
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -2648,7 +2648,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Desuperheater,       !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Humidistat Reheat Coil 1,!- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
     autosize,                     !- Cooling Supply Air Flow Rate {m3/s}
@@ -2669,16 +2669,15 @@
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     80;                      !- Maximum Supply Air Temperature {C}
 
-  Coil:Heating:Desuperheater,
+  Coil:Heating:Fuel,
     Humidistat Reheat Coil 1,!- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    0.3,              !- Heat Reclaim Recovery Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
+    32000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
     VAV Sys 1 Outlet Node,    !- Air Outlet Node Name
-    Coil:Cooling:DX:VariableSpeed, !- Heating Source Object Type
-    Main Cooling Coil 1,      !- Heating Source Name
-    VAV Sys 1 Outlet Node,    !- Temperature Setpoint Node Name
-    5.0;  ! Parasitic Electric Load
+    VAV Sys 1 Outlet Node;
 
   SetpointManager:Scheduled,
     Supply Air Hum Rate Manager 1,  !- Name
@@ -2718,6 +2717,7 @@
     Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name
     Relief Air Outlet Node 1,!- Relief Air Stream Node Name
     VAV Sys 1 Inlet Node;    !- Return Air Stream Node Name
+
 
   Coil:Cooling:DX:VariableSpeed,
     Main Cooling Coil 1,    !- Name
@@ -2804,6 +2804,118 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
+  WaterHeater:Mixed,
+    WaterHeatingCoilTank,    !- Name
+    0.785,                   !- Tank Volume {m3}
+    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
+    2.0,                     !- Deadband Temperature Difference {deltaC}
+    82.2222,                 !- Maximum Temperature Limit {C}
+    CYCLE,                   !- Heater Control Type
+    4500,                   !- Heater Maximum Capacity {W}
+    0,                       !- Heater Minimum Capacity {W}
+    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
+    ,                        !- Heater Ignition Delay {s}
+    ELECTRICITY,             !- Heater Fuel Type
+    1.0,                     !- Heater Thermal Efficiency
+    ,                        !- Part Load Factor Curve Name
+    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    ZONE,                    !- Ambient Temperature Indicator
+    ,                        !- Ambient Temperature Schedule Name
+    SPACE5-1,               !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
+    1.0,                     !- Off Cycle Loss Fraction to Zone
+    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
+    1.0,                     !- On Cycle Loss Fraction to Zone
+    0.1,                     !- Peak Use Flow Rate {m3/s}
+    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    ,                        !- Use Side Inlet Node Name
+    ,                        !- Use Side Outlet Node Name
+    ,                        !- Use Side Effectiveness
+    WaterHeatingCoilOutletNode,  !- Source Side Inlet Node Name
+    WaterHeatingCoilInletNode,  !- Source Side Outlet Node Name
+    0.95;                    !- Source Side Effectiveness
+    
+  Coil:WaterHeating:Desuperheater,
+    WaterHeatingCoil,        !- Name
+    DesuperheaterSched,      !- Availability Schedule Name
+    DesuperheaterTempSch,    !- Setpoint Temperature Schedule Name
+    4.0,                     !- Dead Band Temperature Difference {deltaC}
+    0.25,                    !- Rated Heat Reclaim Recovery Efficiency
+    50.0,                    !- Rated Inlet Water Temperature {C}
+    35.0,                    !- Rated Outdoor Air Temperature {C}
+    50.0,                    !- Maximum Inlet Water Temperature for Heat Reclaim {C}
+    HEffFTemp,               !- Heat Reclaim Efficiency Function of Temperature Curve Name
+    WaterHeatingCoilInletNode,  !- Water Inlet Node Name
+    WaterHeatingCoilOutletNode,  !- Water Outlet Node Name
+    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeatingCoilTank,    !- Tank Name
+    Coil:Cooling:DX:VariableSpeed,  !- Heating Source Object Type
+    Main Cooling Coil 1,      !- Heating Source Name
+    0.0001,                  !- Water Flow Rate {m3/s}
+    25.0,                   !- Water Pump Power {W}
+    0.2,                     !- Fraction of Pump Heat to Water
+    10.0,                    !- On-Cycle Parasitic Electric Load {W}
+    10.0;                    !- Off-Cycle Parasitic Electric Load {W}
+    
+   Curve:Biquadratic,
+    HEffFTemp,               !- Name
+    1.0,                 !- Coefficient1 Constant
+    0.0,               !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    50.0,                    !- Minimum Value of x
+    80.0,                    !- Maximum Value of x
+    20.0,                    !- Minimum Value of y
+    45.0,                    !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type   
+    
+  Schedule:Compact,
+    DesuperheaterSched,      !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+  
+    Schedule:Compact,
+      DesuperheaterTempSch,    !- Name
+      Any Number,              !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: AllDays,            !- Field 2
+    Until: 24:00,60.0;       !- Field 3
+  
+  Schedule:Compact,
+    Hot Water Setpoint Temp Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,40.0;       !- Field 3
+
+  Schedule:Compact,
+    Hot Water Demand Schedule,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 6:00,0,           !- Field 3
+    UNTIL: 7:00,0.003,       !- Field 5
+    UNTIL: 13:00,0,          !- Field 7
+    UNTIL: 13:10,0.002,      !- Field 9
+    UNTIL: 18:00,0,          !- Field 11
+    UNTIL: 18:30,0.005,      !- Field 13
+    UNTIL: 24:00,0;          !- Field 15
+
 
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
@@ -2880,20 +2992,7 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
-
-
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Inlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Coil System Compressor Speed Ratio,hourly;
 
   Output:Variable,*,Cooling Coil Electric Power,hourly;
 
@@ -2973,8 +3072,50 @@ Output:Variable,*,Unitary System Frost Control Status,hourly; !- HVAC Average []
 Output:Variable,*,Unitary System Heating Ancillary Electric Energy,hourly; !- HVAC Sum [J]
 Output:Variable,*,Unitary System Cycling Ratio,hourly; !- HVAC Average []
 Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average []
+Output:Variable,*,Water Heater Tank Temperature,hourly; !- HVAC Average [C]
+Output:Variable,*,Water Heater Final Tank Temperature,hourly; !- HVAC Average [C]
+Output:Variable,*,Water Heater Heat Loss Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Heat Loss Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Source Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+Output:Variable,*,Water Heater Source Side Inlet Temperature,hourly; !- HVAC Average [C]
+Output:Variable,*,Water Heater Source Side Outlet Temperature,hourly; !- HVAC Average [C]
+Output:Variable,*,Water Heater Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Source Side Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Off Cycle Parasitic Tank Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Off Cycle Parasitic Tank Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater On Cycle Parasitic Tank Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater On Cycle Parasitic Tank Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Total Demand Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Total Demand Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Heating Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Heating Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Unmet Demand Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Unmet Demand Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Venting Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Venting Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Net Heat Transfer Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Net Heat Transfer Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Cycle On Count,hourly; !- HVAC Sum []
+Output:Variable,*,Water Heater Runtime Fraction,hourly; !- HVAC Average []
+Output:Variable,*,Water Heater Part Load Ratio,hourly; !- HVAC Average []
+Output:Variable,*,Water Heater Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly; !- HVAC Sum [J]
+Output:Variable,*,Water Heater Water Volume Flow Rate,hourly; !- HVAC Average [m3/s]
+Output:Variable,*,Water Heater Water Volume,hourly; !- HVAC Sum [m3]
+Output:Variable,*,Water Heater Mains Water Volume,hourly; !- HVAC Sum [m3]
+Output:Variable,*,Water Heater Heat Reclaim Efficiency Modifier Multiplier,hourly; !- HVAC Average []
+Output:Variable,*,Water Heater Pump Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Water Heater Pump Electric Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,*,Zone Operative Temperature,hourly; !- Zone Average [C]
-Output:Variable,*,Zone Mean Air Dewpoint Temperature,hourly; !- Zone Average [C]
-Output:Variable,*,Zone Mean Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgDryAir]
-Output:Variable,*,Zone Air Relative Humidity,hourly; !- HVAC Average [%]
+Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
+Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
+Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Part Load Ratio,hourly; !- HVAC Average []
+Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]

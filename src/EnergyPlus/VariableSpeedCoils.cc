@@ -4492,7 +4492,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = 0.0;
 			VarSpeedCoil( DXCoilNum ).OutletWaterTemp = 0.0;
 			VarSpeedCoil( DXCoilNum ).OutletWaterEnthalpy = 0.0;
-			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).AvailCapacity = QWasteHeat;
+			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).AvailCapacity = QSource;
 		} else {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = SourceSideMassFlowRate;
 			VarSpeedCoil( DXCoilNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpSource );

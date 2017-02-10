@@ -2338,6 +2338,8 @@ namespace DesiccantDehumidifiers {
 						}
 					} else if ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 						NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) );
+					} else {
+						NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) );
 					}
 				} else {
 					NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) );
