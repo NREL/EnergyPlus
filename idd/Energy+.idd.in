@@ -52375,6 +52375,7 @@ Dehumidifier:Desiccant:System,
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:VariableSpeed
   A12, \field Companion Cooling Coil Name
        \type object-list
        \object-list CoolingCoilsDXMultiModeOrSingleSpeed

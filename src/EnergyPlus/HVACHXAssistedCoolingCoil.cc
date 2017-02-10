@@ -423,6 +423,12 @@ namespace HVACHXAssistedCoolingCoil {
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
 				CoolingCoilErrFlag = false;
 				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed( AlphArray( 4 ), AlphArray( 5 ), CoolingCoilErrFlag );
+
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ErrorsFound = true;
+				}
+				HXAssistedCoil( HXAssistedCoilNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
@@ -682,6 +688,9 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 			DXCoilFullLoadOutAirTemp( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 			DXCoilFullLoadOutAirHumRat( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
+		} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+			// 
+		
 		}
 
 	}
@@ -755,7 +764,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
 		Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).MassFlowRate = AirMassFlow;
 
-		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
+		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 			CompanionCoilIndexNum = HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex;
 		} else {
 			CompanionCoilIndexNum = 0;
@@ -775,10 +784,18 @@ namespace HVACHXAssistedCoolingCoil {
 		// Force at least 2 iterations to pass outlet node information
 		while ( ( std::abs( Error ) > 0.0005 && Iter <= MaxIter ) || Iter < 2 ) {
 
-			SimHeatRecovery( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _, EconomizerFlag );
+			SimHeatRecovery( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _, EconomizerFlag, _, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num );
 
 			if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 				SimDXCoil( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CompOp, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, FanOpMode, PartLoadRatio, OnOffAirFlow );
+			} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+				Real64 QZnReq( -1.0 ); // Zone load (W), input to variable-speed DX coil
+				Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
+				Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
+				Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
+				Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
+				Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
+				VariableSpeedCoils::SimVariableSpeedCoils( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, CompOp, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadRatio, HXAssistedCoil( HXAssistedCoilNum ).DXCoilNumOfSpeeds, QZnReq, QLatReq, OnOffAirFlowRatio ); // call vs coil model at top speed.
 			} else {
 				SimulateWaterCoilComponents( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex );
 			}

@@ -2265,6 +2265,8 @@ namespace DesiccantDehumidifiers {
 
 		if ( DesicDehum( DesicDehumNum ).CoilUpstreamOfProcessSide == Yes ) {
 			// Cooling coil directly upstream of desiccant dehumidifier, dehumidifier runs in tandem with DX coil
+
+
 			CompanionCoilIndexNum = DesicDehum( DesicDehumNum ).DXCoilIndex;
 		} else {
 			// desiccant dehumidifier determines its own PLR
@@ -2318,17 +2320,23 @@ namespace DesiccantDehumidifiers {
 
 				//     CompanionCoilIndexNum .GT. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == Yes
 				if ( CompanionCoilIndexNum > 0 ) {
-
-					DDPartLoadRatio = DXCoilPartLoadRatio( DesicDehum( DesicDehumNum ).DXCoilIndex );
-
+					if ( ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) || ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) ) {
+						DDPartLoadRatio = DXCoilPartLoadRatio( DesicDehum( DesicDehumNum ).DXCoilIndex );
+					} else if ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+						DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
+					}
 				}
 
 				//     calculate actual condenser outlet node (regen inlet node) temperature
 				if ( CompanionCoilIndexNum > 0 ) {
-					if ( DXCoilFanOpMode( DesicDehum( DesicDehumNum ).DXCoilIndex ) == ContFanCycCoil ) {
-						NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) * DDPartLoadRatio );
-						CondenserWasteHeat /= DDPartLoadRatio;
-					} else {
+					if ( ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) || ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) ) {
+						if ( DXCoilFanOpMode( DesicDehum( DesicDehumNum ).DXCoilIndex ) == ContFanCycCoil ) {
+							NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) * DDPartLoadRatio );
+							CondenserWasteHeat /= DDPartLoadRatio;
+						} else {
+							NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) );
+						}
+					} else if ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 						NewRegenInTemp = Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp + CondenserWasteHeat / ( CpAir * ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate ) );
 					}
 				} else {
@@ -2386,7 +2394,7 @@ namespace DesiccantDehumidifiers {
 						CalcNonDXHeatingCoils( DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust );
 					}
 
-					SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 1.0, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode );
+					SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 1.0, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode, _, _, DesicDehum( DesicDehumNum ).coolingCoil_TypeNum );
 
 					//       calculate desiccant part-load ratio
 					if ( Node( DesicDehum( DesicDehumNum ).ProcAirInNode ).HumRat != Node( DesicDehum( DesicDehumNum ).ProcAirOutNode ).HumRat ) {
@@ -2447,7 +2455,7 @@ namespace DesiccantDehumidifiers {
 
 					//       CompanionCoilIndexNum .EQ. 0 means the same thing as DesicDehum(DesicDehumNum)%CoilUpstreamOfProcessSide == No
 					if ( CompanionCoilIndexNum == 0 ) {
-						SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 1.0, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode );
+						SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 1.0, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode, _, _, DesicDehum( DesicDehumNum ).coolingCoil_TypeNum  );
 
 						//         calculate desiccant part-load ratio
 						if ( Node( DesicDehum( DesicDehumNum ).ProcAirInNode ).HumRat != Node( DesicDehum( DesicDehumNum ).ProcAirOutNode ).HumRat ) {
@@ -2499,7 +2507,7 @@ namespace DesiccantDehumidifiers {
 				CalcNonDXHeatingCoils( DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust );
 			}
 
-			SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, DDPartLoadRatio, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode );
+			SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, DDPartLoadRatio, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode, _, _, DesicDehum( DesicDehumNum ).coolingCoil_TypeNum  );
 
 			if ( DesicDehum( DesicDehumNum ).RegenFanPlacement == DrawThru ) {
 				SimulateFanComponents( DesicDehum( DesicDehumNum ).RegenFanName, FirstHVACIteration, DesicDehum( DesicDehumNum ).RegenFanIndex );
@@ -2531,7 +2539,7 @@ namespace DesiccantDehumidifiers {
 				CalcNonDXHeatingCoils( DesicDehumNum, FirstHVACIteration, -1.0 );
 			}
 
-			SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 0.0, false, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode );
+			SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 0.0, false, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode, _, _, DesicDehum( DesicDehumNum ).coolingCoil_TypeNum  );
 
 			if ( DesicDehum( DesicDehumNum ).RegenFanPlacement == DrawThru ) {
 				SimulateFanComponents( DesicDehum( DesicDehumNum ).RegenFanName, FirstHVACIteration, DesicDehum( DesicDehumNum ).RegenFanIndex );
@@ -2886,7 +2894,7 @@ namespace DesiccantDehumidifiers {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumNum;
 		bool FirstHVACSoln;
-		Real64 RegenCoilActual; // delivered coild load, W valid companion coil must be specified when
+		Real64 RegenCoilActual; // delivered coild load, W
 		Real64 RegenCoilHeatLoad; // requested coild load, W
 		Real64 mdot;
 

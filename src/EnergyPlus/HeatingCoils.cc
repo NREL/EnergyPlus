@@ -2258,7 +2258,7 @@ namespace HeatingCoils {
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
 				//condenser heat rejection
 				HeatingCoil( CoilNum ).RTF = VariableSpeedCoils::VarSpeedCoil( SourceID ).RunFrac;
-				HeatingCoil( CoilNum ).NominalCapacity = VariableSpeedCoils::VarSpeedCoil( SourceID ).QWasteHeat * Effic;
+				HeatingCoil( CoilNum ).NominalCapacity = VariableSpeedCoils::VarSpeedCoil( SourceID ).QSource * Effic;
 			}
 		} else {
 			HeatingCoil( CoilNum ).NominalCapacity = 0.0;
