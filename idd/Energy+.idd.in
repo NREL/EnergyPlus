@@ -1943,12 +1943,21 @@ Site:GroundDomain:Slab,
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   A12; \field Simulation Timestep
+   A12, \field Simulation Timestep
         \type choice
-        \key Hourly
         \key Timestep
+        \key Hourly
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
+   N12, \field Geometric Mesh Coefficient
+        \type real
+        \minimum 1.0
+        \maximum 2.0
+        \default 1.6
+   N13; \field Mesh Density Parameter
+        \type integer
+        \minimum 4
+        \default 6
 
 Site:GroundDomain:Basement,
         \memo Ground-coupled basement model for simulating basements
