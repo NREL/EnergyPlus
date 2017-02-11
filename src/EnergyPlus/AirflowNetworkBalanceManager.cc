@@ -253,9 +253,7 @@ namespace AirflowNetworkBalanceManager {
 	int AirflowNetworkNumOfSurCracks( 0 );
 	int AirflowNetworkNumOfSurELA( 0 );
 	int AirflowNetworkNumOfExtNode( 0 );
-	int AirflowNetworkNumOfCPValue( 0 );
 	int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-	int AirflowNetworkNumofWindDir;
 	int DisSysNumOfNodes( 0 );
 	int DisSysNumOfLeaks( 0 );
 	int DisSysNumOfELRs( 0 );
@@ -318,9 +316,7 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkNumOfSurCracks = 0;
 		AirflowNetworkNumOfSurELA = 0;
 		AirflowNetworkNumOfExtNode = 0;
-		AirflowNetworkNumOfCPValue = 0;
 		AirflowNetworkNumOfSingleSideZones = 0; // added default value
-		AirflowNetworkNumofWindDir = 0; // added default value
 		DisSysNumOfNodes = 0;
 		DisSysNumOfLeaks = 0;
 		DisSysNumOfELRs = 0;
@@ -8344,16 +8340,15 @@ namespace AirflowNetworkBalanceManager {
 		}
 		//Calculate the azimuth and the coordinates of the centroid of each opening.
 		//Calculate Sprime and DeltaCp for each zone.
-		AirflowNetworkNumofWindDir = numWindDir;
-		PiFormula.allocate( AirflowNetworkNumofWindDir );
-		SigmaFormula.allocate( AirflowNetworkNumofWindDir );
+		PiFormula.allocate( numWindDir );
+		SigmaFormula.allocate( numWindDir );
 		DeltaCp.allocate( AirflowNetworkNumOfZones );
 		EPDeltaCP.allocate( AirflowNetworkNumOfZones );
 		Sprime.allocate( AirflowNetworkNumOfZones );
 		ZoneAng.allocate( AirflowNetworkNumOfZones );
 		for ( ZnNum = 1; ZnNum <= AirflowNetworkNumOfZones; ++ZnNum ) {
-			DeltaCp( ZnNum ).WindDir.allocate( AirflowNetworkNumofWindDir );
-			EPDeltaCP( ZnNum ).WindDir.allocate( AirflowNetworkNumofWindDir );
+			DeltaCp( ZnNum ).WindDir.allocate( numWindDir );
+			EPDeltaCP( ZnNum ).WindDir.allocate( numWindDir );
 			for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 				DeltaCp( ZnNum ).WindDir( WindDirNum ) = 0.0;
 				EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = 0.0;
@@ -8388,7 +8383,7 @@ namespace AirflowNetworkBalanceManager {
 				ZoneAng( ZnNum ) = ZoneAng1;
 				Sprime( ZnNum ) = std::sqrt( pow_2( X1 - X2 ) + pow_2( Y1 - Y2 ) ) / MultizoneZoneData( ZnNum ).BuildWidth;
 				//Calculate DeltaCp for each wind direction for each zone
-				for ( WindDirNum = 1; WindDirNum <= AirflowNetworkNumofWindDir; ++WindDirNum ) {
+				for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 					WindDir = ( WindDirNum - 1 ) * 10.0;
 					WindAng = ( WindDirNum - 1 ) * 10.0;
 					IncAng = std::abs( WindAng - ZoneAng( ZnNum ) );
@@ -8405,9 +8400,9 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
-		AirflowNetworkNumOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
-		MultizoneCPValueDataTemp.allocate( AirflowNetworkNumOfCPValue ); //Allocate a temporary array for single sided Cps
-		MultizoneCPValueDataTempUnMod.allocate( AirflowNetworkNumOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
+		int numOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
+		MultizoneCPValueDataTemp.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps
+		MultizoneCPValueDataTempUnMod.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
 		// Copy in Cp values for the 4 main facades
 		for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
 			//gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
@@ -8419,15 +8414,15 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 		//Allocate the rest of the array for single sided openings
-		for ( SrfNum = 5; SrfNum <= AirflowNetworkNumOfCPValue; ++SrfNum ) {
+		for ( SrfNum = 5; SrfNum <= numOfCPValue; ++SrfNum ) {
 			//MultizoneCPValueDataTemp( SrfNum ).CPArrayName = "EVERY10DEGREES";
 			MultizoneCPValueDataTemp( SrfNum ).CPValue.allocate( numWindDir );
 			MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( numWindDir );
 			MultizoneCPValueDataTemp( SrfNum ).CPValue = 0.0;
 		}
 		//Calculate the single sided Cp arrays from DeltaCp for each single sided opening
-		CPV1.allocate( AirflowNetworkNumofWindDir );
-		CPV2.allocate( AirflowNetworkNumofWindDir );
+		CPV1.allocate( numWindDir );
+		CPV2.allocate( numWindDir );
 		CPV1 = 0.0;
 		CPV2 = 0.0;
 		SrfNum = 5;
@@ -8472,9 +8467,9 @@ namespace AirflowNetworkBalanceManager {
 		}
 		//MultizoneCPValueData.deallocate(); //Erase original Cp arrays
 		//MultizoneCPValueData.allocate( AirflowNetworkNumOfCPValue ); //reallocate Cp arrays to include the new single sided Cps
-		valsByFacade = std::vector< std::vector< Real64 > >( AirflowNetworkNumOfCPValue );
+		valsByFacade = std::vector< std::vector< Real64 > >( numOfCPValue );
 		//Copy the temporary array onto the original array
-		for ( NodeNum = 1; NodeNum <= AirflowNetworkNumOfCPValue; ++NodeNum ) {
+		for ( NodeNum = 1; NodeNum <= numOfCPValue; ++NodeNum ) {
 			//MultizoneCPValueData( NodeNum ).Name = MultizoneCPValueDataTemp( NodeNum ).Name;
 			//MultizoneCPValueData( NodeNum ).CPArrayName = MultizoneCPValueDataTemp( NodeNum ).CPArrayName;
 			//MultizoneCPValueData( NodeNum ).CPValue.allocate( numWindDir );

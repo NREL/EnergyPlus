@@ -96,9 +96,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int AirflowNetworkNumOfSurCracks;
 	extern int AirflowNetworkNumOfSurELA;
 	extern int AirflowNetworkNumOfExtNode;
-	extern int AirflowNetworkNumOfCPValue;
 	extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-	extern int AirflowNetworkNumofWindDir;
 	extern int DisSysNumOfNodes;
 	extern int DisSysNumOfLeaks;
 	extern int DisSysNumOfELRs;
