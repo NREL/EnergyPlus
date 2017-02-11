@@ -444,10 +444,10 @@ EnergyPlusPgm( std::string const & filepath )
 
 	try {
 
-		OutputSchema->setupOutputOptions();
+		//OutputSchema->setupOutputOptions();
 		InputProcessor::InitFiles();
 		InputProcessor::ProcessInput();
-
+		OutputSchema->setupOutputOptions();
 		ManageSimulation();
 
 		ShowMessage( "Simulation Error Summary *************" );

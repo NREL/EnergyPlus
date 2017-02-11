@@ -5216,3 +5216,6 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
+  Output:JSON,
+    TimeSeriesAndTabular;              !- Option Type
+

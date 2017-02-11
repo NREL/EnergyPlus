@@ -8,8 +8,6 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Reference.hh>
 
-// cJSON header
-#include <cJSON.h>
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers

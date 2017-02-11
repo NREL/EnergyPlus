@@ -449,7 +449,7 @@ namespace EnergyPlus {
 		json Table::getJSON() {
 			json root;
 			json cols = json::array();
-			json rows = json::array();
+			json rows;
 
 			for (int i = 0; i < ColHeaders.size(); i++) {
 				cols.push_back(ColHeaders[i]);
@@ -460,7 +460,7 @@ namespace EnergyPlus {
 				for (int col = 0; col < ColHeaders.size(); ++col) {
 					rowvec.push_back( Data[col][row] );
 				}
-				rows[RowHeaders[row]] = rowvec;
+				rows[ RowHeaders[row] ] = rowvec;
 			}
 
 			root = {
@@ -918,12 +918,14 @@ namespace EnergyPlus {
 				outputVars[ "RunPeriod" ] = RIRunPeriodTSData.getVariablesJSON();
 
 			// output dictionary
-			rdd = {
+            for (int i = 0; i < RDD.size(); i++) {
+                rddvals.push_back( RDD[i] );
+            }
+            rdd = {
 					{ "Description", "Dictionary containing output variables that may be requested" },
 					{ "Variables", rddvals}
 			};
 			outputVars [ "OutputDictionary" ] = rdd;
-			root[ "OutputVariables" ] = outputVars;
 
 			// meter variables
 			
