@@ -1,4 +1,5 @@
 include_directories("${CMAKE_SOURCE_DIR}/third_party/kiva-ep/src")
+include_directories("${CMAKE_SOURCE_DIR}/third_party/kiva-ep/src/libkiva")
 include_directories("${CMAKE_BINARY_DIR}/third_party/kiva-ep/src/libkiva")
 include_directories( SYSTEM "${CMAKE_SOURCE_DIR}/third_party/kiva-ep/vendor/boost-1.61.0/")
 
