@@ -388,14 +388,12 @@ namespace EnergyPlus {
 				);
 				//cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
 			}
-
 			root = {
 					{ "UUID" , uuid },
 					{ "ReportFrequency" , ReportFrequency },
 					{ "Cols" , cols },
 					{ "Rows" , rows }
 			};
-
 			return root;
 		}
 
@@ -403,19 +401,18 @@ namespace EnergyPlus {
 			std::string jsonfilename = "eplusout_" + ReportFrequency + ".json";
 			std::ofstream jsonfile(jsonfilename);
 			
-			cJSON *_root;
+			json root;
 			
 			if (jsonfile.is_open())
 			{
-				_root = getJSON();
-				jsonfile << cJSON_Print(_root);
+				root = getJSON();
+				jsonfile << std::setw(4) << root << std::endl;
 				jsonfile.close();
 			}
 			// does this need to go to error?
 			else
 				ShowWarningError("Unable to open file for time-series output.");
-			
-			cJSON_Delete(_root);
+			//cJSON_Delete(_root);
 		}
 
 
@@ -449,54 +446,51 @@ namespace EnergyPlus {
 			}
 		}
 
-		cJSON* Table::getJSON() {
-			cJSON *_root;
+		json Table::getJSON() {
+			json root;
+			json cols = json::array();
+			json rows = json::array();
 
-			_root = cJSON_CreateObject();
-			cJSON_AddStringToObject(_root, "TableName", TableName.c_str());
-			cJSON_AddStringToObject(_root, "UUID", UUID().c_str());
-
-			cJSON *_cols;
-			cJSON_AddItemToObject(_root, "Cols", _cols = cJSON_CreateArray());
 			for (int i = 0; i < ColHeaders.size(); i++) {
-				cJSON* str = cJSON_CreateString(ColHeaders[i].c_str());
-				cJSON_AddItemToArray(_cols, str);
+				cols.push_back(ColHeaders[i]);
 			}
-
-			cJSON *_rows;
-			cJSON_AddItemToObject(_root, "Rows", _rows = cJSON_CreateObject());
 
 			for (int row = 0; row < RowHeaders.size(); ++row) {
-				cJSON *_rowvec;
-				cJSON_AddItemToObject(_rows, RowHeaders[row].c_str(), _rowvec = cJSON_CreateArray());
+				json rowvec = json::array();
 				for (int col = 0; col < ColHeaders.size(); ++col) {
-					cJSON *_val = cJSON_CreateString(Data[col][row].c_str());
-					cJSON_AddItemToArray(_rowvec, _val);
+					rowvec.push_back( Data[col][row] );
 				}
+				rows[RowHeaders[row]] = rowvec;
 			}
-			if (!FootnoteText.empty())
-				cJSON_AddStringToObject(_root, "Footnote", FootnoteText.c_str());
 
-			return _root;
+			root = {
+					{ "TableName" , TableName },
+					{ "UUID" , UUID() },
+					{ "Cols", cols },
+					{ "Rows", rows }
+			};
+			if (!FootnoteText.empty())
+				root["Footnote"] =  FootnoteText;
+			return root;
 		}
 
 		// class Report
 
-		cJSON* Report::getJSON() {
-			cJSON *_root;
-			_root = cJSON_CreateObject();
-			cJSON_AddStringToObject(_root, "ReportName", ReportName.c_str());
-			cJSON_AddStringToObject(_root, "For", ReportForString.c_str());
-			cJSON_AddStringToObject(_root, "UUID", UUID().c_str());
+		json Report::getJSON() {
 
-			cJSON *_cols;
-			cJSON_AddItemToObject(_root, "Tables", _cols = cJSON_CreateArray());
+			json root = {
+					{ "ReportName" , ReportName },
+					{ "For" , ReportForString },
+					{ "UUID" , UUID() }
+			};
+
+			json cols = json::array();
+
 			for (int i = 0; i < Tables.size(); i++) {
-				cJSON* tbl = Tables[i]->getJSON();
-				cJSON_AddItemToArray(_cols, tbl);
+				cols.push_back(Tables[i]->getJSON());
 			}
-
-			return _root;
+			root["Tables"] = cols;
+			return root;
 		}
 
 
@@ -529,15 +523,13 @@ namespace EnergyPlus {
 			r->Tables.push_back(tbl);
 		}
 
-		cJSON* ReportsCollection::getJSON() {
-			cJSON *_root;
-			_root = cJSON_CreateArray();
+		json ReportsCollection::getJSON() {
+			json root = json::array();
 
 			for (RptPtrPair iter : reportsMap) {
-				cJSON *_rpts;
-				cJSON_AddItemToArray(_root, iter.second->getJSON());
+				root.push_back( iter.second->getJSON() );
 			}
-			return _root;
+			return root;
 		}
 
 
@@ -893,109 +885,107 @@ namespace EnergyPlus {
 			std::string jsonfilename = "eplusout.json";
 			std::ofstream jsonfile(jsonfilename);
 
-			cJSON *_root, *_simRes, *outputVars, *meterVars, *meterData, *mdd;
+			json root, outputVars, rdd, meterVars, meterData;
+			json rddvals = json::array();
+			root = {
+					{ "SimulationResults", {
+							{"Simulation" , SimulationInformation.getJSON()}
+										   }
+					}
+			};
 
-			_root = cJSON_CreateObject();
+			//output variables
 
-			// simulation results
-			cJSON_AddItemToObject(_root, "SimulationResults", _simRes = cJSON_CreateObject());
-			cJSON_AddItemToObject(_simRes, "Simulation", SimulationInformation.getJSON());
-			
-			// output variables
-			cJSON_AddItemToObject(_root, "OutputVariables", outputVars = cJSON_CreateObject());
-			
 			if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "Detailed-Zone", RIDetailedZoneTSData.getVariablesJSON());
+				outputVars[ "Detailed-Zone" ] = RIDetailedZoneTSData.getVariablesJSON();
 			
 			if (RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "Detailed-HVAC", RIDetailedHVACTSData.getVariablesJSON());
+				outputVars[ "Detailed-HVAC" ] = RIDetailedHVACTSData.getVariablesJSON();
 
 			if (RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "Timestep", RITimestepTSData.getVariablesJSON());
+				outputVars[ "Timestep" ] = RITimestepTSData.getVariablesJSON();
 
 			if (RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "Hourly", RIHourlyTSData.getVariablesJSON());
+				outputVars[ "Hourly" ] = RIHourlyTSData.getVariablesJSON();
 
 			if (RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "Daily", RIDailyTSData.getVariablesJSON());
+				outputVars[ "Daily" ], RIDailyTSData.getVariablesJSON();
 
 			if (RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "Monthly", RIMonthlyTSData.getVariablesJSON());
+				outputVars[ "Monthly" ] = RIMonthlyTSData.getVariablesJSON();
 
 			if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled())
-				cJSON_AddItemToObject(outputVars, "RunPeriod", RIRunPeriodTSData.getVariablesJSON());
+				outputVars[ "RunPeriod" ] = RIRunPeriodTSData.getVariablesJSON();
 
 			// output dictionary
-			cJSON *rdd, *rddvals;
-			cJSON_AddItemToObject(outputVars, "OutputDictonary", rdd = cJSON_CreateObject());
-			cJSON_AddStringToObject(rdd, "Description", "Dictionary containing output variables that may be requested");
-			cJSON_AddItemToObject(rdd, "Variables", rddvals = cJSON_CreateArray());
-			for (int i = 0; i < RDD.size(); i++) {
-				cJSON* str = cJSON_CreateString(RDD[i].c_str());
-				cJSON_AddItemToArray(rddvals, str);
-			}
-
+			rdd = {
+					{ "Description", "Dictionary containing output variables that may be requested" },
+					{ "Variables", rddvals}
+			};
+			outputVars [ "OutputDictionary" ] = rdd;
+			root[ "OutputVariables" ] = outputVars;
 
 			// meter variables
-			cJSON_AddItemToObject(_root, "MeterVariables", meterVars = cJSON_CreateObject());
 			
 			// -- meter values
 			if (TSMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterVars, "Timestep", TSMeters.getVariablesJSON());
+				meterVars[ "Timestep"] = TSMeters.getVariablesJSON();
 
 			if (HRMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterVars, "Hourly", HRMeters.getVariablesJSON());
+				meterVars[ "Hourly" ] = HRMeters.getVariablesJSON();
 			
 			if (DYMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterVars, "Daily", DYMeters.getVariablesJSON());
+				meterVars[  "Daily" ] = DYMeters.getVariablesJSON();
 			
 			if (MNMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterVars, "Monthly", MNMeters.getVariablesJSON());
+				meterVars[  "Monthly" ] = MNMeters.getVariablesJSON();
 
 			if (SMMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterVars, "RunPeriod", SMMeters.getVariablesJSON());
-
-			cJSON_AddItemToObject(_root, "MeterData", meterData = cJSON_CreateObject());
+				meterVars[  "RunPeriod" ] = SMMeters.getVariablesJSON();
 
 			if (TSMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterData, "Timestep", TSMeters.getJSON());
+				meterData[ "Timestep"] = TSMeters.getJSON();
 
 			if (HRMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterData, "Hourly", HRMeters.getJSON());
+				meterData[ "Hourly" ] = HRMeters.getJSON();
 
 			if (DYMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterData, "Daily", DYMeters.getJSON());
+				meterData[ "Daily" ] = DYMeters.getJSON();
 
 			if (MNMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterData, "Monthly", MNMeters.getJSON());
+				meterData[ "Monthly" ] = MNMeters.getJSON();
 
 			if (SMMeters.rDataFrameEnabled())
-				cJSON_AddItemToObject(meterData, "RunPeriod", SMMeters.getJSON());
+				meterData[ "RunPeriod" ] = SMMeters.getJSON();
+
+			json mdd;
+			json mddvals = json::array();
 
 			// -- meter dictionary
-			cJSON_AddItemToObject(meterVars, "MeterDictonary", mdd = cJSON_CreateObject());
-			cJSON_AddStringToObject(mdd, "Description", "Dictionary containing meter variables that may be requested");
-			cJSON *mddvals;
-			cJSON_AddItemToObject(mdd, "Meters", mddvals = cJSON_CreateArray());
 			for (int i = 0; i < MDD.size(); i++) {
-				cJSON* str = cJSON_CreateString(MDD[i].c_str());
-				cJSON_AddItemToArray(mddvals, str);
+				mddvals.push_back( MDD[i] );
 			}
+			mdd = {
+					{ "Description" , "Dictionary containing meter variables that may be requested" },
+					{ "Meters" , mddvals }
+			};
+			meterVars["MeterDictionary"] = mdd;
+
+			root [ "OutputVariables" ] = outputVars;
+			root [ "MeterData" ] = meterData;
+			root [ "MeterVariables" ] = meterVars;
 
 			// reports
-
-			cJSON *reports;
-			cJSON_AddItemToObject(_root, "TabularReports", reports = TabularReportsCollection.getJSON());
-
+			root[ "TabularReports" ] = TabularReportsCollection.getJSON();
 			
 
 			// write json
 			if (jsonfile.is_open())	{
-				jsonfile << cJSON_Print(_root);
+				jsonfile << std::setw(4) << root << std::endl;
 				jsonfile.close();
 			}
 
-			cJSON_Delete(_root);
+			//cJSON_Delete(_root);
 		}
 	} // ResultsFramework
 

@@ -173,7 +173,7 @@ namespace EnergyPlus {
 				std::string const & tableName,
 				std::string footnoteText = "");
 
-			cJSON* getJSON();
+			json getJSON();
 		};
 
 		class Report:public BaseResultObject {
@@ -182,7 +182,7 @@ namespace EnergyPlus {
 			std::string ReportForString;
 			std::vector< Table* > Tables;
 
-			cJSON* getJSON();
+			json getJSON();
 		};
 
 		class ReportsCollection : public BaseResultObject {
@@ -198,7 +198,7 @@ namespace EnergyPlus {
 				std::string const & tableName,
 				std::string footnoteText = "");
 
-			cJSON* getJSON();
+			json getJSON();
 
 		protected:
 			std::unordered_map< std::string, Report * > reportsMap;
