@@ -4462,7 +4462,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( i > 0 ) {
 					if ( i <= AirflowNetworkNumOfExtNode ) {
 						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).height );
-						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressureFromCurve( MultizoneExternalNodeData( i ).curve,
+						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve,
 							Vref, AirflowNetworkNodeData( n ).NodeHeight, MultizoneExternalNodeData( i ).azimuth, 
 							MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle);
 						//AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
@@ -5076,73 +5076,7 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	Real64
-	CalcWindPressure(
-		int const CPVNum, // CP Value number
-		Real64 const Vref, // Velocity at reference height
-		Real64 const Height // Node height for outdoor temperature calculation
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Lixing Gu
-		//       DATE WRITTEN   Oct. 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates surface wind pressure based on given CP values
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// COMIS Fundamentals
-
-		// Return value
-		Real64 CalcWindPressure;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// Output is Wind Pressure [Pa]
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int i;
-		int NWind;
-		Real64 RhoOut; // Outdoor air density
-		Real64 CPV; // CP value at given wind direction
-		bool FoundCPV;
-
-		//     CODE  ************************************************************
-		// Calculate outdoor density
-		RhoOut = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTempAt( Height ), OutHumRat );
-
-		NWind = AirflowNetworkSimu.NWind;
-		// Calculate dynamic pressure
-		FoundCPV = false;
-		for ( i = 2; i <= NWind; ++i ) {
-			if ( MultizoneCPArrayData( 1 ).WindDir( i ) >= WindDir ) {
-				CPV = MultizoneCPValueData( CPVNum ).CPValue( i - 1 ) + ( WindDir - MultizoneCPArrayData( 1 ).WindDir( i - 1 ) ) * ( MultizoneCPValueData( CPVNum ).CPValue( i ) - MultizoneCPValueData( CPVNum ).CPValue( i - 1 ) ) / ( MultizoneCPArrayData( 1 ).WindDir( i ) - MultizoneCPArrayData( 1 ).WindDir( i - 1 ) );
-				FoundCPV = true;
-				break;
-			}
-		}
-		if ( ! FoundCPV ) {
-			CPV = MultizoneCPValueData( CPVNum ).CPValue( NWind ) + ( WindDir - MultizoneCPArrayData( 1 ).WindDir( NWind ) ) * ( MultizoneCPValueData( CPVNum ).CPValue( 1 ) - MultizoneCPValueData( CPVNum ).CPValue( NWind ) ) / ( MultizoneCPArrayData( 1 ).WindDir( 1 ) - MultizoneCPArrayData( 1 ).WindDir( NWind ) + 360 );
-		}
-		CalcWindPressure = CPV * 0.5 * RhoOut * Vref * Vref;
-
-		return CalcWindPressure;
-	}
-
-	Real64
-		CalcWindPressureFromCurve(
+		CalcWindPressure(
 			int const curve, // Curve index, change this to pointer after curve refactor
 			Real64 const Vref, // Velocity at reference height
 			Real64 const height, // Node height for outdoor temperature calculation
@@ -5153,18 +5087,16 @@ namespace AirflowNetworkBalanceManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Jason DeGraw
-		//       DATE WRITTEN   Jan. 2017
-		//       MODIFIED       na
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   Oct. 2005
+		//       MODIFIED       Jason DeGraw, Feb. 2017, modify to use curves
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates surface wind pressure based on a given CP curve object
-
-		// METHODOLOGY EMPLOYED:
+		// Calculates surface wind pressure based on given CP values
 
 		// REFERENCES:
-		// COMIS Fundamentals & CalcWindPressure
+		// COMIS Fundamentals
 
 		// Return value is wind pressure[Pa]
 

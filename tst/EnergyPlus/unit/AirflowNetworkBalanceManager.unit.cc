@@ -3037,13 +3037,13 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( 1.1841123742118911, rho );
 
 		// Compute wind pressure with current defaults
-		Real64 p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( 1, 1.0, 10.0, 0.0, false, false );
+		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure( 1, 1.0, 10.0, 0.0, false, false );
 		EXPECT_DOUBLE_EQ( 0.54*0.5*1.1841123742118911, p);
 		// Test on an east wall, which has a relative angle of 15 (for wind direction 105)
-		p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( 1, 1.0, 10.0, 90.0, false, true );
+		p = AirflowNetworkBalanceManager::CalcWindPressure( 1, 1.0, 10.0, 90.0, false, true );
 		EXPECT_DOUBLE_EQ(-0.26*0.5*1.1841123742118911, p);
 		// Test on a wall with azimuth 105, for a zero relative angle
-		p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve(1, 1.0, 10.0, 105.0, false, true);
+		p = AirflowNetworkBalanceManager::CalcWindPressure(1, 1.0, 10.0, 105.0, false, true);
 		EXPECT_DOUBLE_EQ(-0.56*0.5*1.1841123742118911, p);
 	}
 
@@ -3110,13 +3110,13 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( 1.1841123742118911, rho );
 
 		// Compute wind pressure with current defaults
-		Real64 p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( 1, 1.0, 10.0, 0.0, false, false );
+		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure( 1, 1.0, 10.0, 0.0, false, false );
 		EXPECT_DOUBLE_EQ( -0.56*0.5*1.1841123742118911, p );
 		// Test on an east wall, which has a relative angle of 15 (for wind direction 105)
-		p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( 1, 1.0, 10.0, 90.0, false, true );
+		p = AirflowNetworkBalanceManager::CalcWindPressure( 1, 1.0, 10.0, 90.0, false, true );
 		EXPECT_DOUBLE_EQ( 0.54*0.5*1.1841123742118911, p );
 		// Test on a wall with azimuth 105, for a zero relative angle
-		p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( 1, 1.0, 10.0, 105.0, false, true );
+		p = AirflowNetworkBalanceManager::CalcWindPressure( 1, 1.0, 10.0, 105.0, false, true );
 		EXPECT_DOUBLE_EQ( 0.6*0.5*1.1841123742118911, p );
 	}
 
@@ -3843,7 +3843,7 @@ namespace EnergyPlus {
 		Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp,
 			DataEnvironment::OutHumRat );
 		EXPECT_DOUBLE_EQ( 1.1841123742118911, rho );
-		Real64 p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve,
+		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve,
 			1.0, 0.0, 0.0, false, false );
 		EXPECT_DOUBLE_EQ( -0.56*0.5*1.1841123742118911, p );
 
@@ -4586,7 +4586,7 @@ namespace EnergyPlus {
 		Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp,
 			DataEnvironment::OutHumRat);
 		EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-		Real64 p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve,
+		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve,
 			1.0, 0.0, 0.0, false, false );
 		EXPECT_DOUBLE_EQ(-0.56*0.5*1.1841123742118911, p);
 
@@ -5204,10 +5204,10 @@ namespace EnergyPlus {
 		Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp,
 			DataEnvironment::OutHumRat );
 		EXPECT_DOUBLE_EQ( 1.1841123742118911, rho );
-		Real64 p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve,
+		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve,
 			1.0, 0.0, 0.0, false, false );
 		EXPECT_DOUBLE_EQ( cp105N*0.5*1.1841123742118911, p );
-		p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve,
+		p = AirflowNetworkBalanceManager::CalcWindPressure( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve,
 			1.0, 0.0, 0.0, false, false );
 		EXPECT_DOUBLE_EQ( cp105S*0.5*1.1841123742118911, p );
 

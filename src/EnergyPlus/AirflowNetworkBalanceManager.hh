@@ -199,14 +199,7 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
-	CalcWindPressure(
-		int const CPVNum, // CP Value number
-		Real64 const Vref, // Velocity at reference height
-		Real64 const Height // Node height for outdoor temperature calculation
-	);
-
-	Real64
-		CalcWindPressureFromCurve(
+		CalcWindPressure(
 			int const curve, // Curve index, change this to pointer after curve refactor
 			Real64 const Vref, // Velocity at reference height
 			Real64 const height, // Node height for outdoor temperature calculation
