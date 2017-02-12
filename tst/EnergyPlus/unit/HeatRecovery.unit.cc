@@ -3662,7 +3662,10 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    Hot Water Loop HW Demand Side Connectors,  !- Demand Side Connector List Name",
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantLoop,",
 		"    Chilled Water Loop Chilled Water Loop,  !- Name",
@@ -3686,7 +3689,9 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
 		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
-		"    None;                    !- Common Pipe Simulation",
+		"    None,                    !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantEquipmentList,",
 		"    Hot Water Loop All Equipment,           !- Name",

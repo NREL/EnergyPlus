@@ -5165,7 +5165,12 @@ namespace EnergyPlus {
 			"    HW Demand Outlet Node,   !- Demand Side Outlet Node Name",
 			"    Heating Demand Side Branches,  !- Demand Side Branch List Name",
 			"    Heating Demand Side Connectors,  !- Demand Side Connector List Name",
-			"    Optimal;                 !- Load Distribution Scheme",
+			"    Optimal,                 !- Load Distribution Scheme",
+			"    ,                        !- Availability Manager List Name",
+			"    ,                        !- Plant Loop Demand Calculation Scheme",
+			"    ,                        !- Common Pipe Simulation",
+			"    ,                        !- Pressure Simulation Type",
+			"    2.0;                     !- Loop Circulation Time {minutes}",
 
 			"  SetpointManager:Scheduled,",
 			"    Hot Water Loop Setpoint Manager,  !- Name",
