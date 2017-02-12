@@ -22,4 +22,25 @@ if key = 'PropaneGas', change to = 'Propane'
 
 All other fields stay the same.
 
+# Object Change: `CoolingTower:SingleSpeed`
+
+Fields 1-16 remain the same.  
+After F16, insert four new blank fields that represent user-enterable design conditions. 
+Shift all later fields down by four.
+
+# Object Change: `CoolingTower:TwoSpeed`
+
+Fields 1-24 remain the same.  
+After F24, insert four new blank fields that represent user-enterable design conditions. 
+Shift all later fields down by four.
+
+# Object Change: `CoolingTower:VariableSpeed:Merkel`
+
+Fields 1-24 remain the same.  
+After F24`, insert four new blank fields that represent user-enterable design conditions. 
+Shift all later fields down by four.
+
+
+
+
 
