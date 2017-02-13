@@ -35,9 +35,10 @@ For the following the word "nominal" was shown in the data row and the heading r
 
 Heading rows that represented multiple data rows using slashes were broken up into individual heading rows:
 
-- "Zone Internal Gains/Equipment Information" changed to seperate rows labeled "Zone Internal Gains Nominal" and "Equipment Gains Nominal"
-- "Zone/Shading Surfaces" changed to seperate rows labeled "Zone Surfaces" and "Shading Surfaces"
-- "HeatTransfer/Shading/Frame/Divider_Surface" changed to seperate rows labeled "HeatTransfer Surface", "Shading Surface" and "Frame/Divider Surface"
+- "Zone Internal Gains/Equipment Information" changed to separate rows labeled "Zone Internal Gains Nominal" and "Equipment Gains Nominal"
+- "Zone/Shading Surfaces" changed to separate rows labeled "Zone Surfaces" and "Shading Surfaces"
+- "HeatTransfer/Shading/Frame/Divider_Surface" changed to separate rows labeled "HeatTransfer Surface", "Shading Surface" and "Frame/Divider Surface"
+- For these surface reports, the separate "Units" header has been deleted and the units are part of each heading row.
 
 Underscores were removed from row labels:
 
@@ -53,7 +54,8 @@ In addition:
 - Heading rows labeled "SurfaceGeometry" were changed to "Surface Geometry"
 - In the heading row "Environment:Weather Station" the column headings "Wind Speed Modifier Coefficient [Internal]" and "Temperature Modifier Coefficient [Internal]" were changed to "Wind Speed Modifier Coefficient-Internal" and "Temperature Modifier Coefficient-Internal"
 
-See [5928](https://github.com/NREL/EnergyPlus/pull/5928). 
+See [5928](https://github.com/NREL/EnergyPlus/pull/5928).
+See also [6002](https://github.com/NREL/EnergyPlus/pull/6002).
 
 
 ### System Sizing Information in EIO Changed 
