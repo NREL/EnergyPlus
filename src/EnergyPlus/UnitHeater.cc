@@ -138,7 +138,7 @@ namespace UnitHeater {
 	// Character parameters for outside air control types:
 	std::string const ElectricCoil( "ElectricCoil" );
 	std::string const GasCoil( "GasCoil" );
-	std::string const WaterCoil( "WaterCoil" );
+	std::string const WaterHeatingCoil( "WaterHeatingCoil" );
 	std::string const SteamCoil( "SteamCoil" );
 
 	static std::string const fluidNameSteam( "STEAM" );
@@ -464,7 +464,7 @@ namespace UnitHeater {
 			// Heating coil information:
 			{ auto const SELECT_CASE_var( Alphas( 7 ) );
 			if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
-				UnitHeat( UnitHeatNum ).HCoilType = WaterCoil;
+				UnitHeat( UnitHeatNum ).HCoilType = WaterHeatingCoil;
 				UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
 			} else if ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = SteamCoil;
@@ -489,10 +489,10 @@ namespace UnitHeater {
 				} else {
 					// The heating coil control node is necessary for hot water and steam coils, but not necessary for an
 					// electric or gas coil.
-					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil || UnitHeat( UnitHeatNum ).HCoilType == SteamCoil ) {
+					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil || UnitHeat( UnitHeatNum ).HCoilType == SteamCoil ) {
 						// mine the hot water or steam node from the coil object
 						errFlag = false;
-						if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+						if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 							UnitHeat( UnitHeatNum ).HotControlNode = GetCoilWaterInletNode( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, errFlag );
 						} else { // its a steam coil
 							UnitHeat( UnitHeatNum ).HCoil_Index = GetSteamCoilIndex( "COIL:HEATING:STEAM", UnitHeat( UnitHeatNum ).HCoilName, errFlag );
@@ -766,7 +766,7 @@ namespace UnitHeater {
 			Node( InNode ).MassFlowRateMax = UnitHeat( UnitHeatNum ).MaxAirMassFlow;
 			Node( InNode ).MassFlowRateMin = 0.0;
 
-			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				UnitHeat( UnitHeatNum ).MaxHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MaxVolHotWaterFlow;
@@ -869,6 +869,8 @@ namespace UnitHeater {
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
+		using WaterCoils::GetWaterCoilIndex;
+		using WaterCoils::WaterCoil;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using DataPlant::PlantLoop;
@@ -917,6 +919,9 @@ namespace UnitHeater {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
+		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+		int CoilNum; // index of water coil object
 
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -1003,7 +1008,7 @@ namespace UnitHeater {
 			IsAutoSize = true;
 		}
 
-		if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+		if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
@@ -1017,7 +1022,24 @@ namespace UnitHeater {
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if ( PltSizHeatNum > 0 ) {
+						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizHeatNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water coil requires a heating loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in ZoneHVAC:UnitHeater Object=" + UnitHeat( UnitHeatNum ).Name );
+								ErrorsFound = true;
+							}
+						}
+
+						if ( DoWaterCoilSizing ) {
 							SizingMethod = HeatingCapacitySizing;
 							if ( UnitHeat( UnitHeatNum ).HVACSizingIndex > 0 ) {
 								zoneHVACIndex = UnitHeat( UnitHeatNum ).HVACSizingIndex;
@@ -1059,15 +1081,10 @@ namespace UnitHeater {
 							if ( DesCoilLoad >= SmallLoad ) {
 								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								MaxVolHotWaterFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
 							}
-
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in ZoneHVAC:UnitHeater Object=" + UnitHeat( UnitHeatNum ).Name );
-							ErrorsFound = true;
 						}
 					}
 					if ( IsAutoSize ) {
@@ -1306,7 +1323,7 @@ namespace UnitHeater {
 				//         OR child fan in not available OR child fan not being cycled ON by sys avail manager
 				//         OR child fan being forced OFF by sys avail manager
 				HCoilOn = false;
-				if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+				if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 					mdot = 0.0; // try to turn off
 
 					SetComponentFlowRate( mdot, UnitHeat( UnitHeatNum ).HotControlNode, UnitHeat( UnitHeatNum ).HotCoilOutNodeNum, UnitHeat( UnitHeatNum ).HWLoopNum, UnitHeat( UnitHeatNum ).HWLoopSide, UnitHeat( UnitHeatNum ).HWBranchNum, UnitHeat( UnitHeatNum ).HWCompNum );
@@ -1325,7 +1342,7 @@ namespace UnitHeater {
 					// Case 2: NO LOAD OR COOLING/ON-OFF FAN CONTROL-->turn everything off
 					//         because there is no load on the unit heater
 					HCoilOn = false;
-					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 						mdot = 0.0; // try to turn off
 
 						SetComponentFlowRate( mdot, UnitHeat( UnitHeatNum ).HotControlNode, UnitHeat( UnitHeatNum ).HotCoilOutNodeNum, UnitHeat( UnitHeatNum ).HWLoopNum, UnitHeat( UnitHeatNum ).HWLoopSide, UnitHeat( UnitHeatNum ).HWBranchNum, UnitHeat( UnitHeatNum ).HWCompNum );
@@ -1344,7 +1361,7 @@ namespace UnitHeater {
 					// so there is really nothing else left to do except call the components.
 
 					HCoilOn = false;
-					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 						mdot = 0.0; // try to turn off
 
 						if ( UnitHeat( UnitHeatNum ).HWLoopNum > 0 ) {
@@ -1366,7 +1383,7 @@ namespace UnitHeater {
 
 				{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
-				if ( SELECT_CASE_var == WaterCoil ) {
+				if ( SELECT_CASE_var == WaterHeatingCoil ) {
 
 					//On the first HVAC iteration the system values are given to the controller, but after that
 					// the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1533,7 +1550,7 @@ namespace UnitHeater {
 
 			{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
-			if ( SELECT_CASE_var == WaterCoil ) {
+			if ( SELECT_CASE_var == WaterHeatingCoil ) {
 
 				SimulateWaterCoilComponents( UnitHeat( UnitHeatNum ).HCoilName, FirstHVACIteration, UnitHeat( UnitHeatNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var == SteamCoil ) {
@@ -1579,7 +1596,7 @@ namespace UnitHeater {
 
 			{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
-			if ( SELECT_CASE_var == WaterCoil ) {
+			if ( SELECT_CASE_var == WaterHeatingCoil ) {
 
 				if ( ! HCoilOn ) {
 					mdot = 0.0;
