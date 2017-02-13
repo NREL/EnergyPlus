@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -108,7 +108,7 @@ using std::min;
 // min( short, short, short )
 inline
 short int
-min( short int a, short int b, short int c )
+min( short int const a, short int const b, short int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -125,7 +125,7 @@ min( short int const a, short int const b, short int const c, short int const d,
 // min( int, int, int )
 inline
 int
-min( int a, int b, int c )
+min( int const a, int const b, int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -142,7 +142,7 @@ min( int const a, int const b, int const c, int const d, Ts const &... o )
 // min( long, long, long )
 inline
 long int
-min( long int a, long int b, long int c )
+min( long int const a, long int const b, long int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -159,7 +159,7 @@ min( long int const a, long int const b, long int const c, long int const d, Ts 
 // min( unsigned short, unsigned short, unsigned short )
 inline
 unsigned short int
-min( unsigned short int a, unsigned short int b, unsigned short int c )
+min( unsigned short int const a, unsigned short int const b, unsigned short int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -176,7 +176,7 @@ min( unsigned short int const a, unsigned short int const b, unsigned short int 
 // min( unsigned, unsigned, unsigned )
 inline
 unsigned int
-min( unsigned int a, unsigned int b, unsigned int c )
+min( unsigned int const a, unsigned int const b, unsigned int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -193,7 +193,7 @@ min( unsigned int const a, unsigned int const b, unsigned int const c, unsigned 
 // min( unsigned long, unsigned long, unsigned long )
 inline
 unsigned long int
-min( unsigned long int a, unsigned long int b, unsigned long int c )
+min( unsigned long int const a, unsigned long int const b, unsigned long int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -210,7 +210,7 @@ min( unsigned long int const a, unsigned long int const b, unsigned long int con
 // min( float, float, float )
 inline
 float
-min( float a, float b, float c )
+min( float const a, float const b, float const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -227,7 +227,7 @@ min( float const a, float const b, float const c, float const d, Ts const &... o
 // min( double, double, double )
 inline
 double
-min( double a, double b, double c )
+min( double const a, double const b, double const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -244,7 +244,7 @@ min( double const a, double const b, double const c, double const d, Ts const &.
 // min( long double, long double, long double )
 inline
 long double
-min( long double a, long double b, long double c )
+min( long double const a, long double const b, long double const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 }
@@ -356,7 +356,7 @@ using std::max;
 // max( short, short, short )
 inline
 short int
-max( short int a, short int b, short int c )
+max( short int const a, short int const b, short int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -373,7 +373,7 @@ max( short int const a, short int const b, short int const c, short int const d,
 // max( int, int, int )
 inline
 int
-max( int a, int b, int c )
+max( int const a, int const b, int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -390,7 +390,7 @@ max( int const a, int const b, int const c, int const d, Ts const &... o )
 // max( long, long, long )
 inline
 long int
-max( long int a, long int b, long int c )
+max( long int const a, long int const b, long int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -407,7 +407,7 @@ max( long int const a, long int const b, long int const c, long int const d, Ts 
 // max( unsigned short, unsigned short, unsigned short )
 inline
 unsigned short int
-max( unsigned short int a, unsigned short int b, unsigned short int c )
+max( unsigned short int const a, unsigned short int const b, unsigned short int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -424,7 +424,7 @@ max( unsigned short int const a, unsigned short int const b, unsigned short int 
 // max( unsigned, unsigned, unsigned )
 inline
 unsigned int
-max( unsigned int a, unsigned int b, unsigned int c )
+max( unsigned int const a, unsigned int const b, unsigned int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -441,7 +441,7 @@ max( unsigned int const a, unsigned int const b, unsigned int const c, unsigned 
 // max( unsigned long, unsigned long, unsigned long )
 inline
 unsigned long int
-max( unsigned long int a, unsigned long int b, unsigned long int c )
+max( unsigned long int const a, unsigned long int const b, unsigned long int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -458,7 +458,7 @@ max( unsigned long int const a, unsigned long int const b, unsigned long int con
 // max( float, float, float )
 inline
 float
-max( float a, float b, float c )
+max( float const a, float const b, float const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -475,7 +475,7 @@ max( float const a, float const b, float const c, float const d, Ts const &... o
 // max( double, double, double )
 inline
 double
-max( double a, double b, double c )
+max( double const a, double const b, double const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
@@ -492,7 +492,7 @@ max( double const a, double const b, double const c, double const d, Ts const &.
 // max( long double, long double, long double )
 inline
 long double
-max( long double a, long double b, long double c )
+max( long double const a, long double const b, long double const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }

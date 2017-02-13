@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -80,6 +68,7 @@
 #include <DataSizing.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
@@ -1362,7 +1351,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset 
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1373,9 +1362,13 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
 		using DataHVACGlobals::ElecHeatingCoilPower;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1407,6 +1400,15 @@ namespace HeatingCoils {
 		Control = HeatingCoil( CoilNum ).Control;
 		TempSetPoint = HeatingCoil( CoilNum ).DesiredOutletTemp;
 
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
+		
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -1725,7 +1727,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1736,10 +1738,14 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1775,6 +1781,15 @@ namespace HeatingCoils {
 		AirMassFlow = HeatingCoil( CoilNum ).InletAirMassFlowRate;
 
 		CapacitanceAir = PsyCpAirFnWTdb( Win, TempAirIn ) * AirMassFlow;
+
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
 
 		// If the coil is operating there should be some heating capacitance
 		//  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -2174,7 +2189,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   January 2005
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -2193,7 +2208,11 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using namespace DXCoils;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2227,6 +2246,15 @@ namespace HeatingCoils {
 		Win = HeatingCoil( CoilNum ).InletAirHumRat;
 		CapacitanceAir = PsyCpAirFnWTdb( Win, TempAirIn ) * AirMassFlow;
 		TempSetPoint = HeatingCoil( CoilNum ).DesiredOutletTemp;
+
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
 
 		// Access the appropriate structure to find the available heating capacity of the desuperheater heating coil
 		// The nominal capacity of the desuperheater heating coil varies based on the amount of heat rejected by the source

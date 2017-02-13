@@ -2416,7 +2416,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   Coil:Heating:Water,
     SPACE2-1 Zone Coil,      !- Name
@@ -2433,7 +2434,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   Coil:Heating:Water,
     SPACE3-1 Zone Coil,      !- Name
@@ -2450,7 +2452,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   Coil:Heating:Water,
     SPACE4-1 Zone Coil,      !- Name
@@ -2467,7 +2470,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   Coil:Heating:Water,
     SPACE5-1 Zone Coil,      !- Name
@@ -2484,7 +2488,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   AirLoopHVAC:ReturnPath,
     ReturnAirPath1,          !- Name
@@ -2610,7 +2615,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   Coil:Cooling:Water,
     OA Cooling Coil 1,       !- Name
@@ -2627,7 +2633,9 @@
     OA Heating Coil 1 Air Outlet Node,  !- Air Inlet Node Name
     OA Mixing Box 1 Inlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
-    CrossFlow;               !- Heat Exchanger Configuration
+    CrossFlow,               !- Heat Exchanger Configuration
+    ,                        !- Condensate Collection Water Storage Tank Name
+    4.0;                     !- Design Water Temperature Difference
 
   OutdoorAir:Mixer,
     OA Mixing Box 1,         !- Name
@@ -2651,7 +2659,9 @@
     Mixed Air Node 1,        !- Air Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
-    CrossFlow;               !- Heat Exchanger Configuration
+    CrossFlow,               !- Heat Exchanger Configuration
+    ,                        !- Condensate Collection Water Storage Tank Name
+    4.0;                     !- Design Water Temperature Difference
 
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
@@ -2668,7 +2678,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name

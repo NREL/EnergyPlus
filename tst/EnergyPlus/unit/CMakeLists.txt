@@ -90,12 +90,14 @@ set( test_src
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
+  OutputReports.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
