@@ -42556,10 +42556,17 @@ Coil:Cooling:Water,
        \key CrossFlow
        \key CounterFlow
        \default CounterFlow
-  A9;  \field Condensate Collection Water Storage Tank Name
+  A9,  \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-
+  N8 ; \field Design Water Temperature Difference
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note object is used for sizing the Design Water Flow Rate.
+   
 Coil:Cooling:Water:DetailedGeometry,
        \memo Chilled water cooling coil, detailed flat fin coil model for continuous plate fins,
        \memo with inputs for detailed coil geometry specifications.
@@ -42674,10 +42681,17 @@ Coil:Cooling:Water:DetailedGeometry,
   A6 , \field Air Outlet Node Name
        \required-field
        \type node
-  A7 ; \field Condensate Collection Water Storage Tank Name
+  A7 , \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-
+  N17; \field Design Water Temperature Difference
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note object is used for sizing the Design Water Flow Rate.
+   
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed. Optional inputs for moisture evaporation from wet
@@ -45162,10 +45176,17 @@ Coil:Heating:Water,
       \units C
       \type real
       \default 32.2
-  N8; \field Rated Ratio for Air and Water Convection
+  N8, \field Rated Ratio for Air and Water Convection
       \type real
       \default 0.5
       \minimum> 0
+  N9; \field Design Water Temperature Difference
+      \type real
+      \units deltaC
+      \minimum> 0.0
+      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+      \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Heating:Steam,
        \memo Steam heating coil. Condenses and sub-cools steam at loop pressure and discharges
@@ -69902,7 +69923,7 @@ ThermalStorage:ChilledWater:Stratified,
 
 PlantLoop,
        \memo Defines a central plant loop.
-       \min-fields 18
+       \min-fields 24
   A1 , \field Name
         \required-field
        \reference PlantLoops
@@ -70004,18 +70025,25 @@ PlantLoop,
         \key TwoWayCommonPipe
         \key None
         \default None
-  A18;  \field Pressure Simulation Type
+  A18,  \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
         \key LoopFlowCorrection
         \key None
         \default None
+   N6;  \field Loop Circulation Time
+        \note This field is only used to autocalulate the Plant Loop Volume.
+        \note Loop Volume = Loop Circulation Time * Maximum Loop Flow Rate
+        \type real
+        \units minutes
+        \minimum 0.0
+        \default 2.0
 
 CondenserLoop,
        \memo Defines a central plant condenser loop. CondenserLoop and PlantLoop are nearly
        \memo identical except some components and operation schemes are applicable to only one
        \memo loop type or the other.
-       \min-fields 18
+       \min-fields 21
   A1 , \field Name
         \required-field
         \reference PlantLoops
@@ -70096,12 +70124,19 @@ CondenserLoop,
         \key UniformPLR
         \key SequentialUniformPLR
         \default SequentialLoad
-  A15; \field Pressure Simulation Type
+  A15, \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
         \key LoopFlowCorrection
         \key None
         \default None
+   N6;  \field Loop Circulation Time
+        \note This field is only used to autocalulate the Condenser Loop Volume.
+        \note Loop Volume = Loop Circulation Time * Maximum Loop Flow Rate
+        \type real
+        \units minutes
+        \minimum 0.0
+        \default 2.0
 
 \group Plant-Condenser Control
 
