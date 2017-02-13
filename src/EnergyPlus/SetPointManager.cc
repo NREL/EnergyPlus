@@ -8200,11 +8200,10 @@ namespace SetPointManager {
 			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 				if ( CntrlNodeNum == SchSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ) ) {
 					if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_HumRat ) {
-						HumRatCntrlType = iCtrlVarType_HumRat;
+						return iCtrlVarType_HumRat;
 					} else if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxHumRat ) {
-						HumRatCntrlType = iCtrlVarType_MaxHumRat;
-					} else { continue; }
-					return HumRatCntrlType;
+						return iCtrlVarType_MaxHumRat;
+					}
 				}
 			}
 		}
