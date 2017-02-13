@@ -191,7 +191,7 @@ namespace DataAirflowNetwork {
 	Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
 	Array1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
 	Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
-	AirflowNetworkSimuProp AirflowNetworkSimu; // "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures", false ); // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration | Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag type
+	AirflowNetworkSimuProp AirflowNetworkSimu;
 	Array1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
 	Array1D< AirflowNetworkCompProp > AirflowNetworkCompData;
 	Array1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;
@@ -265,7 +265,7 @@ namespace DataAirflowNetwork {
 		AirflowNetworkLinkReport.deallocate();
 		AirflowNetworkNodeReport.deallocate();
 		AirflowNetworkLinkReport1.deallocate();
-		AirflowNetworkSimu = AirflowNetworkSimuProp(); // "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures", false );
+		AirflowNetworkSimu = AirflowNetworkSimuProp();
 		AirflowNetworkNodeData.deallocate();
 		AirflowNetworkCompData.deallocate();
 		AirflowNetworkLinkageData.deallocate();

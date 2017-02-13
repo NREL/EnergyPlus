@@ -830,9 +830,9 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkSimu.AirflowNetworkSimuName = Alphas( 1 );
 		AirflowNetworkSimu.Control = Alphas( 2 );
 		AirflowNetworkSimu.WPCCntr = Alphas( 3 );
-		AirflowNetworkSimu.CpArrayName = Alphas( 4 );
-		AirflowNetworkSimu.HeightOption = Alphas( 5 );
-		AirflowNetworkSimu.BldgType = Alphas( 6 );
+		//AirflowNetworkSimu.CpArrayName = Alphas( 4 );
+		AirflowNetworkSimu.HeightOption = Alphas( 4 );
+		AirflowNetworkSimu.BldgType = Alphas( 5 );
 
 		// Find a flag for possible combination of vent and distribution system
 		{ auto const SELECT_CASE_var( MakeUPPERCase( AirflowNetworkSimu.Control ) );
@@ -934,15 +934,9 @@ namespace AirflowNetworkBalanceManager {
 				ShowContinueError( ".." + cAlphaFields( 4 ) + " was not entered." );
 				ErrorsFound = true;
 				SimObjectError = true;
-			}
-			if ( lAlphaBlanks( 5 ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " = INPUT." );
-				ShowContinueError( ".." + cAlphaFields( 5 ) + " was not entered." );
-				ErrorsFound = true;
-				SimObjectError = true;
 			} else {
 				if ( ! ( SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) || SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
+					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) + " is invalid." );
 					ShowContinueError( "Valid choices are ExternalNode or OpeningHeight. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 					ErrorsFound = true;
 					SimObjectError = true;
@@ -955,14 +949,14 @@ namespace AirflowNetworkBalanceManager {
 			//     end if
 		} else if ( SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 			AirflowNetworkSimu.iWPCCntr = iWPCCntr_SurfAvg;
-			if ( ! lAlphaBlanks( 4 ) ) {
-				AirflowNetworkSimu.CpArrayName = "";
+			//if ( ! lAlphaBlanks( 4 ) ) {
+				//AirflowNetworkSimu.CpArrayName = "";
 				//        CALL ShowWarningError('GetAirflowNetworkInput: AirflowNetwork Wind Pressure Coefficient Type '// &
 				//             '= SURFACE-AVERAGE CALCULATION.'// &
 				//             ' CP ARRAY NAME was entered but will not be used. The simulation continues...')
-			}
+			//}
 			if ( ! ( SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " is invalid." );
+				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
 				ShowContinueError( "Valid choices are LowRise or HighRise. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 				ErrorsFound = true;
 				SimObjectError = true;
@@ -974,7 +968,7 @@ namespace AirflowNetworkBalanceManager {
 			SimObjectError = true;
 		}
 
-		AirflowNetworkSimu.InitType = Alphas( 7 );
+		AirflowNetworkSimu.InitType = Alphas( 6 );
 		if ( SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
 			AirflowNetworkSimu.InitFlag = 0;
 		} else if ( SameString( AirflowNetworkSimu.InitType, "ZeroNodePressures" ) ) {
@@ -984,13 +978,13 @@ namespace AirflowNetworkBalanceManager {
 		} else if ( SameString( AirflowNetworkSimu.InitType, "1" ) ) {
 			AirflowNetworkSimu.InitFlag = 1;
 		} else {
-			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) + " is invalid." );
+			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " is invalid." );
 			ShowContinueError( "Valid choices are LinearInitializationMethod or ZeroNodePressures. " + CurrentModuleObject + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 			ErrorsFound = true;
 			SimObjectError = true;
 		}
 
-		if ( !lAlphaBlanks( 8 ) && SameString( Alphas( 8 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
+		if ( !lAlphaBlanks( 7 ) && SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
 
 		if ( SimObjectError ) {
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
