@@ -569,3 +569,116 @@ Where,
 
 Note that \emph{Coil:Heating:Water}, \emph{Coil:Cooling:Water}, and \emph{Coil:Cooling:Water:Detailedgeometry} are controlled via \emph{Controller:WaterCoil}, while the other coil types are controlled with an internal \emph{Temperature Setpoint Node}. For the water coils, users need to specify a \emph{Controller:WaterCoil} object that corresponds to the faulty water coil.
 
+
+\subsection{Hot-water Boilers Fouling}\label{hot-water-boiler-fouling}
+
+\subsubsection{Symptom}
+
+The fouling fault of boilers may occur when deposits get clogged at the water side of boilers, usually caused by poor water quality and treatment. The scale deposits can reduce the capacity and efficiency of the boiler. This further impacts the boiler operations by changing the part load ratio and the related operation/performance parameters.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to the hot water boiler model described by the object Boiler:HotWater. It does not apply to the steam boilers which do not have water-based heat exchangers.
+
+The model allows the user to describe the fault using a dynamic fouling factor. The reference factor indicates the decrease of the nominal capacity of the boiler, which is the ratio between the nominal capacity at fouling case and that at fault free case. The nominal thermal efficiency is decreased correspondingly.
+
+\begin{equation}
+Q_{boiler,f} = Q_{boiler,ff} \times F_{boiler}
+\end{equation}
+
+\begin{equation}
+Eff_{boiler,f} = Eff_{boiler,ff} \times F_{boiler}
+\end{equation}
+
+Where,
+
+\(Q_{boiler,f}\) Nominal boiler capacity in the faulty case
+
+\(Q_{boiler,ff}\) Nominal boiler capacity in the fault-free case
+
+\(Eff_{boiler,f}\) Nominal boiler thermal efficiency in the faulty case
+
+\(Eff_{boiler,ff}\) Nominal boiler thermal efficiency in the fault-free case
+
+\(F_{boiler}\) Factor describing the boiler capacity and efficiency reduction due to fouling
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
+
+
+\subsection{Water-cooled Chiller Fouling}\label{water-cooled-chiller-fouling}
+
+\subsubsection{Symptom}
+
+The fouling fault of chillers may occur when deposits get clogged at the water-cooled condensers, usually caused by poor water quality and treatment. The scale deposits can reduce the capacity and efficiency of the chiller. This further impacts the chiller operations by changing the part load ratio and the related operation/performance parameters.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to a number of chiller types that can have water-cooled condensers, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  Chiller:Electric
+\item
+  Chiller:Electric:EIR
+\item
+  Chiller:Electric:ReformulatedEIR
+\item
+  Chiller:ConstantCOP
+\item
+  Chiller:EngineDriven
+\item
+  Chiller:CombustionTurbine
+\end{itemize}
+
+The fault does not apply to the absorption chillers that do not have water-based heat exchangers. 
+
+The model allows the user to describe the fault using a dynamic fouling factor. The reference factor indicates the decrease of the reference capacity of the chiller, which is the ratio between the nominal capacity at fouling case and that at fault free case. The reference COP is decreased correspondingly.
+
+\begin{equation}
+Q_{chiller,f} = Q_{chiller,ff} \times F_{chiller}
+\end{equation}
+
+\begin{equation}
+COP_{chiller,f} = COP_{chiller,ff} \times F_{chiller}
+\end{equation}
+
+Where,
+
+\(Q_{chiller,f}\) Reference chiller capacity in the faulty case
+
+\(Q_{chiller,ff}\) Reference chiller capacity in the fault-free case
+
+\(COP_{chiller,f}\) Reference chiller COP in the faulty case
+
+\(COP_{chiller,ff}\) Reference chiller COP in the fault-free case
+
+\(F_{chiller}\) Factor describing the chiller capacity and efficiency reduction due to fouling
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
+
+
+\subsection{Evaporative Coolers Fouling}\label{evaporative-cooler-fouling}
+
+\subsubsection{Symptom}
+
+The fouling fault may occur at indirect wet-coil evaporative coolers, where the cooling water is sprayed directly on the tubes. This is usually occurs at the wet coil tubes caused by the dust in the air. The fouling can reduce the effectiveness of the tube and further impact the evaporative cooler operations by changing the related operation/performance parameters.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to the wetted coil evaporative cooler described by object EvaporativeCooler:Indirect:WetCoil. The fault does not apply to direct evaporative coolers or the dry coil indirect evaporative coolers where there is no water-cooled coil.
+
+The model allows the user to describe the fault using a dynamic fouling factor. The reference factor indicates the decrease of the indirect stage efficiency, which is the ratio between the indirect stage efficiency at fouling case and that at fault free case.
+
+\begin{equation}
+Eff_{EvapCooler,f} = Eff_{EvapCooler,ff} \times F_{EvapCooler}
+\end{equation}
+
+Where,
+\(Eff_{EvapCooler,f}\) Indirect stage efficiency in the faulty case
+
+\(Eff_{EvapCooler,ff}\) Indirect stage efficiency in the fault-free case
+
+\(F_{EvapCooler}\) Factor describing the evaporative cooler efficiency reduction due to fouling
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
