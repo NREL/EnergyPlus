@@ -26,7 +26,7 @@ This project aims to add Coil:Cooling:DX:VariableSpeed (and Coil:Heating:DX:Vari
     - AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass
     - Dehumidifier:Desiccant:System
 
-Although the model inputs will now allow for the VS DX coil models, in some cases they will still only load the coil as if it was a single speed.  Will try to make some progress but full VS controls for everything here will likely require a follow on phase of development.  For the desuperheater applications when the VS coil providing the waste heat is already able to operate with variable control then the available desuperheat will be adjusted accordingly.  
+Although the model inputs will now allow for the VS DX coil models, in some cases they will still only load the coil as if it was a single speed.  Will try to make some progress but full VS controls for everything here will likely require a follow on phase of development.  For the desuperheater applications when the VS coil providing the waste heat is already able to operate with variable control then the available desuperheat will be adjusted accordingly.  Support for air-to-air VS coil models in AirLoopHVAC:UnitarySystem will be improved.
 
 ## Approach ##
 
@@ -38,6 +38,8 @@ Modify individual parent models to add support for the VS air source DX coil typ
     - WindowAC.cc ( window air conditioner )
     - HVACUnitaryBypassVAV.cc ( change over bypass packaged systems )
     - DesiccantDehumidifiers.cc ( desiccant system with coordinated control and desuperheater regen heat options from upstream DX coil)
+    
+Create test files using AirLoopHVAC:UnitarySystem with setpoint-based control that run Coil:Cooling:DX:VariableSpeed and Coil:Heating:DX:VariableSpeed and fix any problems. Create variations using Coil:Heating:Desuperheater and CoilSystem:Cooling:DX:HeatExchangerAssisted and fix any problems.
 
 ## Testing/Validation/Data Sources ##
 
