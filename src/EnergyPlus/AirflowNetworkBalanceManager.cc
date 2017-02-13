@@ -4574,7 +4574,10 @@ namespace AirflowNetworkBalanceManager {
 					AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
 				}
 				MultizoneSurfaceData( i ).OpenFactor *= MultizoneSurfaceData( i ).WindModifier;
-				if ( MultizoneSurfaceData( i ).HybridVentClose ) MultizoneSurfaceData( i ).OpenFactor = 0.0;
+				if ( MultizoneSurfaceData( i ).HybridVentClose ) {
+					MultizoneSurfaceData( i ).OpenFactor = 0.0;
+					if ( SurfaceWindow( j ).VentingOpenFactorMultRep > 0.0 ) SurfaceWindow( j ).VentingOpenFactorMultRep = 0.0;
+				}
 				if ( AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) && MultizoneSurfaceData( i ).OpenFactor > 0.0 &&
 					( Surface( j ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) && ! WarmupFlag ) {
 					// Exterior Large opening only
