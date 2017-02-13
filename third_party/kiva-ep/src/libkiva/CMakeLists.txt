@@ -22,11 +22,19 @@ endif()
 
 string(TOLOWER ${build_architecture} build_architecture)
 
-execute_process(COMMAND git describe --tags --long
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                RESULT_VARIABLE git_exit_status
-                OUTPUT_VARIABLE kiva_version
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(KIVA_EXE_BUILD)
+  execute_process(COMMAND git describe --tags --long
+                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                  RESULT_VARIABLE git_exit_status
+                  OUTPUT_VARIABLE kiva_version
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+else()
+  set( CMAKE_VERSION_MAJOR 0 )
+  set( CMAKE_VERSION_MINOR 4 )
+  set( CMAKE_VERSION_PATCH 0 )
+  set(kiva_version "v${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}")
+  set(git_exit_status "0")
+endif()
 
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
   set (kiva_version "${kiva_version}-Debug")
