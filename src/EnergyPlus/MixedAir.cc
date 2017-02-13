@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -265,6 +253,7 @@ namespace MixedAir {
 
 	Array1D_bool MyOneTimeErrorFlag;
 	Array1D_bool MyOneTimeCheckUnitarySysFlag;
+	Array1D_bool initOASysFlag;
 	bool GetOASysInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAMixerInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAControllerInputFlag( true ); // Flag set to make sure you get input once
@@ -363,6 +352,7 @@ namespace MixedAir {
 		NumVentMechControllers = 0;
 		MyOneTimeErrorFlag.deallocate();
 		MyOneTimeCheckUnitarySysFlag.deallocate();
+		initOASysFlag.deallocate();
 		GetOASysInputFlag = true;
 		GetOAMixerInputFlag = true;
 		GetOAControllerInputFlag = true;
@@ -431,10 +421,51 @@ namespace MixedAir {
 			}
 		}
 
-		InitOutsideAirSys( OASysNum, FirstHVACIteration );
+		InitOutsideAirSys( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		SimOutsideAirSys( OASysNum, FirstHVACIteration, AirLoopNum );
 
+	}
+
+	void
+	SimOASysComponents(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
+	)
+	{
+		int CompNum;
+		static std::string CompType; //Tuned Made static
+		static std::string CompName; //Tuned Made static
+		static std::string CtrlName; //Tuned Made static
+		bool ReSim( false );
+		bool Sim( true );
+		bool OAHeatCoil( false );
+		bool OACoolCoil( false );
+		bool OAHX( false );
+
+		for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+			CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+			CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+			SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			if( OAHX ) ReSim = true;
+		}
+		// if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
+		// in reverse order to propagate the air flow and conditions out the relief air path to the relief air
+		// exit node
+		if( ReSim ) {
+			for( CompNum = OutsideAirSys( OASysNum ).NumComponents - 1; CompNum >= 1; --CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			}
+			// now simulate again propogate current temps back through OA system
+			for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			}
+		}
 	}
 
 	void
@@ -482,11 +513,6 @@ namespace MixedAir {
 		static std::string CompName; //Tuned Made static
 		static std::string CtrlName; //Tuned Made static
 		bool FatalErrorFlag( false );
-		bool Sim( true );
-		bool OAHeatCoil( false );
-		bool OACoolCoil( false );
-		bool OAHX( false );
-		bool ReSim( false );
 
 		// SimOutsideAirSys can handle only 1 controller right now.  This must be
 		// an Outside Air Controller.  This is because of the lack of iteration
@@ -498,29 +524,7 @@ namespace MixedAir {
 		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
 		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
-
-		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
-			CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-			CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-			SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
-			if ( OAHX ) ReSim = true;
-		}
-		// if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
-		// in reverse order to propagate the air flow and conditions out the relief air path to the relief air
-		// exit node
-		if ( ReSim ) {
-			for ( CompNum = OutsideAirSys( OASysNum ).NumComponents - 1; CompNum >= 1; --CompNum ) {
-				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
-			}
-			// now simulate again propogate current temps back through OA system
-			for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
-				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
-			}
-		}
+		SimOASysComponents( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
 			if ( OutsideAirSys( OASysNum ).NumControllers - OutsideAirSys( OASysNum ).NumSimpleControllers > 1 ) {
@@ -574,9 +578,9 @@ namespace MixedAir {
 		int const AirLoopNum, // air loop index for economizer lockout coordination
 		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
 		int const OASysNum, // index to outside air system
-		Optional_bool OAHeatingCoil, // TRUE indicates a heating coil has been found
-		Optional_bool OACoolingCoil, // TRUE indicates a cooling coil has been found
-		Optional_bool OAHX // TRUE indicates a heat exchanger has been found
+		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool & OAHX // TRUE indicates a heat exchanger has been found
 	)
 	{
 
@@ -905,7 +909,7 @@ namespace MixedAir {
 
 		InitOAController( OAControllerNum, FirstHVACIteration, AirLoopNum );
 
-		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum, FirstHVACIteration );
 
 		OAController( OAControllerNum ).UpdateOAController();
 
@@ -1059,6 +1063,7 @@ namespace MixedAir {
 		OASysEqSizing.allocate( NumOASystems );
 		MyOneTimeErrorFlag.dimension( NumOASystems, true );
 		MyOneTimeCheckUnitarySysFlag.dimension( NumOASystems,true );
+		initOASysFlag.dimension( NumOASystems, true );
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
@@ -1395,10 +1400,10 @@ namespace MixedAir {
 
 				// add applicable faults identifier to avoid string comparison at each time step
 				//  loop through each fault for each OA controller
-				for ( i = 1; i <= NumFaults; ++i ) {
-					if ( Faults( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
-					if ( SameString( OAController( OutAirNum ).Name, Faults( i ).ControllerName ) ) {
-						Faults( i ).ControllerID = OutAirNum;
+				for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
+					if ( FaultsEconomizer( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
+					if ( SameString( OAController( OutAirNum ).Name, FaultsEconomizer( i ).ControllerName ) ) {
+						FaultsEconomizer( i ).ControllerID = OutAirNum;
 					}
 				}
 
@@ -2457,8 +2462,9 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const EP_UNUSED( OASysNum ), // unused1208
-		bool const FirstHVACIteration
+		int const ( OASysNum ),
+		bool const FirstHVACIteration,
+		int const AirLoopNum
 	)
 	{
 
@@ -2491,10 +2497,15 @@ namespace MixedAir {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( BeginEnvrnFlag && FirstHVACIteration ) {
-		}
+//		if ( BeginEnvrnFlag && FirstHVACIteration ) {
+//		}
 
-		if ( BeginDayFlag ) {
+//		if ( BeginDayFlag ) {
+//		}
+
+		if ( initOASysFlag( OASysNum ) ) {
+			AirLoopControlInfo( AirLoopNum ).OASysNum = OASysNum;
+			initOASysFlag( OASysNum ) = false;
 		}
 
 		// Each time step
@@ -3074,6 +3085,7 @@ namespace MixedAir {
 			if ( AirLoopNum > 0 ) {
 				//OAController(OAControllerNum)%ExhMassFlow = AirLoopFlow(AirLoopNum)%ZoneExhaust
 				thisOAController.ExhMassFlow = AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+				AirLoopControlInfo( AirLoopNum ).ZoneExhMassFlow = thisOAController.ExhMassFlow;
 				if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet && ! FirstHVACIteration ) {
 					// if flow rate has been specified by a manager, set it to the specified value
 					thisOAController.MixMassFlow = AirLoopFlow( AirLoopNum ).ReqSupplyFrac * AirLoopFlow( AirLoopNum ).DesSupply;
@@ -3114,27 +3126,27 @@ namespace MixedAir {
 		// Check sensors faults for the air economizer
 		iEco = thisOAController.Econo;
 		if ( AnyFaultsInModel && ( iEco > NoEconomizer ) ) {
-			for ( i = 1; i <= NumFaults; ++i ) {
-				if ( ( Faults( i ).ControllerTypeEnum == iController_AirEconomizer ) && ( Faults( i ).ControllerID == OAControllerNum ) ) {
+			for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
+				if ( ( FaultsEconomizer( i ).ControllerTypeEnum == iController_AirEconomizer ) && ( FaultsEconomizer( i ).ControllerID == OAControllerNum ) ) {
 
-					if ( GetCurrentScheduleValue( Faults( i ).AvaiSchedPtr ) > 0.0 ) {
+					if ( GetCurrentScheduleValue( FaultsEconomizer( i ).AvaiSchedPtr ) > 0.0 ) {
 						rSchVal = 1.0;
-						if ( Faults( i ).SeveritySchedPtr > 0 ) {
-							rSchVal = GetCurrentScheduleValue( Faults( i ).SeveritySchedPtr );
+						if ( FaultsEconomizer( i ).SeveritySchedPtr > 0 ) {
+							rSchVal = GetCurrentScheduleValue( FaultsEconomizer( i ).SeveritySchedPtr );
 						}
 					} else {
 						// no fault
 						continue;
 					}
 
-					rOffset = rSchVal * Faults( i ).Offset;
+					rOffset = rSchVal * FaultsEconomizer( i ).Offset;
 
 					if ( std::abs( rOffset ) < 0.000000001 ) continue;
 
 					// ECONOMIZER - outdoor air dry-bulb temperature sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedDryBulb ) || ( SELECT_CASE_var == DifferentialDryBulb ) || ( SELECT_CASE_var == FixedDewPointAndDryBulb ) || ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir ) {
 							// FaultModel:TemperatureSensorOffset:OutdoorAir
 							thisOAController.OATemp += rOffset;
 							thisOAController.InletTemp += rOffset;
@@ -3145,7 +3157,7 @@ namespace MixedAir {
 					// ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedDewPointAndDryBulb ) || ( SELECT_CASE_var == ElectronicEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir ) {
 							// FaultModel:HumiditySensorOffset:OutdoorAir
 							thisOAController.OAHumRat += rOffset;
 							thisOAController.InletHumRat += rOffset;
@@ -3156,7 +3168,7 @@ namespace MixedAir {
 					// ECONOMIZER - outdoor air enthalpy sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedEnthalpy ) || ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir ) {
 							// FaultModel:EnthalpySensorOffset:OutdoorAir
 							thisOAController.OAEnth += rOffset;
 							thisOAController.InletEnth += rOffset;
@@ -3167,7 +3179,7 @@ namespace MixedAir {
 					// ECONOMIZER - return air dry-bulb temperature sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == DifferentialDryBulb ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir ) {
 							// FaultModel:TemperatureSensorOffset:ReturnAir
 							thisOAController.RetTemp += rOffset;
 						}
@@ -3177,7 +3189,7 @@ namespace MixedAir {
 					// ECONOMIZER - return air enthalpy sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir ) {
 							// FaultModel:EnthalpySensorOffset:ReturnAir
 							thisOAController.RetEnth += rOffset;
 						}
@@ -3272,7 +3284,8 @@ namespace MixedAir {
 
 	void
 	OAControllerProps::CalcOAController(
-		int const AirLoopNum
+		int const AirLoopNum,
+		bool const FirstHVACIteration
 	)
 	{
 
@@ -3447,7 +3460,7 @@ namespace MixedAir {
 		}
 
 		// Economizer
-		this->CalcOAEconomizer( AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag );
+		this->CalcOAEconomizer( AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag, FirstHVACIteration );
 
 		this->OAMassFlow = OASignal * this->MixMassFlow;
 
@@ -4042,9 +4055,12 @@ namespace MixedAir {
 		int const AirLoopNum,
 		Real64 const OutAirMinFrac,
 		Real64 & OASignal,
-		bool & HighHumidityOperationFlag
+		bool & HighHumidityOperationFlag,
+		bool const FirstHVACIteration
 		)
 	{
+		using DataAirLoop::OutsideAirSys;
+		using DataLoopNode::Node;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 		using General::SolveRegulaFalsi;
 		using SetPointManager::GetCoilFreezingCheckFlag;
@@ -4059,11 +4075,16 @@ namespace MixedAir {
 		Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
 		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 		Real64 OutAirSignal; // Used to set OA mass flow rate
-		static Array1D< Real64 > Par(4); // Par(1) = mixed air node number //Tuned Made static
+		static Array1D< Real64 > Par(6); // Par(1) = mixed air node number //Tuned Made static
 										 // Par(2) = return air node number
 										 // Par(3) = outside air node number
 										 // Par(4) = mixed air mass flow rate
+										 // Par(5) = FirstHVACIteration
+										 // Par(6) = AirLoopNum
 		int SolFla; // Flag of solver
+		Real64 lowFlowResiduum; // result of low OA flow calculation (Tmixedair_sp - Tmixedair)
+		Real64 highFlowResiduum; // result of high OA flow calculation (Tmixedair_sp - Tmixedair)
+		Real64 minOAFrac;
 
 		if ( AirLoopNum > 0 ) {
 			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
@@ -4232,14 +4253,72 @@ namespace MixedAir {
 		// it was calculated using the approximate method of sensible energy balance. Now we have to get the
 		// accurate result using a full mass, enthalpy and moisture balance and iteration.
 		if ( OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > VerySmallMassFlow && this->ControllerType_Num == ControllerOutsideAir && ! AirLoopNightVent ) {
-			Par( 1 ) = this->MixNode;
-			Par( 2 ) = this->RetNode;
-			Par( 3 ) = this->InletNode;
-			Par( 4 ) = this->MixMassFlow;
-			SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
-			if ( SolFla < 0 ) {
-				OASignal = OutAirSignal;
+
+			if ( AirLoopNum > 0 ) {
+
+				if( OutsideAirSys( AirLoopControlInfo( AirLoopNum ).OASysNum ).NumComponents == 1 ) {
+					// no need to simulate OA System if only a mixer is used in the OutsideAirSystem
+
+					Par( 1 ) = this->MixNode;
+					Par( 2 ) = this->RetNode;
+					Par( 3 ) = this->InletNode;
+					Par( 4 ) = this->MixMassFlow;
+					SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+					if( SolFla < 0 ) {
+						OASignal = OutAirSignal;
+					}
+
+				} else {
+
+					// simulate OA System if equipment exists other than the mixer (e.g., heating/cooling coil, HX, ect.)
+
+					// 1 - check min OA flow result
+					Node( this->OANode ).MassFlowRate = max( this->ExhMassFlow, OutAirMinFrac * Node( this->MixNode ).MassFlowRate );
+					Node( this->RelNode ).MassFlowRate = max( Node( this->OANode ).MassFlowRate - this->ExhMassFlow, 0.0 );
+					// save actual OA flow frac for use as min value for RegulaFalsi call
+					minOAFrac = max( OutAirMinFrac, Node( this->OANode ).MassFlowRate / this->MixMassFlow );
+					SimOASysComponents( AirLoopControlInfo( AirLoopNum ).OASysNum, FirstHVACIteration, AirLoopNum );
+					lowFlowResiduum = Node( this->MixNode ).TempSetPoint - Node( this->MixNode ).Temp;
+
+					// 2 - check max OA flow result
+					Node( this->OANode ).MassFlowRate = max( this->ExhMassFlow, Node( this->MixNode ).MassFlowRate );
+					Node( this->RelNode ).MassFlowRate = max( Node( this->OANode ).MassFlowRate - this->ExhMassFlow, 0.0 );
+					SimOASysComponents( AirLoopControlInfo( AirLoopNum ).OASysNum, FirstHVACIteration, AirLoopNum );
+					highFlowResiduum = Node( this->MixNode ).TempSetPoint - Node( this->MixNode ).Temp;
+
+					// 3 - test to ensure RegulaFalsi can find an answer
+					if( ( sign( lowFlowResiduum ) == sign( highFlowResiduum ) ) ) {
+						OASignal = OutAirSignal;
+					} else {
+						// 4 - find result
+						Par( 1 ) = this->MixNode;
+						Par( 2 ) = this->RelNode;
+						Par( 3 ) = this->OANode;
+						Par( 4 ) = this->MixMassFlow;
+						Par( 5 ) = 0.0;
+						if( FirstHVACIteration ) Par( 5 ) = 1.0;
+						Par( 6 ) = double( AirLoopNum );
+
+						SolveRegulaFalsi( ( Acc / 10.0 ), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par );
+						if( SolFla < 0 ) { // if RegulaFalsi fails to find a solution, returns -1 or -2, set to existing OutAirSignal
+							OASignal = OutAirSignal;
+						}
+					}
+				}
+
+			} else {
+
+				Par( 1 ) = this->MixNode;
+				Par( 2 ) = this->RetNode;
+				Par( 3 ) = this->InletNode;
+				Par( 4 ) = this->MixMassFlow;
+				SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+				if( SolFla < 0 ) {
+					OASignal = OutAirSignal;
+				}
+
 			}
+
 		} else {
 			OASignal = OutAirSignal;
 		}
@@ -4802,6 +4881,7 @@ namespace MixedAir {
 		RetNode = int( Par( 2 ) );
 		OANode = int( Par( 3 ) );
 		MixMassFlowRate = Par( 4 );
+
 		OAMassFlowRate = OASignal * MixMassFlowRate;
 		RecircMassFlowRate = max( MixMassFlowRate - OAMassFlowRate, 0.0 );
 		RecircEnth = Node( RetNode ).Enthalpy;
@@ -4810,6 +4890,86 @@ namespace MixedAir {
 		MixHumRat = ( RecircMassFlowRate * RecircHumRat + OAMassFlowRate * Node( OANode ).HumRat ) / MixMassFlowRate;
 		MixTemp = PsyTdbFnHW( MixEnth, MixHumRat );
 		Residuum = Node( MixNode ).TempSetPoint - MixTemp;
+
+		return Residuum;
+	}
+
+	Real64
+	MultiCompControlTempResidual(
+		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
+		Array1< Real64 > const & Par // par(1) = mixed node number
+		)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad
+		//       DATE WRITTEN   Nov, 2016
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculates residual function TMixSetPoint - TMix.
+		// Economizer damper position (OASignal) is being varied to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		// Simulate the OA System to determine actual mixed air condition, calculates the
+		// mixed air temperature given the outside air damper position.
+
+		// REFERENCES:
+
+		// Using/Aliasing
+		using Psychrometrics::PsyTdbFnHW;
+
+		// Return value
+		Real64 Residuum; // residual to be minimized to zero
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// pao(1) = mixed air node number
+		// par(2) = relief air node number
+		// par(3) = outside air node number
+		// par(4) = mixed air flow rate
+		// par(5) = FirstHVACIteration
+		// par(6) = AirLoopNum index
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int MixNode; // mixed air node number
+		int RelNode; // return air node number
+		int OANode; // outside air node number
+		Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
+		Real64 OAMassFlowRate; // outside air mass flow rate [kg/s]
+		Real64 ExhMassFlow;
+		bool FirstHVACIteration;
+		int AirloopNum;
+		int OASysNum;
+
+		MixNode = int( Par( 1 ) );
+		RelNode = int( Par( 2 ) );
+		OANode = int( Par( 3 ) );
+		MixMassFlowRate = Par( 4 );
+		FirstHVACIteration = ( Par( 5 ) == 1.0 );
+		AirloopNum = int( Par( 6 ) );
+		OASysNum = AirLoopControlInfo( AirloopNum ).OASysNum;
+		ExhMassFlow = AirLoopControlInfo( AirloopNum ).ZoneExhMassFlow;
+
+		OAMassFlowRate = max( ExhMassFlow, OASignal * MixMassFlowRate );
+		Node( OANode ).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
+		Node( RelNode ).MassFlowRate = max( OAMassFlowRate - ExhMassFlow, 0.0 ); // set relief node mass flow rate to maintain mixer continuity calcs
+
+		SimOASysComponents( OASysNum, FirstHVACIteration, AirloopNum );
+
+		Residuum = Node( MixNode ).TempSetPoint - Node( MixNode ).Temp;
 
 		return Residuum;
 	}
