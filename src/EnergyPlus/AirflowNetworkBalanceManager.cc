@@ -48,6 +48,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -1219,11 +1220,21 @@ namespace AirflowNetworkBalanceManager {
 						ShowContinueError( "Entered in " + CurrentModuleObject + '=' + Alphas( 1 ) );
 						ErrorsFound = true;
 					}
-					if ( NumAlphas >= 3 & !lAlphaBlanks( 3 ) ) {
-						MultizoneExternalNodeData( i ).symmetricCurve = SameString( Alphas( 3 ), "Yes"); // Symmetric curve or not
+					if ( NumAlphas >= 3 && !lAlphaBlanks( 3 ) ) { // Symmetric curve
+						if ( SameString( Alphas( 3 ), "Yes" ) ) {
+							MultizoneExternalNodeData( i ).symmetricCurve = true;
+						} else if ( !SameString(Alphas( 3 ), "No" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+							ShowContinueError( "The default value is assigned as No." );
+						}
 					}
-					if ( NumAlphas == 4 & !lAlphaBlanks( 4 ) ) {
-						MultizoneExternalNodeData( i ).useRelativeAngle = SameString( Alphas( 4 ), "Yes"); // Relative or absolute wind angle
+					if ( NumAlphas == 4 && !lAlphaBlanks( 4 ) ) { // Relative or absolute wind angle
+						if ( SameString( Alphas( 4 ), "Relative" ) ) {
+							MultizoneExternalNodeData( i ).useRelativeAngle = true;
+						} else if ( !SameString(Alphas( 4 ), "Absolute" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+							ShowContinueError( "The default value is assigned as Absolute." );
+						}
 					}
 				}
 			} else {
@@ -2250,31 +2261,37 @@ namespace AirflowNetworkBalanceManager {
 		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 
 		// Write wind pressure coefficients in the EIO file
-		/*
 		gio::write( OutputFileInits, fmtA ) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Direction, "; }
-		for ( i = 1; i <= AirflowNetworkSimu.NWind - 1; ++i ) {
-			StringOut = RoundSigDigits( MultizoneCPArrayData( 1 ).WindDir( i ), 1 );
+		std::vector< Real64 > dirs = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330 };
+		for ( i = 0; i < 11; ++i ) {
+			StringOut = RoundSigDigits( dirs[ i ], 1 );
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 		}
-		StringOut = RoundSigDigits( MultizoneCPArrayData( 1 ).WindDir( AirflowNetworkSimu.NWind ), 1 );
+		StringOut = RoundSigDigits( dirs[ 11 ], 1 );
 		gio::write( OutputFileInits, fmtA ) << StringOut;
 
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, "; }
 		gio::write( OutputFileInits, fmtA ) << "Wind Pressure Coefficients #1 to n (dimensionless)";
 
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) {
-			for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
+			std::set< int > curves;
+			for ( int i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
+				curves.insert( MultizoneExternalNodeData( i ).curve );
+			}
+			for ( auto index : curves ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneCPValueData( i ).Name + ", "; }
-				for ( j = 1; j <= AirflowNetworkSimu.NWind - 1; ++j ) {
-					StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( j ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << CurveManager::GetCurveName( index ) + ", "; }
+				for ( j = 0; j < 11; ++j ) {
+					StringOut = RoundSigDigits( CurveManager::CurveValue( index, dirs[ j ] ), 2 );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				}
-				StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( AirflowNetworkSimu.NWind ), 2 );
+				StringOut = RoundSigDigits( CurveManager::CurveValue( index, dirs[ 11 ] ), 2 );
 				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
-		} else if ( AirflowNetworkNumOfSingleSideZones > 0 ) {
+		}
+		else if (AirflowNetworkNumOfSingleSideZones > 0) {
+			/*
 			for ( i = 1; i <= 4; ++i ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneCPValueData( i ).Name + ", "; }
@@ -2297,8 +2314,8 @@ namespace AirflowNetworkBalanceManager {
 					gio::write( OutputFileInits, fmtA ) << StringOut;
 				}
 			}
+			*/
 		}
-		*/
 
 		// If no zone object, exit
 		if ( AirflowNetworkNumOfZones == 0 ) {
