@@ -11646,6 +11646,8 @@ namespace OutputReportTabular {
 		lightLWRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+		seqData.allocate( NumOfTimeStepInDay );
+		AvgData.allocate( NumOfTimeStepInDay );
 		delayOpaque.allocate( rGrdTot );
 		if (!totalColumn.allocated() )	{
 			totalColumn.allocate( rGrdTot );
@@ -11900,12 +11902,12 @@ namespace OutputReportTabular {
 			if ( CoolDesSelected != 0 && timeCoolMax != 0 ) {
 
 				//PEOPLE
-				seqData = peopleInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rPeople ) += AvgData( timeCoolMax );
-			    grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-//				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rPeople, peopleInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
+				//seqData = peopleInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rPeople ) += AvgData( timeCoolMax );
+			    //grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rPeople, peopleInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//seqData = peopleLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
 				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
@@ -12889,6 +12891,7 @@ namespace OutputReportTabular {
 		using DataSizing::NumTimeStepsInAvg;
 		Array1D< Real64 > AvgData; // sequence data after averaging
 		Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
+		AvgData.allocate( numTimeSteps );
 		seqData = dataSeq * conversionMult;
 		MovingAvg( seqData, numTimeSteps, NumTimeStepsInAvg, AvgData );
 		tableBodyNums( columnNum, rowNum ) = AvgData( maxTimeStep );
