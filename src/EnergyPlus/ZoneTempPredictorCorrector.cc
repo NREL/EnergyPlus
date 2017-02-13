@@ -4080,7 +4080,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			//Hybrid modeling start: Added by Sang Hoon Lee May 2015
-			if ( HybridModelZone( ZoneNum ).InfiltrationCalc || HybridModelZone( ZoneNum ).InternalThermalMassCalc && !WarmupFlag && !DoingSizing ) {
+			if ( ( HybridModelZone( ZoneNum ).InfiltrationCalc || HybridModelZone( ZoneNum ).InternalThermalMassCalc ) && ( !WarmupFlag ) && ( !DoingSizing ) ) {
 
 				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 
