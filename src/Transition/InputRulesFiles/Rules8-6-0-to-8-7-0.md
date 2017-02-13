@@ -40,6 +40,9 @@ Fields 1-24 remain the same.
 After F24`, insert four new blank fields that represent user-enterable design conditions. 
 Shift all later fields down by four.
 
+# Object Change: `AirflowNetwork:SimulationControl`
+
+Field A4, F4 (Wind Pressure Coefficient Array Name) is removed, all other fields rename the same.
 
 
 
