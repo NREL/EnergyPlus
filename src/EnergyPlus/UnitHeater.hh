@@ -68,7 +68,7 @@ namespace UnitHeater {
 	// Character parameters for outside air control types:
 	extern std::string const ElectricCoil;
 	extern std::string const GasCoil;
-	extern std::string const WaterCoil;
+	extern std::string const WaterHeatingCoil;
 	extern std::string const SteamCoil;
 
 	// DERIVED TYPE DEFINITIONS

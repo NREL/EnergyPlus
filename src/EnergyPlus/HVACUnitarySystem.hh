@@ -467,6 +467,11 @@ namespace HVACUnitarySystem {
 		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
 		int ATMixerOutNode; // outlet air node number for the air terminal mixer
 
+		// Fault model of coil SAT sensor
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		
 		// Default Constructor
 		UnitarySystemData() :
 			UnitarySystemType_Num( 0 ),
@@ -722,7 +727,10 @@ namespace HVACUnitarySystem {
 			ATMixerType( 0 ),
 			ATMixerPriNode( 0 ),
 			ATMixerSecNode( 0 ),
-			ATMixerOutNode( 0 )
+			ATMixerOutNode( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 			{}
 
 	};

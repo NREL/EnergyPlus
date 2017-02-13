@@ -226,6 +226,14 @@ namespace ZoneTempPredictorCorrector {
 	CalcZoneAirTempSetPoints();
 
 	void
+
+	CalculateMonthlyRunningAverageDryBulb( Array1D< Real64 > & runningAverageASH, Array1D< Real64 > & runningAverageCEN );
+
+	void
+	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
+
+	void
+
 	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
 
 	void
@@ -313,6 +321,12 @@ namespace ZoneTempPredictorCorrector {
 	AdjustAirSetPointsforOpTempCntrl(
 		int const TempControlledZoneID,
 		int const ActualZoneNum,
+		Real64 & ZoneAirSetPoint
+	);
+
+	void
+	AdjustOperativeSetPointsforAdapComfort(
+		int const TempControlledZoneID,
 		Real64 & ZoneAirSetPoint
 	);
 
