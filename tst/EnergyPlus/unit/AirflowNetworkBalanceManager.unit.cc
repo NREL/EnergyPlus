@@ -2284,7 +2284,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( PresssureSet, AirflowNetworkNodeSimu( 3 ).PZ, 0.0001 );
 		EXPECT_NEAR( 0.00255337, ReliefMassFlowRate, 0.0001 );
 
-		// Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off 
+		// Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
 		AirflowNetworkFanActivated = false;
 
 		AirflowNetworkExchangeData.allocate( NumOfZones );
@@ -2298,7 +2298,7 @@ namespace EnergyPlus {
 
 		AirflowNetworkExchangeData.deallocate( );
 		Node.deallocate( );
-	
+
 	}
 	TEST_F( EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl ) {
 
@@ -2961,6 +2961,18 @@ namespace EnergyPlus {
 		Zone.deallocate( );
 		Surface.deallocate( );
 		SurfaceWindow.deallocate( );
+
+	}
+
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManagerTest_AFNDuctRadGetInput ) {
+
+	// Unit test for a new feature
+
+	}
+
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManagerTest_AFNDuctRadResults ) {
+
+	// Unit test for a new feature
 
 	}
 

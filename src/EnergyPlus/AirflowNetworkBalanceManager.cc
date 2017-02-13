@@ -5290,11 +5290,9 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 
 				Real64 CpAir = PsyCpAirFnWTdb( ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).WZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).WZ ) / 2.0, ( AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 1 ) ).TZ + AirflowNetworkNodeSimu( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).TZ ) / 2.0 );
@@ -5318,26 +5316,28 @@ namespace AirflowNetworkBalanceManager {
 					Tamb = ANZT( AirflowNetworkLinkageData( i ).ZoneNum );
 				}
 
-				// Calculate duct conduction so we can get correct surface temperature
-				Real64 Ei = std::exp( -DuctObj.UThermal * DuctSurfaceArea / ( DirSign * LinkageObj.FLOW * CpAir ) );
-				Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
+				// Duct conduction, assuming effectiveness = 1 - exp(-NTU)
+				Real64 Tin = Node( LF ).Temp;
+				Real64 Ei = std::exp( -DuctObj.UThermal * DuctSurfaceArea / ( std::abs( LinkageObj.FLOW ) * CpAir ) );
+				Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * ( Tamb - Tin ) * ( 1 - Ei );
 
-				Real64 FracOutsideConvectRes = 0.1;	// For now, assume outside convection is 10 percent of air-to-air duct resistance
-
+				// For now, assume outside convection is 10 percent of air-to-air duct resistance
+				Real64 FracOutsideConvectRes = 0.1;
 				Real64 Rtot = 1 / DuctObj.UThermal;
 
+				// Init to dummy values for optimization
 				Real64 Rho = Rtot * FracOutsideConvectRes;
 				Real64 ho =  1 / Rho;
 
-				Real64 TDuctSurf =  QCondDuct / ( ho * DuctSurfaceArea ) + Tamb;	// Duct outside surface temperature [C]
-				Real64 TDuctSurf_K = TDuctSurf + KelvinConv; // Duct outside surface temperature [K]
+				Real64 TDuctSurf = QCondDuct / ( ho * DuctSurfaceArea ) + Tamb;;
+				Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
+				Real64 TDuctSurf_iter = 0;
 
 				Real64 TSurr = 0;
 				Real64 TSurr_K = 0;
 
-				Real64 TDuctSurf_iter = 0;
+				Real64 tolerance = 0.001;
 
-				Real64 tolerance = 0.0001;
 				while ( std::abs( TDuctSurf - TDuctSurf_iter ) > tolerance ) {
 
 					TDuctSurf_iter = TDuctSurf;
@@ -5359,28 +5359,24 @@ namespace AirflowNetworkBalanceManager {
 
 					Real64 UTotal = 1 / ( Rtot * ( 1 - FracOutsideConvectRes ) + ( 1 / ( ho + hrj_sum ) ) );
 
-					Real64 HXCap = ( UTotal * DuctSurfaceArea ) / ( LinkageObj.FLOW * CpAir );
-					Real64 Tin = Node( LF ).Temp;		// Duct inlet node temperature
-					Real64 Tout = TSurr + ( Tin - TSurr ) * ( 1/ HXCap ) * ( 1 - exp( -HXCap ) );
+					Real64 NTU = ( UTotal * DuctSurfaceArea ) / ( LinkageObj.FLOW * CpAir );
+					Real64 Tout = TSurr + ( Tin - TSurr ) * ( 1 / NTU ) * ( 1 - exp( -NTU ) );
 
 					TDuctSurf = Tout - UTotal * ( Rtot * ( 1 - FracOutsideConvectRes ) ) * ( Tout - TSurr );
 					TDuctSurf_K = TDuctSurf + KelvinConv;
-
 				}
 
-				Real64 TotalRadHT = 0;
 				for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
-					Real64 DuctRadFlux = StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurr_K ) );
-					VFObj.linkageSurfaceData( j ).DuctRadLoad = DuctRadFlux * DuctSurfaceArea * VFObj.surfaceEmittance * VFObj.surfaceExposureFraction;
+					Real64 DuctRadFlux = StefanBoltzmann * VFObj.linkageSurfaceData( j ).viewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurr_K ) ); // Radiant flux for this surface [W/m2]
+					VFObj.linkageSurfaceData( j ).DuctRadLoad = DuctRadFlux * DuctSurfaceArea * VFObj.surfaceEmittance * VFObj.surfaceExposureFraction; // Radiant load for this surface [W]
 					int SurfNum = VFObj.linkageSurfaceData( j ).surfaceNum;
 					Real64 SurfArea = Surface( SurfNum ).Area;
-					QRadSurfAFNDuct( SurfNum ) += VFObj.linkageSurfaceData( j ).DuctRadLoad / SurfArea;
-					TotalRadHT += VFObj.linkageSurfaceData( j ).DuctRadLoad;
+					QRadSurfAFNDuct( SurfNum ) += VFObj.linkageSurfaceData( j ).DuctRadLoad * TimeStepSys * SecInHour / SurfArea; // Energy to each surface per unit area [J/m2]
+					VFObj.QRad += VFObj.linkageSurfaceData( j ).DuctRadLoad; // Total radiant load from all surfaces for this system timestep [W]
 				}
 
 				VFObj.TSurr = TSurr;
-				VFObj.UThermalRad = TotalRadHT / ( DuctSurfaceArea * ( Node( LF ).Temp - TSurr ) );
-				VFObj.QRad = TotalRadHT;
+				VFObj.UThermalRad = VFObj.QRad / ( DuctSurfaceArea * ( Tin - TSurr ) );
 			}
 		}
 	}
