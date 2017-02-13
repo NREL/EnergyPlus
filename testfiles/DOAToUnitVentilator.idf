@@ -1434,7 +1434,7 @@
     Through: 9/30,           !- Field 5
     For: Weekdays SummerDesignDay, !- Field 6
     Until: 7:00,0.0,         !- Field 7
-    Until: 17:00,1.0,        !- Field 9
+    Until: 21:00,1.0,        !- Field 9
     Until: 24:00,0.0,        !- Field 11
     For: AllOtherDays,       !- Field 13
     Until: 24:00,0.0,        !- Field 14
@@ -1475,17 +1475,25 @@
 
   Schedule:Compact,
     HVACTemplate-Always 4,   !- Name
-    HVACTemplate Any Number, !- Schedule Type Limits Name
+    Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,4;          !- Field 3
 
   Schedule:Compact,
     UnitVentAvailability,    !- Name
-    Any Number,              !- Schedule Type Limits Name
+    Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
+    For: WeekDays CustomDay1 CustomDay2, !- Field 2
+    Until: 7:00,0.0,         !- Field 3
+    Until: 21:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Weekends Holiday,   !- Field 9
+    Until: 24:00,0.0,        !- Field 10
+    For: SummerDesignDay,    !- Field 12
+    Until: 24:00,1.0,        !- Field 13
+    For: WinterDesignDay,    !- Field 15
+    Until: 24:00,1.0;        !- Field 16
 
   Schedule:Compact,
     UnitVentMinOA,           !- Name
@@ -1507,7 +1515,7 @@
     Through: 12/31,          !- Field 1
     For: WeekDays,           !- Field 2
     Until: 7:00,0.0,         !- Field 3
-    Until: 17:00,1.0,        !- Field 5
+    Until: 21:00,1.0,        !- Field 5
     Until: 24:00,0.0,        !- Field 7
     For: AllOtherDays,       !- Field 9
     Until: 24:00,0.0;        !- Field 10
@@ -2500,7 +2508,6 @@
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
-    !FixedAmount,            !- Outdoor Air Control Type
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
@@ -2526,7 +2533,6 @@
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
-    !FixedAmount,             !- Outdoor Air Control Type
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
@@ -2549,7 +2555,6 @@
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
-    !FixedAmount,             !- Outdoor Air Control Type
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
@@ -2572,7 +2577,6 @@
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
-    !FixedAmount,             !- Outdoor Air Control Type
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
@@ -2598,7 +2602,6 @@
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
-    !FixedAmount,             !- Outdoor Air Control Type
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
@@ -2920,7 +2923,7 @@
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     DOAS Heat Recovery,      !- Name
-    HVACTemplate-Always 1,   !- Availability Schedule Name
+    HeatExchangerAvailSch,   !- Availability Schedule Name
     autosize,                !- Nominal Supply Air Flow Rate {m3/s}
     0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
@@ -3086,8 +3089,8 @@
     DOAS Availability;       !- Availability Manager 1 Name
 
   Schedule:Compact,
-    HVACTemplate-Always 1,   !- Name
-    HVACTemplate Any Number, !- Schedule Type Limits Name
+    HeatExchangerAvailSch,   !- Name
+    Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1;          !- Field 3
@@ -3132,9 +3135,6 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     OnOff;                   !- Central Cooling Capacity Control Method
-
-  ScheduleTypeLimits,
-    HVACTemplate Any Number; !- Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGER:SCHEDULED ===========
 
