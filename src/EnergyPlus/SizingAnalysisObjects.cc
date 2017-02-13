@@ -500,8 +500,6 @@ namespace EnergyPlus {
 	)
 	{
 		using DataGlobals::OutputFileInits;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
 		using DataSizing::NoSizingFactorMode;
 		using DataSizing::GlobalHeatingSizingFactorMode;
