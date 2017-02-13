@@ -357,6 +357,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1) = sVersionNum
                 nodiff=.false.
 
+    ! changes for this version
               CASE('COIL:COOLING:DX:MULTISPEED', 'COIL:HEATING:DX:MULTISPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
@@ -366,6 +367,33 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ELSEIF (SameString(InArgs(16), 'PropaneGas')) THEN
                    OutArgs(16) = 'Propane'
                  ENDIF
+
+             CASE('COOLINGTOWER:SINGLESPEED')
+                 ObjectName='CoolingTower:SingleSpeed'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:12)=InArgs(1:12)  ! No change
+                 OutArgs(13:16)=''           ! Added 4 New Input Fields, Set
+                 OutArgs(17:CurArgs+4)=InArgs(13:CurArgs)  !
+                 CurArgs = CurArgs + 4
+
+             CASE('COOLINGTOWER:TWOSPEED')
+                 ObjectName='CoolingTower:TwoSpeed'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:20)=InArgs(1:20)  ! No change
+                 OutArgs(21:24)=''           ! Added 4 New Input Fields, Set
+                 OutArgs(25:CurArgs+4)=InArgs(21:CurArgs)  !
+                 CurArgs = CurArgs + 4            
+ 
+             CASE('COOLINGTOWER:VARIABLESPEED:MERKEL')
+                 ObjectName='CoolingTower:VariableSpeed:Merkel'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:16)=InArgs(1:16)  ! No change
+                 OutArgs(17:20)=''           ! Added 4 New Input Fields, Set
+                 OutArgs(21:CurArgs+4)=InArgs(17:CurArgs)  !
+                 CurArgs = CurArgs + 4
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
