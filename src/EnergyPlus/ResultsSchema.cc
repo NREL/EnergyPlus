@@ -376,17 +376,14 @@ namespace EnergyPlus {
 			assert(TS.size() == variableMap.begin()->second->values().size());
 
 			for (int row = 0; row < TS.size(); ++row) {
-//				json rowvals = json::array();
 				vals.clear();
+
 				for (auto it = variableMap.begin(); it != variableMap.end(); ++it) {
 					vals.push_back(it->second->values()[row]);
 				}
-//				for (int count = 0; count < vals.size(); count++){
-//					rowvals.push_back( &vals[0][count] );
-//				}
-				rows.push_back( { TS.at(row) , vals[0] }
-				);
-				//cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
+				rows.push_back( {
+                                        {TS.at(row) , vals }
+                                } );
 			}
 			root = {
 					{ "UUID" , uuid },
@@ -971,11 +968,12 @@ namespace EnergyPlus {
 					{ "Description" , "Dictionary containing meter variables that may be requested" },
 					{ "Meters" , mddvals }
 			};
+
 			meterVars["MeterDictionary"] = mdd;
 
 			root [ "OutputVariables" ] = outputVars;
+            root [ "MeterVariables" ] = meterVars;
 			root [ "MeterData" ] = meterData;
-			root [ "MeterVariables" ] = meterVars;
 
 			// reports
 			root[ "TabularReports" ] = TabularReportsCollection.getJSON();
