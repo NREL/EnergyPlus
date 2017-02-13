@@ -42182,10 +42182,17 @@ Coil:Cooling:Water,
        \key CrossFlow
        \key CounterFlow
        \default CounterFlow
-  A9;  \field Condensate Collection Water Storage Tank Name
+  A9,  \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-
+  N8 ; \field Design Water Temperature Difference
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note object is used for sizing the Design Water Flow Rate.
+   
 Coil:Cooling:Water:DetailedGeometry,
        \memo Chilled water cooling coil, detailed flat fin coil model for continuous plate fins,
        \memo with inputs for detailed coil geometry specifications.
@@ -42300,10 +42307,17 @@ Coil:Cooling:Water:DetailedGeometry,
   A6 , \field Air Outlet Node Name
        \required-field
        \type node
-  A7 ; \field Condensate Collection Water Storage Tank Name
+  A7 , \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-
+  N17; \field Design Water Temperature Difference
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note object is used for sizing the Design Water Flow Rate.
+   
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed. Optional inputs for moisture evaporation from wet
@@ -44788,10 +44802,17 @@ Coil:Heating:Water,
       \units C
       \type real
       \default 32.2
-  N8; \field Rated Ratio for Air and Water Convection
+  N8, \field Rated Ratio for Air and Water Convection
       \type real
       \default 0.5
       \minimum> 0
+  N9; \field Design Water Temperature Difference
+      \type real
+      \units deltaC
+      \minimum> 0.0
+      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
+      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+      \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Heating:Steam,
        \memo Steam heating coil. Condenses and sub-cools steam at loop pressure and discharges
