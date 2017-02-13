@@ -399,7 +399,7 @@ namespace HVACUnitarySystem {
 		if ( CompIndex == 0 ) {
 			UnitarySysNum = FindItemInList( UnitarySystemName, UnitarySystem );
 			if ( UnitarySysNum == 0 ) {
-				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + UnitarySystemName );
+				ShowFatalError( "SimUnitarySystem: Unitary System not found=" + UnitarySystemName );
 			}
 			CompIndex = UnitarySysNum;
 		} else {
