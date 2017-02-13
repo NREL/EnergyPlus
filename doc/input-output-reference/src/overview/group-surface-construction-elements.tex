@@ -2064,7 +2064,7 @@ Transmittance averaged over the solar spectrum and weighted by the response of t
 
 Reflectance averaged over the solar spectrum and weighted by the response of the human eye. Assumed same on both side of shade and independent of incidence angle.
 
-\paragraph{Field: Thermal Hemispherical Emissivity}\label{field-thermal-hemispherical-emissivity}
+\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity}
 
 Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
@@ -2074,7 +2074,7 @@ Effective long-wave emissivity. Assumed same on both sides of shade. We can appr
 
 For most non-metallic materials \(\varepsilon\) is about 0.9.
 
-\paragraph{Field: Thermal Transmittance}\label{field-thermal-transmittance}
+\paragraph{Field: Infrared Transmittance}\label{field-infrared-transmittance}
 
 Effective long-wave transmittance. Assumed independent of incidence angle. We can approximate this effective long-wave transmittance, \(T_{\rm{eff}}\) as follows. Let \(\eta\) be the ``openness'' of the shade, i.e., the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \(T\). Then
 
@@ -2143,8 +2143,8 @@ WindowMaterial:Shade,
   0.3000000,                    !- Solar Reflectance
   .05,                          !- Visible transmittance
   0.3000000,                    !- Visible reflectance
-  0.9000000,                    !- Thermal Hemispherical Emissivity
-  0.0,                          !- Thermal Transmittance
+  0.9000000,                    !- Infrared Hemispherical Emissivity
+  0.0,                          !- Infrared Transmittance
   0.003,                        !- Thickness {m}
   0.1,                          !- Conductivity {W/m-K}
   0.050,                        !- Shade to glass distance {m}
@@ -2279,11 +2279,11 @@ The back-side slat reflectance for hemispherically diffuse visible radiation. Th
 
 The slat Infrared transmittance. It is zero for solid metallic, wooden or glass slats, but may be non-zero in some cases (e.g., thin plastic slats).
 
-\paragraph{Field: Front Side Slat Infrared~ Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
+\paragraph{Field: Front Side Slat Infrared Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
 
 Front-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
-\paragraph{Field: Back Side Slat Infrared~ Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
+\paragraph{Field: Back Side Slat Infrared Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
 
 Back-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
@@ -2803,7 +2803,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -2983,7 +2983,7 @@ This value is the slat front side diffuse-diffuse visible reflectance for hemisp
 
 This value is the slat back side diffuse-diffuse visible reflectance for hemispherically diffuse visible spectrum range of solar radiation. Minimum value is 0.0, and the maximum value is less than 1.0.~ This input field is not used currently.
 
-\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-infrared-transmittance}
+\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-Infrared-transmittance}
 
 This value is the long-wave hemispherical transmittance of the slat material. Assumed to be the same for both sides of the slat. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
 
@@ -4207,7 +4207,7 @@ Matrix:TwoDimension,       !- matrix for basis definition
 
 \subsection{Construction:WindowEquivalentLayer}\label{constructionwindowequivalentlayer}
 
-This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM.This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
+This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. The equivalent-layer window model does not support daylighting control. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM. This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
 
 \begin{lstlisting}
 WindowMaterial:Glass:EquivalentLayer

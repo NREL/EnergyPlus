@@ -92,6 +92,9 @@ namespace FaultsManager {
 	extern int const iFault_TemperatureSensorOffset_CondenserSupplyWater;
 	extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
 	extern int const iFault_Fouling_Tower;
+	extern int const iFault_Fouling_Boiler;
+	extern int const iFault_Fouling_Chiller;
+	extern int const iFault_Fouling_EvapCooler;
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -137,8 +140,11 @@ namespace FaultsManager {
 	extern int NumFaultyAirFilter;  // Total number of fouled air filters
 	extern int NumFaultyChillerSWTSensor;  // Total number of faulty Chillers Supply Water Temperature Sensor
 	extern int NumFaultyCondenserSWTSensor;  // Total number of faulty Condenser Supply Water Temperature Sensor
-	extern int NumFaultyTowerScaling;  // Total number of faulty Towers with Scaling
+	extern int NumFaultyTowerFouling;  // Total number of faulty Towers with Scaling
 	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
+	extern int NumFaultyBoilerFouling;  // Total number of faulty Boilers with Fouling
+	extern int NumFaultyChillerFouling;  // Total number of faulty Chillers with Fouling
+	extern int NumFaultyEvapCoolerFouling;  // Total number of faulty Evaporative Coolers with Fouling
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -293,6 +299,22 @@ namespace FaultsManager {
 			bool CheckFaultyAirFilterFanCurve();
 	};
 
+	struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
+	{
+		// Members
+		std::string CoilType; // Coil type
+		std::string CoilName; // Coil name
+		std::string WaterCoilControllerName; // Water coil controller name
+	
+		// Default Constructor
+		FaultPropertiesCoilSAT():
+			CoilType( "" ),
+			CoilName( "" ),
+			WaterCoilControllerName( "" )
+		{}
+			
+	};
+
 	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
 	{
 		// Members
@@ -321,6 +343,91 @@ namespace FaultsManager {
 
 	};
 
+	struct FaultPropertiesCondenserSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+	{
+		// Members
+		std::string TowerType; // Tower type
+		std::string TowerName; // Tower name
+	
+		// Default Constructor
+		FaultPropertiesCondenserSWT():
+			TowerType( "" ),
+			TowerName( "" )
+		{}
+			
+	};
+
+	struct FaultPropertiesTowerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
+	{
+		// Members
+		std::string TowerType; // Tower type
+		std::string TowerName; // Tower name
+		Real64 UAReductionFactor; //UA Reduction Factor
+	
+		// Default Constructor
+		FaultPropertiesTowerFouling():
+			TowerType( "" ),
+			TowerName( "" ),
+			UAReductionFactor( 1.0 )
+		{}
+		
+		public:
+			Real64 CalFaultyTowerFoulingFactor();
+	};
+
+	struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
+	{
+		// Members
+		Real64 FoulingFactor; //Fouling Factor
+
+		// Default Constructor
+		FaultPropertiesFouling():
+			FoulingFactor( 1.0 )
+		{}
+
+		public:
+			Real64 CalFoulingFactor(); // To calculate the dynamic fouling factor
+	};
+
+	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
+	{
+		// Members
+		std::string BoilerType; // Boiler type
+		std::string BoilerName; // Boiler name
+	
+		// Default Constructor
+		FaultPropertiesBoilerFouling():
+			BoilerType( "" ),
+			BoilerName( "" )
+		{}
+	};
+
+	struct FaultPropertiesChillerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Chiller
+	{
+		// Members
+		std::string ChillerType; // Chiller type
+		std::string ChillerName; // Chiller name
+	
+		// Default Constructor
+		FaultPropertiesChillerFouling():
+			ChillerType( "" ),
+			ChillerName( "" )
+		{}
+	};
+
+	struct FaultPropertiesEvapCoolerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:EvaporativeCooler
+	{
+		// Members
+		std::string EvapCoolerType; // Evaporative Cooler type
+		std::string EvapCoolerName; // Evaporative Cooler name
+	
+		// Default Constructor
+		FaultPropertiesEvapCoolerFouling():
+			EvapCoolerType( "" ),
+			EvapCoolerName( "" )
+		{}
+	};
+
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
@@ -328,9 +435,12 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
 	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
 	extern Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
-	extern Array1D< FaultProperties > FaultsCondenserSWTSensor;
-	extern Array1D< FaultProperties > FaultsTowerScaling;
-	extern Array1D< FaultProperties > FaultsCoilSATSensor;
+	extern Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
+	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
+	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
+	extern Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
+	extern Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
+	extern Array1D< FaultPropertiesEvapCoolerFouling > FaultsEvapCoolerFouling;
 
 	// Functions
 

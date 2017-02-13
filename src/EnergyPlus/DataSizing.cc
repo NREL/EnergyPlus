@@ -285,6 +285,8 @@ namespace DataSizing {
 	int DataDesicDehumNum( 0 ); // index to desiccant dehumidifier
 	bool DataDesicRegCoil( false ); // TRUE if heating coil desiccant regeneration coil
 	bool HRFlowSizingFlag( false ); // True, if it is a heat recovery heat exchanger flow sizing
+	Real64 DataWaterCoilSizCoolDeltaT( 0.0 ); // used for sizing cooling coil water design flow rate
+	Real64 DataWaterCoilSizHeatDeltaT( 0.0 ); // used for sizing heating coil water design flow rate
 
 	// Object Data
 	Array1D< OARequirementsData > OARequirements;
@@ -435,6 +437,9 @@ namespace DataSizing {
 		CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
 		CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
 		CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
+	
+		DataWaterCoilSizCoolDeltaT = 0.0;
+		DataWaterCoilSizHeatDeltaT = 0.0;
 	}
 
 } // DataSizing
