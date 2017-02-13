@@ -8223,6 +8223,7 @@ namespace AirflowNetworkBalanceManager {
 				ZoneNum( 0 ),
 				MZDZoneNum( 0 ),
 				ExtNodeNum( 0 ),
+				CPVNum( 0 ),
 				curve( 0 ),
 				CompTypeNum( 0 ),
 				NodeHeight( 0.0 ),

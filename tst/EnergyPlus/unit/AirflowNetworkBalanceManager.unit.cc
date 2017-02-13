@@ -3814,21 +3814,21 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData.size(), 2 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneZoneData.size(), 3 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceData.size(), 4 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceCrackData.size(), 1 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size(), 2 );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth, 0.0 );
+		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth, 180.0 );
+		EXPECT_EQ( 180.0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve, 2 );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve );
 
 		// Set up some environmental parameters
 		DataEnvironment::OutBaroPress = 101325.0;
@@ -4484,21 +4484,21 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData.size(), 2 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneZoneData.size(), 3 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceData.size(), 4 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceCrackData.size(), 1 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size(), 2 );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth, 0.0 );
+		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth, 180.0 );
+		EXPECT_EQ( 180.0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve, 2 );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve );
 
 		// Set up some environmental parameters
 		DataEnvironment::OutBaroPress = 101325.0;
@@ -5123,12 +5123,12 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
 		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
-		EXPECT_EQ( 180, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
+		EXPECT_EQ( 180.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).useRelativeAngle );
 		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve );
 
-		EXPECT_EQ( 0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
+		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
 		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve );
@@ -5761,21 +5761,21 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData.size(), 2 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneZoneData.size(), 3 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceData.size(), 4 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceCrackData.size(), 1 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size(), 2 );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth, 0.0 );
+		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth, 180.0 );
+		EXPECT_EQ( 180.0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve );
 
 		// Set up some environmental parameters
 		DataEnvironment::OutBaroPress = 101325.0;
@@ -6393,21 +6393,21 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData.size(), 2 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneZoneData.size(), 3 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceData.size(), 4 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceCrackData.size(), 1 );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size(), 2 );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth, 0.0 );
+		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve );
 
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth, 180.0 );
+		EXPECT_EQ( 180.0, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).azimuth );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).symmetricCurve );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).useRelativeAngle );
-		EXPECT_EQ( DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve, 1 );
+		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneExternalNodeData( 2 ).curve );
 
 		// Check the curves
 		Real64 cp105N = -0.590653062499999;
