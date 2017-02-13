@@ -1,8 +1,14 @@
-!-LrgOff_GridStorageEMSSmoothing
-!!
-! This example file is based RefBldgLargeOfficeNew2004_Chicago.idf
+! Fault_FoulingChillerBoiler_RefBldgLargeOfficeNew2004.idf
 !
-! Demonstrate on-site storage of grid electricity, controlled to follow smooth out demand.
+! Highlights:  Illustrates the operational fault modeling of fouling chiller and boiler
+!
+! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
+!
+! DOE Commercial Reference Building
+! Large office, new construction 90.1-2004
+! Version 1.3_5.0
+! EnergyPlus Version 6.0
+! ASHRAE Standards 90.1-2004 and 62-1999
 !
 ! Description:  12 story plus basement, office building.
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
@@ -35,7 +41,34 @@
 ! Pumps:                          Yes
 ! Boilers:                        Boiler:HotWater (gas-fired)
 ! Chillers:                       Chiller:Electric:ReformulatedEIR (water-cooled)
-!
+!***** NOTICE *****
+!***** The Reference Buildings were prepared as an account of work sponsored by an *****
+!***** agency of the United States government. Neither the United States *****
+!***** government nor any agency thereof, nor any of their employees, makes *****
+!***** any warranty, express or implied, or assumes any legal liability or *****
+!***** responsibility for the accuracy, completeness, or usefulness of any *****
+!***** information, apparatus, product, or process disclosed, or represents *****
+!***** that its use would not infringe privately owned rights. Reference *****
+!***** herein to any specific commercial product, process, or service by *****
+!***** trade name, trademark, manufacturer, or otherwise does not necessarily *****
+!***** constitute or imply its endorsement, recommendation, or favoring by *****
+!***** the United States government or any agency thereof. The views and *****
+!***** opinions of authors expressed herein do not necessarily state or *****
+!***** reflect those of the United States government or any agency thereof. *****
+!***** Access to and use of the Reference Buildings imposes the following obligations *****
+!***** on the user. The user agrees to credit DOE, NREL, PNNL, and LBNL in *****
+!***** any publication(s) that that result from the use of Reference Buildings. *****
+!***** However, the names of DOE/NREL/PNNL/LBNL may not be used in any *****
+!***** advertising or publicity that implies endorsement or promotion of any *****
+!***** products, services or commercial entities. *****
+! Reference citation for the Commercial Reference Buildings:
+! Deru, M.; Field, K.; Studer, D.; Benne, K.; Griffith, B.; Torcellini, P;
+! Halverson, M.; Winiarski, D.; Liu, B.; Rosenberg, M.; Huang, J.;
+! Yazdanian, M.; Crawley, D. (2010).
+! U.S. Department of Energy Commercial Reference Building Models of the National Building Stock.
+! Washington, DC: U.S. Department of Energy, Energy Efficiency and
+! Renewable Energy, Office of Building Technologies.
+! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
   Version,8.6;
@@ -44,9 +77,9 @@
     YES,                     !- Do Zone Sizing Calculation
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
-    yes,                     !- Run Simulation for Sizing Periods
-    no,                      !- Run Simulation for Weather File Run Periods
-    no,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    YES,                     !- Run Simulation for Sizing Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
     2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Building,
@@ -60,11 +93,25 @@
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    annual,                  !- Name
+    ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    1,                       !- End Month
+    7,                       !- End Day of Month
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes,                     !- Use Weather File Snow Indicators
+    1.0000;                  !- Number of Times Runperiod to be Repeated
+
+  RunPeriod,
+    ,                        !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    7,                       !- End Month
+    7,                       !- End Day of Month
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -6016,17 +6063,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -6055,17 +6102,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -6094,17 +6141,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -6133,17 +6180,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -7324,8 +7371,8 @@
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
-    ,                        !- Design Inlet Air Dry-Bulb Temperature
-    ,                        !- Design Inlet Air Wet-Bulb Temperature
+    ,                        !- Design Inlet Air Dry Bulb Temperature
+    ,                        !- Design Inlet Air Wet Bulb Temperature
     ,                        !- Design Approach Temperature
     ,                        !- Design Range Temperature
     ,                        !- Basin Heater Capacity {W/K}
@@ -7350,20 +7397,20 @@
     CoolSys1 Pump,           !- Name
     CoolSys1 Supply Inlet Node,  !- Inlet Node Name
     CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
-    179352,                  !- Design Pump Head {Pa}
-    AUTOSIZE,                !- Design Power Consumption {W}
+    AUTOSIZE,                !- Rated Flow Rate {m3/s}
+    179352,                  !- Rated Pump Head {Pa}
+    AUTOSIZE,                !- Rated Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    autosize,                !- Design Minimum Flow Rate {m3/s}
+    autosize,                !- Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ,                        !- Pump Flow Rate Schedule Name
     ,                        !- Pump Curve Name
-    ,                        !- Impeller Diameter {m}
+    ,                        !- Impeller Diameter
     ,                        !- VFD Control Type
     ,                        !- Pump rpm Schedule Name
     ,                        !- Minimum Pressure Schedule
@@ -7373,45 +7420,46 @@
     ,                        !- Zone Name
     ,                        !- Skin Loss Radiative Fraction
     PowerPerFlow,            !- Design Power Sizing Method
-    348701.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
-    1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
-    0.0;                     !- Design Minimum Flow Rate Fraction
+    348701.1,                !- Design Electric Power per Unit Flow Rate
+    1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head
+    0.0;                     !- Design Minimum Flow Rate Sizing Factor
+
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
-    179352,                  !- Design Pump Head {Pa}
-    AUTOSIZE,                !- Design Power Consumption {W}
+    AUTOSIZE,                !- Rated Flow Rate {m3/s}
+    179352,                  !- Rated Pump Head {Pa}
+    AUTOSIZE,                !- Rated Power Consumption {W}
     0.875,                   !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Design Minimum Flow Rate {m3/s}
+    0.0,                     !- Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Pump:ConstantSpeed,
     TowerWaterSys Pump,      !- Name
     TowerWaterSys Supply Inlet Node,  !- Inlet Node Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Design Flow Rate {m3/s}
-    179352,                  !- Design Pump Head {Pa}
-    AUTOSIZE,                !- Design Power Consumption {W}
+    AUTOSIZE,                !- Rated Flow Rate {m3/s}
+    179352,                  !- Rated Pump Head {Pa}
+    AUTOSIZE,                !- Rated Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type
     ,                        !- Pump Flow Rate Schedule Name
     ,                        !- Pump Curve Name
-    ,                        !- Impeller Diameter {m}
-    ,                        !- Rotational Speed {rev/min}
+    ,                        !- Impeller Diameter
+    ,                        !- Rotational Speed
     ,                        !- Zone Name
     ,                        !- Skin Loss Radiative Fraction
     PowerPerFlow,            !- Design Power Sizing Method
-    301156.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
-    ;                        !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
+    301156.1,                !- Design Electric Power per Unit Flow Rate
+    ;                        !- Design Shaft Power per Unit Flow Rate per Unit Head
 
   PlantEquipmentList,
     CoolSys1 Equipment List, !- Name
@@ -8520,16 +8568,16 @@
     SWHSys1 Pump,            !- Name
     SWHSys1 Supply Inlet Node,  !- Inlet Node Name
     SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
-    179352,                  !- Design Pump Head {Pa}
-    AUTOSIZE,                !- Design Power Consumption {W}
+    AUTOSIZE,                !- Rated Flow Rate {m3/s}
+    179352,                  !- Rated Pump Head {Pa}
+    AUTOSIZE,                !- Rated Power Consumption {W}
     0.85,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Design Minimum Flow Rate {m3/s}
+    0.0,                     !- Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
 ! ***SWH SIZING & CONTROLS***
@@ -9195,11 +9243,73 @@
 
   Output:Meter,Electricity:Facility,HOURLY;
 
+  Output:Meter,Fans:Electricity,HOURLY;
+
+  Output:Meter,Cooling:Electricity,HOURLY;
+
+  Output:Meter,Heating:Electricity,HOURLY;
+
+  Output:Meter,InteriorLights:Electricity,HOURLY;
+
+  Output:Meter,InteriorEquipment:Electricity,HOURLY;
+
+  Output:Meter,Gas:Facility,HOURLY;
+
+  Output:Meter,Heating:Gas,HOURLY;
+
+  Output:Meter,InteriorEquipment:Gas,HOURLY;
+
+  Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Relative Humidity,HOURLY;
+
+  Output:Variable,*,Boiler Gas Energy,HOURLY;
+
+  Output:Variable,*,Boiler Inlet Temperature,HOURLY;
+
+  Output:Variable,*,Boiler Outlet Temperature,HOURLY;
+
+  Output:Variable,*,Boiler Part Load Ratio,HOURLY;
+
+  Output:Variable,*,Chiller Part Load Ratio,HOURLY;
+
+  Output:Variable,*,Chiller Electric Energy,HOURLY;
+
+  Output:Variable,*,Chiller COP,HOURLY;
+
+  Output:Variable,*,Plant System Cycle On Off Status,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Cooling Demand Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Heating Demand Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Inlet Mass Flow Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Inlet Temperature,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Outlet Temperature,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Unmet Demand Rate,HOURLY;
+
+  Output:Variable,*,Air System Heating Coil Hot Water Energy,HOURLY;
+
+  Output:Variable,*,Air System Outdoor Air Flow Fraction,HOURLY;
+
+  Output:Variable,*,Air System Simulation Cycle On Off Status,HOURLY;
+
+  Output:Variable,*,Air System Outdoor Air Economizer Status,HOURLY;
+
+  Output:Variable,*,Air System Total Heating Energy,HOURLY;
+
+  Output:Variable,*,Air System Total Cooling Energy,HOURLY;
 
   Output:Variable,*,Air System Fan Electric Energy,HOURLY;
 
-  Output:Variable,*,Zone Mean Air Temperature,hourly;
+  Output:Variable,*,Zone Mean Air Temperature,hourly;  
 
 ! ***REPORT TABLES***
 
@@ -9319,251 +9429,123 @@
 
 ! ***ENVIRONMENTAL FACTORS REPORTING***
 
-  ElectricLoadCenter:Distribution,
-    Grid Battery Load Center,!- Name
-    ,                        !- Generator List Name
-    ,                        !- Generator Operation Scheme Type
-    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Generator Track Schedule Name Scheme Schedule Name
-    ,                        !- Generator Track Meter Scheme Meter Name
-    DirectCurrentWithInverterDCStorage,  !- Electrical Buss Type
-    Storage Inverter,        !- Inverter Name
-    Battery,                 !- Electrical Storage Object Name
-    ,                        !- Transformer Object Name
-    TrackChargeDischargeSchedules,  !- Storage Operation Scheme
-    ,                        !- Storage Control Track Meter Name
-    Grid Charge Converter,   !- Storage Converter Object Name
-    0.96,                    !- Maximum Storage State of Charge Fraction
-    0.4,                     !- Minimum Storage State of Charge Fraction
-    1000000,                 !- Design Storage Control Charge Power {W}
-    Charge Schedule,         !- Storage Charge Power Fraction Schedule Name
-    51000000,                !- Design Storage Control Discharge Power {W}
-    Discharge Schedule,      !- Storage Discharge Power Fraction Schedule Name
-    ,                        !- Storage Control Utility Demand Target {W}
-    ;                        !- Storage Control Utility Demand Target Fraction Schedule Name
-
-  Schedule:Compact,
-    Charge Schedule,         !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 08:00,1.0,        !- Field 3
-    Until: 22:00,0.0,        !- Field 5
-    Until: 24:00,1.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 08:00,1.0,        !- Field 10
-    Until: 18:00,0.0,        !- Field 12
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,1.0;        !- Field 17
-
-  Schedule:Compact,
-    Discharge Schedule,      !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 10:00,0.0,        !- Field 3
-    Until: 22:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 10:00,0.0,        !- Field 10
-    Until: 18:00,1.0,        !- Field 12
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0;        !- Field 17
-
-  ElectricLoadCenter:Storage:Converter,
-    Grid Charge Converter,   !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    SimpleFixed,             !- Power Conversion Efficiency Method
-    0.95,                    !- Simple Fixed Efficiency
-    ,                        !- Design Maximum Continuous Input Power {W}
-    ,                        !- Efficiency Function of Power Curve Name
-    20,                      !- Ancillary Power Consumed In Standby {W}
-    ,                        !- Zone Name
-    0.25;                    !- Radiative Fraction
-
-  ElectricLoadCenter:Storage:Simple,
-    Battery,                 !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Zone Name
-    0.0,                     !- Radiative Fraction for Zone Heat Gains
-    0.8,                     !- Nominal Energetic Efficiency for Charging
-    0.8,                     !- Nominal Discharging Energetic Efficiency
-    1.0E13,                  !- Maximum Storage Capacity {J}
-    1000000,                 !- Maximum Power for Discharging {W}
-    1000000,                 !- Maximum Power for Charging {W}
-    5.0E12;                  !- Initial State of Charge {J}
-
-  ElectricLoadCenter:Inverter:LookUpTable,
-    Storage Inverter,        !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Zone Name
-    0.25,                    !- Radiative Fraction
-    14000,                   !- Rated Maximum Continuous Output Power {W}
-    200.0,                   !- Night Tare Loss Power {W}
-    368,                     !- Nominal Voltage Input {V}
-    0.839,                   !- Efficiency at 10% Power and Nominal Voltage
-    0.897,                   !- Efficiency at 20% Power and Nominal Voltage
-    0.916,                   !- Efficiency at 30% Power and Nominal Voltage
-    0.931,                   !- Efficiency at 50% Power and Nominal Voltage
-    0.934,                   !- Efficiency at 75% Power and Nominal Voltage
-    0.930;                   !- Efficiency at 100% Power and Nominal Voltage
-
-  Output:Variable,*,Inverter DC to AC Efficiency,hourly;
-
-  Output:Variable,*,Inverter DC Input Electric Power,hourly;
-
-  Output:Variable,*,Inverter DC Input Electric Energy,hourly;
-
-  Output:Variable,*,Inverter AC Output Electric Power,hourly;
-
-  Output:Variable,*,Inverter AC Output Electric Energy,hourly;
-
-  Output:Variable,*,Inverter Conversion Loss Power,hourly;
-
-  Output:Variable,*,Inverter Conversion Loss Energy,hourly;
-
-  Output:Variable,*,Inverter Conversion Loss Decrement Energy,hourly;
-
-  Output:Variable,*,Inverter Thermal Loss Rate,hourly;
-
-  Output:Variable,*,Inverter Thermal Loss Energy,hourly;
-
-  Output:Variable,*,Inverter Ancillary AC Electric Power,hourly;
-
-  Output:Variable,*,Inverter Ancillary AC Electric Energy,hourly;
-
-  Output:Variable,*,Electric Storage Simple Charge State,hourly;
-
-  Output:Variable,*,Electric Storage Charge Power,hourly;
-
-  Output:Variable,*,Electric Storage Charge Energy,hourly;
-
-  Output:Variable,*,Electric Storage Production Decrement Energy,hourly;
-
-  Output:Variable,*,Electric Storage Discharge Power,hourly;
-
-  Output:Variable,*,Electric Storage Discharge Energy,hourly;
-
-  Output:Variable,*,Electric Storage Thermal Loss Rate,hourly;
-
-  Output:Variable,*,Electric Storage Thermal Loss Energy,hourly;
-
-  Output:Variable,*,Converter AC to DC Efficiency,hourly;
-
-  Output:Variable,*,Converter AC Input Electric Power,hourly;
-
-  Output:Variable,*,Converter AC Input Electric Energy,hourly;
-
-  Output:Variable,*,Converter DC Output Electric Power,hourly;
-
-  Output:Variable,*,Converter DC Output Electric Energy,hourly;
-
-  Output:Variable,*,Converter Electric Loss Power,hourly;
-
-  Output:Variable,*,Converter Electric Loss Energy,hourly;
-
-  Output:Variable,*,Converter Electric Loss Decrement Energy,hourly;
-
-  Output:Variable,*,Converter Thermal Loss Rate,hourly;
-
-  Output:Variable,*,Converter Thermal Loss Energy,hourly;
-
-  Output:Variable,*,Converter Ancillary AC Electric Power,hourly;
-
-  Output:Variable,*,Converter Ancillary AC Electric Energy,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Electric Power,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Electric Energy,hourly;
-
-  Output:Variable,*,Electric Load Center Supplied Electric Power,hourly;
-
-  Output:Variable,*,Electric Load Center Drawn Electric Power,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Thermal Rate,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Thermal Energy,hourly;
-
-  Output:Variable,*,Electric Load Center Requested Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Purchased Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
-
-  Output:Variable,*,Facility Total Surplus Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Surplus Electric Energy,hourly;
-
-  Output:Variable,*,Facility Net Purchased Electric Power,hourly;
-
-  Output:Variable,*,Facility Net Purchased Electric Energy,hourly;
-
-  Output:Variable,*,Facility Total Building Electric Demand Power,hourly;
-
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,hourly;
-
-  Output:Variable,*,Facility Total Electric Demand Power,hourly;
-
-  Output:Variable,*,Facility Total Produced Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Produced Electric Energy,hourly;
-
-! Begin EMS demo of controlling a big battery to smooth out building demand load factor
-
-  Output:EnergyManagementSystem,
-    Verbose,                 !- Actuator Availability Dictionary Reporting
-    Verbose,                 !- Internal Variable Availability Dictionary Reporting
-    ErrorsOnly;              !- EMS Runtime Language Debug Output Level
-
-  EnergyManagementSystem:Sensor,
-    CurntFacilityElectDemand,!- Name
-    Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:Sensor,
-    CurntStorageSOC,         !- Name
-    Battery,                 !- Output:Variable or Output:Meter Index Key Name
-    Electric Storage Simple Charge State;  !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:InternalVariable,
-    MaxSOC,                  !- Name
-    BATTERY,                 !- Internal Data Index Key Name
-    Electrical Storage Simple Maximum Capacity;  !- Internal Data Type
-
-  EnergyManagementSystem:TrendVariable,
-    FacilityElectTrend,      !- Name
-    CurntFacilityElectDemand,!- EMS Variable Name
-    1008;                    !- Number of Timesteps to be Logged
-
-  EnergyManagementSystem:Actuator,
-    dischargeRate,           !- Name
-    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
-    Electrical Storage,      !- Actuated Component Type
-    Power Draw Rate;         !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    chargeRate,              !- Name
-    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
-    Electrical Storage,      !- Actuated Component Type
-    Power Charge Rate;       !- Actuated Component Control Type
-
-  EnergyManagementSystem:ProgramCallingManager,
-    Demand Manager Demonstration,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-    BatteryControlDemandDemo;!- Program Name 1
-
-  EnergyManagementSystem:Program,
-    BatteryControlDemandDemo,!- Name
-    Set fracSOC = CurntStorageSOC / MaxSOC,  !- Program Line 1
-    Set avgFacilDemand = @trendAverage FacilityElectTrend 1008,  !- Program Line 2
-    set dischargeRate = 0.0, !- <none>
-    set chargeRate = 0.0,    !- <none>
-    set dampenFactor = 0.8,  !- <none>
-    If ( CurntFacilityElectDemand > (avgFacilDemand * 1.05 ) ),  !- <none>
-    set dischargeRate = ( CurntFacilityElectDemand - avgFacilDemand ) * dampenFactor,  !- <none>
-    ELSEIF ( CurntFacilityElectDemand < (avgFacilDemand * 0.95 ) ),  !- <none>
-    set chargeRate = ( avgFacilDemand - CurntFacilityElectDemand ) * dampenFactor,  !- <none>
-    ENDIF;                   !- <none>
-
+  Output:EnvironmentalImpactFactors,
+    Monthly;                 !- Reporting Frequency
+
+  EnvironmentalImpactFactors,
+    0.663,                   !- District Heating Efficiency
+    4.18,                    !- District Cooling COP {W/W}
+    0.585,                   !- Steam Conversion Efficiency
+    80.7272,                 !- Total Carbon Equivalent Emission Factor From N2O {kg/kg}
+    6.2727,                  !- Total Carbon Equivalent Emission Factor From CH4 {kg/kg}
+    0.2727;                  !- Total Carbon Equivalent Emission Factor From CO2 {kg/kg}
+
+! Indiana electricity source and emission factors based on Deru and Torcellini 2007
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    kg,                      !- Units of Measure
+    ,                        !- Energy per Unit Factor
+    3.546,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    3.417E+02,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.186E-01,               !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    7.472E-01,               !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.222E-01,               !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    8.028E-03,               !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.872E+00,               !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    0.0,                     !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.739E-02,               !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    0.0,                     !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    0.0,                     !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.019E-02,               !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    5.639E-06,               !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    2.778E-05,               !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.4309556,               !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Deru and Torcellini 2007
+! Source Energy and Emission Factors for Energy Use in Buildings
+! NREL/TP-550-38617
+! source factor and Higher Heating Values from Table 5
+! post-combustion emission factors for boiler from Table 9 (with factor of 1000 correction for natural gas)
+
+  FuelFactors,
+    NaturalGas,              !- Existing Fuel Resource Name
+    m3,                      !- Units of Measure
+    37631000,                !- Energy per Unit Factor
+    1.092,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    5.21E+01,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    3.99E-02,                !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.06E-03,                !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.73E-02,                !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.06E-03,                !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.68E-04,                !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    0.0,                     !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.59E-03,                !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    0.0,                     !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    0,                       !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.61E-03,                !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.11E-07,                !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    2.13E-07,                !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0,                       !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+!*** OPERATIONAL FAULTS ***
+
+  FaultModel:Fouling:Chiller,
+    Fault_Fouling_Chiller1,  !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Chiller:Electric:ReformulatedEIR, !- Chiller Object Type
+    CoolSys1 Chiller 1,      !- Chiller Object Name
+    0.8;                     !- Fouling Factor
+
+  FaultModel:Fouling:Chiller,
+    Fault_Fouling_Chiller2,  !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Chiller:Electric:ReformulatedEIR, !- Chiller Object Type
+    CoolSys1 Chiller 2,      !- Chiller Object Name
+    0.8;                     !- Fouling Factor
+
+  FaultModel:Fouling:Boiler,
+    Fault_Fouling_Boiler,    !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Boiler:HotWater,         !- Boiler Object Type
+    HeatSys1 Boiler,         !- Boiler Object Name
+    0.8;                     !- Fouling Factor

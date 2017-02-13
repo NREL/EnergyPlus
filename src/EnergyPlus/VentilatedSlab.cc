@@ -1447,6 +1447,8 @@ namespace VentilatedSlab {
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
+		using WaterCoils::GetWaterCoilIndex;
+		using WaterCoils::WaterCoil;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -1522,7 +1524,13 @@ namespace VentilatedSlab {
 		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 CoolingAirVolFlowScalable; // cooling airvolume for rate determined using scalable sizing method
 		Real64 HeatingAirVolFlowScalable; // heating airvolume for rate determined using scalable sizing method
+		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
+		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+		int CoilNum; // index of water coil object
 
+		DoWaterCoilSizing = false;
+		WaterCoilSizDeltaT = 0.0;
+		CoilNum = 0;
 		PltSizCoolNum = 0;
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -1738,8 +1746,23 @@ namespace VentilatedSlab {
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						//END IF
-						if ( PltSizHeatNum > 0 ) {
+						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", VentSlab( Item ).HCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizHeatNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
+								ErrorsFound = true;
+							}
+						}
+						if ( DoWaterCoilSizing ) {
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = HeatingCapacitySizing;
 								if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
@@ -1780,14 +1803,10 @@ namespace VentilatedSlab {
 								}
 								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								MaxVolHotWaterFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
 							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
-							ErrorsFound = true;
 						}
 					}
 
@@ -1935,7 +1954,23 @@ namespace VentilatedSlab {
 				CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
 				if ( IsAutoSize ) {
 					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-					if ( PltSizCoolNum > 0 ) {
+					CoilNum = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
+					if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+						WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+						DoWaterCoilSizing = true;
+					} else {
+						if ( PltSizCoolNum > 0 ) {
+							WaterCoilSizDeltaT = PlantSizData( PltSizCoolNum ).DeltaT;
+							DoWaterCoilSizing = true;
+						} else {
+							DoWaterCoilSizing = false;
+							// If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
+							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
+							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
+							ErrorsFound = true;
+						}
+					}
+					if ( DoWaterCoilSizing ) {
 						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 							SizingMethod = CoolingCapacitySizing;
 							if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
@@ -1977,14 +2012,10 @@ namespace VentilatedSlab {
 							}
 							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
 							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-							MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+							MaxVolColdWaterFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 						} else {
 							MaxVolColdWaterFlowDes = 0.0;
 						}
-					} else {
-						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
-						ErrorsFound = true;
 					}
 				}
 				if ( IsAutoSize ) {
