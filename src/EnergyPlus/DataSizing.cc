@@ -425,8 +425,6 @@ namespace DataSizing {
 		ZoneHVACSizing.deallocate();
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
-		DataWaterCoilSizCoolDeltaT = 0.0;
-		DataWaterCoilSizHeatDeltaT = 0.0;
 
 		CalcFacilitySizing.deallocate(); 
 		CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
@@ -439,6 +437,9 @@ namespace DataSizing {
 		CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
 		CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
 		CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
+	
+		DataWaterCoilSizCoolDeltaT = 0.0;
+		DataWaterCoilSizHeatDeltaT = 0.0;
 	}
 
 } // DataSizing

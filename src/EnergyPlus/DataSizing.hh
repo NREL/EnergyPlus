@@ -1194,13 +1194,13 @@ namespace DataSizing {
 		Array1D< Real64 > HeatLoadSeq; // daily sequence of heating load (cooling, zone time step)
 		Real64 DesHeatLoad; // zone design heating load [W]
 		
-        // Default Constructor
+	        // Default Constructor
 		FacilitySizingData( ):
 			CoolDDNum( 0 ),
 			HeatDDNum( 0 ),
 			TimeStepNumAtCoolMax( 0 ),
-			TimeStepNumAtHeatMax( 0 ),
 			DesCoolLoad( 0.0 ),
+			TimeStepNumAtHeatMax( 0 ),
 			DesHeatLoad( 0.0 )
 		{}
 
