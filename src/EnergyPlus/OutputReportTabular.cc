@@ -388,6 +388,10 @@ namespace OutputReportTabular {
 	int DesignDayCount( 0 );
 
 	//arrays related to pulse and load component reporting
+	Array2D< Real64 > tableBodyNums;
+	Array2D_bool tableBodyCellUsed;
+	Array1D< Real64 > totalColumn;
+	Array1D< Real64 > grandTotalRow;
 	Array2D< Real64 > radiantPulseUsed;
 	Array2D_int radiantPulseTimestep;
 	Array2D< Real64 > radiantPulseReceived;
@@ -593,6 +597,10 @@ namespace OutputReportTabular {
 		sourceFactorOtherFuel2 = 0.0;
 		DesignDayName.deallocate();
 		DesignDayCount = 0;
+		tableBodyNums.deallocate();
+		tableBodyCellUsed.deallocate();
+		totalColumn.deallocate();
+		grandTotalRow.deallocate();
 		radiantPulseUsed.deallocate();
 		radiantPulseTimestep.deallocate();
 		radiantPulseReceived.deallocate();
@@ -11564,9 +11572,7 @@ namespace OutputReportTabular {
 		int NumOfTimeStepInDay;
 		Array1D< Real64 > delayOpaque; // hold values for report for delayed opaque
 		Real64 singleSurfDelay;
-		Array1D< Real64 > totalColumn;
 		Array1D< Real64 > percentColumn;
-		Array1D< Real64 > grandTotalRow;
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
@@ -11638,12 +11644,16 @@ namespace OutputReportTabular {
 		lightLWRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
-		seqData.allocate( NumOfTimeStepInDay );
-		AvgData.allocate( NumOfTimeStepInDay );
 		delayOpaque.allocate( rGrdTot );
-		totalColumn.allocate( rGrdTot );
+		if (!totalColumn.allocated() )	{
+			totalColumn.allocate( rGrdTot );
+			totalColumn = 0.;
+		}
 		percentColumn.allocate( rGrdTot );
-		grandTotalRow.allocate( cPerc );
+		if (!grandTotalRow.allocated() ) {
+			grandTotalRow.allocate( cPerc );
+			grandTotalRow = 0.;
+		}
 
 		//establish unit conversion factors
 		if ( unitsStyle == unitsStyleInchPound ) {
@@ -11821,6 +11831,14 @@ namespace OutputReportTabular {
 			columnHead.allocate( cPerc );
 			columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
 			tableBody.allocate( cPerc, rGrdTot );
+			if (!tableBodyNums.allocated() ) {
+				tableBodyNums.allocate( cPerc, rGrdTot );
+				tableBodyNums = 0.;
+			}
+			if ( !tableBodyCellUsed.allocated( ) ) {
+				tableBodyCellUsed.allocate( cPerc, rGrdTot );
+				tableBodyCellUsed = false;
+			}
 
 			if ( unitsStyle != unitsStyleInchPound ) {
 				columnHead( cSensInst ) = "Sensible - Instant [W]";
@@ -11874,7 +11892,7 @@ namespace OutputReportTabular {
 			totalColumn = 0.0;
 			percentColumn = 0.0;
 			grandTotalRow = 0.0;
-
+ 
 			int CoolDesSelected = CalcFinalZoneSizing( iZone ).CoolDDNum;
 			int timeCoolMax = CalcFinalZoneSizing( iZone ).TimeStepNumAtCoolMax;
 			if ( CoolDesSelected != 0 && timeCoolMax != 0 ) {
@@ -11884,115 +11902,133 @@ namespace OutputReportTabular {
 				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
 				tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
 				totalColumn( rPeople ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+			    grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+//				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rPeople, peopleInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = peopleLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rPeople ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = peopleLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rPeople ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rPeople, peopleLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = peopleDelaySeqCool( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rPeople ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				//seqData = peopleDelaySeqCool( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rPeople ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rPeople, peopleDelaySeqCool( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//LIGHTS
-				seqData = lightInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rLights ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = lightInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rLights ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rLights, lightInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = lightRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rLights ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
+				//seqData = lightRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rLights ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensRA, rLights, lightRetAirSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = lightDelaySeqCool( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rLights ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				//seqData = lightDelaySeqCool( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rLights ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rLights, lightDelaySeqCool( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//EQUIPMENT
-				seqData = equipInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rEquip ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = equipInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rEquip ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rEquip, equipInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = equipLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rEquip ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = equipLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rEquip ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rEquip, equipLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = equipDelaySeqCool( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rEquip ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				//seqData = equipDelaySeqCool( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rEquip ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rEquip, equipDelaySeqCool( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//REFRIGERATION EQUIPMENT
-				seqData = refrigInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rRefrig ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = refrigInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rRefrig ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rRefrig, refrigInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = refrigRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rRefrig ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
+				//seqData = refrigRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rRefrig ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensRA, rRefrig, refrigRetAirSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = refrigLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rRefrig ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = refrigLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rRefrig ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rRefrig, refrigLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//WATER USE EQUIPMENT
-				seqData = waterUseInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rWaterUse ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = waterUseInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rWaterUse ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rWaterUse, waterUseInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = waterUseLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rWaterUse ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = waterUseLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rWaterUse ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rWaterUse, waterUseLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//HVAC EQUIPMENT LOSSES
-				seqData = hvacLossInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = hvacLossInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rHvacLoss, hvacLossInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = hvacLossDelaySeqCool( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				//seqData = hvacLossDelaySeqCool( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rHvacLoss, hvacLossDelaySeqCool( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//POWER GENERATION EQUIPMENT
-				seqData = powerGenInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rPowerGen ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = powerGenInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rPowerGen ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rPowerGen, powerGenInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = powerGenDelaySeqCool( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rPowerGen ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				//seqData = powerGenDelaySeqCool( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rPowerGen ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rPowerGen, powerGenDelaySeqCool( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//DOAS
 				tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax ), 2 );
@@ -12004,63 +12040,65 @@ namespace OutputReportTabular {
 				grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
 
 				//INFILTRATION
-				seqData = infilInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rInfil ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = infilInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rInfil ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rInfil, infilInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = infilLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rInfil ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = infilLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rInfil ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rInfil, infilLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//ZONE VENTILATION
-				seqData = zoneVentInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rZoneVent ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = zoneVentInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rZoneVent ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rZoneVent, zoneVentInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = zoneVentLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rZoneVent ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = zoneVentLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rZoneVent ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rZoneVent, zoneVentLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//INTERZONE MIXING
-				seqData = interZoneMixInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = interZoneMixInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rIntZonMix, interZoneMixInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
-				seqData = interZoneMixLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
-				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				//seqData = interZoneMixLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
+				//grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rIntZonMix, interZoneMixLatentSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//FENESTRATION CONDUCTION
-				seqData = feneCondInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rFeneCond ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				//seqData = feneCondInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rFeneCond ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rFeneCond, feneCondInstantSeq( CoolDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//FENESTRATION SOLAR
-				//      seqData = feneSolarInstantSeq(iZone,:,CoolDesSelected) * powerConversion
-				//      CALL MovingAvg(seqData,NumOfTimeStepInDay,NumTimeStepsInAvg,AvgData)
-				//      tableBody(rFeneSolr,cSensInst)  = TRIM(RealToStr(AvgData(timeCoolMax),2))
-				//      totalColumn(rFeneSolr) = totalColumn(rFeneSolr) + AvgData(timeCoolMax)
-				//      grandTotalRow(cSensInst) = grandTotalRow(cSensInst) + AvgData(timeCoolMax)
-
-				seqData = feneSolarDelaySeqCool( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeCoolMax ), 2 );
-				totalColumn( rFeneSolr ) += AvgData( timeCoolMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				//seqData = feneSolarDelaySeqCool( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				//totalColumn( rFeneSolr ) += AvgData( timeCoolMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rFeneSolr, feneSolarDelaySeqCool( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//opaque surfaces - must combine individual surfaces by class and other side conditions
 				delayOpaque = 0.0;
@@ -12123,6 +12161,15 @@ namespace OutputReportTabular {
 			tableBody( cSensDelay, rOpqDoor ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
 			totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
 			grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
+
+			// move number array into string array
+			for ( int c = 1; c <= cLatent; ++c ) {
+				for ( int r = 1; r <= rOpqDoor; ++r ) { //to last row before total
+					if ( tableBodyCellUsed( c, r ) ) {
+						tableBody( c, r ) = RealToStr( tableBodyNums( c, r ), 2 );
+					}
+				}
+			}
 
 			//GRAND TOTAL ROW
 			totalGrandTotal = 0.0;
@@ -12357,119 +12404,137 @@ namespace OutputReportTabular {
 			if ( HeatDesSelected != 0 && timeHeatMax != 0 ) {
 
 				//PEOPLE
-				seqData = peopleInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rPeople ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = peopleInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rPeople ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rPeople, peopleInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = peopleLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rPeople ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = peopleLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rPeople ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rPeople, peopleLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = peopleDelaySeqHeat( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rPeople ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				//seqData = peopleDelaySeqHeat( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rPeople ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rPeople, peopleDelaySeqHeat( _ ), powerConversion, NumOfTimeStepInDay, timeCoolMax );
 
 				//LIGHTS
-				seqData = lightInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rLights ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = lightInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rLights ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rLights, lightInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = lightRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rLights ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
+				//seqData = lightRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rLights ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensRA, rLights, lightRetAirSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = lightDelaySeqHeat( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rLights ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				//seqData = lightDelaySeqHeat( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rLights ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rLights, lightDelaySeqHeat( _ ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//EQUIPMENT
-				seqData = equipInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rEquip ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = equipInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rEquip ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rEquip, equipInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = equipLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rEquip ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = equipLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rEquip ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rEquip, equipLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = equipDelaySeqHeat( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rEquip ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				//seqData = equipDelaySeqHeat( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rEquip ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rEquip, equipDelaySeqHeat( _ ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//REFRIGERATION EQUIPMENT
-				seqData = refrigInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rRefrig ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = refrigInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rRefrig ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rRefrig, refrigInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = refrigRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rRefrig ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
+				//seqData = refrigRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rRefrig ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensRA, rRefrig, refrigRetAirSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = refrigLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rRefrig ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = refrigLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rRefrig ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rRefrig, refrigLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//WATER USE EQUIPMENT
-				seqData = waterUseInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rWaterUse ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = waterUseInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rWaterUse ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rWaterUse, waterUseInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = waterUseLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rWaterUse ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = waterUseLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rWaterUse ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rWaterUse, waterUseLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//HVAC EQUIPMENT LOSSES
-				seqData = hvacLossInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = hvacLossInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rHvacLoss, hvacLossInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = hvacLossDelaySeqHeat( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				//seqData = hvacLossDelaySeqHeat( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rHvacLoss, hvacLossDelaySeqHeat( _ ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//POWER GENERATION EQUIPMENT
-				seqData = powerGenInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rPowerGen ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = powerGenInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rPowerGen ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rPowerGen, powerGenInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = powerGenDelaySeqHeat( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rPowerGen ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				//seqData = powerGenDelaySeqHeat( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rPowerGen ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rPowerGen, powerGenDelaySeqHeat( _ ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//DOAS
 				tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
@@ -12481,63 +12546,65 @@ namespace OutputReportTabular {
 				grandTotalRow( cLatent ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
 
 				//INFILTRATION
-				seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rInfil ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rInfil ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rInfil, infilInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = infilLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rInfil ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = infilLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rInfil ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rInfil, infilLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//ZONE VENTILATION
-				seqData = zoneVentInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rZoneVent ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = zoneVentInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rZoneVent ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rZoneVent, zoneVentInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = zoneVentLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rZoneVent ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = zoneVentLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rZoneVent ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rZoneVent, zoneVentLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//INTERZONE MIXING
-				seqData = interZoneMixInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = interZoneMixInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rIntZonMix, interZoneMixInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
-				seqData = interZoneMixLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
-				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				//seqData = interZoneMixLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
+				//grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cLatent, rIntZonMix, interZoneMixLatentSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//FENESTRATION CONDUCTION
-				seqData = feneCondInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rFeneCond ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				//seqData = feneCondInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rFeneCond ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensInst, rFeneCond, feneCondInstantSeq( HeatDesSelected, _, iZone ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//FENESTRATION SOLAR
-				//      seqData = feneSolarInstantSeq(iZone,:,HeatDesSelected) * powerConversion
-				//      CALL MovingAvg(seqData,NumOfTimeStepInDay,NumTimeStepsInAvg,AvgData)
-				//      tableBody(rFeneSolr,cSensInst)  = TRIM(RealToStr(AvgData(timeHeatMax),2))
-				//      totalColumn(rFeneSolr) = totalColumn(rFeneSolr) + AvgData(timeHeatMax)
-				//      grandTotalRow(cSensInst) = grandTotalRow(cSensInst) + AvgData(timeHeatMax)
-
-				seqData = feneSolarDelaySeqHeat( _ ) * powerConversion;
-				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeHeatMax ), 2 );
-				totalColumn( rFeneSolr ) += AvgData( timeHeatMax );
-				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				//seqData = feneSolarDelaySeqHeat( _ ) * powerConversion;
+				//MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				//tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				//totalColumn( rFeneSolr ) += AvgData( timeHeatMax );
+				//grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+				SetTableBodyCellToMovingAvgAtMaxTime( cSensDelay, rFeneSolr, feneSolarDelaySeqHeat( _ ), powerConversion, NumOfTimeStepInDay, timeHeatMax );
 
 				//opaque surfaces - must combine individual surfaces by class and other side conditions
 				delayOpaque = 0.0;
@@ -12601,6 +12668,15 @@ namespace OutputReportTabular {
 			totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
 			grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
 
+			// move number array into string array
+			for ( int c = 1; c <= cLatent; ++c ) {
+				for ( int r = 1; r <= rOpqDoor; ++r ) { //to last row before total
+					if ( tableBodyCellUsed( c, r ) ) {
+						tableBody( c, r ) = RealToStr( tableBodyNums( c, r ), 2 );
+					}
+				}
+			}
+
 			//GRAND TOTAL ROW
 			totalGrandTotal = 0.0;
 			for ( int k = 1; k <= cLatent; ++k ) {
@@ -12616,6 +12692,8 @@ namespace OutputReportTabular {
 					tableBody( cPerc, k ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
 				}
 			}
+
+
 
 			WriteSubtitle( "Estimated Heating Peak Load Components" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
@@ -12793,6 +12871,32 @@ namespace OutputReportTabular {
 		surfDelaySeqCool.deallocate();
 
 	} // WriteZoneLoadComponentTable()
+
+	// Used to construct the tabular output for a single cell in the component load summary reports
+	void
+	SetTableBodyCellToMovingAvgAtMaxTime( 
+		int const & columnNum,
+		int const & rowNum,
+		Array1S< Real64 > const & dataSeq,
+		Real64 const & conversionMult,
+		int const & numTimeSteps,
+		int const & maxTimeStep
+	)
+	{
+		using General::MovingAvg;
+		using DataSizing::NumTimeStepsInAvg;
+		Array1D< Real64 > AvgData; // sequence data after averaging
+		Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
+		seqData = dataSeq * conversionMult;
+		MovingAvg( seqData, numTimeSteps, NumTimeStepsInAvg, AvgData );
+		tableBodyNums( columnNum, rowNum ) = AvgData( maxTimeStep );
+		tableBodyCellUsed( columnNum, rowNum ) = true;
+		totalColumn( rowNum ) += AvgData( maxTimeStep );
+		grandTotalRow( columnNum ) += AvgData( maxTimeStep );
+	}
+
+	Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
+	Array1D< Real64 > AvgData; // sequence data after averaging
 
 	void
 	WriteReportHeaders(

@@ -285,6 +285,10 @@ namespace OutputReportTabular {
 	extern int DesignDayCount;
 
 	//arrays related to pulse and load component reporting
+	extern Array2D< Real64 > tableBodyNums;
+	extern Array2D_bool tableBodyCellUsed;
+	extern Array1D< Real64 > totalColumn;
+	extern Array1D< Real64 > grandTotalRow;
 	extern Array2D< Real64 > radiantPulseUsed;
 	extern Array2D_int radiantPulseTimestep;
 	extern Array2D< Real64 > radiantPulseReceived;
@@ -773,7 +777,7 @@ namespace OutputReportTabular {
 	
 	void
 	AddTOCZoneLoadComponentTable();
-
+ 
 	void
 	AllocateLoadComponentArrays();
 
@@ -790,10 +794,18 @@ namespace OutputReportTabular {
 	GatherComponentLoadsHVAC();
 
 	void
-	ComputeDelayedComponents();
-
-	void
 	WriteZoneLoadComponentTable();
+
+	// Used to construct the tabular output in a single cell for component load summary reports
+	void
+	SetTableBodyCellToMovingAvgAtMaxTime(
+		int const & columnNum,
+		int const & rowNum,
+		Array1S< Real64 > const & dataSeq,
+		Real64 const & conversionMult,
+		int const & numTimeSteps,
+		int const & maxTimeStep
+	);
 
 	void
 	WriteReportHeaders(
