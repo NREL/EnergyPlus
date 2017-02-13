@@ -230,58 +230,7 @@ namespace DataAirflowNetwork {
 			InitType( "ZeroNodePressures" ),
 			TExtHeightDep( false )
 		{}
-
-		// Member Constructor
-		AirflowNetworkSimuProp(
-			std::string const & AirflowNetworkSimuName, // Provide a unique object name
-			std::string const & Control, // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
-			std::string const & WPCCntr, // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-			int const iWPCCntr, // Integer equivalent for WPCCntr field
-			std::string const & CpArrayName, // CP Array name at WPCCntr = "INPUT"
-			std::string const & BldgType, // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-			std::string const & HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-			int const MaxIteration, // Maximum number of iteration, defualt 500
-			int const InitFlag, // Initialization flag
-			Real64 const RelTol, // Relative airflow convergence
-			Real64 const AbsTol, // Absolute airflow convergence
-			Real64 const ConvLimit, // Convergence acceleration limit
-			Real64 const MaxPressure, // Maximum pressure change in an element [Pa]
-			Real64 const Azimuth, // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
-			Real64 const AspectRatio, // Ratio of Building Width Along Short Axis to Width Along Long Axis
-			int const NWind, // Number of wind directions
-			Real64 const DiffP, // Minimum pressure difference
-			int const ExtLargeOpeningErrCount, // Exterior large opening error count during HVAC system operation
-			int const ExtLargeOpeningErrIndex, // Exterior large opening error index during HVAC system operation
-			int const OpenFactorErrCount, // Large opening error count at Open factor > 1.0
-			int const OpenFactorErrIndex, // Large opening error error index at Open factor > 1.0
-			std::string const & InitType, // Initialization flag type:
-			bool const TExtHeightDep // Choice of height dependence of external node temperature
-		) :
-			AirflowNetworkSimuName( AirflowNetworkSimuName ),
-			Control( Control ),
-			WPCCntr( WPCCntr ),
-			iWPCCntr( iWPCCntr ),
-			CpArrayName( CpArrayName ),
-			BldgType( BldgType ),
-			HeightOption( HeightOption ),
-			MaxIteration( MaxIteration ),
-			InitFlag( InitFlag ),
-			RelTol( RelTol ),
-			AbsTol( AbsTol ),
-			ConvLimit( ConvLimit ),
-			MaxPressure( MaxPressure ),
-			Azimuth( Azimuth ),
-			AspectRatio( AspectRatio ),
-			NWind( NWind ),
-			DiffP( DiffP ),
-			ExtLargeOpeningErrCount( ExtLargeOpeningErrCount ),
-			ExtLargeOpeningErrIndex( ExtLargeOpeningErrIndex ),
-			OpenFactorErrCount( OpenFactorErrCount ),
-			OpenFactorErrIndex( OpenFactorErrIndex ),
-			InitType( InitType ),
-			TExtHeightDep( TExtHeightDep )
-		{}
-
+		
 	};
 
 	struct MultizoneZoneProp // Zone information

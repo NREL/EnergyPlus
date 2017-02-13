@@ -1769,10 +1769,9 @@
     Air Loop Inlet Node;     !- Return Air Stream Node Name
 
   AirflowNetwork:SimulationControl,
-    AriflowNetwork_All,      !- Name
+    AirflowNetwork_All,      !- Name
     MultizoneWithDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
-    Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
