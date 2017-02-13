@@ -131,19 +131,19 @@ This object gives the user considerable flexibility in determining how the night
 
 \subsubsection{Inputs}\label{inputs-3-037}
 
-\textbf{\emph{Field: Name}}
+\paragraph{Field: Name}\label{field-name-2-030}
 
 A unique, user-assigned name for an instance of a night cycle availability manager. Other objects that use this availability manager will reference it by this name.
 
-\textbf{\emph{Field: Applicability Schedule Name}}
+\paragraph{Field: Applicability Schedule Name}\label{field-applicability-schedule-name}
 
 The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time period this availability manager is to be applied. Schedule values greater than zero (usually 1 is used) indicate the availability manager is to be applied. Schedule values less than or equal to zero (usually 0 is used) denote that the availability manager is not used for this time period.
 
-\textbf{\emph{Field: Fan Schedule Name}}
+\paragraph{Field: Fan Schedule Name}\label{field-fan-schedule-name}
 
 The name of the central fan on/off schedule for the air system that this availability manager will affect.
 
-\textbf{\emph{Field: Control Type}}
+\paragraph{Field: Control Type}\label{field-control-type}
 
 The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly}, \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyCoolingZone}, \emph{CycleOnAnyHeatingZone}, or \emph{CycleOnAnyHeatingZoneFansOnly}. The default is \emph{StayOff}.
 
@@ -159,27 +159,27 @@ The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZ
 \item  \emph{CycleOnAnyHeatingZoneFansOnly} means that the zone fans will be enabled if any zone listed in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint. The central fan is never activated with this control type.
 \end{itemize}
 
-\textbf{\emph{Field: Thermostat Tolerance}}
+\paragraph{Field: Thermostat Tolerance}\label{field-thermostat-tolerance}
 
 The Thermostat Tolerance defines the amount by which the zone temperature must fall outside the current zone heating and cooling setpoints for the Night Cycle manager to turn the system on. The zone temperature must exceed the cooling set point or fall below the heating set point by 1/2 the Thermostat Tolerance in order for the availability manager to signal that the system should turn on. The Thermostat Tolerance is specified in degrees Celsius. The default is 1 degree C.
 
-\textbf{\emph{Field: Cycling Run Time}}
+\paragraph{Field: Cycling Run Time}\label{field-cycling-run-time}
 
 The time in seconds for which the system will run after it has cycled on. The default is 3600 seconds (1 hour).
 
-\textbf{\emph{Field: Control Zone or Zone List Name}}
+\paragraph{Field: Control Zone or Zone List Name}\label{field-control-zone-or-zone-list-name}
 
 For the option \emph{CycleOnControlZone} this is the name of the control zone or zone list. These zones will activate the central fan for heating or cooling.
 
-\textbf{\emph{Field: Cooling Control Zone or Zone List Name}}
+\paragraph{Field: Cooling Control Zone or Zone List Name}\label{field-cooling-control-zone-or-zone-list-name}
 
 For the options \emph{CycleOnAnyCoolingOrHeatingZone} and  \emph{CycleOnAnyCoolingZone}  this is the name of the cooling control zone or zone list. These zones will activate the central fan for cooling.
 
-\textbf{\emph{Field: Heating Control Zone or Zone List Name}}
+\paragraph{Field: Heating Control Zone or Zone List Name}\label{field-heating-control-zone-or-zone-list-name}
 
 For the options \emph{CycleOnAnyCoolingOrHeatingZone} and  \emph{CycleOnAnyHeatingZone}  this is the name of the heating control zone or zone list. These zones will activate the central fan for heating.
 
-\textbf{\emph{Field: Heating Zone Fans Only Zone or Zone List Name}}
+\paragraph{Field: Heating Zone Fans Only or Zone List Name}\label{field-heating-zone-fans-only-or-zone-list-name}
 
 For the options \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyHeatingZone}, and \emph{CycleOnAnyHeatingZoneFansOnly},  this is the name of the heating zone fans control zone or zone list. These zones will activate the zone fans for heating.
 

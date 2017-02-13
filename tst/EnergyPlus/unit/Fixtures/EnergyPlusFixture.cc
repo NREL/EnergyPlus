@@ -215,11 +215,13 @@ namespace EnergyPlus {
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
+		DataGlobals::eio_stream = this->eio_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
@@ -442,6 +444,14 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::compare_eio_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->eio_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if ( reset_stream ) this->eio_stream->str( std::string() );
+		return are_equal;
+	}
+
 	bool EnergyPlusFixture::compare_mtr_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->mtr_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -486,6 +496,13 @@ namespace EnergyPlus {
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
 		if ( reset_stream ) this->eso_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_eio_output( bool reset_stream )
+	{
+		auto const has_output = this->eio_stream->str().size() > 0;
+		if ( reset_stream ) this->eio_stream->str( std::string() );
 		return has_output;
 	}
 
@@ -574,6 +591,7 @@ namespace EnergyPlus {
 		if ( errors_found ) {
 			if ( use_assertions ) {
 				compare_eso_stream( "" );
+				compare_eio_stream( "" );
 				compare_mtr_stream( "" );
 				compare_echo_stream( "" );
 				compare_err_stream( "" );
@@ -700,6 +718,7 @@ namespace EnergyPlus {
 
 		if ( use_assertions ) {
 			compare_eso_stream( "" );
+			compare_eio_stream( "" );
 			compare_mtr_stream( "" );
 			compare_echo_stream( "" );
 			compare_err_stream( "" );

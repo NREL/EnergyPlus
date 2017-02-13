@@ -1856,6 +1856,7 @@ namespace ChillerReformulatedEIR {
 		//       MODIFIED
 		//			Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type
 		//			Jun. 2016, Rongpeng Zhang, applied the chiller supply water temperature sensor fault model
+		//			Nov. 2016, Rongpeng Zhang, added fouling chiller fault
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Simulate a vapor compression chiller using the reformulated model developed by Mark Hydeman
@@ -1868,6 +1869,9 @@ namespace ChillerReformulatedEIR {
 		//    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::TimeStepSys;
 		using General::RoundSigDigits;
@@ -1885,6 +1889,7 @@ namespace ChillerReformulatedEIR {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -2028,6 +2033,21 @@ namespace ChillerReformulatedEIR {
 		TempLowLimitEout = ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
 		PartLoadCurveType = ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType; //zrp_Aug2014
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerRefCap;
+			Real64 ReferenceCOP_ff = ReferenceCOP;
+		
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerRefCap = NomCap_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			ReferenceCOP = ReferenceCOP_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			
+		}
 
 		// Set mass flow rates
 
