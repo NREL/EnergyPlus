@@ -287,7 +287,8 @@ namespace DataSizing {
 	extern int DataDesicDehumNum; // index to desiccant dehumidifier
 	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
 	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
-
+	extern Real64 DataWaterCoilSizCoolDeltaT; // used for sizing cooling coil water design flow rate
+	extern Real64 DataWaterCoilSizHeatDeltaT; // used for sizing heating coil water design flow rate
 	// Types
 
 	struct ZoneSizingInputData
