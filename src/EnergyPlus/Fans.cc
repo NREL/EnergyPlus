@@ -1694,7 +1694,7 @@ namespace Fans {
 
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( ! Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
 
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
 

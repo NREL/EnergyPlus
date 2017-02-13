@@ -1940,9 +1940,11 @@ namespace OutputReportTabular {
 					WriteTabularFiles = true;
 					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "EIO" ) ) {
+					WriteTabularFiles = true;
 					displayEioSummary = true;
 					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
+					WriteTabularFiles = true;
 					displayEioSummary = true;
 					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
@@ -15001,12 +15003,12 @@ Label900: ;
 			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
 			noBrackets = false;
-		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
-			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
-			modeInString = misParen;
 		} else if ((posLBrce != std::string::npos) && (posRBrce != std::string::npos) && (posRBrce - posLBrce >= 1)) {
 			unitSIOnly = stringInUpper.substr(posLBrce + 1, posRBrce - posLBrce - 1);
 			modeInString = misBrce;
+		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
+			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
+			modeInString = misParen;
 		} else {
 			unitSIOnly = stringInUpper;
 			modeInString = misNoHint;

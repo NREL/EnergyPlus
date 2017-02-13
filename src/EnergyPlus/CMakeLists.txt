@@ -131,8 +131,6 @@ SET( SRC
   DataPhotovoltaics.hh
   DataPlant.cc
   DataPlant.hh
-  DataPlantPipingSystems.cc
-  DataPlantPipingSystems.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
