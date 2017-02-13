@@ -3808,11 +3808,11 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
-		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
-		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
-		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3u, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4u, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1u, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
 		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
@@ -3844,7 +3844,7 @@ namespace EnergyPlus {
 		// Make sure the reference velocity comes out right
 		EXPECT_DOUBLE_EQ( 10.0, DataEnvironment::WindSpeedAt( MultizoneExternalNodeData( 1 ).height) );
 
-		EXPECT_EQ( 5, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
+		EXPECT_EQ( 5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
 
 		// Run the balance routine, for now only to get the pressure set at the external nodes
 		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
@@ -4477,11 +4477,11 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
-		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
-		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
-		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3u, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4u, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1u, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
 		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
@@ -4513,7 +4513,7 @@ namespace EnergyPlus {
 		// Make sure the reference velocity comes out right
 		EXPECT_DOUBLE_EQ( 10.0, DataEnvironment::WindSpeedAt(MultizoneExternalNodeData( 1 ).height) );
 
-		EXPECT_EQ( 5, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
+		EXPECT_EQ( 5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
 
 		// Run the balance routine, for now only to get the pressure set at the external nodes
 		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
@@ -5109,11 +5109,11 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( 0.592, CurveManager::CurveValue( 1, 0 ) ); // In-range value
 
 		// Check the airflow elements
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
-		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
-		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
-		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3u, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4u, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1u, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
 		EXPECT_EQ( 180.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_FALSE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
@@ -5148,7 +5148,7 @@ namespace EnergyPlus {
 		// Make sure the reference velocity comes out right
 		EXPECT_DOUBLE_EQ( 10.0, DataEnvironment::WindSpeedAt( MultizoneExternalNodeData( 1 ).height ) );
 
-		EXPECT_EQ( 5, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
+		EXPECT_EQ( 5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
 
 		// Run the balance routine, for now only to get the pressure set at the external nodes
 		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
@@ -5752,11 +5752,11 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
-		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
-		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
-		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3u, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4u, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1u, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
 		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
@@ -5788,7 +5788,7 @@ namespace EnergyPlus {
 		// Make sure the reference velocity comes out right
 		EXPECT_DOUBLE_EQ( 10.0, DataEnvironment::WindSpeedAt(MultizoneExternalNodeData( 1 ).height) );
 
-		EXPECT_EQ( 5, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
+		EXPECT_EQ( 5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
 
 		// Run the balance routine, for now only to get the pressure set at the external nodes
 		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
@@ -6383,11 +6383,11 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check the airflow elements
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneExternalNodeData.size() );
-		EXPECT_EQ( 3, DataAirflowNetwork::MultizoneZoneData.size() );
-		EXPECT_EQ( 4, DataAirflowNetwork::MultizoneSurfaceData.size() );
-		EXPECT_EQ( 1, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
-		EXPECT_EQ( 2, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneExternalNodeData.size() );
+		EXPECT_EQ( 3u, DataAirflowNetwork::MultizoneZoneData.size() );
+		EXPECT_EQ( 4u, DataAirflowNetwork::MultizoneSurfaceData.size() );
+		EXPECT_EQ( 1u, DataAirflowNetwork::MultizoneSurfaceCrackData.size() );
+		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size() );
 
 		EXPECT_EQ( 0.0, DataAirflowNetwork::MultizoneExternalNodeData( 1 ).azimuth );
 		EXPECT_TRUE( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).symmetricCurve );
@@ -6428,7 +6428,7 @@ namespace EnergyPlus {
 		// Make sure the reference velocity comes out right
 		EXPECT_DOUBLE_EQ( 10.0, DataEnvironment::WindSpeedAt(MultizoneExternalNodeData( 1 ).height) );
 
-		EXPECT_EQ( 5, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
+		EXPECT_EQ( 5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
 
 		// Run the balance routine, for now only to get the pressure set at the external nodes
 		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
