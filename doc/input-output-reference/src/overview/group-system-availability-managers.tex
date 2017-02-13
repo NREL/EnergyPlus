@@ -555,10 +555,14 @@ The name of a schedule defined elsewhere in the input file. This schedule determ
   The control is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields: Minimum Outdoor Enthalpy and Maximum Outdoor Enthalpy.
   \item
   3 = Dewpoint control for either dehumidification or humidification
+
+  The control is restricted between minimum and maximum outdoor dew point temperatures given in two additional input fields: Minimum Outdoor Dewpoint and Maximum Outdoor Dewpoint.
   \item
   4 = Outdoor ventilation air control
   
   The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects.
+  
+  If the zone air change per hour (ACH) level is above the outdoor air setpoint, specified in the Minimum Outdoor Ventilation Air Schedule Name field, the natural ventilation is on and the HVAC system is shut off. Otherwise, the natural ventilation is shut off (i.e., the window or door openings are closed) and the HVAC system may operate if needed.
   \item
   5 = Operative temperature control using adaptive comfort 80\% acceptability limits
   
