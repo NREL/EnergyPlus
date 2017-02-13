@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -78,6 +66,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -121,7 +110,6 @@ namespace PlantChillers {
 	using namespace DataLoopNode;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -133,8 +121,6 @@ namespace PlantChillers {
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Chillers
 	int const AirCooled( 1 );
 	int const WaterCooled( 2 );
@@ -2088,9 +2074,6 @@ namespace PlantChillers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -2109,19 +2092,9 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitElectricChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -2237,7 +2210,7 @@ namespace PlantChillers {
 
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			ElectricChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
 			InitComponentNodes( 0.0, ElectricChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, ElectricChiller( ChillNum ).Base.CWLoopNum, ElectricChiller( ChillNum ).Base.CWLoopSideNum, ElectricChiller( ChillNum ).Base.CWBranchNum, ElectricChiller( ChillNum ).Base.CWCompNum );
@@ -2247,7 +2220,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = ElectricChiller( ChillNum ).TempDesCondIn; //DSU? old behavior, still want?
 
-				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				ElectricChiller( ChillNum ).Base.CondMassFlowRateMax = rho * ElectricChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -2269,7 +2242,7 @@ namespace PlantChillers {
 			}
 
 			if ( ElectricChiller( ChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				ElectricChiller( ChillNum ).DesignHeatRecMassFlowRate = rho * ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, ElectricChiller( ChillNum ).DesignHeatRecMassFlowRate, ElectricChiller( ChillNum ).HeatRecInletNodeNum, ElectricChiller( ChillNum ).HeatRecOutletNodeNum, ElectricChiller( ChillNum ).HRLoopNum, ElectricChiller( ChillNum ).HRLoopSideNum, ElectricChiller( ChillNum ).HRBranchNum, ElectricChiller( ChillNum ).HRCompNum );
@@ -2388,9 +2361,6 @@ namespace PlantChillers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -2408,17 +2378,8 @@ namespace PlantChillers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitEngineDrivenChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -2441,8 +2402,6 @@ namespace PlantChillers {
 		int BranchIndex;
 		int CompIndex;
 		bool FatalError;
-
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -2532,7 +2491,7 @@ namespace PlantChillers {
 		//     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			EngineDrivenChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRate;
 			InitComponentNodes( 0.0, EngineDrivenChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, EngineDrivenChiller( ChillNum ).Base.CWLoopNum, EngineDrivenChiller( ChillNum ).Base.CWLoopSideNum, EngineDrivenChiller( ChillNum ).Base.CWBranchNum, EngineDrivenChiller( ChillNum ).Base.CWCompNum );
@@ -2543,7 +2502,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = EngineDrivenChiller( ChillNum ).TempDesCondIn;
 
-				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				EngineDrivenChiller( ChillNum ).Base.CondMassFlowRateMax = rho * EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -2562,7 +2521,7 @@ namespace PlantChillers {
 			}
 
 			if ( EngineDrivenChiller( ChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				EngineDrivenChiller( ChillNum ).DesignHeatRecMassFlowRate = rho * EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, EngineDrivenChiller( ChillNum ).DesignHeatRecMassFlowRate, EngineDrivenChiller( ChillNum ).HeatRecInletNodeNum, EngineDrivenChiller( ChillNum ).HeatRecOutletNodeNum, EngineDrivenChiller( ChillNum ).HRLoopNum, EngineDrivenChiller( ChillNum ).HRLoopSideNum, EngineDrivenChiller( ChillNum ).HRBranchNum, EngineDrivenChiller( ChillNum ).HRCompNum );
@@ -2659,17 +2618,8 @@ namespace PlantChillers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitGTChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -2778,7 +2728,7 @@ namespace PlantChillers {
 
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			GTChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * GTChiller( ChillNum ).Base.EvapVolFlowRate;
 			InitComponentNodes( 0.0, GTChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, GTChiller( ChillNum ).Base.CWLoopNum, GTChiller( ChillNum ).Base.CWLoopSideNum, GTChiller( ChillNum ).Base.CWBranchNum, GTChiller( ChillNum ).Base.CWCompNum );
@@ -2788,7 +2738,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = GTChiller( ChillNum ).TempDesCondIn;
 
-				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				GTChiller( ChillNum ).Base.CondMassFlowRateMax = rho * GTChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -2807,7 +2757,7 @@ namespace PlantChillers {
 			}
 
 			if ( GTChiller( ChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				GTChiller( ChillNum ).DesignHeatRecMassFlowRate = rho * GTChiller( ChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, GTChiller( ChillNum ).DesignHeatRecMassFlowRate, GTChiller( ChillNum ).HeatRecInletNodeNum, GTChiller( ChillNum ).HeatRecOutletNodeNum, GTChiller( ChillNum ).HRLoopNum, GTChiller( ChillNum ).HRLoopSideNum, GTChiller( ChillNum ).HRBranchNum, GTChiller( ChillNum ).HRCompNum );
@@ -2904,20 +2854,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitConstCOPChiller" );
 		Real64 const TempDesCondIn( 25.0 ); // Design condenser inlet temp. C
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeFlag( true );
@@ -3005,7 +2945,7 @@ namespace PlantChillers {
 		//Initialize critical Demand Side Variables at the beginning of each environment
 		if ( MyEnvironFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 			ConstCOPChiller( ChillNum ).Base.EvapMassFlowRateMax = ConstCOPChiller( ChillNum ).Base.EvapVolFlowRate * rho;
 			InitComponentNodes( 0.0, ConstCOPChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, ConstCOPChiller( ChillNum ).Base.CWLoopNum, ConstCOPChiller( ChillNum ).Base.CWLoopSideNum, ConstCOPChiller( ChillNum ).Base.CWBranchNum, ConstCOPChiller( ChillNum ).Base.CWCompNum );
 
@@ -3014,7 +2954,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = TempDesCondIn;
 
-				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				ConstCOPChiller( ChillNum ).Base.CondMassFlowRateMax = rho * ConstCOPChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -3098,20 +3038,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeElectricChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
 		bool ErrorsFound( false ); // If errors detected in input
@@ -3140,8 +3070,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
 				if ( ! ElectricChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
 			} else {
@@ -3389,20 +3319,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeEngineDrivenChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
@@ -3434,8 +3354,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * EngineDrivenChiller( ChillNum ).Base.SizFac;
 				if ( ! EngineDrivenChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = EngineDrivenChiller( ChillNum ).Base.NomCap;
 
@@ -3654,20 +3574,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeGTChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
@@ -3707,8 +3617,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * GTChiller( ChillNum ).Base.SizFac;
 				if ( ! GTChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = GTChiller( ChillNum ).Base.NomCap;
 				//IF (PlantFirstSizesOkayToFinalize)  GTChiller(ChillNum)%Base%NomCap = tmpNomCap
@@ -3950,20 +3860,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeConstCOPChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
@@ -3998,8 +3898,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * ConstCOPChiller( ChillNum ).Base.SizFac;
 				if ( ! ConstCOPChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = ConstCOPChiller( ChillNum ).Base.NomCap;
 			} else {
@@ -4184,7 +4084,9 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher / Brandon Anderson
 		//       DATE WRITTEN   Sept. 2000
-		//       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4200,8 +4102,11 @@ namespace PlantChillers {
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using General::RoundSigDigits;
@@ -4216,6 +4121,8 @@ namespace PlantChillers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -4380,6 +4287,21 @@ namespace PlantChillers {
 		LoopNum = ElectricChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ElectricChiller( ChillNum ).Base.CWLoopSideNum;
 
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			Real64 RatedCOP_ff = RatedCOP;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			RatedCOP = RatedCOP_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
+		
 		// initialize outlet air humidity ratio of air or evap cooled chillers
 		CondOutletHumRat = Node( CondInletNode ).HumRat;
 
@@ -4424,6 +4346,19 @@ namespace PlantChillers {
 			AvgCondSinkTemp = CondInletTemp;
 		}
 
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( ElectricChiller( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset ));
+			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
+		
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
 
@@ -4539,6 +4474,19 @@ namespace PlantChillers {
 
 			} //End of Constant Variable Flow If Block
 
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( ElectricChiller( ChillNum ).Base.FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				// ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -4613,6 +4561,16 @@ namespace PlantChillers {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 			// Checks QEvaporator on the basis of the machine limits.
@@ -4731,7 +4689,9 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher / Brandon Anderson
 		//       DATE WRITTEN   Sept. 2000
-		//       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4746,8 +4706,11 @@ namespace PlantChillers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using CurveManager::CurveValue;
@@ -4763,6 +4726,8 @@ namespace PlantChillers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -4986,8 +4951,36 @@ namespace PlantChillers {
 		LoopNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopSideNum;
 		EvapMassFlowRateMax = EngineDrivenChiller( ChillerNum ).Base.EvapMassFlowRateMax;
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			Real64 COP_ff = COP;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			COP = COP_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
 
 		//*********************************
+
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( EngineDrivenChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
+			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
@@ -5081,6 +5074,20 @@ namespace PlantChillers {
 
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( EngineDrivenChiller( ChillerNum ).Base.FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				// ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+			
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5157,6 +5164,16 @@ namespace PlantChillers {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 			// Checks QEvaporator on the basis of the machine limits.
@@ -5333,7 +5350,9 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher / Brandon Anderson
 		//       DATE WRITTEN   Sept. 2000
-		//       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -5348,8 +5367,11 @@ namespace PlantChillers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using General::RoundSigDigits;
@@ -5365,6 +5387,8 @@ namespace PlantChillers {
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -5579,8 +5603,36 @@ namespace PlantChillers {
 		EvapMassFlowRateMax = GTChiller( ChillerNum ).Base.EvapMassFlowRateMax;
 		LoopNum = GTChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = GTChiller( ChillerNum ).Base.CWLoopSideNum;
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			Real64 COP_ff = COP;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;			
+			COP = COP_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
+			
+		}
 
 		//*********************************
+
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( GTChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
+			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
@@ -5672,6 +5724,20 @@ namespace PlantChillers {
 
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( GTChiller( ChillerNum ).Base.FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				// ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+			
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5742,6 +5808,16 @@ namespace PlantChillers {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 			// Checks QEvaporator on the basis of the machine limits.
@@ -6010,8 +6086,10 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       Richard Liesen Nov-Dec 2001; Jan 2002,
-		//                      Chandan Sharma, FSEC, February 2010, Added basin heater
+		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen 
+		//                      Feb. 2010, Chandan Sharma, FSEC. Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -6021,8 +6099,11 @@ namespace PlantChillers {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::SecInHour;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using General::RoundSigDigits;
@@ -6037,6 +6118,8 @@ namespace PlantChillers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -6067,14 +6150,33 @@ namespace PlantChillers {
 		Real64 CurrentEndTime; // end time of time step for current simulation time step
 		static Real64 CurrentEndTimeLast( 0.0 ); // end time of time step for last simulation time step
 		static std::string OutputChar; // character string for warning messages
+		Real64 COP; // coefficient of performance
 		Real64 Cp; // local for fluid specif heat, for evaporator
 		Real64 CpCond; // local for fluid specif heat, for condenser
+		Real64 ChillerNomCap; // chiller nominal capacity
 
+		ChillerNomCap = ConstCOPChiller( ChillNum ).Base.NomCap;
 		EvapInletNode = ConstCOPChiller( ChillNum ).Base.EvapInletNodeNum;
 		EvapOutletNode = ConstCOPChiller( ChillNum ).Base.EvapOutletNodeNum;
 		CondInletNode = ConstCOPChiller( ChillNum ).Base.CondInletNodeNum;
 		CondOutletNode = ConstCOPChiller( ChillNum ).Base.CondOutletNodeNum;
+		COP = ConstCOPChiller( ChillNum ).Base.COP;
 
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerNomCap;
+			Real64 COP_ff = COP;
+			
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor; 
+			
+		}
+		
 		//set module level chiller inlet and temperature variables
 		LoopNum = ConstCOPChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ConstCOPChiller( ChillNum ).Base.CWLoopSideNum;
@@ -6092,6 +6194,20 @@ namespace PlantChillers {
 				TempEvapOutSetPoint = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 			}
 		}}
+
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
+			
+			//calculate the sensor offset using fault information
+			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOutSetPoint
+			TempEvapOutSetPoint = min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset );
+			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOutSetPoint;
+			
+		}
+		
 		EvapDeltaTemp = std::abs( Node( EvapInletNode ).Temp - TempEvapOutSetPoint );
 		EvapInletTemp = Node( EvapInletNode ).Temp;
 
@@ -6207,7 +6323,7 @@ namespace PlantChillers {
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 0 ) {
 			ConstCOPChiller( ChillNum ).Base.PossibleSubcooling = false;
 			QEvaporator = std::abs( MyLoad );
-			Power = std::abs( MyLoad ) / ConstCOPChiller( ChillNum ).Base.COP;
+			Power = std::abs( MyLoad ) / COP;
 
 			// Either set the flow to the Constant value or caluclate the flow for the variable volume
 			if ( ( ConstCOPChiller( ChillNum ).Base.FlowMode == ConstantFlow ) || ( ConstCOPChiller( ChillNum ).Base.FlowMode == NotModulated ) ) {
@@ -6258,6 +6374,20 @@ namespace PlantChillers {
 
 				}
 			} //End of Constant or Variable Flow If Block for FlowLock = 0 (or making a flow request)
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( ConstCOPChiller( ChillNum ).Base.FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				//PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				//PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				// ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -6312,11 +6442,21 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
 
 			// Checks QEvaporator on the basis of the machine limits.
-			if ( QEvaporator > ConstCOPChiller( ChillNum ).Base.NomCap ) {
+			if ( QEvaporator > ChillerNomCap ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
-					QEvaporator = ConstCOPChiller( ChillNum ).Base.NomCap;
+					QEvaporator = ChillerNomCap;
 					EvapDeltaTemp = QEvaporator / EvapMassFlowRate / Cp;
 					EvapOutletTemp = Node( EvapInletNode ).Temp - EvapDeltaTemp;
 				} else {
@@ -6325,7 +6465,7 @@ namespace PlantChillers {
 				}
 			}
 			//Calculate the Power consumption of the Const COP chiller which is a simplified calculation
-			Power = QEvaporator / ConstCOPChiller( ChillNum ).Base.COP;
+			Power = QEvaporator / COP;
 			if ( EvapMassFlowRate == 0.0 ) {
 				QEvaporator = 0.0;
 				EvapOutletTemp = Node( EvapInletNode ).Temp;

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::Dehumidifier:Desiccant:System Unit Tests
 
@@ -2165,28 +2153,23 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    VAV Sys 1 Main Branch,   !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    OA Sys 1,                !- Component 1 Name",
 			"    VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name",
 			"    Mixed Air Node 1,        !- Component 1 Outlet Node Name",
-			"    PASSIVE,                 !- Component 1 Branch Control Type",
 			"    CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 			"    DX Cooling Coil System 1,!- Component 2 Name",
 			"    Mixed Air Node 1,        !- Component 2 Inlet Node Name",
 			"    Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name",
-			"    PASSIVE,                 !- Component 2 Branch Control Type",
-			"    Coil:Heating:Gas,        !- Component 3 Object Type",
+			"    Coil:Heating:Fuel,        !- Component 3 Object Type",
 			"    Main Heating Coil 1,     !- Component 3 Name",
 			"    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name",
 			"    Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name",
-			"    PASSIVE,                 !- Component 3 Branch Control Type",
 			"    Fan:VariableVolume,      !- Component 4 Object Type",
 			"    Supply Fan 1,            !- Component 4 Name",
 			"    Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name",
-			"    VAV Sys 1 Outlet Node,   !- Component 4 Outlet Node Name",
-			"    ACTIVE;                  !- Component 4 Branch Control Type",
+			"    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
 
 			"  AirLoopHVAC,",
 			"    VAV Sys 1,               !- Name",
@@ -2406,7 +2389,7 @@ namespace EnergyPlus {
 			"    0.3,                     !- Constant Minimum Air Flow Fraction",
 			"    ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
 			"    ,                        !- Minimum Air Flow Fraction Schedule Name",
-			"    Coil:Heating:Gas,        !- Reheat Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Reheat Coil Object Type",
 			"    SPACE1-1 Zone Coil,      !- Reheat Coil Name",
 			"    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
@@ -2426,7 +2409,7 @@ namespace EnergyPlus {
 			"    0.3,                     !- Constant Minimum Air Flow Fraction",
 			"    ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
 			"    ,                        !- Minimum Air Flow Fraction Schedule Name",
-			"    Coil:Heating:Gas,        !- Reheat Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Reheat Coil Object Type",
 			"    SPACE2-1 Zone Coil,      !- Reheat Coil Name",
 			"    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
@@ -2446,7 +2429,7 @@ namespace EnergyPlus {
 			"    0.3,                     !- Constant Minimum Air Flow Fraction",
 			"    ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
 			"    ,                        !- Minimum Air Flow Fraction Schedule Name",
-			"    Coil:Heating:Gas,        !- Reheat Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Reheat Coil Object Type",
 			"    SPACE3-1 Zone Coil,      !- Reheat Coil Name",
 			"    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
@@ -2466,7 +2449,7 @@ namespace EnergyPlus {
 			"    0.3,                     !- Constant Minimum Air Flow Fraction",
 			"    ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
 			"    ,                        !- Minimum Air Flow Fraction Schedule Name",
-			"    Coil:Heating:Gas,        !- Reheat Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Reheat Coil Object Type",
 			"    SPACE4-1 Zone Coil,      !- Reheat Coil Name",
 			"    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
@@ -2579,41 +2562,46 @@ namespace EnergyPlus {
 			"    SPACE3-1 ATU In Node,    !- Outlet 3 Node Name",
 			"    SPACE4-1 ATU In Node;    !- Outlet 4 Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    SPACE1-1 Zone Coil,      !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
 			"    SPACE1-1 In Node;        !- Air Outlet Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    SPACE2-1 Zone Coil,      !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
 			"    SPACE2-1 In Node;        !- Air Outlet Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    SPACE3-1 Zone Coil,      !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
 			"    SPACE3-1 In Node;        !- Air Outlet Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    SPACE4-1 Zone Coil,      !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
 			"    SPACE4-1 In Node;        !- Air Outlet Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    Main heating Coil 1,     !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
@@ -2712,9 +2700,10 @@ namespace EnergyPlus {
 			"    OA HX Regen Outlet Node, !- Air Inlet Node Name",
 			"    OA Regen Fan Outlet Node;!- Air Outlet Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    OA Desiccant Regen Coil, !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.80,                    !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    OA Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name",
@@ -2729,7 +2718,7 @@ namespace EnergyPlus {
 			"    Fan:OnOff,               !- Regeneration Air Fan Object Type",
 			"    OA Desiccant Regen Fan,  !- Regeneration Air Fan Name",
 			"    DrawThrough,             !- Regeneration Air Fan Placement",
-			"    Coil:Heating:Gas,        !- Regeneration Air Heater Object Type",
+			"    Coil:Heating:Fuel,        !- Regeneration Air Heater Object Type",
 			"    OA Desiccant Regen Coil, !- Regeneration Air Heater Name",
 			"    46.111111;               !- Regeneration Inlet Air Setpoint Temperature {C}",
 
@@ -2748,8 +2737,6 @@ namespace EnergyPlus {
 
 			"  SetpointManager:SingleZone:Humidity:Maximum,",
 			"    SPACE1-1 Humidistat Manager,  !- Name",
-			"    ,                        !- Control Variable",
-			"    ,                        !- Schedule Name",
 			"    Mixed Air Node 1,        !- Setpoint Node or NodeList Name",
 			"    SPACE1-1 Node;           !- Control Zone Air Node Name",
 
@@ -3611,33 +3598,27 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Desiccant Air Loop Main Branch,  !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Desiccant DXSystem OA System,  !- Component 1 Name",
 			"    Desiccant DXSystem Air Loop Inlet Node,  !- Component 1 Inlet Node Name",
 			"    Desiccant DXSystem Mixed Air Node,  !- Component 1 Outlet Node Name",
-			"    PASSIVE,                 !- Component 1 Branch Control Type",
 			"    CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 			"    Desiccant DXSystem Cooling Coil Sys,  !- Component 2 Name",
 			"    Desiccant DXSystem Mixed Air Node,  !- Component 2 Inlet Node Name",
 			"    HX Process Inlet Node,   !- Component 2 Outlet Node Name",
-			"    PASSIVE,                 !- Component 2 Branch Control Type",
 			"    Dehumidifier:Desiccant:System,  !- Component 3 Object Type",
 			"    Desiccant 1,             !- Component 3 Name",
 			"    HX Process Inlet Node,   !- Component 3 Inlet Node Name",
 			"    HX Process Outlet Node,  !- Component 3 Outlet Node Name",
-			"    PASSIVE,                 !- Component 3 Branch Control Type",
 			"    Fan:ConstantVolume,      !- Component 4 Object Type",
 			"    Desiccant DXSystem Supply Fan,  !- Component 4 Name",
 			"    HX Process Outlet Node,  !- Component 4 Inlet Node Name",
 			"    Desiccant Supply Fan Outlet Node,  !- Component 4 Outlet Node Name",
-			"    ACTIVE,                  !- Component 4 Branch Control Type",
-			"    Coil:Heating:Gas,        !- Component 5 Object Type",
+			"    Coil:Heating:Fuel,        !- Component 5 Object Type",
 			"    Desiccant Process Heating Coil,  !- Component 5 Name",
 			"    Desiccant Supply Fan Outlet Node,  !- Component 5 Inlet Node Name",
-			"    Desiccant DXSystem Air Loop Outlet Node,  !- Component 5 Outlet Node Name",
-			"    PASSIVE;                 !- Component 5 Branch Control Type",
+			"    Desiccant DXSystem Air Loop Outlet Node;  !- Component 5 Outlet Node Name",
 
 			"  AirLoopHVAC,",
 			"    Desiccant DXSystem,      !- Name",
@@ -3727,8 +3708,6 @@ namespace EnergyPlus {
 
 			"  SetpointManager:SingleZone:Humidity:Maximum,",
 			"    Zone Max Humidity Manager,  !- Name",
-			"    ,                        !- Control Variable",
-			"    ,                        !- Schedule Name",
 			"    HX Process Outlet Node,  !- Setpoint Node or NodeList Name",
 			"    Main Zone Node;           !- Control Zone Air Node Name",
 
@@ -3854,18 +3833,20 @@ namespace EnergyPlus {
 			"    Desiccant DXSystem Return Air Mixer Outlet Node,  !- Outlet Node Name",
 			"    Main Zone Out Node;       !- Inlet 1 Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    Desiccant Process Heating Coil,  !- Name",
 			"    Constant,                !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name",
 			"    Desiccant DXSystem Air Loop Outlet Node,  !- Air Outlet Node Name",
 			"    Desiccant DXSystem Air Loop Outlet Node;  !- Temperature Setpoint Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    Desiccant Regen Coil,    !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    1,                       !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    Regen Coil Inlet Node,   !- Air Inlet Node Name",
@@ -3924,7 +3905,7 @@ namespace EnergyPlus {
 			"    Fan:ConstantVolume,      !- Regeneration Air Fan Object Type",
 			"    Desiccant Regen Fan,     !- Regeneration Air Fan Name",
 			"    DrawThrough,             !- Regeneration Air Fan Placement",
-			"    Coil:Heating:Gas,        !- Regeneration Air Heater Object Type",
+			"    Coil:Heating:Fuel,        !- Regeneration Air Heater Object Type",
 			"    Desiccant Regen Coil,    !- Regeneration Air Heater Name",
 			"    46.111111,               !- Regeneration Inlet Air Setpoint Temperature {C}",
 			"    Coil:Cooling:DX:SingleSpeed,  !- Companion Cooling Coil Object Type",
@@ -4786,33 +4767,27 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Desiccant Air Loop Main Branch,  !- Name",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Desiccant DXSystem OA System,  !- Component 1 Name",
 			"    Desiccant DXSystem Air Loop Inlet Node,  !- Component 1 Inlet Node Name",
 			"    Desiccant DXSystem Mixed Air Node,  !- Component 1 Outlet Node Name",
-			"    PASSIVE,                 !- Component 1 Branch Control Type",
 			"    CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 			"    Desiccant DXSystem Cooling Coil Sys,  !- Component 2 Name",
 			"    Desiccant DXSystem Mixed Air Node,  !- Component 2 Inlet Node Name",
 			"    HX Process Inlet Node,   !- Component 2 Outlet Node Name",
-			"    PASSIVE,                 !- Component 2 Branch Control Type",
 			"    Dehumidifier:Desiccant:System,  !- Component 3 Object Type",
 			"    Desiccant 1,             !- Component 3 Name",
 			"    HX Process Inlet Node,   !- Component 3 Inlet Node Name",
 			"    HX Process Outlet Node,  !- Component 3 Outlet Node Name",
-			"    PASSIVE,                 !- Component 3 Branch Control Type",
 			"    Fan:ConstantVolume,      !- Component 4 Object Type",
 			"    Desiccant DXSystem Supply Fan,  !- Component 4 Name",
 			"    HX Process Outlet Node,  !- Component 4 Inlet Node Name",
 			"    Desiccant Supply Fan Outlet Node,  !- Component 4 Outlet Node Name",
-			"    ACTIVE,                  !- Component 4 Branch Control Type",
-			"    Coil:Heating:Gas,        !- Component 5 Object Type",
+			"    Coil:Heating:Fuel,        !- Component 5 Object Type",
 			"    Desiccant Process Heating Coil,  !- Component 5 Name",
 			"    Desiccant Supply Fan Outlet Node,  !- Component 5 Inlet Node Name",
-			"    Desiccant DXSystem Air Loop Outlet Node,  !- Component 5 Outlet Node Name",
-			"    PASSIVE;                 !- Component 5 Branch Control Type",
+			"    Desiccant DXSystem Air Loop Outlet Node;  !- Component 5 Outlet Node Name",
 
 			"  AirLoopHVAC,",
 			"    Desiccant DXSystem,      !- Name",
@@ -4902,8 +4877,6 @@ namespace EnergyPlus {
 
 			"  SetpointManager:SingleZone:Humidity:Maximum,",
 			"    Zone Max Humidity Manager,  !- Name",
-			"    ,                        !- Control Variable",
-			"    ,                        !- Schedule Name",
 			"    HX Process Outlet Node,  !- Setpoint Node or NodeList Name",
 			"    Main Zone Node;           !- Control Zone Air Node Name",
 
@@ -5029,9 +5002,10 @@ namespace EnergyPlus {
 			"    Desiccant DXSystem Return Air Mixer Outlet Node,  !- Outlet Node Name",
 			"    Main Zone Out Node;       !- Inlet 1 Node Name",
 
-			"  Coil:Heating:Gas,",
+			"  Coil:Heating:Fuel,",
 			"    Desiccant Process Heating Coil,  !- Name",
 			"    Constant,                !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
 			"    0.8,                     !- Gas Burner Efficiency",
 			"    autosize,                !- Nominal Capacity {W}",
 			"    Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name",
@@ -5191,7 +5165,12 @@ namespace EnergyPlus {
 			"    HW Demand Outlet Node,   !- Demand Side Outlet Node Name",
 			"    Heating Demand Side Branches,  !- Demand Side Branch List Name",
 			"    Heating Demand Side Connectors,  !- Demand Side Connector List Name",
-			"    Optimal;                 !- Load Distribution Scheme",
+			"    Optimal,                 !- Load Distribution Scheme",
+			"    ,                        !- Availability Manager List Name",
+			"    ,                        !- Plant Loop Demand Calculation Scheme",
+			"    ,                        !- Common Pipe Simulation",
+			"    ,                        !- Pressure Simulation Type",
+			"    2.0;                     !- Loop Circulation Time {minutes}",
 
 			"  SetpointManager:Scheduled,",
 			"    Hot Water Loop Setpoint Manager,  !- Name",
@@ -5238,33 +5217,27 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Heating Supply Inlet Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pump:VariableSpeed,      !- Component 1 Object Type",
 			"    HW Circ Pump,            !- Component 1 Name",
 			"    HW Supply Inlet Node,    !- Component 1 Inlet Node Name",
-			"    HW Pump Outlet Node,     !- Component 1 Outlet Node Name",
-			"    ACTIVE;                  !- Component 1 Branch Control Type",
+			"    HW Pump Outlet Node;     !- Component 1 Outlet Node Name",
 
 			"  Branch,",
 			"    Heating Purchased Hot Water Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    DistrictHeating,         !- Component 1 Object Type",
 			"    Purchased Heating,       !- Component 1 Name",
 			"    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
-			"    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name",
-			"    ACTIVE;                  !- Component 1 Branch Control Type",
+			"    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
 
 			"  Branch,",
 			"    Heating Supply Bypass Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Heating Supply Side Bypass,  !- Component 1 Name",
 			"    Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-			"    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-			"    BYPASS;                  !- Component 1 Branch Control Type",
+			"    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 			"  Pipe:Adiabatic,",
 			"    Heating Supply Side Bypass,  !- Name",
@@ -5273,13 +5246,11 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Heating Supply Outlet Branch,  !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    Heating Supply Outlet,   !- Component 1 Name",
 			"    Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-			"    HW Supply Outlet Node,   !- Component 1 Outlet Node Name",
-			"    PASSIVE;                 !- Component 1 Branch Control Type",
+			"    HW Supply Outlet Node;   !- Component 1 Outlet Node Name",
 
 			"  Pipe:Adiabatic,",
 			"    Heating Supply Outlet,   !- Name",
@@ -5330,13 +5301,11 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    ZonesHWInletBranch,      !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    ZonesHWInletPipe,        !- Component 1 Name",
 			"    HW Demand Inlet Node,    !- Component 1 Inlet Node Name",
-			"    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-			"    PASSIVE;                 !- Component 1 Branch Control Type",
+			"    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 			"  Pipe:Adiabatic,",
 			"    ZonesHWInletPipe,        !- Name",
@@ -5345,13 +5314,11 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    ZonesHWOutletBranch,     !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    ZonesHWOutletPipe,       !- Component 1 Name",
 			"    HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-			"    HW Demand Outlet Node,   !- Component 1 Outlet Node Name",
-			"    PASSIVE;                 !- Component 1 Branch Control Type",
+			"    HW Demand Outlet Node;   !- Component 1 Outlet Node Name",
 
 			"  Pipe:Adiabatic,",
 			"    ZonesHWOutletPipe,       !- Name",
@@ -5360,13 +5327,11 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    RegenCoilHWBranch,       !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Coil:Heating:Water,      !- Component 1 Object Type",
 			"    Desiccant Regen Coil,    !- Component 1 Name",
 			"    RegenCoilHWInletNode,    !- Component 1 Inlet Node Name",
-			"    RegenCoilHWOutletNode,   !- Component 1 Outlet Node Name",
-			"    ACTIVE;                  !- Component 1 Branch Control Type",
+			"    RegenCoilHWOutletNode;   !- Component 1 Outlet Node Name",
 
 			"  Coil:Heating:Water,",
 			"    Desiccant Regen Coil,    !- Name",
@@ -5387,13 +5352,11 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    ZonesHWBypassBranch,     !- Name",
-			"    0,                       !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    ZonesHWBypassPipe,       !- Component 1 Name",
 			"    ZonesHWBypassInletNode,  !- Component 1 Inlet Node Name",
-			"    ZonesHWBypassOutletNode, !- Component 1 Outlet Node Name",
-			"    BYPASS;                  !- Component 1 Branch Control Type",
+			"    ZonesHWBypassOutletNode; !- Component 1 Outlet Node Name",
 
 			"  Pipe:Adiabatic,",
 			"    ZonesHWBypassPipe,       !- Name",
@@ -5454,7 +5417,7 @@ namespace EnergyPlus {
 		CompName = DesicDehum( DesicDehumNum ).Name;
 		CompIndex = NumGenericDesicDehums;
 		// set design parameters and calculate HW coil design capacity
-		RegCoilDesInletTemp = 8.5; 
+		RegCoilDesInletTemp = 8.5;
 		DataSizing::FinalSysSizing( DataSizing::CurSysNum ).HeatOutTemp = RegCoilDesInletTemp;
 		RegCoilDesOutletTemp = DesiccantDehumidifiers::DesicDehum( DesicDehumNum ).RegenSetPointTemp;
 		DataSizing::FinalSysSizing( DataSizing::CurSysNum ).DesMainVolFlow = 1.07;
@@ -5462,7 +5425,7 @@ namespace EnergyPlus {
 		RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnWTdb( 0.0, 20.0 ) * ( RegCoilDesOutletTemp - RegCoilDesInletTemp );
 
 		// simulate to determine HW coil design capacity
-		SimDesiccantDehumidifier( CompName, FirstHVACIteration, CompIndex );	
+		SimDesiccantDehumidifier( CompName, FirstHVACIteration, CompIndex );
 		for ( loop = 1; loop <= NumWaterCoils; ++loop ) {
 			if ( WaterCoil( loop ).Name == DesicDehum( DesicDehumNum ).RegenCoilName ) { CoilIndex = loop; }
 		}

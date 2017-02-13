@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.6;
 
   Timestep,6;
 
@@ -1351,7 +1351,7 @@
     TRoo;                    !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-    yShadeEP,            !- Name
+    yShadeEP,                !- Name
     ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     yShade,                  !- FMU Variable Name

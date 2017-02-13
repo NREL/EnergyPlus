@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -82,6 +70,7 @@
 #include <DataWater.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -1272,7 +1261,7 @@ namespace EvaporativeCoolers {
 							"Design Size Celdek Pad Area [m2]", PadAreaDes, "User-Specified Celdek Pad Area [m2]", PadAreaUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( PadAreaDes - PadAreaUser ) / PadAreaUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: \nPotential issue with equipment sizing for " +
+								ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
 									EvapCond( EvapCoolNum ).EvapCoolerName );
 								ShowContinueError( "User-Specified Celdek Pad Area of" + RoundSigDigits( PadAreaUser, 2 ) + " [m2]" );
 								ShowContinueError( "differs from Design Size Celdek Pad Area of " + RoundSigDigits( PadAreaDes, 2 ) + " [m2]" );
@@ -1307,7 +1296,7 @@ namespace EvaporativeCoolers {
 						"Design Size Celdek Pad Depth [m]", PadDepthDes, "User-Specified Celdek Pad Depth [m]", PadDepthUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( PadDepthDes - PadDepthUser ) / PadDepthUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: \nPotential issue with equipment sizing for " +
+							ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
 								EvapCond( EvapCoolNum ).EvapCoolerName );
 							ShowContinueError( "User-Specified Celdek Pad Depth of" + RoundSigDigits( PadDepthUser, 2 ) + " [m]" );
 							ShowContinueError( "differs from Design Size Celdek Pad Depth of " + RoundSigDigits( PadDepthDes, 2 ) + " [m]" );
@@ -1390,7 +1379,7 @@ namespace EvaporativeCoolers {
 							"Design Size Celdek Pad Area [m2]", PadAreaDes, "User-Specified Celdek Pad Area [m2]", PadAreaUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( PadAreaDes - PadAreaUser ) / PadAreaUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: \nPotential issue with equipment sizing for " +
+								ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
 									EvapCond( EvapCoolNum ).EvapCoolerName );
 								ShowContinueError( "User-Specified Celdek Pad Area " + RoundSigDigits( PadAreaUser, 2) + " [m2]" );
 								ShowContinueError( "differs from Design Size Celdek Pad Area of " + RoundSigDigits( PadAreaDes, 2) + " [m2]" );
@@ -1423,7 +1412,7 @@ namespace EvaporativeCoolers {
 						"Design Size Celdek Pad Depth [m]", PadDepthDes, "User-Specified Celdek Pad Depth [m]", PadDepthUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( PadDepthDes - PadDepthUser ) / PadDepthUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: \nPotential issue with equipment sizing for " +
+							ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
 								EvapCond( EvapCoolNum ).EvapCoolerName );
 							ShowContinueError( "User-Specified Celdek Pad Depth of" + RoundSigDigits( PadDepthUser, 2) + " [m]" );
 							ShowContinueError( "differs from Design Size Celdek Pad Depth of " + RoundSigDigits( PadDepthDes, 2 ) + " [m]" );
@@ -1754,7 +1743,7 @@ namespace EvaporativeCoolers {
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   October 2000
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Jan. 2017, Rongpeng Zhang, added fouling fault for evaporative coolers
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine needs a description.
@@ -1767,6 +1756,9 @@ namespace EvaporativeCoolers {
 
 		// USE STATEMENTS:
 		//     Use DataEnvironment, ONLY: OutDryBulbTemp, OutWetBulbTemp, OutHumRat, OutBaroPress
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using FaultsManager::FaultsEvapCoolerFouling;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1809,6 +1801,19 @@ namespace EvaporativeCoolers {
 			if ( StageEff >= 1.0 ) StageEff = 1.0;
 			// This is a rough approximation of the Total Indirect Stage Efficiency.  I think that
 			//   this would mainly be used for evap sizing purposes.
+			
+			//If there is a fault of fouling (zrp_Jan2017)
+			if( EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+				int FaultIndex = EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingIndex;
+				Real64 StageEff_ff = StageEff;
+			
+				//calculate the Faulty Evaporative Cooler Fouling Factor using fault information
+				EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFactor = FaultsEvapCoolerFouling( FaultIndex ).CalFoulingFactor();
+				
+				//update the StageEff at faulty cases
+				StageEff = StageEff_ff * EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFactor;
+			}
+ 
 			EvapCond( EvapCoolNum ).StageEff = StageEff;
 			//***************************************************************************
 			//   TEMP LEAVING DRY BULB IS CALCULATED FROM A SIMPLE WET BULB APPROACH
@@ -2936,7 +2941,7 @@ namespace EvaporativeCoolers {
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			Real64 FanPowerModCurveValue; // fan power modifier curve value
 			Real64 PumpPowerModCurveValue; // fan power modifier curve value
-			Real64 EvapCoolertotalPower; // current evapoartive cooler total electric power
+			Real64 EvapCoolertotalPower; // current evaporative cooler total electric power
 
 			EvapCoolertotalPower = 0.0;
 			if ( FlowRatio > 0.0 ) {

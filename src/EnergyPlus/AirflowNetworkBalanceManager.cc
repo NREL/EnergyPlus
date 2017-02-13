@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -236,6 +224,9 @@ namespace AirflowNetworkBalanceManager {
 	int const ProbForceChange( 1 ); // Force open or close from probability check
 	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
 	int const NumOfVentCtrTypes( 6 ); // Number of zone level venting control types
+	int const EquivRec_Height( 1 ); // Effective rectangle polygonal height selection
+	int const EquivRec_BaseAspectRatio( 2 ); // Effective rectangle base surface aspect ratio selection
+	int const EquivRec_UserAspectRatio( 3 ); // Effective rectangle user input aspect ratio selection
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -589,6 +580,9 @@ namespace AirflowNetworkBalanceManager {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		bool Errorfound1;
+		Real64 minHeight;
+		Real64 maxHeight;
+		Real64 baseratio;
 
 		// Formats
 		static gio::Fmt Format_110( "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone without Distribution/Multizone with Distribution only during Fan Operation')" );
@@ -1320,6 +1314,29 @@ namespace AirflowNetworkBalanceManager {
 						ErrorsFound = true;
 					}
 				}
+				// Get data of polygonal surface
+				if ( !lAlphaBlanks( 8 ) ) {
+					if ( Alphas( 8 ) == "POLYGONHEIGHT" ) {
+						MultizoneSurfaceData( i ).EquivRecMethod = EquivRec_Height;
+					} else if ( Alphas( 8 ) == "BASESURFACEASPECTRATIO" ) {
+						MultizoneSurfaceData( i ).EquivRecMethod = EquivRec_BaseAspectRatio;
+					} else if ( Alphas( 8 ) == "USERDEFINEDASPECTRATIO" ) {
+						MultizoneSurfaceData( i ).EquivRecMethod = EquivRec_UserAspectRatio;
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields( 8 ) );
+						ShowContinueError( ".." + cAlphaFields( 1 ) + " = " + MultizoneSurfaceData( i ).SurfName + ", Specified " + cAlphaFields( 8 ) + " = " + Alphas( 8 ) );
+						ShowContinueError( "..The valid choices are \"PolygonHeight\", \"BaseSurfaceAspectRatio\", or \"UserDefinedAspectRatio\"" );
+						ErrorsFound = true;
+					}
+				} else {
+					MultizoneSurfaceData( i ).EquivRecMethod = EquivRec_Height;
+				}
+				if ( !lNumericBlanks( 7 ) ) {
+					MultizoneSurfaceData( i ).EquivRecUserAspectRatio = Numbers( 7 );
+				} else {
+					MultizoneSurfaceData( i ).EquivRecUserAspectRatio = 1.0;
+				}
+
 			}
 		} else {
 			ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found." );
@@ -1378,6 +1395,83 @@ namespace AirflowNetworkBalanceManager {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 1 ) + " = " + MultizoneSurfaceData( i ).SurfName );
 				ShowContinueError( "..Zone for inside surface must be defined in a AirflowNetwork:MultiZone:Zone object.  Could not find Zone = " + Zone( Surface( MultizoneSurfaceData( i ).SurfNum ).Zone ).Name );
 				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+			}
+
+			// Calculate equivalent width and height
+			if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Sides != 4 ) {
+				MultizoneSurfaceData( i ).NonRectangular = true;
+				if ( MultizoneSurfaceData( i ).EquivRecMethod == EquivRec_Height ) {
+					if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Tilt < 1.0 || Surface( MultizoneSurfaceData( i ).SurfNum ).Tilt > 179.0 ) { // horizontal surface
+						// check base surface shape
+						if ( Surface( Surface( MultizoneSurfaceData( i ).SurfNum ).BaseSurf ).Sides == 4 ) {
+							baseratio = Surface( Surface( MultizoneSurfaceData( i ).SurfNum ).BaseSurf ).Width / Surface( Surface( MultizoneSurfaceData( i ).SurfNum ).BaseSurf ).Height;
+							MultizoneSurfaceData( i ).Width = sqrt( Surface( MultizoneSurfaceData( i ).SurfNum ).Area * baseratio );
+							MultizoneSurfaceData( i ).Height = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / MultizoneSurfaceData( i ).Width;
+							if ( DisplayExtraWarnings ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
+								ShowContinueError( "The entered choice of Equivalent Rectangle Method is PolygonHeight. This choice is not valid for a horizontal surface."  );
+								ShowContinueError( "The BaseSurfaceAspectRatio choice is used. Simulation continues." );
+							}
+						} else {
+							MultizoneSurfaceData( i ).Width = sqrt( Surface( MultizoneSurfaceData( i ).SurfNum ).Area * MultizoneSurfaceData( i ).EquivRecUserAspectRatio );
+							MultizoneSurfaceData( i ).Height = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / MultizoneSurfaceData( i ).Width;
+							// add warning
+							if ( DisplayExtraWarnings ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
+								ShowContinueError( "The entered choice of Equivalent Rectangle Method is PolygonHeight. This choice is not valid for a horizontal surface with a polygonal base surface." );
+								ShowContinueError( "The deafula aspect ratio at 1 is used. Simulation continues." );
+							}
+						}
+					} else {
+						minHeight = min( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 2 ).z );
+						maxHeight = max( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 2 ).z );
+						for ( j = 3; j <= Surface( MultizoneSurfaceData( i ).SurfNum ).Sides; ++j ) {
+							minHeight = min( minHeight, min( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j - 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j ).z ) );
+							maxHeight = max( maxHeight, max( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j - 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j ).z ) );
+						}
+						if ( maxHeight > minHeight ) {
+							MultizoneSurfaceData( i ).Height = maxHeight - minHeight;
+							MultizoneSurfaceData( i ).Width = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / ( maxHeight - minHeight );
+						}
+					}
+				}
+				if ( MultizoneSurfaceData( i ).EquivRecMethod == EquivRec_BaseAspectRatio ) {
+					if ( Surface( Surface( MultizoneSurfaceData( i ).SurfNum ).BaseSurf ).Sides == 4 ) {
+						baseratio = Surface( Surface( MultizoneSurfaceData( i ).SurfNum ).BaseSurf ).Width / Surface( Surface( MultizoneSurfaceData( i ).SurfNum ).BaseSurf ).Height;
+						MultizoneSurfaceData( i ).Width = sqrt( Surface( MultizoneSurfaceData( i ).SurfNum ).Area * baseratio );
+						MultizoneSurfaceData( i ).Height = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / MultizoneSurfaceData( i ).Width;
+					} else {
+						minHeight = min( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 2 ).z );
+						maxHeight = max( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( 2 ).z );
+						for ( j = 3; j <= Surface( MultizoneSurfaceData( i ).SurfNum ).Sides; ++j ) {
+							minHeight = min( minHeight, min( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j - 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j ).z ) );
+							maxHeight = max( maxHeight, max( Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j - 1 ).z, Surface( MultizoneSurfaceData( i ).SurfNum ).Vertex( j ).z ) );
+						}
+						if ( maxHeight > minHeight ) {
+							MultizoneSurfaceData( i ).Height = maxHeight - minHeight;
+							MultizoneSurfaceData( i ).Width = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / ( maxHeight - minHeight );
+							// add warning
+							if ( DisplayExtraWarnings ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
+								ShowContinueError( "The entered choice of Equivalent Rectangle Method is BaseSurfaceAspectRatio. This choice is not valid for a polygonal base surface." );
+								ShowContinueError( "The PolygonHeight choice is used. Simulation continues." );
+							}
+						} else {
+							MultizoneSurfaceData( i ).Width = sqrt( Surface( MultizoneSurfaceData( i ).SurfNum ).Area * MultizoneSurfaceData( i ).EquivRecUserAspectRatio );
+							MultizoneSurfaceData( i ).Height = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / MultizoneSurfaceData( i ).Width;
+							// add warning
+							if ( DisplayExtraWarnings ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
+								ShowContinueError( "The entered choice of Equivalent Rectangle Method is BaseSurfaceAspectRatio. This choice is not valid for a horizontal surface with a polygonal base surface." );
+								ShowContinueError( "The deafula aspect ratio at 1 is used. Simulation continues." );
+							}
+						}
+					}
+				}
+				if ( MultizoneSurfaceData( i ).EquivRecMethod == EquivRec_UserAspectRatio ) {
+					MultizoneSurfaceData( i ).Width = sqrt( Surface( MultizoneSurfaceData( i ).SurfNum ).Area * MultizoneSurfaceData( i ).EquivRecUserAspectRatio );
+					MultizoneSurfaceData( i ).Height = Surface( MultizoneSurfaceData( i ).SurfNum ).Area / MultizoneSurfaceData( i ).Width;
+				}
 			}
 
 			// Get the number of external surfaces
@@ -1461,6 +1555,20 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
+
+		// write outputs in eio file
+		found = true;
+		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
+			if ( MultizoneSurfaceData( i ).NonRectangular ) {
+				if ( found ) {
+					gio::write( OutputFileInits, fmtA ) << "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {m}, Equivalent Width {m} AirflowNetwork Model:Equivalent Rectangle";
+					found = false;
+				}
+				StringOut = "AirflowNetwork Model:Equivalent Rectangle Surface, " + MultizoneSurfaceData( i ).SurfName;
+				StringOut = StringOut + ", " + RoundSigDigits( MultizoneSurfaceData( i ).Height, 2 ) +"," + RoundSigDigits( MultizoneSurfaceData( i ).Width, 2 );
+				gio::write( OutputFileInits, fmtA ) << StringOut;
+			}
+		} 
 
 		// Validate adjacent temperature and Enthalpy control for an interior surface only
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
@@ -1804,7 +1912,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( j > 0 ) {
 				if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Sides == 3 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\"." );
-					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface will be used with effective width and height." );
+					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height." );
 				}
 				if ( ! MultizoneSurfaceData( i ).VentingSchName.empty() ) {
 					MultizoneSurfaceData( i ).VentingSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentingSchName );
@@ -6732,7 +6840,21 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		if ( ! ( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
+		if ( !AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) )
+		{
+			for ( i = NumOfNodesMultiZone + NumOfNodesIntraZone + 1; i <= AirflowNetworkNumOfNodes; ++i ) {
+				AirflowNetworkNodeSimu( i ).PZ = 0.0;
+			}
+			for ( i = AirflowNetworkNumOfSurfaces + 1; i <= AirflowNetworkNumOfLinks; ++i ) {
+				AirflowNetworkLinkSimu( i ).DP = 0.0;
+				AirflowNetworkLinkReport( i ).FLOW = 0.0;
+				AirflowNetworkLinkReport( i ).FLOW2 = 0.0;
+				AirflowNetworkLinkReport( i ).VolFLOW = 0.0;
+				AirflowNetworkLinkReport( i ).VolFLOW2 = 0.0;
+			}
+		}
+		
+		if ( !( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) { // Multizone airflow energy
@@ -7499,8 +7621,8 @@ namespace AirflowNetworkBalanceManager {
 						ErrorsFound = true;
 					}
 
-				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
-					ValidateComponent( "Coil:Heating:Gas", DisSysCompCoilData( i ).Name, IsNotOK, RoutineName + CurrentModuleObject );
+				} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
+					ValidateComponent( "Coil:Heating:Fuel", DisSysCompCoilData( i ).Name, IsNotOK, RoutineName + CurrentModuleObject );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 					}

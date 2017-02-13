@@ -9,10 +9,10 @@ endif()
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 5 )
+set( CMAKE_VERSION_MINOR 7 )
 set( CMAKE_VERSION_PATCH 0 )
 
-set( PREV_RELEASE_SHA "832e4bb" )
+set( PREV_RELEASE_SHA "198c6a3" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -190,15 +190,16 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V8-4-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V8-5-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V8-6-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V8-7-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 8-6-0 to 8-7-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/AppGPostProcess PROJECT AppGPostProcess NO_EXTERNAL_INSTALL )
 endif()
 
 if( BUILD_PACKAGE )
@@ -222,6 +223,15 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_VALIDATION_REPORTS)
+  if ( NOT BUILD_FORTRAN )
+    message("*** VALIDATION REPORT ERROR : Cannot build validation reports without Fortran targets.  Turn on BUILD_FORTRAN.")
+  endif()
+  # we should check to make sure the Python 3 binary is actually available on the system
+  # we won't use it here, the ValidationReports CMake will do all the setup, we just want a quick check to find the binary
+  find_program(PYTHON_THREE python3)
+  if ( PYTHON_THREE STREQUAL "PYTHON_THREE-NOTFOUND" )
+    message("*** VALIDATION REPORT ERROR : Cannot find Python3 on the system; Validation report building requires Python 3.")
+  endif()
   include(ExternalProject)
   ExternalProject_Add(ValidationReports
     DEPENDS energyplus ReadVarsESO Basement Slab
@@ -250,3 +260,4 @@ if (BUILD_DOCS)
     message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
   endif()
 endif()
+

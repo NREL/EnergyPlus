@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -1386,21 +1374,8 @@ namespace SetPointManager {
 			SZMinHumSetPtMgr( SetPtMgrNum ).CtrlVarType = "MinimumHumidityRatio";
 			SZMinHumSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinHumRat;
 
-			if ( cAlphaArgs( 2 ) != "" ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
-				ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-				ShowContinueError( "Deprecated Field in Object.  Please leave blank." );
-				ShowContinueError( "Please note that this field in this object will be deleted in future versions." );
-			}
-			if ( cAlphaArgs( 3 ) != "" ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
-				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
-				ShowContinueError( "Deprecated Field in Object.  Please leave blank." );
-				ShowContinueError( "Please note that this field in this object will be deleted in future versions." );
-			}
-
 			NodeListError = false;
-			GetNodeNums( cAlphaArgs( 4 ), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames( 4 ) ); // nodes whose min humidity ratio will be set
+			GetNodeNums( cAlphaArgs( 2 ), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames( 4 ) ); // nodes whose min humidity ratio will be set
 			if ( ! NodeListError ) {
 				NumNodesCtrld = NumNodes;
 				SZMinHumSetPtMgr( SetPtMgrNum ).CtrlNodes.allocate( NumNodesCtrld );
@@ -1418,7 +1393,7 @@ namespace SetPointManager {
 			}
 
 			ErrInList = false;
-			GetNodeNums( cAlphaArgs( 5 ), NumNodes, NodeNums, ErrInList, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_Sensor, 1, ObjectIsNotParent, _, cAlphaFieldNames( 5 ) ); // nodes of zones whose humidity is being controlled
+			GetNodeNums( cAlphaArgs( 3 ), NumNodes, NodeNums, ErrInList, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_Sensor, 1, ObjectIsNotParent, _, cAlphaFieldNames( 3 ) ); // nodes of zones whose humidity is being controlled
 			if ( ErrInList ) {
 				//    CALL ShowSevereError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
 				//       '", invalid field.')
@@ -1430,7 +1405,7 @@ namespace SetPointManager {
 			// only allow one control zone for now
 			if ( NumNodes > 1 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", entered nodelist." );
-				ShowContinueError( "..invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
+				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ShowContinueError( "..only one control zone is allowed." );
 				ErrorsFound = true;
 			}
@@ -1477,21 +1452,8 @@ namespace SetPointManager {
 			SZMaxHumSetPtMgr( SetPtMgrNum ).CtrlVarType = "MaximumHumidityRatio";
 			SZMaxHumSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxHumRat;
 
-			if ( cAlphaArgs( 2 ) != "" ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
-				ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-				ShowContinueError( "Deprecated Field in Object.  Please leave blank." );
-				ShowContinueError( "Please note that this field in this object will be deleted in future versions." );
-			}
-			if ( cAlphaArgs( 3 ) != "" ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
-				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
-				ShowContinueError( "Deprecated Field in Object.  Please leave blank." );
-				ShowContinueError( "Please note that this field in this object will be deleted in future versions." );
-			}
-
 			NodeListError = false;
-			GetNodeNums( cAlphaArgs( 4 ), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames( 4 ) ); // nodes whose max humidity ratio will be set
+			GetNodeNums( cAlphaArgs( 2 ), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames( 2 ) ); // nodes whose max humidity ratio will be set
 			if ( ! NodeListError ) {
 				NumNodesCtrld = NumNodes;
 				SZMaxHumSetPtMgr( SetPtMgrNum ).CtrlNodes.allocate( NumNodesCtrld );
@@ -1509,7 +1471,7 @@ namespace SetPointManager {
 			}
 
 			ErrInList = false;
-			GetNodeNums( cAlphaArgs( 5 ), NumNodes, NodeNums, ErrInList, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_Sensor, 1, ObjectIsNotParent, _, cAlphaFieldNames( 5 ) ); // nodes of zones whose humidity is being controlled
+			GetNodeNums( cAlphaArgs( 3 ), NumNodes, NodeNums, ErrInList, NodeType_Air, cCurrentModuleObject, cAlphaArgs( 1 ), NodeConnectionType_Sensor, 1, ObjectIsNotParent, _, cAlphaFieldNames( 3 ) ); // nodes of zones whose humidity is being controlled
 			if ( ErrInList ) {
 				//    CALL ShowSevereError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
 				//       '", invalid field.')

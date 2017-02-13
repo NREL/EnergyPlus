@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef MoistureBalanceEMPDManager_hh_INCLUDED
 #define MoistureBalanceEMPDManager_hh_INCLUDED
@@ -64,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
@@ -71,13 +60,43 @@ namespace MoistureBalanceEMPDManager {
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
-	extern Array1D< Real64 > RhoVapEMPD; // Inside Surface Vapor Density Reporting variable
-	extern Array1D< Real64 > WSurfEMPD; // Inside Surface Humidity Ratio Reporting variable
-	extern Array1D< Real64 > RHEMPD; // Inside Surface Relative Humidity Reporting variable
+
+	struct EMPDReportVarsData {
+		Real64 rv_surface;
+		Real64 RH_surface_layer;
+		Real64 RH_deep_layer;
+		Real64 w_surface_layer;
+		Real64 w_deep_layer;
+		Real64 mass_flux_zone;
+		Real64 mass_flux_deep;
+		Real64 u_surface_layer;
+		Real64 u_deep_layer;
+
+		// Default constructor
+		EMPDReportVarsData() :
+		rv_surface( 0.015 ),
+		RH_surface_layer( 0.0 ),
+		RH_deep_layer( 0.0 ),
+		w_surface_layer( 0.015 ),
+		w_deep_layer( 0.015 ),
+		mass_flux_zone( 0.0 ),
+		mass_flux_deep( 0.0 ),
+		u_surface_layer( 0.0 ),
+		u_deep_layer( 0.0 )
+		{}
+	};
+
+	extern Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
+	extern bool InitEnvrnFlag;
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
 	// Functions
+	Real64
+	CalcDepthFromPeriod(
+		Real64 const period, // in seconds
+		DataHeatBalance::MaterialProperties const & mat // material
+	);
 
 	void
 	GetMoistureBalanceEMPDInput();
@@ -89,22 +108,12 @@ namespace MoistureBalanceEMPDManager {
 	CalcMoistureBalanceEMPD(
 		int const SurfNum,
 		Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
-		Real64 const TempSurfInOld, // INSIDE SURFACE TEMPERATURE at previous time step.
 		Real64 const TempZone, // Zone temperature at current time step.
 		Real64 & TempSat // Satutare surface temperature.
 	);
 
 	void
-	SolverMoistureBalanceEMPD(
-		Real64 & VARNEW, // Value at current time step
-		Real64 const VAROLD, // Value at previous time step
-		Real64 const A, // Coefficient of time derivative in AdV/dt+BV=C
-		Real64 const B, // Coefficienct of variable
-		Real64 const C // Constant
-	);
-
-	void
-	CloseMoistureBalanceEMPD();
+	clear_state();
 
 	void
 	UpdateMoistureBalanceEMPD( int const SurfNum ); // Surface number

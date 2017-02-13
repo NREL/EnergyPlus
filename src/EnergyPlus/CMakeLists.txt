@@ -10,6 +10,8 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
   Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
@@ -30,6 +32,8 @@ SET( SRC
   BranchNodeConnections.hh
   CTElectricGenerator.cc
   CTElectricGenerator.hh
+  ChilledCeilingPanelSimple.cc
+  ChilledCeilingPanelSimple.hh
   ChillerAbsorption.cc
   ChillerAbsorption.hh
   ChillerElectricEIR.cc
@@ -127,8 +131,6 @@ SET( SRC
   DataPhotovoltaics.hh
   DataPlant.cc
   DataPlant.hh
-  DataPlantPipingSystems.cc
-  DataPlantPipingSystems.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -324,6 +326,8 @@ SET( SRC
   IceThermalStorage.hh
   InputProcessor.cc
   InputProcessor.hh
+  IntegratedHeatPump.cc
+  IntegratedHeatPump.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
@@ -590,6 +594,7 @@ set_target_properties(
 install( TARGETS energyplusapi
   RUNTIME DESTINATION ./
   LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
 )
 
 if (MINGW)

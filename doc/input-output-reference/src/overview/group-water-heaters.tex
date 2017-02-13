@@ -588,15 +588,15 @@ The average net heat transfer rate when considering all losses and gains.
 
 The net heat transfer energy when considering all losses and gains.
 
-\paragraph{\texorpdfstring{Water Heater Cycle On Count {[]}}{Water Heater Cycle On Count }}\label{water-heater-cycle-on-count}
+\paragraph{Water Heater Cycle On Count {[]}}\label{water-heater-cycle-on-count}
 
 The number of times that the heater turned on in the time period.
 
-\paragraph{\texorpdfstring{Water Heater Runtime Fraction {[]}}{Water Heater Runtime Fraction }}\label{water-heater-runtime-fraction}
+\paragraph{Water Heater Runtime Fraction {[]}}\label{water-heater-runtime-fraction}
 
 The fraction of the time period that the heater was running.
 
-\paragraph{\texorpdfstring{Water Heater Part Load Ratio {[]}}{Water Heater Part Load Ratio }}\label{water-heater-part-load-ratio}
+\paragraph{Water Heater Part Load Ratio {[]}}\label{water-heater-part-load-ratio}
 
 The fraction of the Heater Maximum Capacity.
 
@@ -630,11 +630,11 @@ The average fuel consumption rate for the on-cycle parasitics.
 
 The fuel consumption energy for the on-cycle parasitics.
 
-\paragraph{\texorpdfstring{Water Heater Water Volume Flow Rate {[}m\(^{3}\)/s{]}}{Water Heater Water Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{water-heater-water-volume-flow-rate-m3s}
+\paragraph{Water Heater Water Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{water-heater-water-volume-flow-rate-m3s}
 
 The water consumption rate for the use side, if in stand-alone operation.
 
-\paragraph{\texorpdfstring{Water Heater Water Volume {[}m\(^{3}\){]}}{Water Heater Water Volume {[}m\^{}\{3\}{]}}}\label{water-heater-water-volume-m3}
+\paragraph{Water Heater Water Volume {[}m\(^{3}\){]}}\label{water-heater-water-volume-m3}
 
 The water consumption for the use side, if in stand-alone operation.
 
@@ -971,11 +971,11 @@ The total average heating rate supplied by Heater 1 plus Heater 2.
 
 The total heating energy supplied by Heater 1 plus Heater 2.
 
-\paragraph{\texorpdfstring{Water Heater Cycle On Count {[]}}{Water Heater Cycle On Count }}\label{water-heater-cycle-on-count-1}
+\paragraph{Water Heater Cycle On Count {[]}}\label{water-heater-cycle-on-count-1}
 
 The number of times that either Heater 1 or Heater 2 turned on in the time period.
 
-\paragraph{\texorpdfstring{Water Heater Runtime Fraction {[]}}{Water Heater Runtime Fraction }}\label{water-heater-runtime-fraction-1}
+\paragraph{Water Heater Runtime Fraction {[]}}\label{water-heater-runtime-fraction-1}
 
 The fraction of the time period that either Heater 1 or Heater 2 was running.
 
@@ -1020,19 +1020,19 @@ The heating energy supplied by Heater 1.
 
 The heating energy supplied by Heater 2.
 
-\paragraph{\texorpdfstring{Water Heater Heater 1 Cycle On Count {[]}}{Water Heater Heater 1 Cycle On Count }}\label{water-heater-heater-1-cycle-on-count}
+\paragraph{Water Heater Heater 1 Cycle On Count {[]}}\label{water-heater-heater-1-cycle-on-count}
 
 The number of times that Heater 1 turned on in the time period.
 
-\paragraph{\texorpdfstring{Water Heater Heater 2 Cycle On Count~ {[]}}{Water Heater Heater 2 Cycle On Count~ }}\label{water-heater-heater-2-cycle-on-count}
+\paragraph{Water Heater Heater 2 Cycle On Count~ {[]}}\label{water-heater-heater-2-cycle-on-count}
 
 The number of times that Heater 2 turned on in the time period.
 
-\paragraph{\texorpdfstring{Water Heater Heater 1 Runtime Fraction {[]}}{Water Heater Heater 1 Runtime Fraction }}\label{water-heater-heater-1-runtime-fraction}
+\paragraph{Water Heater Heater 1 Runtime Fraction {[]}}\label{water-heater-heater-1-runtime-fraction}
 
 The fraction of the time period that Heater 1 was running.
 
-\paragraph{\texorpdfstring{Water Heater Heater 2 Runtime Fraction {[]}}{Water Heater Heater 2 Runtime Fraction }}\label{water-heater-heater-2-runtime-fraction}
+\paragraph{Water Heater Heater 2 Runtime Fraction {[]}}\label{water-heater-heater-2-runtime-fraction}
 
 The fraction of the time period that Heater 2 was running.
 
@@ -1374,13 +1374,11 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
   Branch,
       Central HPWH Branch,     !- Name
-      0,                       !- Maximum Flow Rate {m3/s}
       ,                        !- Pressure Drop Curve Name
       WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
       PlantHeatPumpWaterHeater,!- Component 1 Name
       HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
-      HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
-      PASSIVE;                 !- Component 1 Branch Control Type
+      HPWH Use Outlet Node;    !- Component 1 Outlet Node Name
 
 
 
@@ -1736,13 +1734,11 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
 Branch,
       Central HPWH Branch,     !- Name
-      0,                       !- Maximum Flow Rate {m3/s}
       ,                        !- Pressure Drop Curve Name
       WaterHeater:HeatPump:WrappedCondenser,    !- Component 1 Object Type
       PlantHeatPumpWaterHeater,!- Component 1 Name
       HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
-      HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
-      PASSIVE;                 !- Component 1 Branch Control Type
+      HPWH Use Outlet Node;    !- Component 1 Outlet Node Name
 
   WaterHeater:Stratified,
   HPWHPlantTank,           !- Name
