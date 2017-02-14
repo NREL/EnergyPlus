@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
@@ -527,66 +515,48 @@ namespace ExteriorEnergyUse {
 		if ( SameString( FuelTypeAlpha, "Electricity" ) || SameString( FuelTypeAlpha, "Electric" ) ) {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
-		}
-		if ( SameString( FuelTypeAlpha, "Gas" ) || SameString( FuelTypeAlpha, "NaturalGas" ) ) {
-			if ( SameString( FuelTypeAlpha, "Gas" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"NaturalGas\"." );
-			}
+		} else if ( SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
-		}
-		if ( SameString( FuelTypeAlpha, "Coal" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Coal" ) ) {
 			FuelTypeNumber = CoalUse;
 			FuelTypeString = "Coal";
-		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
 			FuelTypeNumber = FuelOil1Use;
 			FuelTypeString = "FuelOil#1";
-		}
-		if ( SameString( FuelTypeAlpha, "PropaneGas" ) || SameString( FuelTypeAlpha, "LPG" ) ) {
-			if ( SameString( FuelTypeAlpha, "LPG" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"PropaneGas\"." );
-			}
+		} else if ( SameString( FuelTypeAlpha, "PropaneGas" ) ) {
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";
-		}
-		if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
 			FuelTypeNumber = GasolineUse;
 			FuelTypeString = "Gasoline";
-		}
-		if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
 			FuelTypeNumber = DieselUse;
 			FuelTypeString = "Diesel";
-		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
 			FuelTypeNumber = FuelOil2Use;
 			FuelTypeString = "FuelOil#2";
-		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel1";
-		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel2";
-		}
-		if ( SameString( FuelTypeAlpha, "Water" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Water" ) ) {
 			FuelTypeNumber = WaterUse;
 			FuelTypeString = "Water";
-		}
-		if ( SameString( FuelTypeAlpha, "Steam" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Steam" ) ) {
 			FuelTypeNumber = SteamUse;
 			FuelTypeString = "Steam";
-		}
-		if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
 			FuelTypeNumber = DistrictCoolUse;
 			FuelTypeString = "DistrictCooling";
-		}
-		if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
 			FuelTypeNumber = DistrictHeatUse;
 			FuelTypeString = "DistrictHeating";
+		} else {
+			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
+			ShowFatalError( "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha );
 		}
 
 	}

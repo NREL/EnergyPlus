@@ -32,6 +32,8 @@ SET( SRC
   BranchNodeConnections.hh
   CTElectricGenerator.cc
   CTElectricGenerator.hh
+  ChilledCeilingPanelSimple.cc
+  ChilledCeilingPanelSimple.hh
   ChillerAbsorption.cc
   ChillerAbsorption.hh
   ChillerElectricEIR.cc
@@ -129,8 +131,6 @@ SET( SRC
   DataPhotovoltaics.hh
   DataPlant.cc
   DataPlant.hh
-  DataPlantPipingSystems.cc
-  DataPlantPipingSystems.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -326,6 +326,8 @@ SET( SRC
   IceThermalStorage.hh
   InputProcessor.cc
   InputProcessor.hh
+  IntegratedHeatPump.cc
+  IntegratedHeatPump.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
   LowTempRadiantSystem.cc

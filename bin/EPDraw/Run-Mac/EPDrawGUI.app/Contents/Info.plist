@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM
+"file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+   <key>CFBundleExecutable</key>
+   <string>EPDrawGUI</string>
+   <key>CFBundleName</key>
+   <string>EPDrawGUI</string>
+   <key>CFBundleIdentifier</key>
+   <string></string>
+   <key>CFBundleInfoDictionaryVersion</key>
+   <string>6.0</string>
+   <key>CFBundleVersion</key>
+   <string>0.0.9.0.0</string>
+   <key>CFBundleDevelopmentRegion</key>
+   <string>en</string>
+   <key>CFBundlePackageType</key>
+   <string>APPL</string>
+   <key>CFBundleSignature</key>
+   <string></string>
+   <key>CFBundleGetInfoString</key>
+   <string></string>
+   <key>CFBundleShortVersionString</key>
+   <string>0.09</string>
+   <key>CFBundleIconFile</key>
+   <string>EPDrawGUI.icns</string>
+   <key>CFBundleDocumentTypes</key>
+   <array>
+   </array>
+</dict>
+</plist>

@@ -2065,7 +2065,21 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 where
 
-\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\begin{itemize}
+\tightlist
+\item
+  \(c_{p,air}\) is specific heat of air evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio, J/kgC.
+\item
+  \(\dot{V}_{max,hw}\) is maximum hot water flow rate, m$^{3}/s$.
+\item
+  \(\dot{Q}_{coil,des}\) is heating coil design load, W.
+\item
+  \(c_{p,w}\) is specific heat of hot water, J/kgC.
+\item
+  \(\rho_{w}\) is density of hot water, m$^{3}/kg$.
+\item
+  \(\Delta T_{loop,des}\) is hot water loop design temperature difference, deltaC.
+\end{itemize}
 
 \subsubsection{Maximum Cold Water Flow}\label{maximum-cold-water-flow}
 
@@ -2086,12 +2100,26 @@ where
 \end{equation}
 
 \begin{equation}
-  \dot{V}_{max,hw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
+  \dot{V}_{max,cw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
 \end{equation}
 
 where
 
-\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\begin{itemize}
+\tightlist
+\item
+  \(c_{p,air}\) is specific heat of air evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio, J/kgC.
+\item
+  \(\dot{V}_{max,cw}\) is maximum cold water flow rate, m$^{3}/s$.
+\item
+  \(\dot{Q}_{coil,des}\) is cooling coil design load, W.
+\item
+  \(c_{p,w}\) is specific heat of cold water, J/kgC.
+\item
+  \(\rho_{w}\) is density of cold water, m$^{3}/kg$.
+\item
+  \(\Delta T_{loop,des}\) is cold water loop design temperature difference, deltaC.
+\end{itemize}
 
 \subsection{Window Air Conditioner Sizing}\label{window-air-conditioner-sizing}
 

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef SystemAvailabilityManager_hh_INCLUDED
 #define SystemAvailabilityManager_hh_INCLUDED
@@ -206,10 +194,20 @@ namespace SystemAvailabilityManager {
 		//   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
 		Real64 TempTolRange; // range in degrees C of thermostat tolerance
 		int CyclingTimeSteps; // period (in Loads time steps) system will cycle on.
-		std::string CtrlZoneName; // Name of the control zone
-		int ZoneNum; // zone number of control zone
-		int ControlledZoneNum; // controlled zone number of control zone
 		int AvailStatus; // reports status of availability manager
+		int PriorAvailStatus; // prior status of availability manager
+		std::string CtrlZoneListName; // controlled zone or zonelist name
+		int NumOfCtrlZones; // number of controlled zones
+		Array1D_int CtrlZonePtrs; // pointers to controlled zone(s)
+		std::string CoolingZoneListName; // coolin zone or zonelist name
+		int NumOfCoolingZones; // number of cooling zones
+		Array1D_int CoolingZonePtrs; // pointers to cooling zone(s)
+		std::string HeatingZoneListName; // heatig zone or zonelist name
+		int NumOfHeatingZones; // number of heatig zones
+		Array1D_int HeatingZonePtrs; // pointers to heating zone(s)
+		std::string HeatZnFanZoneListName; // heating zone fans only zone or zonelist name
+		int NumOfHeatZnFanZones; // number of heating zone fans only zones
+		Array1D_int HeatZnFanZonePtrs; // pointers to heating zone fans only zone(s)
 
 		// Default Constructor
 		DefineNightCycSysAvailManager() :
@@ -219,9 +217,12 @@ namespace SystemAvailabilityManager {
 			CtrlType( 0 ),
 			TempTolRange( 1.0 ),
 			CyclingTimeSteps( 1 ),
-			ZoneNum( 0 ),
-			ControlledZoneNum( 0 ),
-			AvailStatus( 0 )
+			AvailStatus( 0 ),
+			PriorAvailStatus( 0 ),
+			NumOfCtrlZones( 0 ),
+			NumOfCoolingZones( 0 ),
+			NumOfHeatingZones( 0 ),
+			NumOfHeatZnFanZones( 0 )
 		{}
 
 	};
@@ -231,6 +232,7 @@ namespace SystemAvailabilityManager {
 		// Members
 		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
+		bool isSimulated; // true after availability manager is simulated
 		int SchedPtr; // Applicability schedule pointer
 		std::string FanSched; // Fan schedule name
 		int FanSchedPtr; // Fan schedule pointer
@@ -254,10 +256,29 @@ namespace SystemAvailabilityManager {
 		int NumPreDays; // Number of previous days for adaptive control
 		int AvailStatus; // reports status of availability manager
 		Real64 NumHoursBeforeOccupancy;
+		Real64 TempDiffHi; // temperature difference for cooling mode
+		Real64 TempDiffLo; // temperature difference for heating mode
+		int ATGWCZoneNumLo; // zone index for worst case heating zone
+		int ATGWCZoneNumHi; // zone index for worst case cooling zone
+		bool CycleOnFlag; // Tracks when air loop has cycled on
+		bool ATGUpdateFlag1; // updates 
+		bool ATGUpdateFlag2;
+		bool FirstTimeATGFlag;
+		bool OverNightStartFlag; // Flag to indicate the optimum start starts before mid night.
+		bool OSReportVarFlag;
+		Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
+		Array1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
+		Real64 AdaTempGradHeat;
+		Real64 AdaTempGradCool;
+		Real64 ATGUpdateTime1;
+		Real64 ATGUpdateTime2;
+		Real64 ATGUpdateTemp1;
+		Real64 ATGUpdateTemp2;
 
 		// Default Constructor
 		DefineOptStartSysAvailManager() :
 			MgrType( 0 ),
+			isSimulated( false),
 			SchedPtr( 0 ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
@@ -275,7 +296,23 @@ namespace SystemAvailabilityManager {
 			ConstStartTime( 2.0 ),
 			NumPreDays( 1 ),
 			AvailStatus( 0 ),
-			NumHoursBeforeOccupancy( 0.0 )
+			NumHoursBeforeOccupancy( 0.0 ),
+			TempDiffHi( 0.0 ),
+			TempDiffLo( 0.0 ),
+			ATGWCZoneNumLo( 0 ),
+			ATGWCZoneNumHi( 0 ),
+			CycleOnFlag( false ),
+			ATGUpdateFlag1( false ),
+			ATGUpdateFlag2( false ),
+			FirstTimeATGFlag( true ),
+			OverNightStartFlag( false ),
+			OSReportVarFlag( false ),
+			AdaTempGradHeat( 0.0 ),
+			AdaTempGradCool( 0.0 ),
+			ATGUpdateTime1( 0.0 ),
+			ATGUpdateTime2( 0.0 ),
+			ATGUpdateTemp1( 0.0 ),
+			ATGUpdateTemp2( 0.0 )
 		{}
 
 	};
@@ -565,6 +602,20 @@ namespace SystemAvailabilityManager {
 		int & AvailStatus, // System status indicator
 		Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
 		Optional_int_const CompNum = _ // Index of ZoneHVAC equipment component
+	);
+
+	bool
+	CoolingZoneOutOfTolerance(
+		Array1D_int const ZonePtrList, // list of controlled zone pointers
+		int const NumZones, // number of zones in list
+		Real64 const TempTolerance // temperature tolerance
+	);
+
+	bool
+	HeatingZoneOutOfTolerance(
+		Array1D_int const ZonePtrList, // list of controlled zone pointers
+		int const NumZones, // number of zones in list
+		Real64 const TempTolerance // temperature tolerance
 	);
 
 	void

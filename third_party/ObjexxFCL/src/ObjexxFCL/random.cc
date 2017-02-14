@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,7 @@ namespace { // Internal shared global
 std::default_random_engine random_generator;
 }
 
-// Random float on [0,1]
+// Random int on [0,1]
 std::int32_t
 IRANDM()
 {
@@ -32,7 +32,7 @@ IRANDM()
 	return distribution( random_generator );
 }
 
-// Random float on [0,1]
+// Random int on [0,1]
 std::int32_t
 IRANDM( int const iflag )
 {

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -176,7 +164,7 @@ namespace HVACUnitaryBypassVAV {
 	int const CoilDX_CoolingTwoStageWHumControl( 3 ); // Coil:Cooling:DX:TwoStageWithHumidityControlMode
 	// formerly (v3 and beyond) Coil:DX:MultiMode:CoolingEmpirical
 	int const CoilDX_HeatingEmpirical( 4 ); // Coil:DX:HeatingEmpirical
-	int const Coil_HeatingGas( 5 ); // Coil:Gas:Heating
+	int const Coil_HeatingGasOrOtherFuel( 5 ); // Coil:Gas:Heating
 	int const Coil_HeatingElectric( 6 ); // Coil:Electric:Heating
 
 	// Dehumidification control modes (DehumidControlMode) for Multimode units only
@@ -916,7 +904,7 @@ namespace HVACUnitaryBypassVAV {
 				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = FanVolFlow;
 			}
 
-			if ( SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || SameString( Alphas( 16 ), "Coil:Heating:Gas" ) || SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || SameString( Alphas( 16 ), "Coil:Heating:Water" ) || SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
+			if ( SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) || SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || SameString( Alphas( 16 ), "Coil:Heating:Water" ) || SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
 				CBVAV( CBVAVNum ).HeatCoilType = Alphas( 16 );
 				CBVAV( CBVAVNum ).HeatCoilName = Alphas( 17 );
 
@@ -928,8 +916,8 @@ namespace HVACUnitaryBypassVAV {
 					GetDXCoilIndex( CBVAV( CBVAVNum ).HeatCoilName, CBVAV( CBVAVNum ).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV( CBVAVNum ).HeatCoilType );
 					if ( DXCoilErrFlag ) ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
 
-				} else if ( SameString( Alphas( 16 ), "Coil:Heating:Gas" ) ) {
-					CBVAV( CBVAVNum ).HeatCoilType_Num = Coil_HeatingGas;
+				} else if ( SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) ) {
+					CBVAV( CBVAVNum ).HeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
 					CBVAV( CBVAVNum ).MinOATCompressor = -999.9;
 					CBVAV( CBVAVNum ).HeatingCoilInletNode = GetCoilInletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 					CBVAV( CBVAVNum ).HeatingCoilOutletNode = GetCoilOutletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
@@ -2318,7 +2306,7 @@ namespace HVACUnitaryBypassVAV {
 				//     simulate DX heating coil with compressor off when cooling load is required
 				SimDXCoil( CBVAV( CBVAVNum ).HeatCoilName, Off, FirstHVACIteration, CBVAV( CBVAVNum ).HeatCoilIndex, ContFanCycCoil, 0.0, OnOffAirFlowRatio );
 			}
-		} else if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) { // not a DX heating coil
+		} else if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) { // not a DX heating coil
 			if ( CBVAV( CBVAVNum ).HeatCoolMode == HeatingMode ) {
 				CpAir = PsyCpAirFnWTdb( Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).HumRat, Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).Temp );
 				QHeater = Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).MassFlowRate * CpAir * ( CBVAV( CBVAVNum ).CoilTempSetPoint - Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).Temp );
@@ -3139,7 +3127,7 @@ namespace HVACUnitaryBypassVAV {
 		QCoilActual = 0.0;
 		if ( HeatCoilLoad > SmallLoad ) {
 			{ auto const SELECT_CASE_var( CBVAV( CBVAVNum ).HeatCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( CBVAV( CBVAVNum ).HeatCoilName, FirstHVACIteration, HeatCoilLoad, CBVAV( CBVAVNum ).HeatCoilIndex, QCoilActual, true, FanMode );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				// simulate the heating coil at maximum hot water flow rate
@@ -3189,7 +3177,7 @@ namespace HVACUnitaryBypassVAV {
 			}}
 		} else {
 			{ auto const SELECT_CASE_var( CBVAV( CBVAVNum ).HeatCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( CBVAV( CBVAVNum ).HeatCoilName, FirstHVACIteration, HeatCoilLoad, CBVAV( CBVAVNum ).HeatCoilIndex, QCoilActual, true, FanMode );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				mdot = 0.0;

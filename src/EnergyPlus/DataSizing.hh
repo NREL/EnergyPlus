@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataSizing_hh_INCLUDED
 #define DataSizing_hh_INCLUDED
@@ -299,7 +287,8 @@ namespace DataSizing {
 	extern int DataDesicDehumNum; // index to desiccant dehumidifier
 	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
 	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
-
+	extern Real64 DataWaterCoilSizCoolDeltaT; // used for sizing cooling coil water design flow rate
+	extern Real64 DataWaterCoilSizHeatDeltaT; // used for sizing heating coil water design flow rate
 	// Types
 
 	struct ZoneSizingInputData
@@ -334,6 +323,7 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user input for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -351,6 +341,7 @@ namespace DataSizing {
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
 		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
 		// 3=supply cold ventilation air
@@ -377,6 +368,7 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
+			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			DesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -389,6 +381,7 @@ namespace DataSizing {
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			AccountForDOAS( false ),
 			DOASControlStrategy( 0 ),
 			DOASLowSetpoint( 0.0 ),
@@ -430,6 +423,7 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user flag for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -543,6 +537,7 @@ namespace DataSizing {
 		Real64 ZoneADEffCooling; // the zone air distribution effectiveness in cooling mode
 		Real64 ZoneADEffHeating; // the zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		Real64 ZonePrimaryAirFraction; // the zone primary air fraction for cooling based calculations
 		Real64 ZonePrimaryAirFractionHtg; // the zone primary air fraction for heating based calculations
 		Real64 ZoneOAFracCooling; // OA fraction in cooling mode
@@ -594,6 +589,7 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
+			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			InpDesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -674,6 +670,7 @@ namespace DataSizing {
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			ZonePrimaryAirFraction( 0.0 ),
 			ZonePrimaryAirFractionHtg( 0.0 ),
 			ZoneOAFracCooling( 0.0 ),
@@ -1212,7 +1209,6 @@ namespace DataSizing {
 		Real64 OAFlowPerZone; // - OA requirement per zone
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
-		Real64 MaxOAFractionSchValue; // - Maximum value from OAFlow fraction schedule (used for sizing)
 
 		// Default Constructor
 		OARequirementsData() :
@@ -1221,8 +1217,7 @@ namespace DataSizing {
 			OAFlowPerArea( 0.0 ),
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
-			OAFlowFracSchPtr( 0 ),
-			MaxOAFractionSchValue( 0.0 )
+			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn )
 		{}
 
 	};
@@ -1236,13 +1231,15 @@ namespace DataSizing {
 		Real64 ZoneADEffHeating; // - Zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // - Zone air secondary recirculation ratio
 		int ZoneADEffSchPtr; // - Zone air distribution effectiveness schedule index
+		Real64 ZoneVentilationEff; // Zone ventilation effectiveness
 
 		// Default Constructor
 		ZoneAirDistributionData() :
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
-			ZoneADEffSchPtr( 0 )
+			ZoneADEffSchPtr( 0 ),
+			ZoneVentilationEff( 0.0 )
 		{}
 
 	};

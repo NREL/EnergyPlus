@@ -141,7 +141,6 @@
 ! Reference Capacity = 34.5 kW (9.8 tons)
 ! Compressor Type = Scroll, Condenser Type = Air-cooled
 ! Refrigerant = R407-C
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Chiller:Electric:EIR,
