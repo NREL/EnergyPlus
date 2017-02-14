@@ -6698,6 +6698,11 @@ namespace VariableSpeedCoils {
 		return CBF;
 	}
 
+	Real64 getVarSpeedPartLoadRatio( int const DXCoilNum ) {
+		return VarSpeedCoil( DXCoilNum ).PartLoadRatio;
+	}
+
+
 } // VariableSpeedCoils
 
 } // EnergyPlus

@@ -574,6 +574,8 @@ namespace VariableSpeedCoils {
 		int const CyclingScheme // Continuous fan OR cycling compressor
 	);
 
+	Real64 getVarSpeedPartLoadRatio( int const DXCoilNum ) ;// the number of the DX coil to mined for current PLR
+
 } // VariableSpeedCoils
 
 } // EnergyPlus

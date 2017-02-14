@@ -2509,6 +2509,7 @@ namespace HeatRecovery {
 					HXPartLoadRatio = min( 1.0, HXPartLoadRatio );
 
 				} else if ( CompanionCoilIndex > 0 ) {
+					//VS coil issue here?
 					HXPartLoadRatio = DXCoilPartLoadRatio( CompanionCoilIndex );
 				}
 

@@ -2521,6 +2521,7 @@ namespace DesiccantDehumidifiers {
 			// If preheat is Yes, exhaust fan is condenser fan, if CoilUpstreamOfProcessSide is No, DD runs an its own PLR
 			if ( DesicDehum( DesicDehumNum ).Preheat == Yes && DesicDehum( DesicDehumNum ).CoilUpstreamOfProcessSide == No ) {
 				//    should actually use DX coil RTF instead of PLR since fan power is being calculated
+//VS coil issue?
 				DesicDehum( DesicDehumNum ).ExhaustFanPower += max( 0.0, ( DesicDehum( DesicDehumNum ).ExhaustFanMaxPower * ( DXCoilPartLoadRatio( DesicDehum( DesicDehumNum ).DXCoilIndex ) - DDPartLoadRatio ) ) );
 			}
 
@@ -2550,6 +2551,7 @@ namespace DesiccantDehumidifiers {
 			// Turn on exhaust fan if DX Coil is operating
 			if ( DesicDehum( DesicDehumNum ).ExhaustFanMaxVolFlowRate > 0 ) {
 				if ( DesicDehum( DesicDehumNum ).DXCoilIndex > 0 ) {
+					//VS coil issue here?
 					DDPartLoadRatio = DXCoilPartLoadRatio( DesicDehum( DesicDehumNum ).DXCoilIndex );
 					DesicDehum( DesicDehumNum ).ExhaustFanPower = DesicDehum( DesicDehumNum ).ExhaustFanMaxPower * DDPartLoadRatio;
 					ExhaustFanMassFlowRate = DesicDehum( DesicDehumNum ).ExhaustFanMaxMassFlowRate * DDPartLoadRatio;

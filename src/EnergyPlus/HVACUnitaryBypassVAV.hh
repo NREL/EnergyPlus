@@ -159,7 +159,7 @@ namespace HVACUnitaryBypassVAV {
 		Real64 NoHeatCoolSpeedRatio; // Fan speed ratio when no cooling or heating
 		bool CheckFanFlow; // Check fan volumetric flow versus system flow in init routine.
 		std::string DXCoolCoilName; // Name of DX cooling coil
-		std::string DXCoolCoilType; // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+		std::string DXCoolCoilType; // Type of DX cooling coil, Coil:DX:Cooling:SingleSpeed or
 		//               CoilSystem:Cooling:DX:HeatExchangerAssisted
 		int DXCoolCoilType_Num; // Numeric equivalent for DX cooling coil type
 		int CoolCoilCompIndex; // cooling coil component index number

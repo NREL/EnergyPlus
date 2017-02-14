@@ -4,7 +4,7 @@ Variable Speed DX Coil Enhancements
 **B. Griffith, Energy Archmage Company, for GARD/NREL/DOE**
 
  - 11/18/2016, first draft
- - 
+ - 2/13/2017, revised to reflect unitary system changes
  
 
 ## Justification for New Feature ##
@@ -39,7 +39,7 @@ Modify individual parent models to add support for the VS air source DX coil typ
     - HVACUnitaryBypassVAV.cc ( change over bypass packaged systems )
     - DesiccantDehumidifiers.cc ( desiccant system with coordinated control and desuperheater regen heat options from upstream DX coil)
     
-Create test files using AirLoopHVAC:UnitarySystem with setpoint-based control that run Coil:Cooling:DX:VariableSpeed and Coil:Heating:DX:VariableSpeed and fix any problems. Create variations using Coil:Heating:Desuperheater and CoilSystem:Cooling:DX:HeatExchangerAssisted and fix any problems.
+Create test files using AirLoopHVAC:UnitarySystem with setpoint-based control that run Coil:Cooling:DX:VariableSpeed and Coil:Heating:DX:VariableSpeed and fix any problems. Create variations using Coil:Heating:Desuperheater and CoilSystem:Cooling:DX:HeatExchangerAssisted and fix any problems found related to using VS coil models in HeatRecovery.cc and HVACUnitarySystem.cc.
 
 ## Testing/Validation/Data Sources ##
 
@@ -93,6 +93,12 @@ No new models, just connecting existing models together.
 ## Example File and Transition Changes ##
 
 Approximately seven new test files that demonstrate using variable speed DX coils in these applications.
+
+5Zone_Unitary_HXAssistedCoil
+5Zone_Unitary_VSDesuperheater
+5Zone_Unitary_VSDesuperheatWaterHeater
+DesiccantDehumidifierWithAirToAirCoil
+WindowACAirToAir.idf
 
 ## References ##
 
