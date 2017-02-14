@@ -19716,12 +19716,12 @@ People,
   A8 , \field Surface Name/Angle Factor List Name
        \type object-list
        \object-list AllHeatTranAngFacNames
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A9 , \field Work Efficiency Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note units in schedule are 0.0 to 1.0
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A10, \field Clothing Insulation Calculation Method
        \type choice
        \key ClothingInsulationSchedule
@@ -19736,12 +19736,12 @@ People,
        \type object-list
        \object-list ScheduleNames
        \note use "Clo" from ASHRAE or Thermal Comfort guides
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A13, \field Air Velocity Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note units in the schedule are m/s
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A14, \field Thermal Comfort Model 1 Type
        \type choice
        \key Fanger
@@ -23322,6 +23322,7 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
       \required-field
       \type object-list
       \object-list FansZoneExhaust
+      \reference SurfaceAirflowLeakageNames
       \note Enter the name of a Fan:ZoneExhaust object.
  N1 , \field Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
       \required-field
@@ -73450,6 +73451,9 @@ AvailabilityManager:HybridVentilation,
        \note 2 = Enthalpy control
        \note 3 = Dewpoint control
        \note 4 = Outdoor ventilation air control
+       \note 5 = Operative temperature control with 80% adaptive comfort acceptability limits
+       \note 6 = Operative temperature control with 90% adaptive comfort acceptability limits
+       \note 7 = Carbon dioxide control
   A5 , \field Use Weather File Rain Indicators
        \type choice
        \key Yes
@@ -73528,7 +73532,7 @@ AvailabilityManager:HybridVentilation,
        \note The schedule is used to incorporate operation of simple airflow objects and HVAC
        \note system operation.
        \note The simple airflow objects are Ventilation and Mixing only
-  A10; \field ZoneVentilation Object Name
+  A10, \field ZoneVentilation Object Name
        \note This field has not been instrumented to work with
        \note global Zone or Zone List names option for Ventilation:DesignFlowRate.  In order to
        \note use, you must enter the single <Ventilation:DesignFlowRate> name in this field.
@@ -73538,6 +73542,18 @@ AvailabilityManager:HybridVentilation,
        \object-list VentilationNames
        \note The other ZoneVentilation:* and ZoneMixing objects controlled in the same AirLoopHVAC
        \note will work in the same way as this ventilation object.
+  N8 , \field Minimum HVAC Operation Time
+       \note Minimum operation time when HVAC system is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
+  N9 ; \field Minimum Ventilation Time
+       \note Minimum ventilation time when natural ventilation is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
 
 AvailabilityManagerAssignmentList,
        \memo Defines the applicable managers used for an AirLoopHVAC or PlantLoop. The priority of
@@ -81256,7 +81272,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \object-list HeatingCoilsDesuperheater
    A6, \field Water Coil Controller Name
        \note Enter the name of controller for the water coil affected
-       \required for water coils
+       \note Required for water coils
        \type object-list
        \object-list WaterCoilControllers
    N1; \field Reference Sensor Offset

@@ -259,11 +259,14 @@ namespace ThermalComfort {
 	Array1D< ThermalComfortDataType > ThermalComfortData;
 	Array1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
 
+	Real64 runningAverageASH( 0.0 );
+
 	// Functions
 	void
 	clear_state()
 	{
 		FirstTimeFlag = true;
+		runningAverageASH = 0.0;
 		AbsAirTemp = 0.0;
 		AbsCloSurfTemp = 0.0;
 		AbsRadTemp = 0.0;
@@ -1937,11 +1940,11 @@ namespace ThermalComfort {
 			if ( People( Item ).MRTCalcType != AngleFactor ) continue;
 			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
 			WhichAFList = People( Item ).AngleFactorListPtr;
-			if ( WhichAFList == 0 ) {
+			if ( WhichAFList == 0 && ( People( Item ).Fanger || People( Item ).Pierce || People( Item ).KSU ) ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );
 				ShowSevereError( "... Angle Factor List Name not found for PEOPLE= " + People( Item ).Name );
 				ErrorsFound = true;
-			} else if ( People( Item ).ZonePtr != AngleFactorList( WhichAFList ).ZonePtr ) {
+			} else if ( People( Item ).ZonePtr != AngleFactorList( WhichAFList ).ZonePtr  && ( People( Item ).Fanger || People( Item ).Pierce || People( Item ).KSU ) ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + AngleFactorList( WhichAFList ).Name + " mismatch Zone Name" );
 				ShowContinueError( "...Zone=\"" + AngleFactorList( WhichAFList ).ZoneName + " does not match Zone=\"" + Zone( People( Item ).ZonePtr ).Name + "\" in PEOPLE=\"" + People( Item ).Name + "\"." );
 				ErrorsFound = true;
@@ -2615,7 +2618,6 @@ namespace ThermalComfort {
 		std::string epwLine;
 		static Real64 avgDryBulbASH( 0.0 );
 		Real64 dryBulb;
-		static Real64 runningAverageASH( 0.0 );
 		static Array1D< Real64 > monthlyTemp( 12, 0.0 );
 		Real64 tComf;
 		Real64 numOccupants;
