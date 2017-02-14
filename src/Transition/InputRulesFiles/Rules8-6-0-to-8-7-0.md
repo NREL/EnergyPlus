@@ -40,7 +40,10 @@ Fields 1-24 remain the same.
 After F24`, insert four new blank fields that represent user-enterable design conditions. 
 Shift all later fields down by four.
 
+# Object Change: `Output:Surfaces:List`
 
+The only change is for field F1, which is A1.  Logic to apply:
 
+if key = 'DecayCurvesfromZoneComponentLoads', change to = 'DecayCurvesFromComponentLoadsSummary'
 
 

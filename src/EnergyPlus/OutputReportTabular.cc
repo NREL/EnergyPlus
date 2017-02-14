@@ -273,6 +273,8 @@ namespace OutputReportTabular {
 	bool displayAdaptiveComfort( false );
 	bool displaySourceEnergyEndUseSummary( false );
 	bool displayZoneComponentLoadSummary( false );
+	bool displayAirLoopComponentLoadSummary( false );
+	bool displayFacilityComponentLoadSummary( false );
 	bool displayLifeCycleCostReport( false );
 	bool displayTariffReport( false );
 	bool displayEconomicResultSummary( false );
@@ -514,6 +516,8 @@ namespace OutputReportTabular {
 		displayAdaptiveComfort = false;
 		displaySourceEnergyEndUseSummary = false;
 		displayZoneComponentLoadSummary = false;
+		displayAirLoopComponentLoadSummary = false;
+		displayFacilityComponentLoadSummary = false;
 		displayLifeCycleCostReport = false;
 		displayTariffReport = false;
 		displayEconomicResultSummary = false;
@@ -707,7 +711,7 @@ namespace OutputReportTabular {
 			InitializeTabularMonthly();
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
-			AddTOCZoneLoadComponentTable();
+			AddTOCLoadComponentTableSummaries();
 			UpdateTabularReportsGetInput = false;
 			date_and_time( _, _, _, td );
 		}
@@ -1925,6 +1929,14 @@ namespace OutputReportTabular {
 					displayZoneComponentLoadSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "AirLoopComponentLoadSummary" ) ) {
+					displayAirLoopComponentLoadSummary = true;
+					WriteTabularFiles = true;
+					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "FacilityComponentLoadSummary" ) ) {
+					displayFacilityComponentLoadSummary = true;
+					WriteTabularFiles = true;
+					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "LEEDSummary" ) ) {
 					displayLEEDSummary = true;
 					WriteTabularFiles = true;
@@ -1990,6 +2002,8 @@ namespace OutputReportTabular {
 					}
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
+					displayAirLoopComponentLoadSummary = true;
+					displayFacilityComponentLoadSummary = true;
 				} else if ( SameString( AlphArray( iReport ), "AllMonthly" ) ) {
 					WriteTabularFiles = true;
 					for ( jReport = 1; jReport <= numNamedMonthly; ++jReport ) {
@@ -2040,6 +2054,8 @@ namespace OutputReportTabular {
 					}
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
+					displayAirLoopComponentLoadSummary = true;
+					displayFacilityComponentLoadSummary = true;
 				}
 				// check the reports that are predefined and are created by OutputReportPredefined
 				for ( jReport = 1; jReport <= numReportName; ++jReport ) {
@@ -2285,6 +2301,12 @@ namespace OutputReportTabular {
 			// loop through the fields looking for matching report titles
 			for ( iReport = 1; iReport <= NumAlphas; ++iReport ) {
 				if ( SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
+					isFound = true;
+				}
+				if ( SameString( AlphArray( iReport ), "AirLoopComponentLoadSummary" ) ) {
+					isFound = true;
+				}
+				if ( SameString( AlphArray( iReport ), "FacilityComponentLoadSummary" ) ) {
 					isFound = true;
 				}
 				if ( SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
@@ -10949,7 +10971,7 @@ namespace OutputReportTabular {
 	}
 
 	void
-	AddTOCZoneLoadComponentTable()
+	AddTOCLoadComponentTableSummaries()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -10991,11 +11013,20 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int iZone;
-
-		if ( displayZoneComponentLoadSummary && CompLoadReportIsReq ) {
-			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				if ( ! ZoneEquipConfig( iZone ).IsControlled ) continue;
-				AddTOCEntry( "Zone Component Load Summary", Zone( iZone ).Name );
+		if ( CompLoadReportIsReq ) {
+			if ( displayZoneComponentLoadSummary ) {
+				for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+					if ( ! ZoneEquipConfig( iZone ).IsControlled ) continue;
+					AddTOCEntry( "Zone Component Load Summary", Zone( iZone ).Name );
+				}
+			}
+			if ( displayAirLoopComponentLoadSummary ) {
+				for ( int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum ) {
+					AddTOCEntry( "AirLoop Component Load Summary", DataSizing::FinalSysSizing( AirLoopNum ).AirPriLoopName );
+				}
+			}
+			if ( displayFacilityComponentLoadSummary ) {
+				AddTOCEntry( "Facility Component Load Summary", "Facility" );
 			}
 		}
 	}

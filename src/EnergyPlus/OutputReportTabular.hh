@@ -170,6 +170,8 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
+	extern bool displayAirLoopComponentLoadSummary;
+	extern bool displayFacilityComponentLoadSummary;
 	extern bool displayLifeCycleCostReport;
 	extern bool displayTariffReport;
 	extern bool displayEconomicResultSummary;
@@ -776,7 +778,7 @@ namespace OutputReportTabular {
 	splitCommaString (std::string const & inputString );
 	
 	void
-	AddTOCZoneLoadComponentTable();
+	AddTOCLoadComponentTableSummaries();
  
 	void
 	AllocateLoadComponentArrays();
