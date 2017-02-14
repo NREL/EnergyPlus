@@ -186,6 +186,25 @@ namespace ZoneTempPredictorCorrector {
 
 	};
 
+	struct AdaptiveComfortDailySetPointSchedule
+	{
+		// Members
+		bool initialized;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_90;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_80;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Central;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_I;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_II;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_III;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Central;
+
+		// Default Constructor
+		AdaptiveComfortDailySetPointSchedule() :
+			initialized( false )
+		{}
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneTempControlType > SetPointSingleHeating;
 	extern Array1D< ZoneTempControlType > SetPointSingleCooling;
@@ -195,6 +214,8 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
+	extern Array1D< Real64 > AdapComfortSetPointSummerDesDay;
 
 	// Functions
 	void
@@ -224,6 +245,12 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CalcZoneAirTempSetPoints();
+
+	void
+	CalculateMonthlyRunningAverageDryBulb( Array1D< Real64 > & runningAverageASH, Array1D< Real64 > & runningAverageCEN );
+
+	void
+	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
 
 	void
 	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
@@ -313,6 +340,12 @@ namespace ZoneTempPredictorCorrector {
 	AdjustAirSetPointsforOpTempCntrl(
 		int const TempControlledZoneID,
 		int const ActualZoneNum,
+		Real64 & ZoneAirSetPoint
+	);
+
+	void
+	AdjustOperativeSetPointsforAdapComfort(
+		int const TempControlledZoneID,
 		Real64 & ZoneAirSetPoint
 	);
 
