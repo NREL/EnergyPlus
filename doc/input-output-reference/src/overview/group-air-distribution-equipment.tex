@@ -402,7 +402,7 @@ The name of the HVAC system node that is the air outlet node of the unit. This s
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type}
 
-The type of fan in the terminal unit. At this time the only type of fan allowed is \emph{Fan:VariableVolume}.
+The type of fan in the terminal unit. At this time the only type of fan allowed is \emph{Fan:SystemModel} or \emph{Fan:VariableVolume}.
 
 \paragraph{Field: Fan Name}\label{field-fan-name}
 
@@ -839,7 +839,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run according to the Availability Schedule specified in the fan object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-3}
 
@@ -996,7 +996,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-2}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. When the primary air flow is below the Fan On Flow Fraction (above), the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. When the primary air flow is below the Fan On Flow Fraction (above), the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-4}
 

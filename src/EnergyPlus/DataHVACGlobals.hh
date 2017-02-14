@@ -145,6 +145,8 @@ namespace DataHVACGlobals {
 	extern int const FanType_SimpleOnOff;
 	extern int const FanType_ZoneExhaust;
 	extern int const FanType_ComponentModel; // cpw22Aug2010 (new)
+	extern int const FanType_SystemModelObject; // 
+
 	// Fan Minimum Flow Fraction Input Method
 	extern int const MinFrac;
 	extern int const FixedMin;
@@ -316,7 +318,6 @@ namespace DataHVACGlobals {
 	extern int NumElecCircuits; // Number of electric circuits specified in simulation
 	extern int NumGasMeters; // Number of gas meters specified in simulation
 	extern int NumPrimaryAirSys; // Number of primary HVAC air systems
-	extern Real64 FanElecPower; // fan power from last fan simulation
 	extern Real64 OnOffFanPartLoadFraction; // fan part-load fraction (Fan:OnOff)
 	extern Real64 DXCoilTotalCapacity; // DX coil total cooling capacity (eio report var for HPWHs)
 	extern Real64 DXElecCoolingPower; // Electric power consumed by DX cooling coil last DX simulation

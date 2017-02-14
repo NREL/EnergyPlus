@@ -62,10 +62,12 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <DataWater.hh>
+#include <Fans.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACFan.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -368,6 +370,8 @@ namespace VariableSpeedCoils {
 		CondensateVdot( 0.0 ),
 		CondensateVol( 0.0 ),
 		CondInletTemp( 0.0 ),
+		SupplyFanIndex( 0 ),
+		SupplyFan_TypeNum( 0 ),
 		SourceAirMassFlowRate( 0.0 ),
 		InletSourceAirTemp( 0.0 ),
 		InletSourceAirEnthalpy( 0.0 ),
@@ -2731,7 +2735,7 @@ namespace VariableSpeedCoils {
 			SizeVarSpeedCoil( DXCoilNum );
 
 			//   get rated coil bypass factor excluding fan heat
-			FanElecPower = 0.0;
+
 			MySizeFlag( DXCoilNum ) = false;
 		}
 		//variable-speed heat pump water heating, end
@@ -4536,7 +4540,6 @@ namespace VariableSpeedCoils {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
-		using DataHVACGlobals::FanElecPower;
 		using DataHVACGlobals::HPWHInletDBTemp;
 		using DataHVACGlobals::HPWHInletWBTemp;
 		using DataHVACGlobals::DXCoilTotalCapacity;
@@ -4724,6 +4727,16 @@ namespace VariableSpeedCoils {
 			SpeedCal = SpeedNum;
 		}
 
+		Real64 locFanElecPower= 0.0;// local for fan electric power
+		if ( VarSpeedCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+			if ( VarSpeedCoil( DXCoilNum ).SupplyFanIndex > -1 ) {
+				locFanElecPower = HVACFan::fanObjs[ VarSpeedCoil( DXCoilNum ).SupplyFanIndex ]->fanPower();
+			}
+		} else {
+			if ( VarSpeedCoil( DXCoilNum ).SupplyFanIndex > 0 ) {
+				locFanElecPower = Fans::GetFanPower( VarSpeedCoil( DXCoilNum ).SupplyFanIndex );
+			}
+		}
 
 		if ( ( SpeedNum == 1 ) || ( SpeedNum > MaxSpeed ) || ( SpeedRatio == 1.0 ) ) {
 			AirMassFlowRatio = LoadSideMassFlowRate / VarSpeedCoil( DXCoilNum ).DesignAirMassFlowRate;
@@ -4768,31 +4781,31 @@ namespace VariableSpeedCoils {
 			// calculate evaporator total cooling capacity
 			if ( VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP ) {
 				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
-					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF
-									  - VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					//       make sure fan power is full load fan power, it isn't though,  
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF
+						- VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
 					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
 				} else {
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
-					if ( ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 )
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF;
+					if ( ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
-										 ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+						( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
 				}
 			} else {
 				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
 					CompressorPower = OperatingHeatingPower -
-									  VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 )
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF ) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
-										 ( OperatingHeatingPower + FanElecPower / HPRTF );
+						( OperatingHeatingPower + locFanElecPower / HPRTF);
 				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF +
-						   VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 )
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF +
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
-										 ( OperatingHeatingPower + FanElecPower / HPRTF +
-										   VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+						(OperatingHeatingPower + locFanElecPower / HPRTF +
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower);
 				}
 			}
 
@@ -4892,12 +4905,12 @@ namespace VariableSpeedCoils {
 			if ( VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP ) {
 				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF
-									  - VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF
+						- VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
 					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
 				} else {
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
-					if ( ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 )
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF;
+					if ( ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
 										 ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
 				}
@@ -4905,17 +4918,17 @@ namespace VariableSpeedCoils {
 				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
 					CompressorPower = OperatingHeatingPower -
-									  VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 )
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF ) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
-										 ( OperatingHeatingPower + FanElecPower / HPRTF );
+						( OperatingHeatingPower + locFanElecPower / HPRTF);
 				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF +
-						   VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 )
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF +
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
-										 ( OperatingHeatingPower + FanElecPower / HPRTF +
-										   VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+						( OperatingHeatingPower + locFanElecPower / HPRTF +
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
 				}
 			}
 
@@ -5071,6 +5084,22 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).EnergyLatent = 0.0;
 			VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption = 0.0;
 		}
+	}
+
+	void
+	setVarSpeedHPWHFanTypeNum(
+		int const dXCoilNum,
+		int const fanTypeNum
+	){
+		VarSpeedCoil( dXCoilNum ).SupplyFan_TypeNum = fanTypeNum;
+	}
+
+	void
+	setVarSpeedHPWHFanIndex(
+		int const dXCoilNum,
+		int const fanIndex
+	){
+		VarSpeedCoil( dXCoilNum ).SupplyFanIndex = fanIndex;
 	}
 
 	void

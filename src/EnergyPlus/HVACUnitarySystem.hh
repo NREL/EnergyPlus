@@ -271,6 +271,7 @@ namespace HVACUnitarySystem {
 		int SuppCoilBranchNum; // Branch of number of the supplemental coil in the plant loop
 		int SuppCoilCompNum; // Comp num of the supplemental coil in the plant loop
 		// fan specific data
+		std::string fanName; // TRANE
 		int FanType_Num; // Fan type num i.e. OnOff, ConstVol, VAV
 		int FanIndex; // index of fan of a particular type
 		Real64 ActualFanVolFlowRate; // Actual or design fan volume flow rate

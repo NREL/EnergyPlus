@@ -286,6 +286,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
 	extern int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
 	extern int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
+	extern int const IntGainTypeOf_FanSystemModel;
 
 	//Parameters for checking surface heat transfer models
 	extern Real64 const HighDiffusivityThreshold; // used to check if Material properties are out of line.
