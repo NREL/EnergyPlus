@@ -644,6 +644,8 @@ The iteration correction method presented in the above equation gives a variable
 
 \subsection{Node Temperature Calculations}\label{node-temperature-calculations}
 
+\subsubsection{General}
+
 A brief description of the air node temperature calculation is given below. A detailed description can be found in the work of Swami et al. (1992). The following equation is used to calculate temperature distribution across a duct element at the given airflow rate and inlet air temperature:
 
 \begin{equation}
@@ -716,6 +718,10 @@ $[B]$ &= Given boundary conditions\\
 \end{tabular}
 
 The zone air temperatures and primary air loop component (fan and coils) outlet conditions are used as prescribed conditions in the AirflowNetwork model. In addition, the temperature difference across zone loop components (terminal units) is held constant during the calculations. For example, thermal zone temperatures calculated during the previous system time step are used as prescribed temperatures when calculating all other node temperatures. The zone air temperature is assumed constant (prescribed) throughout the AirflowNetwork iterative solution. The fan and coil outlet air temperatures, and terminal unit temperature differences are assumed constant within an AirflowNetwork iteration. The sensible heat gains calculated during the AirflowNetwork solution are then used to predict a new zone air temperature.
+
+\subsubsection{Duct Radiation}
+
+<Radiation will be treated as point loads heat source/sink on the zone surfaces and the duct.  These point loads will be added or subtracted using the same implementation strategy as the convective load for the ducts to the zone air.  The radiative rate of energy transfer between the duct (d) and a given surface (s) for two grey surfaces can be written as Eq. (1) or Eq. (2).
 
 \subsection{Node Humidity Ratio Calculations}\label{node-humidity-ratio-calculations}
 
