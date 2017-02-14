@@ -1581,7 +1581,6 @@ namespace PlantChillers {
 				if ( GTChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
 					GTChiller( ChillerNum ).Base.CondVolFlowRateWasAutoSized = true;
 				}
-				
 			}
 			GTChiller( ChillerNum ).CapRatCoef( 1 ) = rNumericArgs( 11 );
 			GTChiller( ChillerNum ).CapRatCoef( 2 ) = rNumericArgs( 12 );

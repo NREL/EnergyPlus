@@ -801,7 +801,7 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, WWHP_AutosizeTest1 ) {
 		// this test is for checking autosizing of heating WWHP. derived from unit test PlantLoopSourceSideTest
 		std::string const idf_objects = delimited_string( { 
-		"Version,8.3;",
+		"Version,8.6;",
 		"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
 		"Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
 		"Schedule:Constant,Radiator power demand temporary,Any value sch,3000;",
@@ -1152,7 +1152,10 @@ namespace EnergyPlus {
 		"    GHEV Demand Connectors,  !- Demand Side Connector List Name",
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    , ",
+		"    , ",
+		"    2.0;",
 
 		"PlantLoop,",
 		"    RadHP Loop,              !- Name",
@@ -1175,7 +1178,10 @@ namespace EnergyPlus {
 		"    RADHP Demand Connectors, !- Demand Side Connector List Name",
 		"    Optimal,                 !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    , ",
+		"    , ",
+		"    2.0;",
 
 		"Sizing:Plant,",
 		"    RadHP Loop,",
@@ -1219,7 +1225,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Pump Branch, !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    GHEV pump,               !- Component 1 Name",
@@ -1228,7 +1233,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Borehole Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    GroundHeatExchanger:Vertical,  !- Component 1 Object Type",
 		"    Vertical GHE JL2015,     !- Component 1 Name",
@@ -1237,7 +1241,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Bypass Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV supp bypass pipe,   !- Component 1 Name",
@@ -1246,7 +1249,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV supp exit pipe,     !- Component 1 Name",
@@ -1255,7 +1257,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand Inlet Branch,!- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV dem entrance pipe,  !- Component 1 Name",
@@ -1264,7 +1265,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand HPRad Branch,!- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatPump:WaterToWater:EquationFit:Heating,  !- Component 1 Object Type",
 		"    Rad Heat Pump,           !- Component 1 Name",
@@ -1273,7 +1273,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand Bypass Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV dem bypass pipe,    !- Component 1 Name",
@@ -1282,7 +1281,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV dem exit pipe,      !- Component 1 Name",
@@ -1291,7 +1289,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply Inlet Pump, !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    RAD HP pump,             !- Component 1 Name",
@@ -1300,7 +1297,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply HPR Branch ,!- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatPump:WaterToWater:EquationFit:Heating,  !- Component 1 Object Type",
 		"    Rad Heat Pump,           !- Component 1 Name",
@@ -1309,7 +1305,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply Bypass Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP supp bypass pipe,  !- Component 1 Name",
@@ -1318,7 +1313,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP supp exit pipe,    !- Component 1 Name",
@@ -1327,7 +1321,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Inlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP dem entrance pipe, !- Component 1 Name",
@@ -1336,7 +1329,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Radload Branch ,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,       !- Component 1 Object Type",
 		"    Radiator load,           !- Component 1 Name",
@@ -1345,7 +1337,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Bypass Branch ,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP dem bypass pipe,   !- Component 1 Name",
@@ -1354,7 +1345,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP dem exit pipe,     !- Component 1 Name",

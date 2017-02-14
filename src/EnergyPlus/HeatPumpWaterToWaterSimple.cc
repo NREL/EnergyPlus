@@ -304,8 +304,6 @@ namespace HeatPumpWaterToWaterSimple {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		Array1D_string AlphArray( 6 ); // character string data
-		Array1D< Real64 > NumArray( 17 ); // numeric data
 
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
@@ -332,47 +330,47 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks,DataIPShortCuts::lAlphaFieldBlanks );
+			GetObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks,DataIPShortCuts::lAlphaFieldBlanks );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( DataIPShortCuts::cAlphaArgs( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+				if ( IsBlank ) DataIPShortCuts::cAlphaArgs( 1 ) = "xxxxx";
 			}
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
-			GSHP( GSHPNum ).Name = AlphArray( 1 );
-			GSHP( GSHPNum ).RatedLoadVolFlowCool = NumArray( 1 );
+			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
+			GSHP( GSHPNum ).RatedLoadVolFlowCool = DataIPShortCuts::rNumericArgs( 1 );
 			if ( GSHP( GSHPNum ).RatedLoadVolFlowCool == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).RatedSourceVolFlowCool = NumArray( 2 );
+			GSHP( GSHPNum ).RatedSourceVolFlowCool = DataIPShortCuts::rNumericArgs( 2 );
 			if ( GSHP( GSHPNum ).RatedSourceVolFlowCool == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedSourceVolFlowCoolWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).RatedCapCool = NumArray( 3 );
+			GSHP( GSHPNum ).RatedCapCool = DataIPShortCuts::rNumericArgs( 3 );
 			if ( GSHP( GSHPNum ).RatedCapCool == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedCapCoolWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).RatedPowerCool = NumArray( 4 );
+			GSHP( GSHPNum ).RatedPowerCool = DataIPShortCuts::rNumericArgs( 4 );
 			if ( GSHP( GSHPNum ).RatedPowerCool == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedPowerCoolWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).CoolCap1 = NumArray( 5 );
-			GSHP( GSHPNum ).CoolCap2 = NumArray( 6 );
-			GSHP( GSHPNum ).CoolCap3 = NumArray( 7 );
-			GSHP( GSHPNum ).CoolCap4 = NumArray( 8 );
-			GSHP( GSHPNum ).CoolCap5 = NumArray( 9 );
-			GSHP( GSHPNum ).CoolPower1 = NumArray( 10 );
-			GSHP( GSHPNum ).CoolPower2 = NumArray( 11 );
-			GSHP( GSHPNum ).CoolPower3 = NumArray( 12 );
-			GSHP( GSHPNum ).CoolPower4 = NumArray( 13 );
-			GSHP( GSHPNum ).CoolPower5 = NumArray( 14 );
+			GSHP( GSHPNum ).CoolCap1 = DataIPShortCuts::rNumericArgs( 5 );
+			GSHP( GSHPNum ).CoolCap2 = DataIPShortCuts::rNumericArgs( 6 );
+			GSHP( GSHPNum ).CoolCap3 = DataIPShortCuts::rNumericArgs( 7 );
+			GSHP( GSHPNum ).CoolCap4 = DataIPShortCuts::rNumericArgs( 8 );
+			GSHP( GSHPNum ).CoolCap5 = DataIPShortCuts::rNumericArgs( 9 );
+			GSHP( GSHPNum ).CoolPower1 = DataIPShortCuts::rNumericArgs( 10 );
+			GSHP( GSHPNum ).CoolPower2 = DataIPShortCuts::rNumericArgs( 11 );
+			GSHP( GSHPNum ).CoolPower3 = DataIPShortCuts::rNumericArgs( 12 );
+			GSHP( GSHPNum ).CoolPower4 = DataIPShortCuts::rNumericArgs( 13 );
+			GSHP( GSHPNum ).CoolPower5 = DataIPShortCuts::rNumericArgs( 14 );
 
 			if ( NumNums > 14 ) {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 15 ) ) {
-					GSHP( GSHPNum ).refCOP = NumArray( 15 );
+					GSHP( GSHPNum ).refCOP = DataIPShortCuts::rNumericArgs( 15 );
 				} else {
 					GSHP( GSHPNum ).refCOP = 8.0; 
 				}
@@ -388,7 +386,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			if ( NumNums > 15 ) {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 16 ) ) {
-					GSHP( GSHPNum ).sizFac = NumArray( 16 );
+					GSHP( GSHPNum ).sizFac = DataIPShortCuts::rNumericArgs( 16 );
 				} else {
 					GSHP( GSHPNum ).sizFac = 1.0;
 				}
@@ -396,20 +394,20 @@ namespace HeatPumpWaterToWaterSimple {
 				GSHP( GSHPNum ).sizFac = 1.0;
 			}
 
-			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, HPEqFitCoolingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 2 ), ErrorsFound, HPEqFitCoolingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, HPEqFitCoolingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			GSHP( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 3 ), ErrorsFound, HPEqFitCoolingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).LoadSideInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, HPEqFitCoolingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			GSHP( GSHPNum ).LoadSideInletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 4 ), ErrorsFound, HPEqFitCoolingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, HPEqFitCoolingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 5 ), ErrorsFound, HPEqFitCoolingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			// Test node sets
-			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
-			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Chilled Water Nodes" );
+			TestCompSet( HPEqFitCoolingUC, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 2 ), DataIPShortCuts::cAlphaArgs( 3 ), "Condenser Water Nodes" );
+			TestCompSet( HPEqFitCoolingUC, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 4 ), DataIPShortCuts::cAlphaArgs( 5 ), "Chilled Water Nodes" );
 
 			if ( NumAlphas > 5 && ! DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
-				GSHP( GSHPNum ).companionName = AlphArray( 6 );
+				GSHP( GSHPNum ).companionName = DataIPShortCuts::cAlphaArgs( 6 );
 			}
 
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
@@ -423,48 +421,48 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			GetObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( DataIPShortCuts::cAlphaArgs( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+				if ( IsBlank ) DataIPShortCuts::cAlphaArgs( 1 ) = "xxxxx";
 			}
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
-			GSHP( GSHPNum ).Name = AlphArray( 1 );
-			GSHP( GSHPNum ).RatedLoadVolFlowHeat = NumArray( 1 );
+			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
+			GSHP( GSHPNum ).RatedLoadVolFlowHeat = DataIPShortCuts::rNumericArgs( 1 );
 			if ( GSHP( GSHPNum ).RatedLoadVolFlowHeat == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).RatedSourceVolFlowHeat = NumArray( 2 );
+			GSHP( GSHPNum ).RatedSourceVolFlowHeat = DataIPShortCuts::rNumericArgs( 2 );
 			if ( GSHP( GSHPNum ).RatedSourceVolFlowHeat == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedSourceVolFlowHeatWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).RatedCapHeat = NumArray( 3 );
+			GSHP( GSHPNum ).RatedCapHeat = DataIPShortCuts::rNumericArgs( 3 );
 			if ( GSHP( GSHPNum ).RatedCapHeat == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedCapHeatWasAutoSized = true;
 			}
-			GSHP( GSHPNum ).RatedPowerHeat = NumArray( 4 );
+			GSHP( GSHPNum ).RatedPowerHeat = DataIPShortCuts::rNumericArgs( 4 );
 			if ( GSHP( GSHPNum ).RatedPowerHeat == DataSizing::AutoSize ) {
 				GSHP( GSHPNum ).ratedPowerHeatWasAutoSized = true;
 			}
 
-			GSHP( GSHPNum ).HeatCap1 = NumArray( 5 );
-			GSHP( GSHPNum ).HeatCap2 = NumArray( 6 );
-			GSHP( GSHPNum ).HeatCap3 = NumArray( 7 );
-			GSHP( GSHPNum ).HeatCap4 = NumArray( 8 );
-			GSHP( GSHPNum ).HeatCap5 = NumArray( 9 );
-			GSHP( GSHPNum ).HeatPower1 = NumArray( 10 );
-			GSHP( GSHPNum ).HeatPower2 = NumArray( 11 );
-			GSHP( GSHPNum ).HeatPower3 = NumArray( 12 );
-			GSHP( GSHPNum ).HeatPower4 = NumArray( 13 );
-			GSHP( GSHPNum ).HeatPower5 = NumArray( 14 );
+			GSHP( GSHPNum ).HeatCap1 = DataIPShortCuts::rNumericArgs( 5 );
+			GSHP( GSHPNum ).HeatCap2 = DataIPShortCuts::rNumericArgs( 6 );
+			GSHP( GSHPNum ).HeatCap3 = DataIPShortCuts::rNumericArgs( 7 );
+			GSHP( GSHPNum ).HeatCap4 = DataIPShortCuts::rNumericArgs( 8 );
+			GSHP( GSHPNum ).HeatCap5 = DataIPShortCuts::rNumericArgs( 9 );
+			GSHP( GSHPNum ).HeatPower1 = DataIPShortCuts::rNumericArgs( 10 );
+			GSHP( GSHPNum ).HeatPower2 = DataIPShortCuts::rNumericArgs( 11 );
+			GSHP( GSHPNum ).HeatPower3 = DataIPShortCuts::rNumericArgs( 12 );
+			GSHP( GSHPNum ).HeatPower4 = DataIPShortCuts::rNumericArgs( 13 );
+			GSHP( GSHPNum ).HeatPower5 = DataIPShortCuts::rNumericArgs( 14 );
 
 			if ( NumNums > 14 ) {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 15 ) ) {
-					GSHP( GSHPNum ).refCOP = NumArray( 15 );
+					GSHP( GSHPNum ).refCOP = DataIPShortCuts::rNumericArgs( 15 );
 				} else {
 					GSHP( GSHPNum ).refCOP = 7.5; 
 				}
@@ -480,7 +478,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			if ( NumNums > 15 ) {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 16 ) ) {
-					GSHP( GSHPNum ).sizFac = NumArray( 16 );
+					GSHP( GSHPNum ).sizFac = DataIPShortCuts::rNumericArgs( 16 );
 				} else {
 					GSHP( GSHPNum ).sizFac = 1.0;
 				}
@@ -488,21 +486,21 @@ namespace HeatPumpWaterToWaterSimple {
 				GSHP( GSHPNum ).sizFac = 1.0;
 			}
 
-			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 2 ), ErrorsFound, HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			GSHP( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 3 ), ErrorsFound, HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).LoadSideInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			GSHP( GSHPNum ).LoadSideInletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 4 ), ErrorsFound, HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 5 ), ErrorsFound, HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			if ( NumAlphas > 5 && ! DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
-				GSHP( GSHPNum ).companionName = AlphArray( 6 );
+				GSHP( GSHPNum ).companionName = DataIPShortCuts::cAlphaArgs( 6 );
 			}
 
 			// Test node sets
-			TestCompSet( HPEqFitHeatingUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
-			TestCompSet( HPEqFitHeatingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Hot Water Nodes" );
+			TestCompSet( HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 2 ), DataIPShortCuts::cAlphaArgs( 3 ), "Condenser Water Nodes" );
+			TestCompSet( HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 4 ), DataIPShortCuts::cAlphaArgs( 5 ), "Hot Water Nodes" );
 
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Heating'
 			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
@@ -1347,7 +1345,7 @@ namespace HeatPumpWaterToWaterSimple {
 		func4 = ( SourceSideMassFlowRate / ( SourceSideVolFlowRateRated * rhoSourceSide ) );
 
 		QLoad = CoolCapRated * ( CoolCapCoeff1 + ( func1 * CoolCapCoeff2 ) + ( func2 * CoolCapCoeff3 ) + ( func3 * CoolCapCoeff4 ) + ( func4 * CoolCapCoeff5 ) );
-// this doesn't match eng ref, doc is missing CoolPowerRated
+
 		Power = CoolPowerRated * ( CoolPowerCoeff1 + ( func1 * CoolPowerCoeff2 ) + ( func2 * CoolPowerCoeff3 ) + ( func3 * CoolPowerCoeff4 ) + ( func4 * CoolPowerCoeff5 ) );
 
 		if ( ( QLoad <= 0.0 || Power <= 0.0 ) && ! WarmupFlag ) {

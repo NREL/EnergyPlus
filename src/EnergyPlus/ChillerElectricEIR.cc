@@ -165,7 +165,10 @@ namespace ChillerElectricEIR {
 	Array1D_bool CheckEquipName;
 
 	bool GetInputEIR( true ); // When TRUE, calls subroutine to read input file.
-
+	bool ChillerIPLVOneTimeFlag( true );
+	Array1D_bool ChillerIPLVFlagArr;
+	bool getInputAllocatedFlag( false );
+	bool InitMyOneTimeFlag( true );
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 	//PUBLIC     SimEIRChillerHeatRecovery
 
@@ -179,6 +182,39 @@ namespace ChillerElectricEIR {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumElectricEIRChillers = 0 ; // Number of electric EIR chillers specified in input
+		CondMassFlowRate = 0.0; // Condenser mass flow rate [kg/s]
+		EvapMassFlowRate = 0.0; // Evaporator mass flow rate [kg/s]
+		CondOutletTemp = 0.0; // Condenser outlet temperature [C]
+		CondOutletHumRat = 0.0; // Condenser outlet humidity ratio [kg/kg]
+		EvapOutletTemp = 0.0 ; // Evaporator outlet temperature [C]
+		EvapWaterConsumpRate = 0.0; // Evap condenser water consumption rate [m3/s]
+		Power = 0.0; // Rate of chiller electric energy use [W]
+		QEvaporator = 0.0; // Rate of heat transfer to the evaporator coil [W]
+		QCondenser = 0.0; // Rate of heat transfer to the condenser coil [W]
+		QHeatRecovered = 0.0; // Rate of heat transfer to the heat recovery coil [W]
+		HeatRecOutletTemp = 0.0; // Heat recovery outlet temperature [C]
+		CondenserFanPower = 0.0; // Condenser Fan Power (fan cycles with compressor) [W]
+		ChillerCapFT = 0.0; // Chiller capacity fraction (evaluated as a function of temperature)
+		ChillerEIRFT = 0.0; // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
+		ChillerEIRFPLR = 0.0; // Chiller EIR as a function of part-load ratio (PLR)
+		ChillerPartLoadRatio = 0.0; // Chiller part-load ratio (PLR)
+		ChillerCyclingRatio = 0.0; // Chiller cycling ratio
+		BasinHeaterPower = 0.0; // Basin heater power (W)
+		ChillerFalseLoadRate = 0.0; // Chiller false load over and above the water-side load [W]
+		AvgCondSinkTemp = 0.0; // condenser temperature value for use in curves [C]
+		CheckEquipName.deallocate();
+		GetInputEIR = true;
+		ChillerIPLVOneTimeFlag = true;
+		getInputAllocatedFlag = false;
+		InitMyOneTimeFlag = true;
+		ChillerIPLVFlagArr.deallocate();
+		ElectricEIRChiller.deallocate();
+		ElectricEIRChillerReport.deallocate();
+	}
 
 	void
 	SimElectricEIRChiller(
@@ -357,7 +393,7 @@ namespace ChillerElectricEIR {
 		bool errFlag; // Used to tell if a unique chiller name has been specified
 		std::string StringVar; // Used for EIRFPLR warning messages
 		int CurveValPtr; // Index to EIRFPLR curve output
-		static bool AllocatedFlag( false ); // True when arrays are allocated
+
 		bool Okay;
 
 		// Formats
@@ -365,7 +401,7 @@ namespace ChillerElectricEIR {
 
 		// FLOW
 
-		if ( AllocatedFlag ) return;
+		if ( getInputAllocatedFlag ) return;
 		cCurrentModuleObject = "Chiller:Electric:EIR";
 		NumElectricEIRChillers = GetNumObjectsFound( cCurrentModuleObject );
 
@@ -378,7 +414,7 @@ namespace ChillerElectricEIR {
 		ElectricEIRChiller.allocate( NumElectricEIRChillers );
 		ElectricEIRChillerReport.allocate( NumElectricEIRChillers );
 		CheckEquipName.dimension( NumElectricEIRChillers, true );
-		AllocatedFlag = true;
+		getInputAllocatedFlag = true;
 
 		// Load arrays with electric EIR chiller data
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
@@ -845,7 +881,7 @@ namespace ChillerElectricEIR {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitElectricEIRChiller" );
-		static bool MyOneTimeFlag( true ); // Flag used to execute code only once
+
 		static Array1D_bool MyFlag; // TRUE in order to set component location
 		static Array1D_bool MyEnvrnFlag; // TRUE when new environment is started
 		int EvapInletNode; // Node number for evaporator water inlet node
@@ -867,12 +903,12 @@ namespace ChillerElectricEIR {
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitMyOneTimeFlag ) {
 			MyEnvrnFlag.allocate( NumElectricEIRChillers );
 			MyFlag.allocate( NumElectricEIRChillers );
 			MyEnvrnFlag = true;
 			MyFlag = true;
-			MyOneTimeFlag = false;
+			InitMyOneTimeFlag = false;
 		}
 
 		EvapInletNode = ElectricEIRChiller( EIRChillNum ).EvapInletNodeNum;
@@ -1114,8 +1150,7 @@ namespace ChillerElectricEIR {
 		Real64 rho;
 		Real64 Cp;
 
-		static bool MyOneTimeFlag( true );
-		static Array1D_bool MyFlag; // TRUE in order to calculate IPLV
+
 
 		std::string CompName; // component name
 		std::string	CompType; // component type
@@ -1124,9 +1159,9 @@ namespace ChillerElectricEIR {
 		Real64 TempSize; // autosized value of coil input field
 		int SizingMethod; // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 
-		if ( MyOneTimeFlag ) {
-			MyFlag.dimension( NumElectricEIRChillers, true );
-			MyOneTimeFlag = false;
+		if ( ChillerIPLVOneTimeFlag ) {
+			ChillerIPLVFlagArr.dimension( NumElectricEIRChillers, true );
+			ChillerIPLVOneTimeFlag = false;
 		}
 
 		PltSizNum = 0;
@@ -1389,9 +1424,9 @@ namespace ChillerElectricEIR {
 
 
 		if ( PlantFinalSizesOkayToReport ) {
-			if ( MyFlag( EIRChillNum ) ) {
+			if ( ChillerIPLVFlagArr( EIRChillNum ) ) {
 				CalcChillerIPLV( ElectricEIRChiller( EIRChillNum ).Name, TypeOf_Chiller_ElectricEIR, ElectricEIRChiller( EIRChillNum ).RefCap, ElectricEIRChiller( EIRChillNum ).RefCOP, ElectricEIRChiller( EIRChillNum ).CondenserType, ElectricEIRChiller( EIRChillNum ).ChillerCapFT, ElectricEIRChiller( EIRChillNum ).ChillerEIRFT, ElectricEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElectricEIRChiller( EIRChillNum ).MinUnloadRat );
-				MyFlag( EIRChillNum ) = false;
+				ChillerIPLVFlagArr( EIRChillNum ) = false;
 			}
 			//create predefined report
 			equipName = ElectricEIRChiller( EIRChillNum ).Name;
