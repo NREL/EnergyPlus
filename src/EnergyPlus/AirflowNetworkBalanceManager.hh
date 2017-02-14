@@ -207,6 +207,20 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const Height // Node height for outdoor temperature calculation
 	);
 
+	Real64
+	CalcDuctInsideConvCoeff(
+		Real64 Tair, // Average air temperature
+		Real64 mdot, // Mass flow rate
+		Real64 Dh // Hydraulic diameter
+	);
+
+	Real64
+	CalcDuctOutsideConvCoeff(
+		Real64 Ts, // Surface temperature
+		Real64 Tamb, // Free stream temperature
+		Real64 Dh // Hydraulic diameter
+	);
+
 	void
 	CalcAirflowNetworkRadiation();
 

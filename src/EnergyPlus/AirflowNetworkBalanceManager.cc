@@ -5254,6 +5254,80 @@ namespace AirflowNetworkBalanceManager {
 		return CalcWindPressure;
 	}
 
+	Real64
+	CalcDuctInsideConvCoeff(
+		Real64 Tair, // Average air temperature
+		Real64 mdot, // Mass flow rate
+		Real64 Dh // Hydraulic diameter
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell, Tony Fontanini
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates duct inside convection coefficients
+
+		// REFERENCES:
+		// ASTM C1340
+		// Jakob, F.E.,  Fischer, R.D., Flanigan, L.J. 1987. "Experimental Validation of the Duct Submodel for the SP43 Simulation Model." ASHRAE Trans. pp 1499-1514.
+
+		Real64 Tair_IP = Tair * 1.8 + 32.0; // Convert C to F
+		Real64 mdot_IP = mdot * 2.20462 / 3600; // Convert kg/s to lb/hr
+		Real64 Dh_IP = Dh * 3.28084; // Convert m to ft
+		Real64 Ai_IP = Dh_IP * Pi / 4;
+
+		Real64 CorrelationCoeff = 0.00368 + 1.5e-6 * ( Tair_IP - 80 );
+		Real64 MassFlux = mdot_IP / Ai_IP; // lb/hr-ft2
+
+		Real64 DuctInsideConvCoeff_IP = CorrelationCoeff * pow( MassFlux, 0.8 ) / pow( Dh_IP, 0.2 ); // BTU/hr-ft2-F
+
+		return DuctInsideConvCoeff_IP * pow_2( 3.28084 ) * 1.8 * 1055.06 / 3600; // Convert BTU/hr-ft2-F to W/m2-K
+	}
+
+	Real64
+	CalcDuctOutsideConvCoeff(
+		Real64 Ts, // Surface temperature
+		Real64 Tamb, // Free stream temperature
+		Real64 Dh // Hydraulic diameter
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell, Tony Fontanini
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates duct outside convection coefficients
+
+		// REFERENCES:
+		// ASTM C1340
+
+		using DataGlobals::GravityConstant;
+		using DataGlobals::KelvinConv;
+
+		Real64 const Pr = 0.7296; // Prandtl number for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
+		Real64 const KinVisc = 1.562e-5; // Kinematic viscosity for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
+		Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
+		Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
+
+		Real64 Ra = Gr * Pr;
+
+		Real64 Nu_free( 0 );
+		Real64 Nu_forced( 0 );
+
+		if ( Ra < 10e9 ) {
+			Nu_free = 0.53 * pow( Ra, 0.25 );
+		} else {
+			Nu_free = 0.13 * pow( Ra, 0.333 );
+		}
+
+		return pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 0.333 );
+	}
+
 	void
 	CalcAirflowNetworkRadiation()
 	{
