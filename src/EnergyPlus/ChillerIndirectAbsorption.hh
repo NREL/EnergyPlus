@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef ChillerIndirectAbsorption_hh_INCLUDED
 #define ChillerIndirectAbsorption_hh_INCLUDED
@@ -102,6 +90,8 @@ namespace ChillerIndirectAbsorption {
 	extern Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
 	extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
+	extern bool GetInput; // When TRUE, calls subroutine to read input file 
+	
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
 	// Types
@@ -173,6 +163,9 @@ namespace ChillerIndirectAbsorption {
 		int GenLoopSideNum; // generator plant loop side index
 		int GenBranchNum; // generator plant loop branch index
 		int GenCompNum; // generator plant loop component index
+		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 
 		// Default Constructor
@@ -239,6 +232,9 @@ namespace ChillerIndirectAbsorption {
 			GenLoopSideNum( 0 ),
 			GenBranchNum( 0 ),
 			GenCompNum( 0 ),
+			FaultyChillerSWTFlag( false ),
+			FaultyChillerSWTIndex( 0 ),
+			FaultyChillerSWTOffset( 0.0 ),
 			PossibleSubcooling( false )
 		{}
 	};
