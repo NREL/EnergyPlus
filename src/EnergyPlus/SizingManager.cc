@@ -734,9 +734,13 @@ namespace SizingManager {
 					coolPeakDD = SysSizPeakDDNum( AirLoopNum ).TotCoolPeakDD;
 					coolCap = FinalSysSizing( AirLoopNum ).TotCoolCap;
 				}
-				int heatPeakDD = SysSizPeakDDNum( AirLoopNum ).HeatPeakDD;
 				ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap,                              CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate,                                SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( coolPeakDD ));
-				ReportSysSizing( curName, "Heating", "Sensible",       FinalSysSizing( AirLoopNum ).HeatCap, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).HeatDesDay, SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate, SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( heatPeakDD ));
+				int heatPeakDD = SysSizPeakDDNum( AirLoopNum ).HeatPeakDD;
+				if ( heatPeakDD > 0 ) {
+					ReportSysSizing( curName, "Heating", "Sensible", FinalSysSizing( AirLoopNum ).HeatCap, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).HeatDesDay, SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate, SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( heatPeakDD ) );
+				} else {
+					ReportSysSizing( curName, "Heating", "Sensible", FinalSysSizing( AirLoopNum ).HeatCap, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).HeatDesDay, SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate, 0 );
+				}
 				PreDefTableEntry( pdchSysSizUserHtAir, curName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 			}
 			// Deallocate arrays no longer needed
