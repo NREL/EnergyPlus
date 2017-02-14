@@ -345,29 +345,12 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages unitary system component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
 		using DataAirLoop::AirLoopControlInfo;
 		using InputProcessor::FindItemInList;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // Index to AirloopHVAC:UnitarySystem object
 		bool HXUnitOn; // Flag to control HX for HXAssisted Cooling Coil
@@ -520,9 +503,6 @@ namespace HVACUnitarySystem {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirLoop::AirLoopControlInfo;
 		using DataAirflowNetwork::AirflowNetworkUnitarySystem;
@@ -548,17 +528,9 @@ namespace HVACUnitarySystem {
 		using PlantUtilities::InitComponentNodes;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineNames( "InitUnitarySystems" );
 		static std::string const RoutineName( "InitUnitarySystem" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string CoolingCoilType; // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
@@ -1012,28 +984,10 @@ namespace HVACUnitarySystem {
 		// METHODOLOGY EMPLOYED:
 		// Uses the control node to test for set point.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using EMSManager::iHumidityRatioMaxSetPoint;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( AirLoopNum == -1 ) { // Outdoor Air Unit
 			Node( ControlNode ).TempSetPoint = OAUCoilOutTemp; // Set the coil outlet temperature
@@ -1103,9 +1057,6 @@ namespace HVACUnitarySystem {
 		// Future changes will include a common sizing algorithm and push the calculated
 		// size to the coil object prior to first call (so the coil will not autosize).
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirLoop::AirLoopControlInfo;
 		using Psychrometrics::PsyHfgAirFnWTdb;
@@ -1113,17 +1064,6 @@ namespace HVACUnitarySystem {
 		using namespace DataZoneEnergyDemands;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ControlType;
 		Real64 H2OHtOfVap; // Heat of vaporization of air
@@ -1262,12 +1202,8 @@ namespace HVACUnitarySystem {
 		// METHODOLOGY EMPLOYED:
 		// Initialize mass flow rates and speed ratios. Calculate loads and adjust if necessary when using constant fan.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirLoop::AirLoopControlInfo;
-		using DataAirLoop::AirToZoneNodeInfo;
 		using Fans::GetFanDesignVolumeFlowRate;
 		using Fans::GetFanSpeedRatioCurveIndex;
 		using General::RoundSigDigits;
@@ -1293,17 +1229,9 @@ namespace HVACUnitarySystem {
 		using DataZoneControls::StageZoneLogic;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Small5WLoad( 5.0 );
 		static std::string const RoutineName( "InitUnitarySystems" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyEnvrnFlag; // environment flag
@@ -1332,10 +1260,6 @@ namespace HVACUnitarySystem {
 		Real64 MassFlowRate; // mass flow rate to calculate loss
 		Real64 MaxTemp; // Maximum temperature used in latent loss calculation
 		int EquipNum( 0 ); // local DO loop index for zone equipment
-//		int ZoneInSysIndex( 0 ); // number of zone inlet nodes counter in an airloop
-//		int NumAirLoopZones( 0 ); // number of zone inlet nodes in an air loop
-//		int ZoneInletNodeNum( 0 ); // zone inlet nodes node number
-//		Real64 SumOfMassFlowRateMax( 0.0 ); // the sum of zone inlet mass flow rates
 		Real64 rho;
 		Real64 QZnReq;
 		Real64 QActual;
@@ -1798,12 +1722,10 @@ namespace HVACUnitarySystem {
 		// and heating capacities of a DX heat pump system will be identical. In real life the ARI
 		// heating and cooling capacities are close but not identical.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchInputManager::GetAirBranchIndex;
 		using BranchInputManager::GetBranchFanTypeName;
+		using DataAirLoop::AirToZoneNodeInfo;
 		using DataAirSystems::PrimaryAirSystem;
 		using CurveManager::CurveValue;
 		using DXCoils::SimDXCoil; // , SetDXCoolingCoilData
@@ -1840,17 +1762,8 @@ namespace HVACUnitarySystem {
 		using PackagedThermalStorageCoil::SimTESCoil;
 		using PackagedThermalStorageCoil::GetTESCoilCoolingCapacity;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeUnitarySystem" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Iter; // iteration count
@@ -2622,7 +2535,7 @@ namespace HVACUnitarySystem {
 
 		// Moved from InitLoadBasedControl
 		// Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
-		if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
+		if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment && UnitarySystem(UnitarySysNum).ControlType != SetPointBased) {
 			if ( allocated( AirToZoneNodeInfo ) ) NumAirLoopZones = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled + AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 			if ( allocated( AirToZoneNodeInfo ) ) {
 				InitLoadBasedControlFlowFracFlagReady = true;
@@ -2741,12 +2654,6 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
 
@@ -2775,8 +2682,6 @@ namespace HVACUnitarySystem {
 
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
-
-		// REFERENCES:
 
 		// Using/Aliasing
 		using namespace InputProcessor;
@@ -2879,17 +2784,8 @@ namespace HVACUnitarySystem {
 		using SingleDuct::GetATMixer;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const getAirLoopHVACHeatCoolInput( "GetAirLoopHVACHeatCoolInput" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas; // Alpha input items for object
@@ -6423,27 +6319,10 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages DXCoolingSystem component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 PartLoadRatio; // coil operating part-load ratio
 		Real64 OnOffAirFlowRatio; // Setpoint based coil control does not use this variable
@@ -6533,31 +6412,11 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages DXCoolingSystem component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirLoop::AirLoopControlInfo;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CoolPLR; // cooling part-load ratio
 		Real64 HeatPLR; // heating part-load ratio
@@ -6678,12 +6537,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines operating PLR and calculates the load based system output.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::SolveRegulaFalsi;
 		using General::TrimSigDigits;
@@ -6693,19 +6546,8 @@ namespace HVACUnitarySystem {
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIter( 100 ); // maximum number of iterations
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
@@ -6767,6 +6609,7 @@ namespace HVACUnitarySystem {
 		}
 
 		PartLoadRatio = 0.0; // Get no load result
+		// fan and coil PLR are disconnected when using ASHRAE model, don't confuse these for other models
 		UnitarySystem( UnitarySysNum ).FanPartLoadRatio = 0.0;
 		SolFlag = 0; // # of iterations IF positive, -1 means failed to converge, -2 means bounds are incorrect
 		SolFlagLat = 0; // # of iterations IF positive, -1 means failed to converge, -2 means bounds are incorrect
@@ -7836,9 +7679,6 @@ namespace HVACUnitarySystem {
 				// METHODOLOGY EMPLOYED:
 				// Use SolveRegulaFalsi to CALL this Function to converge on a solution
 			
-				// REFERENCES:
-				// na
-			
 				// USE STATEMENTS:
 		using Psychrometrics::PsyHFnTdbW;
 		using General::SolveRegulaFalsi;
@@ -7847,10 +7687,6 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // Result (forces solution to be within tolerance)
 
 				// Argument array dimensioning
-			
-				// Locals
-				// SUBROUTINE ARGUMENT DEFINITIONS:
-			
 				//   Parameter description example:
 				//       Par(1)  = double(UnitarySysNum)    ! Index to unitary system
 				//       Par(2)  = 0.0                      ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
@@ -7868,15 +7704,6 @@ namespace HVACUnitarySystem {
 				//       Par(14) = systemMaxAirFlowRate     ! UnitarySystem maximum air flow rate [kg/s]
 				//       Par(15) = LoadType                 ! 1.0 for CoolingLoad otherwise don't care
 				//       Par(16) = iteration method         ! 1 = iteration on coil capacity, 2 = iterate on air flow rate at constant coil capacity
-			
-				// SUBROUTINE PARAMETER DEFINITIONS:
-				// na
-			
-				// INTERFACE BLOCK SPECIFICATIONS
-				// na
-			
-				// DERIVED TYPE DEFINITIONS
-				// na
 			
 				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool FirstHVACIteration; // FirstHVACIteration flag
@@ -8016,31 +7843,11 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines operating PLR and calculates the load based system output.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::SolveRegulaFalsi;
 		using DataHeatBalFanSys::TempControlType;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool errFlag; // error flag returned from subroutine
 		Real64 RuntimeFrac; // heat pump runtime fraction
@@ -8145,20 +7952,10 @@ namespace HVACUnitarySystem {
 		// METHODOLOGY EMPLOYED:
 		// Use SolveRegulaFalsi to CALL this Function to converge on a solution
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		Real64 Residuum; // Result (force to 0)
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		//   Parameter description example:
 		//       Par(1)  = REAL(UnitarySysNum,r64) ! Index to Unitary System
 		//       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
@@ -8170,15 +7967,6 @@ namespace HVACUnitarySystem {
 		//       Par(8)  = OnOffAirFlowRatio    ! Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
 		//       Par(9)  = HXUnitOn             ! flag to enable HX, 1=ON and 2=OFF
 		//       Par(10) = HeatingCoilPLR       ! used to calculate latent degradation for cycling fan RH control
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // Index to this unitary system
@@ -8275,12 +8063,6 @@ namespace HVACUnitarySystem {
 		// This subroutine calculates the resulting performance of the unitary system given
 		// the operating PLR. System output is calculated with respect to zone condition.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 		using Psychrometrics::PsyHFnTdbW;
@@ -8288,17 +8070,6 @@ namespace HVACUnitarySystem {
 		using SingleDuct::SimATMixer;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode; // DX System outlet node number
 		Real64 SuppPLR; // supplemental heating coil operating part-load ratio
@@ -8567,12 +8338,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages unitary cooling system component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DXCoils::SimDXCoil;
 		using DXCoils::SimDXCoilMultiSpeed;
@@ -8587,16 +8352,6 @@ namespace HVACUnitarySystem {
 		using PackagedThermalStorageCoil::SimTESCoil;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
 		int CompIndex; // index to cooling coil
@@ -8767,12 +8522,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages unitary heating system component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DXCoils::SimDXCoil;
 		using DXCoils::SimDXCoilMultiSpeed;
@@ -8785,16 +8534,6 @@ namespace HVACUnitarySystem {
 		using UserDefinedComponents::SimCoilUserDefined;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
 		Real64 OutsideDryBulbTemp; // outdoor temperature (C)
@@ -8944,12 +8683,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages supplemental heater simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
@@ -8957,17 +8690,9 @@ namespace HVACUnitarySystem {
 		using General::SolveRegulaFalsi;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
@@ -9062,29 +8787,12 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages supplemental heater component simulation for setpoint based operation scheme.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
 		int CoilType_Num; // integer type of coil
@@ -9134,9 +8842,6 @@ namespace HVACUnitarySystem {
 		//  Calculate operating PLR and adjust speed when using multispeed coils.
 		//  Meet moisture load if required to do so.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataAirLoop::LoopDXCoilRTF;
 		using DataGlobals::DoingSizing;
@@ -9165,18 +8870,10 @@ namespace HVACUnitarySystem {
 		using PackagedThermalStorageCoil::ChargeOnlyMode;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
 		Real64 const HumRatAcc( 1.e-6 ); // Accuracy of solver result
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of the DX cooling coil
@@ -10135,9 +9832,6 @@ namespace HVACUnitarySystem {
 		// METHODOLOGY EMPLOYED:
 		//  Calculate operating PLR and adjust speed when using multispeed coils.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
@@ -10164,17 +9858,9 @@ namespace HVACUnitarySystem {
 		// Locals
 		bool const SuppHeatingCoilFlag( false );
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.0e-3 ); // Accuracy of solver result
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of the heating coil
@@ -10632,9 +10318,6 @@ namespace HVACUnitarySystem {
 		// METHODOLOGY EMPLOYED:
 		//  Data is moved from the System data structure to the System outlet nodes.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
@@ -10653,18 +10336,10 @@ namespace HVACUnitarySystem {
 		// Locals
 		const bool SuppHeatingCoilFlag( true );
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.0e-3 ); // Accuracy of solver result
 		int const SolveMaxIter( 50 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of the heating coil
@@ -10691,7 +10366,6 @@ namespace HVACUnitarySystem {
 		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
 
 		// Set local variables
-		// Retrieve the load on the controlled zone
 
 		OutletNode = UnitarySystem( UnitarySysNum ).SuppCoilAirOutletNode;
 		InletNode = UnitarySystem( UnitarySysNum ).SuppCoilAirInletNode;
@@ -10932,26 +10606,10 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages water cooling/heating coil simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using WaterCoils::SimulateWaterCoilComponents;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
 		Real64 mdot;
@@ -11001,26 +10659,10 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages steam heating coil simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using SteamCoils::SimulateSteamCoilComponents;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
 		Real64 mdot;
@@ -11070,12 +10712,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages multispeed and variable speed cooling coil simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::DXCoilOutletTemp;
@@ -11083,17 +10719,6 @@ namespace HVACUnitarySystem {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of Unitary System object
 		Real64 dummy;
@@ -11226,26 +10851,10 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the set point based output of the unitary system.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 PartLoadRatio; // coil operating part-load ratio
 		Real64 OnOffAirFlowRatio; // Setpoint based coil control does not use this variable
@@ -11335,21 +10944,7 @@ namespace HVACUnitarySystem {
 		// REFERENCES:
 		// Based on SetOnOffMassFlowRate by Richard Raustad
 
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatSpeedNum;
 		int CoolSpeedNum;
@@ -11740,24 +11335,10 @@ namespace HVACUnitarySystem {
 		// The air flow rate in cooling, heating, and no cooling or heating can be dIFferent.
 		// Calculate the air flow rate based on initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode; // inlet node number
 		Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
@@ -11860,11 +11441,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine updates the report variable for the coils.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyHFnTdbW;
 		using DataAirLoop::LoopSystemOnMassFlowrate;
@@ -11875,17 +11451,6 @@ namespace HVACUnitarySystem {
 		using DataAirLoop::AirLoopFlow;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode;
 		int InletNode;
@@ -12107,12 +11672,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Calculate the heat recovered from UnitarySystem
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
@@ -12120,13 +11679,8 @@ namespace HVACUnitarySystem {
 		using PlantUtilities::SafeCopyPlantNode;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "UnitarySystemHeatRecovery" );
-
-		// DERIVMS TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatRecInNode; // Node number of heat recovery water inlet node
@@ -12199,29 +11753,12 @@ namespace HVACUnitarySystem {
 		// Calls CalcDOe2DXCoil to get outlet temperature at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::CalcDXHeatingCoil;
 
 		// Return value
 		Real64 Residuum; // Residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// Par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // Index of this coil
@@ -12259,8 +11796,6 @@ namespace HVACUnitarySystem {
 		// Calls CalcMultiSpeedDXCoil to get outlet temperature at the given compressor speed
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::CalcMultiSpeedDXCoil;
@@ -12269,21 +11804,6 @@ namespace HVACUnitarySystem {
 
 		// Return value
 		Real64 Residuum; // residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -12366,8 +11886,6 @@ namespace HVACUnitarySystem {
 		// Calls calc routines of  multi Speed or variable Coil to get outlet temperature at the given compressor speed
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::CalcMultiSpeedDXCoil;
@@ -12378,21 +11896,6 @@ namespace HVACUnitarySystem {
 
 		// Return value
 		Real64 Residuum; // residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -12490,8 +11993,6 @@ namespace HVACUnitarySystem {
 		// Calls calc routine sof multi speed or variable speed coils to get outlet humidity ratio at the given compressor speed
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletHumRat;
 		using DXCoils::CalcMultiSpeedDXCoil;
@@ -12500,21 +12001,6 @@ namespace HVACUnitarySystem {
 
 		// Return value
 		Real64 Residuum; // residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// par(2) = desired air outlet humidity ratio [kg/kg]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -12596,8 +12082,6 @@ namespace HVACUnitarySystem {
 		// Calls multi or variable speed coil to get outlet temperature at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::CalcMultiSpeedDXCoil;
@@ -12607,21 +12091,6 @@ namespace HVACUnitarySystem {
 
 		// Return value
 		Real64 Residuum; // residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -12712,8 +12181,6 @@ namespace HVACUnitarySystem {
 		// Calls multi or variable speed coil to get outlet temperature at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::CalcMultiSpeedDXCoil;
@@ -12724,21 +12191,6 @@ namespace HVACUnitarySystem {
 
 		// Return value
 		Real64 Residuum; // residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -12844,8 +12296,6 @@ namespace HVACUnitarySystem {
 		// Calls CalcMultiSpeedDXCoil to get outlet temperature at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletHumRat;
 		using DXCoils::CalcMultiSpeedDXCoil;
@@ -12854,21 +12304,6 @@ namespace HVACUnitarySystem {
 
 		// Return value
 		Real64 Residuum; // residual to be minimized to zero
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// par(2) = desired air outlet humidity ratio [kg/kg]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -12950,8 +12385,6 @@ namespace HVACUnitarySystem {
 		// Calls CalcDOe2DXCoil to get outlet temperature at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::CalcDoe2DXCoil;
@@ -12960,20 +12393,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet temperature [C]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -13010,8 +12431,6 @@ namespace HVACUnitarySystem {
 		// Calls CalcDOe2DXCoil to get outlet humidity ratio at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletHumRat;
 		using DXCoils::CalcDoe2DXCoil;
@@ -13020,20 +12439,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -13070,8 +12477,6 @@ namespace HVACUnitarySystem {
 		// Calls SimulateWaterCoilComponents to get outlet temp at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using WaterCoils::SimulateWaterCoilComponents;
 
@@ -13079,20 +12484,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // index of this coil
@@ -13142,20 +12535,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // index of this coil
@@ -13197,8 +12578,6 @@ namespace HVACUnitarySystem {
 		// Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using WaterToAirHeatPump::SimWatertoAirHP;
@@ -13207,20 +12586,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // index of this coil
@@ -13274,8 +12641,6 @@ namespace HVACUnitarySystem {
 		// Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using WaterToAirHeatPump::SimWatertoAirHP;
@@ -13284,20 +12649,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // index of this coil
@@ -13357,8 +12710,6 @@ namespace HVACUnitarySystem {
 		// Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using PackagedThermalStorageCoil::SimTESCoil;
 
@@ -13366,21 +12717,9 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// Par( 1 ) = double( UnitarySysNum );
 		// Par( 2 ) = DesOutTemp;
 		// Par( 3 ) = 0.0; // DesOutHumRat; set to 0 if temp controlled
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // index of this coil
@@ -13427,8 +12766,6 @@ namespace HVACUnitarySystem {
 		// Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using WaterToAirHeatPump::SimWatertoAirHP;
@@ -13437,20 +12774,8 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum; // index of this coil
@@ -13520,20 +12845,6 @@ namespace HVACUnitarySystem {
 		// (2) Henderson, H.I. Jr., Y.J. Huang and Danny Parker. 1999. Residential Equipment
 		// Part Load Curves for Use in DOE-2.  Environmental Energy Technologies Division,
 		// Ernest OrlanDO Lawrence Berkeley National Laboratory.
-
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 PartLoadFactor; // Part load factor
@@ -13640,8 +12951,6 @@ namespace HVACUnitarySystem {
 		// Calls SimDXCoilMultiMode to get outlet temperature at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletTemp;
 		using DXCoils::SimDXCoilMultiMode;
@@ -13650,21 +12959,9 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet temperature [C]
 		// par(3) = dehumidification mode (0=normal, 1=enhanced)
 		// par(4) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -13703,8 +13000,6 @@ namespace HVACUnitarySystem {
 		// Calls SimDXCoilMultiMode to get outlet humidity ratio at the given cycling ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DXCoils::DXCoilOutletHumRat;
 		using DXCoils::SimDXCoilMultiMode;
@@ -13713,21 +13008,9 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(3) = dehumidification mode (0=normal, 1=enhanced)
 		// par(4) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -13766,8 +13049,6 @@ namespace HVACUnitarySystem {
 		//  Calls CalcHXAssistedCoolingCoil to get outlet temperature at the given part load ratio
 		//  and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp;
 		using HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil;
@@ -13776,22 +13057,10 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet temperature [C]
 		// par(3) = FirstHVACIteration logical converted to numeric (1=TRUE,0=FALSE)
 		// par(4) = HX control (On/Off)
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		//  na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -13838,8 +13107,6 @@ namespace HVACUnitarySystem {
 		//  Calls CalcHXAssistedCoolingCoil to get outlet humidity ratio at the given part load ratio
 		//  and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat;
 		using HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil;
@@ -13848,22 +13115,10 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // residual to be minimized to zero
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// par(2) = desired air outlet humidity ratio [kg/kg]
 		// par(3) = FirstHVACIteration logical converted to numeric (1=TRUE,0=FALSE)
 		// par(4) = HX control (On/Off)
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		//  na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
@@ -13905,8 +13160,6 @@ namespace HVACUnitarySystem {
 		// Calls SimulateHeatingCoilComponents to get outlet temperature at the given part load ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using HeatingCoils::SimulateHeatingCoilComponents;
 
@@ -13914,22 +13167,11 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // Residual to be minimized to zero
 
 		// Argument array dimensioning
+		// Par(2) = desired air outlet temperature [C]
 
 		// Locals
 		Real64 CoilLoad; // heating coil load to be met [W]
 		bool SuppHeatingCoilFlag; // true if heating coil is a supplemental heater in a parent object
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// Par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 OutletAirTemp; // Outlet air temperature [C]
@@ -13975,8 +13217,6 @@ namespace HVACUnitarySystem {
 		// Calls SimulateWaterCoilComponents to get outlet temperature at the given part load ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using WaterCoils::SimulateWaterCoilComponents;
 
@@ -13984,22 +13224,11 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // Residual to be minimized to zero
 
 		// Argument array dimensioning
+		// Par(2) = desired air outlet temperature [C]
 
 		// Locals
 		bool LoadBased; // TRUE if controlling to load, else control to temperature
 		bool SuppHeatingCoilFlag; // TRUE if supplemental heating coil
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// Par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 OutletAirTemp; // Outlet air temperature [C]
@@ -14054,8 +13283,6 @@ namespace HVACUnitarySystem {
 		// Calls SimulateSteamCoilComponents to get outlet temperature at the given part load ratio
 		// and calculates the residual as defined above
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using SteamCoils::SimulateSteamCoilComponents;
 
@@ -14063,21 +13290,10 @@ namespace HVACUnitarySystem {
 		Real64 Residuum; // Residual to be minimized to zero
 
 		// Argument array dimensioning
+		// Par(2) = desired air outlet temperature [C]
 
 		// Locals
 		bool SuppHeatingCoilFlag;
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// Par(2) = desired air outlet temperature [C]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 OutletAirTemp; // Outlet air temperature [C]
@@ -14126,23 +13342,16 @@ namespace HVACUnitarySystem {
 		// temperature for frost control.
 		// METHODOLOGY EMPLOYED:
 		// Based on FrostControlSetPointLimit by Bereket Nigusse in HVACDXSystem
-		// REFERENCES:
-		//  na
+
 		// Using/Aliasing
 		using Psychrometrics::PsyWFnTdpPb;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const RunOnSensible( 1 ); // identifier for temperature (sensible load) control
 		int const RunOnLatent( 2 ); // identifier for humidity (latent load) control
 		static std::string const RoutineName( "FrostControlSetPointLimit" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 HumRatioSat; // saturation humidity ratio at forst control temperature
 		Real64 AirMassFlow; // air masss flow rate through the DX coil
@@ -14178,23 +13387,14 @@ namespace HVACUnitarySystem {
 		// OA System.  IF exists then the DX cooling coil is 100% DOAS DX coil.
 		// METHODOLOGY EMPLOYED:
 		// Based on CheckDXCoolingCoilInOASysExists by Bereket Nigusse in HVACDXSystem
-		// REFERENCES:
-		// na
+
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DXCoils::SetDXCoilTypeData;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CheckUnitarySysCoilInOASysExists: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum;
@@ -14237,27 +13437,10 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS FUNCTION:
 		// Determined weather Unitary system in OA stream has heating or cooling coils
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::SameString;
 
 		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum;
 
@@ -14292,12 +13475,6 @@ namespace HVACUnitarySystem {
 		// PURPOSE OF THIS FUNCTION:
 		// Find the DX cooling coil in this Unitary System
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::SameString;
 
@@ -14305,17 +13482,6 @@ namespace HVACUnitarySystem {
 		int GetUnitarySystemDXCoolingCoilIndex;
 
 		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int UnitarySysNum;
 

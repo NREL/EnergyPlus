@@ -580,7 +580,7 @@ The air mass flow rate calculations during heating operation are the same as tho
 
 \subsubsection{ASHRAE Standard 90.1 load based control:}\label{ashrae-901-load-based-control}
 
-The unitary system can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. The coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is applicable to AirloopHVAC and ZoneHVAC equipment and is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for Load Based control. Additionally, only specific coil types are allowed for the ASHRAE 90.1 load based control method. 
+The unitary system can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is applicable to AirloopHVAC and ZoneHVAC equipment and is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for Load Based control. Additionally, only specific coil types are allowed for the ASHRAE 90.1 single zone VAV load based control method. 
 
 Allowed coil types are:
 \textbf{Cooling coils:}
@@ -594,9 +594,9 @@ Allowed coil types are:
 ·~~~~~~~~Coil:Heating:Electric
 ·~~~~~~~~Coil:Heating:DX:SingleSpeed
 
-Other coil types may be used when selecting the ASHRAE 90.1 control method, however, these coils will not be modeled using the ASHRAE 90.1 load based control method and instead will be modeled using the Load Based control method described in a previous section.
+Other coil types may be used when selecting the ASHRAE 90.1 control method, however, these coils will not be modeled using the ASHRAE 90.1 single zone VAV load based control method and instead will be modeled using the Load Based control method described in a previous section.
 
-The example below shows two implementations of the ASHRAE model using the AirloopHVAC:UnitarySystem object as both air loop equipment serving multiple zones and as zone equipment serving a single zone. Chilled and hot water coils are used with autosized limits on supply air temperature. The supply air temperature limits are intended to reflect the ASHRAE Standard 90.1 requirement to allow low speed fan operation at zone loads representative of 50\% of the design load.
+The example below shows two implementations of the ASHRAE single zone VAV model using the AirloopHVAC:UnitarySystem object as both air loop equipment serving multiple zones and as zone equipment serving a single zone. Chilled and hot water coils are used with autosized limits on supply air temperature. The supply air temperature limits are intended to reflect the ASHRAE Standard 90.1 requirement to allow low speed fan operation at zone loads less than or equal to 50\% of the design load. The zone cooling and heating loads identified in the figure are actual data taken from the zone sizing information for the control zones used for each system. Outdoor air loads were eliminated (i.e., set to 0) for this example.
 
 \begin{figure}[hbtp]
 \centering

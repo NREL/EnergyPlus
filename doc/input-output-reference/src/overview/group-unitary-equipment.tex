@@ -61,7 +61,7 @@ This alpha field contains the identifying name for the unitary system.
 
 \paragraph{Field: Control Type}\label{field-control-type-004}
 
-This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{ASHRAE90VariableFan}. Load and ASHRAE90VariableFan control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. ASRHAE90VaribleFan also requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. ASHRAE90VariableFan allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the ASRHAE90VaribleFan control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the ASHRAE90VariableFan control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
+This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{ASHRAE90VariableFan}. Load and SingleZoneVAV control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. ASRHAE90VaribleFan also requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the ASRHAE90VaribleFan control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{field-controlling-zone-or-thermostat-location}
 
@@ -71,7 +71,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 This alpha field contains the type of dehumidification control. The following options are valid for this field:
 
-\textbf{None} - meet sensible load only, no active dehumidification control. None is required when Control Type = ASHRAE90VariableFan.
+\textbf{None} - meet sensible load only, no active dehumidification control. None is required when Control Type = SingleZoneVAV.
 
 \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
 
@@ -105,7 +105,7 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{supply-air-fan-operating-mode-schedule-name}
 
-This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load. The ASHRAE90VariableFan control type is only active when the supply air fan runs continuously.
+This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load. The SingleZoneVAV control type is only active when the supply air fan runs continuously.
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-002}
 
@@ -197,12 +197,12 @@ This input field enables DX Cooling coils to be used for 100\% outdoor air dedic
 
 \paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature}
 
-When Use DOAS DX Cooling Coil is specified as Yes, this input field is the DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.5\(^{o}\)C, and the default value is 2.0\(^{o}\)C. This field is not autosizable when the input for Use DOAS DX Cooling Coil = Yes. When Control Type = ASHRAE90VariableFan, enter the minimum air temperature limit for reduced fan speed in cooling mode. For ASHRAE90VariableFan, the maximum limit for the minimum supply air temperature is 20.0\(^{o}\)C. Additionally, for the ASHRAE90VariableFan model this input does not limit the minimum supply air temperature resulting from cooling coil operation at higher fan speeds.
+When Use DOAS DX Cooling Coil is specified as Yes, this input field is the DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.5\(^{o}\)C, and the default value is 2.0\(^{o}\)C. This field is not autosizable when the input for Use DOAS DX Cooling Coil = Yes. When Control Type = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, the maximum limit for the minimum supply air temperature is 20.0\(^{o}\)C. Additionally, for the SingleZoneVAV model this input does not limit the minimum supply air temperature resulting from cooling coil operation at higher fan speeds.
 
 
 \paragraph{Field: Latent Load Control}\label{field-latent-load-control}
 
-This alpha field defines the latent load control method. Available choices are SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentWithSensibleLoadControl, or LatentOrSensibleLoadControl. The default choice is SensibleOnlyLoadControl. The SensibleOnlyLoadControl choice will operate to meet only a sensible load and is also required when ASHRAE90VariableFan control is selected. The LatentOnlyLoadConrol will operate to meet only a latent load. The LatentWithSensibleLoadControl will operate to meet the latent load only if there is a sensible load. The LatentOrSensibleLoadControl will operate to meet either a latent or sensible load.
+This alpha field defines the latent load control method. Available choices are SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentWithSensibleLoadControl, or LatentOrSensibleLoadControl. The default choice is SensibleOnlyLoadControl. The SensibleOnlyLoadControl choice will operate to meet only a sensible load and is also required when SingleZoneVAV control is selected. The LatentOnlyLoadConrol will operate to meet only a latent load. The LatentWithSensibleLoadControl will operate to meet the latent load only if there is a sensible load. The LatentOrSensibleLoadControl will operate to meet either a latent or sensible load.
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type}
 
@@ -269,7 +269,7 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: No Load Supply Air Flow Rate Method}\label{field-no-load-supply-air-flow-rate-method}
 
-This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified. The following fields are also used to specify the lower air flow rate for the ASHRAE90VariableFan control method with recommendations of greater than or equal to 60\% of the Cooling or Heating Supply Air Flow Rate for DX coils and 50\% for water coils.
+This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified. The following fields are also used to specify the lower air flow rate for the SingleZoneVAV control method with recommendations of greater than or equal to 60\% of the Cooling or Heating Supply Air Flow Rate for DX coils and 50\% for water coils.
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
@@ -297,7 +297,7 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-000}
 
-This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C. When Control Type = ASHRAE90VariableFan, enter the maximum air temperature limit for reduced fan speed in heating model. For the ASHRAE90VariableFan model this input does not limit the maximum supply air temperature resulting from heating or supplemental heating coil operation at higher fan speeds.  This field is autosizable.
+This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C. When Control Type = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating model. For the SingleZoneVAV model this input does not limit the maximum supply air temperature resulting from heating or supplemental heating coil operation at higher fan speeds.  This field is autosizable.
 
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation}

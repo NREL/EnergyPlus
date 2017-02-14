@@ -53001,11 +53001,11 @@ AirLoopHVAC:UnitarySystem,
        \type choice
        \key Load
        \key SetPoint
-       \key ASHRAE90VariableFan
+       \key SingleZoneVAV
        \default Load
        \note Load control requires a Controlling Zone name.
        \note SetPoint control requires set points at coil outlet node.
-       \note ASHRAE90VariableFan also requires a Controlling Zone name and allows
+       \note SingleZoneVAV also requires a Controlling Zone name and allows
        \note load control at low speed fan until the load exceeds capacity
        \note or outlet air temperature limits. The fan speed is then increased.
   A3,  \field Controlling Zone or Thermostat Location
@@ -53019,7 +53019,7 @@ AirLoopHVAC:UnitarySystem,
        \key Multimode
        \key CoolReheat
        \default None
-       \note None = meet sensible load only. Required when Control Type = ASHRAE90VariableFan.
+       \note None = meet sensible load only. Required when Control Type = SingleZoneVAV.
        \note Multimode = activate enhanced dehumidification mode
        \note as needed and meet sensible load.  Valid only with
        \note cooling coil type Coil:Cooling:DX:TwoStageWithHumidityControlMode or CoilSystem:Cooling:DX:HeatExchangerAssisted.
@@ -53085,7 +53085,7 @@ AirLoopHVAC:UnitarySystem,
        \note entire simulation period.
        \note This field is not used when set point based control is used where a set point
        \note controls the coil.
-       \note ASHRAE90VariableFan control type is only active when constant fan operating mode is active.
+       \note SingleZoneVAV control type is only active when constant fan operating mode is active.
   A12, \field Heating Coil Object Type
        \type choice
        \key Coil:Heating:DX:SingleSpeed
@@ -53168,7 +53168,7 @@ AirLoopHVAC:UnitarySystem,
        \note defines the minimum DOAS DX cooling coil leaving air temperature that should
        \note be maintained to avoid frost formation. This field is not autosizable when
        \note the input for Use DOAS DX Cooling Coil = Yes.
-       \note When Control Type = ASHRAE90VariableFan, enter the minimum air temperature limit for reduced fan speed.
+       \note When Control Type = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed.
   A17, \field Latent Load Control
        \type choice
        \key SensibleOnlyLoadControl
@@ -53176,7 +53176,7 @@ AirLoopHVAC:UnitarySystem,
        \key LatentWithSensibleLoadControl
        \key LatentOrSensibleLoadControl
        \default SensibleOnlyLoadControl
-       \note SensibleOnlyLoadControl is selected when thermostat or ASHRAE90VariableFan control is used.
+       \note SensibleOnlyLoadControl is selected when thermostat or SingleZoneVAV control is used.
        \note LatentOnlyLoadControl is selected when humidistat control is used.
        \note LatentWithSensibleLoadControl is selected when thermostat control is used and
        \note dehumidification is required only when a sensible load exists.
@@ -53350,7 +53350,7 @@ AirLoopHVAC:UnitarySystem,
        \autosizable
        \default 80.0
        \note Enter the maximum supply air temperature leaving the heating coil.
-       \note When Control Type = ASHRAE90VariableFan, enter the maximum air temperature limit for reduced fan speed.
+       \note When Control Type = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed.
   N18, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
        \type real
        \units C
