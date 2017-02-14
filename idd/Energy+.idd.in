@@ -19716,12 +19716,12 @@ People,
   A8 , \field Surface Name/Angle Factor List Name
        \type object-list
        \object-list AllHeatTranAngFacNames
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A9 , \field Work Efficiency Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note units in schedule are 0.0 to 1.0
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A10, \field Clothing Insulation Calculation Method
        \type choice
        \key ClothingInsulationSchedule
@@ -19736,12 +19736,12 @@ People,
        \type object-list
        \object-list ScheduleNames
        \note use "Clo" from ASHRAE or Thermal Comfort guides
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A13, \field Air Velocity Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note units in the schedule are m/s
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A14, \field Thermal Comfort Model 1 Type
        \type choice
        \key Fanger
