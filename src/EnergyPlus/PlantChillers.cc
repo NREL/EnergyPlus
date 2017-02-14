@@ -1821,6 +1821,7 @@ namespace PlantChillers {
 		using General::RoundSigDigits;
 		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1875,6 +1876,9 @@ namespace PlantChillers {
 			}
 			ConstCOPChiller( ChillerNum ).Base.Name = cAlphaArgs( 1 );
 			ConstCOPChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
+			if ( ConstCOPChiller( ChillerNum ).Base.NomCap == AutoSize ) {
+				ConstCOPChiller( ChillerNum ).Base.NomCapWasAutoSized = true;
+			}
 			if ( rNumericArgs( 1 ) == 0.0 ) {
 				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -1901,10 +1905,16 @@ namespace PlantChillers {
 			}
 
 			ConstCOPChiller( ChillerNum ).Base.EvapVolFlowRate = rNumericArgs( 3 );
+			if ( ConstCOPChiller( ChillerNum ).Base.EvapVolFlowRate == AutoSize ) {
+				ConstCOPChiller( ChillerNum ).Base.EvapVolFlowRateWasAutoSized = true;
+			}
 			if ( ConstCOPChiller( ChillerNum ).Base.CondenserType == AirCooled || ConstCOPChiller( ChillerNum ).Base.CondenserType == EvapCooled ) { // Condenser flow rate not used for these cond types
 				ConstCOPChiller( ChillerNum ).Base.CondVolFlowRate = 0.0011;
 			} else {
 				ConstCOPChiller( ChillerNum ).Base.CondVolFlowRate = rNumericArgs( 4 );
+				if ( ConstCOPChiller( ChillerNum ).Base.CondVolFlowRate == AutoSize ) {
+					ConstCOPChiller( ChillerNum ).Base.CondVolFlowRateWasAutoSized = true;
+				}
 			}
 			ConstCOPChiller( ChillerNum ).Base.SizFac = rNumericArgs( 5 );
 
