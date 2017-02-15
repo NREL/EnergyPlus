@@ -33606,6 +33606,7 @@ ZoneHVAC:UnitVentilator,
         \min-fields 16
    A1 , \field Name
         \required-field
+        \reference DOAToZonalUnit
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -33645,19 +33646,28 @@ ZoneHVAC:UnitVentilator,
    A6 , \field Air Inlet Node Name
         \required-field
         \type node
+        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the  
+        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer 
+        \note outlet air node name for InletSide mixer connection. 
    A7 , \field Air Outlet Node Name
         \required-field
         \type node
+        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the   
+        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer 
+        \note secondary air inlet node name for SupplySide mixer connection. 
    A8,  \field Outdoor Air Node Name
-        \required-field
         \type node
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A9,  \field Exhaust Air Node Name
-        \required-field
         \type node
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A10, \field Mixed Air Node Name
-        \required-field
         \type node
         \note inlet to coils
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A11, \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -40556,6 +40566,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \key ZoneHVAC:UnitVentilator 
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name
