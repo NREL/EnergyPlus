@@ -820,8 +820,10 @@ namespace DataAirflowNetwork {
 		Real64 A; // Cross section area [m2]
 		Real64 Rough; // Surface roughness [m]
 		Real64 TurDynCoef; // Turbulent dynamic loss coefficient
-		Real64 UThermal; // Overall heat transmittance [W/m2.K]
+		Real64 UThermConduct; // Conduction heat transmittance [W/m2-K]
 		Real64 UMoisture; // Overall moisture transmittance [kg/m2]
+		Real64 InsideConvCoeff; // Inside convection coefficient [W/m2-K]
+		Real64 OutsideConvCoeff; // Outside convection coefficient [W/m2-K]
 		Real64 MThermal; // Thermal capacity [J/K]
 		Real64 MMoisture; // Moisture capacity [kg]
 		Real64 LamDynCoef; // Laminar dynamic loss coefficient
@@ -839,8 +841,10 @@ namespace DataAirflowNetwork {
 			A( 0.0 ),
 			Rough( 0.0 ),
 			TurDynCoef( 0.0 ),
-			UThermal( 0.0 ),
+			UThermConduct( 0.0 ),
 			UMoisture( 0.0 ),
+			InsideConvCoeff( 0.0 ),
+			OutsideConvCoeff( 0.0 ),
 			MThermal( 0.0 ),
 			MMoisture( 0.0 ),
 			LamDynCoef( 0.0 ),

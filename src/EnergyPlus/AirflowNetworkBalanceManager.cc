@@ -481,7 +481,7 @@ namespace AirflowNetworkBalanceManager {
 		CalcAirflowNetworkAirBalance();
 
 		if ( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
-			CalcAirflowNetworkRadiation();
+			//CalcAirflowNetworkRadiation();
 			CalcAirflowNetworkHeatBalance();
 			CalcAirflowNetworkMoisBalance();
 			if ( Contaminant.CO2Simulation ) CalcAirflowNetworkCO2Balance();
@@ -2844,8 +2844,10 @@ namespace AirflowNetworkBalanceManager {
 				DisSysCompDuctData( i ).A = Numbers( 3 ); // Cross section area [m2]
 				DisSysCompDuctData( i ).Rough = Numbers( 4 ); // Surface roughness [m]
 				DisSysCompDuctData( i ).TurDynCoef = Numbers( 5 ); // Turbulent dynamic loss coefficient
-				DisSysCompDuctData( i ).UThermal = Numbers( 6 ); // Overall heat transmittance [W/m2.K]
+				DisSysCompDuctData( i ).UThermConduct = Numbers( 6 ); // Conduction heat transmittance [W/m2.K]
 				DisSysCompDuctData( i ).UMoisture = Numbers( 7 ); // Overall moisture transmittance [kg/m2]
+				DisSysCompDuctData( i ).OutsideConvCoeff = Numbers( 8 ); // Inside convection coefficient [W/m2.K]
+				DisSysCompDuctData( i ).InsideConvCoeff = Numbers( 9 ); // Outside convection coefficient [W/m2.K]
 				DisSysCompDuctData( i ).MThermal = 0.0; // Thermal capacity [J/K]
 				DisSysCompDuctData( i ).MMoisture = 0.0; // Moisture capacity [kg]
 				DisSysCompDuctData( i ).LamDynCoef = 64.0; // Laminar dynamic loss coefficient
@@ -5255,10 +5257,11 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	Real64
-	CalcDuctInsideConvCoeff(
-		Real64 Tair, // Average air temperature
-		Real64 mdot, // Mass flow rate
-		Real64 Dh // Hydraulic diameter
+	CalcDuctInsideConvResist(
+		Real64 const Tair, // Average air temperature
+		Real64 const mdot, // Mass flow rate
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hIn // User defined convection coefficient
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -5274,24 +5277,39 @@ namespace AirflowNetworkBalanceManager {
 		// ASTM C1340
 		// Jakob, F.E.,  Fischer, R.D., Flanigan, L.J. 1987. "Experimental Validation of the Duct Submodel for the SP43 Simulation Model." ASHRAE Trans. pp 1499-1514.
 
-		Real64 Tair_IP = Tair * 1.8 + 32.0; // Convert C to F
-		Real64 mdot_IP = mdot * 2.20462 / 3600; // Convert kg/s to lb/hr
-		Real64 Dh_IP = Dh * 3.28084; // Convert m to ft
-		Real64 Ai_IP = Dh_IP * Pi / 4;
+		Real64 hIn_final = 0;
 
-		Real64 CorrelationCoeff = 0.00368 + 1.5e-6 * ( Tair_IP - 80 );
-		Real64 MassFlux = mdot_IP / Ai_IP; // lb/hr-ft2
+		if ( hIn == 0 ) {
 
-		Real64 DuctInsideConvCoeff_IP = CorrelationCoeff * pow( MassFlux, 0.8 ) / pow( Dh_IP, 0.2 ); // BTU/hr-ft2-F
+			Real64 Tair_IP = Tair * 1.8 + 32.0; // Convert C to F
+			Real64 mdot_IP = mdot * 2.20462 * 3600; // Convert kg/s to lb/hr
+			Real64 Dh_IP = Dh * 3.28084; // Convert m to ft
+			Real64 Ai_IP = pow_2( Dh_IP ) * Pi / 4;
 
-		return DuctInsideConvCoeff_IP * pow_2( 3.28084 ) * 1.8 * 1055.06 / 3600; // Convert BTU/hr-ft2-F to W/m2-K
+			Real64 CorrelationCoeff = 0.00368 + 1.5e-6 * ( Tair_IP - 80 );
+			Real64 MassFlux = mdot_IP / Ai_IP; // lb/hr-ft2
+
+			Real64 DuctInsideConvCoeff_IP = CorrelationCoeff * pow( MassFlux, 0.8 ) / pow( Dh_IP, 0.2 ); // BTU/hr-ft2-F
+
+			hIn_final = DuctInsideConvCoeff_IP * pow_2( 3.28084 ) * 1.8 * 1055.06 / 3600; // Convert BTU/hr-ft2-F to W/m2-K
+
+		} else {
+			hIn_final = hIn;
+		}
+
+		if ( hIn_final == 0 ) {
+			return 0;
+		} else {
+			return 1 / hIn_final;
+		}
 	}
 
 	Real64
-	CalcDuctOutsideConvCoeff(
-		Real64 Ts, // Surface temperature
-		Real64 Tamb, // Free stream temperature
-		Real64 Dh // Hydraulic diameter
+	CalcDuctOutsideConvResist(
+		Real64 const Ts, // Surface temperature
+		Real64 const Tamb, // Free stream temperature
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hOut // User defined convection coefficient
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -5309,23 +5327,40 @@ namespace AirflowNetworkBalanceManager {
 		using DataGlobals::GravityConstant;
 		using DataGlobals::KelvinConv;
 
-		Real64 const Pr = 0.7296; // Prandtl number for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
-		Real64 const KinVisc = 1.562e-5; // Kinematic viscosity for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
-		Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
-		Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
+		Real64 const k = 0.02551; // Thermal conductivity of air at 300K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
 
-		Real64 Ra = Gr * Pr;
+		Real64 hOut_final = 0;
 
-		Real64 Nu_free( 0 );
-		Real64 Nu_forced( 0 );
+		if ( hOut == 0 ) {
 
-		if ( Ra < 10e9 ) {
-			Nu_free = 0.53 * pow( Ra, 0.25 );
+			Real64 const Pr = 0.7296; // Prandtl number for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
+			Real64 const KinVisc = 1.562e-5; // Kinematic viscosity for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
+			Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
+			Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
+
+			Real64 Ra = Gr * Pr;
+
+			Real64 Nu_free( 0 );
+			Real64 Nu_forced( 0 );
+
+			if ( Ra < 10e9 ) {
+				Nu_free = 0.53 * pow( Ra, 0.25 );
+			} else {
+				Nu_free = 0.13 * pow( Ra, 0.333 );
+			}
+
+			Real64 Nu_combined = pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 0.333 );
+			hOut_final = Nu_combined * k / Dh;
+
 		} else {
-			Nu_free = 0.13 * pow( Ra, 0.333 );
+			hOut_final = hOut;
 		}
 
-		return pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 0.333 );
+		if ( hOut_final == 0 ) {
+			return 0;
+		} else {
+			return 1 / hOut_final;
+		}
 	}
 
 	void
@@ -5392,12 +5427,12 @@ namespace AirflowNetworkBalanceManager {
 
 				// Duct conduction, assuming effectiveness = 1 - exp(-NTU)
 				Real64 Tin = Node( LF ).Temp;
-				Real64 Ei = std::exp( -DuctObj.UThermal * DuctSurfaceArea / ( std::abs( LinkageObj.FLOW ) * CpAir ) );
+				Real64 Ei = std::exp( -DuctObj.UThermConduct * DuctSurfaceArea / ( std::abs( LinkageObj.FLOW ) * CpAir ) );
 				Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * ( Tamb - Tin ) * ( 1 - Ei );
 
 				// For now, assume outside convection is 10 percent of air-to-air duct resistance
 				Real64 FracOutsideConvectRes = 0.1;
-				Real64 Rtot = 1 / DuctObj.UThermal;
+				Real64 Rtot = 1 / DuctObj.UThermConduct;
 
 				// Init to dummy values for optimization
 				Real64 Rho = Rtot * FracOutsideConvectRes;
@@ -5474,7 +5509,11 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// USE STATEMENTS:
-		// na
+		using DataGlobals::KelvinConv;
+		using DataGlobals::StefanBoltzmann;
+		using DataHVACGlobals::TimeStepSys;
+		using DataHeatBalSurface::TH;
+		using DataHeatBalFanSys::QRadSurfAFNDuct;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5538,7 +5577,6 @@ namespace AirflowNetworkBalanceManager {
 					ShowFatalError( "AirflowNetwork: The previous error causes termination." );
 				}
 
-				Ei = std::exp( -DisSysCompDuctData( TypeNum ).UThermal * DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
 				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
 					Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).NodeHeight );
 				} else if ( AirflowNetworkLinkageData( i ).ZoneNum == 0 ) {
@@ -5546,20 +5584,87 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					Tamb = ANZT( AirflowNetworkLinkageData( i ).ZoneNum );
 				}
- 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
-				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * Ei;
-				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
 
-				// Duct-surface radiation
-				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum != 0 ) {
-					auto & DuctRadObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
-					if ( std::abs( DuctRadObj.QRad ) > 0 ) {
-						Real64 EiDuctRad = std::exp( -DuctRadObj.UThermalRad * DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
-						MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
-						MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) += -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * EiDuctRad;
-						MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * DuctRadObj.TSurr * ( 1.0 - EiDuctRad ) * CpAir;
+				Real64 const tolerance = 0.01;
+				Real64 UThermal( 10 ); // Initialize. This will get updated.
+				Real64 UThermal_iter = 0;
+				Real64 Tsurr;
+				Real64 Tin = AirflowNetworkNodeSimu( LF ).TZ;
+				Real64 TDuctSurf = ( Tamb + Tin ) / 2.0;
+				Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
+				Real64 DuctSurfArea = DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi;
+
+				// If user defined view factors not present, calculate air-to-air heat transfer
+				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum == 0 ) {
+
+					// Calculate convection coefficient if one or both not present
+					if ( DisSysCompDuctData( TypeNum ).InsideConvCoeff == 0 && DisSysCompDuctData( TypeNum ).OutsideConvCoeff == 0 ) {
+						while( abs( UThermal - UThermal_iter ) > tolerance ) {
+							UThermal_iter = UThermal;
+
+							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
+							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
+							UThermal = pow( RThermTotal , -1);
+
+							// Duct conduction, assuming effectiveness = 1 - exp(-NTU)
+							Real64 Ei = std::exp( -UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
+							Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * ( Tamb - Tin ) * ( 1 - Ei );
+
+							TDuctSurf = Tamb - QCondDuct * RThermConvOut / DuctSurfArea;
+
+						}
+					} else { // Air-to-air only. U and h values are all known
+							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
+							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
+							UThermal = pow( RThermTotal , -1);
+					}
+
+					Tsurr = Tamb;
+
+				} else { // Air-to-air + radiation heat transfer
+
+					auto & VFObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
+
+					while( abs( UThermal - UThermal_iter ) > tolerance ) {
+						UThermal_iter = UThermal;
+
+						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+						Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
+
+						Real64 hrjTj_sum = 0;
+						Real64 hrj_sum = 0;
+
+						for ( int j = 1; j <= VFObj.linkageSurfaceData.u(); ++j ) {
+							Real64 TSurfj = TH( 1, 1, VFObj.linkageSurfaceData( j ).surfaceNum );	// Zone surface temperature [C]
+							Real64 TSurfj_K = TSurfj + KelvinConv;
+
+							Real64 hrj = VFObj.surfaceEmittance * StefanBoltzmann * ( TDuctSurf_K + TSurfj_K ) * ( pow_2( TDuctSurf_K ) + pow_2( TSurfj_K ) );
+							hrjTj_sum += hrj * TSurfj;
+							hrj_sum += hrj;
+						}
+
+						Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
+						UThermal = pow( RThermTotal , -1);
+
+						// Duct conduction, assuming effectiveness = 1 - exp(-NTU)
+						Real64 Ei = std::exp( -UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
+						Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * ( Tamb - Tin ) * ( 1 - Ei );
+
+						TDuctSurf = Tamb - QCondDuct * RThermConvOut / DuctSurfArea;
+
 					}
 				}
+
+				Ei = std::exp( -UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
+ 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
+				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * Ei;
+				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tsurr * ( 1.0 - Ei ) * CpAir;
+
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;

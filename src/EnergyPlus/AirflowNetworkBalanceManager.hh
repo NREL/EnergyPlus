@@ -208,17 +208,19 @@ namespace AirflowNetworkBalanceManager {
 	);
 
 	Real64
-	CalcDuctInsideConvCoeff(
-		Real64 Tair, // Average air temperature
-		Real64 mdot, // Mass flow rate
-		Real64 Dh // Hydraulic diameter
+	CalcDuctInsideConvResist(
+		Real64 const Tair, // Average air temperature
+		Real64 const mdot, // Mass flow rate
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hIn // User defined convection coefficient
 	);
 
 	Real64
-	CalcDuctOutsideConvCoeff(
-		Real64 Ts, // Surface temperature
-		Real64 Tamb, // Free stream temperature
-		Real64 Dh // Hydraulic diameter
+	CalcDuctOutsideConvResist(
+		Real64 const Ts, // Surface temperature
+		Real64 const Tamb, // Free stream temperature
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hOut // User defined convection coefficient
 	);
 
 	void
