@@ -148,7 +148,7 @@ namespace DataZoneControls {
 			EMSOverrideCoolingSetPointOn( false ),
 			EMSOverrideCoolingSetPointValue( 0.0 ),
 			OperativeTempControl( false ),
-			OpTempCntrlModeScheduled( false ),			
+			OpTempCntrlModeScheduled( false ),
 			FixedRadiativeFraction( 0.0 ),
 			OpTempRadiativeFractionSched( 0 ),
 			AdaptiveComfortTempControl( false ),
