@@ -3487,6 +3487,17 @@ namespace SizingManager {
 				CalcFacilitySizing( DDNum ).HeatOutTempSeq.allocate( NumOfTimeStepInDay );
 				CalcFacilitySizing( DDNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
 				CalcFacilitySizing( DDNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
+
+				CalcFacilitySizing( DDNum ).DOASHeatAddSeq = 0.;
+				CalcFacilitySizing( DDNum ).DOASLatAddSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolOutHumRatSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolOutTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolZoneTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolLoadSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatOutHumRatSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatOutTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatZoneTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatLoadSeq = 0.;
 			}
 		}
 		if ( !CalcFinalFacilitySizing.DOASHeatAddSeq.allocated( ) ) {
@@ -3500,6 +3511,17 @@ namespace SizingManager {
 			CalcFinalFacilitySizing.HeatOutTempSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalFacilitySizing.HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalFacilitySizing.HeatLoadSeq.allocate( NumOfTimeStepInDay );
+
+			CalcFinalFacilitySizing.DOASHeatAddSeq = 0.;
+			CalcFinalFacilitySizing.DOASLatAddSeq = 0.;
+			CalcFinalFacilitySizing.CoolOutHumRatSeq = 0.;
+			CalcFinalFacilitySizing.CoolOutTempSeq = 0.;
+			CalcFinalFacilitySizing.CoolZoneTempSeq = 0.;
+			CalcFinalFacilitySizing.CoolLoadSeq = 0.;
+			CalcFinalFacilitySizing.HeatOutHumRatSeq = 0.;
+			CalcFinalFacilitySizing.HeatOutTempSeq = 0.;
+			CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
+			CalcFinalFacilitySizing.HeatLoadSeq = 0.;
 		}
 		if ( CallIndicator == BeginDay ) {
 			CalcFacilitySizing( CurOverallSimDay ).HeatDDNum = CurOverallSimDay;
