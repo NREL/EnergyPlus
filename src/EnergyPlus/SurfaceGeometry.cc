@@ -1916,9 +1916,9 @@ namespace SurfaceGeometry {
 
 		GetHTSurfExtVentedCavityData( ErrorsFound );
 
-		GetSurfaceHeatTransferAlgorithmOverrides( ErrorsFound );
-
 		exposedFoundationPerimeter.getData( ErrorsFound );
+
+		GetSurfaceHeatTransferAlgorithmOverrides( ErrorsFound );
 
 		if ( SurfError || ErrorsFound ) {
 			ErrorsFound = true;
@@ -6288,7 +6288,7 @@ namespace SurfaceGeometry {
 
 		// Setup Kiva intances
 		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
-			if (!ErrorsFound) kivaManager.setupKivaInstances();
+			if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
 		}
 
 		// test for missing materials for algorithms selected

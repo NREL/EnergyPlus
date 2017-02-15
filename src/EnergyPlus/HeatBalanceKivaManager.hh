@@ -99,7 +99,7 @@ class KivaManager{
 public:
   KivaManager();
   virtual ~KivaManager();
-  void setupKivaInstances();
+  bool setupKivaInstances();
   void initKivaInstances();
   void calcKivaInstances();
   void defineDefaultFoundation();

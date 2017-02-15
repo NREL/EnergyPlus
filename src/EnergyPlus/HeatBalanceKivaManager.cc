@@ -196,8 +196,9 @@ KivaManager::KivaManager() :
 KivaManager::~KivaManager() {
 }
 
-void KivaManager::setupKivaInstances() {
+bool KivaManager::setupKivaInstances() {
 
+  bool ErrorsFound = false;
   auto& Surfaces = DataSurfaces::Surface;
   auto& Constructs = DataHeatBalance::Construct;
   auto& Materials = DataHeatBalance::Material;
@@ -216,11 +217,11 @@ void KivaManager::setupKivaInstances() {
         if ( Surfaces(wl).Zone == surface.Zone && wl != surfNum ) {
           if ( Surfaces(wl).Class != DataSurfaces::SurfaceClass_Wall ) {
             if ( Surfaces(wl).Class == DataSurfaces::SurfaceClass_Floor ) {
+              ErrorsFound = true;
               ShowSevereError( "Only one floor per Foundation Object allowed." );
-              ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
             } else {
+              ErrorsFound = true;
               ShowSevereError( "Only floor and wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
-              ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
             }
           } else {
             wallSurfaces.push_back(wl);
@@ -241,8 +242,8 @@ void KivaManager::setupKivaInstances() {
           auto&v = Surfaces(wl).Vertex;
           // Enforce quadrilateralism
           if (v.size() != 4) {
+            ErrorsFound = true;
             ShowSevereError( "Only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
-            ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
           }
 
           // sort vertices by Z-value
@@ -358,8 +359,9 @@ void KivaManager::setupKivaInstances() {
 
 
       // Loop through combinations and assign instances until there is no remaining exposed pereimeter
+      bool assignKivaInstances = true;
       auto comb = combinationMap.begin();
-      while (remainingExposedPerimeter > 0) {
+      while (assignKivaInstances) {
         int constructionNum;
         Real64 wallHeight;
         Real64 perimeter;
@@ -374,8 +376,8 @@ void KivaManager::setupKivaInstances() {
           // Set wall construction
           if (constructionNum != foundationInputs[surface.OSCPtr].wallConstructionIndex && foundationInputs[surface.OSCPtr].wallConstructionIndex != 0) {
             // TODO Kiva: details
+            ErrorsFound = true;
             ShowSevereError( "Foundation footing wall must have the same construction as the associated wall surfaces (or be left blank)." );
-            ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
           }
           foundationInputs[surface.OSCPtr].wallConstructionIndex = constructionNum;
 
@@ -387,7 +389,13 @@ void KivaManager::setupKivaInstances() {
           perimeter = remainingExposedPerimeter;
         }
 
-        Real64 weightedPerimeter = perimeter/totalExposedPerimeter;
+        Real64 weightedPerimeter;
+
+        if (totalExposedPerimeter > 0.001) {
+          weightedPerimeter = perimeter/totalExposedPerimeter;
+        } else {
+          weightedPerimeter = 1.0;
+        }
 
         // Copy foundation input for this instance
         Kiva::Foundation fnd = foundationInputs[surface.OSCPtr].foundation;
@@ -407,6 +415,13 @@ void KivaManager::setupKivaInstances() {
           // Push back construction's layers
           for (int layer = 1; layer <= c.TotLayers; layer++ ) {
             auto& mat = Materials(c.LayerPoint(layer));
+            if ( mat.ROnly ) {
+              ErrorsFound = true;
+              ShowSevereError( "Construction=\""+ c.Name + "\", constructions referenced by surfaces with a");
+              ShowContinueError( "\"Foundation\" Outside Boundary Condition must use only regular material objects");
+              ShowContinueError( "Material=\"" + mat.Name + "\", is not a regular material object" );
+              return ErrorsFound;
+            }
 
             Kiva::Layer tempLayer;
 
@@ -420,6 +435,13 @@ void KivaManager::setupKivaInstances() {
         // Set slab construction
         for (int i = 0; i < Constructs( surface.Construction ).TotLayers; ++i ) {
           auto& mat = Materials(Constructs( surface.Construction ).LayerPoint[i]);
+          if ( mat.ROnly ) {
+            ErrorsFound = true;
+            ShowSevereError( "Construction=\""+ Constructs( surface.Construction ).Name + "\", constructions referenced by surfaces with a");
+            ShowContinueError( "\"Foundation\" Outside Boundary Condition must use only regular material objects");
+            ShowContinueError( "Material=\"" + mat.Name + "\", is not a regular material object" );
+            return ErrorsFound;
+          }
 
           Kiva::Layer tempLayer;
 
@@ -526,6 +548,10 @@ void KivaManager::setupKivaInstances() {
 
         remainingExposedPerimeter -= perimeter;
 
+        if (remainingExposedPerimeter < 0.001) {
+          assignKivaInstances = false;
+        }
+
       }
 
       surfaceMap[surfNum] = floorSurfaceMaps;
@@ -556,6 +582,13 @@ void KivaManager::setupKivaInstances() {
 
     grnd.buildDomain();
 
+    std::string constructionName;
+    if (kv.constructionNum == 0) {
+      constructionName = "Default Footing Wall Construction";
+    } else {
+      constructionName = DataHeatBalance::Construct( kv.constructionNum ).Name;
+    }
+
     std::string wallSurfaceString = "";
     for (auto& wl : kv.wallSurfaces) {
       wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
@@ -566,11 +599,13 @@ void KivaManager::setupKivaInstances() {
       << General::RoundSigDigits( grnd.foundation.netPerimeter, 2 )
       << General::RoundSigDigits( kv.weightedPerimeter, 2 )
       << General::RoundSigDigits( grnd.foundation.foundationDepth, 2 )
-      << DataHeatBalance::Construct( kv.constructionNum ).Name
+      << constructionName
       << DataSurfaces::Surface(kv.floorSurface).Name
       << wallSurfaceString;
 
   }
+
+  return ErrorsFound;
 
 }
 
@@ -610,11 +645,19 @@ void KivaInstanceMap::plotDomain() {
 
   #ifdef GROUND_PLOT
 
+  std::string constructionName;
+  if (constructionNum == 0) {
+    constructionName = "Default Footing Wall Construction";
+  } else {
+    constructionName = DataHeatBalance::Construct( constructionNum ).Name;
+  }
+
+
   Kiva::SnapshotSettings ss;
   ss.dir = DataStringGlobals::outDirPathName + "/"
     + DataSurfaces::Surface(floorSurface).Name + " "
     + General::RoundSigDigits( ground.foundation.foundationDepth, 2 ) + " "
-    + DataHeatBalance::Construct( constructionNum ).Name;
+    + constructionName;
   double& l = ground.foundation.reductionLength2;
   const double width = 6.0;
   const double depth = ground.foundation.foundationDepth + width/2.0;
@@ -699,7 +742,7 @@ Real64 KivaManager::getTemp(int surfNum) {
 
 Real64 KivaManager::getConv(int surfNum) {
   auto conv = getValue(surfNum, Kiva::GroundOutput::OT_CONV);
-  assert(conv > 0.0);
+  assert(conv >= 0.0);
   return conv;
 
 }
