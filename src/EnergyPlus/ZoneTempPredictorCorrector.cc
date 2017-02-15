@@ -3331,7 +3331,7 @@ namespace ZoneTempPredictorCorrector {
 			}}
 
 			//Apply offset for faulty therostats_Feb. 2015, zrp
-			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ) {
+			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )) {
 
 				//  loop through the FaultsThermostatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
