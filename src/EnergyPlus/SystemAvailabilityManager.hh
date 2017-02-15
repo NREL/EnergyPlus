@@ -84,6 +84,9 @@ namespace SystemAvailabilityManager {
 	extern int const HybridVentMode_Enth; // Enthalpy control
 	extern int const HybridVentMode_DewPoint; // Dew point control
 	extern int const HybridVentMode_OA; // Outdoor air control
+	extern int const HybridVentMode_OperT80; // Operative temperature control with 80% acceptability limits
+	extern int const HybridVentMode_OperT90; // Operative temperature control with 90% acceptability limits
+	extern int const HybridVentMode_CO2; // CO2 control
 
 	extern int const HybridVentCtrl_NoAction; // No hybrid ventilation control
 	extern int const HybridVentCtrl_Open; // Open windows or doors
@@ -456,6 +459,14 @@ namespace SystemAvailabilityManager {
 		// manager is connected to air loop
 		bool SimHybridVentSysAvailMgr; // Set to false when a zone has two hybrid ventilation
 		// managers, one with air loop and one without
+		Real64 OperativeTemp; // Zone air operative temperature [C]
+		Real64 CO2; // Zone air CO2 [ppm]
+		Real64 MinOperTime; // Minimum HVAC Operation Time [minutes]
+		Real64 MinVentTime; // Minimum Ventilation Time [minutes]
+		Real64 TimeOperDuration; // Time duration with continuous HVAC operation [minutes]
+		Real64 TimeVentDuration; // Time duration with continuous ventilation [minutes]
+		Real64 minAdaTem; // minimum adaptive temperature for adaptive temperature control [C]
+		Real64 maxAdaTem; // maximum adaptive temperature for adaptive temperature control [C]
 
 		// Default Constructor
 		DefineHybridVentSysAvailManager() :
@@ -488,7 +499,15 @@ namespace SystemAvailabilityManager {
 			VentilationPtr( 0 ),
 			AvailStatus( 0 ),
 			HybridVentMgrConnectedToAirLoop( true ),
-			SimHybridVentSysAvailMgr( false )
+			SimHybridVentSysAvailMgr( false ),
+			OperativeTemp( 0.0 ),
+			CO2( 0.0 ),
+			MinOperTime( 0.0 ),
+			MinVentTime( 0.0 ),
+			TimeOperDuration( 0.0 ),
+			TimeVentDuration( 0.0 ),
+			minAdaTem( 0.0 ), 
+			maxAdaTem( 0.0 ) 
 		{}
 
 	};

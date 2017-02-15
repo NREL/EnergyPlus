@@ -62,6 +62,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
@@ -269,6 +270,7 @@ namespace EnergyPlus {
 		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
 		CoolingPanelSimple::clear_state();
+		ChillerElectricEIR::clear_state();
 		ChillerExhaustAbsorption::clear_state();
 		ChillerGasAbsorption::clear_state();
 		ChillerIndirectAbsorption::clear_state();
