@@ -69620,7 +69620,7 @@ ThermalStorage:ChilledWater:Stratified,
 
 PlantLoop,
        \memo Defines a central plant loop.
-       \min-fields 24
+       \min-fields 18
   A1 , \field Name
         \required-field
        \reference PlantLoops
@@ -69740,7 +69740,7 @@ CondenserLoop,
        \memo Defines a central plant condenser loop. CondenserLoop and PlantLoop are nearly
        \memo identical except some components and operation schemes are applicable to only one
        \memo loop type or the other.
-       \min-fields 21
+       \min-fields 18
   A1 , \field Name
         \required-field
         \reference PlantLoops

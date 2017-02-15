@@ -954,7 +954,7 @@ namespace DataPlant {
 		Real64 MaxMassFlowRate; // Maximum flow rate allowed in the loop
 		Real64 Volume; // Volume of the fluid in the loop
 		bool VolumeWasAutoSized; //true if Volume was set to autocalculate
-		Real64 CirculationTime; // Loop circulation time [minutes] used to autocalculate loop volume
+		Real64 CirculationTime; // Loop circulation time [minutes] used to autocalculate loop volume, default is 2 minutes
 		Real64 Mass; // Mass of the fluid in the loop
 		bool EMSCtrl;
 		Real64 EMSValue;
@@ -1007,7 +1007,7 @@ namespace DataPlant {
 			MaxMassFlowRate( 0.0 ),
 			Volume( 0.0 ),
 			VolumeWasAutoSized ( false ), //true if Volume was set to autocalculate
-			CirculationTime( 0.0 ),
+			CirculationTime( 2.0 ),
 			Mass( 0.0 ),
 			EMSCtrl( false ),
 			EMSValue( 0.0 ),
