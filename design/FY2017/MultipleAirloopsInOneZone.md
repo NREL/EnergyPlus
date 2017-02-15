@@ -17,6 +17,7 @@ Allow Multiple Air Loops to One Thermal Zone
  	 - *Change* - add the new field referencing `DesignSpecification:AirTerminal:Sizing` object to  `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` (*not* to every terminal unit as previously proposed).
  - January 5, 2017 - Final Design
  - January 6, 2017 - Document additional review comments
+ - January 11 and later - As-built comments
  
 *Reviewers - Hong, Griffith, Gu, Buhl, Raustad, Horowitz, Merket, Winkler, Scheier, Lee
 
@@ -177,9 +178,9 @@ Zone Return Air Flow Rate Basis Node or NodeList Name
 ```
 
 ### Modified Object: AirloopHVAC###
-*New Field:: Return Air Flow Fraction of Supply Air Flow*
+*New Field:: Design Return Air Flow Fraction of Supply Air Flow*
 
-This field specified the air loop return air flow as a fraction of the supply flow.  It may be used to set zero return air flow for a DOAS system or to model a pressurized system where the return flow is a fraction of the supply flow. The return air flow rate will never be greater than the current supply air flow rate multiplied by this fraction.  It may be less if there is unbalanced exhaust from any zones served by this airloop. The default is 1.0.
+This field specifies the design air loop return air flow as a fraction of the supply flow when there is no exhaust flow.  It may be used to set zero return air flow for a DOAS system or to model a pressurized system where the return flow is a fraction of the supply flow. The return air flow rate will never be greater than the current supply air flow rate multiplied by this fraction.  It may be less if there is unbalanced exhaust from any zones served by this airloop. The default is 1.0.
 
 ```
   AirLoopHVAC,
@@ -193,7 +194,7 @@ This field specified the air loop return air flow as a fraction of the supply fl
     PLENUM-1 Out Node,       !- Demand Side Outlet Node Name
     Zone Eq In Node,         !- Demand Side Inlet Node Names
     VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names
-    0.90;                    !- Return Air Flow Fraction of Supply Air Flow
+    0.90;                    !- Design Return Air Flow Fraction of Supply Air Flow
 ```
 
 ### New Object: DesignSpecification:AirTerminal:Sizing###
@@ -400,6 +401,7 @@ New example files will be made to show various combinations of systems.
 Actually, the only existing check looks for *an air distribution unit and an AirTerminal:SingleDuct:Uncontrolled (direct air) object in the same zone.* This check will be removed.  The code already allows more than one air distribution unit without throwing an error.
 
 #### ZoneEquipmentManager::SimZoneEquipment ####
+*1/9/2017-Done*
 
 - Delete all uses of `ZoneHasAirLoopHVACTerminal` and `ZoneHasAirLoopHVACDirectAir` which includes the error check.  That's the only purpose of these variables.
 
@@ -407,6 +409,7 @@ Actually, the only existing check looks for *an air distribution unit and an Air
 
 #### DataZoneEquipment.hh ####
 In struct `EquipConfiguration`
+*1/9/2017-NumReturnNodes and ReturnNode array added, old ReturnAirNode still there, set to first return node number*
 
  - Delete `int ReturnAirNode`
  - Add `int NumReturnNodes`
@@ -414,18 +417,21 @@ In struct `EquipConfiguration`
  - Add to IDD and input processing for Return Air Node or Nodelist
 
  - Delete `int AirLoopNum`
- - Add `int NumAirLoops` (this may not always equal `NumReturnNodes` if an airloop has no return path)
- - Add `Array1D_int AirLoopPointer`
+ - ~~Add `int NumAirLoops` (this may not always equal `NumReturnNodes` if an airloop has no return path)~~
+ - Add `Array1D_int ReturnNodeAirLoopNum`
 
-   - *RR recommends that these align so that AirLoopPointer(6) corresponds with ReturnNode(6) to avoid mistakes.*
+   - *RR recommends that these align so that AirLoopPointer(6) corresponds with ReturnNode(6) to avoid mistakes. - MJW - Done*
 
 ### 3. Add a new field to AirloopHVAC to specify loop return air flow fraction
 
 #### DataAirSystems.hh ####
+*1/11/2017 - Done*
+
 In struct `DefinePrimaryAirSystem`
 
  - Add `Real64 DesignReturnFlowFrac`
  - Add to IDD and input processing
+ - Also add to DataAirLoop::AirLoopFlow (because this is what's used primarily in CalcZoneMassBalance below)
 
 ### 4. Revise return air flow and air loop flow balance calculations
 

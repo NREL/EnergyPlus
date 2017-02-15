@@ -253,6 +253,7 @@ namespace DataAirLoop {
 		Real64 ZoneExhaust; // total of zone exhaust air mass flow rate for this loop [kg/s]
 		Real64 ZoneExhaustBalanced; // zone exhaust air that is balanced by simple air flow for loop [kg/s]
 		Real64 DesSupply; // design supply air mass flow rate for loop [kg/s]
+		Real64 DesReturnFrac; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
 		Real64 ReqSupplyFrac; // required flow (as a fraction of DesSupply) set by a manager
 		Real64 MinOutAir; // minimum outside air mass flow rate [kg/s]

@@ -595,6 +595,7 @@ namespace SimAirServingZones {
 				continue;
 			}
 			PrimaryAirSystem( AirSysNum ).DesignVolFlowRate = Numbers( 1 );
+			PrimaryAirSystem( AirSysNum ).DesignReturnFlowFraction = Numbers( 2 );
 			//Only allow one return air node
 			AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 1;
 			// Allocate the return air node arrays
@@ -1917,6 +1918,7 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				SumZoneDesFlow = 0.0;
 				AirLoopFlow( AirLoopNum ).DesSupply = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate * StdRhoAir;
+				AirLoopFlow( AirLoopNum ).DesReturnFrac = PrimaryAirSystem( AirLoopNum ).DesignReturnFlowFraction;
 				for ( ZoneInSysIndex = 1; ZoneInSysIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++ZoneInSysIndex ) {
 					TUInNode = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex );
 					SumZoneDesFlow += Node( TUInNode ).MassFlowRateMax;

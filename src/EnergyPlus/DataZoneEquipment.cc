@@ -755,9 +755,11 @@ namespace DataZoneEquipment {
 				ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes = NumNodes;
 
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
 
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
+					ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
 					// Save the first return air node number in ReturnAirNode (this wil be removed later)
 					if ( NodeNum == 1 ) ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = NodeNums( NodeNum );
 					UniqueNodeError = false;

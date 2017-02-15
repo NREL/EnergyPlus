@@ -57071,7 +57071,7 @@ AirLoopHVAC:ControllerList,
 \group Air Distribution
 
 AirLoopHVAC,
-       \min-fields 10
+       \min-fields 11
        \memo Defines a central forced air system.
    A1, \field Name
        \required-field
@@ -57110,10 +57110,16 @@ AirLoopHVAC,
        \note Name of a Node or NodeList containing the inlet node(s) supplying air to zone equipment.
        \required-field
        \type node
-   A9; \field Supply Side Outlet Node Names
+   A9, \field Supply Side Outlet Node Names
        \note Name of a Node or NodeList containing the outlet node(s) supplying air to the demand side.
        \required-field
        \type node
+   N2; \field Design Return Air Flow Fraction of Supply Air Flow
+       \note The design return air flow rate as a fraction of supply air flow rate with no exhaust.
+       \note This can be used to model a pressurized system or set to zero to model a DOAS with no return flow.
+       \note Use ZoneAirMassFlowConservation to balance zone infiltration and mixing flows.
+       \minimum 0.0
+       \default 1.0
 
 AirLoopHVAC:OutdoorAirSystem:EquipmentList,
        \memo List equipment in simulation order

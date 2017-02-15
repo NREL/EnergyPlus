@@ -3855,9 +3855,12 @@ namespace ZoneEquipmentManager {
 				//
 				// Include zone mixing mass flow rate
 				if ( ZoneMassBalanceFlag( ZoneNum ) ) {
-					RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
-					if ( RetNode > 0 ) {
-						ZoneReturnAirMassFlowRate = Node( RetNode ).MassFlowRate;
+					int NumRetNodes = ZoneEquipConfig( ZoneNum ).NumReturnNodes;
+					for (int NodeNumHere = 1; NodeNumHere <= NumRetNodes; ++NodeNumHere) {
+						RetNode = ZoneEquipConfig(ZoneNum).ReturnNode( NodeNumHere );
+						if ( RetNode > 0 ) {
+							ZoneReturnAirMassFlowRate += Node( RetNode ).MassFlowRate;
+						}
 					}
 					// Set zone mixing incoming mass flow rate
 					if ( (Iteration == 0) || ! ZoneAirMassFlow.BalanceMixing ){
@@ -3881,7 +3884,7 @@ namespace ZoneEquipmentManager {
 				UserReturnNodeMassFlow = 0.0;
 				StdReturnNodeMassFlow = 0.0;
 				if ( RetNode > 0 ) {
-					// Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhuast flow
+					// Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
 					StdReturnNodeMassFlow = max( 0.0, ( Node( ZoneNode ).MassFlowRate + ZoneMixingNetAirMassFlowRate - ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ) ) );
 					if ( AirLoopNum > 0 ) {
 						if ( !PrimaryAirSystem( AirLoopNum ).OASysExists ) {
@@ -3989,9 +3992,9 @@ namespace ZoneEquipmentManager {
 				if ( AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0 ) {
 					// the source zone and the recieving zone are in different air loops
 					AirLoopFlow(AirLoopNum).ZoneExhaust = max(0.0, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneMixingFlow));
-					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow );
+					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, ( AirLoopFlow( AirLoopNum ).SupFlow * AirLoopFlow(AirLoopNum).DesReturnFrac ) - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow );
 				} else {
-					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow);
+					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, ( AirLoopFlow( AirLoopNum ).SupFlow * AirLoopFlow(AirLoopNum).DesReturnFrac ) - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow);
 				}
 			}
 
