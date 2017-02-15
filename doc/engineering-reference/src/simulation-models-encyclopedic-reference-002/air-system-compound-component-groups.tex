@@ -2211,7 +2211,7 @@ Heating Mode:
 \end{equation}
 
 \begin{equation}
-\frac{{Powe{r_h}}}{{Power{}_{h,ref}}} = F1 + F2\left[ {\frac{{{T_{db}}}}{{{T_{ref}}}}} \right] + F3\left[ {\frac{{T{}_{w,in}}}{{T{}_{ref}}}} \right] + F4\left[ {\frac{{{{\dot V}_{air}}}}{{{{\dot V}_{air,ref}}}}} \right] + F5\left[ {\frac{{{{\dot V}_w}}}{{{{\dot V}_{w,ref}}}}} \right]
+\frac{{Power{_h}}}{{Power{}_{h,ref}}} = F1 + F2\left[ {\frac{{{T_{db}}}}{{{T_{ref}}}}} \right] + F3\left[ {\frac{{T{}_{w,in}}}{{T{}_{ref}}}} \right] + F4\left[ {\frac{{{{\dot V}_{air}}}}{{{{\dot V}_{air,ref}}}}} \right] + F5\left[ {\frac{{{{\dot V}_w}}}{{{{\dot V}_{w,ref}}}}} \right]
 \end{equation}
 
 Assuming no losses, the source side heat transfer rate for cooling and heating mode is calculated as following;
@@ -2359,7 +2359,7 @@ UA for the source side and the load side are two of the parameters estimated in 
 
 Additional model details and a discussion of the parameters and parameter estimation technique are described in the following section on Water to Water Heat Pumps.
 
-\subsection{Water To Water Heat Pumps}\label{water-to-water-heat-pumps}
+\section{Water To Water Heat Pumps}\label{water-to-water-heat-pumps}
 
 There are two water-water heat pump models available in EnergyPlus which are \textbf{parameter estimation based model} and \textbf{equation-fit model}. Detailed descriptions of the model are available in the references Tang and Jin
 
@@ -2374,7 +2374,7 @@ Cooling Mode:
 \end{equation}
 
 \begin{equation}
-Powe{r_c} = B1 + B2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + B3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + B4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + B5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]
+\frac{{Power{}_c}}{{Power{}_{c,ref}}} = B1 + B2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + B3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + B4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + B5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]
 \end{equation}
 
 Heating Mode:
@@ -2384,7 +2384,7 @@ Heating Mode:
 \end{equation}
 
 \begin{equation}
-Powe{r_h} = D1 + D2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + D3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + D4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + D5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]
+\frac{{Power{_h}}}{{Power{}_{h,ref}}} = D1 + D2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + D3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + D4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + D5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]
 \end{equation}
 
 Assuming no losses, the source side heat transfer rate for cooling and heating mode is calculated as following;
