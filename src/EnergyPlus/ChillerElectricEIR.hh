@@ -97,7 +97,12 @@ namespace ChillerElectricEIR {
 
 	extern Array1D_bool CheckEquipName;
 
+
 	extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
+	extern bool ChillerIPLVOneTimeFlag;
+	extern Array1D_bool ChillerIPLVFlagArr; // TRUE in order to calculate IPLV
+	extern bool getInputAllocatedFlag; // True when arrays are allocated
+	extern bool InitMyOneTimeFlag; // Flag used to execute code only once
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 	//PUBLIC     SimEIRChillerHeatRecovery
@@ -362,6 +367,8 @@ namespace ChillerElectricEIR {
 	extern Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimElectricEIRChiller(
