@@ -578,33 +578,38 @@ In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
 The air mass flow rate calculations during heating operation are the same as those described above for cooling operation for multi/variable speed.
 
-\subsubsection{ASHRAE Standard 90.1 load based control:}\label{ashrae-901-load-based-control}
+\subsubsection{Single Zone VAV load based control:}\label{ashrae-901-load-based-control}
 
-The unitary system can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is applicable to AirloopHVAC and ZoneHVAC equipment and is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for Load Based control. Additionally, only specific coil types are allowed for the ASHRAE 90.1 single zone VAV load based control method. 
+The unitary system can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the fan speed is maintained at a minimum level and the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is applicable to AirloopHVAC and ZoneHVAC equipment and is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for Load Based control. Additionally, only specific coil types are allowed for the Single Zone VAV load based control method. 
 
 Allowed coil types are:
+
 \textbf{Cooling coils:}
-·~~~~~~~~Coil:Cooling:Water
-·~~~~~~~~Coil:Cooling:WaterDetailed
-·~~~~~~~~Coil:Cooling:DX:SingleSpeed
+\begin{itemize}
+\item Coil:Cooling:Water
+\item Coil:Cooling:WaterDetailed
+\item Coil:Cooling:DX:SingleSpeed
+\end{itemize}
 
 \textbf{Heating coils:}
-·~~~~~~~~Coil:Heating:Water
-·~~~~~~~~Coil:Heating:Fuel
-·~~~~~~~~Coil:Heating:Electric
-·~~~~~~~~Coil:Heating:DX:SingleSpeed
+\begin{itemize}
+\item Coil:Heating:Water
+\item Coil:Heating:Fuel
+\item Coil:Heating:Electric
+\item Coil:Heating:DX:SingleSpeed
+\end{itemize}
 
-Other coil types may be used when selecting the ASHRAE 90.1 control method, however, these coils will not be modeled using the ASHRAE 90.1 single zone VAV load based control method and instead will be modeled using the Load Based control method described in a previous section.
+Other coil types may be used when selecting the Single Zone VAV control method, however, these coils will not be modeled using the Single Zone VAV load based control method and instead will be modeled using the Load Based control method described in a previous section.
 
-The example below shows two implementations of the ASHRAE single zone VAV model using the AirloopHVAC:UnitarySystem object as both air loop equipment serving multiple zones and as zone equipment serving a single zone. Chilled and hot water coils are used with autosized limits on supply air temperature. The supply air temperature limits are intended to reflect the ASHRAE Standard 90.1 requirement to allow low speed fan operation at zone loads less than or equal to 50\% of the design load. The zone cooling and heating loads identified in the figure are actual data taken from the zone sizing information for the control zones used for each system. Outdoor air loads were eliminated (i.e., set to 0) for this example.
+The example below shows two implementations of the Single Zone VAV model using the AirloopHVAC:UnitarySystem object as both air loop equipment serving multiple zones and as zone equipment serving a single zone. Chilled and hot water coils are used with autosized limits on supply air temperature. The supply air temperature limits are intended to reflect the model requirement to allow low speed fan operation at zone loads less than or equal to 50\% of the design load. The zone cooling and heating loads identified in the figure are actual simulation data taken from the zone sizing information representative of the control zones used for each system. Outdoor air loads were eliminated for this example (i.e., Outdoor Air = 0).
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/UnitarySystem_SZVAV_watercoils.png}
-\caption{Example of the EnergyPlus Unitary System ASHRAE Model \protect \label{fig:example-of-the-energyplus-unitary-system-ashrae-model}}
+\caption{Example of the EnergyPlus Unitary System Single Zone VAV Model \protect \label{fig:example-of-the-energyplus-unitary-system-single-zone-vav-model}}
 \end{figure}
 
-Supply air temperature limits are autosizable and calculated with respect to the zone temperatures at the design cooling and heating peak load conditions. Once the temperature limits are reached and the zone load continues to increase, the fan speed is increased while limiting the maximum outlet air temperature up to the maximum fan speed. At this point, the maximum temperature limits are ignored and the coils are allowed to provide excess temperatures when needed to meet increasing loads. When a supplemental heating coil is used, this coil should be active only when maximum fan speed is reached and will supplement any additional heating required to meet the zone load. the supplemental heating coil also has no maximum temperature limit while attempting to meet high heating loads.
+Supply air temperature limits are autosizable and calculated with respect to the zone temperatures at the design cooling and heating peak load conditions. Once the temperature limits are reached and the zone load continues to increase, the fan speed is increased while limiting the maximum outlet air temperature up to the maximum fan speed. At this point, the maximum temperature limits are ignored and the coils are allowed to provide excess temperatures when needed to meet increasing loads. When a supplemental heating coil is used, this coil should be active only when maximum fan speed is reached and will supplement any additional heating required to meet the zone load. The supplemental heating coil also has no maximum temperature limit while attempting to meet high heating loads.
 
 \subsubsection{High Humidity Control}\label{high-humidity-control}
 
@@ -622,7 +627,7 @@ The unitary system's sensible cooling load to be met and the full load cooling o
 PartLoadRatio = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - NoCoolOutput} \right)}}{{\left( {FullCoolOutput - NoCoolOutput} \right)}}} \right)
 \end{equation}
 
-When the unitary system's sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
+When the unitary system's sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (UnitarySystemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
 
 \begin{equation}
 UnitarySystemMoistureLoad = \frac{{ControlZoneMoistureLoad}}{{ControlZoneAirFlowFraction}}
