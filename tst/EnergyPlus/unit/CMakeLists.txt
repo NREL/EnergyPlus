@@ -87,6 +87,7 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  OASystemHWPreheatCoil.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
@@ -99,6 +100,7 @@ set( test_src
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantChillers.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
