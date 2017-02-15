@@ -16285,6 +16285,151 @@ Foundation:Kiva,
        \units m
        \type real
 
+Foundation:Kiva:Settings,
+       \memo Settings applied across all Kiva foundation calculations.
+       \memo Object is not required. If not defined, defaults will applied.
+  N1,  \field Soil Conductivity
+       \type real
+       \default 1.73
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \type real
+       \default 1842
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \type real
+       \default 419
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Ground Solar Absorptivity
+       \type real
+       \default 0.9
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+  N5,  \field Ground Thermal Absorptivity
+       \type real
+       \default 0.9
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+  N6,  \field Ground Surface Roughness
+       \type real
+       \default 0.03
+       \units m
+       \minimum> 0.0
+  N7,  \field Far-Field Width
+       \type real
+       \default 40
+       \units m
+       \minimum> 0.0
+  A1,  \field Deep-Ground Boundary Condition
+       \type choice
+       \key ZeroFlux
+       \key GroundWater
+       \key Autocalculate
+       \default Autocalculate
+  N8,  \field Deep-Ground Depth
+       \type real
+       \default 40
+       \units m
+       \minimum> 0.0
+       \autocalculatable
+       \default autocalculate
+  N9,  \field Minimum Cell Dimension
+       \type real
+       \default 0.02
+       \units m
+       \minimum> 0.0
+  N10, \field Maximum Cell Growth Coefficient
+       \type real
+       \default 1.5
+       \units dimensionless
+       \minimum 1.0
+  A2;  \field Simulation Timestep
+       \type choice
+       \key Hourly
+       \key Timestep
+       \default Hourly
+
+SurfaceProperty:ExposedFoundationPerimeter,
+       \memo Defines the perimeter of a foundation floor that is exposed to the
+       \memo exterior environment through the floor. User may either define the
+       \memo total exposed perimeter or individually define which segments of
+       \memo the floor surface perimeter are exposed. This object is optional.
+       \memo by default it is assumed that the entire perimeter of each
+       \memo foundation is exposed.
+       \extensible:1
+  A1 , \field Surface Name
+       \required-field
+       \type object-list
+       \object-list FloorSurfaceNames
+  N1 , \field Total Exposed Perimeter
+       \type real
+       \units m
+       \minimum> 0.0
+  N2 , \field Exposed Perimeter Fraction
+       \type real
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  A2 , \field Surface Segment 1 Exposed
+       \note Surface Segment N is the perimeter between the Nth and (N+1)th
+       \note vertices
+       \begin-extensible
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A3 , \field Surface Segment 2 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A4 , \field Surface Segment 3 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A5 , \field Surface Segment 4 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A6 , \field Surface Segment 5 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A7 , \field Surface Segment 6 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A8 , \field Surface Segment 7 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A9 , \field Surface Segment 8 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A10, \field Surface Segment 9 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A11; \field Surface Segment 10 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
        \unique-object
        \memo Options to change the individual convection model equations for dynamic selection when using AdaptiveConvectiongAlgorithm
@@ -17529,82 +17674,6 @@ SurfaceProperty:SolarIncidentInside,
        \type object-list
        \object-list ScheduleNames
 
-SurfaceProperty:ExposedFoundationPerimeter,
-       \memo Defines the perimeter of a foundation floor that is exposed to the
-       \memo exterior environment through the floor. User may either define the
-       \memo total exposed perimeter or individually define which segments of
-       \memo the floor surface perimeter are exposed. This object is optional.
-       \memo by default it is assumed that the entire perimeter of each
-       \memo foundation is exposed.
-       \extensible:1
-  A1 , \field Surface Name
-       \required-field
-       \type object-list
-       \object-list FloorSurfaceNames
-  N1 , \field Total Exposed Perimeter
-       \type real
-       \units m
-       \minimum> 0.0
-  N2 , \field Exposed Perimeter Fraction
-       \type real
-       \units dimensionless
-       \minimum 0.0
-       \maximum 1.0
-       \default 1.0
-  A2 , \field Surface Segment 1 Exposed
-       \note Surface Segment N is the perimeter between the Nth and (N+1)th
-       \note vertices
-       \begin-extensible
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A3 , \field Surface Segment 2 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A4 , \field Surface Segment 3 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A5 , \field Surface Segment 4 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A6 , \field Surface Segment 5 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A7 , \field Surface Segment 6 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A8 , \field Surface Segment 7 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A9 , \field Surface Segment 8 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A10, \field Surface Segment 9 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-  A11; \field Surface Segment 10 Exposed
-       \type choice
-       \default Yes
-       \key Yes
-       \key No
-
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
        \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
@@ -17639,75 +17708,6 @@ ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
-
-Foundation:Kiva:Settings,
-       \memo Settings applied across all Kiva foundation calculations.
-       \memo Object is not required. If not defined, defaults will applied.
-  N1,  \field Soil Conductivity
-       \type real
-       \default 1.73
-       \units W/m-K
-       \minimum> 0.0
-  N2,  \field Soil Density
-       \type real
-       \default 1842
-       \units kg/m3
-       \minimum> 0.0
-  N3,  \field Soil Specific Heat
-       \type real
-       \default 419
-       \units J/kg-K
-       \minimum> 0.0
-  N4,  \field Ground Solar Absorptivity
-       \type real
-       \default 0.9
-       \units dimensionless
-       \minimum 0.0
-       \maximum 1.0
-  N5,  \field Ground Thermal Absorptivity
-       \type real
-       \default 0.9
-       \units dimensionless
-       \minimum 0.0
-       \maximum 1.0
-  N6,  \field Ground Surface Roughness
-       \type real
-       \default 0.03
-       \units m
-       \minimum> 0.0
-  N7,  \field Far-Field Width
-       \type real
-       \default 40
-       \units m
-       \minimum> 0.0
-  A1,  \field Deep-Ground Boundary Condition
-       \type choice
-       \key ZeroFlux
-       \key GroundWater
-       \key Autocalculate
-       \default Autocalculate
-  N8,  \field Deep-Ground Depth
-       \type real
-       \default 40
-       \units m
-       \minimum> 0.0
-       \autocalculatable
-       \default autocalculate
-  N9,  \field Minimum Cell Dimension
-       \type real
-       \default 0.02
-       \units m
-       \minimum> 0.0
-  N10, \field Maximum Cell Growth Coefficient
-       \type real
-       \default 1.5
-       \units dimensionless
-       \minimum 1.0
-  A2;  \field Simulation Timestep
-       \type choice
-       \key Hourly
-       \key Timestep
-       \default Hourly
 
 
 ZoneProperty:UserViewFactors:bySurfaceName,
@@ -40036,9 +40036,9 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
@@ -40049,9 +40049,9 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
@@ -40112,9 +40112,9 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
@@ -40125,9 +40125,9 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
@@ -42563,10 +42563,10 @@ Coil:Cooling:Water,
        \type real
        \units deltaC
        \minimum> 0.0
-       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
-       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate.
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant
        \note object is used for sizing the Design Water Flow Rate.
-   
+
 Coil:Cooling:Water:DetailedGeometry,
        \memo Chilled water cooling coil, detailed flat fin coil model for continuous plate fins,
        \memo with inputs for detailed coil geometry specifications.
@@ -42688,10 +42688,10 @@ Coil:Cooling:Water:DetailedGeometry,
        \type real
        \units deltaC
        \minimum> 0.0
-       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
-       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate.
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant
        \note object is used for sizing the Design Water Flow Rate.
-   
+
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed. Optional inputs for moisture evaporation from wet
@@ -45184,8 +45184,8 @@ Coil:Heating:Water,
       \type real
       \units deltaC
       \minimum> 0.0
-      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
-      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate.
+      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant
       \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Heating:Steam,
@@ -65403,7 +65403,7 @@ CoolingTower:SingleSpeed,
        \default 0.1
        \minimum> 0.0
        \maximum< 1.0
-       \note This field is only used if the previous field is set to autocalculate 
+       \note This field is only used if the previous field is set to autocalculate
   N13, \field Design Inlet Air Dry-Bulb Temperature
        \type real
        \units C
@@ -65420,7 +65420,7 @@ CoolingTower:SingleSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize   
+       \default autosize
        \minimum> 0
        \note Enter the approach temperature corresponding to the design inlet air
        \note wet-bulb temperature and design range temperature.
@@ -65430,7 +65430,7 @@ CoolingTower:SingleSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize 
+       \default autosize
        \minimum> 0
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
@@ -65730,7 +65730,7 @@ CoolingTower:TwoSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize 
+       \default autosize
        \minimum> 0
        \note Enter the approach temperature corresponding to the design inlet air
        \note wet-bulb temperature and design range temperature.
@@ -65740,12 +65740,12 @@ CoolingTower:TwoSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize 
+       \default autosize
        \minimum> 0
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
        \note Design range = inlet water temperature minus outlet water temperature
-       \note at design conditions. Autosized to 5.5 deltaC. 
+       \note at design conditions. Autosized to 5.5 deltaC.
   N25, \field Basin Heater Capacity
        \type real
        \units W/K
@@ -81809,9 +81809,9 @@ FaultModel:Fouling:Boiler,
        \maximum 1
        \default 1
        \units dimensionless
-   
+
 FaultModel:Fouling:EvaporativeCooler,
-   \memo This object describes the fouling fault of the wetted coil evaporative cooler 
+   \memo This object describes the fouling fault of the wetted coil evaporative cooler
    \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
@@ -81825,7 +81825,7 @@ FaultModel:Fouling:EvaporativeCooler,
        \object-list ScheduleNames
    A4, \field Evaporative Cooler Object Type
        \note Enter the type of a Evaporative Cooler object
-       \note The fault applies to the wetted coil evaporative cooler 
+       \note The fault applies to the wetted coil evaporative cooler
        \note The fault does not apply to direct evaporative coolers or the dry coil indirect evaporative coolers
        \required-field
        \type choice
@@ -88385,21 +88385,21 @@ UtilityCost:Tariff,
         \note The name of the schedule that defines the time-of-use periods that occur each day. The values for the
         \note different variables are: 1 for Peak. 2 for Shoulder. 3 for OffPeak. 4 for MidPeak.
         \note The following variables are created automatically if these different periods are used in the
-        \note schedule and include: TotalEnergy, TotalDemand, PeakEnergy, PeakDemand, ShoulderEnergy, ShoulderDemand, 
+        \note schedule and include: TotalEnergy, TotalDemand, PeakEnergy, PeakDemand, ShoulderEnergy, ShoulderDemand,
         \note OffPeakEnergy, OffPeakDemand, MidPeakEnergy, MidPeakDemand
         \note Some special variables are created that include: PeakExceedsOffPeak, OffPeakExceedsPeak,
-        \note PeakExceedsMidPeak, MidPeakExceedsPeak, PeakExceedsShoulder, ShoulderExceedsPeak, 
+        \note PeakExceedsMidPeak, MidPeakExceedsPeak, PeakExceedsShoulder, ShoulderExceedsPeak,
         \note Others include: PeakAndShoulderEnergy, PeakAndShoulderDemand, PeakAndMidPeakEnergy,
-        \note PeakAndMidPeakDemand, ShoulderAndOffPeakEnergy, ShoulderAndOffPeakDemand, PeakAndOffPeakEnergy, 
-        \note PeakAndOffPeakDemand, RealTimePriceCosts, AboveCustomerBaseCosts, BelowCustomerBaseCosts, 
+        \note PeakAndMidPeakDemand, ShoulderAndOffPeakEnergy, ShoulderAndOffPeakDemand, PeakAndOffPeakEnergy,
+        \note PeakAndOffPeakDemand, RealTimePriceCosts, AboveCustomerBaseCosts, BelowCustomerBaseCosts,
         \note AboveCustomerBaseEnergy, BelowCustomerBaseEnergy
    A5,  \field Season Schedule Name
         \type object-list
         \object-list ScheduleNames
         \note The name of a schedule that defines the seasons.  The schedule values are: 1 for Winter. 2 for Spring.
         \note 3 for Summer. 4 for Autumn.
-        \note Variables are automatically created if a season schedule is used. These variables are set to 1 within 
-        \note the season and 0 for the months that are not in the season. The variables are: IsWinter, IsNotWinter, 
+        \note Variables are automatically created if a season schedule is used. These variables are set to 1 within
+        \note the season and 0 for the months that are not in the season. The variables are: IsWinter, IsNotWinter,
         \note IsSpring, IsNotSpring, IsSummer, IsNotSummer, IsAutumn, IsNotAutumn.
    A6,  \field Month Schedule Name
         \type object-list
