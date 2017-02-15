@@ -165,6 +165,8 @@ namespace ThermalComfort {
 	extern Real64 TotalAnyZoneNotMetOccupied;
 	extern Array1D< Real64 > ZoneOccHrs;
 
+	extern Real64 runningAverageASH;
+
 	// Subroutine Specifications for the Thermal Comfort module
 
 	// Types

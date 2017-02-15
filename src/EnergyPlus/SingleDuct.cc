@@ -4653,7 +4653,7 @@ namespace SingleDuct {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE
-		// Get input for inlet side air temrinal mixers and store it in the inlet side air terminal mixer array
+		// Get input for inlet side air terminal mixers and store it in the inlet side air terminal mixer array
 
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
@@ -4733,6 +4733,8 @@ namespace SingleDuct {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 5;
 			} else if ( cAlphaArgs( 2 ) == "AIRLOOP:UNITARYSYSTEM" ) {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 6;
+			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:UNITVENTILATOR") {
+				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 7;
 			}
 
 			SysATMixer( ATMixerNum ).ZoneHVACUnitName = cAlphaArgs( 3 );

@@ -3862,7 +3862,7 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeElectricity;
 			} else if ( SameString( Alphas( 12 ), "NaturalGas" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeNaturalGas;
-			} else if ( SameString( Alphas( 12 ), "PropaneGas" ) ) {
+			} else if ( SameString( Alphas( 12 ), "Propane" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypePropaneGas;
 			} else if ( SameString( Alphas( 12 ), "Diesel" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeDiesel;
@@ -4359,7 +4359,7 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeElectricity;
 			} else if ( SameString( Alphas( 9 ), "NaturalGas" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeNaturalGas;
-			} else if ( SameString( Alphas( 9 ), "PropaneGas" ) ) {
+			} else if ( SameString( Alphas( 9 ), "Propane" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypePropaneGas;
 			} else if ( SameString( Alphas( 9 ), "Diesel" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeDiesel;
