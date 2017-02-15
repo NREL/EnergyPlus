@@ -1425,7 +1425,7 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).FanExists && ! MultiOrVarSpeedHeatCoil( UnitarySysNum ) && ! MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) {
 						bool fanHasPowerSpeedRatioCurve = false;
 						if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-							if ( HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->getFanPowerCurveIndex() > 0 ) fanHasPowerSpeedRatioCurve = true;
+							if ( HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->powerModFuncFlowFractionCurveIndex > 0 ) fanHasPowerSpeedRatioCurve = true;
 						} else {
 							if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) fanHasPowerSpeedRatioCurve = true;
 						}
@@ -1445,7 +1445,7 @@ namespace HVACUnitarySystem {
 			} else {
 				if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 					if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate();
+						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate;
 					} else {
 						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( BlankString, BlankString, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
 					}
@@ -3291,13 +3291,13 @@ namespace HVACUnitarySystem {
 				} else { // mine data from fan object
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( FanName ) ); // call constructor
 					UnitarySystem( UnitarySysNum ).FanIndex = HVACFan::getFanObjectVectorIndex( FanName );
-					FanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate();
+					FanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate;
 					if ( FanVolFlowRate == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = FanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = FanVolFlowRate;
-					FanInletNode = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->inletNodeNum();
-					FanOutletNode = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->outletNodeNum();
-					UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->availSchedIndex();
+					FanInletNode = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->inletNodeNum;
+					FanOutletNode = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->outletNodeNum;
+					UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->availSchedIndex;
 				}
 
 

@@ -1872,7 +1872,7 @@ namespace WaterThermalTanks {
 							HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 							HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( HPWH.FanName ) ); // call constructor
 							HPWH.FanNum = HVACFan::getFanObjectVectorIndex( HPWH.FanName );
-							FanVolFlow = HVACFan::fanObjs[ HPWH.FanNum ]->designAirVolFlowRate();
+							FanVolFlow = HVACFan::fanObjs[ HPWH.FanNum ]->designAirVolFlowRate;
 
 						} else {
 							GetFanType( HPWH.FanName, HPWH.FanType_Num, errFlag, cCurrentModuleObject, HPWH.Name );
@@ -2189,7 +2189,7 @@ namespace WaterThermalTanks {
 					// check that fan outlet node is indeed correct
 					int FanOutletNodeNum( 0 );
 					if ( HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-						FanOutletNodeNum = HVACFan::fanObjs[ HPWH.FanNum ]->outletNodeNum();
+						FanOutletNodeNum = HVACFan::fanObjs[ HPWH.FanNum ]->outletNodeNum;
 					} else {
 						errFlag = false;
 						FanOutletNodeNum = GetFanOutletNode( HPWH.FanType, HPWH.FanName, errFlag );
@@ -2211,7 +2211,7 @@ namespace WaterThermalTanks {
 					}
 					int FanInletNodeNum( 0 );
 					if ( HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-						FanInletNodeNum = HVACFan::fanObjs[ HPWH.FanNum ]->inletNodeNum();
+						FanInletNodeNum = HVACFan::fanObjs[ HPWH.FanNum ]->inletNodeNum;
 					} else {
 						errFlag = false;
 						FanInletNodeNum = GetFanInletNode( HPWH.FanType, HPWH.FanName, errFlag );
@@ -5642,7 +5642,7 @@ namespace WaterThermalTanks {
 
 				// check fan flow rate, should be larger than the max flow rate of the VS coil
 				if ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					FanVolFlow = HVACFan::fanObjs[ HPWaterHeater( HPNum ).FanNum ]->designAirVolFlowRate();
+					FanVolFlow = HVACFan::fanObjs[ HPWaterHeater( HPNum ).FanNum ]->designAirVolFlowRate;
 				} else if ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ) {
 					GetFanVolFlow( HPWaterHeater( HPNum ).FanNum, FanVolFlow );
 				}
@@ -8680,7 +8680,7 @@ namespace WaterThermalTanks {
 
 		// put fan component first, regardless placement, to calculate fan power
 		if ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-			HVACFan::fanObjs[ HPWaterHeater( HPNum ).FanNum ]->inletNodeNum();
+			HVACFan::fanObjs[ HPWaterHeater( HPNum ).FanNum ]->inletNodeNum;
 		} else {
 			FanInNode = Fans::Fan( HPWaterHeater( HPNum ).FanNum ).InletNodeNum;
 		}

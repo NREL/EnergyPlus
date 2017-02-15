@@ -12194,8 +12194,8 @@ Label50: ;
 				}
 				FanStaticPressureRise = ExternalStatic + DXCoil( DXCoilNum ).InternalStaticPressureDrop;
 				if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
-					FanInletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->inletNodeNum();
-					FanOutletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->outletNodeNum();
+					FanInletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->inletNodeNum;
+					FanOutletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->outletNodeNum;
 				} else {
 					FanInletNode = Fans::GetFanInletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
 					FanOutletNode = Fans::GetFanOutletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );

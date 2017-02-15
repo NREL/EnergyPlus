@@ -1321,9 +1321,9 @@ namespace SingleDuct {
 			if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( Sys( SysNum ).FanName ) ); // call constructor, safe here because get input is not using DataIPShortCuts.
 				Sys( SysNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( Sys( SysNum ).FanName );
-				Sys( SysNum ).OutletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->outletNodeNum();
-				Sys( SysNum ).InletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->inletNodeNum();
-				HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->fanIsSecondaryDriver();
+				Sys( SysNum ).OutletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->outletNodeNum;
+				Sys( SysNum ).InletNodeNum = HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->inletNodeNum;
+				HVACFan::fanObjs[ Sys( SysNum ).Fan_Index ]->fanIsSecondaryDriver = true;
 			} else if ( Sys( SysNum ).Fan_Num == DataHVACGlobals::FanType_SimpleVAV ) {
 				IsNotOK = false;
 

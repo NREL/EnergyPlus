@@ -725,8 +725,8 @@ namespace DesiccantDehumidifiers {
 					DesicDehum( DesicDehumNum ).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( DesicDehum( DesicDehumNum ).RegenFanName ) ); // call constructor
 					DesicDehum( DesicDehumNum ).RegenFanIndex = HVACFan::getFanObjectVectorIndex( DesicDehum( DesicDehumNum ).RegenFanName );
-					DesicDehum( DesicDehumNum ).RegenFanInNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->inletNodeNum();
-					DesicDehum( DesicDehumNum ).RegenFanOutNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->outletNodeNum();
+					DesicDehum( DesicDehumNum ).RegenFanInNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->inletNodeNum;
+					DesicDehum( DesicDehumNum ).RegenFanOutNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->outletNodeNum;
 
 
 			} else {
@@ -877,8 +877,8 @@ namespace DesiccantDehumidifiers {
 					DesicDehum( DesicDehumNum ).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( DesicDehum( DesicDehumNum ).RegenFanName ) ); // call constructor
 					DesicDehum( DesicDehumNum ).RegenFanIndex = HVACFan::getFanObjectVectorIndex( DesicDehum( DesicDehumNum ).RegenFanName );
-					DesicDehum( DesicDehumNum ).RegenFanInNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->inletNodeNum();
-					DesicDehum( DesicDehumNum ).RegenFanOutNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->outletNodeNum();
+					DesicDehum( DesicDehumNum ).RegenFanInNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->inletNodeNum;
+					DesicDehum( DesicDehumNum ).RegenFanOutNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->outletNodeNum;
 
 
 			} else {

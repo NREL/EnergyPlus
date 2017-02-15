@@ -447,9 +447,9 @@ namespace HVACStandAloneERV {
 				StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) ); // call constructor
 				StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex  = HVACFan::getFanObjectVectorIndex( StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
-				StandAloneERV( StandAloneERVNum ).SupplyAirFanSchPtr = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->availSchedIndex();
-				StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->designAirVolFlowRate();
-				StandAloneERV( StandAloneERVNum ).SupplyAirOutletNode = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->outletNodeNum();
+				StandAloneERV( StandAloneERVNum ).SupplyAirFanSchPtr = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->availSchedIndex;
+				StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->designAirVolFlowRate;
+				StandAloneERV( StandAloneERVNum ).SupplyAirOutletNode = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->outletNodeNum;
 			} else {
 				GetFanType( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, SAFanTypeNum, errFlag, CurrentModuleObject, StandAloneERV( StandAloneERVNum ).Name );
 				if ( errFlag ) {
@@ -491,9 +491,9 @@ namespace HVACStandAloneERV {
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) ); // call constructor
 
 				StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex = HVACFan::getFanObjectVectorIndex( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
-				StandAloneERV( StandAloneERVNum ).ExhaustAirFanSchPtr = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->availSchedIndex();
-				StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->designAirVolFlowRate();
-				StandAloneERV( StandAloneERVNum ).ExhaustAirOutletNode = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->outletNodeNum();
+				StandAloneERV( StandAloneERVNum ).ExhaustAirFanSchPtr = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->availSchedIndex;
+				StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->designAirVolFlowRate;
+				StandAloneERV( StandAloneERVNum ).ExhaustAirOutletNode = HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->outletNodeNum;
 
 			} else {
 				GetFanType( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, EAFanTypeNum, errFlag, CurrentModuleObject, StandAloneERV( StandAloneERVNum ).Name );

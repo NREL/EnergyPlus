@@ -76,7 +76,7 @@ class FanSystem
 public: // Methods
 
 	// Constructor
-	FanSystem( std::string const objectName );
+	FanSystem( std::string const &objectName );
 
 	//Destructor
 	~FanSystem()
@@ -94,35 +94,14 @@ public: // Methods
 		Optional< Real64 const > pressureRise = _ // Pressure difference to use for DeltaPress
 	);
 
-	std::string const &
-	name() const;
-
 	Real64
 	fanPower() const;
 
 	Real64
 	powerLossToAir() const;
-	
-	Real64
-	designAirVolFlowRate() const;
 
 	Real64
 	maxAirMassFlowRate() const;
-
-	int
-	inletNodeNum() const;
-
-	int
-	outletNodeNum() const;
-
-	int
-	availSchedIndex() const;
-
-	Real64
-	deltaPress() const;
-
-	int
-	getFanPowerCurveIndex() const;
 
 	Real64
 	getFanDesignTemperatureRise() const;
@@ -130,19 +109,36 @@ public: // Methods
 	Real64 
 	getFanDesignHeatGain( Real64 const FanVolFlow );
 
-	bool
-	getIfContinuousSpeedControl() const;
+	//void
+	//fanIsSecondaryDriver();
 
-	void
-	fanIsSecondaryDriver();
+	//void
+	//setFaultyFilterOn();
 
-	void
-	setFaultyFilterOn();
+	//void
+	//setFaultyFilterIndex( int const faultyAirFilterIndex );
 
-	void
-	setFaultyFilterIndex( int const faultyAirFilterIndex );
+	enum class SpeedControlMethod : int {
+		notSet = 0,
+		discrete,
+		continuous
+	};
 
-private: //methods
+	// data
+	std::string name; // user identifier
+	int availSchedIndex; // Pointer to the availability schedule
+	int inletNodeNum; // system air node at fan inlet
+	int outletNodeNum; // system air node at fan outlet
+	Real64 designAirVolFlowRate; // Max Specified Volume Flow Rate of Fan [m3/sec]
+	SpeedControlMethod speedControl; // Discrete or Continuous speed control method
+	Real64 deltaPress; // Delta Pressure Across the Fan [N/m2]
+	Real64 designElecPower; // design electric power consumption [W]
+	int powerModFuncFlowFractionCurveIndex; // pointer to performance curve or table
+
+	// Mass Flow Rate Control Variables
+	bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off. 
+
+private: // methods
 
 	void
 	init();
@@ -162,13 +158,8 @@ private: //methods
 	void
 	report();
 
-private: // data
+	// data
 
-	enum class SpeedControlMethod : int {
-		notSet = 0,
-		discrete,
-		continuous
-	};
 	enum class PowerSizingMethod : int {
 		powerSizingMethodNotSet = 0,
 		powerPerFlow,
@@ -181,83 +172,73 @@ private: // data
 		lostToOutside
 	};
 
-	std::string name_; // user identifier
-	std::string fanType_; // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-	int fanType_Num_; // DataHVACGlobals fan type
-	int availSchedIndex_; // Pointer to the availability schedule
-	int inletNodeNum_; // system air node at fan inlet
-	int outletNodeNum_; // system air node at fan outlet
-	Real64 designAirVolFlowRate_; // Max Specified Volume Flow Rate of Fan [m3/sec]
-	bool designAirVolFlowRateWasAutosized_; // true if design max volume flow rate was autosize on input
-	SpeedControlMethod speedControl_; // Discrete or Continuous speed control method
-	Real64 minPowerFlowFrac_; // Minimum fan air flow fraction for power calculation
-	Real64 deltaPress_; // Delta Pressure Across the Fan [N/m2]
-	Real64 motorEff_; // Fan motor efficiency
-	Real64 motorInAirFrac_; // Fraction of motor heat entering air stream
-	Real64 designElecPower_; // design electric power consumption [W]
-	bool designElecPowerWasAutosized_;
-	PowerSizingMethod powerSizingMethod_; // sizing method for design electric power, three options
-	Real64 elecPowerPerFlowRate_; // scaling factor for powerPerFlow method
-	Real64 elecPowerPerFlowRatePerPressure_; // scaling factor for powerPerFlowPerPressure
-	Real64 fanTotalEff_; // Fan total system efficiency (fan*belt*motor*VFD)
-	int powerModFuncFlowFractionCurveIndex_; // pointer to performance curve or table
-	Real64 nightVentPressureDelta_; // fan pressure rise during night ventilation mode
-	Real64 nightVentFlowFraction_; // fan's flow fraction during night ventilation mode, not used
-	int zoneNum_; // zone index for motor heat losses as internal gains
-	Real64 zoneRadFract_; // thermal radiation split for motor losses
-	ThermalLossDestination heatLossesDestination_; //enum for where motor loss go
-	Real64 qdotConvZone_; // fan power lost to surrounding zone by convection to air (W)
-	Real64 qdotRadZone_;  // fan power lost to surrounding zone by radiation to zone surfaces(W)
-	std::string endUseSubcategoryName_;
-	int numSpeeds_; // input for how many speed levels for discrete fan
-	std::vector< Real64 > flowFractionAtSpeed_; //array of flow fractions for speed levels
-	std::vector< Real64 > powerFractionAtSpeed_; // array of power fractions for speed levels
-	std::vector< bool > powerFractionInputAtSpeed_;
+	std::string m_fanType; // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
+	int m_fanType_Num; // DataHVACGlobals fan type
+	bool m_designAirVolFlowRateWasAutosized; // true if design max volume flow rate was autosize on input
+	Real64 m_minPowerFlowFrac; // Minimum fan air flow fraction for power calculation
+	Real64 m_motorEff; // Fan motor efficiency
+	Real64 m_motorInAirFrac; // Fraction of motor heat entering air stream
+	bool m_designElecPowerWasAutosized;
+	PowerSizingMethod m_powerSizingMethod; // sizing method for design electric power, three options
+	Real64 m_elecPowerPerFlowRate; // scaling factor for powerPerFlow method
+	Real64 m_elecPowerPerFlowRatePerPressure; // scaling factor for powerPerFlowPerPressure
+	Real64 m_fanTotalEff; // Fan total system efficiency (fan*belt*motor*VFD)
+	Real64 m_nightVentPressureDelta; // fan pressure rise during night ventilation mode
+	Real64 m_nightVentFlowFraction; // fan's flow fraction during night ventilation mode, not used
+	int m_zoneNum; // zone index for motor heat losses as internal gains
+	Real64 m_zoneRadFract; // thermal radiation split for motor losses
+	ThermalLossDestination m_heatLossesDestination; //enum for where motor loss go
+	Real64 m_qdotConvZone; // fan power lost to surrounding zone by convection to air (W)
+	Real64 m_qdotRadZone;  // fan power lost to surrounding zone by radiation to zone surfaces(W)
+	std::string m_endUseSubcategoryName;
+	int m_numSpeeds; // input for how many speed levels for discrete fan
+	std::vector< Real64 > m_flowFractionAtSpeed; //array of flow fractions for speed levels
+	std::vector< Real64 > m_powerFractionAtSpeed; // array of power fractions for speed levels
+	std::vector< bool > m_powerFractionInputAtSpeed;
 	//calculation variables
-	std::vector< Real64 > massFlowAtSpeed_;
-	std::vector< Real64 > totEfficAtSpeed_;
-	Real64 inletAirMassFlowRate_; // MassFlow through the Fan being Simulated [kg/Sec]
-	Real64 outletAirMassFlowRate_;
-	Real64 minAirFlowRate_; // Min Specified Volume Flow Rate of Fan [m3/sec]
-	Real64 maxAirMassFlowRate_; // Max flow rate of fan in kg/sec
-	Real64 minAirMassFlowRate_; // Min flow rate of fan in kg/sec
+	std::vector< Real64 > m_massFlowAtSpeed;
+	std::vector< Real64 > m_totEfficAtSpeed;
+	Real64 m_inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
+	Real64 m_outletAirMassFlowRate;
+	Real64 m_minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
+	Real64 m_maxAirMassFlowRate; // Max flow rate of fan in kg/sec
+	Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
 //	int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
 //	Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
-	Real64 inletAirTemp_;
-	Real64 outletAirTemp_;
-	Real64 inletAirHumRat_;
-	Real64 outletAirHumRat_;
-	Real64 inletAirEnthalpy_;
-	Real64 outletAirEnthalpy_;
-	bool objTurnFansOn_;
-	bool objTurnFansOff_;
-	bool objEnvrnFlag_; // initialize to true
-	bool objSizingFlag_; //initialize to true, set to false after sizing routine
+	Real64 m_inletAirTemp;
+	Real64 m_outletAirTemp;
+	Real64 m_inletAirHumRat;
+	Real64 m_outletAirHumRat;
+	Real64 m_inletAirEnthalpy;
+	Real64 m_outletAirEnthalpy;
+	bool m_objTurnFansOn;
+	bool m_objTurnFansOff;
+	bool m_objEnvrnFlag; // initialize to true
+	bool m_objSizingFlag; //initialize to true, set to false after sizing routine
 
 	//report variables
-	Real64 fanPower_; // Power of the Fan being Simulated [W]
-	Real64 fanEnergy_; // Fan energy in [J]
+	Real64 m_fanPower; // Power of the Fan being Simulated [W]
+	Real64 m_fanEnergy; // Fan energy in [J]
 //	Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
-	Real64 deltaTemp_; // Temp Rise across the Fan [C]
-	Real64 powerLossToAir_; // fan heat gain into process air [W]
-	std::vector< Real64 > fanRunTimeFractionAtSpeed_;
+	Real64 m_deltaTemp; // Temp Rise across the Fan [C]
+	Real64 m_powerLossToAir; // fan heat gain into process air [W]
+	std::vector< Real64 > m_fanRunTimeFractionAtSpeed;
 	//EMS related variables
-	bool maxAirFlowRateEMSOverrideOn_; // if true, EMS wants to override fan size for Max Volume Flow Rate
-	Real64 maxAirFlowRateEMSOverrideValue_; // EMS value to use for override of  Max Volume Flow Rate
-	bool eMSFanPressureOverrideOn_; // if true, then EMS is calling to override
-	Real64 eMSFanPressureValue_; // EMS value for Delta Pressure Across the Fan [Pa]
-	bool eMSFanEffOverrideOn_; // if true, then EMS is calling to override
-	Real64 eMSFanEffValue_; // EMS value for total efficiency of the Fan, fraction on 0..1
-	bool eMSMaxMassFlowOverrideOn_; // if true, then EMS is calling to override mass flow
-	Real64 eMSAirMassFlowValue_; // value EMS is directing to use [kg/s]
+	bool m_maxAirFlowRateEMSOverrideOn; // if true, EMS wants to override fan size for Max Volume Flow Rate
+	Real64 m_maxAirFlowRateEMSOverrideValue; // EMS value to use for override of  Max Volume Flow Rate
+	bool m_eMSFanPressureOverrideOn; // if true, then EMS is calling to override
+	Real64 m_eMSFanPressureValue; // EMS value for Delta Pressure Across the Fan [Pa]
+	bool m_eMSFanEffOverrideOn; // if true, then EMS is calling to override
+	Real64 m_eMSFanEffValue; // EMS value for total efficiency of the Fan, fraction on 0..1
+	bool m_eMSMaxMassFlowOverrideOn; // if true, then EMS is calling to override mass flow
+	Real64 m_eMSAirMassFlowValue; // value EMS is directing to use [kg/s]
 
-	bool faultyFilterFlag_; // Indicate whether there is a fouling air filter corresponding to the fan
-	int faultyFilterIndex_;  // Index of the fouling air filter corresponding to the fan
+	bool m_faultyFilterFlag; // Indicate whether there is a fouling air filter corresponding to the fan
+	int m_faultyFilterIndex;  // Index of the fouling air filter corresponding to the fan
 	// Mass Flow Rate Control Variables
-	bool fanIsSecondaryDriver_; // true if this fan is used to augment flow and may pass air when off. 
-	Real64 massFlowRateMaxAvail_;
-	Real64 massFlowRateMinAvail_;
-	Real64 rhoAirStdInit_;
+	Real64 m_massFlowRateMaxAvail;
+	Real64 m_massFlowRateMinAvail;
+	Real64 m_rhoAirStdInit;
 //	bool oneTimePowerCurveCheck_; // one time flag used for error message
 
 }; //class FanSystem 

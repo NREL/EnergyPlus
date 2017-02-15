@@ -496,8 +496,8 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).SFanType = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutAirUnit( OAUnitNum ).SFanName ) ); // call constructor
 				OutAirUnit( OAUnitNum ).SFan_Index = HVACFan::getFanObjectVectorIndex( OutAirUnit( OAUnitNum ).SFanName );
-				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate();
-				OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->availSchedIndex();
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
+				OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->availSchedIndex;
 			} else {
 				GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 
@@ -535,8 +535,8 @@ namespace OutdoorAirUnit {
 					OutAirUnit( OAUnitNum ).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutAirUnit( OAUnitNum ).ExtFanName ) ); // call constructor
 					OutAirUnit( OAUnitNum ).ExtFan_Index = HVACFan::getFanObjectVectorIndex( OutAirUnit( OAUnitNum ).ExtFanName );
-					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate();
-					OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->availSchedIndex();
+					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
+					OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->availSchedIndex;
 				} else {
 					GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
@@ -1289,7 +1289,7 @@ namespace OutdoorAirUnit {
 			
 			} else {
 				HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,_,_,_);
-				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate();
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
 			}
 
 		}
@@ -1301,7 +1301,7 @@ namespace OutdoorAirUnit {
 					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, ErrorsFound );
 				} else {
 					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->simulate(_,_,_,_);
-					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->designAirVolFlowRate();
+					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->designAirVolFlowRate;
 				}
 			}
 		}

@@ -93,13 +93,13 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
 	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); // triggers sizing call
-	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate; // get function
 	EXPECT_NEAR( 1.0000, locFanSizeVdot, 0.00000001 );
 	Real64 locDesignTempRise = HVACFan::fanObjs[ 0 ]->getFanDesignTemperatureRise();
 	EXPECT_NEAR( locDesignTempRise, 0.166, 0.001 );
 	Real64 locDesignHeatGain = HVACFan::fanObjs[ 0 ]->getFanDesignHeatGain( locFanSizeVdot );
 	EXPECT_NEAR( locDesignHeatGain, 200.0, 0.1 );
-	EXPECT_FALSE( HVACFan::fanObjs[ 0 ]->getIfContinuousSpeedControl() );
+	EXPECT_FALSE( HVACFan::fanObjs[ 0 ]->speedControl == HVACFan::FanSystem::SpeedControlMethod::continuous );
 }
 
 
@@ -137,7 +137,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_FanSizing1 )
 	DataSizing::CurOASysNum = 0;
 	DataSizing::DataNonZoneNonAirloopValue = 1.00635;
 	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); // triggers sizing call
-	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate; // get function
 	EXPECT_NEAR( 1.00635, locFanSizeVdot, 0.00001 );
 	DataSizing::DataNonZoneNonAirloopValue = 0.0;
 }
@@ -187,7 +187,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1 )
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
 	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
-	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate; // get function
 	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
 
 	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75 
@@ -260,7 +260,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2 )
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
 	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
-	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate(); // get function
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate;
 	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
 
 	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75 
