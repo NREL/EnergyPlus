@@ -62,7 +62,6 @@
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
 #include <DataHVACGlobals.hh>
-#include <DataStringGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -75,8 +74,6 @@
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -87,8 +84,6 @@
 #include <UtilityRoutines.hh>
 #include <ZonePlenum.hh>
 #include <DirectAirManager.hh>
-#include <WeatherManager.hh>
-
 
 namespace EnergyPlus {
 
@@ -168,17 +163,9 @@ namespace ZoneTempPredictorCorrector {
 	int const iZC_HStat( 4 );
 	int const iZC_TandHStat( 5 );
 	int const iZC_StagedDual( 6 );
-	Array1D_int const iZControlTypes(6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual });
 
-	int const ADAP_NONE( 1 );
-	int const ASH55_CENTRAL( 2 );
-	int const ASH55_UPPER_90( 3 );
-	int const ASH55_UPPER_80( 4 );
-	int const CEN15251_CENTRAL( 5 );
-	int const CEN15251_UPPER_I( 6 );
-	int const CEN15251_UPPER_II( 7 );
-	int const CEN15251_UPPER_III( 8 );
-	
+	Array1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual });
+
 	int const SglHeatSetPoint( 1 );
 	int const SglCoolSetPoint( 2 );
 	int const SglHCSetPoint( 3 );
@@ -255,8 +242,6 @@ namespace ZoneTempPredictorCorrector {
 	Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
-	AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
-	Array1D< Real64 > AdapComfortSetPointSummerDesDay(7, -1);
 
 	// Functions
 	void
@@ -289,13 +274,6 @@ namespace ZoneTempPredictorCorrector {
 		SetPointSingleCoolingFanger.deallocate();
 		SetPointSingleHeatCoolFanger.deallocate();
 		SetPointDualHeatCoolFanger.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
-		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
 	}
 
 	void
@@ -3212,7 +3190,9 @@ namespace ZoneTempPredictorCorrector {
 				SchedTypeIndex = TempControlledZone( RelativeZoneNum ).ControlTypeSchIndx( SchedNameIndex );
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
-				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );			
+
+				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
@@ -3233,7 +3213,6 @@ namespace ZoneTempPredictorCorrector {
 					AdapComfortCoolingSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint ( ActualZoneNum );
 				}
 				
-
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
