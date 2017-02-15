@@ -306,7 +306,7 @@ namespace HVACFan {
 		outletNodeNum( 0 ),
 		designAirVolFlowRate( 0.0 ),
 		m_designAirVolFlowRateWasAutosized( false),
-		speedControl( SpeedControlMethod::notSet ), 
+		speedControl( SpeedControlMethod::NotSet ), 
 		m_minPowerFlowFrac( 0.0 ),
 		deltaPress( 0.0 ),
 		m_motorEff( 0.0 ),
@@ -414,11 +414,11 @@ namespace HVACFan {
 		}
 
 		if ( isAlphaFieldBlank( 5 ) ) {
-			speedControl = SpeedControlMethod::discrete;
+			speedControl = SpeedControlMethod::Discrete;
 		} else if ( InputProcessor::SameString( alphaArgs( 5 ), "Continuous") ) {
-			speedControl = SpeedControlMethod::continuous;
+			speedControl = SpeedControlMethod::Continuous;
 		} else if ( InputProcessor::SameString( alphaArgs( 5 ), "Discrete")  ) {
-			speedControl = SpeedControlMethod::discrete;
+			speedControl = SpeedControlMethod::Discrete;
 		} else {
 			ShowSevereError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
 			ShowContinueError( "Invalid " + alphaFieldNames( 5 ) + " = " + alphaArgs( 5 ) );
@@ -457,12 +457,12 @@ namespace HVACFan {
 				ShowWarningError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Invalid " + alphaFieldNames( 7 ) + " = " + alphaArgs( 7 ) );
 				ShowContinueError( "Curve not found." );
-				if ( speedControl == SpeedControlMethod::continuous ) {
+				if ( speedControl == SpeedControlMethod::Continuous ) {
 					errorsFound = true;
 				}
 			}
 		} else { //blank
-			if ( speedControl == SpeedControlMethod::continuous ) {
+			if ( speedControl == SpeedControlMethod::Continuous ) {
 				ShowWarningError( routineName + locCurrentModuleObject + "=\"" + alphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Continuous speed control requires a fan power curve in " + alphaFieldNames( 7 ) + " = " + alphaArgs( 7 ) );
 			}
@@ -495,7 +495,7 @@ namespace HVACFan {
 			m_numSpeeds = 1;
 		}
 		m_fanRunTimeFractionAtSpeed.resize( m_numSpeeds, 0.0 );
-		if ( speedControl == SpeedControlMethod::discrete && m_numSpeeds > 1 ) {
+		if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 ) {
 			//should have field sets 
 			m_flowFractionAtSpeed.resize( m_numSpeeds, 0.0 );
 			m_powerFractionAtSpeed.resize( m_numSpeeds, 0.0 );
@@ -531,7 +531,7 @@ namespace HVACFan {
 		}
 
 		// check if power curve present when any speeds have no power fraction 
-		if ( speedControl == SpeedControlMethod::discrete && m_numSpeeds > 1 && powerModFuncFlowFractionCurveIndex == 0 ) {
+		if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 && powerModFuncFlowFractionCurveIndex == 0 ) {
 			bool foundMissingPowerFraction = false;
 			for ( auto loop = 0 ; loop< m_numSpeeds; ++loop ) {
 				if ( ! m_powerFractionInputAtSpeed[ loop ] ) {
@@ -555,9 +555,9 @@ namespace HVACFan {
 		SetupOutputVariable( "Fan Heat Gain to Air [W]", m_powerLossToAir, "System", "Average", name );
 		SetupOutputVariable( "Fan Electric Energy [J]", m_fanEnergy, "System", "Sum", name, _, "Electric", "Fans", m_endUseSubcategoryName, "System" );
 		SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", m_outletAirMassFlowRate, "System", "Average", name );
-		if ( speedControl == SpeedControlMethod::discrete && m_numSpeeds == 1 ) {
+		if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1 ) {
 			SetupOutputVariable( "Fan Runtime Fraction []", m_fanRunTimeFractionAtSpeed[ 0 ], "System", "Average", name );
-		} else if ( speedControl == SpeedControlMethod::discrete && m_numSpeeds > 1 ) {
+		} else if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 ) {
 			for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
 				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + " []", m_fanRunTimeFractionAtSpeed[ speedLoop ], "System", "Average", name );
 			}
@@ -673,7 +673,7 @@ namespace HVACFan {
 
 			switch ( speedControl ) {
 			
-			case SpeedControlMethod::discrete: {
+			case SpeedControlMethod::Discrete: {
 				//
 				if ( DataHVACGlobals::OnOffFanPartLoadFraction <= 0.0 ) {
 					DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
@@ -738,7 +738,7 @@ namespace HVACFan {
 				DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
 				break;
 			}
-			case SpeedControlMethod::continuous : {
+			case SpeedControlMethod::Continuous : {
 				localFanTotEff = m_fanTotalEff;
 				Real64 localFlowFractionForPower = max( m_minPowerFlowFrac, localFlowFraction );
 				Real64 localPowerFraction( 0.0);
@@ -783,7 +783,7 @@ namespace HVACFan {
 				}
 				break;
 			} // continuous speed control case
-			case SpeedControlMethod::notSet: {
+			case SpeedControlMethod::NotSet: {
 				// do nothing
 				break;
 			}

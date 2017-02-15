@@ -99,7 +99,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
 	EXPECT_NEAR( locDesignTempRise, 0.166, 0.001 );
 	Real64 locDesignHeatGain = HVACFan::fanObjs[ 0 ]->getFanDesignHeatGain( locFanSizeVdot );
 	EXPECT_NEAR( locDesignHeatGain, 200.0, 0.1 );
-	EXPECT_FALSE( HVACFan::fanObjs[ 0 ]->speedControl == HVACFan::FanSystem::SpeedControlMethod::continuous );
+	EXPECT_FALSE( HVACFan::fanObjs[ 0 ]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous );
 }
 
 

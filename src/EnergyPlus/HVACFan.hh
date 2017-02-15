@@ -119,9 +119,9 @@ public: // Methods
 	//setFaultyFilterIndex( int const faultyAirFilterIndex );
 
 	enum class SpeedControlMethod : int {
-		notSet = 0,
-		discrete,
-		continuous
+		NotSet = 0,
+		Discrete,
+		Continuous
 	};
 
 	// data

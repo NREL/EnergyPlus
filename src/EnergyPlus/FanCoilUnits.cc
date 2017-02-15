@@ -704,7 +704,7 @@ namespace FanCoilUnits {
 
 					// check that for VariableFanVariableFlow or VariableFanConstantFlow that the fan speed control is continuous
 					if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanVarFlow || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanConsFlow || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_ASHRAE ) { // then expect continuous speed control fan
-						if ( HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->speedControl != HVACFan::FanSystem::SpeedControlMethod::continuous ) {
+						if ( HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->speedControl != HVACFan::FanSystem::SpeedControlMethod::Continuous ) {
 							ShowSevereError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "...the fan type of the object : " + FanCoil( FanCoilNum ).FanName + " does not match with the capacity control method selected : " + FanCoil( FanCoilNum ).CapCtrlMeth + " please see I/O reference" );
 							ShowContinueError( "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control." );
