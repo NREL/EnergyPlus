@@ -25,6 +25,7 @@
 #include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
+#include <DataStringGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -395,7 +396,7 @@ namespace EnergyPlus {
 		}
 
 		void DataFrame::writeFile() {
-			std::string jsonfilename = "eplusout_" + ReportFrequency + ".json";
+			std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout_" + ReportFrequency + ".json";
 			std::ofstream jsonfile(jsonfilename);
 			
 			json root;
@@ -879,7 +880,7 @@ namespace EnergyPlus {
 
 		void ResultsSchema::writeFile()
 		{
-			std::string jsonfilename = "eplusout.json";
+			std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout.json";
 			std::ofstream jsonfile(jsonfilename);
 
 			json root, outputVars, rdd, meterVars, meterData;
