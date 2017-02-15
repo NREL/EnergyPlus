@@ -255,13 +255,16 @@ void Domain::setDomain(Foundation &foundation)
           }
           else
           {
-            if (isEqual(meshZ.deltas[k], 0.0))
+            if (k != 0 && k != nZ - 1)
             {
-              std::vector<std::tuple<std::size_t,std::size_t,std::size_t> > pointSet =
-                {std::make_tuple(i,j,k-1),
-                 std::make_tuple(i,j,k+1)};
+              if (isEqual(meshZ.deltas[k], 0.0))
+              {
+                std::vector<std::tuple<std::size_t,std::size_t,std::size_t> > pointSet =
+                  {std::make_tuple(i,j,k-1),
+                   std::make_tuple(i,j,k+1)};
 
-              setZeroThicknessCellProperties(i, j, k, pointSet);
+                setZeroThicknessCellProperties(i, j, k, pointSet);
+              }
             }
           }
         }

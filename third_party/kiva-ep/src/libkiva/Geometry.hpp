@@ -62,7 +62,7 @@ bool LIBKIVA_EXPORT pointOnPoly(Point point, Polygon poly);
 bool LIBKIVA_EXPORT isConvex(Polygon poly);
 
 
-double getDistance(Point a, Point b);
+double LIBKIVA_EXPORT getDistance(Point a, Point b);
 
 double getAngle(Point a, Point b, Point c);
 

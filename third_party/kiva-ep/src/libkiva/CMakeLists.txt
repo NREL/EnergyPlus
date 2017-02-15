@@ -42,7 +42,7 @@ endif()
 
 if(${git_exit_status} MATCHES "0")
   set(VERSION_NUMBER "${kiva_version} (${build_architecture})")
-  message("Building Kiva version: ${VERSION_NUMBER}")
+  message("-- Building Kiva version: ${VERSION_NUMBER}")
 else()
   set(VERSION_NUMBER "v?.?.?")
   message("Cannot determine version number.")

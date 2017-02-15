@@ -8003,9 +8003,7 @@ namespace SurfaceGeometry {
 						} alpF++;
 
 						if ( lNumericFieldBlanks( numF ) ) {
-							ErrorsFound = true;
-							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
-							continue;
+							block.depth = 0.0;
 						} else {
 							block.depth = rNumericArgs( numF );
 						} numF++;
@@ -8019,9 +8017,7 @@ namespace SurfaceGeometry {
 						} numF++;
 
 						if ( lNumericFieldBlanks( numF ) ) {
-							ErrorsFound = true;
-							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
-							continue;
+							block.z = 0.0;
 						} else {
 							block.z = rNumericArgs( numF );
 						} numF++;
@@ -8990,7 +8986,7 @@ namespace SurfaceGeometry {
 				// Processing of 4-sided but non-rectangular Window, Door or GlassDoor, for use in calc of convective air flow.
 				if ( ! isRectangle( ThisSurf ) ) {
 
-					// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio. 
+					// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 					MakeEquivalentRectangle( ThisSurf, ErrorsFound );
 
 					if( DisplayExtraWarnings ){
@@ -11113,7 +11109,7 @@ namespace SurfaceGeometry {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Processing of 4-sided but non-rectangular Window, Door or GlassDoor.
 		// Calculate the effective height and width of the surface.
-		// 
+		//
 		// METHODOLOGY EMPLOYED:
 		// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 
@@ -11134,7 +11130,7 @@ namespace SurfaceGeometry {
 
 		// DERIVED TYPE DEFINITIONS:
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 BaseCosAzimuth;
 		static Real64 BaseCosTilt;
@@ -11154,19 +11150,19 @@ namespace SurfaceGeometry {
 		Real64 XLLC;
 		Real64 YLLC;
 		Real64 ZLLC;
-		
-		if( SurfNum == 0 ){ 
-		// invalid surface 
+
+		if( SurfNum == 0 ){
+		// invalid surface
 			ErrorsFound = true;
-			return; 
+			return;
 		} else if( Surface( SurfNum ).Sides != 4 ){
-		// the method is designed for 4-sided surface 
-			return; 
+		// the method is designed for 4-sided surface
+			return;
 		} else if( isRectangle( SurfNum )){
 		// no need to transform
-			return;  
+			return;
 		}
-		
+
 		SurfWorldAz = Surface( SurfNum ).Azimuth;
 		SurfTilt = Surface( SurfNum ).Tilt;
 		BaseCosAzimuth = std::cos( SurfWorldAz * DegToRadians );
@@ -11180,22 +11176,22 @@ namespace SurfaceGeometry {
 		HeightMax = 0.0;
 		for ( int i = 1; i < NumSurfSides; ++i ) {
 			for ( int j = i + 1; j <= NumSurfSides; ++j ) {
-			
+
 				Xp = Surface( SurfNum ).Vertex( j ).x - Surface( SurfNum ).Vertex( i ).x ;
 				Yp = Surface( SurfNum ).Vertex( j ).y - Surface( SurfNum ).Vertex( i ).y ;
 				Zp = Surface( SurfNum ).Vertex( j ).z - Surface( SurfNum ).Vertex( i ).z ;
-				
+
 				XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
 				YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
 				ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-			
+
 				if( std::abs( XLLC ) > WidthMax ) WidthMax = std::abs( XLLC );
 				if( std::abs( YLLC ) > WidthMax ) HeightMax = std::abs( YLLC );
-			
+
 			}
 		}
-		
-		// Perform transformation by calculating WidthEff and HeightEff 
+
+		// Perform transformation by calculating WidthEff and HeightEff
 		if(( WidthMax > 0 ) && ( HeightMax > 0 )){
 			AspectRatio = WidthMax / HeightMax;
 		} else {
@@ -11203,13 +11199,13 @@ namespace SurfaceGeometry {
 		}
 		WidthEff = std::sqrt( Surface( SurfNum ).Area * AspectRatio );
 		HeightEff = std::sqrt( Surface( SurfNum ).Area / AspectRatio );
-		
+
 		// Assign the effective width and length to the surface
 		Surface( SurfNum ).Width = WidthEff;
 		Surface( SurfNum ).Height = HeightEff;
 
 	}
-	
+
 } // SurfaceGeometry
 
 } // EnergyPlus

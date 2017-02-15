@@ -78,7 +78,9 @@ public:
     std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
     int floorSurface,
     std::vector< int > wallSurfaces,
-    int zoneNum
+    int zoneNum,
+    Real64 weightedPerimeter,
+    int constructionNum
   );
   std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
   Kiva::Ground ground;
@@ -89,6 +91,8 @@ public:
   void reportKivaSurfaces();
   void plotDomain();
   Kiva::BoundaryConditions bcs;
+  Real64 weightedPerimeter;
+  int constructionNum;
 };
 
 class KivaManager{
@@ -140,13 +144,20 @@ public:
     TSType timestepType;
   };
 
+  struct WallGroup{
+    WallGroup();
+    WallGroup(Real64 exposedPerimeter, std::vector<int> wallIDs);
+    Real64 exposedPerimeter;
+    std::vector<int> wallIDs;
+  };
+
   Settings settings;
   bool defaultSet;
   int defaultIndex;
 
 private:
   Real64 getValue(int surfNum, Kiva::GroundOutput::OutputType oT);
-  std::map<int, std::pair<int, Kiva::Surface::SurfaceType>> surfaceMap;
+  std::map<int, std::vector<std::pair<int, Kiva::Surface::SurfaceType>>> surfaceMap;
   std::map<int,Kiva::Foundation> foundationInstances;
 };
 
