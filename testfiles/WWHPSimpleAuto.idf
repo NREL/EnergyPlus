@@ -26,7 +26,7 @@
 !           tries to meet the load.
 ! SolDis=FullInteriorAndExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,6;
 
@@ -1229,7 +1229,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal;                 !- Load Distribution Scheme
+    Optimal,                     !- Load Distribution Scheme
+    ,                          !- Availability Manager List Name
+    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
+    None,  !- Common Pipe Simulation
+    None,  !- field Pressure Simulation Type
+    2.0;  !- field Loop Circulation Time
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -1492,7 +1497,12 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal;                 !- Load Distribution Scheme
+    Optimal,                     !- Load Distribution Scheme
+    ,                          !- Availability Manager List Name
+    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
+    None,  !- Common Pipe Simulation
+    None,  !- field Pressure Simulation Type
+    2.0;  !- field Loop Circulation Time
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -1780,8 +1790,10 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    SequentialLoad;          !- Load Distribution Scheme
-
+    SequentialLoad,                     !- Load Distribution Scheme
+    None,  !- field Pressure Simulation Type
+    2.0;  !- field Loop Circulation Time
+    
   SetpointManager:FollowGroundTemperature,
     MyCondenserControl,      !- Name
     Temperature,             !- Control Variable

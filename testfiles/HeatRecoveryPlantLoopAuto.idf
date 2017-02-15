@@ -110,7 +110,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
@@ -2159,7 +2159,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal;                 !- Load Distribution Scheme
+    Optimal,                     !- Load Distribution Scheme
+    ,                          !- Availability Manager List Name
+    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
+    None,  !- Common Pipe Simulation
+    None,  !- field Pressure Simulation Type
+    2.0;  !- field Loop Circulation Time
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -2186,7 +2191,12 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal;                 !- Load Distribution Scheme
+    Optimal,                     !- Load Distribution Scheme
+    ,                          !- Availability Manager List Name
+    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
+    None,  !- Common Pipe Simulation
+    None,  !- field Pressure Simulation Type
+    2.0;  !- field Loop Circulation Time
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -2213,7 +2223,12 @@
     Heat Recovery Demand Outlet Node,  !- Demand Side Outlet Node Name
     Heat Recovery Demand Side Branches,  !- Demand Side Branch List Name
     Heat Recovery Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal;                 !- Load Distribution Scheme
+    Optimal,                     !- Load Distribution Scheme
+    ,                          !- Availability Manager List Name
+    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
+    None,  !- Common Pipe Simulation
+    None,  !- field Pressure Simulation Type
+    2.0;  !- field Loop Circulation Time
 
   Sizing:Plant,
     Heat Recovery Water Loop,!- Plant or Condenser Loop Name
