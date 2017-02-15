@@ -19720,12 +19720,12 @@ People,
   A8 , \field Surface Name/Angle Factor List Name
        \type object-list
        \object-list AllHeatTranAngFacNames
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A9 , \field Work Efficiency Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note units in schedule are 0.0 to 1.0
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A10, \field Clothing Insulation Calculation Method
        \type choice
        \key ClothingInsulationSchedule
@@ -19740,12 +19740,12 @@ People,
        \type object-list
        \object-list ScheduleNames
        \note use "Clo" from ASHRAE or Thermal Comfort guides
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A13, \field Air Velocity Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note units in the schedule are m/s
-       \note optional (only required for thermal comfort runs)
+       \note optional (only required for runs of thermal comfort models: Fanger, Pierce and KSU)
   A14, \field Thermal Comfort Model 1 Type
        \type choice
        \key Fanger
@@ -23326,6 +23326,7 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
       \required-field
       \type object-list
       \object-list FansZoneExhaust
+      \reference SurfaceAirflowLeakageNames
       \note Enter the name of a Fan:ZoneExhaust object.
  N1 , \field Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
       \required-field
@@ -33611,6 +33612,7 @@ ZoneHVAC:UnitVentilator,
         \min-fields 16
    A1 , \field Name
         \required-field
+        \reference DOAToZonalUnit
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -33650,19 +33652,28 @@ ZoneHVAC:UnitVentilator,
    A6 , \field Air Inlet Node Name
         \required-field
         \type node
+        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the  
+        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer 
+        \note outlet air node name for InletSide mixer connection. 
    A7 , \field Air Outlet Node Name
         \required-field
         \type node
+        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the   
+        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer 
+        \note secondary air inlet node name for SupplySide mixer connection. 
    A8,  \field Outdoor Air Node Name
-        \required-field
         \type node
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A9,  \field Exhaust Air Node Name
-        \required-field
         \type node
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A10, \field Mixed Air Node Name
-        \required-field
         \type node
         \note inlet to coils
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A11, \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -40561,6 +40572,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \key ZoneHVAC:UnitVentilator 
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name
@@ -63364,6 +63376,7 @@ Chiller:EngineDriven,
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
        \ip-units gal/min
+       \autosizable
   A13, \field Heat Recovery Inlet Node Name
        \type node
   A14, \field Heat Recovery Outlet Node Name
@@ -63406,7 +63419,7 @@ Chiller:EngineDriven,
        \default 2.0
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Enter the outdoor dry-bulb temperature when the basin heater turns on.
-  A16; \field Basin Heater Operating Schedule Name
+  A16, \field Basin Heater Operating Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note This field is only used for Condenser Type = EvaporativelyCooled.
@@ -63414,6 +63427,12 @@ Chiller:EngineDriven,
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
+  N31; \field Condenser Heat Recovery Relative Capacity Fraction
+       \note This optional field is the fraction of total rejected heat that can be recovered at full load.
+       \note Also used to autosize Design Heat Recovery Water Flow Rate as a fraction of Design Condenser Water Flow Rate.
+       \type real
+       \minimum 0.0
+       \maximum 1.0
 
 Chiller:CombustionTurbine,
    \min-fields 56
@@ -63528,6 +63547,7 @@ Chiller:CombustionTurbine,
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
        \ip-units gal/min
+       \autosizable
   A7 , \field Heat Recovery Inlet Node Name
        \type node
   A8 , \field Heat Recovery Outlet Node Name
@@ -63581,7 +63601,7 @@ Chiller:CombustionTurbine,
        \default 2.0
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Enter the outdoor dry-bulb temperature when the basin heater turns on.
-  A11; \field Basin Heater Operating Schedule Name
+  A11, \field Basin Heater Operating Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note This field is only used for Condenser Type = EvaporativelyCooled.
@@ -63589,6 +63609,16 @@ Chiller:CombustionTurbine,
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
+  N50, \field Condenser Heat Recovery Relative Capacity Fraction
+       \note This optional field is the fraction of total rejected heat that can be recovered at full load.
+       \note Also used to autosize Design Heat Recovery Water Flow Rate as a fraction of Design Condenser Water Flow Rate.
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N51; \field Turbine Engine Efficiency
+       \note This optional field is the nominal turbine engine efficiency and is used when Gas Turbine Engine Capacity is set to Autosize
+       \default 0.35
+       \type real
 
 ChillerHeater:Absorption:DirectFired,
   \min-fields 34
@@ -64007,6 +64037,8 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \memo simple water-water hp curve-fit model
         \min-fields 19
    A1,  \field Name
+        \type alpha
+        \reference WWHPHeatingNames
         \required-field
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
@@ -64024,28 +64056,32 @@ HeatPump:WaterToWater:EquationFit:Heating,
    A5,  \field Load Side Outlet Node Name
         \required-field
         \type node
-   N1,  \field Rated Load Side Flow Rate
+   N1,  \field Reference Load Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
-   N2,  \field Rated Source Side Flow Rate
+        \autosizable
+   N2,  \field Reference Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
-   N3,  \field Rated Heating Capacity
+        \autosizable
+   N3,  \field Reference Heating Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
-   N4,  \field Rated Heating Power Consumption
+        \autosizable
+   N4,  \field Reference Heating Power Consumption
         \required-field
         \type real
         \minimum> 0.0
         \units W
+        \autosizable
    N5,  \field Heating Capacity Coefficient 1
         \required-field
         \type real
@@ -64073,14 +64109,30 @@ HeatPump:WaterToWater:EquationFit:Heating,
    N13, \field Heating Compressor Power Coefficient 4
         \required-field
         \type real
-   N14; \field Heating Compressor Power Coefficient 5
+   N14, \field Heating Compressor Power Coefficient 5
         \required-field
         \type real
+   N15, \field Reference Coefficient of Performance
+        \note This optional field is used to autosize Reference Heating Power Consumption
+        \note COP = Reference Heating Capacity / Reference Heating Power Consumption
+        \type real
+        \minimum> 0.0
+        \default 7.5
+   N16, \field Sizing Factor
+        \note Multiplies the autosized capacity and flow rates
+        \type real
+        \minimum> 0.0
+        \default 1.0
+   A6 ; \field Companion Cooling Heat Pump Name
+        \type object-list
+        \object-list WWHPCoolingNames
 
 HeatPump:WaterToWater:EquationFit:Cooling,
         \memo simple water-water heat pump curve-fit model
         \min-fields 19
    A1,  \field Name
+        \type alpha
+        \reference WWHPCoolingNames
         \required-field
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
@@ -64098,28 +64150,32 @@ HeatPump:WaterToWater:EquationFit:Cooling,
    A5,  \field Load Side Outlet Node Name
         \required-field
         \type node
-   N1,  \field Rated Load Side Flow Rate
+   N1,  \field Reference Load Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
-   N2,  \field Rated Source Side Flow Rate
+        \autosizable
+   N2,  \field Reference Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
-   N3,  \field Rated Cooling Capacity
+        \autosizable
+   N3,  \field Reference Cooling Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
-   N4,  \field Rated Cooling Power Consumption
+        \autosizable
+   N4,  \field Reference Cooling Power Consumption
         \required-field
         \type real
         \minimum> 0.0
         \units W
+        \autosizable
    N5,  \field Cooling Capacity Coefficient 1
         \required-field
         \type real
@@ -64147,9 +64203,24 @@ HeatPump:WaterToWater:EquationFit:Cooling,
    N13, \field Cooling Compressor Power Coefficient 4
         \required-field
         \type real
-   N14; \field Cooling Compressor Power Coefficient 5
+   N14, \field Cooling Compressor Power Coefficient 5
         \required-field
         \type real
+   N15, \field Reference Coefficient of Performance
+        \note This optional field is used to autosize Reference Cooling Power Consumption
+        \note COP = Rated Cooling Capacity / Rated Cooling Power Consumption
+        \type real
+        \minimum> 0.0
+        \default 8.0
+   N16, \field Sizing Factor
+        \note Multiplies the autosized capacity and flow rates
+        \type real
+        \minimum> 0.0
+        \default 1.0
+   A6 ; \field Companion Heating Heat Pump Name
+        \type object-list
+        \object-list WWHPHeatingNames
+        \note This optional field is used to coordinate sizing calculations between heating and cooling modes.
 
 HeatPump:WaterToWater:ParameterEstimation:Cooling,
   \memo OSU parameter estimation model
@@ -73485,6 +73556,9 @@ AvailabilityManager:HybridVentilation,
        \note 2 = Enthalpy control
        \note 3 = Dewpoint control
        \note 4 = Outdoor ventilation air control
+       \note 5 = Operative temperature control with 80% adaptive comfort acceptability limits
+       \note 6 = Operative temperature control with 90% adaptive comfort acceptability limits
+       \note 7 = Carbon dioxide control
   A5 , \field Use Weather File Rain Indicators
        \type choice
        \key Yes
@@ -73563,7 +73637,7 @@ AvailabilityManager:HybridVentilation,
        \note The schedule is used to incorporate operation of simple airflow objects and HVAC
        \note system operation.
        \note The simple airflow objects are Ventilation and Mixing only
-  A10; \field ZoneVentilation Object Name
+  A10, \field ZoneVentilation Object Name
        \note This field has not been instrumented to work with
        \note global Zone or Zone List names option for Ventilation:DesignFlowRate.  In order to
        \note use, you must enter the single <Ventilation:DesignFlowRate> name in this field.
@@ -73573,6 +73647,18 @@ AvailabilityManager:HybridVentilation,
        \object-list VentilationNames
        \note The other ZoneVentilation:* and ZoneMixing objects controlled in the same AirLoopHVAC
        \note will work in the same way as this ventilation object.
+  N8 , \field Minimum HVAC Operation Time
+       \note Minimum operation time when HVAC system is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
+  N9 ; \field Minimum Ventilation Time
+       \note Minimum ventilation time when natural ventilation is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
 
 AvailabilityManagerAssignmentList,
        \memo Defines the applicable managers used for an AirLoopHVAC or PlantLoop. The priority of
@@ -81291,7 +81377,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \object-list HeatingCoilsDesuperheater
    A6, \field Water Coil Controller Name
        \note Enter the name of controller for the water coil affected
-       \required for water coils
+       \note Required for water coils
        \type object-list
        \object-list WaterCoilControllers
    N1; \field Reference Sensor Offset
