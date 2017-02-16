@@ -4329,6 +4329,7 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using DataDaylighting::ZoneDaylight;
+		using HybridModel::FlagHybridModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4441,7 +4442,9 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
 
 		// Hybrid model output added by Sang Hoon Lee August 2016
-		SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		if ( FlagHybridModel ){
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		}
 
 	}
 
