@@ -403,6 +403,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(2)=''               ! Add new Zone Name Field
                  OutArgs(3:CurArgs+2)=InArgs(1:CurArgs)
                  CurArgs = CurArgs + 2
+             
+             CASE('WATERHEATER:HEATPUMP:WRAPPEDCONDENSER')
+                 ObjectName='WaterHeater:HeatPump:WrappedCondenser'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 IF (SameString(InArgs(35), 'MutuallyExlcusive')) THEN
+                   OutArgs(35) = 'MutuallyExclusive'
+                 END IF
+
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
