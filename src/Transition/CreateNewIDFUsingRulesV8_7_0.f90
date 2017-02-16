@@ -403,6 +403,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(4:(CurArgs-1))=InArgs(5:(CurArgs))
                  CurArgs = CurArgs-1
 
+             CASE('WATERHEATER:HEATPUMP:WRAPPEDCONDENSER')
+                 ObjectName='WaterHeater:HeatPump:WrappedCondenser'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 IF (SameString(InArgs(35), 'MutuallyExlcusive')) THEN
+                   OutArgs(35) = 'MutuallyExclusive'
+                 END IF
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
