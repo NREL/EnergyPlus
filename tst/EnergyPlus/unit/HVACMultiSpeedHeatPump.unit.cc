@@ -760,7 +760,8 @@ namespace EnergyPlus {
 			"    AC-24 airloop inlet node,!- Supply Side Inlet Node Name",
 			"    Z401 RA node,            !- Demand Side Outlet Node Name",
 			"    Z401 splitter inlet,     !- Demand Side Inlet Node Names",
-			"    AC-24 airloop outlet node;  !- Supply Side Outlet Node Names",
+			"    AC-24 airloop outlet node,  !- Supply Side Outlet Node Names",
+			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
 
 			"  AirLoopHVAC,",
 			"    Z402 airloop,            !- Name",
@@ -772,7 +773,8 @@ namespace EnergyPlus {
 			"    AC-25 airloop inlet node,!- Supply Side Inlet Node Name",
 			"    Z402 RA node,            !- Demand Side Outlet Node Name",
 			"    Z402 splitter inlet,     !- Demand Side Inlet Node Names",
-			"    AC-25 airloop outlet node;  !- Supply Side Outlet Node Names",
+			"    AC-25 airloop outlet node,  !- Supply Side Outlet Node Names",
+			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM:EQUIPMENTLIST ===========",
 

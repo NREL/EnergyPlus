@@ -57144,7 +57144,7 @@ AirLoopHVAC:ControllerList,
 \group Air Distribution
 
 AirLoopHVAC,
-       \min-fields 11
+       \min-fields 10
        \memo Defines a central forced air system.
    A1, \field Name
        \required-field

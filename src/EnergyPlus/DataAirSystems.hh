@@ -269,7 +269,7 @@ namespace DataAirSystems {
 		// Default Constructor
 		DefinePrimaryAirSystem() :
 			DesignVolFlowRate( 0.0 ),
-			DesignReturnFlowFraction( 0.0 ),
+			DesignReturnFlowFraction( 1.0 ),
 			NumControllers( 0 ),
 			NumBranches( 0 ),
 			NumOutletBranches( 0 ),

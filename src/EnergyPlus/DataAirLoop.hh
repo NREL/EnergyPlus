@@ -279,6 +279,7 @@ namespace DataAirLoop {
 			ZoneExhaust( 0.0 ),
 			ZoneExhaustBalanced( 0.0 ),
 			DesSupply( 0.0 ),
+			DesReturnFrac( 1.0 ),
 			SysToZoneDesFlowRatio( 0.0 ),
 			ReqSupplyFrac( 1.0 ),
 			MinOutAir( 0.0 ),

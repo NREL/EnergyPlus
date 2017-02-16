@@ -719,7 +719,8 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
 		"    Demand Out Node,         !- Demand Side Outlet Node Name",
 		"    Zone Eq In Node,         !- Demand Side Inlet Node Names",
-		"    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
+		"    VAV Sys 1 Outlet Node,   !- Supply Side Outlet Node Names",
+		"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
 
 		"  AirLoopHVAC:SupplyPath,",
 		"    Zone Supply Air Path 1,  !- Name",

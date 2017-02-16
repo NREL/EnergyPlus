@@ -319,8 +319,9 @@ namespace EnergyPlus {
 		Schedule( 1 ).CurrentValue = 1.0; // enable the VRF condenser
 		Schedule( 2 ).CurrentValue = 1.0; // enable the terminal unit
 		Schedule( 3 ).CurrentValue = 1.0; // turn on fan
-		DataLoopNode::Node( 5 ).MassFlowRate = 0.60215437; // zone exhaust flow rate
-		DataLoopNode::Node( 5 ).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
+		int EAFanInletNode = Fans::Fan( 2 ).InletNodeNum;
+		DataLoopNode::Node( EAFanInletNode ).MassFlowRate = 0.60215437; // zone exhaust flow rate
+		DataLoopNode::Node( EAFanInletNode ).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
 		SetPredefinedTables();
 		SimOutdoorAirUnit( "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );

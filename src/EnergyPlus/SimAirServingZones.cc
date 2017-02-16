@@ -595,8 +595,10 @@ namespace SimAirServingZones {
 				continue;
 			}
 			PrimaryAirSystem( AirSysNum ).DesignVolFlowRate = Numbers( 1 );
-			PrimaryAirSystem( AirSysNum ).DesignReturnFlowFraction = Numbers( 2 );
-			//Only allow one return air node
+			if ( !lNumericBlanks( 2 ) ) {
+				PrimaryAirSystem( AirSysNum ).DesignReturnFlowFraction = Numbers( 2 );
+			}
+			//Only allow one return air node (at the loop level)
 			AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 1;
 			// Allocate the return air node arrays
 			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
