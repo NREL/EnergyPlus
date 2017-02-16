@@ -1343,6 +1343,19 @@ namespace DataHeatBalance {
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
+		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
+		// Hybrid Modeling
+		Real64 ZoneMeasuredTemperature; // Measured zone air temperature input by user
+		Real64 ZoneVolCapMultpSens; // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
+		Real64 ZoneVolCapMultpMoist; // Zone humidity capacity multiplier
+		Real64 ZoneVolCapMultpCO2; // Zone carbon dioxide capacity multiplier
+		Real64 ZoneVolCapMultpGenContam; // Zone generic contaminant capacity multiplier
+		Real64 ZoneVolCapMultpSensHM; // Calculated temperature capacity multiplier by hybrid model
+		Real64 ZoneVolCapMultpSensHMSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMAverage; // Temperature capacity multiplier average
+		Real64 MCPIHM; // Calcualted mass flow rate by hybrid model
+		Real64 InfilOAAirChangeRateHM; // Calcualted infilgration air change per hour by hybrid model
 
 		// Default Constructor
 		ZoneData() :
@@ -1407,7 +1420,20 @@ namespace DataHeatBalance {
 			TempOutOfBoundsReported( false ),
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
-			ZoneContamControllerSchedIndex( 0 )
+			ZoneContamControllerSchedIndex( 0 ),
+			FlagCustomizedZoneCap( false ),
+			// Hybrid Modeling
+			ZoneMeasuredTemperature( 0.0 ),
+			ZoneVolCapMultpSens( 1.0 ),
+			ZoneVolCapMultpMoist( 1.0 ),
+			ZoneVolCapMultpCO2( 1.0 ),
+			ZoneVolCapMultpGenContam( 1.0 ),
+			ZoneVolCapMultpSensHM( 1.0 ),
+			ZoneVolCapMultpSensHMSum( 0.0 ),
+			ZoneVolCapMultpSensHMCountSum( 0.0 ),
+			ZoneVolCapMultpSensHMAverage( 1.0 ),
+			MCPIHM( 0.0 ),
+			InfilOAAirChangeRateHM( 0.0 )
 		{}
 
 		void

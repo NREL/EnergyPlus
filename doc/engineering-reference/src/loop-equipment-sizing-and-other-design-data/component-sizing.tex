@@ -2666,3 +2666,29 @@ The maximum supply air temperature can also be automatically selected. The value
 \begin{equation}
 T_{SA,max} = \text{HeatDesTemp}_{ZoneOrSystem}
 \end{equation}
+
+\subsubsection{Single Zone VAV Temperature Limits}\label{single-zone-vav-temperature-limits}
+
+The minimum and maximum supply air temperature limits for the single zone VAV model are calculated using a fraction of the control zone design load and the low speed fan operating air volume flow rate. When using the single zone VAV model, the minimum and maximum supply air temperature limits are used to control the system when low speed fan operation under low load conditions and to modulate the fan speed to limit the outlet air temperature at higher zone loads. These limits are not enforced once the system fan speed reaches the maximum. See Figure~\ref{fig:example-of-the-energyplus-unitary-system-single-zone-vav-model}.
+
+\begin{equation}
+T_{sup} = T_{zone,at-peak}+\frac{\dot{Q}_{sens,at-peak} * frac}{\rho_{air}c_{p,air}\dot{V}_{air,min}}
+\end{equation}
+
+where
+
+\emph{T\(_{sup}\) is the supply air temperature limit to meet a fraction of the zone design load, (\(^{o}\)C)}
+
+\emph{T\(_{zone,at-peak}\) is the zone air temperature at the time of peak design load, (\(^{o}\)C)}
+
+\emph{Q\(_{sens,at-peak}\) is the zone design cooling or heating load, (W) (negative for cooling)}
+
+\emph{frac is the fraction of zone design load at minimum fan speed, 50\% for the single zone VAV model}
+
+\emph{rho\(_{air}\) is the density of air at standard conditions, (kg/m\(^{3}\))}
+
+\emph{c\(_{p,air}\) is the specific heat of zone air, (J/kg K)}
+
+\emph{V\(_{air,min}\) is the air volume flow rate at minimum fan speed, (m\(^{3}\)/s)}
+
+
