@@ -8680,7 +8680,7 @@ namespace WaterThermalTanks {
 
 		// put fan component first, regardless placement, to calculate fan power
 		if ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-			HVACFan::fanObjs[ HPWaterHeater( HPNum ).FanNum ]->inletNodeNum;
+			FanInNode = HVACFan::fanObjs[ HPWaterHeater( HPNum ).FanNum ]->inletNodeNum;
 		} else {
 			FanInNode = Fans::Fan( HPWaterHeater( HPNum ).FanNum ).InletNodeNum;
 		}
@@ -8688,7 +8688,7 @@ namespace WaterThermalTanks {
 		Node( FanInNode ).MassFlowRate = MdotAir;
 		Node( FanInNode ).MassFlowRateMaxAvail = MdotAir;
 		Node( FanInNode ).MassFlowRateMax = MdotAir;
-		if ( ! HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+		if ( ! ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) ) {
 			Fans::Fan( HPWaterHeater( HPNum ).FanNum ).MassFlowRateMaxAvail = MdotAir; //TODO, what is this for? needed for Fan:SystemModel?
 		}
 
