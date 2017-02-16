@@ -3323,6 +3323,7 @@ Schedule:Week:Compact,
        \required-field
        \type choice
        \key AllDays
+       \key AllOtherDays
        \key Weekdays
        \key Weekends
        \key Sunday
@@ -3343,6 +3344,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A4 , \field DayType List 2
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3363,6 +3365,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A6 , \field DayType List 3
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3383,6 +3386,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A8 , \field DayType List 4
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3403,6 +3407,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A10, \field DayType List 5
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -15893,7 +15898,6 @@ SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
        \memo EMPD (Effective Moisture Penetration Depth with Conduction Transfer Functions).
        \memo Advanced/Research Usage: CondFD (Conduction Finite Difference)
        \memo Advanced/Research Usage: HAMT (Combined Heat And Moisture Finite Element)
-       \min-fields 3
   A1 , \field Name
        \required-field
        \type alpha
@@ -23966,13 +23970,13 @@ AirflowNetwork:Distribution:Component:Duct,
 
 AirflowNetwork:Distribution:Component:Fan,
       \min-fields 2
-      \memo This object defines the name of the constant volume supply Air Fan used in an Air loop.
+      \memo This object defines the name of the supply Air Fan used in an Air loop.
  A1 , \field Fan Name
       \required-field
       \type object-list
-      \object-list FansCVandOnOff
+      \object-list FansCVandOnOffandVAV
       \reference AirflowNetworkComponentNames
-      \note Enter the name of the constant volume fan in the primary air loop.
+      \note Enter the name of the fan in the primary air loop.
  A2 ; \field Supply Fan Object Type
       \type choice
       \key Fan:OnOff
@@ -23993,6 +23997,7 @@ AirflowNetwork:Distribution:Component:Coil,
       \required-field
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
+      \key Coil:Cooling:DX:TwoSpeed
       \key Coil:Heating:Fuel
       \key Coil:Heating:Electric
       \key Coil:Heating:DX:SingleSpeed
@@ -24518,6 +24523,7 @@ Exterior:FuelEquipment,
        \required-field
        \type choice
        \key Electricity
+       \key Water
        \key NaturalGas
        \key PropaneGas
        \key FuelOil#1
@@ -32553,6 +32559,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \min-fields 26
   A1 , \field Name
        \required-field
+       \reference ZoneEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -32727,6 +32734,7 @@ ZoneHVAC:FourPipeFanCoil,
    A1 , \field Name
         \required-field
         \reference DOAToZonalUnit
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -32883,6 +32891,7 @@ ZoneHVAC:WindowAirConditioner,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -32970,6 +32979,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \required-field
         \type alpha
         \reference DOAToZonalUnit
+        \reference ZoneEquipmentNames
         \note Unique name for this packaged terminal air conditioner object.
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -33127,6 +33137,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \required-field
         \type alpha
         \reference DOAToZonalUnit
+        \reference ZoneEquipmentNames
         \note Unique name for this packaged terminal heat pump object.
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -33323,6 +33334,7 @@ ZoneHVAC:WaterToAirHeatPump,
         \required-field
         \type alpha
         \reference DOAToZonalUnit
+        \reference ZoneEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -33528,6 +33540,7 @@ ZoneHVAC:Dehumidifier:DX,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference ZoneEquipmentNames
         \note Unique name for this direct expansion (DX) zone dehumidifier object.
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -33632,6 +33645,7 @@ ZoneHVAC:EnergyRecoveryVentilator,
   A1,  \field Name
         \required-field
         \type alpha
+        \reference ZoneEquipmentNames
   A2 ,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -33773,6 +33787,7 @@ ZoneHVAC:UnitVentilator,
    A1 , \field Name
         \required-field
         \reference DOAToZonalUnit
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -33812,15 +33827,15 @@ ZoneHVAC:UnitVentilator,
    A6 , \field Air Inlet Node Name
         \required-field
         \type node
-        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the  
-        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer 
-        \note outlet air node name for InletSide mixer connection. 
+        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the
+        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer
+        \note outlet air node name for InletSide mixer connection.
    A7 , \field Air Outlet Node Name
         \required-field
         \type node
-        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the   
-        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer 
-        \note secondary air inlet node name for SupplySide mixer connection. 
+        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the
+        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer
+        \note secondary air inlet node name for SupplySide mixer connection.
    A8,  \field Outdoor Air Node Name
         \type node
         \note this field is left blank only if the Unit Ventilator is connected to a central
@@ -33902,6 +33917,7 @@ ZoneHVAC:UnitHeater,
         \min-fields 11
    A1 , \field Name
         \required-field
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -33991,6 +34007,7 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \min-fields 15
    A1 , \field Name
         \required-field
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -34087,6 +34104,7 @@ ZoneHVAC:OutdoorAirUnit,
        \min-fields 18
    A1, \field Name
        \required-field
+       \reference ZoneEquipmentNames
    A2, \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -34307,6 +34325,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \type alpha
         \reference ZoneTerminalUnitNames
         \reference DOAToZonalUnit
+        \reference ZoneEquipmentNames
   A2 ,  \field Terminal Unit Availability Schedule
         \type object-list
         \object-list ScheduleNames
@@ -34481,6 +34500,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \required-field
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference ZoneEquipmentNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -35277,6 +35297,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \required-field
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference ZoneEquipmentNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -36055,6 +36076,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \memo groups to the end of the list
   A1 , \field Name
        \required-field
+       \reference ZoneEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -36816,6 +36838,7 @@ ZoneHVAC:CoolingPanel:RadiantConvective:Water,
        \min-fields 18
   A1 , \field Name
        \required-field
+       \reference ZoneEquipmentNames
   A2 , \field Availability Schedule Name
        \required-field
        \type object-list
@@ -37620,6 +37643,7 @@ ZoneHVAC:Baseboard:Convective:Water,
        \required-field
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference ZoneEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37679,11 +37703,12 @@ ZoneHVAC:Baseboard:Convective:Water,
        \default 0.001
 
 ZoneHVAC:Baseboard:Convective:Electric,
-       \memo Electric baseboard heater, convection-only. Natural convection electric heating unit.
-       \min-fields 7
-  A1 , \field Name
+        \memo Electric baseboard heater, convection-only. Natural convection electric heating unit.
+        \min-fields 7
+  A1 ,  \field Name
         \required-field
-  A2 , \field Availability Schedule Name
+        \reference ZoneEquipmentNames
+  A2 ,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
         \type object-list
@@ -37730,11 +37755,12 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
         \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
         \memo flow to the unit.
-   \min-fields 29
+        \min-fields 29
    A1 , \field Name
         \required-field
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -37895,6 +37921,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \required-field
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -38025,6 +38052,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \min-fields 11
    A1 , \field Name
         \required-field
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -38613,6 +38641,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \min-fields 14
    A1,  \field Name
         \required-field
+        \reference ZoneEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -39312,6 +39341,7 @@ ZoneHVAC:VentilatedSlab,
        \min-fields 32
    A1, \field Name
        \required-field
+       \reference ZoneEquipmentNames
    A2, \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -39732,6 +39762,7 @@ AirTerminal:SingleDuct:Uncontrolled,
        \min-fields 4
    A1, \field Name
        \required-field
+       \reference ZoneEquipmentNames
    A2, \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -39751,6 +39782,7 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \memo water, electric, gas, or steam).
   A1 , \field Name
        \required-field
+       \reference AirTerminalUnitNames
        \reference AFNTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -39806,6 +39838,7 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \memo Central air system terminal unit, single duct, variable volume, with no reheat coil.
   A1,  \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -39879,6 +39912,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \min-fields 18
   A1 , \field Name
        \required-field
+       \reference AirTerminalUnitNames
+       \reference AFNTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40026,6 +40061,7 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \memo of conditioned air that enters the space.
   A1,  \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40100,6 +40136,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
        \min-fields 6
   A1,  \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40130,6 +40167,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \min-fields 11
   A1,  \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40199,6 +40237,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
   A1,  \field Name
        \required-field
        \type alpha
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40272,6 +40311,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
   A1,  \field Name
        \required-field
        \type alpha
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40354,6 +40394,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
   A1,  \field Name
        \required-field
        \type alpha
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40441,6 +40482,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
   A1 , \field Name
        \type alpha
        \required-field
+       \reference AirTerminalUnitNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field Primary Air Availability Schedule Name
@@ -40610,6 +40652,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
   A1 , \field Name
        \type alpha
        \required-field
+       \reference AirTerminalUnitNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
@@ -40724,6 +40767,7 @@ AirTerminal:SingleDuct:Mixer,
        \memo a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
+       \reference AirTerminalUnitNames
    A2, \field ZoneHVAC Unit Object Type
        \required-field
        \type choice
@@ -40732,7 +40776,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \key ZoneHVAC:UnitVentilator 
+       \key ZoneHVAC:UnitVentilator
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name
@@ -40777,6 +40821,7 @@ AirTerminal:DualDuct:ConstantVolume,
        \min-fields 6
   A1 , \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40804,6 +40849,7 @@ AirTerminal:DualDuct:VAV,
        \min-fields 7
   A1 , \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40847,6 +40893,7 @@ AirTerminal:DualDuct:VAV:OutdoorAir,
        \min-fields 7
   A1 , \field Name
        \required-field
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40889,6 +40936,7 @@ ZoneHVAC:AirDistributionUnit,
        \min-fields 4
   A1 , \field Name
        \required-field
+       \reference ZoneEquipmentNames
   A2 , \field Air Distribution Unit Outlet Node Name
        \required-field
        \type node
@@ -40897,6 +40945,7 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:DualDuct:ConstantVolume
        \key AirTerminal:DualDuct:VAV
        \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+       \key AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
        \key AirTerminal:SingleDuct:VAV:Reheat
        \key AirTerminal:SingleDuct:VAV:NoReheat
        \key AirTerminal:SingleDuct:SeriesPIU:Reheat
@@ -40912,6 +40961,8 @@ ZoneHVAC:AirDistributionUnit,
        \required-field
   A4 , \field Air Terminal Name
        \required-field
+       \type object-list
+       \object-list AirTerminalUnitNames
   N1 , \field Nominal Upstream Leakage Fraction
        \note fraction at system design Flow; leakage Flow constant, leakage fraction
        \note varies with variable system Flow Rate.
@@ -40955,6 +41006,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40980,9 +41032,13 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
        \required-field
   A3 , \field Zone Equipment 1 Name
        \required-field
+       \type object-list
+       \object-list ZoneEquipmentNames
   N1 , \field Zone Equipment 1 Cooling Sequence
        \required-field
        \type integer
@@ -41002,6 +41058,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41027,7 +41084,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A5 , \field Zone Equipment 2 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N3 , \field Zone Equipment 2 Cooling Sequence
        \type integer
        \minimum 1
@@ -41045,6 +41106,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41070,7 +41132,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A7 , \field Zone Equipment 3 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N5 , \field Zone Equipment 3 Cooling Sequence
        \type integer
        \minimum 1
@@ -41088,6 +41154,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41113,7 +41180,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A9 , \field Zone Equipment 4 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N7 , \field Zone Equipment 4 Cooling Sequence
        \type integer
        \minimum 1
@@ -41131,6 +41202,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41156,7 +41228,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A11, \field Zone Equipment 5 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N9 , \field Zone Equipment 5 Cooling Sequence
        \type integer
        \minimum 1
@@ -41174,6 +41250,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41199,7 +41276,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A13, \field Zone Equipment 6 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N11, \field Zone Equipment 6 Cooling Sequence
        \type integer
        \minimum 1
@@ -41217,6 +41298,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41242,7 +41324,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A15, \field Zone Equipment 7 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N13, \field Zone Equipment 7 Cooling Sequence
        \type integer
        \minimum 1
@@ -41260,6 +41346,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41285,7 +41372,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A17, \field Zone Equipment 8 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N15, \field Zone Equipment 8 Cooling Sequence
        \type integer
        \minimum 1
@@ -41303,6 +41394,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41328,7 +41420,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A19, \field Zone Equipment 9 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N17, \field Zone Equipment 9 Cooling Sequence
        \type integer
        \minimum 1
@@ -41346,6 +41442,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41371,7 +41468,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A21, \field Zone Equipment 10 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N19, \field Zone Equipment 10 Cooling Sequence
        \type integer
        \minimum 1
@@ -41389,6 +41490,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41414,7 +41516,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A23, \field Zone Equipment 11 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N21, \field Zone Equipment 11 Cooling Sequence
        \type integer
        \minimum 1
@@ -41432,6 +41538,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41457,7 +41564,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A25, \field Zone Equipment 12 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N23, \field Zone Equipment 12 Cooling Sequence
        \type integer
        \minimum 1
@@ -41475,6 +41586,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41500,7 +41612,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A27, \field Zone Equipment 13 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N25, \field Zone Equipment 13 Cooling Sequence
        \type integer
        \minimum 1
@@ -41518,6 +41634,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41543,7 +41660,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A29, \field Zone Equipment 14 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N27, \field Zone Equipment 14 Cooling Sequence
        \type integer
        \minimum 1
@@ -41561,6 +41682,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41586,7 +41708,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A31, \field Zone Equipment 15 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N29, \field Zone Equipment 15 Cooling Sequence
        \type integer
        \minimum 1
@@ -41604,6 +41730,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41629,7 +41756,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A33, \field Zone Equipment 16 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
        \minimum 1
@@ -41647,6 +41778,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41672,7 +41804,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A35, \field Zone Equipment 17 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N33, \field Zone Equipment 17 Cooling Sequence
        \type integer
        \minimum 1
@@ -41690,6 +41826,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -41715,7 +41852,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
   A37, \field Zone Equipment 18 Name
+       \type object-list
+       \object-list ZoneEquipmentNames
   N35, \field Zone Equipment 18 Cooling Sequence
        \type integer
        \minimum 1
@@ -41965,6 +42106,7 @@ Fan:ZoneExhaust,
   A1 , \field Name
        \required-field
        \reference FansZoneExhaust
+       \reference ZoneEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -42753,6 +42895,7 @@ Coil:Cooling:DX:TwoSpeed,
        \type alpha
        \reference CoolingCoilsDX
        \reference DesuperHeatingCoilSources
+       \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -52649,6 +52792,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \reference validBranchEquipmentNames
       \reference-class-name validOASysEquipmentTypes
       \reference validOASysEquipmentNames
+      \reference ZoneEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -53173,6 +53317,7 @@ AirLoopHVAC:UnitarySystem,
        \reference validBranchEquipmentNames
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
+       \reference ZoneEquipmentNames
   A2,  \field Control Type
        \type choice
        \key Load
@@ -68866,6 +69011,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference ZoneEquipmentNames
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -69129,6 +69275,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference ZoneEquipmentNames
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -69338,7 +69485,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note proportional to the schedule value.
   A27, \field Tank Element Control Logic
        \type choice
-       \key MutuallyExlcusive
+       \key MutuallyExclusive
        \key Simultaneous
        \default Simultaneous
        \note MutuallyExclusive means that once the tank heating element is active the
@@ -69786,7 +69933,7 @@ ThermalStorage:ChilledWater:Stratified,
 
 PlantLoop,
        \memo Defines a central plant loop.
-       \min-fields 24
+       \min-fields 18
   A1 , \field Name
         \required-field
        \reference PlantLoops
@@ -69906,7 +70053,7 @@ CondenserLoop,
        \memo Defines a central plant condenser loop. CondenserLoop and PlantLoop are nearly
        \memo identical except some components and operation schemes are applicable to only one
        \memo loop type or the other.
-       \min-fields 21
+       \min-fields 18
   A1 , \field Name
         \required-field
         \reference PlantLoops
@@ -71952,6 +72099,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A3 , \field Control Scheme 1 Name
        \required-field
@@ -71967,6 +72115,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A6 , \field Control Scheme 2 Name
        \type object-list
@@ -71980,6 +72129,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A9 , \field Control Scheme 3 Name
        \type object-list
@@ -71993,6 +72143,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A12, \field Control Scheme 4 Name
        \type object-list
@@ -72006,6 +72157,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A15, \field Control Scheme 5 Name
        \type object-list
@@ -72019,6 +72171,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A18, \field Control Scheme 6 Name
        \type object-list
@@ -72032,6 +72185,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A21, \field Control Scheme 7 Name
        \type object-list
@@ -72045,6 +72199,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A24, \field Control Scheme 8 Name
        \type object-list
@@ -73009,6 +73164,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames
+        \reference ZoneEquipmentNames
         \note This is the name of the zone unit
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -73067,6 +73223,7 @@ ZoneHVAC:ForcedAir:UserDefined,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference AirTerminalUnitNames
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames
         \note This is the name of the air terminal
@@ -77134,6 +77291,7 @@ ZoneHVAC:RefrigerationChillerSet,
   A1 ,  \field Name
         \required-field
         \type alpha
+        \reference ZoneEquipmentNames
   A2 ,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -85658,16 +85816,16 @@ FluidProperties:Saturated,
       \note SpecificHeat Units are J/kg-K
       \note Pressure Units are Pa
       \type choice
-      \key Enthalpy     ! Units are J/kg
-      \key Density      ! Units are kg/m3
-      \key SpecificHeat ! Units are J/kg-K
-      \key Pressure     ! Units are Pa
+      \key Enthalpy
+      \key Density
+      \key SpecificHeat
+      \key Pressure
   A3, \field Fluid Phase
       \note Fluid=saturated fluid
       \note FluidGas=saturated vapor
       \type choice
-      \key Fluid        ! saturated fluid
-      \key FluidGas     ! saturated vapor
+      \key Fluid
+      \key FluidGas
   A4, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -86433,8 +86591,8 @@ FluidProperties:Superheated,
       \note Enthalpy Units are J/kg
       \note Density Units are kg/m3
       \type choice
-      \key Enthalpy     ! Units are J/kg
-      \key Density      ! Units are kg/m3
+      \key Enthalpy
+      \key Density
   A3, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -87208,10 +87366,10 @@ FluidProperties:Concentration,
       \note Conductivity Units are W/m-K
       \note Viscosity Units are N-s/m2
       \type choice
-      \key Density      ! Units are kg/m3
-      \key SpecificHeat ! Units are J/kg-K
-      \key Conductivity ! Units are W/m-K
-      \key Viscosity    ! Units are N-s/m2
+      \key Density
+      \key SpecificHeat
+      \key Conductivity
+      \key Viscosity
   A3, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -99380,7 +99538,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A6, \field Variable or Meter or EMS Variable or Field 2 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A7, \field Aggregation Type for Variable or Meter 2
@@ -99407,7 +99564,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A8, \field Variable or Meter or EMS Variable or Field 3 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A9, \field Aggregation Type for Variable or Meter 3
@@ -99434,7 +99590,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A10,\field Variable or Meter or EMS Variable or Field 4 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A11,\field Aggregation Type for Variable or Meter 4
@@ -99461,7 +99616,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A12,\field Variable or Meter or EMS Variable or Field 5 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A13,\field Aggregation Type for Variable or Meter 5
@@ -99488,7 +99642,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A14,\field Variable or Meter or EMS Variable or Field 6 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A15,\field Aggregation Type for Variable or Meter 6
@@ -99515,7 +99668,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A16,\field Variable or Meter or EMS Variable or Field 7 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A17,\field Aggregation Type for Variable or Meter 7
@@ -99542,7 +99694,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A18,\field Variable or Meter or EMS Variable or Field 8 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A19,\field Aggregation Type for Variable or Meter 8
@@ -99569,7 +99720,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A20,\field Variable or Meter or EMS Variable or Field 9 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A21,\field Aggregation Type for Variable or Meter 9
@@ -99596,7 +99746,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A22,\field Variable or Meter or EMS Variable or Field 10 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A23,\field Aggregation Type for Variable or Meter 10
@@ -99623,7 +99772,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A24,\field Variable or Meter or EMS Variable or Field 11 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A25,\field Aggregation Type for Variable or Meter 11
@@ -99650,7 +99798,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A26,\field Variable or Meter or EMS Variable or Field 12 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A27,\field Aggregation Type for Variable or Meter 12
@@ -99677,7 +99824,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A28,\field Variable or Meter or EMS Variable or Field 13 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A29,\field Aggregation Type for Variable or Meter 13
@@ -99704,7 +99850,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A30,\field Variable or Meter or EMS Variable or Field 14 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A31,\field Aggregation Type for Variable or Meter 14
@@ -99731,7 +99876,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A32,\field Variable or Meter or EMS Variable or Field 15 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A33,\field Aggregation Type for Variable or Meter 15
@@ -99843,7 +99987,6 @@ Output:Variable,
        \key Environment
        \key Annual
        \default Hourly
-       \note RunPeriod, Environment, and Annual are synonymous
   A4 ; \field Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -99863,6 +100006,7 @@ Output:Meter,
        \note Output:Meter puts results on both the eplusout.mtr and eplusout.eso files
   A2 ; \field Reporting Frequency
        \type choice
+       \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
        \note RunPeriod, Environment, and Annual are the same
@@ -99873,7 +100017,6 @@ Output:Meter,
        \key Environment
        \key Annual
        \default Hourly
-       \note RunPeriod, Environment, and Annual are synonymous
 
 Output:Meter:MeterFileOnly,
        \memo Each Output:Meter:MeterFileOnly command picks meters to be put only onto meter file (.mtr).
@@ -99890,6 +100033,7 @@ Output:Meter:MeterFileOnly,
        \note Output:Meter:MeterFileOnly puts results on the eplusout.mtr file only
   A2 ; \field Reporting Frequency
        \type choice
+       \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
        \note RunPeriod, Environment, and Annual are the same
@@ -99900,7 +100044,6 @@ Output:Meter:MeterFileOnly,
        \key Environment
        \key Annual
        \default Hourly
-       \note RunPeriod, Environment, and Annual are synonymous
 
 Output:Meter:Cumulative,
        \memo Each Output:Meter:Cumulative command picks meters to be reported cumulatively onto the
@@ -99918,6 +100061,7 @@ Output:Meter:Cumulative,
        \note Output:Meter:Cumulative puts results on both the eplusout.mtr and eplusout.eso files
   A2 ; \field Reporting Frequency
        \type choice
+       \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
        \note RunPeriod, Environment, and Annual are the same
@@ -99928,7 +100072,6 @@ Output:Meter:Cumulative,
        \key Environment
        \key Annual
        \default Hourly
-       \note RunPeriod, Environment, and Annual are synonymous
 
 Output:Meter:Cumulative:MeterFileOnly,
        \memo Each Output:Meter:Cumulative:MeterFileOnly command picks meters to be reported cumulatively
@@ -99946,6 +100089,7 @@ Output:Meter:Cumulative:MeterFileOnly,
        \note Output:Meter:Cumulative:MeterFileOnly puts results on the eplusout.mtr file only
   A2 ; \field Reporting Frequency
        \type choice
+       \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
        \note RunPeriod, Environment, and Annual are the same
@@ -99956,7 +100100,6 @@ Output:Meter:Cumulative:MeterFileOnly,
        \key Environment
        \key Annual
        \default Hourly
-       \note RunPeriod, Environment, and Annual are synonymous
 
 Meter:Custom,
    \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
@@ -100108,11 +100251,15 @@ Output:EnvironmentalImpactFactors,
    \memo for all of the Environmental Factors.
   A1 ; \field Reporting Frequency
        \type choice
+       \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
+       \note RunPeriod, Environment, and Annual are the same. Detailed is not a valid choice.
        \key Timestep
        \key Hourly
        \key Daily
        \key Monthly
        \key RunPeriod
+       \key Environment
+       \key Annual
 
 EnvironmentalImpactFactors,
    \memo Used to help convert district and ideal energy use to a fuel type and provide total carbon equivalent with coefficients
