@@ -53,9 +53,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
-
+		
+	// Forward Declarations
+	struct PlantLocation;
+ 
 namespace BoilerSteam {
 
 	// Using/Aliasing
@@ -67,10 +71,10 @@ namespace BoilerSteam {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern Real64 FuelUsed; // W - Boiler fuel used
-	extern Real64 BoilerLoad; // W - Boiler Load
+	extern Real64 nsvFuelUsed; // W - Boiler fuel used
+	extern Real64 nsvBoilerLoad; // W - Boiler Load
 	extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-	extern Real64 BoilerOutletTemp; // W - Boiler outlet temperature
+	extern Real64 nsvBoilerOutletTemp; // W - Boiler outlet temperature
 	extern Real64 BoilerMaxPress;
 	extern int NumBoilers; // Number of boilers
 	extern Real64 BoilerMassFlowMaxAvail; // kg/s - Boiler mass flow rate
@@ -82,7 +86,7 @@ namespace BoilerSteam {
 
 	// Types
 
-	struct BoilerSpecs
+	struct BoilerSteamSpecs : public PlantComponent 
 	{
 		// Members
 		std::string Name; // user identifier
@@ -115,9 +119,18 @@ namespace BoilerSteam {
 		int CompNum; // Plant loop component index number
 		int PressErrIndex; // index pointer for recurring errors
 		int FluidIndex; // Steam index
+		bool MyEnvrnFlag; // environment flag
+		bool MyFlag;
+		Real64 BoilerLoad; // W - Boiler operating load
+		Real64 BoilerEnergy; // J - Boiler energy integrated over time
+		Real64 FuelUsed; // W - Boiler fuel used
+		Real64 FuelConsumed; // J - Boiler Fuel consumed integrated over time
+		Real64 BoilerInletTemp; // C - Boiler inlet temperature
+		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
+		Real64 Mdot; // kg/s - Boiler mass flow rate
 
 		// Default Constructor
-		BoilerSpecs() :
+		BoilerSteamSpecs() :
 			FuelType( 0 ),
 			Available( false ),
 			ON( false ),
@@ -145,39 +158,42 @@ namespace BoilerSteam {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			PressErrIndex( 0 ),
-			FluidIndex( 0 )
-		{}
-	};
-
-	struct ReportVars
-	{
-		// Members
-		Real64 BoilerLoad; // W - Boiler operating load
-		Real64 BoilerEnergy; // J - Boiler energy integrated over time
-		Real64 FuelUsed; // W - Boiler fuel used
-		Real64 FuelConsumed; // J - Boiler Fuel consumed integrated over time
-		Real64 BoilerInletTemp; // C - Boiler inlet temperature
-		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
-		Real64 Mdot; // kg/s - Boiler mass flow rate
-		Real64 BoilerMaxOperPress;
-
-		// Default Constructor
-		ReportVars() :
+			FluidIndex( 0 ),
+			MyEnvrnFlag( true ),
+			MyFlag( true ),
 			BoilerLoad( 0.0 ),
 			BoilerEnergy( 0.0 ),
 			FuelUsed( 0.0 ),
 			FuelConsumed( 0.0 ),
 			BoilerInletTemp( 0.0 ),
 			BoilerOutletTemp( 0.0 ),
-			Mdot( 0.0 ),
-			BoilerMaxOperPress( 0.0 )
+			Mdot( 0.0 )
 		{}
+		
+		
+		public:
+			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+			 
+			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
+			
+			void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+			
+			void getSizingFactor( Real64 & SizFac );
+			
+			void InitBoiler();
+			
+			void SizeBoiler();
+			
+			void CalcBoilerModel( Real64 & MyLoad, bool const RunFlag, int const EquipFlowCtrl );
+
+			void UpdateBoilerRecords( Real64 const MyLoad, bool const RunFlag );
+ 
 	};
 
 	// Object Data
-	extern Array1D< BoilerSpecs > Boiler; // dimension to number of machines
-	extern Array1D< ReportVars > BoilerReport;
+	extern Array1D< BoilerSteamSpecs > Boiler; // dimension to number of machines
 
 	// Functions
 
@@ -204,29 +220,7 @@ namespace BoilerSteam {
 	void
 	GetBoilerInput();
 
-	void
-	InitBoiler( int const BoilerNum ); // number of the current electric chiller being simulated
-
-	void
-	SizeBoiler( int const BoilerNum );
-
-	void
-	CalcBoilerModel(
-		int & BoilerNum, // boiler identifier
-		Real64 & MyLoad, // W - hot water demand to be met by boiler
-		bool const RunFlag, // TRUE if boiler operating
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
-
 	// Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
-
-	void
-	UpdateBoilerRecords(
-		Real64 const MyLoad, // boiler operating load
-		bool const RunFlag, // boiler on when TRUE
-		int const Num, // boiler number
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	);
 
 	// End of Record Keeping subroutines for the BOILER:STEAM Module
 
