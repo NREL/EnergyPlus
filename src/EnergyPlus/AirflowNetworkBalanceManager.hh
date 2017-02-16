@@ -224,9 +224,6 @@ namespace AirflowNetworkBalanceManager {
 	);
 
 	void
-	CalcAirflowNetworkRadiation();
-
-	void
 	CalcAirflowNetworkHeatBalance();
 
 	void

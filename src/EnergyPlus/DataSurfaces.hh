@@ -746,7 +746,6 @@ namespace DataSurfaces {
 		// LG added 1/6/12
 		Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
 		// the surface diffusion model
-		Real64 RadEnergyFromAFNDucts; // Radiant energy from AirflowNetwork duct
 
 		// Default Constructor
 		SurfaceData() :
@@ -867,8 +866,7 @@ namespace DataSurfaces {
 			IntConvSurfGetsRadiantHeat( false ),
 			IntConvSurfHasActiveInIt( false ),
 			PartOfVentSlabOrRadiantSurface( false ),
-			GenericContam( 0.0 ),
-			RadEnergyFromAFNDucts( 0.0 )
+			GenericContam( 0.0 )
 		{}
 
 	public: // Methods

@@ -1398,38 +1398,38 @@ namespace DataAirflowNetwork {
 	struct LinkageSurfaceProp
 	{
 		// Members
-		std::string surfaceName;
-		int surfaceNum;		// Name of surface referenced by view factor
-		Real64 viewFactor;	// View factor
-		Real64 DuctRadLoad;	// Duct radiation load from surface [W]
+		std::string SurfaceName;
+		int SurfaceNum;		// Name of surface referenced by view factor
+		Real64 ViewFactor;	// View factor
+		Real64 SurfaceRadLoad;	// Duct radiation load from surface [W]
 
 		// Default constructor
 		LinkageSurfaceProp() :
-			surfaceNum( 0 ),
-			viewFactor( 0 ),
-			DuctRadLoad( 0 )
+			SurfaceNum( 0 ),
+			ViewFactor( 0.0 ),
+			SurfaceRadLoad( 0.0 )
 		{}
 	};
 
 	struct AirflowNetworkLinkageViewFactorProp
 	{
 		// Members
-		std::string linkageName;
-		Real64 surfaceExposureFraction;
-		Real64 surfaceEmittance;
-		Array1D< LinkageSurfaceProp > linkageSurfaceData;
-		int objectNum;
+		std::string LinkageName;
+		Real64 DuctExposureFraction;
+		Real64 DuctEmittance;
+		Array1D< LinkageSurfaceProp > LinkageSurfaceData;
+		int ObjectNum;
 		Real64 UThermalRad;
 		Real64 QRad;
 		Real64 TSurr;
 
 		AirflowNetworkLinkageViewFactorProp() :
-			surfaceExposureFraction( 0 ),
-			surfaceEmittance( 0 ),
-			objectNum( 0 ),
-			UThermalRad( 0 ),
-			QRad( 0 ),
-			TSurr( 0 )
+			DuctExposureFraction( 0.0 ),
+			DuctEmittance( 0.0 ),
+			ObjectNum( 0 ),
+			UThermalRad( 0.0 ),
+			QRad( 0.0 ),
+			TSurr( 0.0 )
 		{}
 	};
 
