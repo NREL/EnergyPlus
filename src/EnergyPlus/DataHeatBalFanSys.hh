@@ -208,6 +208,10 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	extern Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	extern Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
+	// Hybrid Modeling
+	extern Array1D< Real64 > PreviousMeasuredZT1; // Measured zone air temperature at previous timestep1
+	extern Array1D< Real64 > PreviousMeasuredZT2; // Measured zone air temperature at previous timestep2
+	extern Array1D< Real64 > PreviousMeasuredZT3; // Measured zone air temperature at previous timestep3
 	// Exact and Euler solutions
 	extern Array1D< Real64 > ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
@@ -215,17 +219,6 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
 	extern Array1D< Real64 > ZoneW1; // Zone temperature at the previous time step used in Exact and Euler method
-
-	extern Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone temp in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone humidity ratio in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone CO2 concentration in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone generic contaminant concentration in the predictor
-	// and corrector step
-
 	extern Array1D_int TempControlType;
 	extern Array1D_int ComfortControlType;
 

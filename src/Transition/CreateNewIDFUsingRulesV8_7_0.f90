@@ -403,6 +403,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(4:(CurArgs-1))=InArgs(5:(CurArgs))
                  CurArgs = CurArgs-1
 
+             CASE('ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL')
+                 ObjectName='ZoneCapacitanceMultiplier:ResearchSpecial'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1)='Multiplier'     ! Add new Name field
+                 OutArgs(2)=''               ! Add new Zone Name Field
+                 OutArgs(3:CurArgs+2)=InArgs(1:CurArgs)
+                 CurArgs = CurArgs + 2
+             
              CASE('WATERHEATER:HEATPUMP:WRAPPEDCONDENSER')
                  ObjectName='WaterHeater:HeatPump:WrappedCondenser'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
