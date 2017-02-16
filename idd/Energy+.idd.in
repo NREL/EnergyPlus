@@ -33661,15 +33661,15 @@ ZoneHVAC:UnitVentilator,
    A6 , \field Air Inlet Node Name
         \required-field
         \type node
-        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the  
-        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer 
-        \note outlet air node name for InletSide mixer connection. 
+        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the
+        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer
+        \note outlet air node name for InletSide mixer connection.
    A7 , \field Air Outlet Node Name
         \required-field
         \type node
-        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the   
-        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer 
-        \note secondary air inlet node name for SupplySide mixer connection. 
+        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the
+        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer
+        \note secondary air inlet node name for SupplySide mixer connection.
    A8,  \field Outdoor Air Node Name
         \type node
         \note this field is left blank only if the Unit Ventilator is connected to a central
@@ -34333,12 +34333,8 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
   A1,  \field Name
        \required-field
        \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
        \reference validBranchEquipmentNames
-=======
-       \reference validBranchEquipmentNames 
        \reference ZoneEquipmentNames
->>>>>>> develop
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -35134,12 +35130,8 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
   A1,  \field Name
        \required-field
        \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
        \reference validBranchEquipmentNames
-=======
-       \reference validBranchEquipmentNames 
        \reference ZoneEquipmentNames
->>>>>>> develop
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37484,12 +37476,8 @@ ZoneHVAC:Baseboard:Convective:Water,
   A1 , \field Name
        \required-field
        \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
        \reference validBranchEquipmentNames
-=======
-       \reference validBranchEquipmentNames 
        \reference ZoneEquipmentNames
->>>>>>> develop
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37605,12 +37593,8 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
    A1 , \field Name
         \required-field
         \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
         \reference validBranchEquipmentNames
-=======
-        \reference validBranchEquipmentNames 
         \reference ZoneEquipmentNames
->>>>>>> develop
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -37770,12 +37754,8 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
    A1 , \field Name
         \required-field
         \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
         \reference validBranchEquipmentNames
-=======
-        \reference validBranchEquipmentNames 
         \reference ZoneEquipmentNames
->>>>>>> develop
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -39636,7 +39616,7 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \memo water, electric, gas, or steam).
   A1 , \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
        \reference AFNTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -39692,7 +39672,7 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \memo Central air system terminal unit, single duct, variable volume, with no reheat coil.
   A1,  \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -39726,9 +39706,9 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
@@ -39739,9 +39719,9 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
@@ -39766,7 +39746,7 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \min-fields 18
   A1 , \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
        \reference AFNTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -39804,9 +39784,9 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the following field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
@@ -39817,9 +39797,9 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
        \note If both this field and the previous field are entered, the larger result is used.
-       \note The values for autosizing are picked up from the Sizing:Zone input fields 
-       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and 
-       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of 
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
   A6 , \field Minimum Air Flow Fraction Schedule Name
        \type object-list
@@ -39915,7 +39895,7 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \memo of conditioned air that enters the space.
   A1,  \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -39990,7 +39970,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
        \min-fields 6
   A1,  \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40021,7 +40001,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \min-fields 11
   A1,  \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40091,7 +40071,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
   A1,  \field Name
        \required-field
        \type alpha
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40165,7 +40145,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
   A1,  \field Name
        \required-field
        \type alpha
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40248,7 +40228,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
   A1,  \field Name
        \required-field
        \type alpha
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40336,7 +40316,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
   A1 , \field Name
        \type alpha
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field Primary Air Availability Schedule Name
@@ -40506,7 +40486,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
   A1 , \field Name
        \type alpha
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field Availability Schedule Name
@@ -40621,7 +40601,7 @@ AirTerminal:SingleDuct:Mixer,
        \memo a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
    A2, \field ZoneHVAC Unit Object Type
        \required-field
        \type choice
@@ -40630,7 +40610,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \key ZoneHVAC:UnitVentilator 
+       \key ZoneHVAC:UnitVentilator
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name
@@ -40675,7 +40655,7 @@ AirTerminal:DualDuct:ConstantVolume,
        \min-fields 6
   A1 , \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40703,7 +40683,7 @@ AirTerminal:DualDuct:VAV,
        \min-fields 7
   A1 , \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40747,7 +40727,7 @@ AirTerminal:DualDuct:VAV:OutdoorAir,
        \min-fields 7
   A1 , \field Name
        \required-field
-       \reference AirTerminalUnitNames 
+       \reference AirTerminalUnitNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -42363,10 +42343,10 @@ Coil:Cooling:Water,
        \type real
        \units deltaC
        \minimum> 0.0
-       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
-       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate.
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant
        \note object is used for sizing the Design Water Flow Rate.
-   
+
 Coil:Cooling:Water:DetailedGeometry,
        \memo Chilled water cooling coil, detailed flat fin coil model for continuous plate fins,
        \memo with inputs for detailed coil geometry specifications.
@@ -42488,10 +42468,10 @@ Coil:Cooling:Water:DetailedGeometry,
        \type real
        \units deltaC
        \minimum> 0.0
-       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
-       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+       \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate.
+       \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant
        \note object is used for sizing the Design Water Flow Rate.
-   
+
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed. Optional inputs for moisture evaporation from wet
@@ -44985,8 +44965,8 @@ Coil:Heating:Water,
       \type real
       \units deltaC
       \minimum> 0.0
-      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate. 
-      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant  
+      \note This input field is optional. If specified, it is used for sizing the Design Water Flow Rate.
+      \note If blank or omitted, the Loop Design Temperature Difference value specified in Sizing:Plant
       \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Heating:Steam,
@@ -65265,7 +65245,7 @@ CoolingTower:SingleSpeed,
        \default 0.1
        \minimum> 0.0
        \maximum< 1.0
-       \note This field is only used if the previous field is set to autocalculate 
+       \note This field is only used if the previous field is set to autocalculate
   N13, \field Design Inlet Air Dry-Bulb Temperature
        \type real
        \units C
@@ -65282,7 +65262,7 @@ CoolingTower:SingleSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize   
+       \default autosize
        \minimum> 0
        \note Enter the approach temperature corresponding to the design inlet air
        \note wet-bulb temperature and design range temperature.
@@ -65292,7 +65272,7 @@ CoolingTower:SingleSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize 
+       \default autosize
        \minimum> 0
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
@@ -65592,7 +65572,7 @@ CoolingTower:TwoSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize 
+       \default autosize
        \minimum> 0
        \note Enter the approach temperature corresponding to the design inlet air
        \note wet-bulb temperature and design range temperature.
@@ -65602,12 +65582,12 @@ CoolingTower:TwoSpeed,
        \type real
        \units deltaC
        \autosizable
-       \default autosize 
+       \default autosize
        \minimum> 0
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
        \note Design range = inlet water temperature minus outlet water temperature
-       \note at design conditions. Autosized to 5.5 deltaC. 
+       \note at design conditions. Autosized to 5.5 deltaC.
   N25, \field Basin Heater Capacity
        \type real
        \units W/K
@@ -68864,12 +68844,8 @@ WaterHeater:HeatPump:PumpedCondenser,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
        \reference validBranchEquipmentNames
-=======
-       \reference validBranchEquipmentNames 
        \reference ZoneEquipmentNames
->>>>>>> develop
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -69132,12 +69108,8 @@ WaterHeater:HeatPump:WrappedCondenser,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
        \reference validBranchEquipmentNames
-=======
-       \reference validBranchEquipmentNames 
        \reference ZoneEquipmentNames
->>>>>>> develop
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -73025,12 +72997,8 @@ ZoneHVAC:ForcedAir:UserDefined,
         \required-field
         \type alpha
         \reference-class-name validBranchEquipmentTypes
-<<<<<<< HEAD
         \reference validBranchEquipmentNames
-=======
-        \reference validBranchEquipmentNames 
         \reference ZoneEquipmentNames
->>>>>>> develop
         \note This is the name of the zone unit
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -81711,9 +81679,9 @@ FaultModel:Fouling:Boiler,
        \maximum 1
        \default 1
        \units dimensionless
-   
+
 FaultModel:Fouling:EvaporativeCooler,
-   \memo This object describes the fouling fault of the wetted coil evaporative cooler 
+   \memo This object describes the fouling fault of the wetted coil evaporative cooler
    \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
@@ -81727,7 +81695,7 @@ FaultModel:Fouling:EvaporativeCooler,
        \object-list ScheduleNames
    A4, \field Evaporative Cooler Object Type
        \note Enter the type of a Evaporative Cooler object
-       \note The fault applies to the wetted coil evaporative cooler 
+       \note The fault applies to the wetted coil evaporative cooler
        \note The fault does not apply to direct evaporative coolers or the dry coil indirect evaporative coolers
        \required-field
        \type choice
@@ -88287,21 +88255,21 @@ UtilityCost:Tariff,
         \note The name of the schedule that defines the time-of-use periods that occur each day. The values for the
         \note different variables are: 1 for Peak. 2 for Shoulder. 3 for OffPeak. 4 for MidPeak.
         \note The following variables are created automatically if these different periods are used in the
-        \note schedule and include: TotalEnergy, TotalDemand, PeakEnergy, PeakDemand, ShoulderEnergy, ShoulderDemand, 
+        \note schedule and include: TotalEnergy, TotalDemand, PeakEnergy, PeakDemand, ShoulderEnergy, ShoulderDemand,
         \note OffPeakEnergy, OffPeakDemand, MidPeakEnergy, MidPeakDemand
         \note Some special variables are created that include: PeakExceedsOffPeak, OffPeakExceedsPeak,
-        \note PeakExceedsMidPeak, MidPeakExceedsPeak, PeakExceedsShoulder, ShoulderExceedsPeak, 
+        \note PeakExceedsMidPeak, MidPeakExceedsPeak, PeakExceedsShoulder, ShoulderExceedsPeak,
         \note Others include: PeakAndShoulderEnergy, PeakAndShoulderDemand, PeakAndMidPeakEnergy,
-        \note PeakAndMidPeakDemand, ShoulderAndOffPeakEnergy, ShoulderAndOffPeakDemand, PeakAndOffPeakEnergy, 
-        \note PeakAndOffPeakDemand, RealTimePriceCosts, AboveCustomerBaseCosts, BelowCustomerBaseCosts, 
+        \note PeakAndMidPeakDemand, ShoulderAndOffPeakEnergy, ShoulderAndOffPeakDemand, PeakAndOffPeakEnergy,
+        \note PeakAndOffPeakDemand, RealTimePriceCosts, AboveCustomerBaseCosts, BelowCustomerBaseCosts,
         \note AboveCustomerBaseEnergy, BelowCustomerBaseEnergy
    A5,  \field Season Schedule Name
         \type object-list
         \object-list ScheduleNames
         \note The name of a schedule that defines the seasons.  The schedule values are: 1 for Winter. 2 for Spring.
         \note 3 for Summer. 4 for Autumn.
-        \note Variables are automatically created if a season schedule is used. These variables are set to 1 within 
-        \note the season and 0 for the months that are not in the season. The variables are: IsWinter, IsNotWinter, 
+        \note Variables are automatically created if a season schedule is used. These variables are set to 1 within
+        \note the season and 0 for the months that are not in the season. The variables are: IsWinter, IsNotWinter,
         \note IsSpring, IsNotSpring, IsSummer, IsNotSummer, IsAutumn, IsNotAutumn.
    A6,  \field Month Schedule Name
         \type object-list
