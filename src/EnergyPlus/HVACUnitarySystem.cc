@@ -585,7 +585,7 @@ namespace HVACUnitarySystem {
 			} else if( AirLoopNum < 0 ) {
 				if( UnitarySystem( UnitarySysNum ).ControlType == CCM_ASHRAE ) {
 					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "  Invalid application of Control Type = ASHRAE90VariableFan in outdoor air system." );
+					ShowContinueError( "  Invalid application of Control Type = SingleZoneVAV in outdoor air system." );
 					ShowFatalError( "InitUnitarySystems: Program terminated for previous conditions." );
 				}
 			}
@@ -1806,7 +1806,7 @@ namespace HVACUnitarySystem {
 		int ZoneInSysIndex( 0 ); // number of zone inlet nodes counter in an airloop
 		Real64 SumOfMassFlowRateMax( 0.0 ); // the sum of zone inlet mass flow rates
 		int ZoneInletNodeNum( 0 ); // zone inlet nodes node number
-		Real64 minNoLoadFlow; // used for sizing MaxNoCoolHeatVolFlow for ASHRAE90VariableFan method
+		Real64 minNoLoadFlow; // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
 		//////////// hoisted into namespace ////////////////////////////////////////////////
 		// static int NumUnitarySystemsSized( 0 ); // counter used to delete UnitarySystemNumericFields array after last system is sized
 		////////////////////////////////////////////////////////////////////////////////////
@@ -2620,9 +2620,9 @@ namespace HVACUnitarySystem {
 			// check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
 			if( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow || UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow ) {
 				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " = " + UnitarySystem( UnitarySysNum ).Name );
-				ShowContinueError( " For ASHRAE90VariableFan control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply air flow rates." );
+				ShowContinueError( " For SingleZoneVAV control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply air flow rates." );
 				UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = min( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow ) - 0.01;
-				ShowContinueError( " The ASHRAE90VariableFan control No Load Supply Air Flow Rate is reset to " + TrimSigDigits( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow, 5 ) + " and the simulation continues." );
+				ShowContinueError( " The SingleZoneVAV control No Load Supply Air Flow Rate is reset to " + TrimSigDigits( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow, 5 ) + " and the simulation continues." );
 			}
 		}
 
@@ -3122,7 +3122,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).ControlType = LoadBased;
 			} else if ( SameString( Alphas( iControlTypeAlphaNum ), "SetPoint" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = SetPointBased;
-			} else if ( SameString( Alphas( iControlTypeAlphaNum ), "ASHRAE90VariableFan" ) ) {
+			} else if ( SameString( Alphas( iControlTypeAlphaNum ), "SingleZoneVAV" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = CCM_ASHRAE;
 				UnitarySystem( UnitarySysNum ).validASHRAECoolCoil = true;
 				UnitarySystem( UnitarySysNum ).validASHRAEHeatCoil = true;

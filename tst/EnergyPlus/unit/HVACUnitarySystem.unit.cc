@@ -1175,7 +1175,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	EXPECT_TRUE( UnitarySystem( 1 ).FanIndex > 0 ); // ZoneHVAC must contain a fan object to provide flow
 	EXPECT_EQ( UnitarySystem( 1 ).FanType_Num, DataHVACGlobals::FanType_SimpleOnOff ); // fan must be FanOnOff when used with cycling fan
 
-	// switch to ASHRAE90VariableFan control type and test that answer does not change since cycling fan is allowed but will not call the ASHRAE model
+	// switch to SingleZoneVAV control type and test that answer does not change since cycling fan is allowed but will not call the ASHRAE model
 	// note that the input objects above show a constant fan operating mode, but since the schedules were never handled the schedule value = 0 which means cycling fan
 	UnitarySystem( 1 ).ControlType = CCM_ASHRAE; // control type = 3
 	UnitarySystem( 1 ).validASHRAECoolCoil = true;
@@ -5518,7 +5518,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 
 		"AirLoopHVAC:UnitarySystem,",
 		"  ASHRAE Model HVAC,       !- Name",
-		"  ASHRAE90VariableFan,     !- Control Type",
+		"  SingleZoneVAV,           !- Control Type",
 		"  East Zone,               !- Controlling Zone or Thermostat Location",
 		"  None,                    !- Dehumidification Control Type",
 		"  FanAndCoilAvailSched,    !- Availability Schedule Name",
