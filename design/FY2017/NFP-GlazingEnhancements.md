@@ -22,10 +22,12 @@
 **Lixing Gu**
 **Florida Solar Energy Center**
 
- - Original: January 5, 2017
- - Submitted an NFP to the team
+ - Second revision on Feb. 15, 2017
+ - Revised NFP based on discussion in the the first conference call on 2/14/17
  - First revision on Feb. 3, 2017
  - Received comments and made initial reply before the first conference call
+ - Original: January 5, 2017
+ - Submitted an NFP to the team
  
 
 ## Justification for New Feature ##
@@ -124,7 +126,140 @@ I will make changes in NFP based on Tnaguy's comments.
 
 I propose two choices to input optical datasets. The first choice is to add 3 new objects to read data, proposed earlier. The second choice is to use existing object of Table:TwoIndependentVariables. Minor modifications are needed. For example, two additional choice of the Input Unit Type field are added as wavelength (microns) and angle (degrees). The dimensionless of output unit type is available, there is no need to make any changes. An additional effort may be proposed to add an option to read datasets from an external file. The second choice is recommended, since no new objects will be created.  
 
-By the way, the Matrix:TwoDimension object is used in BSDF input. The object allows two-dimentional matrix of values only. The proposed datasets are three-dimentional matrix of values. Therefore, the existing object needs to be revised. Fortunately, the existing Table:TwoIndependentVariables meets input requirements with minor modification. That is why we propose to use the Table:TwoIndependentVariables as an alternative input data holder.   
+By the way, the Matrix:TwoDimension object is used in BSDF input. The object allows two-dimentional matrix of values only. The proposed datasets are three-dimentional matrix of values. Therefore, the existing object needs to be revised. Fortunately, the existing Table:TwoIndependentVariables meets input requirements with minor modification. That is why we propose to use the Table:TwoIndependentVariables as an alternative input data holder. 
+
+More E-mail communications on 2/14/17
+
+Mike:
+
+Thanks for your comments and suggestions.
+
+1. New fields in WindowMaterial:Glazing
+
+I like your suggestions to place 3 new dataset field names at the end of the object, so that no transitions are needed.
+
+2. External File name
+
+I think there may be 3 options.
+
+1.	Existing data format from Table:MultiVariableLookup
+The data format is not nice. If there are 3 independent variables, it specify values of independent variables one-by-one, then specify values of dependent variable. Therefore, data are not easily readable. 
+
+    1,                       !- Number of Independent Variables
+   4,                       !- Number of Values for Independent Variable X1
+    0.0,                     !- Field 1 Determined by the Number of Independent Variables
+    0.5,                     !- Field 2 Determined by the Number of Independent Variables
+    1.0,                     !- Field 3 Determined by the Number of Independent Variables
+    1.5,                     !- <none>
+    1.1552,                  !- <none>
+    1.0712,                  !- <none>
+    1.0,                     !- <none>
+0.9416;                  !- <none>
+
+Rich and I had discussion. He suggested to use the proposed format (below).
+
+2.	Proposed data format
+Specify data one-by-one:
+X1, y1, z1
+X2, y2, z2,
+
+The advantage is readable. However, the data format is fixed.
+
+3.	New data:file object
+
+As suggested by Mike, a new object, similar to Schedule:File to provide more flexibility. However, it requires a new object to handle. At least, Schedule:File name may not be proper.
+
+We can discuss this issue in the conference call, although I prefer to use the second one without new objects.
+
+Thanks.
+
+Gu 
+From: Michael J Witte [mailto:mjwitte@gard.com] 
+Sent: Tuesday, February 14, 2017 10:43 AM
+To: Lixing Gu <gu@fsec.ucf.edu>; 'Neal Kruis' <neal.kruis@bigladdersoftware.com>; Simon Vidanovic <dvvidanovic@lbl.gov>; D. Charlie Curcija <dccurcija@lbl.gov>; 'Tianzhen Hong' <thong@lbl.gov>; 'Lee, Edwin' <Edwin.Lee@nrel.gov>
+Cc: 'Timmermans Tanguy' <Tanguy.Timmermans@eu.agc.com>
+Subject: Re: Doodle: Link for poll "Discuss an NFP of glazing enhancements"
+
+Gu:
+Just one small suggestion we can discuss on today's call.
+In WindowMaterial:Glazing, I'd rather see the new fields placed at (or near) the end of the object rather than adding infrequently used fields at the top.  (If I were to design the object today, I would put the spectral data set field to the end as well.)
+Otherwise, this looks good to me.  I like using the existing table object, and I like adding the external file option.  I was going to suggest a more general table from file object (like Schedule:File) that lets you specify rows to skip at the top and which columns to grab data  from, but I see that Table:MultiVariableLookup already has an "External File Name" filed, so your proposal follows that pattern.
+Mike
+
+###Second revision
+  
+The first conference call was held on 2/14/17. The following people attended the conference call:
+
+Michael J Witte, GARD
+Neal Kruis, Big Ladder
+Simon Vidanovic, LBNL
+D. Charlie Curcija, LBNL
+Tianzhen Hong, LBNL
+Edwin Lee, NREL
+Timmermans Tanguy, AGC Glass
+Lixing Gu, FSEC 
+
+Here is a summary based on discussion during the conference call
+
+#### New feature justification
+
+The new feature is needed based on following reasons:
+
+1. AGC measured data shows that optical properties are a function of wavelength and incident angles. It may be described by curves. However, tabular inputs are also a good approach with direct inputs from measured data without curve-fitting effort. In addition, some properties may not be defined as a simple curve.  
+2. Existing hard code to calculate optical properties is based on a single empirical curve. Tabular data input can provide more flexibility to users.
+3. ASHRAE SPC205 (Standard Representation of Performance Simulation  Data for HVAC&R and Other Facility Equipment) favors to use tabular data to represent optical properties. The proposed approach meets SPC205 requirements
+ 
+
+#### Table:TwoIndependentVariables to hold optical tabular data
+
+The Table:TwoIndependentVariables object will be used to hold optical data with minor modifications. One of modifications is to add a new field as External File Name to read optical data from an external file. The data format of the external file will be the same as text inputs:
+
+X1, Y1, Z1,
+
+X2, Y2, Z2,
+
+...
+
+Xn, Yn, Zn;
+
+
+#### Adjust positions of new fields in WindowMaterial:Glazing
+
+The proposed 3 new fields will be placed at the end in the WindowMaterial:Glazing objects:
+
+WindowMaterial:Glazing,
+    \min-fields 14
+    \memo Glass material properties for Windows or Glass Doors
+    \memo Transmittance/Reflectance input method.
+...
+  N14, \field Poisson's ratio
+
+  A5 , \field Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+
+  A6 , \field Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+
+  A7 ; \field Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+ 
+
+#### Possible optional outputs 
+
+This section provides possible efforts if time and money are left.
+ 
+1. Possible optical outputs based on certain range of wavelengths
+
+The certain ranges of wavelengths will include visible, infrared, and different colors.
+
+2. Tabular data may include data range to simplify inputs
+
+The proposed tabular input may meet data range requirement. The only restriction is linear interpolation is performed between two data points.
+
+#### Future enhancements   
+
+A new Data:File object   
+
+A new data object may be similar to Schedule:File. The format may be similar. However, the Schedule:File varies with time with a single independent variable, while Data:File needs multiple independent variables and allows to vary with single or multiple independent variables.
+
+I will write an item in the enhancement list. 
 
 ## Overview ##
 
@@ -134,13 +269,7 @@ The code modification will be based on Window Calculation Engine (WCE) submitted
 
 ## Approach ##
 
-The proposed approach will revise the existing object of WindowMaterial:Glazing, and select one of two alternative choices to input optical datasets.
-
-1. Add 3 new objects to handle data sets of the glazing properties as a function of both wavelength and incident angle. 
-
-2. Use existing object of Table:TwoIndependentVariables with minor modifications 
-
-Based on Neal's comments, the second choice is recommended. The first choice will be removed after the first conference call.
+The proposed approach will revise the existing object of WindowMaterial:Glazing, and use existing object of Table:TwoIndependentVariables with minor modifications to input optical datasets.
 
 ### Revision of WindowMaterial:Glazing object ###
 
@@ -153,11 +282,9 @@ Wavelength 1, Incident Angle 1, Transmittance 1, Front Reflectance 1, and Back R
 
 Therefore, the dataset becomes very large and not readable easily. It is better to have 3 datasets to represent transmittance, front reflectance, and back reflectance, respectively. It also provides flexibility to allow each optical property may have values at different wavelengths and incident angles. Each dataset set up 2 independent variables (wavelength and incident angle) and 1 dependent variable (optical property). 
 
-### New objects of glazing properties as first choice ###
+In order to avoid transition, the three new optional fields will be placed at the end of the object.
 
-We proposed 3 new objects to represent optical properties of transmittance, front reflectance, and back reflectance as a function of both wavelength and incident angle. Each object contains an optical property at different wavelengths and incident angles. 
-
-### Modify existing object of Table:TwoIndependentVariables as second choice ###
+### Modify existing object of Table:TwoIndependentVariables ###
 
 The existing object of Table:TwoIndependentVariables will be modified slightly to meet input requirements:
 
@@ -172,7 +299,7 @@ The calculation procedure is expanded based on the Spectral choice defined in th
 
 1. Read input objects
 
-A new function will be created to read 3 new dataset objects as GetWindowGlassSpectralAndAngleData in the HeatBalanceManager module. Its functionality is similar to GetWindowGlassSpectralData. The second choice will be to read inputs from Table:TwoIndependentVariables objects as an alternative choice.
+Read inputs from Table:TwoIndependentVariables objects when the choice of SpectralAndIncidentAngle is entered.
 
 2. Integrate system properties with respect to wavelength for each angle of incidence
 
@@ -229,30 +356,6 @@ If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object mu
 #### Field: Window Glass Spectral Data Set Name
 
 If Optical Data Type = Spectral, this is the name of a spectral data set defined with a WindowGlassSpectralData object.
-
-#### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Transmittance Data Set Name</span>
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of transmittance defined with a TransmittanceSpectralAndAngleDataSet object.</span>
-
-<span style="color:red;">Alternative approach
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of transmittance defined with a Table:TwoIndependentVariables object.</span>
-
-#### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Name</span>
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a FrontReflectanceSpectralAndAngleDataSet object.</span>
-
-<span style="color:red;">Alternative approach
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of front reflectance defined with a Table:TwoIndependentVariables object.</span>
-
-#### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Name</span>
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a BackReflectanceSpectralAndAngleDataSet object.</span>
-
-<span style="color:red;">Alternative approach
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of back reflectance defined with a Table:TwoIndependentVariables object.</span>
 
 #### Field: Thickness
 
@@ -369,66 +472,78 @@ A measure of the stiffness of an elastic material.  It is defined as the ratio 
 
 The ratio, when a sample object is stretched, of the contraction or transverse strain (perpendicular to the applied load), to the extension or axial strain (in the direction of the applied load). This value is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 0.22.
 
+#### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name</span>
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of transmittance defined with a Table:TwoIndependentVariables object.</span>
+
+#### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name</span>
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of front reflectance defined with a Table:TwoIndependentVariables object.</span>
+
+#### <span style="color:red;">Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name</span>
+
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, this is the name of a spectral  and angle data set of back reflectance defined with a Table:TwoIndependentVariables object.</span>
+
+
 IDF examples of Spectral average and using a Spectral data set:
 
 ```idf
 MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
-  SpectralAverage, ! Optical data type
+  SpectralAverage, !- Optical data type
   ,                    !- Spectral Data name
-  ,      !- Window Glass Spectral and Incident Angle Transmittance Data Set Name
-  ,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Name
-  ,      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Name
-  0.003, ! Thickness {m} 1/8"
-  0.850, ! Solar transmittance at normal incidence
-  0.075, ! Solar reflectance at normal incidence: front side
-  0.075, ! Solar reflectance at normal incidence: back side
-  0.901, ! Visible transmittance at normal incidence
-  0.081, ! Visible reflectance at normal incidence: front side
-  0.081, ! Visible reflectance at normal incidence: back side
-  0.0,   ! IR transmittance at normal incidence
-  0.84,  ! IR hemispherical emissivity: front side
-  0.84,  ! IR hemispherical emissivity: back side
-  0.9;   ! Conductivity {W/m-K}
+  0.003, !- Thickness {m} 1/8"
+  0.850, !- Solar transmittance at normal incidence
+  0.075, !- Solar reflectance at normal incidence: front side
+  0.075, !- Solar reflectance at normal incidence: back side
+  0.901, !- Visible transmittance at normal incidence
+  0.081, !- Visible reflectance at normal incidence: front side
+  0.081, !- Visible reflectance at normal incidence: back side
+  0.0,   !- IR transmittance at normal incidence
+  0.84,  !- IR hemispherical emissivity: front side
+  0.84,  !- IR hemispherical emissivity: back side
+  0.9;   !- Conductivity {W/m-K}
 
 
 WindowMaterial:Glazing ,SPECTRAL GLASS INNER PANE, ! Material name
-    Spectral, ! Optical data type {SpectralAverage or Spectral}
-    TestSpectralDataSet, ! Name of spectral data set
-    ,      !- Window Glass Spectral and Incident Angle Transmittance Data Set Name
-    ,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Name
-    ,      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Name
-    0.0099, ! Thickness {m}
-    ,  ! Solar transmittance at normal incidence
-    ,  ! Solar reflectance at normal incidence: front side
-    ,  ! Solar reflectance at normal incidence: back side
-    ,  ! Visible transmittance at normal incidence
-    ,  ! Visible reflectance at normal incidence: front side
-    ,  ! Visible reflectance at normal incidence: back side
-    0.0,   ! IR transmittance at normal incidence
-    0.84,  ! IR emissivity: front side
-    0.84,  ! IR emissivity: back side
-    0.798; ! Conductivity {W/m-K}
+    Spectral, !- Optical data type {SpectralAverage or Spectral}
+    TestSpectralDataSet, !- Name of spectral data set
+    0.0099, !- Thickness {m}
+    ,  !- Solar transmittance at normal incidence
+    ,  !- Solar reflectance at normal incidence: front side
+    ,  !- Solar reflectance at normal incidence: back side
+    ,  !- Visible transmittance at normal incidence
+    ,  !- Visible reflectance at normal incidence: front side
+    ,  !- Visible reflectance at normal incidence: back side
+    0.0,   !- IR transmittance at normal incidence
+    0.84,  !- IR emissivity: front side
+    0.84,  !- IR emissivity: back side
+    0.798; !- Conductivity {W/m-K}
 ```
 IDF example using a SpectralAndAngle data set:
 
 ```idf
 WindowMaterial:Glazing ,SPECTRAL AND ANGLE GLASS INNER PANE, ! Material name
     SpectralAndAngle, ! Optical data type {SpectralAverage or Spectral}
-    , ! Name of spectral data set
-    TranmittanceDataSet,  !- Window Glass Spectral and Incident Angle Transmittance Data Set Name
-    FrontReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Name
-    BackReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Name
+    , !- Name of spectral data set
+
     0.0099, ! Thickness {m}
-    ,  ! Solar transmittance at normal incidence
-    ,  ! Solar reflectance at normal incidence: front side
-    ,  ! Solar reflectance at normal incidence: back side
-    ,  ! Visible transmittance at normal incidence
-    ,  ! Visible reflectance at normal incidence: front side
-    ,  ! Visible reflectance at normal incidence: back side
-    0.0,   ! IR transmittance at normal incidence
-    0.84,  ! IR emissivity: front side
-    0.84,  ! IR emissivity: back side
-    0.798; ! Conductivity {W/m-K}
+    ,  !- Solar transmittance at normal incidence
+    ,  !- Solar reflectance at normal incidence: front side
+    ,  !- Solar reflectance at normal incidence: back side
+    ,  !- Visible transmittance at normal incidence
+    ,  !- Visible reflectance at normal incidence: front side
+    ,  !- Visible reflectance at normal incidence: back side
+    0.0,   !- IR transmittance at normal incidence
+    0.84,  !- IR emissivity: front side
+    0.84,  !- IR emissivity: back side
+    0.798, !- Conductivity {W/m-K}
+    ,      !- Dirt Correction Factor for Solar and Visible Transmittance
+    ,      !- Solar Diffusing
+    ,      !- Young's modulus
+    ,      !- Poisson's ratio
+    TranmittanceDataSet,  !- Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+    FrontReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+    BackReflectanceDataSet;      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
 ```
 
 IDF example of Spectral Data Type = BSDF
@@ -438,9 +553,6 @@ WindowMaterial:Glazing,
   Glass_5012_Layer,        !- Layer name : CLEAR_6.PPG
   BSDF,                    !- Optical Data Type
   ,                        !- Spectral Data name
-  ,      !- Window Glass Spectral and Incident Angle Transmittance Data Set Name
-  ,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Name
-  ,      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Name
   0.005664,                !- Thickness
   ,                        !- Solar Transmittance
   ,                        !- Solar Front Reflectance
@@ -452,138 +564,13 @@ WindowMaterial:Glazing,
   0.840000,                !-Front Emissivity
   0.840000,                !-Back Emissivity
   1.000000,                !-Conductivity
-  ,                        !-Dirt Correction Factor for Sol/Vis Transmittance
+  ,                        !-Dirt Correction Factor for Solar and Visible Transmittance
   ,                        !-Solar Diffusing
   7.2e10,                  !-Young’s modulus
   0.22;                    !-Poisson’s ratio
 ```
 
-### New objects as the first choice ###
-
-There are 3 new objects to allow users to input optical data as a function of wavelength and incident angle.
-
-### MaterialProperty:GlazingTransmittanceData
-
-With the MaterialProperty:GlazingTransmittanceData object, you can specify transmittance of a glass material as a function of wavelength and angle of incidence. To determine the overall optical properties of a glazing system (solar and visible transmittance and solar absorptance), EnergyPlus first integrates transmittance and absorptance with respect to wavelength for each angle of incidence. The integration is weighted by a standard solar spectrum to get the solar transmittance and absorptance (for use in the solar heat gain calculations). The properties are further weighted by the response of the human eye to get the visible transmittance for each angle of incidence (for use in the daylighting calculation). 
-
-MaterialProperty:GlazingTransmittanceData should be used for multi-pane windows when one or more of the glass layers is *spectrally and angled selective*, i.e., the transmittance depends strongly on wavelength and angle of incidence. An example is glass with a coating that gives high transmittance in the daylight part of the solar spectrum (roughly 0.4 to 0.7 microns) and low transmittance at longer wavelengths, thus providing better solar heat gain control than uncoated glass. If spectral data is not used in case, the overall optical properties of the glazing system that EnergyPlus calculates will not be correct.
-
-You can input up to 1000 sets of values for wavelengths and angle of incidence covering the solar spectrum. Each set consists of {wavelength (microns), incident angle, transmittance}.
-
-#### Field: Name
-
-The name of the Transmittance data set as a function of wavelength and angle of incidence. It is referenced by WindowMaterial:Glazing when Optical Data Type = SpectralAndAngle.
-
-#### Fields 1-3 (repeated up to 1000 times)
-
-Sets of values for wavelengths covering the solar spectrum (from about 0.25 to 2.5 microns [10<sup>-6</sup> m]), angles of incidence between 0 and 90 degrees, and transmittance at corresponding wavelength and incident angle. Each set consists of
-
-**{wavelength (microns), incident angle, transmittance}**
-
-The wavelength and incident angle values must be in ascending order. 
-
-An IDF example:
-
-```idf
-MaterialProperty:GlazingTransmittanceData,
-      TransmittanceDataSet,
-       ! { from WINDOW 4 library }
-       ! { actual 9.91mm clear laminate: 15_mil PVB, ID:37966/50032-39-9 } 10.38
-       ! { conductivity PVB adjusted, W/M/K  } 0.798
-       ! { thermal IR transmittance, assumed } tir=0.00
-       ! { thermal IR hemispherical emittance, assumed } emis= 0.84 0.84
-
-       ! WL  IncAng Trans     
-       .300, 0.000, 0.000, 
-       .310, 0.000, 0.000, 
-      <snip>
-      2.450, 0.000, 0.200,
-      2.500, 0.000, 0.214, 
-      <snip>
-       .300, 90.00, 0.000, 
-       .310, 90.00, 0.000, 
-      <snip>
-      2.450, 90.00, 0.000,
-      2.500, 90.00, 0.000; 
-```
-### MaterialProperty:GlazingFrontReflectanceData
-
-With the MaterialProperty:GlazingFrontReflectanceData object, you can specify front reflectance of a glass material as a function of wavelength and angle of incidence. “Front reflectance” is the reflectance for radiation striking the glass from the outside, i.e., from the side opposite the zone in which the window is defined. To determine the overall optical properties of a glazing system, EnergyPlus first integrates front reflectance with respect to wavelength for each angle of incidence. The integration is weighted by a standard solar spectrum to get the front reflectance (for use in the solar heat gain calculations).  
-
-MaterialProperty:GlazingFrontReflectanceData should be used for multi-pane windows when one or more of the glass layers is *spectrally and angled selective*, i.e., the front reflectance depends strongly on wavelength and angle of incidence. 
-
-You can input up to 1000 sets of values for wavelengths and angle of incidence covering the solar spectrum. Each set consists of {wavelength (microns), incident angle, front reflectance}.
-
-#### Field: Name
-
-The name of the front reflectance data set as a function of wavelength and angle of incidence. It is referenced by WindowMaterial:Glazing when Optical Data Type = SpectralAndAngle.
-
-#### Fields 1-3 (repeated up to 1000 times)
-
-Sets of values for wavelengths covering the solar spectrum (from about 0.25 to 2.5 microns [10<sup>-6</sup> m]), angles of incidence between 0 and 90 degrees, and front reflectance. Each set consists of
-
-**{wavelength (microns), incident angle, front reflectance}**
-
-The wavelength and incident angle values must be in ascending order. 
-
-An IDF example:
-
-```idf
-MaterialProperty:GlazingFrontReflectanceData,
-      FrontReflectanceDataSet,
-       ! WL  IncAng FRefl     
-       .300, 0.000, 0.000, 
-       .310, 0.000, 0.000, 
-      <snip>
-      2.450, 0.000, 0.200,
-      2.500, 0.000, 0.214, 
-      <snip>
-       .300, 90.00, 0.000, 
-       .310, 90.00, 0.000, 
-      <snip>
-      2.450, 90.00, 0.000,
-      2.500, 90.00, 0.000; 
-```
-
-### MaterialProperty:GlazingBackReflectanceData
-
-With the MaterialProperty:GlazingBackReflectanceData object, you can specify back reflectance of a glass material as a function of wavelength and angle of incidence. “Back reflectance” is the reflectance for radiation striking the glass from the inside, i.e., from the zone in which the window is defined. To determine the overall optical properties of a glazing system, EnergyPlus first integrates back reflectance with respect to wavelength for each angle of incidence. The integration is weighted by a standard solar spectrum to get the back reflectance (for use in the solar heat gain calculations).  
-
-MaterialProperty:GlazingBackReflectanceData should be used for multi-pane windows when one or more of the glass layers is *spectrally and angled selective*, i.e., the front reflectance depends strongly on wavelength and angle of incidence. 
-
-You can input up to 1000 sets of values for wavelengths and angle of incidence covering the solar spectrum. Each set consists of {wavelength (microns), incident angle, back reflectance}.
-
-#### Field: Name
-
-The name of the back reflectance data set as a function of wavelength and angle of incidence. It is referenced by WindowMaterial:Glazing when Optical Data Type = SpectralAndAngle.
-
-#### Fields 1-3 (repeated up to 1000 times)
-
-Sets of values for wavelengths covering the solar spectrum (from about 0.25 to 2.5 microns [10<sup>-6</sup> m]), angles of incidence between 0 and 90 degrees, and back reflectance. Each set consists of
-
-**{wavelength (microns), incident angle, back reflectance}**
-
-The wavelength and incident angle values must be in ascending order. 
-
-An IDF example:
-
-```idf
-MaterialProperty:GlazingBackReflectanceData,
-      BackReflectanceDataSet,
-       ! WL  IncAng BRefl     
-       .300, 0.000, 0.000, 
-       .310, 0.000, 0.000, 
-      <snip>
-      2.450, 0.000, 0.200,
-      2.500, 0.000, 0.214, 
-      <snip>
-       .300, 90.00, 0.000, 
-       .310, 90.00, 0.000, 
-      <snip>
-      2.450, 90.00, 0.000,
-      2.500, 90.00, 0.000; 
-```
-### Modify Table:TwoIndependentVariables object as the second choice ###
+### Modify Table:TwoIndependentVariables object ###
 
 \subsection{Table:TwoIndependentVariables}\label{tabletwoindependentvariables}
 
@@ -715,7 +702,9 @@ The normalization point for the data set. This field provides a method for autom
 
 <span style="color:red;">**Field: External File Name}\label{field-external-file-name}**<span>
 
-<span style="color:red;">The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the same format as idf: X1, Y1, Z1, X2, Y2, Z2, ..., and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+<span style="color:red;">The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the same format as idf: X1, Y1, Z1, X2, Y2, Z2, ..., Xn, Yn, Zn, and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+<span style="color:red;">When the External File Name is entered, the following input fields are ignored. 
 
 \paragraph{Data Pairs}\label{data-pairs-1}
 
@@ -751,6 +740,7 @@ Table:TwoIndependentVariables,
   Temperature,                       !- Input Unit Type for y
   Dimensionless,                     !- Output Unit Type
   0.258266502,                       !- Normalization Point
+  ,                                  !- External File Name
   17.2222222,18.3333333,0.18275919,  !-X Value #1,Y Value #1,Output #1
   17.2222222,23.8888889,0.207383768, !-X Value #2,Y Value #2,Output #2
   17.2222222,29.4444444,0.237525541, !-X Value #3,Y Value #3,Output #3
@@ -787,6 +777,7 @@ Table:TwoIndependentVariables,
   Angle,                       !- Input Unit Type for y
   Dimensionless,                     !- Output Unit Type
   ,                       !- Normalization Point
+  ,                                  !- External File Name
   .025,0,0.0,  !-X Value #1,Y Value #1,Output #1
   0.31,0,0.7, !-X Value #2,Y Value #2,Output #2
  ....
@@ -815,9 +806,9 @@ The current value of the first and second independent variable passed to the per
 
 ## Input Description ##
 
-This section describes inputs of 3 new objects and a revised object
+This section describes two revised objects: WindowMaterial:Glazing and Table:TwoIndependentVariables.
 
-### Revised object  
+### WindowMaterial:Glazing object  
 
 The WindowMaterial:Glazing object will be revised.
 
@@ -845,22 +836,7 @@ Any new additions will be highlighted in red.
        \note Used only when Optical Data Type = Spectral
        \type object-list
        \object-list SpectralDataSets
- <span style="color:red;">**A4 , \field Window Glass Spectral and Incident Angle Transmittance Data Set Name**</span>
-
-       \note Used only when Optical Data Type = SpectralAndAngle
-       \type object-list
-       \object-list TransmittanceSpectralAndAngleDataSet
- <span style="color:red;">**A5 , \field Window Glass Spectral and Incident Angle Front Reflectance Data Set Name**</span>
-
-       \note Used only when Optical Data Type = SpectralAndAngle
-       \type object-list
-       \object-list FrontReflectanceSpectralAndAngleDataSet
- <span style="color:red;">**A6 , \field Window Glass Spectral and Incident Angle Back Reflectance Data Set Name**</span>
-
-       \note Used only when Optical Data Type = SpectralAndAngle
-       \type object-list
-       \object-list BackReflectanceSpectralAndAngleDataSet
-  	N1 , \field Thickness
+   	N1 , \field Thickness
        \required-field
        \units m
        \type real
@@ -923,7 +899,7 @@ Any new additions will be highlighted in red.
        \minimum> 0.0
        \maximum 1.0
        \default 1.0 
-   	A7 ,  \field Solar Diffusing
+   	A4 ,  \field Solar Diffusing
        \type choice
        \key No
        \key Yes
@@ -935,101 +911,32 @@ Any new additions will be highlighted in red.
        \type real
        \minimum> 0.0
        \default 7.2e10
-  	N14; \field Poisson's ratio
+  	N14, \field Poisson's ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
        \minimum>  0.0
        \maximum<  1.0
        \default 0.22
+<span style="color:red;">**A5 , \field Window Glass Spectral and Incident Angle Transmittance Data Set Table Name**</span>
 
-### 3 New objects as the first choice###
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
+ <span style="color:red;">**A6 , \field Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name**</span>
 
-There are 3 new objects to contain optical properties as a function of wavelength and incident angle: MaterialProperty:GlazingTransmittanceData, MaterialProperty:GlazingFrontReflectanceData, and MaterialProperty:GlazingBackReflectanceData.
- 
-	MaterialProperty:GlazingTransmittanceData,
-       \memo Name is followed by up to 1000 sets of measured values of transmittance
-       \memo [wavelength, incident angle, transmittance] for wavelengths and incident angle.
-       \extensible:3 -- duplicate last set of data: [wavelength, incident angle, transmittance] 
-       \ (last 3 fields), remembering to remove ; from "inner" fields.
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
+ <span style="color:red;">**A7 ; \field Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name**</span>
 
-	A1,  \field Name
-       \required-field
-       \reference TransmittanceSpectralAndAngleDataSet
-	N1,  \field Wavelength 1
-       \type real
-       \units micron
-  	N2,  \field IncidentAngle 1
-       \type real
-       \units degree
-  	N3,  \field Transmittance 1
-       \type real
-       \units dimensionless
-  	N4,  \field Wavelength 2
-  	N5,  \field IncidentAngle 2
-  	N6,  \field Transmittance 2
-       \type real
-       \units dimensionless
-    ....
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
 
-	MaterialProperty:GlazingFrontReflectanceData,
-       \memo Name is followed by up to 1000 sets of measured values of front reflectance
-       \memo [wavelength, incident angle, front reflectance] for wavelengths and incident angle.
-       \extensible:3 -- duplicate last set of data: [wavelength, incident angle, front reflectance] 
-       \ (last 3 fields), remembering to remove ; from "inner" fields.
-
-	A1,  \field Name
-       \required-field
-       \reference FrontReflectanceSpectralAndAngleDataSet
-	N1,  \field Wavelength 1
-       \type real
-       \units micron
-  	N2,  \field Incident Angle 1
-       \type real
-       \units degree
-  	N3,  \field Front Reflectance 1
-       \type real
-       \units dimensionless
-  	N4,  \field Wavelength 2
-  	N5,  \field Incident Angle 2
-  	N6,  \field Front Reflectance 2
-       \type real
-       \units dimensionless
-    ....
-
-	MaterialProperty:GlazingBackReflectanceData,
-       \memo Name is followed by up to 1000 sets of measured values of back reflectance
-       \memo [wavelength, incident angle, back reflectance] for wavelengths and incident angle.
-       \extensible:3 -- duplicate last set of data: [wavelength, incident angle, back reflectance] 
-       \ (last 3 fields), remembering to remove ; from "inner" fields.
-
-	A1,  \field Name
-       \required-field
-       \reference BackReflectanceSpectralAndAngleDataSet
-	N1,  \field Wavelength 1
-       \type real
-       \units micron
-  	N2,  \field Incident Angle 1
-       \type real
-       \units degree
-  	N3,  \field Back Reflectance 1
-       \type real
-       \units dimensionless
-  	N4,  \field Wavelength 2
-  	N5,  \field Incident Angle 2
-  	N6,  \field Back Reflectance 2
-       \type real
-       \units dimensionless
-    ....
-
-Questions:
-
-How many fields are needed in idd? I assume 1000 sets.
-
-###Revise Table:TwoIndependentVariables as the second choice###
+###Revise Table:TwoIndependentVariables ###
 
 Two more choices will be added in the fields of Input Unit Type for X and Input Unit Type for Y as Wavelength (microns) and Angle (Degrees). A new field will be added to read optical data sets from an external file. The data formats are the same as idf inputs.
-
 
 	Table:TwoIndependentVariables,
        \extensible:3 repeat last three fields
@@ -1085,9 +992,9 @@ Two more choices will be added in the fields of Input Unit Type for X and Input 
        \key MassFlow
        \key Power
        \key Distance
- <span style="color:red;">**\key, Wavelength**</span>
+ <span style="color:red;">**\key Wavelength**</span>
 
- <span style="color:red;">**\key, Angle**</span>
+ <span style="color:red;">**\key Angle**</span>
 
        \default Dimensionless
   	A5,  \field Input Unit Type for Y
@@ -1098,9 +1005,9 @@ Two more choices will be added in the fields of Input Unit Type for X and Input 
        \key MassFlow
        \key Power
        \key Distance
- <span style="color:red;">**\key, Wavelength**</span>
+ <span style="color:red;">**\key Wavelength**</span>
 
- <span style="color:red;">**\key, Angle**</span>
+ <span style="color:red;">**\key Angle**</span>
 
        \default Dimensionless
   	A6,  \field Output Unit Type
@@ -1158,6 +1065,9 @@ Two more choices will be added in the fields of Input Unit Type for X and Input 
        \type real
 	....
 
+#### The number of fields increase
+
+AGC requires the number of dataset = 1000. In order to accommodate 1000 data points, the number of numerical fields increases from existing N799 to N3099, the same size as one in Table:MultiVariableLookup.
 
 ## Outputs Description ##
 
@@ -1211,7 +1121,7 @@ The spectral-average visible property is
 
 where <span>\({E_s}(\lambda )\)</span>is the solar spectral irradiance function and <span>\(V(\lambda )\)</span>is the photopic response function of the eye. The default functions are shown in Table 29 and Table 30. They can be overwritten by user defined solar and/or visible spectrum using the objects Site:SolarAndVisibleSpectrum and Site:SpectrumData. They are expressed as a set of values followed by the corresponding wavelengths for values.
 
-<span style="color:red;">When a choice of Spectral is entered as optical data type, the correlations to store glazing system's angular performance are generated based on angular performance at 10 degree increments. When a choice of SpectralAndAngel is entered as optical data type, the correlations to store glazing system's angular performance are generated based on given incident angular values from inputs. An increment of 10 degree is not used for generation of the correlations.</span>
+<span style="color:red;">When a choice of Spectral is entered as optical data type, the correlations to store glazing system's angular performance are generated based on angular performance at 10 degree increments. When a choice of SpectralAndAngel is entered as optical data type, no correlations will be generated. The optical properties will be calculated by linear interpolation at a give incident angle.</span>
   
 If a glazing layer has optical properties that are roughly constant with wavelength, the wavelength-dependent values of *T<sub>i,i</sub>* , *R<sup>f</sup><sub>i,i</sub>* and *R<sup>b</sup><sub>i,i</sub>* in Eqs. to can be replaced with constant values for that layer.
 
@@ -1219,7 +1129,7 @@ If a glazing layer has optical properties that are roughly constant with wavelen
 
 An example input file with the SpectralAndAngle choice will be delivered.
 
-A transition by adding 3 new extra fields are needed.
+A transition of Table:TwoIndependentVariables is needed because an additional field of External File Name is added.
 
 ## References ##
 
