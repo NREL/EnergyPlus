@@ -2845,8 +2845,8 @@ namespace AirflowNetworkBalanceManager {
 				DisSysCompDuctData( i ).TurDynCoef = Numbers( 5 ); // Turbulent dynamic loss coefficient
 				DisSysCompDuctData( i ).UThermConduct = Numbers( 6 ); // Conduction heat transmittance [W/m2.K]
 				DisSysCompDuctData( i ).UMoisture = Numbers( 7 ); // Overall moisture transmittance [kg/m2]
-				DisSysCompDuctData( i ).OutsideConvCoeff = Numbers( 8 ); // Inside convection coefficient [W/m2.K]
-				DisSysCompDuctData( i ).InsideConvCoeff = Numbers( 9 ); // Outside convection coefficient [W/m2.K]
+				DisSysCompDuctData( i ).OutsideConvCoeff = Numbers( 8 ); // Outside convection coefficient [W/m2.K]
+				DisSysCompDuctData( i ).InsideConvCoeff = Numbers( 9 ); // Inside convection coefficient [W/m2.K]
 				DisSysCompDuctData( i ).MThermal = 0.0; // Thermal capacity [J/K]
 				DisSysCompDuctData( i ).MMoisture = 0.0; // Moisture capacity [kg]
 				DisSysCompDuctData( i ).LamDynCoef = 64.0; // Laminar dynamic loss coefficient
@@ -5384,6 +5384,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataGlobals::KelvinConv;
 		using DataGlobals::StefanBoltzmann;
 		using DataHVACGlobals::TimeStepSys;
+		using DataHeatBalance::Construct;
 		using DataHeatBalSurface::TH;
 		using DataHeatBalFanSys::QRadSurfAFNDuct;
 
@@ -5504,10 +5505,12 @@ namespace AirflowNetworkBalanceManager {
 					VFObj.UThermalRad = 0;
 					VFObj.QRad = 0;
 
+					Real64 Tin_ave = Tin;
+
 					while( abs( UThermal - UThermal_iter ) > tolerance ) {
 						UThermal_iter = UThermal;
 
-						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin_ave, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
 						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 						Real64 hOut = 1 / RThermConvOut;
 						Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
@@ -5516,10 +5519,27 @@ namespace AirflowNetworkBalanceManager {
 						Real64 hrj_sum = 0;
 
 						for ( int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j ) {
-							Real64 TSurfj = TH( 1, 1, VFObj.LinkageSurfaceData( j ).SurfaceNum );	// Zone surface temperature [C]
+
+							int ZoneSurfNum = VFObj.LinkageSurfaceData( j ).SurfaceNum;
+
+							Real64 TSurfj = TH( 1, 1, ZoneSurfNum );
 							Real64 TSurfj_K = TSurfj + KelvinConv;
 
-							Real64 hrj = VFObj.DuctEmittance * StefanBoltzmann * ( TDuctSurf_K + TSurfj_K ) * ( pow_2( TDuctSurf_K ) + pow_2( TSurfj_K ) );
+							Real64 ZoneSurfEmissivity = Construct( Surface( ZoneSurfNum ).Construction ).InsideAbsorpThermal;
+							Real64 ZoneSurfArea = Surface( ZoneSurfNum ).Area;
+
+							Real64 DuctEmissivity = VFObj.DuctEmittance;
+							Real64 DuctExposureFrac = VFObj.DuctExposureFraction;
+							Real64 DuctToZoneSurfViewFactor = VFObj.LinkageSurfaceData( j ).ViewFactor;
+
+							Real64 DuctSurfResistance = ( 1 - DuctEmissivity ) / ( DuctExposureFrac * DuctSurfArea * DuctEmissivity );
+							Real64 SpaceResistance = 1 / ( DuctExposureFrac * DuctSurfArea * DuctToZoneSurfViewFactor );
+							Real64 ZoneSurfResistance = ( 1 - ZoneSurfEmissivity ) / ( ZoneSurfArea * ZoneSurfEmissivity );
+
+							VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor = StefanBoltzmann / ( DuctSurfResistance + SpaceResistance + ZoneSurfResistance );
+
+							Real64 hrj =  VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor * ( TDuctSurf_K + TSurfj_K ) * ( pow_2( TDuctSurf_K ) + pow_2( TSurfj_K ) );
+
 							hrjTj_sum += hrj * TSurfj;
 							hrj_sum += hrj;
 						}
@@ -5533,13 +5553,18 @@ namespace AirflowNetworkBalanceManager {
 						Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct + RThermRad;
 						UThermal = pow( RThermTotal , -1);
 
-						TDuctSurf = Tin - UThermal * ( RThermConvIn + RThermConduct ) * ( Tin - Tsurr );
+						Real64 NTU = UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir );
+						Tin_ave = Tsurr + ( Tin  - Tsurr ) * ( 1 / NTU ) * ( 1 - exp( - NTU ) );
+
+						TDuctSurf = Tin - UThermal * ( RThermConvIn + RThermConduct ) * ( Tin_ave - Tsurr );
 						TDuctSurf_K = TDuctSurf + KelvinConv;
 					}
 
 					for ( int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j ) {
-						Real64 DuctRadFlux = StefanBoltzmann * VFObj.LinkageSurfaceData( j ).ViewFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( Tsurr_K ) ); // Radiant flux for this surface [W/m2]
-						VFObj.LinkageSurfaceData( j ).SurfaceRadLoad = DuctRadFlux * DuctSurfArea * VFObj.DuctEmittance * VFObj.DuctExposureFraction; // Radiant load for this surface [W]
+						int ZoneSurfNum = VFObj.LinkageSurfaceData( j ).SurfaceNum;
+						Real64 TSurfj = TH( 1, 1, ZoneSurfNum );
+						Real64 TSurfj_K = TSurfj + KelvinConv;
+						VFObj.LinkageSurfaceData( j ).SurfaceRadLoad = VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurfj_K ) ); // Radiant load for this surface [W]
 						int SurfNum = VFObj.LinkageSurfaceData( j ).SurfaceNum;
 						Real64 ZoneSurfaceArea = Surface( SurfNum ).Area;
 						QRadSurfAFNDuct( SurfNum ) += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad * TimeStepSys * SecInHour / ZoneSurfaceArea; // Energy to each surface per unit area [J/m2]
