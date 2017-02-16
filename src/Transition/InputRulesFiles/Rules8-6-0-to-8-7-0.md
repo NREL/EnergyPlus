@@ -40,7 +40,9 @@ Fields 1-24 remain the same.
 After F24`, insert four new blank fields that represent user-enterable design conditions. 
 Shift all later fields down by four.
 
+# Object Change: `ZoneCapacitanceMultiplier:ResearchSpecial`
 
-
-
+Insert new field 1 set to 'Multiplier'.  
+Insert new blank field 2 (for Zone Name). 
+Shift all later fields down by two.
 
