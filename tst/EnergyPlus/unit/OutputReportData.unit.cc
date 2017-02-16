@@ -236,7 +236,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.6;",
-		//" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
 		" Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,", "timestep;",
 		" Output:Variable,", "[A-Z]{4},", "Unitary System Compressor Part Load Ratio,", "timestep;",
 		" Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
@@ -277,7 +277,9 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_SpecChars )
 	EXPECT_EQ( OutputVariablesNames.size(), 1u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 1u );
 
-//	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+
+	compare_err_stream("");
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Carrot )

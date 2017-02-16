@@ -50,11 +50,8 @@
 // EnergyPlus Headers
 #include <DataOutputs.hh>
 #include <InputProcessor.hh>
-#include "internal/regex.h"
+#include "re2/re2.h"
 #include "UtilityRoutines.hh"
-
-using regex = rapidjson::internal::Regex;
-using regex_search = rapidjson::internal::RegexSearch;
 
 namespace EnergyPlus {
 
@@ -153,19 +150,19 @@ namespace DataOutputs {
 			Found = FirstIndex->second;
 		}
 		if ( Found != 0 ) {
-			// TODO: take this out in the future InputProcessor
-//			std::string const uppercaseKeyedValue = InputProcessor::MakeUPPERCase( KeyedValue );
 			do {
 				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
 					return true;
 				} else {
-					regex KeyRegex( OutputVariablesForSimulation( Found ).Key.c_str() );
-					if ( ! KeyRegex.IsValid() ) {
-						ShowFatalError( "Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
+					RE2 pattern( OutputVariablesForSimulation( Found ).Key );
+					if ( ! pattern.ok() ) {
+						ShowSevereError( "Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
+						ShowContinueError( pattern.error() );
+						ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
 						break;
 					}
-					regex_search KeySearch( KeyRegex );
-					if ( KeySearch.Match( KeyedValue.c_str() ) || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
+					auto const matched = RE2::FullMatch( KeyedValue, pattern );
+					if ( matched || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
 						return true;
 					}
 				}
