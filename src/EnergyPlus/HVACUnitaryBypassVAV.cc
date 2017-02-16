@@ -2037,6 +2037,8 @@ namespace HVACUnitaryBypassVAV {
 		Node( CBVAV( CBVAVNum ).MixerInletAirNode ).Enthalpy = PsyHFnTdbW( Node( CBVAV( CBVAVNum ).MixerInletAirNode ).Temp, Node( CBVAV( CBVAVNum ).MixerInletAirNode ).HumRat );
 		SimOAMixer( CBVAV( CBVAVNum ).OAMixName, FirstHVACIteration, CBVAV( CBVAVNum ).OAMixIndex );
 
+		// could support new fan if that goes in
+
 		if ( CBVAV( CBVAVNum ).FanPlace == BlowThru ) SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
 
 		// Simulate cooling coil if zone load is negative (cooling load)
@@ -2137,7 +2139,7 @@ namespace HVACUnitaryBypassVAV {
 					// Get no load result
 					VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, DataHVACGlobals::ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, Off, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq );
 
-					Real64 NoOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+					Real64 NoOutput = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
 					Real64 NoLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
 
 					// Get full load result
@@ -2148,8 +2150,8 @@ namespace HVACUnitaryBypassVAV {
 					VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq );
 
 					Real64 FullLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
-					Real64 FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-					Real64 ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+					Real64 FullOutput = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
+					Real64 ReqOutput = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
 					//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
 					Real64 loadAccuracy( 0.001 ); // Watts, power
 					Real64 tempAccuracy( 0.001 ); // delta C, temperature
@@ -2180,8 +2182,8 @@ namespace HVACUnitaryBypassVAV {
 							QZnReq = 0.001; //to indicate the coil is running
 							VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, DataHVACGlobals::ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
-							Real64 TempSpeedOut = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-							Real64 TempSpeedReqst = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+							Real64 TempSpeedOut = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
+							Real64 TempSpeedReqst = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
 
 							if ( ( TempSpeedOut - TempSpeedReqst ) > tempAccuracy ) {
 								// Check to see which speed to meet the load
@@ -2191,8 +2193,8 @@ namespace HVACUnitaryBypassVAV {
 									SpeedNum = I;
 									VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, DataHVACGlobals::ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
-									TempSpeedOut = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-									TempSpeedReqst = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+									TempSpeedOut = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
+									TempSpeedReqst = Node( CBVAV( CBVAVNum ).DXCoilInletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) - PsyHFnTdbW( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp, Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).HumRat ) );
 
 									if ( ( TempSpeedOut - TempSpeedReqst ) < tempAccuracy ) {
 										SpeedNum = I;
@@ -2438,14 +2440,17 @@ namespace HVACUnitaryBypassVAV {
 					SimDXCoilMultiMode( CBVAV( CBVAVNum ).DXCoolCoilName, Off, FirstHVACIteration, 0.0, 0, CBVAV( CBVAVNum ).CoolCoilCompIndex, ContFanCycCoil );
 					SaveCompressorPLR = DXCoilPartLoadRatio( CBVAV( CBVAVNum ).DXCoolCoilIndexNum );
 				} else if ( CBVAV( CBVAVNum ).DXCoolCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
-					Real64 QZnReq( -1.0 ); // Zone load (W), input to variable-speed DX coil
+					Real64 QZnReq( 0.0 ); // Zone load (W), input to variable-speed DX coil
 					Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
 					Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
 					Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
 					Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
 					Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
-					bool errorFlag ( false );
-					VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, Off, 0.0, VariableSpeedCoils::GetVSCoilNumOfSpeeds( CBVAV( CBVAVNum ).DXCoolCoilName, errorFlag ),1.0, QZnReq, QLatReq );
+					Real64 PartLoadFrac( 0.0 );
+					Real64 SpeedRatio( 0.0 );
+					int SpeedNum( 1 );
+					// Get no load result
+					VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, DataHVACGlobals::ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, Off, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq );
 					SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio( CBVAV( CBVAVNum ).CoolCoilCompIndex );
 				}
 			}
@@ -2456,6 +2461,19 @@ namespace HVACUnitaryBypassVAV {
 				SimHXAssistedCoolingCoil( CBVAV( CBVAVNum ).DXCoolCoilName, FirstHVACIteration, Off, 0.0, CBVAV( CBVAVNum ).CoolCoilCompIndex, ContFanCycCoil, HXUnitOn );
 			} else if ( CBVAV( CBVAVNum ).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 				SimDXCoil( CBVAV( CBVAVNum ).DXCoolCoilName, Off, FirstHVACIteration, CBVAV( CBVAVNum ).CoolCoilCompIndex, ContFanCycCoil, 0.0, OnOffAirFlowRatio );
+			} else if ( CBVAV( CBVAVNum ).DXCoolCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+				Real64 QZnReq( 0.0 ); // Zone load (W), input to variable-speed DX coil
+				Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
+				Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
+				Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
+				Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
+				Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
+				Real64 PartLoadFrac( 0.0 );
+				Real64 SpeedRatio( 0.0 );
+				int SpeedNum( 1 );
+				// Get no load result
+				VariableSpeedCoils::SimVariableSpeedCoils( CBVAV( CBVAVNum ).DXCoolCoilName, CBVAV( CBVAVNum ).CoolCoilCompIndex, DataHVACGlobals::ContFanCycCoil, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, Off, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq );
+
 			} else if ( CBVAV( CBVAVNum ).DXCoolCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 				SimDXCoilMultiMode( CBVAV( CBVAVNum ).DXCoolCoilName, Off, FirstHVACIteration, 0.0, 0, CBVAV( CBVAVNum ).CoolCoilCompIndex, ContFanCycCoil );
 			}
@@ -2504,6 +2522,7 @@ namespace HVACUnitaryBypassVAV {
 				QHeater = 0.0;
 			}
 			// Added None DX heating coils calling point
+			Node( CBVAV( CBVAVNum ).HeatingCoilOutletNode ).TempSetPoint = CBVAV( CBVAVNum ).CoilTempSetPoint;
 			CalcNonDXHeatingCoils( CBVAVNum, FirstHVACIteration, QHeater, CBVAV( CBVAVNum ).OpMode, QHeaterActual );
 		} else {
 			ShowFatalError( "SimCBVAV System: Invalid Heating Coil=" + CBVAV( CBVAVNum ).HeatCoilType );
