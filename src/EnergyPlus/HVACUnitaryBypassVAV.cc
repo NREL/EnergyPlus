@@ -2041,8 +2041,6 @@ namespace HVACUnitaryBypassVAV {
 		Node( CBVAV( CBVAVNum ).MixerInletAirNode ).Enthalpy = PsyHFnTdbW( Node( CBVAV( CBVAVNum ).MixerInletAirNode ).Temp, Node( CBVAV( CBVAVNum ).MixerInletAirNode ).HumRat );
 		SimOAMixer( CBVAV( CBVAVNum ).OAMixName, FirstHVACIteration, CBVAV( CBVAVNum ).OAMixIndex );
 
-		// could support new fan if that goes in
-
 		if ( CBVAV( CBVAVNum ).FanPlace == BlowThru ) SimulateFanComponents( CBVAV( CBVAVNum ).FanName, FirstHVACIteration, CBVAV( CBVAVNum ).FanIndex, FanSpeedRatio );
 
 		// Simulate cooling coil if zone load is negative (cooling load)
@@ -2126,7 +2124,7 @@ namespace HVACUnitaryBypassVAV {
 							}
 						}
 					}
-
+					SaveCompressorPLR = DXCoilPartLoadRatio( CBVAV( CBVAVNum ).DXCoolCoilIndexNum );
 				} else if ( SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 					Real64 QZnReq( 0.0 ); // Zone load (W), input to variable-speed DX coil
 					Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
@@ -2275,6 +2273,7 @@ namespace HVACUnitaryBypassVAV {
 					} else if ( PartLoadFrac < 0.0 ) {
 						PartLoadFrac = 0.0;
 					}
+					SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio( CBVAV( CBVAVNum ).CoolCoilCompIndex );
 					//variable-speed air-to-air cooling coil, end -------------------------
 				
 				} else if ( SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) { // Coil:Cooling:DX:TwoStageWithHumidityControlMode
@@ -2428,6 +2427,7 @@ namespace HVACUnitaryBypassVAV {
 					} else if ( PartLoadFrac < 0.0 ) {
 						PartLoadFrac = 0.0;
 					}
+					SaveCompressorPLR = DXCoilPartLoadRatio( CBVAV( CBVAVNum ).DXCoolCoilIndexNum );
 
 				} else {
 					ShowFatalError( "SimCBVAV System: Invalid DX Cooling Coil=" + CBVAV( CBVAVNum ).DXCoolCoilType );
@@ -2673,7 +2673,7 @@ if ( CBVAV( CBVAVNum ).DXHeatIterationExceeded < 4 ) {
 					} else if ( PartLoadFrac < 0.0 ) {
 						PartLoadFrac = 0.0;
 					}
-
+					SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio( CBVAV( CBVAVNum ).DXHeatCoilIndexNum );
 		} else if ( ( SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric ) || ( SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater ) || ( SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam ) ) { // not a DX heating coil
 			if ( CBVAV( CBVAVNum ).HeatCoolMode == HeatingMode ) {
 				CpAir = PsyCpAirFnWTdb( Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).HumRat, Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).Temp );
