@@ -2919,14 +2919,22 @@ namespace SimAirServingZones {
 
 			// Fan Types for the air sys simulation
 		} else if ( SELECT_CASE_var == Fan_Simple_CV ) { // 'Fan:ConstantVolume'
-			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
-			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+
+		} else if ( SELECT_CASE_var == Fan_System_Object ) { // "Fan:SystemModel" new for V8.6
+			if ( CompIndex == 0 ) { // 0 means has not been filled because of 1-based arrays in old fortran
+				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+			}
+			// if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils involved but the fan should really run like constant volume and not cycle with compressor
+			DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+			HVACFan::fanObjs[ CompIndex - 1 ]->simulate( _,_,_,_ ); // vector is 0 based, but CompIndex is 1 based so shift 
 
 			// cpw22Aug2010 Add Fan:ComponentModel (new)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
-			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
 			// Coil Types for the air sys simulation
 			//  Currently no control for HX Assisted coils
