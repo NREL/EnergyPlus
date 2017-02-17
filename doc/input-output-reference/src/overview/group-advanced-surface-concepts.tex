@@ -475,8 +475,7 @@ Limitations when using Foundation:Kiva objects include:
   However, multiple floors may exist in the same thermal zone so long as
   they reference separate Foundation:Kiva objects.
 \item
-  All foundation wall surfaces must be quadrilateral and connect to the
-  floor surface along one edge.
+  All foundation wall surfaces must be quadrilateral.
 \end{itemize}
 
 The inputs from Foundation:Kiva objects are translated into Kiva's
@@ -621,7 +620,7 @@ Foundation:Kiva,
   ,                          !- Exterior Vertical Insulation Depth
   0.2,                       !- Wall Height Above Grade
   0.3,                       !- Wall Depth Below Slab
-  Slab Footer Construction;  !- Footing Wall Construction Name
+  Slab Footing Construction; !- Footing Wall Construction Name
 
 Material,
   XPS,    !- Name
@@ -646,7 +645,7 @@ Material,
   0.7;       !- Visible Absorptance
 
 Construction,
-  Slab Footer Construction,  !- Name
+  Slab Footing Construction, !- Name
   Concrete;                  !- Outside Layer Name
 \end{verbatim}
 
@@ -795,19 +794,13 @@ discretization and, therefore, longer computation times.
 \paragraph{Field: Footing Wall Construction
 Name}\label{field-footing-wall-construction-name}
 
-Defines the construction of the foundation footing wall. This is
-required for slab foundations where the foundation wall is not exposed
+Defines the construction of the foundation footing wall for slab foundations where the foundation wall is not exposed
 to the zone (and has no zone surface to explicitly assign a
 construction).
-
-For foundations with below-grade walls, this construction must be the
-same construction as the wall surfaces (or left blank).
 
 By default, this is the same construction as any associated below-grade
 wall surfaces, or a 0.3 m wide poured concrete wall (conductivity = 1.95
 W/m-K, density = 2240 kg/m3, specific heat = 900 J/kg-K).
-
-Note: all associated walls must have the same construction.
 
 \paragraph{Field: Footing Material
 Name}\label{field-footing-material-name}
@@ -983,13 +976,13 @@ Depth. Options are:
 \item
   GroundWater
 \item
-  Autocalculate
+  Autoselect
 \end{itemize}
 
 ZeroFlux applies a zero vertical heat flux (i.e.~adiabatic) boundary
 condition. GroundWater applies a constant temperature boundary
 condition, with a temperature equal to the average outdoor air dry-bulb
-temperature from the environment(s). Auto applies either boundary
+temperature from the environment(s). Autoselect applies either boundary
 condition depending on the elevation of the building site (Williams and
 Williamson, 1989):
 
@@ -998,7 +991,7 @@ Williamson, 1989):
 If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
 a ZeroFlux boundary is applied at 40 m.
 
-Default: Autocalculate.
+Default: Autoselect.
 
 \paragraph{Field: Deep-Ground Depth}\label{field-deep-ground-depth}
 

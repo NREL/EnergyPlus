@@ -683,8 +683,10 @@ namespace HeatBalanceSurfaceManager {
 
 		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
 			SurfaceGeometry::kivaManager.initKivaInstances();
-			if ( (SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-				SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP )
+			if ( ((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY
+				&& TimeStep == 1) ||
+				SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP)
+			 	&& !WarmupFlag )
 			{
 					SurfaceGeometry::kivaManager.calcKivaInstances();
 			}

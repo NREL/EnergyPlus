@@ -16066,7 +16066,7 @@ SurfaceProperty:OtherSideConditionsModel,
 
 Foundation:Kiva,
        \memo Refined definition of the foundation surface construction used to
-       \memo infrom two-diemensional heat transfer calculated using the Kiva
+       \memo inform two-dimensional heat transfer calculated using the Kiva
        \memo ground heat transfer methodology.
        \extensible:4
   A1,  \field Name
@@ -16287,7 +16287,7 @@ Foundation:Kiva,
 
 Foundation:Kiva:Settings,
        \memo Settings applied across all Kiva foundation calculations.
-       \memo Object is not required. If not defined, defaults will applied.
+       \memo Object is not required. If not defined, defaults will be applied.
   N1,  \field Soil Conductivity
        \type real
        \default 1.73
@@ -16329,8 +16329,8 @@ Foundation:Kiva:Settings,
        \type choice
        \key ZeroFlux
        \key GroundWater
-       \key Autocalculate
-       \default Autocalculate
+       \key Autoselect
+       \default Autoselect
   N8,  \field Deep-Ground Depth
        \type real
        \default 40
@@ -34020,15 +34020,15 @@ ZoneHVAC:UnitVentilator,
    A6 , \field Air Inlet Node Name
         \required-field
         \type node
-        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the  
-        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer 
-        \note outlet air node name for InletSide mixer connection. 
+        \note Inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the
+        \note unit ventilator is connected DOA, then the air inlet node name must be the mixer
+        \note outlet air node name for InletSide mixer connection.
    A7 , \field Air Outlet Node Name
         \required-field
         \type node
-        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the   
-        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer 
-        \note secondary air inlet node name for SupplySide mixer connection. 
+        \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the
+        \note unit ventilator is connected DOA, then the air outlet node name must be the mixer
+        \note secondary air inlet node name for SupplySide mixer connection.
    A8,  \field Outdoor Air Node Name
         \type node
         \note this field is left blank only if the Unit Ventilator is connected to a central
@@ -40940,7 +40940,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \key ZoneHVAC:UnitVentilator 
+       \key ZoneHVAC:UnitVentilator
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name

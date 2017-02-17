@@ -77,6 +77,7 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -2918,6 +2919,13 @@ namespace SurfaceGeometry {
 					}
 
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
+
+					if ( !WeatherManager::WeatherFileExists ){
+						ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file");
+				    ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+						ErrorsFound = true;
+				  }
+
 					// Find foundation object, if blank use default
 					if ( lAlphaFieldBlanks(ArgPointer + 1) ) {
 
@@ -6276,18 +6284,20 @@ namespace SurfaceGeometry {
 		}
 
 		// Change algorithm for Kiva foundaiton surfaces
+		bool hasKivaHeatTransferAlgo = any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva );
 		for (auto& surf : Surface) {
-			if (surf.ExtBoundCond == KivaFoundation) {
-				surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
-				if ( ! any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) { // add new algo
-					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
-					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = HeatTransferModel_Kiva;
-				}
-			}
+		    if (surf.ExtBoundCond == KivaFoundation) {
+		        surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
+		        if ( ! hasKivaHeatTransferAlgo ) { // add new algo
+		            HeatTransferAlgosUsed.push_back( HeatTransferModel_Kiva );
+		            ++NumberOfHeatTransferAlgosUsed;
+		            hasKivaHeatTransferAlgo = true;
+		        }
+		    }
 		}
 
 		// Setup Kiva intances
-		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
+		if ( hasKivaHeatTransferAlgo ) {
 			if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
 		}
 
@@ -7695,7 +7705,7 @@ namespace SurfaceGeometry {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
 				} else if (SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-				} else /* if (SameString(cAlphaArgs( alpF ), "Autocalculate")) */ {
+				} else /* if (SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
 				}
 			} alpF++;
@@ -7760,7 +7770,7 @@ namespace SurfaceGeometry {
 						continue;
 					}
 					auto& m = Material( index );
-					if ( m.Group != RegularMaterial) {
+					if ( m.Group != RegularMaterial || m.ROnly ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
 						ShowContinueError( "Must be of type \"Material\"" );
@@ -7771,7 +7781,7 @@ namespace SurfaceGeometry {
 					fndInput.intHIns.depth = m.Thickness;
 				} alpF++;
 
-				if ( !lAlphaFieldBlanks( alpF - 1) ) {
+				if ( !lAlphaFieldBlanks( alpF - 1 ) ) {
 					if ( lNumericFieldBlanks( numF ) ) {
 						fndInput.intHIns.z = 0.0;
 					} else {
@@ -7804,7 +7814,7 @@ namespace SurfaceGeometry {
 						continue;
 					}
 					auto& m = Material( index );
-					if ( m.Group != RegularMaterial) {
+					if ( m.Group != RegularMaterial || m.ROnly ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
 						ShowContinueError( "Must be of type \"Material\"" );
@@ -7840,7 +7850,7 @@ namespace SurfaceGeometry {
 						continue;
 					}
 					auto& m = Material( index );
-					if ( m.Group != RegularMaterial) {
+					if ( m.Group != RegularMaterial || m.ROnly ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
 						ShowContinueError( "Must be of type \"Material\"" );
@@ -7851,7 +7861,7 @@ namespace SurfaceGeometry {
 					fndInput.extHIns.depth = m.Thickness;
 				} alpF++;
 
-				if ( !lAlphaFieldBlanks( alpF - 1) ) {
+				if ( !lAlphaFieldBlanks( alpF - 1 ) ) {
 					if ( lNumericFieldBlanks( numF ) ) {
 						fndInput.extHIns.z = 0.0;
 					} else {
@@ -7884,7 +7894,7 @@ namespace SurfaceGeometry {
 						continue;
 					}
 					auto& m = Material( index );
-					if ( m.Group != RegularMaterial) {
+					if ( m.Group != RegularMaterial || m.ROnly ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
 						ShowContinueError( "Must be of type \"Material\"" );
@@ -7944,7 +7954,7 @@ namespace SurfaceGeometry {
 						continue;
 					}
 					auto& m = Material( index );
-					if ( m.Group != RegularMaterial) {
+					if ( m.Group != RegularMaterial || m.ROnly ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
 						ShowContinueError( "Must be of type \"Material\"" );
@@ -7988,7 +7998,7 @@ namespace SurfaceGeometry {
 								continue;
 							}
 							auto& m = Material( index );
-							if ( m.Group != RegularMaterial) {
+							if ( m.Group != RegularMaterial || m.ROnly ) {
 								ErrorsFound = true;
 								ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
 								ShowContinueError( "Must be of type \"Material\"" );

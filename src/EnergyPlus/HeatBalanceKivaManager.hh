@@ -58,107 +58,119 @@
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
 
-class FoundationKiva {
+class FoundationKiva
+{
 public:
-  Kiva::Foundation foundation;
-  Kiva::InputBlock intHIns;
-  Kiva::InputBlock intVIns;
-  Kiva::InputBlock extHIns;
-  Kiva::InputBlock extVIns;
-  Kiva::InputBlock footing;
-  std::string name;
-  std::vector< int > surfaces;
-  int wallConstructionIndex;
-
+	Kiva::Foundation foundation;
+	Kiva::InputBlock intHIns;
+	Kiva::InputBlock intVIns;
+	Kiva::InputBlock extHIns;
+	Kiva::InputBlock extVIns;
+	Kiva::InputBlock footing;
+	std::string name;
+	std::vector< int > surfaces;
+	int wallConstructionIndex;
 };
 
-class KivaInstanceMap {
+class KivaInstanceMap
+{
 public:
-  KivaInstanceMap(Kiva::Foundation& foundation,
-    std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
-    int floorSurface,
-    std::vector< int > wallSurfaces,
-    int zoneNum,
-    Real64 weightedPerimeter,
-    int constructionNum
-  );
-  std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
-  Kiva::Ground ground;
-  int floorSurface;
-  std::vector< int > wallSurfaces;
-  int zoneNum;
-  void setBoundaryConditions();
-  void reportKivaSurfaces();
-  void plotDomain();
-  Kiva::BoundaryConditions bcs;
-  Real64 weightedPerimeter;
-  int constructionNum;
+	KivaInstanceMap(
+		Kiva::Foundation& foundation,
+		std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
+		int floorSurface,
+		std::vector< int > wallSurfaces,
+		int zoneNum,
+		Real64 weightedPerimeter,
+		int constructionNum
+	);
+	std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
+	Kiva::Ground ground;
+	int floorSurface;
+	std::vector< int > wallSurfaces;
+	int zoneNum;
+	void initGround();
+	void setBoundaryConditions();
+	void reportKivaSurfaces();
+	void plotDomain();
+	Kiva::BoundaryConditions bcs;
+	Real64 weightedPerimeter;
+	int constructionNum;
 };
 
-class KivaManager{
+class KivaManager
+{
 public:
-  KivaManager();
-  virtual ~KivaManager();
-  bool setupKivaInstances();
-  void initKivaInstances();
-  void calcKivaInstances();
-  void defineDefaultFoundation();
-  void addDefaultFoundation();
-  int findFoundation(std::string name);
-  Real64 getTemp(int surfNum );
-  Real64 getConv(int surfNum );
+	KivaManager();
+	virtual ~KivaManager();
+	bool setupKivaInstances();
+	void initKivaInstances();
+	void calcKivaInstances();
+	void defineDefaultFoundation();
+	void addDefaultFoundation();
+	int findFoundation( std::string const& name);
+	Real64 getTemp( int surfNum );
+	Real64 getConv( int surfNum );
 
-  FoundationKiva defaultFoundation;
-  std::vector<FoundationKiva> foundationInputs;
-  std::vector<KivaInstanceMap> kivaInstances;
+	FoundationKiva defaultFoundation;
+	std::vector<FoundationKiva> foundationInputs;
+	std::vector<KivaInstanceMap> kivaInstances;
 
 
 
-  struct Settings{
-    Settings();
+	struct Settings
+	{
+		Settings();
 
-    Real64 soilK;
-    Real64 soilRho;
-    Real64 soilCp;
-    Real64 groundSolarAbs;
-    Real64 groundThermalAbs;
-    Real64 groundRoughness;
-    Real64 farFieldWidth;
+		Real64 soilK;
+		Real64 soilRho;
+		Real64 soilCp;
+		Real64 groundSolarAbs;
+		Real64 groundThermalAbs;
+		Real64 groundRoughness;
+		Real64 farFieldWidth;
 
-    enum DGType {
-      ZERO_FLUX,
-      GROUNDWATER,
-      AUTO
-    };
+		enum DGType {
+			ZERO_FLUX,
+			GROUNDWATER,
+			AUTO
+		};
 
-    DGType deepGroundBoundary;
-    Real64 deepGroundDepth;
-    Real64 minCellDim;
-    Real64 maxGrowthCoeff;
+		DGType deepGroundBoundary;
+		Real64 deepGroundDepth;
+		Real64 minCellDim;
+		Real64 maxGrowthCoeff;
 
-    enum TSType {
-      HOURLY,
-      TIMESTEP
-    };
+		enum TSType {
+			HOURLY,
+			TIMESTEP
+		};
 
-    TSType timestepType;
-  };
+		TSType timestepType;
+	};
 
-  struct WallGroup{
-    WallGroup();
-    WallGroup(Real64 exposedPerimeter, std::vector<int> wallIDs);
-    Real64 exposedPerimeter;
-    std::vector<int> wallIDs;
-  };
+	struct WallGroup
+	{
+		WallGroup();
+		WallGroup(
+			Real64 exposedPerimeter,
+			std::vector<int> wallIDs
+		);
+		Real64 exposedPerimeter;
+		std::vector<int> wallIDs;
+	};
 
-  Settings settings;
-  bool defaultSet;
-  int defaultIndex;
+	Settings settings;
+	bool defaultSet;
+	int defaultIndex;
 
 private:
-  Real64 getValue(int surfNum, Kiva::GroundOutput::OutputType oT);
-  std::map<int, std::vector<std::pair<int, Kiva::Surface::SurfaceType>>> surfaceMap;
-  std::map<int,Kiva::Foundation> foundationInstances;
+	Real64 getValue(
+		int surfNum,
+		Kiva::GroundOutput::OutputType oT
+	);
+	std::map<int, std::vector<std::pair<int, Kiva::Surface::SurfaceType>>> surfaceMap;
+	std::map<int,Kiva::Foundation> foundationInstances;
 };
 
 } // HeatBalanceKivaManager
