@@ -11597,7 +11597,7 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( !(displayZoneComponentLoadSummary && CompLoadReportIsReq) )
+		if ( !((displayZoneComponentLoadSummary || displayAirLoopComponentLoadSummary || displayFacilityComponentLoadSummary) && CompLoadReportIsReq) )
 			return;
 
 		Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
