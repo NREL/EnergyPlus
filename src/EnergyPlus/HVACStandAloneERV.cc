@@ -1413,11 +1413,19 @@ namespace HVACStandAloneERV {
 		// simulate the fan to size using the flow rate specified above
 		// (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;)
 		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
-			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
-		}		
+			if ( ! ( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject ) ) {
+				SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
+			} else {
+				HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex ]->simulate( _,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+			}
+		}
 		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
-			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
-		}			
+			if ( ! ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject ) ) {
+				SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
+			} else {
+				HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->simulate( _,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+			}
+		}
 
 		// now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
 		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
