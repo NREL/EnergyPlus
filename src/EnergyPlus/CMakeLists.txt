@@ -308,6 +308,8 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  HybridModel.cc
+  HybridModel.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc

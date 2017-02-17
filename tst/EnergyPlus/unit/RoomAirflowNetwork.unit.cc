@@ -147,7 +147,7 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	int RoomAirNode;
 	TimeStepSys = 15.0 / 60.0;
 	OutBaroPress = 101325.0;
-	ZoneVolCapMultpSens = 1;
+	Zone( ZoneNum ).ZoneVolCapMultpSens = 1;
 
 	RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed = true;
 	RoomAirflowNetworkZoneInfo( ZoneNum ).ActualZoneID = ZoneNum;
@@ -254,6 +254,7 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	Zone( ZoneNum ).IsControlled = true;
 	Zone( ZoneNum ).SurfaceFirst = 1;
 	Zone( ZoneNum ).SurfaceLast = 2;
+	Zone( ZoneNum ).ZoneVolCapMultpMoist = 0;
 
 	ZoneIntGain( ZoneNum ).NumberOfDevices = 1;
 	ZoneIntGain( ZoneNum ).Device.allocate( ZoneIntGain( 1 ).NumberOfDevices );
