@@ -1512,7 +1512,7 @@
     For: AllDays,            !- Field 2
     Until:  7:00,0,          !- Field 3
     Until: 17:00,1,          !- Field 5
-    Until: 24:00,0;          !- Field 11
+    Until: 24:00,0;          !- Field 7
 
   Schedule:Compact,
     Outdoor air Schedule,    !- Name
@@ -1806,8 +1806,8 @@
     ,                        !- AirflowNetwork Control Type Schedule Name
     ,                        !- Simple Airflow Control Type Schedule Name
     ,                        !- ZoneVentilation Object Name
-    30.0,                    !- Minimum HVAC Operation Time
-    30.0;                    !- Minimum Ventilation Time
+    30.0,                    !- Minimum HVAC Operation Time {minutes}
+    30.0;                    !- Minimum Ventilation Time {minutes}
 
   BranchList,
     Air Loop Branches,       !- Name

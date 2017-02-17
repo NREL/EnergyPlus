@@ -150,7 +150,7 @@
     Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Cooling Coil Object Type
     Sys 1 Heat Pump Cooling Mode,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name

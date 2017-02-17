@@ -117,7 +117,7 @@
   Timestep,6;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    Multiplier1,             !- MultiplierName
+    Multiplier1,             !- Name
     ,                        !- Zone or ZoneList Name
     1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
@@ -157,7 +157,7 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
@@ -2309,13 +2309,13 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-
 !*** OPERATIONAL FAULTS ***
-  
+
   FaultModel:Fouling:CoolingTower,
     Fault_fouling_CoolTower, !- Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     CoolingTower:SingleSpeed,!- Cooling Tower Object Type
     Big Tower1,              !- Cooling Tower Object Name
-    0.7;                     !- UA Reduction Factor
+    0.7;                     !- Reference UA Reduction Factor {dimensionless}
+

@@ -1523,12 +1523,12 @@
     For: AllDays,            !- Field 2
     Until:  7:00,0,          !- Field 3
     Until: 14:00,1,          !- Field 5
-    Until: 15:00,6,          !- Field 5
-    Until: 16:00,7,          !- Field 5
-    Until: 17:00,5,          !- Field 5
-    Until: 18:00,2,          !- Field 7
-    Until: 19:00,3,          !- Field 9
-    Until: 24:00,4;          !- Field 11
+    Until: 15:00,6,          !- Field 7
+    Until: 16:00,7,          !- Field 9
+    Until: 17:00,5,          !- Field 11
+    Until: 18:00,2,          !- Field 13
+    Until: 19:00,3,          !- Field 15
+    Until: 24:00,4;          !- Field 17
 
   Schedule:Compact,
     Outdoor air Schedule,    !- Name
@@ -3039,7 +3039,7 @@
 
   ZoneControl:ContaminantController,
     CO2 Controller1,         !- Name
-    NORTH ZONE,               !- Zone Name
+    NORTH ZONE,              !- Zone Name
     CO2AvailSchedule,        !- Carbon Dioxide Control Availability Schedule Name
     CO2SetpointSchedule;     !- Carbon Dioxide Setpoint Schedule Name
 

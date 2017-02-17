@@ -12,7 +12,12 @@ import subprocess
 def usage():
     print("""Call this script with three command line arguments:
  $ make_pretty.py <path to repo> <path to transition dir> <transition exe>
- $ make_pretty.py /repos/eplus /build/products Trans-V-X-to-V-Y.exe""")
+ $ make_pretty.py /repos/eplus /build/products Trans-V-X-to-V-Y.exe
+
+ To run, 'MakingPretty' needs to be TRUE in DataVCompareGlobals.f90
+ and VCompareGlobals.f90. The exe's need to be compiled with this in place.
+ Both .idd versions refereced by the transition exe need to match the current transition verison.
+ Example: To run on V8.7, both V8-6-0-Energy+.idd and V8-7-0-Energy+.idd need to match the V8.7 idd.""")
 
 # check the command line argument status
 if not len(sys.argv) == 4:

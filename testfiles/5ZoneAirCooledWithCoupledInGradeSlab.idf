@@ -262,12 +262,12 @@
     Slab Material-In-grade,  !- Slab Material Name
     Yes,                     !- Horizontal Insulation
     Slab Insulation,         !- Horizontal Insulation Material Name
-    Full,                    !- Full Horizontal or Perimeter Only {Full/Perimeter}
-    ,                        !- Perimeter insulation width {m}
-    Yes,                     !- Vertical Insulation {Yes/No}
-    Slab Insulation,         !- Vertical Insulation Name
-    2,                       !- Vertical perimeter insulation depth from surface {m}
-    Timestep,                !- Domain Simulation Interval {Timestep/Hourly}
+    Full,                    !- Horizontal Insulation Extents
+    ,                        !- Perimeter Insulation Width {m}
+    Yes,                     !- Vertical Insulation
+    Slab Insulation,         !- Vertical Insulation Material Name
+    2,                       !- Vertical Insulation Depth {m}
+    Timestep,                !- Simulation Timestep
     ,                        !- Geometric Mesh Coefficient
     ;                        !- Mesh Density Parameter
 

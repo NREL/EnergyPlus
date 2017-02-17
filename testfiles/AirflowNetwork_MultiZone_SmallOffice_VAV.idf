@@ -3169,7 +3169,7 @@
     0.000508,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Outdoor Air Flow per Zone {m3/s}
     ,                        !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    Min OARequirements Sched;!- Outdoor Air Flow Rate Fraction Schedule Name
+    Min OARequirements Sched;!- Outdoor Air Schedule Name
 
   Schedule:Compact,
     Min OARequirements Sched,!- Name
