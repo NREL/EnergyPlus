@@ -719,10 +719,16 @@ ZoneAirMassFlowConservation,
        \default MixingSourceZonesOnly
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
-       \unique-object
        \format singleLine
        \memo Multiplier altering the relative capacitance of the air compared to an empty zone
-       \min-fields 4
+       \min-fields 6
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Zone or ZoneList Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
+       \note If this field is left blank, the multipliers are applied to all the zones not specified
   N1 , \field Temperature Capacity Multiplier
        \type real
        \default 1.0
@@ -32873,6 +32879,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For Capacity Control Method = ASHRAE90VariableFan, enter the minimum air temperature in cooling mode.
         \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
         \type real
+        \units C
         \minimum 0.0
         \autosizable
         \default autosize
@@ -32880,6 +32887,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For Capacity Control Method = ASHRAE90VariableFan, enter the maximum air temperature in heating mode.
         \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
         \type real
+        \units C
         \minimum 0.0
         \autosizable
         \default autosize
@@ -53322,9 +53330,13 @@ AirLoopHVAC:UnitarySystem,
        \type choice
        \key Load
        \key SetPoint
+       \key SingleZoneVAV
        \default Load
        \note Load control requires a Controlling Zone name.
        \note SetPoint control requires set points at coil outlet node.
+       \note SingleZoneVAV also requires a Controlling Zone name and allows
+       \note load control at low speed fan until the load exceeds capacity
+       \note or outlet air temperature limits. The fan speed is then increased.
   A3,  \field Controlling Zone or Thermostat Location
        \note Used only for Load based control
        \type object-list
@@ -53336,7 +53348,7 @@ AirLoopHVAC:UnitarySystem,
        \key Multimode
        \key CoolReheat
        \default None
-       \note None = meet sensible load only
+       \note None = meet sensible load only. Required when Control Type = SingleZoneVAV.
        \note Multimode = activate enhanced dehumidification mode
        \note as needed and meet sensible load.  Valid only with
        \note cooling coil type Coil:Cooling:DX:TwoStageWithHumidityControlMode or CoilSystem:Cooling:DX:HeatExchangerAssisted.
@@ -53401,7 +53413,8 @@ AirLoopHVAC:UnitarySystem,
        \note Leaving this schedule name blank will default to constant fan mode for the
        \note entire simulation period.
        \note This field is not used when set point based control is used where a set point
-       \note controls the coil (i.e., model assumes constant fan mode operation).
+       \note controls the coil.
+       \note SingleZoneVAV control type is only active when constant fan operating mode is active.
   A12, \field Heating Coil Object Type
        \type choice
        \key Coil:Heating:DX:SingleSpeed
@@ -53473,15 +53486,18 @@ AirLoopHVAC:UnitarySystem,
        \note If Yes, the DX cooling coil runs as 100% DOAS DX coil.
        \note If No, the DX cooling coil runs as a regular DX coil.
        \note If left blank the default is regular dx coil.
-  N2 , \field DOAS DX Cooling Coil Leaving Minimum Air Temperature
+  N2 , \field Minimum Supply Air Temperature
        \type real
        \units C
        \minimum 0.0
-       \maximum 7.2
+       \maximum 20.0
        \default 2.0
-       \note DX cooling coil leaving minimum air temperature defines the minimum DOAS DX cooling coil
-       \note leaving air temperature that should be maintained to avoid frost formation. This input
-       \note field is optional and only used along with the input field above.
+       \autosizable
+       \note When Use DOAS DX Cooling Coil is specified as Yes, Minimum Supply Air Temperature
+       \note defines the minimum DOAS DX cooling coil leaving air temperature that should
+       \note be maintained to avoid frost formation. This field is not autosizable when
+       \note the input for Use DOAS DX Cooling Coil = Yes.
+       \note When Control Type = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed.
   A17, \field Latent Load Control
        \type choice
        \key SensibleOnlyLoadControl
@@ -53489,7 +53505,7 @@ AirLoopHVAC:UnitarySystem,
        \key LatentWithSensibleLoadControl
        \key LatentOrSensibleLoadControl
        \default SensibleOnlyLoadControl
-       \note SensibleOnlyLoadControl is selected when thermostat control is used.
+       \note SensibleOnlyLoadControl is selected when thermostat or SingleZoneVAV control is used.
        \note LatentOnlyLoadControl is selected when humidistat control is used.
        \note LatentWithSensibleLoadControl is selected when thermostat control is used and
        \note dehumidification is required only when a sensible load exists.
@@ -53663,6 +53679,7 @@ AirLoopHVAC:UnitarySystem,
        \autosizable
        \default 80.0
        \note Enter the maximum supply air temperature leaving the heating coil.
+       \note When Control Type = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed.
   N18, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
        \type real
        \units C
@@ -61870,7 +61887,7 @@ LoadProfile:Plant,
        \required-field
        \type object-list
        \object-list ScheduleNames
-
+   
 \group Solar Collectors
 
 SolarCollectorPerformance:FlatPlate,
@@ -83081,6 +83098,58 @@ Matrix:TwoDimension,
   N21001,N21002,N21003,N21004,N21005,N21006,N21007,N21008,N21009,N21010,N21011,N21012,N21013,N21014,N21015,N21016,N21017,N21018,N21019,N21020,  \note fields as indicated
   N21021,N21022,N21023,N21024,N21025,N21026,N21027,N21028,N21029,N21030,N21031,N21032,N21033,N21034,N21035,N21036,N21037,N21038,N21039,N21040;  \note fields as indicated
 
+\ group Hybrid Model
+
+HybridModel:Zone,
+       \memo Zones with measured air temperature data and a range of dates.
+       \memo If the range of temperature measurement dates includes a leap day, the weather data should include a leap day.
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Zone Name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field Calculate Zone Internal Thermal Mass
+       \note Use measured temperature data to calculate zone temperature capacity multiplier
+       \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
+       \type choice
+       \key No
+       \key Yes
+       \default No
+  A4 , \field Calculate Zone Air Infiltration Rate
+       \note Use measured temperature data to calculate zone air infiltration air flow rate
+       \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
+       \type choice
+       \key No
+       \key Yes
+       \default No
+  A5 , \field Zone Measured Air Temperature Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note from Schedule:File
+  N1 , \field Begin Month
+       \required-field
+       \minimum 1
+       \maximum 12
+       \type integer
+  N2 , \field Begin Day of Month
+       \required-field
+       \minimum 1
+       \maximum 31
+       \type integer
+  N3 , \field End Month
+       \required-field
+       \minimum 1
+       \maximum 12
+       \type integer
+  N4 ; \field End Day of Month
+       \required-field
+       \minimum 1
+       \maximum 31
+       \type integer
+
 \group Performance Curves
 
 Curve:Linear,
@@ -99967,6 +100036,7 @@ Output:Variable,
        \memo the report dictionary file (.rdd) if the Output:VariableDictionary has been requested.
        \format singleLine
   A1 , \field Key Value
+       \retaincase
        \default *
        \note use '*' (without quotes) to apply this variable to all keys
   A2 , \field Variable Name
