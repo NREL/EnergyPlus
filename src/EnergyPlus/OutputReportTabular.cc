@@ -69,6 +69,7 @@
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
+#include <DataGlobals.hh>
 #include <DataGlobalConstants.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -86,6 +87,7 @@
 #include <EconomicLifeCycleCost.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
@@ -165,6 +167,7 @@ namespace OutputReportTabular {
 	using namespace DataGlobalConstants;
 	using namespace OutputReportPredefined;
 	using namespace DataHeatBalance;
+	using namespace HybridModel;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -9332,8 +9335,8 @@ namespace OutputReportTabular {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   June 2006
-		//       MODIFIED       January 2010, Kyle Benne
-		//                      Added SQLite output
+		//       MODIFIED       Jan. 2010, Kyle Benne. Added SQLite output
+		//                      Aug. 2015, Sang Hoon Lee. Added a new table for hybrid modeling multiplier output.
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -9392,6 +9395,7 @@ namespace OutputReportTabular {
 		using ExteriorEnergyUse::NumExteriorLights;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
+		using namespace DataGlobals; 
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9430,6 +9434,7 @@ namespace OutputReportTabular {
 		int iZone;
 		int iPeople;
 		int iPlugProc;
+		int NumOfCol;
 		Real64 mult;
 		Real64 curAzimuth;
 		Real64 curArea;
@@ -9894,6 +9899,39 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
+			//---- Hybrid Model: Internal Thermal Mass Sub-Table
+			if ( FlagHybridModel ){
+				rowHead.allocate( NumOfZones );
+				NumOfCol = 2;
+				columnHead.allocate( NumOfCol );
+				columnWidth.allocate( NumOfCol );
+				columnWidth = 14; //array assignment - same for all columns
+				tableBody.allocate( NumOfCol, NumOfZones );
+
+				columnHead( 1 ) = "Hybrid Modeling (Y/N)";
+				columnHead( 2 ) = "Temperature Capacitance Multiplier ";
+
+				rowHead = "";
+				tableBody = "";
+
+				for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+					rowHead( iZone ) = Zone( iZone ).Name;
+					if ( HybridModelZone( iZone ).InternalThermalMassCalc ) {
+						tableBody( 1, iZone ) = "Yes";
+					}
+					else {
+						tableBody( 1, iZone ) = "No";
+					}
+					tableBody( 2, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
+				}
+				
+				WriteSubtitle( "Hybrid Model: Internal Thermal Mass" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Hybrid Model: Internal Thermal Mass" );
+				}
+			}
+
 			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
 			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
 			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
@@ -9915,10 +9953,11 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 12 );
-			columnWidth.allocate( 12 );
+			NumOfCol = 12;
+			columnHead.allocate( NumOfCol );
+			columnWidth.allocate( NumOfCol );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 12, NumOfZones + 4 );
+			tableBody.allocate( NumOfCol, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
@@ -9934,7 +9973,6 @@ namespace OutputReportTabular {
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
 
 			rowHead = "";
-
 			rowHead( NumOfZones + grandTotal ) = "Total";
 			rowHead( NumOfZones + condTotal ) = "Conditioned Total";
 			rowHead( NumOfZones + uncondTotal ) = "Unconditioned Total";
@@ -10020,6 +10058,7 @@ namespace OutputReportTabular {
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
 					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
+
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
 					zstArea( grandTotal ) += mult * Zone( iZone ).FloorArea;
