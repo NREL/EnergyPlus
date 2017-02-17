@@ -9114,7 +9114,6 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using MixedAir::SimOAMixer;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -9195,7 +9194,11 @@ namespace HVACVariableRefrigerantFlow {
 		}
 		// if blow through, simulate fan then coils
 		if ( this->FanPlace == BlowThru ) {
-			SimulateFanComponents( "", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+			} else {
+				Fans::SimulateFanComponents( "", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			}
 		}
 
 		if ( this->CoolingCoilPresent ) {
@@ -9224,7 +9227,11 @@ namespace HVACVariableRefrigerantFlow {
 
 		// if draw through, simulate coils then fan
 		if ( this->FanPlace == DrawThru ) {
-			SimulateFanComponents( "", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+			} else {
+				Fans::SimulateFanComponents( "", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			}
 		}
 
 		// track fan power per terminal unit for calculating COP
