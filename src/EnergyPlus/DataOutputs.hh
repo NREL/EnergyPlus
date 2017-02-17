@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <unordered_map>
 
 namespace EnergyPlus {
 
@@ -98,7 +99,7 @@ namespace DataOutputs {
 
 	// Object Data
 	extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
-
+	extern std::unordered_map <std::string, int> OutputVariablesNames;
 	// Functions
 
 	// Clears the global data in DataOutputs.
