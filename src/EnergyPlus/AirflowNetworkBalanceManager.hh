@@ -201,6 +201,41 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
+	AirDensity(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
+	AirThermConductivity(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
+	AirCp(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
+	AirDynamicVisc(
+		Real64 T  // Temperature in Celsius
+	);
+
+	Real64
+	AirKinematicVisc(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
+	AirThermalDiffusivity(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
+	AirPrandtl(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
 	CalcWindPressure(
 		int const CPVNum, // CP Value number
 		Real64 const Vref, // Velocity at reference height

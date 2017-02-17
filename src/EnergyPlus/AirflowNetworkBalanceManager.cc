@@ -5256,6 +5256,176 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	Real64
+	AirDensity(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air density {kg/m3}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		Real64 const a = 1.292;
+		Real64 const b = -0.00467558800659982;
+		Real64 const c = 0.0000125483407801669;
+
+		if ( T < LowerLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for density calculation");
+			return a + b * LowerLimit + c * pow_2( LowerLimit );
+		} else if ( T > UpperLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for density calculation");
+			return a + b * UpperLimit + c * pow_2( UpperLimit );
+		} else {
+			return a + b * T + c * pow_2( T );
+		}
+	}
+
+	Real64
+	AirThermConductivity(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air thermal conductivity {W/m-K}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		Real64 const a = 0.02364;
+		Real64 const b = 0.0000754772569209165;
+		Real64 const c = -2.40977632412045e-8;
+
+		if ( T < LowerLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for conductivity calculation");
+			return a + b * LowerLimit + c * pow_2( LowerLimit );
+		} else if ( T > UpperLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for conductivity calculation");
+			return a + b * UpperLimit + c * pow_2( UpperLimit );
+		} else {
+			return a + b * T + c * pow_2( T );
+		}
+	}
+
+	Real64
+	AirCp(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air specific heat {J/kg-K}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		Real64 const a = 1006;
+		Real64 const b = 0.0431668570326241;
+		Real64 const c = -0.00042378743454105;
+
+		if ( T < LowerLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for specific heat calculation");
+			return a + b * LowerLimit + c * pow_2( LowerLimit );
+		} else if ( T > UpperLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for specific heat calculation");
+			return a + b * UpperLimit + c * pow_2( UpperLimit );
+		} else {
+			return a + b * T + c * pow_2( T );
+		}
+	}
+
+	Real64
+	AirDynamicVisc(
+		Real64 T  // Temperature in Celsius
+	)
+	{
+		// Dry air dynamic viscosity {kg/m-s}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		Real64 const a = 0.00001729;
+		Real64 const b = 0.000000047;
+
+		if ( T < LowerLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for viscosity calculation");
+			return a + b * LowerLimit;
+		} else if ( T > UpperLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for viscosity calculation");
+			return a + b * UpperLimit;
+		} else {
+			return a + b * T;
+		}
+	}
+
+	Real64
+	AirKinematicVisc(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air kinematic viscosity {m2/s}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		if ( T < LowerLimit ) {
+			return AirDynamicVisc( LowerLimit ) / AirDensity( LowerLimit );
+		} else if ( T > UpperLimit ) {
+			return AirDynamicVisc( UpperLimit ) / AirDensity( UpperLimit );
+		} else {
+			return AirDynamicVisc( T ) / AirDensity( T );
+		}
+	}
+
+	Real64
+	AirThermalDiffusivity(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air thermal diffusivity {-}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		if ( T < LowerLimit ) {
+			return AirThermConductivity( LowerLimit ) / ( AirCp( LowerLimit ) * AirDensity( LowerLimit ) );
+		} else if ( T > UpperLimit ) {
+			return AirThermConductivity( UpperLimit ) / ( AirCp( UpperLimit ) * AirDensity( UpperLimit ) );
+		} else {
+			return AirThermConductivity( T ) / ( AirCp( T ) * AirDensity( T ) );
+		}
+	}
+
+	Real64
+	AirPrandtl(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air Prandtl number {-}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		if ( T < LowerLimit ) {
+			return AirKinematicVisc( LowerLimit ) / AirThermalDiffusivity( LowerLimit );
+		} else if ( T > UpperLimit ) {
+			return AirKinematicVisc( UpperLimit ) / AirThermalDiffusivity( UpperLimit );
+		} else {
+			return AirKinematicVisc( T ) / AirThermalDiffusivity( T );
+		}
+	}
+
+	Real64
 	CalcDuctInsideConvResist(
 		Real64 const Tair, // Average air temperature
 		Real64 const mdot, // Mass flow rate
@@ -5326,14 +5496,14 @@ namespace AirflowNetworkBalanceManager {
 		using DataGlobals::GravityConstant;
 		using DataGlobals::KelvinConv;
 
-		Real64 const k = 0.02551; // Thermal conductivity of air at 300K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
+		Real64 k = AirThermConductivity( Ts );
 
 		Real64 hOut_final = 0;
 
 		if ( hOut == 0 ) {
 
-			Real64 const Pr = 0.7296; // Prandtl number for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
-			Real64 const KinVisc = 1.562e-5; // Kinematic viscosity for air at 300 K. Cengel & Gahjar, Heat and Mass Transfer. 5th ed.
+			Real64 Pr = AirPrandtl( Ts );
+			Real64 KinVisc = AirKinematicVisc( Ts );
 			Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
 			Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
 
