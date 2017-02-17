@@ -23376,7 +23376,7 @@ AirflowNetwork:MultiZone:ExternalNode,
       \object-list WPCValueNames
       \object-list UniVariateCurves
       \object-list UniVariateTables
-      \note The name of the curve or table object specifying the wind pressure coefficient.
+      \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
  A3 , \field Symmetric Wind Pressure Coefficient Curve
       \type choice
       \key Yes
@@ -23385,15 +23385,14 @@ AirflowNetwork:MultiZone:ExternalNode,
       \note Specify whether the pressure curve is symmetric or not.
       \note Specify Yes for curves that should be evaluated from 0 to 180 degrees
       \note Specify No for curves that should be evaluated from 0 to 360 degrees
- A4 ; \field Use Relative Wind Angle
+ A4 ; \field Wind Angle Type
       \type choice
-      \key Yes
-      \key No
-      \default No
+      \key Absolute
+      \key Relative
+      \default Absolute
       \note Specify whether the angle used to compute the wind pressure coefficient is absolute or relative
-      \note Specify Yes to computes the angle between the wind direction and the surface azimuth
-      \note Specify No to use the wind direction angle directly
-
+      \note Specify Relative to compute the angle between the wind direction and the surface azimuth
+      \note Specify Absolute to use the wind direction angle directly
 
 AirflowNetwork:MultiZone:WindPressureCoefficientArray,
       \min-fields 3
