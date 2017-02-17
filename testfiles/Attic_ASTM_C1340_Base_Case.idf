@@ -1,5 +1,4 @@
-
-  VERSION,8.6;
+  VERSION,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -41,14 +40,17 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                     !- Run Simulation for Sizing Periods
-    Yes;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Sizing Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: LOCATION ===========
 
   Site:Location,
-    Pheonix,  !- Name
-    33.43,-112.02,-7.0,339.0;
+    Pheonix,                 !- Name
+    33.43,                   !- Latitude {deg}
+    -112.02,                 !- Longitude {deg}
+    -7.0,                    !- Time Zone {hr}
+    339.0;                   !- Elevation {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: DESIGNDAY ===========
 ! CHICAGO_IL_USA Cooling (DB=>MWB) .4%, MaxDB=  32.80 MWB=  23.60
@@ -131,114 +133,114 @@
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL:REGULAR ===========
 
   Material,
-    Gypsum Board,        !- Name
-    MediumSmooth,        !- Roughness
-    0.0127,              !- Thickness {m}
-    0.160265598,         !- Conductivity {W/m-K}
-    800.92,              !- Density {kg/m3}
-    1088.568,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.9;                 !- Visible Absorptance
+    Gypsum Board,            !- Name
+    MediumSmooth,            !- Roughness
+    0.0127,                  !- Thickness {m}
+    0.160265598,             !- Conductivity {W/m-K}
+    800.92,                  !- Density {kg/m3}
+    1088.568,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.9;                     !- Visible Absorptance
 
   Material,
-    R-19 Insulation,     !- Name
-    Rough,               !- Roughness
-    0.15875,             !- Thickness {m}
-    0.0474393093,        !- Conductivity {W/m-K}
-    9.61104,             !- Density {kg/m3}
-    795.492,             !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.9;                 !- Visible Absorptance
+    R-19 Insulation,         !- Name
+    Rough,                   !- Roughness
+    0.15875,                 !- Thickness {m}
+    0.0474393093,            !- Conductivity {W/m-K}
+    9.61104,                 !- Density {kg/m3}
+    795.492,                 !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.9;                     !- Visible Absorptance
 
   Material,
-    Joists,              !- Name
-    Rough,               !- Roughness
-    0.00740918,          !- Thickness {m}
-    0.1182607809,        !- Conductivity {W/m-K}
-    448.5152,            !- Density {kg/m3}
-    1632.852,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.9;                 !- Visible Absorptance
+    Joists,                  !- Name
+    Rough,                   !- Roughness
+    0.00740918,              !- Thickness {m}
+    0.1182607809,            !- Conductivity {W/m-K}
+    448.5152,                !- Density {kg/m3}
+    1632.852,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.9;                     !- Visible Absorptance
 
   Material,
-    Shingles,            !- Name
-    Rough,               !- Roughness
-    0.00635,             !- Thickness {m}
-    0.0819327582,        !- Conductivity {W/m-K}
-    1121.288,            !- Density {kg/m3}
-    1256.04,             !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.05;                !- Visible Absorptance
+    Shingles,                !- Name
+    Rough,                   !- Roughness
+    0.00635,                 !- Thickness {m}
+    0.0819327582,            !- Conductivity {W/m-K}
+    1121.288,                !- Density {kg/m3}
+    1256.04,                 !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.05;                    !- Visible Absorptance
 
   Material,
-    Felt,                !- Name
-    Rough,               !- Roughness
-    0.02159,             !- Thickness {m}
-    0.0819327582,        !- Conductivity {W/m-K}
-    1121.288,            !- Density {kg/m3}
-    1507.248,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.05;                !- Visible Absorptance
+    Felt,                    !- Name
+    Rough,                   !- Roughness
+    0.02159,                 !- Thickness {m}
+    0.0819327582,            !- Conductivity {W/m-K}
+    1121.288,                !- Density {kg/m3}
+    1507.248,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.05;                    !- Visible Absorptance
 
   Material,
-    Plywood,             !- Name
-    Rough,               !- Roughness
-    0.0127,              !- Thickness {m}
-    0.288512691,         !- Conductivity {W/m-K}
-    544.6256,            !- Density {kg/m3}
-    1214.172,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.05;                !- Visible Absorptance
+    Plywood,                 !- Name
+    Rough,                   !- Roughness
+    0.0127,                  !- Thickness {m}
+    0.288512691,             !- Conductivity {W/m-K}
+    544.6256,                !- Density {kg/m3}
+    1214.172,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.05;                    !- Visible Absorptance
 
   Material,
-    Rafters,             !- Name
-    Rough,               !- Roughness
-    0.00555625,          !- Thickness {m}
-    0.1182607809,        !- Conductivity {W/m-K}
-    448.5152,            !- Density {kg/m3}
-    1632.852,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.9,                 !- Solar Absorptance
-    0.05;                !- Visible Absorptance
+    Rafters,                 !- Name
+    Rough,                   !- Roughness
+    0.00555625,              !- Thickness {m}
+    0.1182607809,            !- Conductivity {W/m-K}
+    448.5152,                !- Density {kg/m3}
+    1632.852,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.05;                    !- Visible Absorptance
 
   Material,
-    Hardboard Siding-Gable,!- Name
-    MediumSmooth,        !- Roughness
-    0.0111125,           !- Thickness {m}
-    0.214956666,         !- Conductivity {W/m-K}
-    640.736,             !- Density {kg/m3}
-    1172.304,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.7,                 !- Solar Absorptance
-    0.05;                !- Visible Absorptance
+    Hardboard Siding-Gable,  !- Name
+    MediumSmooth,            !- Roughness
+    0.0111125,               !- Thickness {m}
+    0.214956666,             !- Conductivity {W/m-K}
+    640.736,                 !- Density {kg/m3}
+    1172.304,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.05;                    !- Visible Absorptance
 
   Material,
-    Studs,               !- Name
-    Rough,               !- Roughness
-    0.00555625,          !- Thickness {m}
-    0.1182607809,        !- Conductivity {W/m-K}
-    448.5152,            !- Density {kg/m3}
-    1632.852,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.7,                 !- Solar Absorptance
-    0.05;                !- Visible Absorptance
+    Studs,                   !- Name
+    Rough,                   !- Roughness
+    0.00555625,              !- Thickness {m}
+    0.1182607809,            !- Conductivity {W/m-K}
+    448.5152,                !- Density {kg/m3}
+    1632.852,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.05;                    !- Visible Absorptance
 
   Material,
-    Hardboard Siding-Eave,!- Name
-    MediumSmooth,        !- Roughness
-    0.0111125,           !- Thickness {m}
-    0.214956666,         !- Conductivity {W/m-K}
-    640.736,             !- Density {kg/m3}
-    1172.304,            !- Specific Heat {J/kg-K}
-    0.9,                 !- Thermal Absorptance
-    0.7,                 !- Solar Absorptance
-    0.9;                 !- Visible Absorptance
+    Hardboard Siding-Eave,   !- Name
+    MediumSmooth,            !- Roughness
+    0.0111125,               !- Thickness {m}
+    0.214956666,             !- Conductivity {W/m-K}
+    640.736,                 !- Density {kg/m3}
+    1172.304,                !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.9;                     !- Visible Absorptance
 
   Material,
     HF-C5,                   !- Name
@@ -260,32 +262,32 @@
     Gypsum Board;            !- Layer 3
 
   Construction,
-    Reverse:CeilingConstruction,     !- Name
+    Reverse:CeilingConstruction,  !- Name
     Gypsum Board,            !- Outside Layer
     R-19 Insulation,         !- Layer 2
     Joists;                  !- Layer 3
 
   Construction,
-    Roof,                  !- Name
-    Shingles,              !- Outside Layer
-    Felt,                  !- Layer 2
-    Plywood,               !- Layer 3
-    Rafters;               !- Layer 3
+    Roof,                    !- Name
+    Shingles,                !- Outside Layer
+    Felt,                    !- Layer 2
+    Plywood,                 !- Layer 3
+    Rafters;                 !- Layer 4
 
   Construction,
-    Gables,                 !- Name
-    Hardboard Siding-Gable, !- Outside Layer
-    Studs;                  !- Layer 2
+    Gables,                  !- Name
+    Hardboard Siding-Gable,  !- Outside Layer
+    Studs;                   !- Layer 2
 
   Construction,
-    Eave Walls,             !- Name
-    Hardboard Siding-Eave;  !- Outside Layer
+    Eave Walls,              !- Name
+    Hardboard Siding-Eave;   !- Outside Layer
 
   Construction,
-    Walls,                  !- Name
-    Hardboard Siding-Eave,  !- Outside Layer
-    R-19 Insulation,        !- Layer 2
-    Gypsum Board;           !- Layer 3
+    Walls,                   !- Name
+    Hardboard Siding-Eave,   !- Outside Layer
+    R-19 Insulation,         !- Layer 2
+    Gypsum Board;            !- Layer 3
 
   Construction,
     LTFLOOR,                 !- Name
@@ -294,26 +296,26 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
   Zone,
-    OCCUPIED ZONE,                !- Name
+    OCCUPIED ZONE,           !- Name
     0,                       !- Direction of Relative North {deg}
     0,                       !- X Origin {m}
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    autocalculate,                  !- Ceiling Height {m}
-    autocalculate;                   !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   Zone,
-    ATTIC ZONE,                !- Name
+    ATTIC ZONE,              !- Name
     0,                       !- Direction of Relative North {deg}
     0,                       !- X Origin {m}
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    autocalculate,                  !- Ceiling Height {m}
-    autocalculate;                   !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACEGEOMETRY ===========
 
@@ -325,10 +327,10 @@
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========
 
   BuildingSurface:Detailed,
-    North Wall,           !- Name
+    North Wall,              !- Name
     Wall,                    !- Surface Type
-    Walls,                  !- Construction Name
-    OCCUPIED ZONE,                !- Zone Name
+    Walls,                   !- Construction Name
+    OCCUPIED ZONE,           !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -341,10 +343,10 @@
     0,8.5344,2.70;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    North Wall Attic,           !- Name
+    North Wall Attic,        !- Name
     Wall,                    !- Surface Type
-    Eave Walls,                  !- Construction Name
-    ATTIC ZONE,                !- Zone Name
+    Eave Walls,              !- Construction Name
+    ATTIC ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -359,8 +361,8 @@
   BuildingSurface:Detailed,
     East Wall,               !- Name
     Wall,                    !- Surface Type
-    Walls,                  !- Construction Name
-    OCCUPIED ZONE,                !- Zone Name
+    Walls,                   !- Construction Name
+    OCCUPIED ZONE,           !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -373,10 +375,10 @@
     16.764,8.5344,2.70;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    East Wall Attic,               !- Name
+    East Wall Attic,         !- Name
     Wall,                    !- Surface Type
-    Eave Walls,                  !- Construction Name
-    ATTIC ZONE,                !- Zone Name
+    Eave Walls,              !- Construction Name
+    ATTIC ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -387,12 +389,12 @@
     16.764,0,2.70,  !- X,Y,Z ==> Vertex 2 {m}
     16.764,8.5344,2.70,  !- X,Y,Z ==> Vertex 3 {m}
     16.764,8.5344,2.7254,  !- X,Y,Z ==> Vertex 4 {m}
-    16.764,4.2672,4.5034;
+    16.764,4.2672,4.5034;  !- X,Y,Z ==> Vertex 5 {m}
 
   BuildingSurface:Detailed,
     South Wall,              !- Name
     Wall,                    !- Surface Type
-    Walls,                  !- Construction Name
+    Walls,                   !- Construction Name
     OCCUPIED ZONE,           !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
@@ -406,10 +408,10 @@
     16.764,0,2.70;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    South Wall Attic,              !- Name
+    South Wall Attic,        !- Name
     Wall,                    !- Surface Type
-    Eave Walls,                  !- Construction Name
-    ATTIC ZONE,           !- Zone Name
+    Eave Walls,              !- Construction Name
+    ATTIC ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -424,7 +426,7 @@
   BuildingSurface:Detailed,
     West Wall,               !- Name
     Wall,                    !- Surface Type
-    Walls,                  !- Construction Name
+    Walls,                   !- Construction Name
     OCCUPIED ZONE,           !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
@@ -432,27 +434,27 @@
     WindExposed,             !- Wind Exposure
     0.50,                    !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,8.5344,2.70,           !- X,Y,Z ==> Vertex 1 {m}
-    0,8.5344,0,              !- X,Y,Z ==> Vertex 2 {m}
-    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
-    0,0,2.70;                !- X,Y,Z ==> Vertex 4 {m}
+    0,8.5344,2.70,  !- X,Y,Z ==> Vertex 1 {m}
+    0,8.5344,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,2.70;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    West Wall Attic,               !- Name
+    West Wall Attic,         !- Name
     Wall,                    !- Surface Type
-    Eave Walls,                  !- Construction Name
-    ATTIC ZONE,           !- Zone Name
+    Eave Walls,              !- Construction Name
+    ATTIC ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.50,                    !- View Factor to Ground
     5,                       !- Number of Vertices
-    0,8.5344,2.7254,           !- X,Y,Z ==> Vertex 1 {m}
-    0,8.5344,2.70,              !- X,Y,Z ==> Vertex 2 {m}
-    0,0,2.70,                   !- X,Y,Z ==> Vertex 3 {m}
-    0,0,2.7254,                !- X,Y,Z ==> Vertex 4 {m}
-    0,4.2672,4.5034;
+    0,8.5344,2.7254,  !- X,Y,Z ==> Vertex 1 {m}
+    0,8.5344,2.70,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,2.70,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,2.7254,  !- X,Y,Z ==> Vertex 4 {m}
+    0,4.2672,4.5034;  !- X,Y,Z ==> Vertex 5 {m}
 
   BuildingSurface:Detailed,
     Zone Floor,              !- Name
@@ -471,14 +473,14 @@
     16.764,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Zone Ceiling,       !- Name
-    Ceiling,                    !- Surface Type
-    CeilingConstruction,                  !- Construction Name
+    Zone Ceiling,            !- Name
+    Ceiling,                 !- Surface Type
+    CeilingConstruction,     !- Construction Name
     OCCUPIED ZONE,           !- Zone Name
-    Surface,                !- Outside Boundary Condition
-    Attic Floor,                        !- Outside Boundary Condition Object
-    NoSun,              !- Sun Exposure
-    NoWind,             !- Wind Exposure
+    Surface,                 !- Outside Boundary Condition
+    Attic Floor,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
     0,8.5344,2.70,  !- X,Y,Z ==> Vertex 1 {m}
@@ -487,26 +489,26 @@
     16.764,8.5344,2.70;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Attic Floor,       !- Name
-    Floor,                    !- Surface Type
-    Reverse:CeilingConstruction,                  !- Construction Name
-    ATTIC ZONE,           !- Zone Name
-    Surface,                !- Outside Boundary Condition
-    Zone Ceiling,                        !- Outside Boundary Condition Object
-    NoSun,              !- Sun Exposure
-    NoWind,             !- Wind Exposure
+    Attic Floor,             !- Name
+    Floor,                   !- Surface Type
+    Reverse:CeilingConstruction,  !- Construction Name
+    ATTIC ZONE,              !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zone Ceiling,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    16.764,8.5344,2.70,  !- X,Y,Z ==> Vertex 4 {m}
-    16.764,0,2.70,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,2.70,  !- X,Y,Z ==> Vertex 2 {m}
-    0,8.5344,2.70;  !- X,Y,Z ==> Vertex 1 {m}
+    16.764,8.5344,2.70,  !- X,Y,Z ==> Vertex 1 {m}
+    16.764,0,2.70,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,2.70,  !- X,Y,Z ==> Vertex 3 {m}
+    0,8.5344,2.70;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Attic Roof South,       !- Name
+    Attic Roof South,        !- Name
     Roof,                    !- Surface Type
-    Roof,                  !- Construction Name
-    ATTIC ZONE,           !- Zone Name
+    Roof,                    !- Construction Name
+    ATTIC ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -519,20 +521,20 @@
     16.764,4.2672,4.5034;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Attic Roof North,       !- Name
+    Attic Roof North,        !- Name
     Roof,                    !- Surface Type
-    Roof,                  !- Construction Name
-    ATTIC ZONE,           !- Zone Name
+    Roof,                    !- Construction Name
+    ATTIC ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    16.764,4.2672,4.5034,  !- X,Y,Z ==> Vertex 4 {m}
-    16.764,8.5344,2.7254,  !- X,Y,Z ==> Vertex 4 {m}
-    0,8.5344,2.7254,  !- X,Y,Z ==> Vertex 2 {m}
-    0,4.2672,4.5034;  !- X,Y,Z ==> Vertex 3 {m}
+    16.764,4.2672,4.5034,  !- X,Y,Z ==> Vertex 1 {m}
+    16.764,8.5344,2.7254,  !- X,Y,Z ==> Vertex 2 {m}
+    0,8.5344,2.7254,  !- X,Y,Z ==> Vertex 3 {m}
+    0,4.2672,4.5034;  !- X,Y,Z ==> Vertex 4 {m}
 
 !-   ===========  AIRFLOWNETWORK Objects ===========
 
@@ -614,7 +616,6 @@
     0.0,                     !- Lower Limit Value
     1.0,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
-
 
   Schedule:Compact,
     HVACAvailSched,          !- Name
@@ -701,7 +702,7 @@
     1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
 
   AirflowNetwork:MultiZone:Zone,
-    OCCUPIED ZONE,             !- Zone Name
+    OCCUPIED ZONE,           !- Zone Name
     NOVENT,                  !- Ventilation Control Mode
     ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
@@ -721,31 +722,31 @@
     300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Surface,
-    East Wall Attic,            !- Surface Name
-    EastAtticLeak,                !- Leakage Component Name
+    East Wall Attic,         !- Surface Name
+    EastAtticLeak,           !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-    West Wall Attic,            !- Surface Name
-    WestAtticLeak,                !- Leakage Component Name
+    West Wall Attic,         !- Surface Name
+    WestAtticLeak,           !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-    East Wall,            !- Surface Name
+    East Wall,               !- Surface Name
     EastLeak,                !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-    West Wall,            !- Surface Name
+    West Wall,               !- Surface Name
     WestLeak,                !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface:Crack,
-    EastAtticLeak,                !- Name
+    EastAtticLeak,           !- Name
     0.02,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     0.65,                    !- Air Mass Flow Exponent {dimensionless}
     ReferenceCrackConditions;!- Reference Crack Conditions
@@ -757,13 +758,13 @@
     ReferenceCrackConditions;!- Reference Crack Conditions
 
   AirflowNetwork:MultiZone:Surface:Crack,
-    EastLeak,               !- Name
+    EastLeak,                !- Name
     0.05,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     0.65,                    !- Air Mass Flow Exponent {dimensionless}
     ReferenceCrackConditions;!- Reference Crack Conditions
 
   AirflowNetwork:MultiZone:Surface:Crack,
-    WestLeak,              !- Name
+    WestLeak,                !- Name
     0.03,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     0.65,                    !- Air Mass Flow Exponent {dimensionless}
     ReferenceCrackConditions;!- Reference Crack Conditions
@@ -858,7 +859,6 @@
     ! 1.9,                     !- Maximum Flow Rate {m3/s}
     ! 60,                      !- Reference Pressure Difference {Pa}
     ! 0.65;                    !- Air Mass Flow Exponent {dimensionless}
-
   ! AirflowNetwork:Distribution:Component:LeakageRatio,
     ! ReturnLeak,              !- Name
     ! 0.05,                    !- Effective Leakage Ratio {dimensionless}
@@ -873,8 +873,10 @@
     0.1297,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     ZoneSupply,              !- Name
@@ -883,8 +885,10 @@
     0.1297,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.91,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     ZoneReturn,              !- Name
@@ -893,8 +897,10 @@
     0.1963,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     ZoneConnectionDuct,      !- Name
@@ -903,8 +909,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     0.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     MainReturn,              !- Name
@@ -913,8 +921,10 @@
     0.1963,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     AirLoopReturn,           !- Name
@@ -923,8 +933,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     0.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     AirLoopSupply,           !- Name
@@ -933,8 +945,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     0.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Fan,
     Supply Fan 1,            !- Fan Name
@@ -952,14 +966,14 @@
     0.1,                     !- Air Path Length {m}
     1.000;                   !- Air Path Hydraulic Diameter {m}
 
- AirflowNetwork:Distribution:DuctViewFactors,
-    Main Trunk,              !- Name of Linkage
-    0.5,                     !- Surface Exposure Fraction
-    0.9,                     !- Duct surface emittance
-    West Wall,               !- Surface 1
-    0.2,                     !- View Factor for Surface 1
-    East Wall,               !- Surface 2
-    0.3;                     !- View Factor for Surface 2
+  AirflowNetwork:Distribution:DuctViewFactors,
+    Main Trunk,              !- Linkage Name
+    0.5,                     !- Duct Surface Exposure Fraction
+    0.9,                     !- Duct Surface Emittance
+    West Wall,               !- Surface 1 Name
+    0.2,                     !- Surface 1 View Factor
+    East Wall,               !- Surface 2 Name
+    0.3;                     !- Surface 2 View Factor
 
   AirflowNetwork:Distribution:Linkage,
     Main Link,               !- Name
@@ -985,12 +999,12 @@
   AirflowNetwork:Distribution:Linkage,
     ZoneSupplyConnectionLink,!- Name
     ZoneSupplyRegisterNode,  !- Node 1 Name
-    OCCUPIED ZONE,             !- Node 2 Name
+    OCCUPIED ZONE,           !- Node 2 Name
     ZoneConnectionDuct;      !- Component Name
 
   AirflowNetwork:Distribution:Linkage,
     ZoneReturnConnectionLink,!- Name
-    OCCUPIED ZONE,             !- Node 1 Name
+    OCCUPIED ZONE,           !- Node 1 Name
     ZoneOutletNode,          !- Node 2 Name
     ZoneConnectionDuct;      !- Component Name
 
@@ -1006,14 +1020,14 @@
     ZoneReturnNode,          !- Node 1 Name
     MixerNode,               !- Node 2 Name
     ZoneReturn,              !- Component Name
-    OCCUPIED Zone;             !- Thermal Zone Name
+    OCCUPIED Zone;           !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
     ReturnMixerLink,         !- Name
     MixerNode,               !- Node 1 Name
     MainReturnNode,          !- Node 2 Name
     MainReturn,              !- Component Name
-    OCCUPIED Zone;             !- Thermal Zone Name
+    OCCUPIED Zone;           !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
     SystemReturnLink,        !- Name
@@ -1026,7 +1040,7 @@
     MainInletNode,           !- Node 1 Name
     FanInletNode,            !- Node 2 Name
     MainReturn,              !- Component Name
-    OCCUPIED ZONE;             !- Thermal Zone Name
+    OCCUPIED ZONE;           !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
     SupplyFanLink,           !- Name
@@ -1066,13 +1080,13 @@
     Temperature,             !- Control Variable
     13.,                     !- Minimum Supply Air Temperature {C}
     45.,                     !- Maximum Supply Air Temperature {C}
-    OCCUPIED ZONE,             !- Control Zone Name
+    OCCUPIED ZONE,           !- Control Zone Name
     Zone Node,               !- Zone Node Name
     Zone Inlet Node,         !- Zone Inlet Node Name
     Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
-    OCCUPIED ZONE,             !- Zone Name
+    OCCUPIED ZONE,           !- Zone Name
     ZoneEquipment,           !- Zone Conditioning Equipment List Name
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
@@ -1103,7 +1117,7 @@
 
   ZoneControl:Thermostat,
     Zone Thermostat,         !- Name
-    OCCUPIED ZONE,             !- Zone or ZoneList Name
+    OCCUPIED ZONE,           !- Zone or ZoneList Name
     Dual Zone Control Type Sched,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     Setpoints;               !- Control 1 Name
@@ -1173,28 +1187,22 @@
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPE ===========
-
   ! ScheduleTypeLimits,
     ! Any Number;              !- Name
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
-
   ! Schedule:Compact,
     ! ALWAYS 4,                !- Name
     ! Any Number,              !- Schedule Type Limits Name
     ! Through: 12/31,          !- Field 1
     ! For: AllDays,            !- Field 2
     ! Until: 24:00,4;          !- Field 3
-
   ! Schedule:Compact,
     ! ALWAYS 23,               !- Name
     ! Any Number,              !- Schedule Type Limits Name
     ! Through: 12/31,          !- Field 1
     ! For: AllDays,            !- Field 2
     ! Until: 24:00,23;         !- Field 3
-
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLED ZONE EQUIP CONFIGURATION ===========
-
   ! ZoneHVAC:EquipmentConnections,
     ! OCCUPIED ZONE,                !- Zone Name
     ! OCCUPIED ZONE Equipment,      !- Zone Conditioning Equipment List Name
@@ -1202,18 +1210,14 @@
     ! ,                        !- Zone Air Exhaust Node or NodeList Name
     ! OCCUPIED ZONE Zone Air Node,  !- Zone Air Node Name
     ! OCCUPIED ZONE Return Outlet;  !- Zone Return Air Node Name
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONE EQUIPMENT LIST ===========
-
   ! ZoneHVAC:EquipmentList,
     ! OCCUPIED ZONE Equipment,      !- Name
     ! ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ! OCCUPIED ZONE Purchased Air,  !- Zone Equipment 1 Name
     ! 1,                       !- Zone Equipment 1 Cooling Sequence
     ! 1;                       !- Zone Equipment 1 Heating or No-Load Sequence
-
 !-   ===========  ALL OBJECTS IN CLASS: PURCHASED AIR ===========
-
   ! ZoneHVAC:IdealLoadsAirSystem,
     ! OCCUPIED ZONE Purchased Air,  !- Name
     ! ,                        !- Availability Schedule Name
@@ -1241,52 +1245,46 @@
     ! ,                        !- Heat Recovery Type
     ! ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
     ! ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONE CONTROL:THERMOSTATIC ===========
-
   ! ZoneControl:Thermostat,
     ! OCCUPIED ZONE Thermostat,     !- Name
     ! OCCUPIED ZONE,                !- Zone or ZoneList Name
     ! ALWAYS 4,                !- Control Type Schedule Name
     ! ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     ! Office Thermostat Dual SP Control;  !- Control 1 Name
-
 !-   ===========  ALL OBJECTS IN CLASS: DUAL SETPOINT WITH DEADBAND ===========
-
   ! ThermostatSetpoint:DualSetpoint,
     ! Office Thermostat Dual SP Control,  !- Name
     ! ALWAYS 23,               !- Heating Setpoint Temperature Schedule Name
     ! ALWAYS 23;               !- Cooling Setpoint Temperature Schedule Name
-
 !-   ===========  ALL OBJECTS IN CLASS: REPORT VARIABLE ===========
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 
   ! Output:Variable,*,Zone Ideal Loads Zone Total Heating Rate,hourly; !- HVAC Average [W]
-
   ! Output:Variable,*,Zone Ideal Loads Zone Total Cooling Rate,hourly; !- HVAC Average [W]
 
   Output:Variable,*,Zone Air Temperature,Hourly;
 
-  Output:Variable,*,AFN Zone Duct Leaked Air Sensible Heat Gain Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Leaked Air Sensible Heat Gain Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Leaked Air Sensible Heat Loss Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Leaked Air Sensible Heat Loss Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Leaked Air Latent Heat Gain Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Leaked Air Latent Heat Gain Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Leaked Air Latent Heat Loss Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Leaked Air Latent Heat Loss Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Conduction Sensible Heat Gain Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Conduction Sensible Heat Gain Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Conduction Sensible Heat Loss Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Conduction Sensible Heat Loss Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Radiation Heat Gain Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Radiation Heat Gain Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Radiation Sensible Heat Gain Energy,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Radiation Sensible Heat Gain Energy,hourly;
 
-  Output:Variable,*,AFN Zone Duct Radiation Heat Loss Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Radiation Heat Loss Rate,hourly;
 
-  Output:Variable,*,AFN Zone Duct Radiation Sensible Heat Loss Energy,hourly; !- HVAC Average [W]
+  Output:Variable,*,AFN Zone Duct Radiation Sensible Heat Loss Energy,hourly;
 
   Output:Variable,*,Surface Outside Face Conduction Heat Transfer Rate per Area;
 
@@ -1297,7 +1295,6 @@
   Output:Variable,*,Surface Inside Face Temperature;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT METER ===========
-
 !-   ===========  ALL OBJECTS IN CLASS: REPORT ===========
 
   Output:Surfaces:Drawing,DXF;
@@ -1306,7 +1303,9 @@
 
   Output:VariableDictionary,IDF;
 
-  Output:Diagnostics,DisplayUnusedObjects;
+  Output:Diagnostics,
+    DisplayUnusedObjects;    !- Key 1
 
-  Output:Diagnostics,DisplayAllWarnings;
+  Output:Diagnostics,
+    DisplayAllWarnings;      !- Key 1
 
