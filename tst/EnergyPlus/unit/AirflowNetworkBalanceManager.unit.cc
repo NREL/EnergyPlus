@@ -61,6 +61,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2964,11 +2966,11 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_AFNDuctRadGetInput ) {
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFactors ) {
 
 		std::string const idf_objects = delimited_string( {
 			"  Version,",
-			"    8.6;                     !- Version Identifier",
+			"    8.7;                     !- Version Identifier",
 
 			"  SimulationControl,",
 			"    No,                      !- Do Zone Sizing Calculation",
@@ -4313,6 +4315,7 @@ namespace EnergyPlus {
 
 		bool ErrorsFound = false;
         // Read objects
+		SimulationManager::GetProjectData();
 		HeatBalanceManager::GetProjectControlData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 		HeatBalanceManager::GetZoneData( ErrorsFound );
@@ -4323,6 +4326,10 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ErrorsFound );
 		HeatBalanceManager::GetConstructData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
+		HeatBalanceManager::GetHeatBalanceInput();
+		HeatBalanceManager::AllocateHeatBalArrays();
+		DataEnvironment::OutBaroPress = 101000;
+		DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
 		SurfaceGeometry::GetGeometryParameters( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
@@ -4332,8 +4339,10 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ErrorsFound );
 
 		// Read AirflowNetwork inputs
-		GetAirflowNetworkInput( );
+		GetAirflowNetworkInput();
+		InitAirflowNetwork();
 
+		// Check inputs
 		EXPECT_EQ( AirflowNetworkLinkageViewFactorData( 1 ).LinkageName, "ZONESUPPLYLINK1" );
 		EXPECT_EQ( AirflowNetworkLinkageViewFactorData( 1 ).DuctExposureFraction, 1.0 );
 		EXPECT_EQ( AirflowNetworkLinkageViewFactorData( 1 ).DuctEmittance, 0.9 );
@@ -4347,6 +4356,34 @@ namespace EnergyPlus {
 		EXPECT_EQ( AirflowNetworkLinkageViewFactorData( 1 ).LinkageSurfaceData( 4 ).ViewFactor, 0.02052 );
 		EXPECT_EQ( AirflowNetworkLinkageViewFactorData( 1 ).LinkageSurfaceData( 5 ).SurfaceName, "WEST WALL ATTIC" );
 		EXPECT_EQ( AirflowNetworkLinkageViewFactorData( 1 ).LinkageSurfaceData( 5 ).ViewFactor, 0.02052 );
+
+		Real64 const tol = 0.01;
+
+		// Outside convection coefficients
+		// Calculate convection resistance given a convection coefficient
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 1, 2, 5 ), 0.2, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 1, 2, 20 ), 0.05, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 1, 2, 0.1 ), 10, tol );
+
+		// Calculate convection resistance from correlation
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.1, 2, 0 ), 3.977, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 1.0, 2, 0 ), 39.77, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 1.5, 2, 0 ), 59.66, tol );
+
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.1, 2, 0 ), 4.099, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 1.0, 2, 0 ), 40.99, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 1.5, 2, 0 ), 61.49, tol );
+
+		// Calculate convection resistance given a convection coefficient
+		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 5 ), 0.2, tol );
+		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 20 ), 0.05, tol );
+		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 0.1 ), 10, tol );
+
+		// Calculate convection resistance from correlation
+		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 0 ), 1.611, tol );
+		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 1.0, 1, 0 ), 0.2554, tol );
+		EXPECT_NEAR( CalcDuctInsideConvResist( 40, 0.1, 1, 0 ), 1.5879, tol );
+		EXPECT_NEAR( CalcDuctInsideConvResist( 40, 1.0, 1, 0 ), 0.2516, tol );
 	}
 
 	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_AirCp ) {
@@ -4445,31 +4482,5 @@ namespace EnergyPlus {
 		EXPECT_NEAR( AirPrandtl( 60 ), 0.7211, tol );
 		EXPECT_NEAR( AirPrandtl( 70 ), 0.7194, tol );
 		EXPECT_NEAR( AirPrandtl( 80 ), 0.7194, tol );
-	}
-
-	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_CalcDuctInsideConvResist ) {
-
-		Real64 const tol = 0.01;
-
-		// Calculate convection resistance given a convection coefficient
-		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 5 ), 0.2, tol );
-		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 20 ), 0.05, tol );
-		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 0.1 ), 10, tol );
-
-		// Calculate convection coefficient from correlation
-		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 0 ), 1.611, tol );
-		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 1.0, 1, 0 ), 0.2554, tol );
-		EXPECT_NEAR( CalcDuctInsideConvResist( 40, 0.1, 1, 0 ), 1.5879, tol );
-		EXPECT_NEAR( CalcDuctInsideConvResist( 40, 1.0, 1, 0 ), 0.2516, tol );
-	}
-
-	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_CalcDuctOutsideConvResist ) {
-
-		Real64 const tol = 0.01;
-
-		// Calculate convection resistance given a convection coefficient
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 0.1, 1, 5 ), 0.2, tol );
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 0.1, 1, 20 ), 0.05, tol );
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 0.1, 1, 0.1 ), 10, tol );
 	}
 }

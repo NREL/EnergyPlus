@@ -255,6 +255,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const Ts, // Surface temperature
 		Real64 const Tamb, // Free stream temperature
 		Real64 const Dh, // Hydraulic diameter
+		Real64 const ZoneNum, // Zone number
 		Real64 const hOut // User defined convection coefficient
 	);
 

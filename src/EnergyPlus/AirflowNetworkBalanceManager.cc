@@ -5478,6 +5478,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const Ts, // Surface temperature
 		Real64 const Tamb, // Free stream temperature
 		Real64 const Dh, // Hydraulic diameter
+		Real64 const ZoneNum, // Zone number
 		Real64 const hOut // User defined convection coefficient
 	)
 	{
@@ -5502,15 +5503,13 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( hOut == 0 ) {
 
+			// Free convection
 			Real64 Pr = AirPrandtl( Ts );
 			Real64 KinVisc = AirKinematicVisc( Ts );
 			Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
 			Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
-
 			Real64 Ra = Gr * Pr;
-
 			Real64 Nu_free( 0 );
-			Real64 Nu_forced( 0 );
 
 			if ( Ra < 10e9 ) {
 				Nu_free = 0.53 * pow( Ra, 0.25 );
@@ -5518,7 +5517,34 @@ namespace AirflowNetworkBalanceManager {
 				Nu_free = 0.13 * pow( Ra, 0.333 );
 			}
 
-			Real64 Nu_combined = pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 0.333 );
+			// Forced convection
+			Real64 ACH = GetZoneInfilAirChangeRate( ZoneNum ); // Zone air change rate [1/hr]
+			Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
+			Real64 V = pow( Vol, 1/3 ) * ACH / 3600; // Average air speed in zone [m/s]
+			Real64 Re = V * Dh / AirKinematicVisc( Tamb ); // Reynolds number
+			Real64 c;
+			Real64 n;
+
+			if ( Re <= 4 ) {
+				c = 0.989;
+				n = 0.33;
+			} else if ( 4 < Re && Re <= 40 ) {
+				c = 0.911;
+				n = 0.385;
+			} else if ( 40 < Re && Re <= 4000 ) {
+				c = 0.683;
+				n = 0.466;
+			} else if ( 4000 < Re && Re <= 40000 ) {
+				c = 0.193;
+				n = 0.618;
+			} else if ( 40000 < Re ) {
+				c = 0.0266;
+				n = 0.805;
+			}
+
+			Real64 Nu_forced = c * pow( Re, n ) * pow( Pr, 1/3 );
+
+			Real64 Nu_combined = pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 1/3 );
 			hOut_final = Nu_combined * k / Dh;
 
 		} else {
@@ -5647,7 +5673,7 @@ namespace AirflowNetworkBalanceManager {
 							UThermal_iter = UThermal;
 
 							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
-							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
 							UThermal = pow( RThermTotal , -1);
@@ -5660,7 +5686,7 @@ namespace AirflowNetworkBalanceManager {
 						}
 					} else { // Air-to-air only. U and h values are all known
 							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
-							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
 							UThermal = pow( RThermTotal , -1);
@@ -5681,7 +5707,7 @@ namespace AirflowNetworkBalanceManager {
 						UThermal_iter = UThermal;
 
 						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin_ave, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
-						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 						Real64 hOut = 1 / RThermConvOut;
 						Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 
