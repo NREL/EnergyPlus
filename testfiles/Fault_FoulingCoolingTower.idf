@@ -117,6 +117,8 @@
   Timestep,6;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier1,             !- MultiplierName
+    ,                        !- Zone or ZoneList Name
     1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
     1.0,                     !- Carbon Dioxide Capacity Multiplier

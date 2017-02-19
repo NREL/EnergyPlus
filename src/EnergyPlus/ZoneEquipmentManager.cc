@@ -4524,7 +4524,6 @@ namespace ZoneEquipmentManager {
 		VentMCP = 0.0;
 		MDotCPOA = 0.0;
 		MDotOA = 0.0;
-
 		MCPThermChim = 0.0;
 		ThermChimAMFL = 0.0;
 		MCPTThermChim = 0.0;
@@ -5228,7 +5227,6 @@ namespace ZoneEquipmentManager {
 				OAMFL( NZ ) += MCpI_temp / CpAir;
 				MCPTI( NZ ) += MCpI_temp * TempExt;
 			}
-
 		}
 
 		// Add infiltration rate enhanced by the existence of thermal chimney
