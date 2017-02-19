@@ -158,7 +158,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
 	EXPECT_EQ( OutputVariablesNames.size(), 6u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 6u );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
-	EXPECT_FALSE( FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
+	EXPECT_TRUE( FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
 	EXPECT_FALSE( FindItemInVariableList( "Inlet", "System Node Mass Flow Rate" ));
 	EXPECT_FALSE( FindItemInVariableList( "BackRoom Inlet Node", "System Node Humidity Ratio" ));
 	EXPECT_TRUE( FindItemInVariableList( "BackRoom Any Node", "Zone Air System Sensible Heating Rate" ));
@@ -185,7 +185,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 	EXPECT_EQ( OutputVariablesNames.size(), 7u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 7u );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
-	EXPECT_FALSE( FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
+	EXPECT_TRUE( FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
 	EXPECT_TRUE( FindItemInVariableList( "Inlet", "System Node Mass Flow Rate" ));
 	EXPECT_TRUE( FindItemInVariableList( "Inlet Node", "System Node Mass Flow Rate" ));
 	EXPECT_FALSE( FindItemInVariableList( "BackRoom Inlet Node", "System Node Humidity Ratio" ));
@@ -193,7 +193,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 	EXPECT_TRUE( FindItemInVariableList( "Any Inlet", "System Node Humidity Ratio" ));
 	EXPECT_TRUE( FindItemInVariableList( "BackRoom Any Node", "Zone Air System Sensible Heating Rate" ));
 	EXPECT_TRUE( FindItemInVariableList( "Node", "Zone Air System Sensible Heating Rate" ));
-	EXPECT_FALSE( FindItemInVariableList( "NODE", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_TRUE( FindItemInVariableList( "NODE", "Zone Air System Sensible Heating Rate" ));
 	EXPECT_TRUE( FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" ));
 	EXPECT_TRUE( FindItemInVariableList( "Outside Air Node", "Unitary System Compressor Part Load Ratio" ));
 	EXPECT_TRUE( FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Compressor Part Load Ratio" ));
@@ -253,7 +253,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 	EXPECT_FALSE( FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" ));
 	EXPECT_TRUE( FindItemInVariableList( "BackRoom_NODE1", "System Node Humidity Ratio" ));
 	EXPECT_TRUE( FindItemInVariableList( "NODE", "Unitary System Compressor Part Load Ratio" ));
-	EXPECT_FALSE( FindItemInVariableList( "Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_TRUE( FindItemInVariableList( "Node", "Unitary System Compressor Part Load Ratio" ));
 	EXPECT_FALSE( FindItemInVariableList( "NOD", "Unitary System Compressor Part Load Ratio" ));
 	//next 7 test cases are meant for "{,}" type of regexes
 	EXPECT_FALSE( FindItemInVariableList( "Inlet", "Zone Air System Sensible Heating Rate" ));
