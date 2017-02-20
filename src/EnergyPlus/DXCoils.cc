@@ -9605,10 +9605,10 @@ Label50: ;
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 					LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
 					LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
-					OutletAirDryBulbTempSat = PsyTsatFnHPb(LSOutletAirEnthalpy, OutdoorPressure, RoutineNameLowSpeedOutlet);
-					if (LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+					OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineNameLowSpeedOutlet );
+					if ( LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-						LSOutletAirHumRat = PsyWFnTdbH(LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineNameLowSpeedOutlet);
+						LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineNameLowSpeedOutlet );
 					}
 
 				}
@@ -10746,7 +10746,7 @@ Label50: ;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHRLS ) * hDelta;
 				LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, RoutineName );
 				LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
-				OutletAirDryBulbTempSat = PsyTsatFnHPb(LSOutletAirEnthalpy, OutdoorPressure, RoutineName);
+				OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineName );
 				if ( LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 					LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
 					LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineName );
@@ -10788,10 +10788,10 @@ Label50: ;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHRHS ) * hDelta;
 				HSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, RoutineName );
 				HSOutletAirDryBulbTemp = PsyTdbFnHW( HSOutletAirEnthalpy, HSOutletAirHumRat );
-				OutletAirDryBulbTempSat = PsyTsatFnHPb(HSOutletAirEnthalpy, OutdoorPressure, RoutineName);
-				if (HSOutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+				OutletAirDryBulbTempSat = PsyTsatFnHPb( HSOutletAirEnthalpy, OutdoorPressure, RoutineName );
+				if ( HSOutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 					HSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-					HSOutletAirHumRat = PsyWFnTdbH(HSOutletAirDryBulbTemp, HSOutletAirEnthalpy, RoutineName);
+					HSOutletAirHumRat = PsyWFnTdbH( HSOutletAirDryBulbTemp, HSOutletAirEnthalpy, RoutineName );
 				}
 
 				//  If constant fan with cycling compressor, call function to determine "effective SHR"
@@ -10995,10 +10995,10 @@ Label50: ;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 				LSOutletAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout, RoutineName );
 				LSOutletAirDryBulbTemp = PsyTdbFnHW( LSOutletAirEnthalpy, LSOutletAirHumRat );
-				OutletAirDryBulbTempSat = PsyTsatFnHPb(LSOutletAirEnthalpy, OutdoorPressure, RoutineName);
-				if (LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+				OutletAirDryBulbTempSat = PsyTsatFnHPb( LSOutletAirEnthalpy, OutdoorPressure, RoutineName );
+				if ( LSOutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 					LSOutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-					LSOutletAirHumRat = PsyWFnTdbH(LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineName);
+					LSOutletAirHumRat = PsyWFnTdbH( LSOutletAirDryBulbTemp, LSOutletAirEnthalpy, RoutineName );
 				}
 
 				//  If constant fan with cycling compressor, call function to determine "effective SHR"
