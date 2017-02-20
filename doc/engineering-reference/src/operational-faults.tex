@@ -1,6 +1,6 @@
 \chapter{Operational Faults}\label{operational-faults}
 
-\section{Introduction to Operational Faults Modeling}\label{introduction-to-operational-faults-modeling}
+\section{Introduction to HVAC Operational Faults Modeling}\label{introduction-to-hvac-operational-faults}
 
 Most of the buildings, either new or old, have operational faults in the sensors, controllers, meters, equipment and systems. Being able to model and simulate these faults and their impact on energy performance of buildings is crucial to improve accuracy of building simulations and to support the retrofit of buildings. To date, the main practitioner use of EnergyPlus has been for new construction design. With the new high priority attached by USDOE to retrofit and improved operation of existing buildings, there is a need to extend the capabilities of EnergyPlus to model existing buildings, including faulty operation:
 
@@ -16,7 +16,10 @@ Most of the buildings, either new or old, have operational faults in the sensors
 
 The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.
 
-EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults.
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of a number of fault types that categorized as: (1) sensor faults with air economizers (e.g., outdoor air temperature sensor) (2) thermostat/humidistat offset faults, (3) fouling or scaling at air side or water side components (e.g., heating and cooling coil, air filter, cooling tower), (4) sensor faults with plant components (e.g., chiller supply water temperature sensor offset).
+
+
+\section{Operational Faults Modeling}\label{operational-faults-modeling}
 
 \subsection{Sensor Faults with Air Economizers}\label{sensor-faults-with-air-economizers}
 
@@ -315,3 +318,367 @@ Where,
 \(_{design}\) is for the parameters in the design condition;
 
 \(_{df}\) is for the parameters in the dirty filter case.
+
+
+\subsection{Chiller Supply Water Temperature Sensor Offset}\label{chiller-supply-water-temperature-sensor-offset}
+
+\subsubsection{Symptom}
+
+The chiller supply water temperature readings deviate from the actual water temperature levels due to sensor offset at the evaporator outlet. This can lead to incorrect chiller supply water temperature, and thus the inappropriate and inefficient chiller operations.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to a number of chiller types, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  Chiller:Electric
+\item
+  Chiller:Electric:EIR
+\item
+  Chiller:Electric:ReformulatedEIR
+\item
+  Chiller:ConstantCOP
+\item
+  Chiller:EngineDriven
+\item
+  Chiller:CombustionTurbine
+\item
+  Chiller:Absorption
+\item
+  Chiller:Absorption:Indirect
+\end{itemize}
+
+These chillers can have different flow modes:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{ConstantFlow} for constant pumping with flow controlled by chiller to operate at full design flow rate.
+\item
+  \emph{LeavingSetpointModulated} for variable pumping with flow controlled by chiller to vary flow to target a leaving temperature setpoint.
+\item
+  \emph{NotModulated} for either variable or constant pumping with flow controlled by the external plant system.
+\end{itemize}
+
+\textbf{(a) constant flow chillers}
+
+For the chillers with \emph{ConstantFlow} and \emph{NotModulated}, local control is provided by resetting the leaving water temperature. The actual evaporator outlet water temperature value at faulty operations can be obtained via:
+
+\begin{equation}
+T_{evap-o,f} = T_{evap-o,ff} - \Delta T
+\end{equation}
+
+Where, 
+
+\(T_{evap-o,f}\) evaporator outlet temperature in the faulty case (actual value)
+
+\(T_{evap-o,ff}\) evaporator outlet temperature in the fault-free case (reading value)
+
+\(\Delta T\) difference between the temperature reading and the actual temperature
+
+Then the evaporator capacity can be calculated with:
+
+\begin{equation}
+Q_{evap,f} = m_{evap} \times C_p \times (T_{evap-i} - T_{evap-o,f} )
+\end{equation}
+
+Where, 
+
+\(m_{evap}\) evaporator water flow rate (design value, actual value)
+
+\(Q_{evap,f}\) actual evaporator capacity in the faulty case
+
+\(T_{evap-o,f}\) evaporator outlet temperature value in the faulty case (actual value)
+
+\(T_{evap-i}\) evaporator inlet temperature value \newline
+
+\textbf{(b) variable flow chillers}
+
+For the variable flow chillers with internal water flow rate controls to target a leaving temperature setpoint (type \emph{LeavingSetpointModulated}), the actual evaporator outlet water temperature value at faulty operations can be obtained via:
+
+\begin{equation}
+T_{evap-o,f} = T_{evap-o,ff} - \Delta T
+\end{equation}
+
+Where, 
+
+\(T_{evap-o,f}\) evaporator outlet temperature in the faulty case (actual value)
+
+\(T_{evap-o,ff}\) evaporator outlet temperature in the fault-free case (reading, design value)
+
+\(\Delta T\) difference between the temperature reading and the actual temperature
+
+The water flow rate at faulty operations can be obtained via:
+
+\begin{equation}
+m_{evap,f} = Q_{evap,ff} / ( C_p \times (T_{evap-i} - T_{evap-o,ff} ) )
+\end{equation}
+
+Where, 
+
+\(m_{evap,f}\) evaporator water flow rate in the faulty case (actual value)
+
+\(Q_{evap,ff}\) evaporator capacity in the fault-free case (required value)
+
+\(Q_{evap,f}\) actual evaporator capacity in the faulty case (actual value)
+
+\(T_{evap-o,ff}\) evaporator outlet temperature in the fault-free case (reading, design value)
+
+\(T_{evap-i}\) evaporator inlet temperature value 
+
+\(\Delta T\) difference between the temperature reading and the actual temperature
+
+Then the evaporator capacity can be calculated with:
+
+\begin{equation}
+Q_{evap,f} = m_{evap,f} \times C_p \times (T_{evap-i} - T_{evap-o,f} )
+\end{equation}
+
+Where, 
+
+\(m_{evap,f}\) evaporator water flow rate in the faulty case (actual value)
+
+\(Q_{evap,f}\) actual evaporator capacity in the faulty case (actual value)
+
+\(T_{evap-o,f}\) evaporator outlet temperature value in the faulty case (actual value)
+
+\(T_{evap-i}\) evaporator inlet temperature value 
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations. If the faulty sensor leads to a supply water temperature level that goes beyond the limits defined in the chiller object, the predefined bound values will be used as the actual supply water temperature \(T_{evap-o,f}\).
+
+If there are multiple chillers operating together with one shared faulty supply water temperature sensor, one fault object needs to be created for every chiller that is affected.
+
+
+\subsection{Condenser Supply Water Temperature Sensor Offset}\label{condenser-supply-water-temperature-sensor-offset}
+
+\subsubsection{Symptom}
+
+The condenser supply water temperature readings deviate from the actual water temperature levels due to sensor offset at the condenser inlet. Because this is usually used as the condenser loop temperature setpoint, the fault may affect the actual performance of cooling tower and condenser. It can result in inappropriate tower operations such as fan and pump cycling and water bypass. 
+
+\subsubsection{Modeling Approach}
+
+The fault applies to a number of cooling tower types, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  CoolingTower:SingleSpeed
+\item
+  CoolingTower:TwoSpeed
+\item
+  CoolingTower:VariableSpeed
+\item
+  CoolingTower:VariableSpeed:MERKEL
+\end{itemize}
+
+The effect of an offset in a condenser supply water temperature sensor whose sole use is for calculation of the difference between the set-points and the actual values can be modeled as an equal and opposite offset: 
+
+\begin{equation}
+T_{tower-o,f} = T_{tower-o,ff} - \Delta T
+\end{equation}
+
+Where,
+
+\(T_{tower-o,f}\) tower outlet temperature in the faulty case (actual value)
+
+\(T_{tower-o,ff}\) tower outlet temperature in the fault-free case (reading value)
+
+\(\Delta T\) difference between the temperature reading and the actual temperature
+
+Note that the fault affects the tower in both the free convection cooling mode when fan is off and normal cooling mode when fan is on. Also note that if the faulty sensor temperature goes beyond the sensor bounds (e.g., min/max condenser loop temperature defined in object \emph{CondenserLoop}, or the min/max setpoint values defined in object \emph{SetpointManager:FollowOutdoorAirTemperature}), the predefined bound values will be used as the actual temperature.
+
+
+\subsection{Cooling Tower Fouling}\label{cooling-tower-fouling}
+
+\subsubsection{Symptom}
+
+The fault of scaling widely exists in the cooling tower operations. It occurs when deposits get clogged, usually caused by poor water quality and treatment. It is reported that the removal of scale deposits is one of the biggest expenses in the cooling tower maintenance. Scale deposits can reduce the overall heat transfer coefficient (UA), affecting both the tower effectiveness and energy efficiency.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to a number of cooling tower types, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  CoolingTower:SingleSpeed
+\item
+  CoolingTower:TwoSpeed
+\item
+  CoolingTower:VariableSpeed:MERKEL
+\end{itemize}
+
+The fault model allows the user to describe the fouling using UA reduction factor, which is the ratio between the UA value at fouling case and that at fault free case. The factor is applicable to both the Design UA and Free Convection UA of the tower. 
+
+\begin{equation}
+UA_{tower,f} = UA_{tower,ff} \times F_{UA}
+\end{equation}
+
+Where,
+
+\(UA_{tower,f}\) U-factor times area values in the faulty case
+
+\(UA_{tower,ff}\) U-factor times area values in the fault-free case
+
+\(F_{UA}\) Factor describing the tower UA reduction due to fouling
+
+
+\subsection{Coil Supply Air Temperature Sensor Offset}\label{coil-supply-air-temperature-sensor-offset}
+
+\subsubsection{Symptom}
+
+The coil supply air temperature readings deviate from the actual air temperature levels due to sensor offset at the coil outlet. Because coil outlet node are often used as the setpoint node for coil control, the fault may affect the actual performance of the coils. It can result in inappropriate coil operations such as coil on/off mode and water-side flow rate control, and therefore affect the coil energy consumption. Since the coil outlet air temperature deviate from the design level, the operations and performance of other components (e.g., other dcoils) at the downstream may also be affected.
+
+\subsubsection{Modeling Approach}
+
+EnergyPlus can model a number of coil types, some of which are temperature-based control and the others are load-based control. The proposed fault model will be applied to the ones with temperature-based control, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  Coil:Heating:Electric
+\item
+  Coil:Heating:Gas
+\item
+  Coil:Heating:Steam
+\item
+  Coil:Heating:Desuperheater
+\item
+  Coil:Heating:Water
+\item
+  Coil:Cooling:Water
+\item
+  Coil:Cooling:Water:Detailedgeometry
+\end{itemize}
+
+The effect of an offset in a coil supply air temperature sensor whose sole use is for calculation of the difference between the set-points and the actual values can be modeled as an equal and opposite offset:
+
+\begin{equation}
+T_{coil-o,f} = T_{coil-o,ff} - \Delta T
+\end{equation}
+
+Where,
+
+\(T_{coil-o,f}\) coil outlet temperature in the faulty case (actual value)
+
+\(T_{coil-o,ff}\) coil outlet temperature in the fault-free case (reading value)
+
+\(\Delta T\) difference between the temperature reading and the actual temperature
+
+Note that \emph{Coil:Heating:Water}, \emph{Coil:Cooling:Water}, and \emph{Coil:Cooling:Water:Detailedgeometry} are controlled via \emph{Controller:WaterCoil}, while the other coil types are controlled with an internal \emph{Temperature Setpoint Node}. For the water coils, users need to specify a \emph{Controller:WaterCoil} object that corresponds to the faulty water coil.
+
+
+\subsection{Hot-water Boilers Fouling}\label{hot-water-boiler-fouling}
+
+\subsubsection{Symptom}
+
+The fouling fault of boilers may occur when deposits get clogged at the water side of boilers, usually caused by poor water quality and treatment. The scale deposits can reduce the capacity and efficiency of the boiler. This further impacts the boiler operations by changing the part load ratio and the related operation/performance parameters.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to the hot water boiler model described by the object Boiler:HotWater. It does not apply to the steam boilers which do not have water-based heat exchangers.
+
+The model allows the user to describe the fault using a dynamic fouling factor. The reference factor indicates the decrease of the nominal capacity of the boiler, which is the ratio between the nominal capacity at fouling case and that at fault free case. The nominal thermal efficiency is decreased correspondingly.
+
+\begin{equation}
+Q_{boiler,f} = Q_{boiler,ff} \times F_{boiler}
+\end{equation}
+
+\begin{equation}
+Eff_{boiler,f} = Eff_{boiler,ff} \times F_{boiler}
+\end{equation}
+
+Where,
+
+\(Q_{boiler,f}\) Nominal boiler capacity in the faulty case
+
+\(Q_{boiler,ff}\) Nominal boiler capacity in the fault-free case
+
+\(Eff_{boiler,f}\) Nominal boiler thermal efficiency in the faulty case
+
+\(Eff_{boiler,ff}\) Nominal boiler thermal efficiency in the fault-free case
+
+\(F_{boiler}\) Factor describing the boiler capacity and efficiency reduction due to fouling
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
+
+
+\subsection{Water-cooled Chiller Fouling}\label{water-cooled-chiller-fouling}
+
+\subsubsection{Symptom}
+
+The fouling fault of chillers may occur when deposits get clogged at the water-cooled condensers, usually caused by poor water quality and treatment. The scale deposits can reduce the capacity and efficiency of the chiller. This further impacts the chiller operations by changing the part load ratio and the related operation/performance parameters.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to a number of chiller types that can have water-cooled condensers, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  Chiller:Electric
+\item
+  Chiller:Electric:EIR
+\item
+  Chiller:Electric:ReformulatedEIR
+\item
+  Chiller:ConstantCOP
+\item
+  Chiller:EngineDriven
+\item
+  Chiller:CombustionTurbine
+\end{itemize}
+
+The fault does not apply to the absorption chillers that do not have water-based heat exchangers. 
+
+The model allows the user to describe the fault using a dynamic fouling factor. The reference factor indicates the decrease of the reference capacity of the chiller, which is the ratio between the nominal capacity at fouling case and that at fault free case. The reference COP is decreased correspondingly.
+
+\begin{equation}
+Q_{chiller,f} = Q_{chiller,ff} \times F_{chiller}
+\end{equation}
+
+\begin{equation}
+COP_{chiller,f} = COP_{chiller,ff} \times F_{chiller}
+\end{equation}
+
+Where,
+
+\(Q_{chiller,f}\) Reference chiller capacity in the faulty case
+
+\(Q_{chiller,ff}\) Reference chiller capacity in the fault-free case
+
+\(COP_{chiller,f}\) Reference chiller COP in the faulty case
+
+\(COP_{chiller,ff}\) Reference chiller COP in the fault-free case
+
+\(F_{chiller}\) Factor describing the chiller capacity and efficiency reduction due to fouling
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
+
+
+\subsection{Evaporative Coolers Fouling}\label{evaporative-cooler-fouling}
+
+\subsubsection{Symptom}
+
+The fouling fault may occur at indirect wet-coil evaporative coolers, where the cooling water is sprayed directly on the tubes. This is usually occurs at the wet coil tubes caused by the dust in the air. The fouling can reduce the effectiveness of the tube and further impact the evaporative cooler operations by changing the related operation/performance parameters.
+
+\subsubsection{Modeling Approach}
+
+The fault applies to the wetted coil evaporative cooler described by object EvaporativeCooler:Indirect:WetCoil. The fault does not apply to direct evaporative coolers or the dry coil indirect evaporative coolers where there is no water-cooled coil.
+
+The model allows the user to describe the fault using a dynamic fouling factor. The reference factor indicates the decrease of the indirect stage efficiency, which is the ratio between the indirect stage efficiency at fouling case and that at fault free case.
+
+\begin{equation}
+Eff_{EvapCooler,f} = Eff_{EvapCooler,ff} \times F_{EvapCooler}
+\end{equation}
+
+Where,
+\(Eff_{EvapCooler,f}\) Indirect stage efficiency in the faulty case
+
+\(Eff_{EvapCooler,ff}\) Indirect stage efficiency in the fault-free case
+
+\(F_{EvapCooler}\) Factor describing the evaporative cooler efficiency reduction due to fouling
+
+Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.

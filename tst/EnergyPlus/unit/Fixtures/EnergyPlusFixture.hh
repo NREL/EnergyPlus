@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef EnergyPlusFixture_hh_INCLUDED
 #define EnergyPlusFixture_hh_INCLUDED
@@ -245,6 +233,13 @@ namespace EnergyPlus {
 		// Will return true if string matches the stream and false if it does not
 		bool compare_eso_stream( std::string const & expected_string, bool reset_stream = true );
 
+		// Compare an expected string against the EIO stream. The default is to reset the EIO stream after every call.
+		// It is easier to test successive functions if the EIO stream is 'empty' before the next call.
+		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+		// if it makes sense for the unit test to continue after returning from function.
+		// Will return true if string matches the stream and false if it does not
+		bool compare_eio_stream( std::string const & expected_string, bool reset_stream = true );
+
 		// Compare an expected string against the MTR stream. The default is to reset the MTR stream after every call.
 		// It is easier to test successive functions if the MTR stream is 'empty' before the next call.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -289,6 +284,9 @@ namespace EnergyPlus {
 
 		// Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
 		bool has_eso_output( bool reset_stream = true );
+
+		// Check if EIO stream has any output. Useful to make sure there are or are not outputs to EIO.
+		bool has_eio_output( bool reset_stream = true );
 
 		// Check if MTR stream has any output. Useful to make sure there are or are not outputs to MTR.
 		bool has_mtr_output( bool reset_stream = true );
@@ -348,6 +346,7 @@ namespace EnergyPlus {
 		static void setup_cache();
 
 		std::unique_ptr< std::ostringstream > eso_stream;
+		std::unique_ptr< std::ostringstream > eio_stream;
 		std::unique_ptr< std::ostringstream > mtr_stream;
 		std::unique_ptr< std::ostringstream > echo_stream;
 		std::unique_ptr< std::ostringstream > err_stream;

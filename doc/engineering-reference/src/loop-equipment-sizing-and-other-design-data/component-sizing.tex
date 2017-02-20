@@ -1253,74 +1253,154 @@ where
 
 \subsection{Electric Chiller Sizing}\label{electric-chiller-sizing}
 
-Generally chillers will need nominal cooling capacity, evaporator flow rate and condenser flow rate. All 3 quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.
+Generally chillers will need nominal cooling capacity, evaporator flow rate and condenser flow rate. All three quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.  Chillers may also have a third plant loop connection for heat recovery and this flow rate can also be obtained. 
 
-All chillers on a loop are sized to meet the full loop load. If there are multiple chillers on a loop that call for autosizing, they will all be assigned the same cooling capacity and evaporator flow rate.
+All chillers on a loop are sized to meet the full loop load multiplied by a component-level sizing factor.  This sizing factor is set by the user in the chiller input object. If there are multiple chillers on a loop that call for autosizing, they will all use their own sizing factor applied to the loop level flow rate.
 
 \subsubsection{Nominal Cooling Capacity}\label{nominal-cooling-capacity}
 
 \begin{equation}
-\dot Qchiller,nom = Cp,w\cdot \rho w\cdot \Delta Tloop,des\cdot \dot Vloop,des
+\dot Q_{chiller,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
 where
 
-\emph{C\(_{p,w}\)} is the specific heat of water at 5 \(^{o}\)C;
+\( C_{p,w} \) is the specific heat of evaporator loop fluid at 5 \(^{o}\)C;
 
-\emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
+\( \rho_w \) is the density of evaporator loop fluid at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{loop,des}\)} is the chilled water loop design temperature rise;
+\( \Delta T_{loop,des} \) is the chilled water loop design temperature rise (from the chilled water loop's Sizing:Plant input data);
 
-\(\dot Vloop,des\) is the loop design volumetric flow rate.
+\( \dot V_{loop,des} \) is the loop design volume flow rate.
+
+\( f_{size} \) is the chiller's sizing factor.
 
 \subsubsection{Design Evaporator Volumetric Water Flow Rate}\label{design-evaporator-volumetric-water-flow-rate}
 
+The evaporator flow rate is set equal to the loop's design flow rate multiplied by the chiller's sizing factor.
+
 \begin{equation}
-\dot Vevap,des = \dot Vloop,des
+\dot V_{evap,des} = \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
-\subsubsection{Design Condenser Volumetric Water Flow Rate}\label{design-condenser-volumetric-water-flow-rate}
+\subsubsection{Design Condenser Volume Flow Rate}\label{design-condenser-volume-flow-rate}
+
+The condenser flow rate is obtained by balancing the total heat rejected at full capacity with the heat transferred by the condenser fluid at the design temperature difference using the fluid properties for the condenser loop.
 
 \begin{equation}
-\dot Vcond,des = \dot Qchiller,nom\cdot (1 + 1/COPchiller,nom)/(\Delta Tloop,des\cdot Cp,w\cdot \rho w)
+\dot V_{cond,des} = \dot Q_{chiller,nom} \cdot (1 + 1/COP_{chiller,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
 \end{equation}
 
 where
 
-\emph{C\(_{p,w}\)} is the specific heat of water at design condenser inlet temperature;
+\( C_{p,w} \) is the specific heat of condenser loop fluid at design condenser inlet temperature;
 
-\emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
+\( \rho_w \) is the density of condenser loop fluid at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{loop,des}\)} is the chilled water loop design temperature rise;
+\( \Delta T_{loop,des} \) is the condenser loop design temperature rise (from condenser loop's Sizing:Plant input data);
 
-\emph{COP\(_{chiller,nom}\)} is the chiller nominal COP.
+\( COP_{chiller,nom} \) is the chiller's nominal COP.
 
-Boiler Sizing
+\subsubsection{Design Heat Recovery Volume Water Flow Rate}\label{design-heat-recovery-chiller-volume-water-flow-rate}
 
-Generally boilers will need nominal heating capacity and rate. Both quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.
+The chiller heat recovery volume flow rate, \( \dot V_{hr,des} \), is obtained from the condenser volume flow rate modified by a capacity fraction.
 
-All boilers on a loop are sized to meet the full loop load. If there are multiple boilers on a loop that call for autosizing, they will all be assigned the same heating capacity and flow rate.
+\begin{equation}
+\dot V_{hr,des} = \dot V_{cond,des} \cdot F_{HR,cap} 
+\end{equation}
+
+where
+
+\( F_{HR,cap} \) is user input from the field called Condenser Heat Recovery Relative Capacity Fraction.
+
+
+\subsection{Water to Water Heat Pump Sizing}\label{WWHP-sizing}
+
+Generally water to water heat pumps will need nominal capacity and fluid volume flow rates for both the load and source sides.  The models for HeatPump:WaterToWater:EquationFit:Cooling and HeatPump:WaterToWater:EquationFit:Heating also need a reference power consumption.  
+
+\subsubsection{Reference Load Side Flow Rate}\label{WWHP-ref-load-side-flow-rate}
+
+The load side design fluid flow rate, \( \dot V_{load,des} \), is set equal to the load side loop's total design flow rate multipled by a component-level sizing factor.
+\begin{equation}
+\dot V_{load,des} = \dot V_{loop,des} \cdot f_{size}
+\end{equation}
+
+where
+
+\( \dot V_{loop,des} \) is the loop design volume flow rate;
+
+\( f_{size} \) is the heat pump's sizing factor.
+
+\subsubsection{Reference Capacity}\label{wwhp-ref-capacity}
+
+The nominal capacity is determined from the loop design flow rate, loop design temperature difference and load side fluid properties.
+
+\begin{equation}
+\dot Q_{hp,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
+\end{equation}
+
+where
+
+\( C_{p,w} \) is the specific heat of load side loop fluid at standard conditions (5.05 \(^{o}\)C for cooling, 60.0 \(^{o}\)C for heating);
+
+\( \rho_w \) is the density of load side loop fluid at standard conditions (5.05 \(^{o}\)C for cooling, 60.0 \(^{o}\)C for heating);
+
+\( \Delta T_{loop,des} \) is the load side loop design temperature rise (from load side loop's Sizing:Plant input data).
+
+\subsubsection{Reference Source Side Flow Rate}\label{WWHP-ref-source-side-flow-rate}
+
+The source side design fluid flow rate, \( \dot V_{source,des} \), is obtained by balancing the total heat supplied or rejected at full capacity with the heat transferred by the source side fluid at the design temperature difference using the fluid properties for the source side loop.
+
+For the cooling heat pump, the heat rejected includes the compressor work,
+\begin{equation}
+\dot V_{source,des} = \dot Q_{hp,nom} \cdot (1 + 1/COP_{hp,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
+\end{equation}
+
+For the heating heat pump, the heat supplied is reduced by the compressor work,
+
+\begin{equation}
+\dot V_{source,des} = \dot Q_{hp,nom} \cdot (1 - 1/COP_{hp,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
+\end{equation}
+
+where
+
+\( COP_{hp,nom} \) is the reference coefficient of performance.  This is from user input if reference power consumption is autosized.
+
+\subsubsection{Reference Power Consumption}\label{wwhp-ref-power-consumption}
+
+The reference power consumption is the capacity divided by COP
+\begin{equation}
+P_{hp,nom} = \dot Q_{hp,nom} / COP_{hp,nom}
+\end{equation}
+
+\subsection{Boiler Sizing}\label{boiler-sizing}
+
+Generally boilers will need nominal heating capacity and water volume flow rate. Both quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.
+
+All boilers on a loop are sized to meet the full loop load multipled by a component-level sizing factor. If there are multiple boilers on a loop that call for autosizing, they will all be assigned a heating capacity and flow rate using their own sizing factor.
 
 \subsubsection{Nominal Capacity}\label{nominal-capacity}
 
 \begin{equation}
-\dot Qboiler,nom = Cp,w\cdot \rho w\cdot \Delta Tloop,des\cdot \dot Vloop,des
+\dot Q_{boiler,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
 where
 
-\emph{C\(_{p,w}\)} is the specific heat of water at the boiler design outlet temperature;
+\( C_{p,w} \) is the specific heat of water at the boiler design outlet temperature;
 
-\emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
+\( \rho_w \) is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{loop,des}\)} is the hot water loop design temperature decrease;
+\( \Delta T_{loop,des} \) is the hot water loop design temperature decrease;
 
-\(\dot Vloop,des\) is the loop design volumetric flow rate.
+\( \dot V_{loop,des} \) is the loop design volumetric flow rate.
 
-\subsubsection{Design Evaporator Volumetric Water Flow Rate}\label{design-evaporator-volumetric-water-flow-rate-1}
+\( f_{size} \) is the boiler's sizing factor.
+
+\subsubsection{Design Water Volume Flow Rate}\label{design-boiler-water-flow-rate-1}
 
 \begin{equation}
-\dot Vdes = \dot Vloop,des
+\dot Vdes = \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
 \subsection{Plant Heat Exchanger Sizing}\label{plant-heat-exchanger-sizing}
@@ -1985,7 +2065,21 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 where
 
-\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\begin{itemize}
+\tightlist
+\item
+  \(c_{p,air}\) is specific heat of air evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio, J/kgC.
+\item
+  \(\dot{V}_{max,hw}\) is maximum hot water flow rate, m$^{3}/s$.
+\item
+  \(\dot{Q}_{coil,des}\) is heating coil design load, W.
+\item
+  \(c_{p,w}\) is specific heat of hot water, J/kgC.
+\item
+  \(\rho_{w}\) is density of hot water, m$^{3}/kg$.
+\item
+  \(\Delta T_{loop,des}\) is hot water loop design temperature difference, deltaC.
+\end{itemize}
 
 \subsubsection{Maximum Cold Water Flow}\label{maximum-cold-water-flow}
 
@@ -2006,12 +2100,26 @@ where
 \end{equation}
 
 \begin{equation}
-  \dot{V}_{max,hw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
+  \dot{V}_{max,cw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
 \end{equation}
 
 where
 
-\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\begin{itemize}
+\tightlist
+\item
+  \(c_{p,air}\) is specific heat of air evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio, J/kgC.
+\item
+  \(\dot{V}_{max,cw}\) is maximum cold water flow rate, m$^{3}/s$.
+\item
+  \(\dot{Q}_{coil,des}\) is cooling coil design load, W.
+\item
+  \(c_{p,w}\) is specific heat of cold water, J/kgC.
+\item
+  \(\rho_{w}\) is density of cold water, m$^{3}/kg$.
+\item
+  \(\Delta T_{loop,des}\) is cold water loop design temperature difference, deltaC.
+\end{itemize}
 
 \subsection{Window Air Conditioner Sizing}\label{window-air-conditioner-sizing}
 
@@ -2558,3 +2666,29 @@ The maximum supply air temperature can also be automatically selected. The value
 \begin{equation}
 T_{SA,max} = \text{HeatDesTemp}_{ZoneOrSystem}
 \end{equation}
+
+\subsubsection{Single Zone VAV Temperature Limits}\label{single-zone-vav-temperature-limits}
+
+The minimum and maximum supply air temperature limits for the single zone VAV model are calculated using a fraction of the control zone design load and the low speed fan operating air volume flow rate. When using the single zone VAV model, the minimum and maximum supply air temperature limits are used to control the system when low speed fan operation under low load conditions and to modulate the fan speed to limit the outlet air temperature at higher zone loads. These limits are not enforced once the system fan speed reaches the maximum. See Figure~\ref{fig:example-of-the-energyplus-unitary-system-single-zone-vav-model}.
+
+\begin{equation}
+T_{sup} = T_{zone,at-peak}+\frac{\dot{Q}_{sens,at-peak} * frac}{\rho_{air}c_{p,air}\dot{V}_{air,min}}
+\end{equation}
+
+where
+
+\emph{T\(_{sup}\) is the supply air temperature limit to meet a fraction of the zone design load, (\(^{o}\)C)}
+
+\emph{T\(_{zone,at-peak}\) is the zone air temperature at the time of peak design load, (\(^{o}\)C)}
+
+\emph{Q\(_{sens,at-peak}\) is the zone design cooling or heating load, (W) (negative for cooling)}
+
+\emph{frac is the fraction of zone design load at minimum fan speed, 50\% for the single zone VAV model}
+
+\emph{rho\(_{air}\) is the density of air at standard conditions, (kg/m\(^{3}\))}
+
+\emph{c\(_{p,air}\) is the specific heat of zone air, (J/kg K)}
+
+\emph{V\(_{air,min}\) is the air volume flow rate at minimum fan speed, (m\(^{3}\)/s)}
+
+
