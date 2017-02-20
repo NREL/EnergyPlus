@@ -796,7 +796,7 @@ namespace OutputReportTabular {
 	GatherComponentLoadsHVAC();
 
 	void
-	WriteZoneLoadComponentTable();
+	WriteLoadComponentSummaryTables();
 
 	// Used to construct the tabular output in a single cell for component load summary reports
 	void

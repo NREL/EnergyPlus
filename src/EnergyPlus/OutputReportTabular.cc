@@ -5224,7 +5224,7 @@ namespace OutputReportTabular {
 			WriteCompCostTable();
 			WriteAdaptiveComfortTable();
 			WriteEioTables();
-			WriteZoneLoadComponentTable();
+			WriteLoadComponentSummaryTables();
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
 				WriteTimeBinTables();
@@ -11490,7 +11490,7 @@ namespace OutputReportTabular {
 
 
 	void
-	WriteZoneLoadComponentTable()
+	WriteLoadComponentSummaryTables()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -12656,7 +12656,7 @@ namespace OutputReportTabular {
 		surfDelaySeqHeat.deallocate();
 		surfDelaySeqCool.deallocate();
 
-	} // WriteZoneLoadComponentTable()
+	} // WriteLoadComponentSummaryTables()
 
 	// Used to construct the tabular output for a single cell in the component load summary reports
 	void
