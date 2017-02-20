@@ -31,6 +31,7 @@ if(WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 elseif(UNIX)
   add_compile_options(-pthread)
+  add_compile_options(-fPIC)
   list(APPEND EXTRA_TARGET_LINK_LIBRARIES -pthread)
 endif()
 
