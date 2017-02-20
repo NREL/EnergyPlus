@@ -481,7 +481,11 @@ namespace PlantManager {
 				this_loop.VolumeWasAutoSized = true;
 			}
 			// circulation time used to autocalculate loop volume
-			this_loop.CirculationTime = Num( 6 );
+			if ( lNumericFieldBlanks( 6 ) ) {
+				this_loop.CirculationTime = 2.0 ; // default
+			} else {
+				this_loop.CirculationTime = Num( 6 );
+			}
 
 			// Load the Loop Inlet and Outlet Nodes and Connection Info (Alpha(7-10) are related to the supply side)
 			this_supply_side.NodeNameIn = Alpha( 6 );
