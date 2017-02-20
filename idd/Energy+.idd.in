@@ -12171,6 +12171,7 @@ WindowProperty:AirflowControl,
        \key OutdoorAir
        \default IndoorAir
   A3 , \field Airflow Destination
+       \note If ReturnAir is selected, the name of the Return Air Node may be specified below.
        \type choice
        \key IndoorAir
        \key OutdoorAir
@@ -12196,11 +12197,15 @@ WindowProperty:AirflowControl,
        \key No
        \default No
        \note If Yes, then Airflow Multiplier Schedule Name must be specified
-  A6 ; \field Airflow Multiplier Schedule Name
+  A6 , \field Airflow Multiplier Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Required if Airflow Is Scheduled = Yes.
        \note Schedule values are 0.0 or 1.0 and multiply Maximum Air Flow.
+  A7 ; \field Airflow Return Air Node Name
+       \note Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. 
+       \note If left blank, defaults to the first return air node for the zone of the window surface.
+       \type node
 
 WindowProperty:StormWindow,
        \min-fields 7
@@ -20028,13 +20033,19 @@ Lights,
        \type real
        \minimum 0.0
        \default 0.0
-  N9 ; \field Return Air Fraction Function of Plenum Temperature Coefficient 2
+  N9 , \field Return Air Fraction Function of Plenum Temperature Coefficient 2
        \note Used only if Return Air Fraction Is Calculated from Plenum Temperature = Yes
        \note Equation is Return Air Fraction = Coefficient#1 - Coefficient#2 X PlenumTemp(degC)
        \type real
        \units 1/K
        \minimum 0.0
        \default 0.0
+  A7 ; \field Return Air Heat Gain Node Name
+       \note Name of the return air node for this heat gain.
+       \note If left blank, defaults to the first return air node for the zone.
+       \note Leave this field blank when using a ZoneList name.
+       \type node
+
 
 ElectricEquipment,
    \memo Sets internal gains for electric equipment in the zone.
@@ -75074,10 +75085,14 @@ Refrigeration:Case,
         \minimum -70.0
         \maximum 40.0
         \note Default is 5 C less than case operating temperature
-  N21;  \field Average Refrigerant Charge Inventory
+  N21,  \field Average Refrigerant Charge Inventory
         \units kg/m
         \type real
         \default 0.0
+  A15; \field Under Case HVAC Return Air Node Name
+       \note Name of the return air node for this case. 
+       \note If left blank, defaults to the first return air node for this zone.
+       \type node
 
 Refrigeration:CompressorRack,
         \memo Works in conjunction with the refrigeration case and walk-in objects to simulate the

@@ -1027,12 +1027,24 @@ namespace RefrigeratedCase {
 				}
 
 				RefrigCase( CaseNum ).ZoneNodeNum = GetSystemNodeNumberForZone( RefrigCase( CaseNum ).ZoneName );
-				RefrigCase( CaseNum ).ZoneRANode = GetReturnAirNodeForZone( RefrigCase( CaseNum ).ZoneName );
+
+				// Set return air node number
+				RefrigCase( CaseNum ).ZoneRANode = 0;
+				std::string retNodeName = "";
+				if ( !lAlphaBlanks( 15 ) ) {
+					retNodeName = Alphas( 15 );
+				}
+				RefrigCase( CaseNum ).ZoneRANode = GetReturnAirNodeForZone( RefrigCase( CaseNum ).ZoneName, retNodeName );
 
 				if ( RefrigCase( CaseNum ).ActualZoneNum >= 0 ) {
 					if ( RefrigCase( CaseNum ).ZoneNodeNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( 3 ) + " = " + Alphas( 3 ) );
 						ShowContinueError( "..Refrigerated cases must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object)." );
+						ErrorsFound = true;
+					}
+					if ( ( RefrigCase( CaseNum ).RAFrac > 0.0 ) && ( RefrigCase( CaseNum ).ZoneRANode == 0 ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", Under Case HVAC Return Air Node number not found for " + cAlphaFieldNames( 3 ) + " = " + Alphas( 3 ) );
+						ShowContinueError( "..Refrigerated cases must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object) with at least one return air node." );
 						ErrorsFound = true;
 					}
 				}

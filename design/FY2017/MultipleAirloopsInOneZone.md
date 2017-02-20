@@ -330,9 +330,9 @@ Name of the return air node for this case. If left blank, defaults to the first 
 
 ### Modified Object: WindowProperty:AirflowControl ###
 
-*New Field: Return Air Node Name*
+*New Field: Airflow Return Air Node Name*
 
-Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. If left blank, defaults to the first return air node for this zone.
+Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. If left blank, defaults to the first return air node for the zone of the window surface.
 
 ### Outputs Description ##
 
@@ -431,12 +431,19 @@ In struct `DefinePrimaryAirSystem`
 
  - Add `Real64 DesignReturnFlowFrac`
  - Add to IDD and input processing
- - Also add to DataAirLoop::AirLoopFlow (because this is what's used primarily in CalcZoneMassBalance below)
+
+#### DataAirLoop.hh
+*1/11/2017 - Done*
+
+ - Add `Real64 DesReturnFrac`
+ - Added here because this is what's used primarily in CalcZoneMassBalance below, used slightly different name to avoid confusion.
 
 ### 4. Revise return air flow and air loop flow balance calculations
+**NOT DONE YET**
+*2/19/2017  - At this point, added design return frac, but that's all basically.*
 
 #### ZoneEquipmentManager::CalcZoneMassBalance ####
-This function will be refactored into multiple smaller functions reflecting the steps outlined  in the above NFP section plus other sections currently in this function:
+This function will be refactored into multiple smaller functions reflecting the steps outlined in the above NFP section plus other sections currently in this function:
 
   - Initialize values to zero
   - Sum zone inlet, exhaust, and mixing flows
@@ -453,37 +460,48 @@ This function will be refactored into multiple smaller functions reflecting the 
 
 #### DataHeatBalance.hh
 In struct `LightsData` (Lights object)
+*2/20/2017 - done*
 
  - Add `int ReturnNodePtr`
- - Add new field to IDD and input processing
+ - Add new field to IDD and input processing in InternalHeatGains::GetInternalHeatGainsInput
 
 #### RefrigeratedCase.hh
 In struct `RefrigCaseData` (Refrigeration:Case object)
+*2/20/2017 - done*
 
  - Use existing `int ZoneRANode; // Node number of return node in zone`
- - Add new field to IDD and input processing
+ - Add new field to IDD and input processing in RefrigeratedCase::GetRefrigerationInput
 
 #### DataSurfaces.hh
 In struct `SurfaceWindowCalc` (WindowProperty:AirflowControl object)
+*2/20/2017 - done*
 
- - Add `int ReturnNodePtr`
- - Add new field to IDD and input processing
+ - Add `int AirflowReturnNodePtr`
+ - Add new field to IDD and input processing in SurfaceGeometry::GetWindowGasAirflowControlData
 
 
 #### DataZoneEquipment.hh ####
 In struct `EquipConfiguration`
+*2/20/2017 - done*
 
- - Add `bool ZoneHasAirFlowWindow` to avoid [looping over every zone surface](https://github.com/NREL/EnergyPlus/blob/2592ba992c6cba84395eef038be8d3a049304067/src/EnergyPlus/ZoneEquipmentManager.cc#L4178-L4183) every iteration in `ZoneEquipmentManager::CalcZoneLeavingConditions`
- - Possibly add an array of just the airflow window surface numbers to avoid looping over all the surfaces in the zone even when there *is* an airflow window
+ - Add `bool ZoneHasAirFlowWindowReturn` to avoid [looping over every zone surface](https://github.com/NREL/EnergyPlus/blob/2592ba992c6cba84395eef038be8d3a049304067/src/EnergyPlus/ZoneEquipmentManager.cc#L4178-L4183) every iteration in `ZoneEquipmentManager::CalcZoneLeavingConditions`
+ - ~Possibly add an array of just the airflow window surface numbers to avoid looping over all the surfaces in the zone even when there *is* an airflow window~
 
 #### ZoneEquipmentManager::CalcZoneLeavingConditions ####
 
- - Do some minor reorganization
- - Add a for loop over all the return nodes in the zone
- - Add an if on `ZoneHasAirFlowWindow` to skip the for [loop over all the surfaces](https://github.com/NREL/EnergyPlus/blob/2592ba992c6cba84395eef038be8d3a049304067/src/EnergyPlus/ZoneEquipmentManager.cc#L4178-L4183) just to look for an airflow window
- - Change `InternalHeatGains::SumAllReturnAirConvectionGains` to allocate gains to specific nodes
- - Change `QRetAir` to be an array, sized to the max number of return nodes across all zones - this may work better as an array inside `EquipConfiguration`
+ - **NOT DONE** Do some minor reorganization
+ - *Done* Add a for loop over all the return nodes in the zone
+ - *Done* Add an if on `ZoneHasAirFlowWindow` to skip the for [loop over all the surfaces](https://github.com/NREL/EnergyPlus/blob/2592ba992c6cba84395eef038be8d3a049304067/src/EnergyPlus/ZoneEquipmentManager.cc#L4178-L4183) just to look for an airflow window
+ - *Done* Add a new argument `ReturnNodeNum` to `InternalHeatGains::SumAllReturnAirConvectionGains` to allocate gains for a specific return air node
+ - *Done* Also add `ReturnAirNodeNum` optional argument to `HeatBalanceInternalHeatGains::SetupZoneInternalGain` - this only applies to Lights, because refrigerated case and airflow windows don't use this system for internal gains?
+ - *Done* Add a new field for `ReturnNodeName` to struct `GenericComponentZoneIntGainStruct` in `DataHeatBalance`.
+ - **Not done** `InternalHeatGains::SumReturnAirConvectionGainsByTypes` may also need a ReturnNodeNum argument?
+ - ~Change `QRetAir` to be an array, sized to the max number of return nodes across all zones - this may work better as an array inside `EquipConfiguration`~
  - Modify as needed to allocate heat gains to specific nodes and track multiple return temperatures
+
+#### Room air models ####
+
+- search for uses of SumAllReturnAirConvectionGains and adjust as needed
 
 
 ### 6. Revise other places that assume a single airloop is associated with a zone

@@ -357,6 +357,7 @@ namespace DataZoneEquipment {
 		// true when zone has in-ceiling HVAC
 		int ADUNum; // index of Air Distribution Unit
 		int SDUNum; // index of Single Duct Uncontrolled
+		bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -384,7 +385,8 @@ namespace DataZoneEquipment {
 			InWallActiveElement( false ),
 			InCeilingActiveElement( false ),
 			ADUNum( 0 ),
-			SDUNum( 0 )
+			SDUNum( 0 ),
+			ZoneHasAirFlowWindowReturn( false )
 		{}
 
 	};
@@ -571,7 +573,10 @@ namespace DataZoneEquipment {
 	GetSystemNodeNumberForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
 
 	int
-	GetReturnAirNodeForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone( 
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	);
 
 	Real64
 	CalcDesignSpecificationOutdoorAir(

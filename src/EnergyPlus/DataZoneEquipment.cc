@@ -1243,24 +1243,22 @@ namespace DataZoneEquipment {
 	}
 
 	int
-	GetReturnAirNodeForZone( std::string const & ZoneName ) // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone(
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	) 
 	{
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   March 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       MODIFIED       Feb 2017 expanded for multiple return nodes in a zone
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the return air node number for the indicated
-		// zone.  Returns 0 if the Zone is not a controlled zone.
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
+		// zone and node name.  If NodeName is blank, return the first return node number,
+		// otherwise return the node number of the matching return node name.  
+		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
@@ -1268,19 +1266,6 @@ namespace DataZoneEquipment {
 		// Return value
 		int ReturnAirNodeNumber; // Return Air node number for controlled zone
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlledZoneIndex;
 
 		if ( ! ZoneEquipInputsFilled ) {
@@ -1292,7 +1277,17 @@ namespace DataZoneEquipment {
 		ReturnAirNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
-				ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnAirNode;
+				if ( NodeName == "" ) {
+					// If NodeName is blank, return first return node number
+					ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( 1 );
+				} else {
+					for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ControlledZoneIndex ).NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( nodeCount );
+						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
+							ReturnAirNodeNumber = curNodeNum;
+						}
+					}
+				}
 			}
 		}
 

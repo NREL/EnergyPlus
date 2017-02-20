@@ -4113,17 +4113,18 @@ namespace ZoneEquipmentManager {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
 			ActualZoneNum = ZoneEquipConfig( ZoneNum ).ActualZoneNum;
-			//A return air system may not exist for certain systems; Therefore when no return node exits
-			// there is no update.  OF course if there is no return air system then you cannot update
+			//A return air system may not exist for certain systems; Therefore when no return node exists
+			// there is no update.  Of course if there is no return air system then you cannot update
 			// the energy for the return air heat gain from the lights statements.
-			ReturnNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
+			if ( ZoneEquipConfig( ZoneNum ).NumReturnNodes == 0 ) continue;
 			ZoneNode = ZoneEquipConfig( ZoneNum ).ZoneNode;
 			ZoneMult = Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier;
-			if ( ReturnNode > 0 ) {
+			for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ZoneNum ).NumReturnNodes; ++nodeCount ) {
+				ReturnNode = ZoneEquipConfig( ZoneNum ).ReturnNode( nodeCount );
 
 				//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
 				// Add sensible heat gain from refrigerated cases with under case returns
-				SumAllReturnAirConvectionGains( ActualZoneNum, QRetAir );
+				SumAllReturnAirConvectionGains( ActualZoneNum, QRetAir, ReturnNode );
 
 				// Need to add the energy to the return air from lights and from airflow windows. Where the heat
 				// is added depends on if there is system flow or not.  If there is system flow the heat is added
@@ -4150,11 +4151,13 @@ namespace ZoneEquipmentManager {
 				WinGapTtoRA = 0.0;
 				WinGapFlowTtoRA = 0.0;
 
-				for ( SurfNum = Zone( ActualZoneNum ).SurfaceFirst; SurfNum <= Zone( ActualZoneNum ).SurfaceLast; ++SurfNum ) {
-					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
-						WinGapFlowToRA += FlowThisTS;
-						WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+				if ( ZoneEquipConfig( ZoneNum ).ZoneHasAirFlowWindowReturn ) {
+					for ( SurfNum = Zone( ActualZoneNum ).SurfaceFirst; SurfNum <= Zone( ActualZoneNum ).SurfaceLast; ++SurfNum ) {
+						if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
+							FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+							WinGapFlowToRA += FlowThisTS;
+							WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+						}
 					}
 				}
 				if ( WinGapFlowToRA > 0.0 ) WinGapTtoRA = WinGapFlowTtoRA / WinGapFlowToRA;
@@ -4208,7 +4211,7 @@ namespace ZoneEquipmentManager {
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
 					if ( MassFlowRA > 0 ) {
-						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 						H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
 						Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat + ( SumRetAirLatentGainRate / ( H2OHtOfVap * MassFlowRA ) );
 					} else {
@@ -4216,7 +4219,7 @@ namespace ZoneEquipmentManager {
 						Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat;
 						RefrigCaseCredit( ActualZoneNum ).LatCaseCreditToZone += RefrigCaseCredit( ActualZoneNum ).LatCaseCreditToHVAC;
 						// shouldn't the HVAC term be zeroed out then?
-						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 						ZoneLatentGain( ActualZoneNum ) += SumRetAirLatentGainRate;
 
 					}
@@ -4224,7 +4227,7 @@ namespace ZoneEquipmentManager {
 					Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat;
 					RefrigCaseCredit( ActualZoneNum ).LatCaseCreditToZone += RefrigCaseCredit( ActualZoneNum ).LatCaseCreditToHVAC;
 					// shouldn't the HVAC term be zeroed out then?
-					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 					ZoneLatentGain( ActualZoneNum ) += SumRetAirLatentGainRate;
 				}
 

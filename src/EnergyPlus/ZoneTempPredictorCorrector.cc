@@ -5353,7 +5353,7 @@ namespace ZoneTempPredictorCorrector {
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, RetAirGain );
+			SumAllReturnAirConvectionGains( ZoneNum, RetAirGain, 0 );
 			SumIntGain += RetAirGain;
 		}
 
@@ -5678,7 +5678,7 @@ namespace ZoneTempPredictorCorrector {
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, SumRetAirGains );
+			SumAllReturnAirConvectionGains( ZoneNum, SumRetAirGains, 0 );
 			SumIntGains += SumRetAirGains;
 		}
 
