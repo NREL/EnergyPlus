@@ -161,8 +161,12 @@ namespace DataOutputs {
 						ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
 						break;
 					}
-					auto const matched = RE2::FullMatch( KeyedValue, pattern );
-					if ( matched || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
+					if (
+						RE2::FullMatch( KeyedValue, pattern ) || // match against regex as written
+						equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || // straight case-insensitive string comparison
+						RE2::FullMatch( KeyedValue, "(?i)" + OutputVariablesForSimulation( Found ).Key ) // attempt case-insensitive regex comparison
+						)
+					{
 						return true;
 					}
 				}
