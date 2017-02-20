@@ -201,38 +201,34 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
-	AirDensity(
+	airThermConductivity(
 		Real64 T // Temperature in Celsius
 	);
 
 	Real64
-	AirThermConductivity(
-		Real64 T // Temperature in Celsius
-	);
-
-	Real64
-	AirCp(
-		Real64 T // Temperature in Celsius
-	);
-
-	Real64
-	AirDynamicVisc(
+	airDynamicVisc(
 		Real64 T  // Temperature in Celsius
 	);
 
 	Real64
-	AirKinematicVisc(
-		Real64 T // Temperature in Celsius
+	airKinematicVisc(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
 	);
 
 	Real64
-	AirThermalDiffusivity(
-		Real64 T // Temperature in Celsius
+	airThermalDiffusivity(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
 	);
 
 	Real64
-	AirPrandtl(
-		Real64 T // Temperature in Celsius
+	airPrandtl(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
 	);
 
 	Real64
@@ -253,7 +249,9 @@ namespace AirflowNetworkBalanceManager {
 	Real64
 	CalcDuctOutsideConvResist(
 		Real64 const Ts, // Surface temperature
-		Real64 const Tamb, // Free stream temperature
+		Real64 const Tamb, // Free air temperature
+		Real64 const Wamb, // Free air humidity ratio
+		Real64 const Pamb, // Free air barometric pressure
 		Real64 const Dh, // Hydraulic diameter
 		Real64 const ZoneNum, // Zone number
 		Real64 const hOut // User defined convection coefficient

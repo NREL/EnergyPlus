@@ -5256,34 +5256,7 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	Real64
-	AirDensity(
-		Real64 T // Temperature in Celsius
-	)
-	{
-		// Dry air density {kg/m3}
-		// Correlated over the range -20C to 70C
-		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-		Real64 const LowerLimit = -20;
-		Real64 const UpperLimit = 70;
-
-		Real64 const a = 1.292;
-		Real64 const b = -0.00467558800659982;
-		Real64 const c = 0.0000125483407801669;
-
-		if ( T < LowerLimit ) {
-			ShowWarningMessage( "Air temperature out of limits for density calculation");
-			return a + b * LowerLimit + c * pow_2( LowerLimit );
-		} else if ( T > UpperLimit ) {
-			ShowWarningMessage( "Air temperature out of limits for density calculation");
-			return a + b * UpperLimit + c * pow_2( UpperLimit );
-		} else {
-			return a + b * T + c * pow_2( T );
-		}
-	}
-
-	Real64
-	AirThermConductivity(
+	airThermConductivity(
 		Real64 T // Temperature in Celsius
 	)
 	{
@@ -5300,71 +5273,28 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( T < LowerLimit ) {
 			ShowWarningMessage( "Air temperature out of limits for conductivity calculation");
-			return a + b * LowerLimit + c * pow_2( LowerLimit );
+			T = LowerLimit;
 		} else if ( T > UpperLimit ) {
 			ShowWarningMessage( "Air temperature out of limits for conductivity calculation");
-			return a + b * UpperLimit + c * pow_2( UpperLimit );
-		} else {
-			return a + b * T + c * pow_2( T );
+			T = UpperLimit;
 		}
+
+		return a + b * T + c * pow_2( T );
 	}
 
 	Real64
-	AirCp(
-		Real64 T // Temperature in Celsius
-	)
-	{
-		// Dry air specific heat {J/kg-K}
-		// Correlated over the range -20C to 70C
-		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-		Real64 const LowerLimit = -20;
-		Real64 const UpperLimit = 70;
-
-		Real64 const a = 1006;
-		Real64 const b = 0.0431668570326241;
-		Real64 const c = -0.00042378743454105;
-
-		if ( T < LowerLimit ) {
-			ShowWarningMessage( "Air temperature out of limits for specific heat calculation");
-			return a + b * LowerLimit + c * pow_2( LowerLimit );
-		} else if ( T > UpperLimit ) {
-			ShowWarningMessage( "Air temperature out of limits for specific heat calculation");
-			return a + b * UpperLimit + c * pow_2( UpperLimit );
-		} else {
-			return a + b * T + c * pow_2( T );
-		}
-	}
-
-	Real64
-	AirDynamicVisc(
+	airDynamicVisc(
 		Real64 T  // Temperature in Celsius
 	)
 	{
-		// Dry air dynamic viscosity {kg/m-s}
-		// Correlated over the range -20C to 70C
-		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-		Real64 const LowerLimit = -20;
-		Real64 const UpperLimit = 70;
-
-		Real64 const a = 0.00001729;
-		Real64 const b = 0.000000047;
-
-		if ( T < LowerLimit ) {
-			ShowWarningMessage( "Air temperature out of limits for viscosity calculation");
-			return a + b * LowerLimit;
-		} else if ( T > UpperLimit ) {
-			ShowWarningMessage( "Air temperature out of limits for viscosity calculation");
-			return a + b * UpperLimit;
-		} else {
-			return a + b * T;
-		}
+		return 1.71432e-5 + 4.828e-8 * T;
 	}
 
 	Real64
-	AirKinematicVisc(
-		Real64 T // Temperature in Celsius
+	airKinematicVisc(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
 	)
 	{
 		// Dry air kinematic viscosity {m2/s}
@@ -5375,17 +5305,19 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const UpperLimit = 70;
 
 		if ( T < LowerLimit ) {
-			return AirDynamicVisc( LowerLimit ) / AirDensity( LowerLimit );
+			T = LowerLimit;
 		} else if ( T > UpperLimit ) {
-			return AirDynamicVisc( UpperLimit ) / AirDensity( UpperLimit );
-		} else {
-			return AirDynamicVisc( T ) / AirDensity( T );
+			T = UpperLimit;
 		}
+
+		return airDynamicVisc( T ) / PsyRhoAirFnPbTdbW( P, T, W );
 	}
 
 	Real64
-	AirThermalDiffusivity(
-		Real64 T // Temperature in Celsius
+	airThermalDiffusivity(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
 	)
 	{
 		// Dry air thermal diffusivity {-}
@@ -5396,17 +5328,19 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const UpperLimit = 70;
 
 		if ( T < LowerLimit ) {
-			return AirThermConductivity( LowerLimit ) / ( AirCp( LowerLimit ) * AirDensity( LowerLimit ) );
+			T = LowerLimit;
 		} else if ( T > UpperLimit ) {
-			return AirThermConductivity( UpperLimit ) / ( AirCp( UpperLimit ) * AirDensity( UpperLimit ) );
-		} else {
-			return AirThermConductivity( T ) / ( AirCp( T ) * AirDensity( T ) );
+			T = UpperLimit;
 		}
+
+		return airThermConductivity( T ) / ( PsyCpAirFnWTdb( W, T ) * PsyRhoAirFnPbTdbW( P, T, W ) );
 	}
 
 	Real64
-	AirPrandtl(
-		Real64 T // Temperature in Celsius
+	airPrandtl(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
 	)
 	{
 		// Dry air Prandtl number {-}
@@ -5417,12 +5351,12 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const UpperLimit = 70;
 
 		if ( T < LowerLimit ) {
-			return AirKinematicVisc( LowerLimit ) / AirThermalDiffusivity( LowerLimit );
+			T = LowerLimit;
 		} else if ( T > UpperLimit ) {
-			return AirKinematicVisc( UpperLimit ) / AirThermalDiffusivity( UpperLimit );
-		} else {
-			return AirKinematicVisc( T ) / AirThermalDiffusivity( T );
+			T = UpperLimit;
 		}
+
+		return airKinematicVisc( T, W, P ) / airThermalDiffusivity( T, W, P );
 	}
 
 	Real64
@@ -5476,7 +5410,9 @@ namespace AirflowNetworkBalanceManager {
 	Real64
 	CalcDuctOutsideConvResist(
 		Real64 const Ts, // Surface temperature
-		Real64 const Tamb, // Free stream temperature
+		Real64 const Tamb, // Free air temperature
+		Real64 const Wamb, // Free air humidity ratio
+		Real64 const Pamb, // Free air barometric pressure
 		Real64 const Dh, // Hydraulic diameter
 		Real64 const ZoneNum, // Zone number
 		Real64 const hOut // User defined convection coefficient
@@ -5497,15 +5433,15 @@ namespace AirflowNetworkBalanceManager {
 		using DataGlobals::GravityConstant;
 		using DataGlobals::KelvinConv;
 
-		Real64 k = AirThermConductivity( Ts );
+		Real64 k = airThermConductivity( Ts );
 
 		Real64 hOut_final = 0;
 
 		if ( hOut == 0 ) {
 
 			// Free convection
-			Real64 Pr = AirPrandtl( Ts );
-			Real64 KinVisc = AirKinematicVisc( Ts );
+			Real64 Pr = airPrandtl( ( Ts + Tamb ) / 2, Wamb, Pamb );
+			Real64 KinVisc = airKinematicVisc( ( Ts + Tamb ) / 2, Wamb, Pamb );
 			Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
 			Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
 			Real64 Ra = Gr * Pr;
@@ -5521,7 +5457,7 @@ namespace AirflowNetworkBalanceManager {
 			Real64 ACH = GetZoneInfilAirChangeRate( ZoneNum ); // Zone air change rate [1/hr]
 			Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
 			Real64 V = pow( Vol, 1/3 ) * ACH / 3600; // Average air speed in zone [m/s]
-			Real64 Re = V * Dh / AirKinematicVisc( Tamb ); // Reynolds number
+			Real64 Re = V * Dh / KinVisc; // Reynolds number
 			Real64 c;
 			Real64 n;
 
@@ -5577,6 +5513,8 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// USE STATEMENTS:
+		using DataEnvironment::OutHumRat;
+		using DataEnvironment::OutBaroPress;
 		using DataGlobals::KelvinConv;
 		using DataGlobals::StefanBoltzmann;
 		using DataHVACGlobals::TimeStepSys;
@@ -5611,6 +5549,8 @@ namespace AirflowNetworkBalanceManager {
 		Real64 Ei;
 		Real64 DirSign;
 		Real64 Tamb;
+		Real64 Wamb;
+		Real64 Pamb;
 		Real64 CpAir;
 		Real64 TZON;
 		Real64 load;
@@ -5648,11 +5588,16 @@ namespace AirflowNetworkBalanceManager {
 
 				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
 					Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).NodeHeight );
+					Wamb = OutHumRat;
 				} else if ( AirflowNetworkLinkageData( i ).ZoneNum == 0 ) {
 					Tamb = AirflowNetworkNodeSimu( LT ).TZ;
+					Wamb = AirflowNetworkNodeSimu( LT ).WZ;
 				} else {
 					Tamb = ANZT( AirflowNetworkLinkageData( i ).ZoneNum );
+					Wamb = ANZW( AirflowNetworkLinkageData( i ).ZoneNum );
 				}
+
+				Pamb = OutBaroPress;
 
 				Real64 const tolerance = 0.001;
 				Real64 UThermal( 10 ); // Initialize. This will get updated.
@@ -5663,6 +5608,8 @@ namespace AirflowNetworkBalanceManager {
 				Real64 TDuctSurf = ( Tamb + Tin ) / 2.0;
 				Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
 				Real64 DuctSurfArea = DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi;
+				Real64 ZoneNum = AirflowNetworkLinkageData( i ).ZoneNum;
+
 
 				// If user defined view factors not present, calculate air-to-air heat transfer
 				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum == 0 ) {
@@ -5673,7 +5620,7 @@ namespace AirflowNetworkBalanceManager {
 							UThermal_iter = UThermal;
 
 							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
-							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
 							UThermal = pow( RThermTotal , -1);
@@ -5686,7 +5633,7 @@ namespace AirflowNetworkBalanceManager {
 						}
 					} else { // Air-to-air only. U and h values are all known
 							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
-							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
 							UThermal = pow( RThermTotal , -1);
@@ -5707,7 +5654,7 @@ namespace AirflowNetworkBalanceManager {
 						UThermal_iter = UThermal;
 
 						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin_ave, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
-						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 						Real64 hOut = 1 / RThermConvOut;
 						Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 

@@ -24208,7 +24208,8 @@ AirflowNetwork:Distribution:DuctViewFactors,
        \memo calculations.
   A1,  \field Linkage Name
        \required-field
-       \type alpha
+       \type object-list
+       \object-list AirflowNetworkComponentNames
   N1,  \field Duct Surface Exposure Fraction
        \type real
        \minimum 0.0
@@ -61887,7 +61888,7 @@ LoadProfile:Plant,
        \required-field
        \type object-list
        \object-list ScheduleNames
-   
+
 \group Solar Collectors
 
 SolarCollectorPerformance:FlatPlate,
