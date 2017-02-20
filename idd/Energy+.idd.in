@@ -41795,6 +41795,7 @@ Fan:SystemModel,
        \maximum 1.0
   N3 , \field Design Pressure Rise
        \type real
+       \minimum> 0.0
        \units Pa
        \ip-units inH2O
        \required-field

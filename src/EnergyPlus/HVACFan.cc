@@ -428,6 +428,10 @@ namespace HVACFan {
 
 		m_minPowerFlowFrac = numericArgs( 2 );
 		deltaPress       = numericArgs( 3 );
+		if ( deltaPress <= 0.0 ) {
+			ShowSevereError( routineName + locCurrentModuleObject + " zero or negative, invalid entry in " +numericFieldNames( 3 ) );
+			errorsFound = true;
+		}
 		m_motorEff         = numericArgs( 4 );
 		m_motorInAirFrac   = numericArgs( 5 );
 		designElecPower  = numericArgs( 6 );
@@ -548,7 +552,7 @@ namespace HVACFan {
 		}
 
 		if ( errorsFound ) {
-			ShowFatalError( routineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( routineName + "Errors found in input for fan name = " + name + ".  Program terminates." );
 		}
 
 		SetupOutputVariable( "Fan Electric Power [W]", m_fanPower, "System", "Average", name );
