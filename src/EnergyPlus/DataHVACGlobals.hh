@@ -76,6 +76,7 @@ namespace DataHVACGlobals {
 	extern Real64 const BlankNumeric; // indicates numeric input field was blank
 	extern Real64 const RetTempMax; // maximum return air temperature [deg C]
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
+	extern Real64 const DesCoilHWInletTempMin; // minimum heating water coil water inlet temp for UA sizing only. [deg C] 
 
 	extern int const NumOfSizingTypes; // request sizing for cooling air flow rate
 
@@ -106,8 +107,10 @@ namespace DataHVACGlobals {
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
 	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
 	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
-	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating
+	extern int const ASHRAEMinSATCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const ASHRAEMaxSATHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
 	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
 	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
 	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil

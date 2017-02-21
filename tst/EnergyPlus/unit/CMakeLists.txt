@@ -76,6 +76,7 @@ set( test_src
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
+  HybridModel.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
@@ -87,16 +88,20 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  OASystemHWPreheatCoil.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
+  OutputReports.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantChillers.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc

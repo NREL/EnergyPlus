@@ -182,9 +182,13 @@ namespace PlantChillers {
 		bool CheckEquipName;
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 		int CondMassFlowIndex;
+		// Operational fault parameters
 		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
 		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
 		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset 
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
 
 		// Default Constructor
 		BaseChillerSpecs() :
@@ -228,7 +232,10 @@ namespace PlantChillers {
 			CondMassFlowIndex( 0 ),
 			FaultyChillerSWTFlag( false ),
 			FaultyChillerSWTIndex( 0 ),
-			FaultyChillerSWTOffset( 0.0 )
+			FaultyChillerSWTOffset( 0.0 ),
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 	};
 
@@ -321,10 +328,12 @@ namespace PlantChillers {
 		Real64 DesignMinExitGasTemp; // Steam Saturation Temperature
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
 		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
+		bool DesignHeatRecVolFlowRateWasAutoSized; // true if user input was autosize for heat recover design flow rate
 		Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
 		bool HeatRecActive; // True entered Heat Rec Vol Flow Rate >0
 		int HeatRecInletNodeNum; // Node number on the heat recovery inlet side of the condenser
 		int HeatRecOutletNodeNum; // Node number on the heat recovery outlet side of the condenser
+		Real64 HeatRecCapacityFraction; // user input for heat recovery capacity fraction []
 		Real64 HeatRecMaxTemp; // Max Temp that can be produced in heat recovery
 		int HRLoopNum; // heat recovery water plant loop side index
 		int HRLoopSideNum; // heat recovery water plant loop side index
@@ -355,10 +364,12 @@ namespace PlantChillers {
 			DesignMinExitGasTemp( 0.0 ),
 			FuelHeatingValue( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			HeatRecActive( false ),
 			HeatRecInletNodeNum( 0 ),
 			HeatRecOutletNodeNum( 0 ),
+			HeatRecCapacityFraction( 0.0 ),
 			HeatRecMaxTemp( 0.0 ),
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
@@ -411,9 +422,12 @@ namespace PlantChillers {
 		Real64 HeatRecOutletTemp; // Outlet Temperature of the heat recovery fluid
 		Real64 HeatRecMdot; // reporting: Heat Recovery Loop Mass flow rate
 		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
+		bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous field was autosize on input
 		Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
 		bool HeatRecActive; // True entered Heat Rec Vol Flow Rate >0
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
+		Real64 HeatRecCapacityFraction; // user input for heat recovery capacity fraction []
+		Real64 engineCapacityScalar; // user input for engine efficiency for sizing GTEngineCapacity []
 		Real64 HeatRecMaxTemp; // Max Temp that can be produced in heat recovery
 		int HRLoopNum; // heat recovery water plant loop side index
 		int HRLoopSideNum; // heat recovery water plant loop side index
@@ -456,9 +470,12 @@ namespace PlantChillers {
 			HeatRecOutletTemp( 0.0 ),
 			HeatRecMdot( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			HeatRecActive( false ),
 			FuelHeatingValue( 0.0 ),
+			HeatRecCapacityFraction( 0.0 ),
+			engineCapacityScalar( 0.35 ),
 			HeatRecMaxTemp( 0.0 ),
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
