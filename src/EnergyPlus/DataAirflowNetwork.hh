@@ -230,58 +230,7 @@ namespace DataAirflowNetwork {
 			InitType( "ZeroNodePressures" ),
 			TExtHeightDep( false )
 		{}
-
-		// Member Constructor
-		AirflowNetworkSimuProp(
-			std::string const & AirflowNetworkSimuName, // Provide a unique object name
-			std::string const & Control, // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
-			std::string const & WPCCntr, // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-			int const iWPCCntr, // Integer equivalent for WPCCntr field
-			std::string const & CpArrayName, // CP Array name at WPCCntr = "INPUT"
-			std::string const & BldgType, // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-			std::string const & HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-			int const MaxIteration, // Maximum number of iteration, defualt 500
-			int const InitFlag, // Initialization flag
-			Real64 const RelTol, // Relative airflow convergence
-			Real64 const AbsTol, // Absolute airflow convergence
-			Real64 const ConvLimit, // Convergence acceleration limit
-			Real64 const MaxPressure, // Maximum pressure change in an element [Pa]
-			Real64 const Azimuth, // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
-			Real64 const AspectRatio, // Ratio of Building Width Along Short Axis to Width Along Long Axis
-			int const NWind, // Number of wind directions
-			Real64 const DiffP, // Minimum pressure difference
-			int const ExtLargeOpeningErrCount, // Exterior large opening error count during HVAC system operation
-			int const ExtLargeOpeningErrIndex, // Exterior large opening error index during HVAC system operation
-			int const OpenFactorErrCount, // Large opening error count at Open factor > 1.0
-			int const OpenFactorErrIndex, // Large opening error error index at Open factor > 1.0
-			std::string const & InitType, // Initialization flag type:
-			bool const TExtHeightDep // Choice of height dependence of external node temperature
-		) :
-			AirflowNetworkSimuName( AirflowNetworkSimuName ),
-			Control( Control ),
-			WPCCntr( WPCCntr ),
-			iWPCCntr( iWPCCntr ),
-			CpArrayName( CpArrayName ),
-			BldgType( BldgType ),
-			HeightOption( HeightOption ),
-			MaxIteration( MaxIteration ),
-			InitFlag( InitFlag ),
-			RelTol( RelTol ),
-			AbsTol( AbsTol ),
-			ConvLimit( ConvLimit ),
-			MaxPressure( MaxPressure ),
-			Azimuth( Azimuth ),
-			AspectRatio( AspectRatio ),
-			NWind( NWind ),
-			DiffP( DiffP ),
-			ExtLargeOpeningErrCount( ExtLargeOpeningErrCount ),
-			ExtLargeOpeningErrIndex( ExtLargeOpeningErrIndex ),
-			OpenFactorErrCount( OpenFactorErrCount ),
-			OpenFactorErrIndex( OpenFactorErrIndex ),
-			InitType( InitType ),
-			TExtHeightDep( TExtHeightDep )
-		{}
-
+		
 	};
 
 	struct MultizoneZoneProp // Zone information
@@ -650,20 +599,25 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Name of external node
-		std::string WPCName; // Wind Pressure Coefficient Values Object Name
-		Real64 Orien; // Orientation
-		Real64 Height; // Nodal height
+		Real64 azimuth; // Azimuthal angle of the associated surface
+		Real64 height; // Nodal height
 		int ExtNum; // External node number
 		int CPVNum; // CP Value number
-		int FacadeNum; // Facade number
+		int facadeNum; // Facade number
+		int curve; // Curve ID, replace with pointer after curve refactor
+		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
+		bool useRelativeAngle; // Determines whether the wind angle is relative to the surface or absolute
 
 		// Default Constructor
 		MultizoneExternalNodeProp() :
-			Orien( 0.0 ),
-			Height( 0.0 ),
+			azimuth( 0.0 ),
+			height( 0.0 ),
 			ExtNum( 0 ),
-			CPVNum( 0 ),
-			FacadeNum( 0 )
+			//CPVNum( 0 ),
+			facadeNum( 0 ),
+			curve( 0 ),
+			symmetricCurve( false ),
+			useRelativeAngle( false )
 		{}
 
 	};

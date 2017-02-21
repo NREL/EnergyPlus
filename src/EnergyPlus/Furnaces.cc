@@ -8535,8 +8535,7 @@ namespace Furnaces {
 
 		// to be removed by furnace/unitary system
 
-		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
+		// zero DX coils, and supplemental electric heater electricity consumption
 		DXElecHeatingPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		SaveCompressorPLR = 0.0;

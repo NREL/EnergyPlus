@@ -65,6 +65,7 @@
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -120,7 +121,6 @@ namespace UnitVentilator {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 	using DataHVACGlobals::CycFanCycCoil;
@@ -510,18 +510,6 @@ namespace UnitVentilator {
 			}
 			UnitVent( UnitVentNum ).AirOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			// Fan information:
-			//   A11, \field Supply Air Fan Object Type
-			//        \required-field
-			//        \type choice
-			//        \key Fan:ConstantVolume
-			//        \key Fan:VariableVolume
-			//        \note Allowable fan types are Fan:ConstantVolume and
-			//        \note Fan:VariableVolume
-			//   A12, \field Fan Name
-			//        \required-field
-			//        \type object-list
-			//        \object-list FansCVandVAV
 
 			UnitVent( UnitVentNum ).FanType = Alphas( 11 );
 			UnitVent( UnitVentNum ).FanName = Alphas( 12 );
@@ -531,48 +519,72 @@ namespace UnitVentilator {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
+				if ( ! InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+					GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
 
-				{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
-				if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
+					{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
+					if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
 
-					// Get fan outlet node
-					UnitVent( UnitVentNum ).FanOutletNode = GetFanOutletNode( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
-						ErrorsFound = true;
-					} else {
-						GetFanIndex( UnitVent( UnitVentNum ).FanName, FanIndex, errFlag, CurrentModuleObject );
-						// Other error checks should trap before it gets to this point in the code, but including just in case.
-
-						GetFanVolFlow( FanIndex, FanVolFlow );
-						if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-							ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
-							ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
-							ErrorsFound = true;
-						} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-							ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
-							ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
-						} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-							ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
-							ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
-						}
-						// Get the fan's availability schedule
-						errFlag = false;
-						UnitVent( UnitVentNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
+						// Get fan outlet node
+						UnitVent( UnitVentNum ).FanOutletNode = GetFanOutletNode( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+							ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 							ErrorsFound = true;
+						} else {
+							GetFanIndex( UnitVent( UnitVentNum ).FanName, FanIndex, errFlag, CurrentModuleObject );
+							// Other error checks should trap before it gets to this point in the code, but including just in case.
+
+							GetFanVolFlow( FanIndex, FanVolFlow );
+							if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
+								ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
+								ErrorsFound = true;
+							} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
+								ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+							} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
+								ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+							}
+							// Get the fan's availability schedule
+							errFlag = false;
+							UnitVent( UnitVentNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
+							if ( errFlag ) {
+								ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ErrorsFound = true;
+							}
 						}
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
+						ErrorsFound = true;
+					}}
+				} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
+					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName ); //zero-based
+					UnitVent( UnitVentNum ).FanOutletNode = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->outletNodeNum;
+					FanVolFlow = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->designAirVolFlowRate;
+					if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
+						ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
+						ErrorsFound = true;
+					} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
+						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+					} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
+						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					}
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-					ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
-					ErrorsFound = true;
-				}}
+					UnitVent( UnitVentNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->availSchedIndex;
+
+				}
 			}
 			// For node connections, this object is both a parent and a non-parent, because the
 			// OA mixing box is not called out as a separate component, its nodes must be connected
@@ -665,7 +677,7 @@ namespace UnitVentilator {
 				ShowSevereError( CurrentModuleObject + " \"" + UnitVent( UnitVentNum ).Name + "\" " + cAlphaFields( 14 ) + " not found: " + Alphas( 14 ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( 14 ) ) {
-				if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff ) {
+				if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff || UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					UnitVent( UnitVentNum ).OpMode = CycFanCycCoil;
 				} else {
 					UnitVent( UnitVentNum ).OpMode = ContFanCycCoil;
@@ -2279,8 +2291,6 @@ namespace UnitVentilator {
 
 		}}
 
-		// FLOW:
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -2764,7 +2774,11 @@ namespace UnitVentilator {
 		UnitVent( UnitVentNum ).HeatPower = max( 0.0, QUnitOut );
 		UnitVent( UnitVentNum ).SensCoolPower = std::abs( min( 0.0, QUnitOut ) );
 		UnitVent( UnitVentNum ).TotCoolPower = std::abs( min( 0.0, QTotUnitOut ) );
-		UnitVent( UnitVentNum ).ElecPower = FanElecPower;
+		if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			UnitVent( UnitVentNum ).ElecPower = Fans::GetFanPower( UnitVent( UnitVentNum ).Fan_Index );
+		} else {
+			UnitVent( UnitVentNum ).ElecPower = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->fanPower();
+		}
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;
@@ -2803,7 +2817,6 @@ namespace UnitVentilator {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -2874,7 +2887,12 @@ namespace UnitVentilator {
 			} else {
 				SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 			}
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
+				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 				if ( UnitVent( UnitVentNum ).CCoilType == Cooling_CoilHXAssisted ) {
@@ -2943,8 +2961,11 @@ namespace UnitVentilator {
 			} else {
 				SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 			}
-
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 

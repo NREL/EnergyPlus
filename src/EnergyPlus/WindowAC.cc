@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <WindowAC.hh>
 #include <BranchNodeConnections.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -66,6 +67,7 @@
 #include <DXCoils.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -125,7 +127,6 @@ namespace WindowAC {
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::OnOffFanPartLoadFraction;
 	using DataHVACGlobals::SmallAirVolFlow;
@@ -474,31 +475,48 @@ namespace WindowAC {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				GetFanType( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC( WindACNum ).Name );
-				{ auto const SELECT_CASE_var( WindAC( WindACNum ).FanType_Num );
-				if ( ( SELECT_CASE_var == FanType_SimpleOnOff ) || ( SELECT_CASE_var == FanType_SimpleConstVolume ) ) {
-					GetFanIndex( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanIndex, FanErrFlag, CurrentModuleObject );
-					if ( FanErrFlag ) {
-						ShowContinueError( " specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
-						ErrorsFound = true;
-					} else {
-						GetFanVolFlow( WindAC( WindACNum ).FanIndex, FanVolFlow );
-						if ( FanVolFlow != AutoSize ) {
-							if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
-								ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
-								ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
-								ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
-								ErrorsFound = true;
-							}
+				if ( SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
+					WindAC( WindACNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( WindAC( WindACNum ).FanName ) ); // call constructor
+					WindAC( WindACNum ).FanIndex = HVACFan::getFanObjectVectorIndex( WindAC( WindACNum ).FanName );
+					FanVolFlow =  HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->designAirVolFlowRate;
+					if ( FanVolFlow != AutoSize ) {
+						if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
+							ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
+							ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
+							ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
+							ErrorsFound = true;
 						}
 					}
+					WindAC( WindACNum ).FanAvailSchedPtr = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->availSchedIndex;
 				} else {
-					ShowSevereError( CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"." );
-					ShowContinueError( "Fan Type must be Fan:OnOff, or Fan:ConstantVolume." );
-					ErrorsFound = true;
-				}}
-				// Get the fan's availability schedule
-				WindAC( WindACNum ).FanAvailSchedPtr = GetFanAvailSchPtr( WindAC( WindACNum ).FanType, WindAC( WindACNum ).FanName, FanErrFlag );
+
+					GetFanType( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC( WindACNum ).Name );
+					{ auto const SELECT_CASE_var( WindAC( WindACNum ).FanType_Num );
+					if ( ( SELECT_CASE_var == FanType_SimpleOnOff ) || ( SELECT_CASE_var == FanType_SimpleConstVolume ) ) {
+						GetFanIndex( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanIndex, FanErrFlag, CurrentModuleObject );
+						if ( FanErrFlag ) {
+							ShowContinueError( " specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
+							ErrorsFound = true;
+						} else {
+							GetFanVolFlow( WindAC( WindACNum ).FanIndex, FanVolFlow );
+							if ( FanVolFlow != AutoSize ) {
+								if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
+									ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
+									ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
+									ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
+									ErrorsFound = true;
+								}
+							}
+						}
+					} else {
+						ShowSevereError( CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"." );
+						ShowContinueError( "Fan Type must be Fan:OnOff, or Fan:ConstantVolume." );
+						ErrorsFound = true;
+					}}
+					// Get the fan's availability schedule
+					WindAC( WindACNum ).FanAvailSchedPtr = GetFanAvailSchPtr( WindAC( WindACNum ).FanType, WindAC( WindACNum ).FanName, FanErrFlag );
+				}
 				if ( FanErrFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
 					ErrorsFound = true;
@@ -1125,8 +1143,8 @@ namespace WindowAC {
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
-		// zero the fan and DX coil electricity consumption
-		FanElecPower = 0.0;
+		// zero the DX coil electricity consumption
+
 		DXElecCoolingPower = 0.0;
 		// initialize local variables
 		UnitOn = true;
@@ -1202,7 +1220,13 @@ namespace WindowAC {
 		WindAC( WindACNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
 		WindAC( WindACNum ).SensCoolEnergyRate = min( WindAC( WindACNum ).SensCoolEnergyRate, WindAC( WindACNum ).TotCoolEnergyRate );
 		WindAC( WindACNum ).LatCoolEnergyRate = WindAC( WindACNum ).TotCoolEnergyRate - WindAC( WindACNum ).SensCoolEnergyRate;
-		WindAC( WindACNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+		Real64 locFanElecPower = 0.0;
+		if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = Fans::GetFanPower( WindAC( WindACNum ).FanIndex );
+		} else {
+			locFanElecPower = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->fanPower();
+		}
+		WindAC( WindACNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;
@@ -1285,7 +1309,6 @@ namespace WindowAC {
 
 		// Using/Aliasing
 		using MixedAir::SimOAMixer;
-		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using InputProcessor::SameString;
@@ -1330,7 +1353,11 @@ namespace WindowAC {
 
 		// if blow through, simulate fan then coil. For draw through, simulate coil then fan.
 		if ( WindAC( WindACNum ).FanPlace == BlowThru ) {
-			SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[  WindAC( WindACNum ).FanIndex ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+			}
 		}
 
 		if ( WindAC( WindACNum ).DXCoilType_Num == CoilDX_CoolingHXAssisted ) {
@@ -1350,7 +1377,11 @@ namespace WindowAC {
 		}
 
 		if ( WindAC( WindACNum ).FanPlace == DrawThru ) {
-			SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[  WindAC( WindACNum ).FanIndex ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+			}
 		}
 
 		MinHumRat = min( Node( InletNode ).HumRat, Node( OutletNode ).HumRat );

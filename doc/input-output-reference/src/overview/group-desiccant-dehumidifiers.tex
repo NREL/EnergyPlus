@@ -93,7 +93,7 @@ Name of heating coil object for regeneration air.
 
 \paragraph{Field: Regeneration Fan Object Type}\label{field-regeneration-fan-object-type}
 
-Type of fan object for regeneration air. For UserCurves performance (see below) Fan:VariableVolume and Fan:ConstantVolume are valid. For Default performance (see below) only Fan:VariableVolume is valid.
+Type of fan object for regeneration air. For UserCurves performance (see below) Fan:SystemModel, Fan:VariableVolume and Fan:ConstantVolume are valid. For Default performance (see below) only Fan:SystemModel or Fan:VariableVolume are valid.
 
 \paragraph{Field: Regeneration Fan Name}\label{field-regeneration-fan-name}
 
@@ -241,7 +241,7 @@ Dehumidifier:Desiccant:NoFans,
   10,                                           !- Rotor Power {W}
   Coil:Heating:Fuel,               !- Regeneration Coil Object Type
   Desiccant Regen Coil,       !- Regeneration Coil Name
-  Fan:VariableVolume,           !- Regeneration Fan Object Type
+  Fan:SystemModel,           !- Regeneration Fan Object Type
   Desiccant Regen Fan,         !- Regeneration Fan Name
   UserCurves,                           !- Performance Model Type
   Desiccant DryBulb fTW Curve, !- Leaving Dry-Bulb Function of Entering Dry-Bulb and Humidity Ratio
@@ -372,7 +372,7 @@ Currently the only heat exchanger choice for this object is HeatExchanger:Desicc
 \item
   (when in an air loop (AirLoopHVAC) Branch), and SetpointManager:OutdoorAirPretreat (when in an AirLoopHVAC:OutdoorAirSystem) to place a maximum humidity ratio set point on the sensor node, typically the process air outlet node
 \item
-  Fan:OnOff or Fan:ConstantVolume (regeneration air fan)
+  Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume (regeneration air fan)
 \item
   Coil:Heating:Electric or Coil:Heating:Fuel (optional regeneration air heater)
 \item
@@ -407,7 +407,7 @@ This alpha field specifies the name of the air loop node used to control desicca
 
 \paragraph{Field: Regeneration Air Fan Object Type}\label{field-regeneration-air-fan-object-type}
 
-This alpha field contains the type of regeneration air fan used. Available fan types are Fan:OnOff and Fan:ConstantVolume.
+This alpha field contains the type of regeneration air fan used. Available fan types are Fan:SystemModel, Fan:OnOff and Fan:ConstantVolume.
 
 \paragraph{Field: Regeneration Air Fan Name}\label{field-regeneration-air-fan-name}
 
@@ -478,7 +478,7 @@ Dehumidifier:Desiccant:System,
   HeatExchanger:Desiccant:BalancedFlow,   !- Desiccant Heat Exchanger Object Type
   Desiccant Heat Exchanger 1,   !- Desiccant Heat Exchanger Name
   HX Process Outlet Node,   !- Sensor Node Name
-  Fan:ConstantVolume,           !- Regeneration Air Fan Object Type
+  Fan:SystemModel,           !- Regeneration Air Fan Object Type
   Desiccant Regen Fan,         !- Regeneration Air Fan Name
   DrawThrough,                         !- Regeneration Air Fan Placement
   Coil:Heating:Fuel,               !- Regeneration Air Heater Object Type

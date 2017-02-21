@@ -330,6 +330,9 @@ namespace VariableSpeedCoils {
 		Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
 		Real64 CondensateVol; // amount of water condensed from air stream [m3]
 		Real64 CondInletTemp; // Evap condenser inlet temperature [C], report variable
+		int SupplyFanIndex; // index of this fan in fan array or vector
+		int SupplyFan_TypeNum; // type of fan, in DataHVACGlobals
+		std::string SupplyFanName; // name of fan associated with this dx coil
 		Real64 SourceAirMassFlowRate; // source air mass flow rate [kg/s]
 		Real64 InletSourceAirTemp; // source air temperature entering the outdoor coil [C]
 		Real64 InletSourceAirEnthalpy; // source air enthalpy entering the outdoor coil [J/kg]
@@ -575,6 +578,18 @@ namespace VariableSpeedCoils {
 	);
 
 	Real64 getVarSpeedPartLoadRatio( int const DXCoilNum ) ;// the number of the DX coil to mined for current PLR
+
+	void
+	setVarSpeedHPWHFanTypeNum(
+		int const dXCoilNum,
+		int const fanTypeNum
+	);
+
+	void
+	setVarSpeedHPWHFanIndex(
+		int const dXCoilNum,
+		int const fanIndex
+	);
 
 } // VariableSpeedCoils
 

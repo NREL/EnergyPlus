@@ -2931,7 +2931,7 @@ This alpha field defines the name of an outdoor air mixer component that compose
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-3}
 
-This alpha field defines the type of fan used by this unitary system. The only valid choices are \textbf{Fan:OnOff} and \textbf{Fan:ConstantVolume}. The input requirements for these fan objects are described elsewhere in this document.
+This alpha field defines the type of fan used by this unitary system. The only valid choices are \textbf{Fan:SystemModel}, \textbf{Fan:OnOff}, and \textbf{Fan:ConstantVolume}. The input requirements for these fan objects are described elsewhere in this document.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-3}
 
@@ -3041,7 +3041,7 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 1)~~~outdoor air mixer (OutdoorAir:Mixer)
 
-2)~~~fan (Fan:OnOff or Fan:ConstantVolume)
+2)~~~fan (Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume)
 
 3)~~~cooling coil (Coil:Cooling:DX:SingleSpeed, CoilSystem:Cooling:DX:HeatExchangerAssisted, or Coil:Cooling:DX:TwoStageWithHumidityControlMode)
 
