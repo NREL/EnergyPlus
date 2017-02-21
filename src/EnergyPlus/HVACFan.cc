@@ -100,8 +100,12 @@ namespace HVACFan {
 				} else { // found duplicate
 					//TODO throw warning?  
 					index = -1;
+					ShowSevereError( "getFanObjectVectorIndex: Found duplicate Fan:SystemModel inputs of name =" + objectName + ". Check inputs" );
 				}
 			}
+		}
+		if ( ! found ) {
+			ShowSevereError( "getFanObjectVectorIndex: did not find Fan:SystemModel name =" + objectName + ". Check inputs" );
 		}
 		return index;
 	}
@@ -167,20 +171,12 @@ namespace HVACFan {
 		if ( ! DataGlobals::SysSizingCalc && m_objSizingFlag ) {
 			set_size();
 			m_objSizingFlag = false;
-			//TRANE, removed the following, caused major problems with return air bypass central air systems
-			//if ( DataSizing::CurSysNum > 0 ) {
-			//	DataAirLoop::AirLoopControlInfo( DataSizing::CurSysNum ).CyclingFan = true;
-			//}
 		}
 
 		if ( DataGlobals::BeginEnvrnFlag && m_objEnvrnFlag ) {
 
 			m_minAirFlowRate = designAirVolFlowRate * m_minPowerFlowFrac;
 			m_minAirMassFlowRate = m_minAirFlowRate * m_rhoAirStdInit;
-
-//			if ( Fan( FanNum ).NVPerfNum > 0 ) {
-//				NightVentPerf( Fan( FanNum ).NVPerfNum ).MaxAirMassFlowRate = NightVentPerf( Fan( FanNum ).NVPerfNum ).MaxAirFlowRate * Fan( FanNum ).RhoAirStdInit;
-//			}
 
 			//Init the Node Control variables
 			DataLoopNode::Node( outletNodeNum ).MassFlowRateMax = m_maxAirMassFlowRate;

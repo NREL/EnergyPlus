@@ -730,7 +730,7 @@ namespace DesiccantDehumidifiers {
 
 
 			} else {
-				GetFanType( DesicDehum( DesicDehumNum ).RegenFanName, DesicDehum( DesicDehumNum ).regenFanType_Num, errFlag, CurrentModuleObject,  DesicDehum( DesicDehumNum ).Name );
+				GetFanType( DesicDehum( DesicDehumNum ).RegenFanName, DesicDehum( DesicDehumNum ).regenFanType_Num, errFlag, CurrentModuleObject, DesicDehum( DesicDehumNum ).Name );
 				DesicDehum( DesicDehumNum ).RegenFanInNode = GetFanInletNode( DesicDehum( DesicDehumNum ).RegenFanType, DesicDehum( DesicDehumNum ).RegenFanName, ErrorsFound2 );
 				if ( ErrorsFound2 ) {
 					ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
@@ -873,14 +873,12 @@ namespace DesiccantDehumidifiers {
 			}
 
 			ErrorsFound2 = false;
-			if ( SameString(  DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
+			if ( SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
 					DesicDehum( DesicDehumNum ).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( DesicDehum( DesicDehumNum ).RegenFanName ) ); // call constructor
 					DesicDehum( DesicDehumNum ).RegenFanIndex = HVACFan::getFanObjectVectorIndex( DesicDehum( DesicDehumNum ).RegenFanName );
 					DesicDehum( DesicDehumNum ).RegenFanInNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->inletNodeNum;
 					DesicDehum( DesicDehumNum ).RegenFanOutNode = HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->outletNodeNum;
-
-
 			} else {
 				GetFanType( DesicDehum( DesicDehumNum ).RegenFanName, DesicDehum( DesicDehumNum ).regenFanType_Num, errFlag, CurrentModuleObject,  DesicDehum( DesicDehumNum ).Name );
 				DesicDehum( DesicDehumNum ).RegenFanInNode = GetFanInletNode( DesicDehum( DesicDehumNum ).RegenFanType, DesicDehum( DesicDehumNum ).RegenFanName, ErrorsFound2 );
