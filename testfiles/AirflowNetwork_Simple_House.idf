@@ -1305,10 +1305,9 @@
     Air Loop Outlet Node;    !- Supply Side Outlet Node Names
 
   AirflowNetwork:SimulationControl,
-    House AriflowNetwork,    !- Name
+    House AirflowNetwork,    !- Name
     MultizoneWithDistributionOnlyDuringFanOperation,  !- AirflowNetwork Control
     SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
-    ,                        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ,                        !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}

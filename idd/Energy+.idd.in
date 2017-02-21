@@ -22592,7 +22592,7 @@ ZoneThermalChimney,
 
 ! Basic parameters
 AirflowNetwork:SimulationControl,
-      \min-fields 13
+      \min-fields 12
       \unique-object
       \memo This object defines the global parameters used in an Airflow Network simulation.
  A1 , \field Name
@@ -22630,11 +22630,7 @@ AirflowNetwork:SimulationControl,
       \note If SurfaceAverageCalculation is selected,
       \note AirflowNetwork:MultiZone:WindPressureCoefficientArray, AirflowNetwork:MultiZone:ExternalNode,
       \note and AirflowNetwork:MultiZone:WindPressureCoefficientValues objects are not used.
- A4 , \field AirflowNetwork Wind Pressure Coefficient Array Name
-      \type object-list
-      \object-list WPCSetNames
-      \note Used only if Wind Pressure Coefficient Type = Input, otherwise this field may be left blank.
- A5 , \field Height Selection for Local Wind Pressure Calculation
+ A4 , \field Height Selection for Local Wind Pressure Calculation
       \type choice
       \key ExternalNode
       \key OpeningHeight
@@ -22645,7 +22641,7 @@ AirflowNetwork:SimulationControl,
       \note calculate local wind pressure
       \note This field is ignored when the choice of the Wind Pressure Coefficient Type field is
       \note SurfaceAverageCalculation.
- A6 , \field Building Type
+ A5 , \field Building Type
       \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation,
       \note otherwise this field may be left blank.
       \type choice
@@ -22660,7 +22656,7 @@ AirflowNetwork:SimulationControl,
       \maximum 30000
       \note Determines the maximum number of iterations used to converge on a solution. If this limit
       \note is exceeded, the program terminates.
- A7 , \field Initialization Type
+ A6 , \field Initialization Type
       \type choice
       \key LinearInitializationMethod
       \key ZeroNodePressures
@@ -22705,7 +22701,7 @@ AirflowNetwork:SimulationControl,
       \maximum 1.0
       \default 1.0
       \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
- A8 ; \field Height Dependence of External Node Temperature
+ A7 ; \field Height Dependence of External Node Temperature
       \note If Yes, external node temperature is height dependent.
       \note If No, external node temperature is based on zero height.
       \type choice
@@ -23374,11 +23370,29 @@ AirflowNetwork:MultiZone:ExternalNode,
       \units m
       \default 0.0
       \note Designates the reference height used to calculate relative pressure.
- A2 ; \field Wind Pressure Coefficient Values Object Name
+ A2 , \field Wind Pressure Coefficient Curve Name
       \required-field
       \type object-list
       \object-list WPCValueNames
-      \note Enter the name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues object.
+      \object-list UniVariateCurves
+      \object-list UniVariateTables
+      \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
+ A3 , \field Symmetric Wind Pressure Coefficient Curve
+      \type choice
+      \key Yes
+      \key No
+      \default No
+      \note Specify whether the pressure curve is symmetric or not.
+      \note Specify Yes for curves that should be evaluated from 0 to 180 degrees
+      \note Specify No for curves that should be evaluated from 0 to 360 degrees
+ A4 ; \field Wind Angle Type
+      \type choice
+      \key Absolute
+      \key Relative
+      \default Absolute
+      \note Specify whether the angle used to compute the wind pressure coefficient is absolute or relative
+      \note Specify Relative to compute the angle between the wind direction and the surface azimuth
+      \note Specify Absolute to use the wind direction angle directly
 
 AirflowNetwork:MultiZone:WindPressureCoefficientArray,
       \min-fields 3
