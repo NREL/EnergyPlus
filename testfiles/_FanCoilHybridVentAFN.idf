@@ -1964,7 +1964,6 @@
     AriflowNetwork_All,      !- Name
     MultizoneWithoutDistribution,  !- AirflowNetwork Control
     Input,                   !- Wind Pressure Coefficient Type
-    Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LowRise,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}

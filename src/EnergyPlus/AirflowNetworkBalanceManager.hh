@@ -96,10 +96,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int AirflowNetworkNumOfSurCracks;
 	extern int AirflowNetworkNumOfSurELA;
 	extern int AirflowNetworkNumOfExtNode;
-	extern int AirflowNetworkNumOfCPArray;
-	extern int AirflowNetworkNumOfCPValue;
 	extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-	extern int AirflowNetworkNumofWindDir;
 	extern int DisSysNumOfNodes;
 	extern int DisSysNumOfLeaks;
 	extern int DisSysNumOfELRs;
@@ -200,11 +197,14 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
-	CalcWindPressure(
-		int const CPVNum, // CP Value number
-		Real64 const Vref, // Velocity at reference height
-		Real64 const Height // Node height for outdoor temperature calculation
-	);
+		CalcWindPressure(
+			int const curve, // Curve index, change this to pointer after curve refactor
+			Real64 const Vref, // Velocity at reference height
+			Real64 const height, // Node height for outdoor temperature calculation
+			Real64 const azimuth, // Azimuthal angle of surface
+			bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+			bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
+		);
 
 	void
 	CalcAirflowNetworkHeatBalance();
@@ -243,7 +243,7 @@ namespace AirflowNetworkBalanceManager {
 	HybridVentilationControl();
 
 	void
-	CalcSingleSidedCps();
+	CalcSingleSidedCps(std::vector< std::vector< Real64 > > &valsByFacade, int numWindDirs = 36);
 
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number
