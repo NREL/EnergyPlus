@@ -67,8 +67,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
 
-#include "Fixtures/EnergyPlusFixture.hh"
-
 using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace DataGlobals;

@@ -1,12 +1,9 @@
-!-Generator IDFEditor 1.34
-!-Option OriginalOrderTop UseSpecialFormat
-!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
-!-      Use '!' comments if they need to be retained when using the IDFEditor.
-! WindACAuto.idf
+! WindACAirtoAir.idf
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              illustrates use of Window air conditoners with autosizing. 
+! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX:VariableSpeed. 
+!                          derived from WindACAuto.idf
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -84,7 +81,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
-! Coils:                          Coil:Cooling:DX:SingleSpeed
+! Coils:                          Coil:Cooling:DX:VariableSpeed
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       None
