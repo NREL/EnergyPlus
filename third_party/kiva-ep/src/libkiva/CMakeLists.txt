@@ -79,11 +79,13 @@ option( KIVA_STATIC_LIB "Make libkiva a static library" ON )
 
 if (KIVA_STATIC_LIB)
   add_library(libkiva STATIC ${kiva_src})
+  set_target_properties(libkiva PROPERTIES COMPILE_FLAGS -DLIBKIVA_STATIC_DEFINE)
 else()
   add_library(libkiva SHARED ${kiva_src})
-  include(GenerateExportHeader)
-  generate_export_header(libkiva)
 endif()
+
+include(GenerateExportHeader)
+generate_export_header(libkiva)
 
 set_target_properties(libkiva PROPERTIES OUTPUT_NAME kiva)
 set_target_properties(libkiva PROPERTIES PDB_NAME libkiva)
