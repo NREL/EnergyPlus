@@ -70,6 +70,7 @@ set( test_src
   HVACFourPipeBeam.unit.cc
   HVACManager.unit.cc
   HVACInterfaceManager.unit.cc
+  HVACHXAssistedCoolingCoil.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
