@@ -47,6 +47,10 @@
 #ifndef FanCoilUnits_hh_INCLUDED
 #define FanCoilUnits_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+#include <string>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -54,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
