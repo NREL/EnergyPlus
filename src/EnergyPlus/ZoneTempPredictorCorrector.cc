@@ -5011,7 +5011,9 @@ namespace ZoneTempPredictorCorrector {
 					// no system flow (yet) so just use last value for inlet node temp, this can happen early in the environment
 					RefAirTemp = NodeTemp;
 				}
-				SumHATref += HA * RefAirTemp;
+				// #5906
+				SumHA += HA;
+				SumHATref += HA * ( TempSurfInTmp( SurfNum ) - RefAirTemp );
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
