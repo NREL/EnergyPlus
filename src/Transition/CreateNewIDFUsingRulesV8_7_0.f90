@@ -401,6 +401,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(21:CurArgs+4)=InArgs(17:CurArgs)  !
                  CurArgs = CurArgs + 4
 
+             CASE('AIRFLOWNETWORK:SIMULATIONCONTROL')
+                 ObjectName='AirflowNetwork:SimulationControl'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:3)=InArgs(1:3)
+                 OutArgs(4:(CurArgs-1))=InArgs(5:(CurArgs))
+                 CurArgs = CurArgs-1
+
              CASE('ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL')
                  ObjectName='ZoneCapacitanceMultiplier:ResearchSpecial'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -430,6 +438,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   WRITE(OutArgs(9), '(f10.6)') AFNDuctUVal/AFNDuctFracRout
                   WRITE(OutArgs(10), '(f10.6)') AFNDuctUVal/AFNDuctFracRin
                   CurArgs = CurArgs + 2
+
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
