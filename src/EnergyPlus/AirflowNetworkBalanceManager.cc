@@ -5608,8 +5608,6 @@ namespace AirflowNetworkBalanceManager {
 				Real64 TDuctSurf = ( Tamb + Tin ) / 2.0;
 				Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
 				Real64 DuctSurfArea = DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi;
-				Real64 ZoneNum = AirflowNetworkLinkageData( i ).ZoneNum;
-
 
 				// If user defined view factors not present, calculate air-to-air heat transfer
 				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum == 0 ) {
