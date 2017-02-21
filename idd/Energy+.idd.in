@@ -31557,6 +31557,49 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
 
+DesignSpecification:AirTerminal:Sizing,
+  \min-fields 1
+  \memo This object is used to scale the sizing of air terminal units.
+  A1, \field Name
+      \note This name may be referenced by a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled object.
+      \required-field
+      \type alpha
+      \reference DesignSpecificationAirTerminalSizingName
+  N1, \field Fraction of Design Cooling Load
+      \note The fraction of the design sensible cooling load to be met by this terminal unit. 
+      \note This fraction is applied after the Zone Cooling Sizing Factor (see Sizing:Zone).
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+  N2, \field Cooling Design Supply Air Temperature Difference Ratio
+      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note the cooling design supply air flow rate for this terminal unit.
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+  N3, \field Fraction of Design Heating Load
+      \note The fraction of the design sensible heating load to be met by this terminal unit. 
+      \note This fraction is applied after the Zone Heating Sizing Factor (see Sizing:Zone).
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+  N4, \field Heating Design Supply Air Temperature Difference Ratio
+      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note the heating design supply air flow rate for this terminal unit.
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+  N5; \field Fraction of Minimum Outdoor Air Flow
+      \note The fraction of the zone minimum outdoor air requirement to be met by this terminal unit.
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
       \memo system. System design air flow, heating capacity, and cooling capacity will be calculated
@@ -39624,11 +39667,16 @@ AirTerminal:SingleDuct:Uncontrolled,
    A3, \field Zone Supply Air Node Name
        \required-field
        \type node
-   N1; \field Maximum Air Flow Rate
+   N1, \field Maximum Air Flow Rate
        \required-field
        \units m3/s
        \minimum 0.0
        \autosizable
+   A4; \field Design Specification Air Terminal Sizing Object Name
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
+       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \type object-list
+       \object-list DesignSpecificationAirTerminalSizingName
 
 AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \memo Central air system terminal unit, single duct, constant volume, with reheat coil (hot
@@ -40615,7 +40663,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
 
 AirTerminal:SingleDuct:Mixer,
        \memo The mixer air terminal unit provides a means of supplying central system
-       \memo air to the air inlet or outlet side of a zoneHAC equipment such as a four
+       \memo air to the air inlet or outlet side of a zoneHVAC equipment such as a four
        \memo pipe fan coil unit. Normally the central air would be ventilation air from
        \memo a dedicated outdoor air system (DOAS).
    A1, \field Name
@@ -40823,11 +40871,16 @@ ZoneHVAC:AirDistributionUnit,
        \minimum 0
        \maximum 0.3
        \default 0
-  N2 ; \field Constant Downstream Leakage Fraction
+  N2 , \field Constant Downstream Leakage Fraction
        \type real
        \minimum 0
        \maximum 0.3
        \default 0
+  A5 ; \field Design Specification Air Terminal Sizing Object Name
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
+       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \type object-list
+       \object-list DesignSpecificationAirTerminalSizingName
 
 \group Zone HVAC Equipment Connections
 

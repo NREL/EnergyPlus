@@ -273,6 +273,7 @@ namespace DataSizing {
 	int DataZoneUsedForSizing( 0 ); // pointer to control zone for air loop equipment
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
 	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
+	int NumAirTerminalSizingSpec( 0 ); // Number of air terminal sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
@@ -311,6 +312,7 @@ namespace DataSizing {
 	Array1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
 	Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	Array1D< AirTerminalSizingSpecData > AirTerminalSizingSpec; // Input data for zone HVAC sizing
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.
@@ -389,6 +391,7 @@ namespace DataSizing {
 		DataNonZoneNonAirloopValue = 0.0;
 		DataZoneNumber = 0;
 		NumZoneHVACSizing = 0;
+		NumAirTerminalSizingSpec = 0;
 		DXCoolCap = 0.0;
 		GlobalHeatSizingFactor = 0.0;
 		GlobalCoolSizingFactor = 0.0;
@@ -421,6 +424,7 @@ namespace DataSizing {
 		DesDayWeath.deallocate();
 		CompDesWaterFlow.deallocate();
 		ZoneHVACSizing.deallocate();
+		AirTerminalSizingSpec.deallocate();
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
 		DataWaterCoilSizCoolDeltaT = 0.0;

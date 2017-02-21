@@ -110,6 +110,7 @@ namespace DataDefineEquip {
 		std::shared_ptr< AirTerminalUnit > airTerminalPtr;
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;
+		int AirTerminalSizingIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
@@ -141,6 +142,7 @@ namespace DataDefineEquip {
 			airTerminalPtr( nullptr ),
 			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
+			AirTerminalSizingIndex( 0 ),
 			UpStreamLeakFrac( 0.0 ),
 			DownStreamLeakFrac( 0.0 ),
 			MassFlowRateUpStrLk( 0.0 ),

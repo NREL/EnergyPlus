@@ -86,6 +86,7 @@ namespace DirectAirManager {
 		Real64 InitMaxAvailMassFlow; // The Initial max mass Flow to set the Control Flow Fraction
 		Real64 AirMassFlowFraction;
 		int ZoneEquipAirInletNode;
+		int AirTerminalSizingIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
 		// Simulation Data
 		Real64 SensOutputProvided;
 		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate
@@ -108,6 +109,7 @@ namespace DirectAirManager {
 			InitMaxAvailMassFlow( 0.0 ),
 			AirMassFlowFraction( 0.0 ),
 			ZoneEquipAirInletNode( 0 ),
+			AirTerminalSizingIndex( 0 ),
 			SensOutputProvided( 0.0 ),
 			EMSOverrideAirFlow( false ),
 			EMSMassFlowRateValue( 0.0 ),

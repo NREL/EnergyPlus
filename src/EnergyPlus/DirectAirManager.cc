@@ -320,6 +320,17 @@ namespace DirectAirManager {
 				//Load the maximum volume flow rate
 				DirectAir( DirectAirNum ).MaxAirVolFlowRate = rNumericArgs( 1 );
 
+				// DesignSpecification:AirTerminal:Sizing name
+				DirectAir( DirectAirNum ).AirTerminalSizingIndex = 0;
+				if ( !lAlphaFieldBlanks( 4 )) {
+					DirectAir( DirectAirNum ).AirTerminalSizingIndex = InputProcessor::FindItemInList( cAlphaArgs( 4 ), DataSizing::AirTerminalSizingSpec );
+					if (DirectAir( DirectAirNum ).AirTerminalSizingIndex  == 0) {
+						ShowSevereError(cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + " not found.");
+						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );
+						ErrorsFound = true;
+					}
+				}
+
 				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;

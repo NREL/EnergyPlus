@@ -290,14 +290,14 @@ namespace ZoneAirLoopEquipmentManager {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		static Array1D_string AlphArray( 4 ); //Tuned Made static
+		static Array1D_string AlphArray( 5 ); //Tuned Made static
 		static Array1D< Real64 > NumArray( 2 ); //Tuned Made static
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		static Array1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
+		static Array1D_string cAlphaFields( 5 ); // Alpha field names //Tuned Made static
 		static Array1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
-		static Array1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
+		static Array1D_bool lAlphaBlanks( 5 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
 		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
 		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
@@ -365,6 +365,16 @@ namespace ZoneAirLoopEquipmentManager {
 					AirDistUnit( AirDistUnitNum ).DownStreamLeak = false;
 				}
 
+				// DesignSpecification:AirTerminal:Sizing name
+				AirDistUnit( AirDistUnitNum ).AirTerminalSizingIndex = 0;
+				if ( !lAlphaBlanks( 5 )) {
+					AirDistUnit( AirDistUnitNum ).AirTerminalSizingIndex = InputProcessor::FindItemInList( AlphArray( 5 ), DataSizing::AirTerminalSizingSpec );
+					if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingIndex  == 0) {
+						ShowSevereError( cAlphaFields( 5 ) + " = " + AlphArray( 5 ) + " not found." );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
+						ErrorsFound = true;
+					}
+				}
 				// Validate EquipType for Air Distribution Unit
 				if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:DualDuct:ConstantVolume" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = DualDuctConstVolume;

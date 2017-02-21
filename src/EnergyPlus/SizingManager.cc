@@ -230,6 +230,7 @@ namespace SizingManager {
 		GetOARequirements(); // get the OA requirements object
 		GetZoneAirDistribution(); // get zone air distribution objects
 		GetZoneHVACSizing(); // get zone HVAC sizing object
+		GetAirTerminalSizing(); // get air terminal sizing object
 		GetSizingParams(); // get the building level sizing paramets
 		GetZoneSizingInput(); // get the Zone Sizing input
 		GetSystemSizingInput(); // get the System Sizing input
@@ -3452,6 +3453,69 @@ namespace SizingManager {
 
 	}
 
+	void
+	GetAirTerminalSizing()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   February 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Obtains input data for the AirTerminal sizing methods object and stores it in
+		// appropriate data structure.
+
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
+		using namespace DataIPShortCuts;
+		using General::RoundSigDigits;
+		using General::TrimSigDigits;
+
+		static std::string const RoutineName( "GetAirTerminalSizing: " ); // include trailing blank space
+
+		int NumAlphas; // Number of Alphas for each GetObjectItem call
+		int NumNumbers; // Number of Numbers for each GetObjectItem call
+		int TotalArgs; // Total number of alpha and numeric arguments (max) for a
+		int IOStatus; // Used in GetObjectItem
+		bool ErrorsFound( false ); // If errors detected in input
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+
+		cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
+		DataSizing::NumAirTerminalSizingSpec = GetNumObjectsFound( cCurrentModuleObject );
+		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		if ( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+			AirTerminalSizingSpec.allocate( DataSizing::NumAirTerminalSizingSpec );
+
+			//Start Loading the System Input
+			for ( int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex ) {
+
+				GetObjectItem( cCurrentModuleObject, zSIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+				VerifyName( cAlphaArgs( 1 ), AirTerminalSizingSpec, zSIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				}
+
+				auto & thisATSizing( DataSizing::AirTerminalSizingSpec( zSIndex ) );
+				thisATSizing.Name = cAlphaArgs( 1 );
+				thisATSizing.DesSensCoolingFrac = rNumericArgs( 1 );
+				thisATSizing.DesCoolSATRatio = rNumericArgs( 2 );
+				thisATSizing.DesSensHeatingFrac = rNumericArgs( 3 );
+				thisATSizing.DesHeatSATRatio = rNumericArgs( 4 );
+				thisATSizing.MinOAFrac = rNumericArgs( 5 );
+			}
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+		}
+
+	}
 } // SizingManager
 
 } // EnergyPlus

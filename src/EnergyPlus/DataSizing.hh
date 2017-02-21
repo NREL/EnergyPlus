@@ -263,6 +263,7 @@ namespace DataSizing {
 	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
 	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
+	extern int NumAirTerminalSizingSpec; // Number of air terminal sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
@@ -814,6 +815,29 @@ namespace DataSizing {
 
 	};
 
+	// Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled
+	struct AirTerminalSizingSpecData
+	{
+		// Members
+		std::string Name;
+		Real64 DesSensCoolingFrac; // Fraction of Design Sensible Cooling Load
+		Real64 DesCoolSATRatio; // Cooling Design Supply Air Temperature Difference Ratio
+		Real64 DesSensHeatingFrac; // Fraction of Design Sensible Heating Load
+		Real64 DesHeatSATRatio; // Heating Design Supply Air Temperature Difference Ratio
+		Real64 MinOAFrac; // Fraction of Minimum Outdoor Air Flow
+
+		// Default Constructor
+		AirTerminalSizingSpecData() :
+			DesSensCoolingFrac( 1.0 ),
+			DesCoolSATRatio( 1.0 ),
+			DesSensHeatingFrac( 1.0 ),
+			DesHeatSATRatio( 1.0 ),
+			MinOAFrac( 1.0 )
+		{}
+
+	};
+
+
 	struct SystemSizingInputData
 	{
 		// Members
@@ -1267,6 +1291,7 @@ namespace DataSizing {
 	extern Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	extern Array1D< AirTerminalSizingSpecData > AirTerminalSizingSpec; // Input data for air terminal sizing
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.

@@ -120,6 +120,9 @@ namespace SizingManager {
 	GetZoneHVACSizing();
 
 	void
+	GetAirTerminalSizing();
+
+	void
 	GetSizingParams();
 
 	void
