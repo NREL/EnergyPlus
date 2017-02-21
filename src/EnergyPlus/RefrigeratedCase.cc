@@ -5924,7 +5924,7 @@ namespace RefrigeratedCase {
 
 					//register refrigeration case credits as internal gains
 					if ( RefrigCase( CaseNum ).ActualZoneNum > 0 ) {
-						SetupZoneInternalGain( RefrigCase( CaseNum ).ActualZoneNum, "Refrigeration:Case", RefrigCase( CaseNum ).Name, IntGainTypeOf_RefrigerationCase, RefrigCase( CaseNum ).SensZoneCreditRate, RefrigCase( CaseNum ).SensHVACCreditRate, _, RefrigCase( CaseNum ).LatZoneCreditRate, RefrigCase( CaseNum ).LatHVACCreditRate );
+						SetupZoneInternalGain( RefrigCase( CaseNum ).ActualZoneNum, "Refrigeration:Case", RefrigCase( CaseNum ).Name, IntGainTypeOf_RefrigerationCase, RefrigCase( CaseNum ).SensZoneCreditRate, RefrigCase( CaseNum ).SensHVACCreditRate, _, RefrigCase( CaseNum ).LatZoneCreditRate, RefrigCase( CaseNum ).LatHVACCreditRate, _, _, RefrigCase( CaseNum ).ZoneRANode );
 					}
 				} //END IF (.NOT. RefrigCase(CaseNum)%unusedCase)
 			}
