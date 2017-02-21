@@ -58,6 +58,11 @@
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
 
+class KivaWeatherData {
+public:
+	Real64 annualAverageDrybulbTemp;
+};
+
 class FoundationKiva
 {
 public:
@@ -103,6 +108,7 @@ class KivaManager
 public:
 	KivaManager();
 	virtual ~KivaManager();
+	void readWeatherData();
 	bool setupKivaInstances();
 	void initKivaInstances();
 	void calcKivaInstances();
@@ -112,6 +118,7 @@ public:
 	Real64 getTemp( int surfNum );
 	Real64 getConv( int surfNum );
 
+	KivaWeatherData kivaWeather;
 	FoundationKiva defaultFoundation;
 	std::vector<FoundationKiva> foundationInputs;
 	std::vector<KivaInstanceMap> kivaInstances;

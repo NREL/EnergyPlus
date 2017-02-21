@@ -62,11 +62,14 @@
 #include <DataGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataStringGlobals.hh>
+#include <DataSystemVariables.hh>
 #include <DataVectorTypes.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
+#include <InputProcessor.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
@@ -217,9 +220,152 @@ KivaManager::KivaManager() :
 KivaManager::~KivaManager()
 {}
 
+void KivaManager::readWeatherData()
+{
+	// Below from OpenEPlusWeatherFile
+	int kivaWeatherFileUnitNumber = GetNewUnitNumber();
+	{
+		IOFlags flags; flags.ACTION( "read" ); gio::open( kivaWeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags );
+		if ( flags.err() )
+			ShowFatalError( "Kiva::ReadWeatherFile: Could not OPEN EPW Weather File" );
+	}
+
+	// Read in Header Information
+	static Array1D_string const Header( 8, { "LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS" } );
+
+	std::string Line;
+	int HdLine = 1; // Look for first Header
+	bool StillLooking = true;
+	while ( StillLooking ) {
+		{
+			IOFlags flags; gio::read( kivaWeatherFileUnitNumber, "(A)", flags ) >> Line;
+			if ( flags.end() )
+				ShowFatalError( "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ) );
+		}
+		/* Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
+		int endcol = len( Line );
+		if ( endcol > 0 ) {
+			if ( int( Line[ endcol - 1 ] ) == DataSystemVariables::iUnicode_end ) {
+				ShowSevereError( "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file." );
+				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
+				ShowFatalError( "Program terminates due to previous condition." );
+			}
+		}
+		std::string::size_type Pos = FindNonSpace( Line );
+		std::string::size_type const HdPos = index( Line, Header( HdLine ) );
+		if ( Pos != HdPos ) continue;
+		Pos = index( Line, ',' );
+
+		// Below borrowed from ProcessEPWHeader
+
+		if ( ( Pos == std::string::npos ) && ( ! has_prefixi( Header( HdLine ), "COMMENTS" ) ) ) {
+			ShowSevereError( "Invalid Header line in in.epw -- no commas" );
+			ShowContinueError( "Line=" + Line );
+			ShowFatalError( "Previous conditions cause termination." );
+		}
+		if ( Pos != std::string::npos ) Line.erase( 0, Pos + 1 );
+
+		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( Header( HdLine ) ) );
+
+		if ( SELECT_CASE_var == "DATA PERIODS" ) {
+			bool IOStatus;
+			uppercase( Line );
+			int NumHdArgs = 2;
+			int Count = 1;
+			while ( Count <= NumHdArgs ) {
+				strip( Line );
+				Pos = index( Line, ',' );
+				if ( Pos == std::string::npos ) {
+					if ( len( Line ) == 0 ) {
+						while ( Pos == std::string::npos ) {
+							gio::read( kivaWeatherFileUnitNumber, "(A)" ) >> Line;
+							strip( Line );
+							uppercase( Line );
+							Pos = index( Line, ',' );
+						}
+					} else {
+						Pos = len( Line );
+					}
+				}
+
+				{ auto const SELECT_CASE_var1( Count );
+
+				if ( SELECT_CASE_var1 == 1 ) {
+					 int NumDataPeriods = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					 NumHdArgs += 4 * NumDataPeriods;
+				} else if ( SELECT_CASE_var1 == 2 ) {
+					int NumIntervalsPerHour = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+				}}
+				Line.erase( 0, Pos + 1 );
+				++Count;
+			}
+		}}*/
+		++HdLine;
+		if ( HdLine == 9 ) StillLooking = false;
+	}
+
+	int ReadStatus = 0;
+	bool ErrorFound = false;
+	int WYear;
+	int WMonth;
+	int WDay;
+	int WHour;
+	int WMinute;
+	Real64 DryBulb;
+	Real64 DewPoint;
+	Real64 RelHum;
+	Real64 AtmPress;
+	Real64 ETHoriz;
+	Real64 ETDirect;
+	Real64 IRHoriz;
+	Real64 GLBHoriz;
+	Real64 DirectRad;
+	Real64 DiffuseRad;
+	Real64 GLBHorizIllum;
+	Real64 DirectNrmIllum;
+	Real64 DiffuseHorizIllum;
+	Real64 ZenLum;
+	Real64 WindDir;
+	Real64 WindSpeed;
+	Real64 TotalSkyCover;
+	Real64 OpaqueSkyCover;
+	Real64 Visibility;
+	Real64 CeilHeight;
+	Real64 PrecipWater;
+	Real64 AerosolOptDepth;
+	Real64 SnowDepth;
+	Real64 DaysSinceLastSnow;
+	Real64 Albedo;
+	Real64 LiquidPrecip;
+	int PresWeathObs;
+	Array1D_int PresWeathConds( 9 );
+
+	Real64 totalDB = 0.0;
+	int count = 0;
+	std::string WeatherDataLine;
+
+	while (! ReadStatus) {
+		{ IOFlags flags; gio::read( kivaWeatherFileUnitNumber, "(A)", flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+		if ( ReadStatus < 0 ) {
+			break;
+		}
+		WeatherManager::InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
+		++count;
+		totalDB += DryBulb;
+
+	}
+
+	// Annual averages
+	kivaWeather.annualAverageDrybulbTemp = totalDB/count;
+
+	gio::close( kivaWeatherFileUnitNumber );
+}
+
 bool KivaManager::setupKivaInstances()
 {
 	bool ErrorsFound = false;
+
+	readWeatherData();
 
 	auto& Surfaces = DataSurfaces::Surface;
 	auto& Constructs = DataHeatBalance::Construct;
@@ -782,7 +928,7 @@ void KivaManager::defineDefaultFoundation()
 		if ( waterTableDepth <= 40. ) {
 			defFnd.deepGroundDepth = waterTableDepth;
 			defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
-			defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp + DataGlobals::KelvinConv;
+			defFnd.deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
 		} else {
 			defFnd.deepGroundDepth = 40.;
 			defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
@@ -793,7 +939,7 @@ void KivaManager::defineDefaultFoundation()
 	} else /* if (settings.deepGroundBoundary == Settings::GROUNDWATER) */ {
 		defFnd.deepGroundDepth = settings.deepGroundDepth;
 		defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
-		defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp + DataGlobals::KelvinConv;
+		defFnd.deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
 	}
 
 	defFnd.wall.heightAboveGrade = 0.2; // m
