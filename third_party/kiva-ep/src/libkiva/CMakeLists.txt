@@ -75,12 +75,19 @@ set(kiva_src Algorithms.cpp
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(libkiva SHARED ${kiva_src})
+option( KIVA_STATIC_LIB "Make libkiva a static library" ON )
+
+if (KIVA_STATIC_LIB)
+  add_library(libkiva STATIC ${kiva_src})
+else()
+  add_library(libkiva SHARED ${kiva_src})
+  include(GenerateExportHeader)
+  generate_export_header(libkiva)
+endif()
+
 set_target_properties(libkiva PROPERTIES OUTPUT_NAME kiva)
 set_target_properties(libkiva PROPERTIES PDB_NAME libkiva)
 
-include(GenerateExportHeader)
-generate_export_header(libkiva)
 
 set(kiva_link_flags "")
 
