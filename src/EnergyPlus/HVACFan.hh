@@ -65,10 +65,10 @@ namespace EnergyPlus {
 namespace HVACFan {
 
 	int
-	getFanObjectVectorIndex( std::string const objectName );
+	getFanObjectVectorIndex( std::string const & objectName );
 
 	bool
-	checkIfFanNameIsAFanSystem( std::string const objectName );
+	checkIfFanNameIsAFanSystem( std::string const & objectName );
 
 class FanSystem
 {
