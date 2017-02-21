@@ -68,7 +68,7 @@ SetupZoneInternalGain(
 	Optional< Real64 > ReturnAirLatentGainRate = _,
 	Optional< Real64 > CarbonDioxideGainRate = _,
 	Optional< Real64 > GenericContamGainRate = _,
-	Optional< int > ReturnAirNodeNum = _ // for return air heat gains
+	Optional< int > RetNodeNum = _ // for return air heat gains
 );
 
 } // EnergyPlus

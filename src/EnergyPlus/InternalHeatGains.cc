@@ -1187,7 +1187,7 @@ namespace InternalHeatGains {
 						SetupEMSInternalVariable( "Lighting Power Design Level", Lights( Loop ).Name, "[W]", Lights( Loop ).DesignLevel );
 					} // EMS
 					//setup internal gains
-					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, Lights(Loop).ReturnNodePtr );
+					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, Lights(Loop).ReturnNodePtr );
 
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;

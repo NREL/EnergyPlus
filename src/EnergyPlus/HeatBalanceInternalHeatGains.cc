@@ -71,7 +71,7 @@ SetupZoneInternalGain(
 	Optional< Real64 > ReturnAirLatentGainRate,
 	Optional< Real64 > CarbonDioxideGainRate,
 	Optional< Real64 > GenericContamGainRate,
-	Optional< int > ReturnAirNodeNum // for return air heat gains
+	Optional< int > RetNodeNum // for return air heat gains
 )
 {
 
@@ -207,8 +207,8 @@ SetupZoneInternalGain(
 		ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).PtrGenericContamGainRate >>= ZeroPointerVal;
 	}
 
-	if ( present( ReturnAirNodeNum ) ) {
-
+	if ( present( RetNodeNum ) ) {
+		ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).ReturnAirNodeNum = RetNodeNum;
 	}
 }
 
