@@ -32967,10 +32967,12 @@ ZoneHVAC:WindowAirConditioner,
         \type choice
         \key Coil:Cooling:DX:SingleSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
+        \key Coil:Cooling:DX:VariableSpeed
    A10, \field DX Cooling Coil Name
         \required-field
         \type object-list
         \object-list CoolingCoilsDXSingleSpeed
+        \object-list CoolingCoilsDXVariableSpeed
    A11, \field Supply Air Fan Operating Mode Schedule Name
         \type object-list
         \object-list ScheduleNames
@@ -44068,6 +44070,7 @@ Coil:Cooling:DX:VariableSpeed,
         \required-field
         \type alpha
         \reference CoolingCoilsDXVariableSpeed
+        \reference DesuperHeatingCoilSources
    A2,  \field Indoor Air Inlet Node Name
         \required-field
         \type node
@@ -45698,6 +45701,7 @@ Coil:Heating:Desuperheater,
        \required-field
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
+       \key Coil:Cooling:DX:VariableSpeed
        \key Coil:Cooling:DX:TwoSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
        \key Refrigeration:CompressorRack
@@ -50904,6 +50908,7 @@ Coil:WaterHeating:Desuperheater,
        \key Coil:Cooling:DX:SingleSpeed
        \key Coil:Cooling:DX:TwoSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:VariableSpeed
        \key Refrigeration:CompressorRack
        \key Refrigeration:Condenser:AirCooled
        \key Refrigeration:Condenser:EvaporativeCooled
@@ -51141,10 +51146,12 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
        \required-field
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
+       \key Coil:Cooling:DX:VariableSpeed
   A5 ; \field Cooling Coil Name
        \required-field
        \type object-list
        \object-list CoolingCoilsDXSingleSpeed
+       \object-list CoolingCoilsDXVariableSpeed
 
 CoilSystem:IntegratedHeatPump:AirSource,
       \memo This object is used for air-source integrated heat pump, a collection of its working modes.
@@ -52933,9 +52940,11 @@ Dehumidifier:Desiccant:System,
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:VariableSpeed
   A12, \field Companion Cooling Coil Name
        \type object-list
        \object-list CoolingCoilsDXMultiModeOrSingleSpeed
+       \object-list CoolingCoilsDXVariableSpeed
   A13, \field Companion Cooling Coil Upstream of Dehumidifier Process Inlet
        \type choice
        \key Yes
@@ -54931,6 +54940,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type choice
         \key Coil:Cooling:DX:SingleSpeed
+        \key Coil:Cooling:DX:VariableSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
         \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
         \note Specify the type of cooling coil used in this unitary system.
@@ -54938,11 +54948,13 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type object-list
         \object-list CoolingCoilsDXMultiModeOrSingleSpeed
+        \object-list CoolingCoilsDXVariableSpeed
         \note Enter the name of the cooling coil used in this unitary system.
    A16, \field Heating Coil Object Type
         \required-field
         \type choice
         \key Coil:Heating:DX:SingleSpeed
+        \key Coil:Heating:DX:VariableSpeed
         \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
@@ -54953,6 +54965,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type object-list
         \object-list HeatingCoilName
+        \object-list HeatingCoilsDXVariableSpeed
         \note Enter the name of the heating coil used in this unitary system.
    A18, \field Priority Control Mode
         \type choice

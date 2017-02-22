@@ -1,12 +1,9 @@
-!-Generator IDFEditor 1.34
-!-Option OriginalOrderTop UseSpecialFormat
-!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
-!-      Use '!' comments if they need to be retained when using the IDFEditor.
-! WindACAuto.idf
+! WindACAirtoAir.idf
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              illustrates use of Window air conditioners with autosizing. 
+! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX:VariableSpeed. 
+!                          derived from WindACAuto.idf
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -73,7 +70,7 @@
 ! Solar Distribution:             FullInteriorAndExterior
 !
 ! HVAC:                           Window ACs and hot-water baseboards serving each zone. NO AIR SYSTEM! Purchased hot water.
-!                                 Zone 1 uses a cycling fan cycling compressor in a blow-through configuration.
+!                                 Zone 1 uses a cycling fan cycling compressor in a blow-through configuration.  It use the variable speed DX coil model with one speed level.
 !                                 Zone 2 uses a constant fan cycling compressor in a blow-through configuration.
 !                                 Zone 3 uses a constant fan cycling compressor in a draw-through configuration.
 !
@@ -84,7 +81,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
-! Coils:                          Coil:Cooling:DX:SingleSpeed
+! Coils:                          Coil:Cooling:DX:VariableSpeed
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1578,8 +1575,8 @@
     Zone1WindACOAMixer,      !- Outdoor Air Mixer Name
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone1WindACFan,          !- Supply Air Fan Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-    Zone1WindACDXCoil,       !- DX Cooling Coil Name
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    Zone1WindAC_VS_DXCoil,       !- DX Cooling Coil Name
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
     BlowThrough,             !- Fan Placement
     0.001;                   !- Cooling Convergence Tolerance
@@ -1602,21 +1599,90 @@
     Zone1WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone1WindACFanOutletNode;!- Air Outlet Node Name
 
-  Coil:Cooling:DX:SingleSpeed,
-    Zone1WindACDXCoil,       !- Name
-    CoolingCoilAvailSched,   !- Availability Schedule Name
-    autosize,                !- Gross Rated Total Cooling Capacity {W}
-    autosize,                !- Gross Rated Sensible Heat Ratio
-    3.0,                     !- Gross Rated Cooling COP {W/W}
-    autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    Zone1WindACFanOutletNode,!- Air Inlet Node Name
-    Zone1WindACAirOutletNode,!- Air Outlet Node Name
-    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
-    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
-    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
-    WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name
+  Coil:Cooling:DX:VariableSpeed,
+    Zone1WindAC_VS_DXCoil,    !- Name
+    Zone1WindACFanOutletNode,  !- Indoor Air Inlet Node Name
+    Zone1WindACAirOutletNode,  !- Indoor Air Outlet Node Name
+    1.0,                     !- Number of Speeds {dimensionless}
+    1.0,                     !- Nominal Speed Level {dimensionless}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPCoolingCAPFTemp4,      !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+   
+   Curve:Quadratic,
+    HPACCOOLPLFFPLR,         !- Name
+    1.0,                    !- Coefficient1 Constant
+    0.0,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x  
+   
+  Curve:Cubic,
+    HPACFFF,                 !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+    
+  Curve:Biquadratic,
+    HPCoolingEIRFTemp4,      !- Name
+    0.0001514017,            !- Coefficient1 Constant
+    0.0655062896,            !- Coefficient2 x
+    -0.0020370821,           !- Coefficient3 x**2
+    0.0067823041,            !- Coefficient4 y
+    0.0004087196,            !- Coefficient5 y**2
+    -0.0003552302,           !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    12.78,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.5141,                  !- Minimum Curve Output
+    1.7044,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPCoolingCAPFTemp4,      !- Name
+    1.3544202152,            !- Coefficient1 Constant
+    -0.0493402773,           !- Coefficient2 x
+    0.0022649843,            !- Coefficient3 x**2
+    0.0008517727,            !- Coefficient4 y
+    -0.0000426316,           !- Coefficient5 y**2
+    -0.0003364517,           !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    12.78,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.7923,                  !- Minimum Curve Output
+    1.2736,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
