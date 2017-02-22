@@ -694,7 +694,8 @@ namespace HeatRecovery {
 		Optional_int_const CompanionCoilIndex = _, // index of companion cooling coil
 		Optional_bool_const RegenInletIsOANode = _, // flag to determine if supply inlet is OA node, if so air flow cycles
 		Optional_bool_const EconomizerFlag = _, // economizer operation flag passed by airloop or OA sys
-		Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys
+		Optional_bool_const HighHumCtrlFlag = _, // high humidity control flag passed by airloop or OA sys
+		Optional_int_const CompanionCoilType_Num =_ // cooling coil type of coil 
 	);
 
 	void
@@ -703,7 +704,8 @@ namespace HeatRecovery {
 	void
 	InitHeatRecovery(
 		int const ExchNum, // number of the current heat exchanger being simulated
-		int const CompanionCoilIndex
+		int const CompanionCoilIndex,
+		int const CompanionCoilType_Num
 	);
 
 	void

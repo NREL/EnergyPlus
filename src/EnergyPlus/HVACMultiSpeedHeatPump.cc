@@ -144,7 +144,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::SmallLoad;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::DXElecHeatingPower;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::ElecHeatingCoilPower;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -372,7 +371,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
 		DXElecHeatingPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		SaveCompressorPLR = 0.0;
@@ -480,16 +478,18 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		MSHeatPump( MSHeatPumpNum ).AuxElecPower = MSHeatPump( MSHeatPumpNum ).AuxOnCyclePower * SaveCompressorPLR + MSHeatPump( MSHeatPumpNum ).AuxOffCyclePower * ( 1.0 - SaveCompressorPLR );
+		Real64 locFanElecPower = 0.0;
+		locFanElecPower = Fans::GetFanPower( MSHeatPump( MSHeatPumpNum ).FanNum );
 		if ( MSHeatPump( MSHeatPumpNum ).HeatCoilType != MultiSpeedHeatingCoil ) {
 			{ auto const SELECT_CASE_var( MSHeatPump( MSHeatPumpNum ).HeatCoilType );
 			if ( ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) || ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) ) {
-				MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
+				MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
 			} else if ( ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) {
-				MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+				MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 			} else {
 			}}
 		} else {
-			MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump( MSHeatPumpNum ).AuxElecPower;
+			MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump( MSHeatPumpNum ).AuxElecPower;
 		}
 
 	}
