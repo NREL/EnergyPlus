@@ -138,6 +138,10 @@ namespace HVACFan {
 
 		init( );
 
+		if ( m_objSizingFlag ) {
+			return; // can't run calculations until sizing is completed
+		}
+
 		if ( present( zoneCompTurnFansOn ) && present( zoneCompTurnFansOff ) ) {
 			// Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
 			// for ZoneHVAC components with system availability managers defined.

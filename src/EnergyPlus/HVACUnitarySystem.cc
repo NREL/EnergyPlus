@@ -10508,8 +10508,15 @@ namespace HVACUnitarySystem {
 
 				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
 					SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, QCoilActual, SuppHeatingCoilFlag, FanOpMode, PartLoadFrac ); // QCoilReq= 0.0d0,  &
-					PartLoadFrac = QCoilActual / UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity;
-
+					if ( ! ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
+						PartLoadFrac = QCoilActual / UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity;
+					} else {
+						if ( QCoilActual > SmallLoad ) {
+							PartLoadFrac = 1.0;
+						} else {
+							PartLoadFrac = 0.0;
+						}
+					}
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 
 					SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, SuppHeatCoil );
