@@ -299,8 +299,8 @@ namespace DataZoneEquipment {
 		int NumAlphas;
 		int NumNums;
 		int NodeNum;
-		int PathNum;
-		int CompNum;
+		// int PathNum;
+		// int CompNum;
 		int ControlledZoneNum;
 		int ControlledZoneLoop;
 		int ZoneEquipTypeNum;
@@ -316,7 +316,7 @@ namespace DataZoneEquipment {
 		int NumParams;
 		int NumNodes;
 		Array1D_int NodeNums;
-		int Counter;
+		// int Counter;
 		//////////// hoisted into namespace ////////////////////////////////////////////////
 		// static bool ErrorsFound( false ); // If errors detected in input // GetZoneEquipmentDataErrorsFound
 		// static int found( 0 );
