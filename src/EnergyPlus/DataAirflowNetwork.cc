@@ -92,7 +92,6 @@ namespace DataAirflowNetwork {
 	int const CompTypeNum_RVD( 18 ); // Reheat VAV terminal damper
 	int const CompTypeNum_OAF( 19 ); // Distribution system OA
 	int const CompTypeNum_REL( 20 ); // Distribution system relief air
-	int const CompTypeNum_DVF( 21 ); // Distribution system duct view factors
 
 	// EPlus component Type
 	int const EPlusTypeNum_SCN( 1 ); // Supply connection
