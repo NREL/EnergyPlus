@@ -5406,6 +5406,7 @@ namespace AirflowNetworkBalanceManager {
 		// REFERENCES:
 		// ASTM C1340
 
+		using DataEnvironment::WindSpeed;
 		using DataGlobals::GravityConstant;
 		using DataGlobals::KelvinConv;
 
@@ -5429,10 +5430,16 @@ namespace AirflowNetworkBalanceManager {
 				Nu_free = 0.13 * pow( Ra, 0.333 );
 			}
 
+			Real64 V = 0;
 			// Forced convection
-			Real64 ACH = GetZoneInfilAirChangeRate( ZoneNum ); // Zone air change rate [1/hr]
-			Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
-			Real64 V = pow( Vol, 1/3 ) * ACH / 3600; // Average air speed in zone [m/s]
+			if ( ZoneNum > 0 ) {
+				Real64 ACH = GetZoneInfilAirChangeRate( ZoneNum ); // Zone air change rate [1/hr]
+				Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
+				V = pow( Vol, 1/3 ) * ACH / 3600; // Average air speed in zone [m/s]
+			} else {
+				V = WindSpeed;
+			}
+
 			Real64 Re = V * Dh / KinVisc; // Reynolds number
 			Real64 c;
 			Real64 n;
@@ -5453,9 +5460,7 @@ namespace AirflowNetworkBalanceManager {
 				c = 0.0266;
 				n = 0.805;
 			} else {
-				// fallthrough
-				c = 0;
-				n = 1;
+				assert( false );
 			}
 
 			Real64 Nu_forced = c * pow( Re, n ) * pow( Pr, 1/3 );
