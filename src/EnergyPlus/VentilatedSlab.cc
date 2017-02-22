@@ -71,6 +71,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
+#include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessor.hh>
@@ -123,7 +124,6 @@ namespace VentilatedSlab {
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataHeatBalFanSys::QRadSysSource;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 
@@ -826,6 +826,21 @@ namespace VentilatedSlab {
 
 			// Fan information:
 			VentSlab( Item ).FanName = cAlphaArgs( 25 );
+
+			if ( HVACFan::checkIfFanNameIsAFanSystem( VentSlab( Item ).FanName ) ) {
+				VentSlab( Item ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( VentSlab( Item ).FanName ) );
+				VentSlab( Item ).Fan_Index = HVACFan::getFanObjectVectorIndex( VentSlab( Item ).FanName );
+			} else {
+				bool isNotOkay( false );
+				ValidateComponent( "FAN:CONSTANTVOLUME", VentSlab( Item ).FanName, isNotOkay, "GetPIUs"  );
+				if ( isNotOkay ) {
+					ShowContinueError( "In " + CurrentModuleObject + " = " + VentSlab( Item ).Name );
+					ErrorsFound = true;
+				}
+				VentSlab( Item ).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+			}
+
 
 			if ( VentSlab( Item ).OAControlType == FixedOAControl ) {
 				VentSlab( Item ).OutAirVolFlow = VentSlab( Item ).MinOutAirVolFlow;
@@ -2134,7 +2149,6 @@ namespace VentilatedSlab {
 		using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
 		using SteamCoils::CheckSteamCoilSchedule;
 		using General::TrimSigDigits;
-		using Fans::SimulateFanComponents; // 12/18
 		using DataHeatBalSurface::TH;
 		using NodeInputManager::GetOnlySingleNode;
 
@@ -2258,7 +2272,6 @@ namespace VentilatedSlab {
 
 		// FLOW:
 
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -2565,7 +2578,13 @@ namespace VentilatedSlab {
 					}}
 
 					SimVentSlabOAMixer( Item );
-					SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+
+					if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+					} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+						Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					}
+
 					CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
 					QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
 
@@ -2791,7 +2810,11 @@ namespace VentilatedSlab {
 					HCoilOn = false;
 
 					SimVentSlabOAMixer( Item );
-					SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+					} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+						Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					}
 
 					CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
 					QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
@@ -2808,14 +2831,24 @@ namespace VentilatedSlab {
 
 		// Resimulate fans if AirMassFlow is zero and FanElecPower is > 0, indicating that load or condensation controls shut off the ventilated slab in CalcVentilatedSlabRadComps
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
-		if ( ( AirMassFlow <= 0.0 ) && ( FanElecPower > 0.0 ) ) {
+		Real64 locFanElecPower = 0.0;
+		if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( VentSlab( Item ).Fan_Index );
+		}
+		if ( ( AirMassFlow <= 0.0 ) && ( locFanElecPower > 0.0 ) ) {
 			Node( MixoutNode ).MassFlowRate = 0.0;
 			Node( MixoutNode ).MassFlowRateMaxAvail = 0.0;
 			Node( MixoutNode ).MassFlowRateMinAvail = 0.0;
 			Node( FanOutletNode ).MassFlowRate = 0.0;
 			Node( FanOutletNode ).MassFlowRateMaxAvail = 0.0;
 			Node( FanOutletNode ).MassFlowRateMinAvail = 0.0;
-			SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+			} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+				Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			}
 		}
 
 		CalcVentilatedSlabCoilOutput( Item, PowerMet, LatOutputProvided );
@@ -2852,7 +2885,6 @@ namespace VentilatedSlab {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -2887,7 +2919,11 @@ namespace VentilatedSlab {
 		// FLOW:
 
 		SimVentSlabOAMixer( Item );
-		SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+		} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+			Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		}
 		if ( ( VentSlab( Item ).CCoilPresent ) && ( VentSlab( Item ).CCoilSchedValue >= 0.0 ) ) {
 			if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
 				SimHXAssistedCoolingCoil( VentSlab( Item ).CCoilName, FirstHVACIteration, On, 0.0, VentSlab( Item ).CCoil_Index, ContFanCycCoil );
@@ -3012,7 +3048,11 @@ namespace VentilatedSlab {
 		VentSlab( Item ).SensCoolCoilPower = std::abs( min( 0.0, QUnitOut ) );
 		VentSlab( Item ).TotCoolCoilPower = std::abs( min( 0.0, QTotUnitOut ) );
 		VentSlab( Item ).LateCoolCoilPower = VentSlab( Item ).TotCoolCoilPower - VentSlab( Item ).SensCoolCoilPower;
-		VentSlab( Item ).ElecFanPower = FanElecPower;
+		if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			VentSlab( Item ).ElecFanPower = HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->fanPower();
+		} else {
+			VentSlab( Item ).ElecFanPower = Fans::GetFanPower( VentSlab( Item ).Fan_Index );
+		}
 		VentSlab( Item ).AirMassFlowRate = AirMassFlow;
 
 		SpecHumOut = Node( OutletNode ).HumRat;
@@ -3053,7 +3093,7 @@ namespace VentilatedSlab {
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using General::RoundSigDigits;
-		using Fans::SimulateFanComponents;
+
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
