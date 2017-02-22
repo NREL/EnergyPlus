@@ -644,6 +644,8 @@ The iteration correction method presented in the above equation gives a variable
 
 \subsection{Node Temperature Calculations}\label{node-temperature-calculations}
 
+\subsubsection{General}
+
 A brief description of the air node temperature calculation is given below. A detailed description can be found in the work of Swami et al. (1992). The following equation is used to calculate temperature distribution across a duct element at the given airflow rate and inlet air temperature:
 
 \begin{equation}
@@ -716,6 +718,33 @@ $[B]$ &= Given boundary conditions\\
 \end{tabular}
 
 The zone air temperatures and primary air loop component (fan and coils) outlet conditions are used as prescribed conditions in the AirflowNetwork model. In addition, the temperature difference across zone loop components (terminal units) is held constant during the calculations. For example, thermal zone temperatures calculated during the previous system time step are used as prescribed temperatures when calculating all other node temperatures. The zone air temperature is assumed constant (prescribed) throughout the AirflowNetwork iterative solution. The fan and coil outlet air temperatures, and terminal unit temperature differences are assumed constant within an AirflowNetwork iteration. The sensible heat gains calculated during the AirflowNetwork solution are then used to predict a new zone air temperature.
+
+\subsubsection{Duct Radiation}
+
+The duct-surface user-defined view factors object defines the view factor from the duct to the zone surfaces. Because the view factors, duct surface area, and temperatures are known, the heat gain to the duct can be directly calculated and applied to the duct air heat balance to determine the outlet temperature. The duct heat gain is then treated as a direct heat loss from each participating surface. Once the heat loss to the duct for each surface is calculated, the surface temperatures are adjusted to maintain the surface energy balance.
+
+Radiation is treated as point loads heat source/sink on the zone surfaces and the duct.  These point loads will be added or subtracted using the same implementation strategy as the convective load for the ducts to the zone air.  The radiative rate of energy transfer between the duct (d) and a given surface (s) for two grey surfaces can be written as shown below.
+
+
+\begin{equation}
+\dot{Q}_{d\rightarrow s} = \frac{\sigma (T^4_d - T^4_s)}{\frac{1 - \epsilon_d}{f_e A_d \epsilon_d} + \frac{1}{f_e A_d F_{d\rightarrow s}}+\frac{1 - \epsilon_s}{A_s \epsilon_s}}
+\end{equation}
+
+where:
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\sigma$ &= Steffan-Boltzmann constant [W/m\(^{2}\)-K\(^{4}\)] \\
+$T_d$ &= Duct surface temperature [C] \\
+$T_s$ &= Zone surface temperature [C] \\ 
+$\epsilon_d$ &= Duct grey body emissivity [-] \\
+$\epsilon_s$ &= Zone surface grey body emissivity [-] \\
+$A_d$ &= Duct surface area [m\(^{2}\)] \\
+$A_s$ &= Zone surface area [m\(^{2}\)] \\
+$f_e$ &= Duct exposure fraction [-] \\
+$F_{d\rightarrow s}$ &= Duct-to-surface view factor \\
+\\
+\end{tabular}
 
 \subsection{Node Humidity Ratio Calculations}\label{node-humidity-ratio-calculations}
 

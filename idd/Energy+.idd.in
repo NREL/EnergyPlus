@@ -23963,22 +23963,30 @@ AirflowNetwork:Distribution:Component:Duct,
       \default 0.0
       \minimum 0.0
       \note Enter the coefficient used to calculate dynamic losses of fittings (e.g. elbows).
- N6 , \field Overall Heat Transmittance Coefficient (U-Factor) from Air to Air
-      \note including film coefficients at both surfaces
+ N6 , \field Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction
+      \note conduction only
       \type real
       \units W/m2-K
       \minimum> 0.0
-      \default 0.772
-      \note Enter the overall U-value for this duct.
-      \note Default value of 0.772 is equivalent to 1.06 m2-K/W (R6) duct insulation with
-      \note film coefficients for outside and inside equal to 5 and 25 W/m2-K, respectively.
- N7 ; \field Overall Moisture Transmittance Coefficient from Air to Air
+      \default 0.943
+      \note Default value of 0.943 is equivalent to 1.06 m2-K/W (R6) duct insulation.
+ N7 , \field Overall Moisture Transmittance Coefficient from Air to Air
       \type real
       \units kg/m2
       \minimum> 0.0
       \default 0.001
       \note Enter the overall moisture transmittance coefficient
       \note including moisture film coefficients at both surfaces.
+ N8 , \field Outside Convection Coefficient
+      \note optional. convection coefficient calculated automatically, unless specified
+      \type real
+      \units W/m2-K
+      \minimum> 0.0
+ N9 ; \field Inside Convection Coefficient
+      \note optional. convection coefficient calculated automatically, unless specified
+      \type real
+      \units W/m2-K
+      \minimum> 0.0
 
 AirflowNetwork:Distribution:Component:Fan,
       \min-fields 2
@@ -24208,6 +24216,165 @@ AirflowNetwork:Distribution:Linkage,
       \note Only used if component = AirflowNetwork:Distribution:Component:Duct
       \note The zone name is where AirflowNetwork:Distribution:Component:Duct is exposed. Leave this field blank if the duct
       \note conduction loss is ignored.
+
+AirflowNetwork:Distribution:DuctViewFactors,
+       \memo This object is used to allow user-defined view factors to be used for duct-surface radiation
+       \memo calculations.
+  A1,  \field Linkage Name
+       \required-field
+       \type object-list
+       \object-list AirflowNetworkComponentNames
+  N1,  \field Duct Surface Exposure Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N2,  \field Duct Surface Emittance
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.9
+  A2,  \field Surface 1 Name
+       \begin-extensible
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N3,  \field Surface 1 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A3,  \field Surface 2 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N4,  \field Surface 2 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A4,  \field Surface 3 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N5,  \field Surface 3 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A5,  \field Surface 4 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N6,  \field Surface 4 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A6,  \field Surface 5 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N7,  \field Surface 5 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A7,  \field Surface 6 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N8,  \field Surface 6 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A8,  \field Surface 7 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N9,  \field Surface 7 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A9,  \field Surface 8 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N10, \field Surface 8 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A10, \field Surface 9 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N11, \field Surface 9 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A11, \field Surface 10 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N12, \field Surface 10 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A12, \field Surface 11 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N13, \field Surface 11 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A13, \field Surface 12 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N14, \field Surface 12 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A14, \field Surface 13 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N15, \field Surface 13 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A15, \field Surface 14 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N16, \field Surface 14 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A16, \field Surface 15 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N17, \field Surface 15 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A17, \field Surface 16 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N18, \field Surface 16 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A18, \field Surface 17 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N19, \field Surface 17 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A19, \field Surface 18 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N20, \field Surface 18 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A20, \field Surface 19 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N21, \field Surface 19 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A21, \field Surface 20 Name
+       \type object-list
+       \object-list AllHeatTransSurfNames
+  N22; \field Surface 20 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
 
 AirflowNetwork:OccupantVentilationControl,
       \memo This object is used to provide advanced thermal comfort control of window opening and closing
@@ -61911,7 +62078,7 @@ LoadProfile:Plant,
        \required-field
        \type object-list
        \object-list ScheduleNames
-   
+
 \group Solar Collectors
 
 SolarCollectorPerformance:FlatPlate,
