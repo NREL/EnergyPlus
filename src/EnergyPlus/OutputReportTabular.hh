@@ -798,7 +798,6 @@ namespace OutputReportTabular {
 	void
 	WriteLoadComponentSummaryTables();
 
-	// Used to construct the tabular output in a single cell for component load summary reports
 	void
 	SetTableBodyCellToMovingAvgAtMaxTime(
 		int const & columnNum,
@@ -807,6 +806,13 @@ namespace OutputReportTabular {
 		Real64 const & conversionMult,
 		int const & numTimeSteps,
 		int const & maxTimeStep
+	);
+
+	void
+	SetTableBodyCellToValue(
+		int const & columnNum,
+		int const & rowNum,
+		Real64 const & value
 	);
 
 	void
