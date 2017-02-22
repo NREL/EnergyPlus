@@ -2612,21 +2612,6 @@
     GasHeat DXAC Furnace 1,
     Mixed Air Node 1,
     VAV Sys 1 Outlet Node;
-    
-    
-!    CoilSystem:Cooling:DX,   !- Component 2 Object Type
-!    DX Cooling Coil System 1,!- Component 2 Name
-!    Mixed Air Node 1,        !- Component 2 Inlet Node Name
-!    Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-!    Coil:Heating:Fuel,       !- Component 3 Object Type
-!    Main Heating Coil 1,     !- Component 3 Name
-!    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
-!    Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name
-!    Fan:VariableVolume,      !- Component 4 Object Type
-!    Supply Fan 1,            !- Component 4 Name
-!    Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name
-!    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name
-!_-- changes
 
   AirLoopHVAC:UnitarySystem,
     GasHeat DXAC Furnace 1,  !- Name
