@@ -274,6 +274,7 @@ namespace HVACManager {
 		using SystemAvailabilityManager::ManageHybridVentilation;
 		using DataHeatBalFanSys::SysDepZoneLoads;
 		using DataHeatBalFanSys::SysDepZoneLoadsLagged;
+		using DataHeatBalFanSys::QRadSurfAFNDuct;
 		using DataHeatBalFanSys::ZTAVComf;
 		using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
 		using DataSystemVariables::ReportDuringWarmup; // added for FMI
@@ -370,6 +371,7 @@ namespace HVACManager {
 			MyEnvrnFlag = true;
 		}
 
+		QRadSurfAFNDuct = 0.0;
 		SysTimeElapsed = 0.0;
 		TimeStepSys = TimeStepZone;
 		FirstTimeStepSysFlag = true;
@@ -846,7 +848,7 @@ namespace HVACManager {
 			++HVACManageIteration; // Increment the iteration counter
 
 			if ( anyEMSRan && HVACManageIteration <= 2 ) {
-				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice 
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
 				SimAirLoopsFlag = true;
 			}
 
@@ -1495,7 +1497,7 @@ namespace HVACManager {
 		bool & SimZoneEquipment, // True when zone equipment components need to be (re)simulated
 		bool & SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
 		bool & SimPlantLoops, // True when the main plant loops need to be (re)simulated
-		bool & SimElecCircuits, // True when electic circuits need to be (re)simulated
+		bool & SimElecCircuits, // True when electric circuits need to be (re)simulated
 		bool & FirstHVACIteration, // True when solution technique on first iteration
 		bool const LockPlantFlows
 	)

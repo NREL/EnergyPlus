@@ -77,6 +77,7 @@
 #include <EMSManager.hh>
 #include <Fans.hh>
 #include <FaultsManager.hh>
+#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -948,10 +949,10 @@ namespace HVACUnitarySystem {
 		UnitarySystem( UnitarySysNum ).SuppHeatPartLoadFrac = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingCycRatio = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
-		UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0.0;
+		UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 		UnitarySystem( UnitarySysNum ).HeatingCycRatio = 0.0;
 		UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
-		UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0.0;
+		UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
 		UnitarySystem( UnitarySysNum ).HeatingCoilSensDemand = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingCoilSensDemand = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolingCoilLatentDemand = 0.0;
@@ -1356,8 +1357,15 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).HeatingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).CoolingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).NoHeatCoolSpeedRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
-					if ( UnitarySystem( UnitarySysNum ).FanExists && ! MultiOrVarSpeedHeatCoil( UnitarySysNum ) && ! MultiOrVarSpeedCoolCoil( UnitarySysNum )) {
-						if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) {
+					if ( UnitarySystem( UnitarySysNum ).FanExists && ! MultiOrVarSpeedHeatCoil( UnitarySysNum ) && ! MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) {
+						bool fanHasPowerSpeedRatioCurve = false;
+						if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+							if ( HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->powerModFuncFlowFractionCurveIndex > 0 ) fanHasPowerSpeedRatioCurve = true;
+						} else {
+							if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) fanHasPowerSpeedRatioCurve = true;
+						}
+						if ( fanHasPowerSpeedRatioCurve ) {
+
 							if ( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow ) {
 								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 								ShowContinueError( "...For fan type and name = " + FanType + " \"" + FanName + "\"" );
@@ -1371,7 +1379,11 @@ namespace HVACUnitarySystem {
 				MyFanFlag( UnitarySysNum ) = false;
 			} else {
 				if ( UnitarySystem( UnitarySysNum ).FanExists ) {
-					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( BlankString, BlankString, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
+					if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate;
+					} else {
+						UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = GetFanDesignVolumeFlowRate( BlankString, BlankString, errFlag, UnitarySystem( UnitarySysNum ).FanIndex );
+					}
 				}
 			}
 		}
@@ -2804,7 +2816,6 @@ namespace HVACUnitarySystem {
 		std::string SuppHeatCoilName; // Used in mining function calls
 		std::string FanType; // Used in mining function calls
 		std::string FanName; // Used in mining function calls
-		int FanIndex; // Used in mining function calls
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		Array1D< Real64 > Numbers; // Numeric input items for object
@@ -3189,12 +3200,20 @@ namespace HVACUnitarySystem {
 			//Get fan data
 			FanType = Alphas( iFanTypeAlphaNum );
 			FanName = Alphas( iFanNameAlphaNum );
-
+			UnitarySystem( UnitarySysNum ).fanName = FanName; //TRANE, for coil selection report
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
-				IsNotOK = false;
-				GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, IsNotOK, CurrentModuleObject, Alphas( iNameAlphaNum ) );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
+				if ( SameString( FanType, "Fan:SystemModel" ) ) {
+					if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
+						ErrorsFound = true;
+					} else {
+						UnitarySystem( UnitarySysNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					}
+				} else {
+					IsNotOK = false;
+					GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, IsNotOK, CurrentModuleObject, Alphas( iNameAlphaNum ) );
+					if ( IsNotOK ) {
+						ErrorsFound = true;
+					}
 				}
 				UnitarySystem( UnitarySysNum ).FanExists = true;
 			}
@@ -3253,6 +3272,25 @@ namespace HVACUnitarySystem {
 
 				} // IF (IsNotOK) THEN
 
+			} else if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				IsNotOK = false;
+				ValidateComponent( FanType, FanName, IsNotOK, CurrentModuleObject );
+				if ( IsNotOK ) {
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ErrorsFound = true;
+				} else { // mine data from fan object
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( FanName ) ); // call constructor
+					UnitarySystem( UnitarySysNum ).FanIndex = HVACFan::getFanObjectVectorIndex( FanName );
+					FanVolFlowRate = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->designAirVolFlowRate;
+					if ( FanVolFlowRate == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
+					UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate = FanVolFlowRate;
+					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = FanVolFlowRate;
+					FanInletNode = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->inletNodeNum;
+					FanOutletNode = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->outletNodeNum;
+					UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->availSchedIndex;
+				}
+
+
 			} else if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
@@ -3282,10 +3320,10 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
 				} else {
 					UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
-					if ( UnitarySystem( UnitarySysNum ).FanType_Num != FanType_SimpleOnOff && UnitarySystem( UnitarySysNum ).FanExists ) {
+					if ( UnitarySystem( UnitarySysNum ).FanType_Num != FanType_SimpleOnOff && UnitarySystem( UnitarySysNum ).FanType_Num != FanType_SystemModelObject && UnitarySystem( UnitarySysNum ).FanExists ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
-						ShowContinueError( "Fan type must be Fan:OnOff when " + cAlphaFields( iFanSchedAlphaNum ) + " = Blank." );
+						ShowContinueError( "Fan type must be Fan:OnOff of Fan:SystemModel when " + cAlphaFields( iFanSchedAlphaNum ) + " = Blank." );
 						ErrorsFound = true;
 					}
 				}
@@ -4011,9 +4049,9 @@ namespace HVACUnitarySystem {
 
 						if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 							errFlag = false;
-							GetFanIndex( FanName, FanIndex, errFlag, CurrentModuleObject );
 							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, FanName );
-							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, FanIndex );
+							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, UnitarySystem( UnitarySysNum ).FanIndex );
+							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,_, UnitarySystem( UnitarySysNum ).FanType_Num );
 							if ( errFlag ) {
 								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
@@ -6320,7 +6358,6 @@ namespace HVACUnitarySystem {
 		// This subroutine manages DXCoolingSystem component simulation.
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6333,7 +6370,12 @@ namespace HVACUnitarySystem {
 
 		//CALL the series of components that simulate a Unitary System
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
-			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+			} else {
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			}
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
@@ -6373,11 +6415,14 @@ namespace HVACUnitarySystem {
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
 				CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 			}
-
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == DrawThru ) {
-			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+			} else {
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			}
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
@@ -7876,7 +7921,7 @@ namespace HVACUnitarySystem {
 				}
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP ) {
 				HeatPumpRunFrac( UnitarySysNum, PartLoadRatio, errFlag, RuntimeFrac );
-				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == CycFanCycCoil ) { // was ContFanCycCoil
 					OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
 				} else {
 					OnOffFanPartLoadFraction = 1;
@@ -7909,7 +7954,7 @@ namespace HVACUnitarySystem {
 				}
 			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHP ) {
 				HeatPumpRunFrac( UnitarySysNum, PartLoadRatio, errFlag, RuntimeFrac );
-				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				if ( RuntimeFrac > 0.0 && UnitarySystem( UnitarySysNum ).FanOpMode == CycFanCycCoil ) { // was ContFanCycCoil, maybe file an issue or see if it fixes some
 					OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
 				} else {
 					OnOffFanPartLoadFraction = 1.0;
@@ -8064,7 +8109,6 @@ namespace HVACUnitarySystem {
 		// the operating PLR. System output is calculated with respect to zone condition.
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using SingleDuct::SimATMixer;
@@ -8134,7 +8178,11 @@ namespace HVACUnitarySystem {
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
-			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+			} else {
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			}
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
@@ -8159,8 +8207,11 @@ namespace HVACUnitarySystem {
 
 			// If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
 			if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru && OnOffFanPartLoadFraction < 1.0 ) {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
-
+				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+				} else {
+					Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				}
 				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 				}
@@ -8198,8 +8249,11 @@ namespace HVACUnitarySystem {
 
 			// If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
 			if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru && OnOffFanPartLoadFraction < 1.0 ) {
-				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
-
+				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+					HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+				} else {
+					Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+				}
 				if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 					CalcUnitaryHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad );
 					if ( Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp > UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp && !UnitarySystem( UnitarySysNum ).simASHRAEModel ) {
@@ -8220,7 +8274,11 @@ namespace HVACUnitarySystem {
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == DrawThru ) {
-			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+			} else {
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			}
 		}
 
 		SuppPLR = UnitarySystem( UnitarySysNum ).SuppHeatPartLoadFrac;
@@ -8343,7 +8401,6 @@ namespace HVACUnitarySystem {
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::SimDXCoilMultiMode;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-		using Fans::SimulateFanComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
@@ -10852,7 +10909,6 @@ namespace HVACUnitarySystem {
 		// This subroutine calculates the set point based output of the unitary system.
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -10868,7 +10924,11 @@ namespace HVACUnitarySystem {
 		QZnReq = 0.0;
 		//CALL the series of components that simulate a Unitary System
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
-			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+			} else {
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			}
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
@@ -10906,7 +10966,11 @@ namespace HVACUnitarySystem {
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == DrawThru ) {
-			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->simulate( _,_,_,_ );
+			} else {
+				Fans::SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
+			}
 		}
 
 		// CALL reheat coils next
@@ -11547,6 +11611,13 @@ namespace HVACUnitarySystem {
 			}
 		}
 
+		Real64 locFanElecPower = 0.0;
+		if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( UnitarySystem( UnitarySysNum ).FanIndex );
+		}
+
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num );
 
 		if ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) {
@@ -11570,7 +11641,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingAuxElecConsumption += UnitarySystem( UnitarySysNum ).AncillaryOffPower * ( 1.0 - CompPartLoadFrac ) * ReportingConstant;
 
 			}
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else if ( SELECT_CASE_var == Coil_CoolingWater || SELECT_CASE_var == Coil_CoolingWaterDetailed ) {
@@ -11580,7 +11651,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).SpeedRatio = max( UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio );
 				UnitarySystem( UnitarySysNum ).SpeedNum = max( UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).HeatingSpeedNum );
 			}
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else {
@@ -11604,14 +11675,14 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingAuxElecConsumption += UnitarySystem( UnitarySysNum ).AncillaryOffPower * ( 1.0 - CompPartLoadFrac ) * ReportingConstant;
 
 			}
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else if ( ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) || ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) ) {
 			UnitarySystem( UnitarySysNum ).CycRatio = max( UnitarySystem( UnitarySysNum ).CoolingCycRatio, UnitarySystem( UnitarySysNum ).HeatingCycRatio );
 			UnitarySystem( UnitarySysNum ).SpeedRatio = max( UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio );
 
-			UnitarySystem( UnitarySysNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
+			UnitarySystem( UnitarySysNum ).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower + UnitarySystem( UnitarySysNum ).TotalAuxElecPower;
 			UnitarySystem( UnitarySysNum ).ElecPowerConsumption = UnitarySystem( UnitarySysNum ).ElecPower * ReportingConstant;
 
 		} else {
