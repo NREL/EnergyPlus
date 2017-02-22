@@ -543,7 +543,7 @@ namespace DataSurfaces {
 		{
 			auto const & v1 = a.vertices;
 			auto const & v2 = b.vertices;
-			return eq( v1, v2 );		
+			return eq( v1, v2 );
 		}
 
 		// Inequality
@@ -722,7 +722,7 @@ namespace DataSurfaces {
 		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
-		bool MirroredSurf; // Ture if it is a mirrored surface
+		bool MirroredSurf; // True if it is a mirrored surface
 		// additional attributes for convection correlations
 		int IntConvClassification; // current classification for inside face air flow regime and surface orientation
 		int IntConvHcModelEq; // current convection model for inside face

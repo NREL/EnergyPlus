@@ -4130,7 +4130,7 @@ namespace InternalHeatGains {
 			Lights( Loop ).TotGainEnergy = Lights( Loop ).TotGainRate * TimeStepZoneSec;
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) { //for weather simulations only
-					//for tabular report, accumlate the total electricity used for each Light object
+					//for tabular report, accumulate the total electricity used for each Light object
 					Lights( Loop ).SumConsumption += Lights( Loop ).Consumption;
 					//for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)
 					if ( Lights( Loop ).Power > 0.01 * Lights( Loop ).DesignLevel ) {
