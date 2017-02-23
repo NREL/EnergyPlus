@@ -1,9 +1,5 @@
 project(Basement Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-
 set(SRC
   3DBasementHT.f90
   DataGlobals.f90
@@ -45,14 +41,17 @@ else()  # Windows
   endif()
 endif()
 
-set(SKIP_BUILD_RPATH true)
-ADD_EXECUTABLE( Basement ${SRC} )
+set(SKIP_BUILD_RPATH TRUE)
+add_executable( Basement ${SRC} )
 
-SET_TARGET_PROPERTIES(Basement PROPERTIES
+set_target_properties(Basement PROPERTIES
   COMPILE_FLAGS "-O1 -ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( Basement PreProcess/GrndTempCalc ${STATIC_EXE} )
+install( TARGETS Basement DESTINATION PreProcess/GrndTempCalc )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( Basement PreProcess/GrndTempCalc )
+endif()
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/BasementGHT.idd" DESTINATION "PreProcess/GrndTempCalc/")
 

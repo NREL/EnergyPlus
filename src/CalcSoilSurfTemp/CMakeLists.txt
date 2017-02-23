@@ -1,9 +1,5 @@
 project(CalcSoilSurfTemp Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-
 set(SRC EPWRead.f90 SoilSurfTemp.f90) 
 
 set(STATIC_EXE FALSE)
@@ -41,9 +37,12 @@ else()  # Windows
   endif()
 endif()
 
-set(SKIP_BUILD_RPATH true)
+set(SKIP_BUILD_RPATH TRUE)
 ADD_EXECUTABLE( CalcSoilSurfTemp ${SRC} )
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( CalcSoilSurfTemp "./PreProcess/CalcSoilSurfTemp" ${STATIC_EXE} )
+install( TARGETS CalcSoilSurfTemp DESTINATION PreProcess )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( CalcSoilSurfTemp PreProcess )
+endif()
 

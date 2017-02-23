@@ -1,9 +1,5 @@
 project(HVAC-Diagram Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-
 set(SRC HVAC-Diagram-Main.f90)
 
 set(STATIC_EXE TRUE) 
@@ -39,8 +35,11 @@ else()
 endif()
 
 set(SKIP_BUILD_RPATH true)
-ADD_EXECUTABLE( HVAC-Diagram ${SRC} )
+add_executable( HVAC-Diagram ${SRC} )
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( HVAC-Diagram PostProcess ${STATIC_EXE} )
+install( TARGETS HVAC-Diagram DESTINATION PostProcess )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( TARGETS HVAC-Diagram DESTINATION PostProcess )
+endif()
 
