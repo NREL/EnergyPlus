@@ -81,6 +81,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -141,10 +142,11 @@ namespace HeatingCoils {
 
 	// reclaim heat object types
 	int const COMPRESSORRACK_REFRIGERATEDCASE( 1 );
-	int const COIL_DX_COOLING( 2 );
+	int const COIL_DX_COOLING( 2 ); // single speed DX
 	int const COIL_DX_MULTISPEED( 3 );
 	int const COIL_DX_MULTIMODE( 4 );
 	int const CONDENSER_REFRIGERATION( 5 );
+	int const COIL_DX_VARIABLE_COOLING( 6 );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -832,6 +834,10 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_COOLING;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
+			} else if ( SameString( Alphas( 5 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
+				HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( Alphas( 5 ), Alphas( 6 ), DXCoilErrFlag );
+				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
 			} else if ( SameString( Alphas( 5 ), "Coil:Cooling:DX:TwoSpeed" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_MULTISPEED;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
@@ -921,6 +927,10 @@ namespace HeatingCoils {
 					if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 						SourceTypeString = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
 						SourceNameString = HeatReclaimDXCoil( SourceIndexNum ).Name;
+					}
+					if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+						SourceTypeString = "Coil:Cooling:DX:VariableSpeed";
+						SourceNameString = DataHeatBalance::HeatReclaimVS_DXCoil( SourceIndexNum ).Name;
 					}
 					ShowSevereError( "Coil:Heating:Desuperheater, \"" + HeatingCoil( CoilNum ).Name + "\" and \"" + HeatingCoil( RemainingCoils ).Name + "\" cannot use the same" );
 					ShowContinueError( " heat source object " + SourceTypeString + ", \"" + SourceNameString + "\"" );
@@ -1133,6 +1143,13 @@ namespace HeatingCoils {
 					if ( ! SameString( HeatReclaimDXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
 					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 					if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( CoilNum ) = true;
+					break;
+				}
+			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				for ( DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum ) {
+					if ( ! SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
+					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
+					if ( allocated( DataHeatBalance::HeatReclaimVS_DXCoil ) ) ValidSourceType( CoilNum ) = true;
 					break;
 				}
 			}
@@ -2278,6 +2295,10 @@ namespace HeatingCoils {
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_COOLING || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				HeatingCoil( CoilNum ).RTF = DXCoil( SourceID ).CoolingCoilRuntimeFraction;
 				HeatingCoil( CoilNum ).NominalCapacity = HeatReclaimDXCoil( SourceID ).AvailCapacity * Effic;
+			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				//condenser heat rejection
+				HeatingCoil( CoilNum ).RTF = VariableSpeedCoils::VarSpeedCoil( SourceID ).RunFrac;
+				HeatingCoil( CoilNum ).NominalCapacity = VariableSpeedCoils::VarSpeedCoil( SourceID ).QSource * Effic;
 			}
 		} else {
 			HeatingCoil( CoilNum ).NominalCapacity = 0.0;
@@ -2357,6 +2378,8 @@ namespace HeatingCoils {
 				HeatReclaimRefrigCondenser( SourceID ).UsedHVACCoil = HeatingCoilLoad;
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_COOLING || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				HeatReclaimDXCoil( SourceID ).AvailCapacity -= HeatingCoilLoad;
+			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				DataHeatBalance::HeatReclaimVS_DXCoil( SourceID ).AvailCapacity -= HeatingCoilLoad;
 			}
 		}
 
@@ -3015,6 +3038,13 @@ namespace HeatingCoils {
 			GetDXCoilIndex( CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning );
 			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
 				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTISPEED && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
+				CoilFound = CoilNum;
+				break;
+			}
+		} else if ( SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( CoilType, CoilName, GetCoilErrFlag );
+			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
+				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
 				CoilFound = CoilNum;
 				break;
 			}

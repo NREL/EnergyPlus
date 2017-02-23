@@ -104,6 +104,7 @@ namespace DataSurfaces {
 	extern int const OtherSideCoefNoCalcExt;
 	extern int const OtherSideCoefCalcExt;
 	extern int const OtherSideCondModeledExt;
+	extern int const KivaFoundation;
 	extern int const GroundFCfactorMethod;
 
 	extern Array1D_string const cExtBoundCondition;
@@ -162,6 +163,7 @@ namespace DataSurfaces {
 	extern int const HeatTransferModel_Window5; // original detailed layer-by-layer based on window 4 and window 5
 	extern int const HeatTransferModel_ComplexFenestration; // BSDF
 	extern int const HeatTransferModel_TDD; // tubular daylighting device
+	extern int const HeatTransferModel_Kiva; // Kiva ground calculations
 
 	// Parameters for classification of outside face of surfaces
 	extern int const OutConvClass_WindwardVertWall;
@@ -543,7 +545,7 @@ namespace DataSurfaces {
 		{
 			auto const & v1 = a.vertices;
 			auto const & v2 = b.vertices;
-			return eq( v1, v2 );		
+			return eq( v1, v2 );
 		}
 
 		// Inequality
@@ -722,7 +724,7 @@ namespace DataSurfaces {
 		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
-		bool MirroredSurf; // Ture if it is a mirrored surface
+		bool MirroredSurf; // True if it is a mirrored surface
 		// additional attributes for convection correlations
 		int IntConvClassification; // current classification for inside face air flow regime and surface orientation
 		int IntConvHcModelEq; // current convection model for inside face

@@ -80,9 +80,7 @@ namespace SingleDuct {
 	extern int const HCoilType_Electric;
 	extern int const HCoilType_SimpleHeating;
 	extern int const HCoilType_SteamAirHeating;
-	// Fan types used here
-	extern int const FanType_None;
-	extern int const FanType_VS;
+
 	// Minimum Flow Fraction Input Method
 	extern int const ConstantMinFrac;
 	extern int const ScheduledMinFrac;

@@ -128,12 +128,12 @@ include(cmake/CompilerFlags.cmake)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/re2 )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen-3.3.2/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
 INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
 
@@ -157,6 +157,11 @@ IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
+
+# Kiva
+option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
+mark_as_advanced(FORCE BUILD_GROUND_PLOT)
+INCLUDE(third_party/cmake/kiva.cmake)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
