@@ -5441,8 +5441,8 @@ namespace AirflowNetworkBalanceManager {
 			}
 
 			Real64 Re = V * Dh / KinVisc; // Reynolds number
-			Real64 c;
-			Real64 n;
+			Real64 c = 0;
+			Real64 n = 0;
 
 			if ( Re <= 4 ) {
 				c = 0.989;
@@ -5459,8 +5459,6 @@ namespace AirflowNetworkBalanceManager {
 			} else if ( 40000 < Re ) {
 				c = 0.0266;
 				n = 0.805;
-			} else {
-				assert( false );
 			}
 
 			Real64 Nu_forced = c * pow( Re, n ) * pow( Pr, 1/3 );
