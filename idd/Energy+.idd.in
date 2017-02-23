@@ -24611,140 +24611,140 @@ AirflowNetwork:Distribution:DuctViewFactors,
   A2,  \field Surface 1 Name
        \begin-extensible
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N3,  \field Surface 1 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A3,  \field Surface 2 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N4,  \field Surface 2 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A4,  \field Surface 3 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N5,  \field Surface 3 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A5,  \field Surface 4 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N6,  \field Surface 4 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A6,  \field Surface 5 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N7,  \field Surface 5 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A7,  \field Surface 6 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N8,  \field Surface 6 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A8,  \field Surface 7 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N9,  \field Surface 7 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A9,  \field Surface 8 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N10, \field Surface 8 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A10, \field Surface 9 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N11, \field Surface 9 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A11, \field Surface 10 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N12, \field Surface 10 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A12, \field Surface 11 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N13, \field Surface 11 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A13, \field Surface 12 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N14, \field Surface 12 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A14, \field Surface 13 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N15, \field Surface 13 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A15, \field Surface 14 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N16, \field Surface 14 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A16, \field Surface 15 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N17, \field Surface 15 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A17, \field Surface 16 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N18, \field Surface 16 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A18, \field Surface 17 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N19, \field Surface 17 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A19, \field Surface 18 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N20, \field Surface 18 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A20, \field Surface 19 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N21, \field Surface 19 View Factor
        \type real
        \minimum 0.0
        \maximum 1.0
   A21, \field Surface 20 Name
        \type object-list
-       \object-list AllHeatTransSurfNames
+       \object-list AllHeatTranSurfNames
   N22; \field Surface 20 View Factor
        \type real
        \minimum 0.0
@@ -42385,13 +42385,13 @@ Fan:SystemModel,
        \ip-units W/(ft3/min)
   N8 , \field Electric Power Per Unit Flow Rate Per Unit Pressure
        \type real
-       \units W/((m3/s) -Pa)
+       \units W/((m3/s)-Pa)
        \ip-units W/((ft3/min)-inH2O)
        \default 1.66667
   N9,  \field Fan Total Efficiency
        \type real
        \default 0.7
-       \minimum>0.0
+       \minimum> 0.0
        \maximum 1.0
   A7 , \field Electric Power Function of Flow Fraction Curve Name
        \note independent variable is normalized flow rate, current flow divided by Design Maximum Air Flow Rate.
