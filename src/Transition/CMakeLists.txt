@@ -6,8 +6,10 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
+set(STATIC_EXE FALSE)
+
 # first create a static library of shared stuff
-SET(LIB_SRC
+set(LIB_SRC
   DataGlobals.f90
   DataStringGlobals.f90
   DataVCompareGlobals.f90
@@ -70,11 +72,13 @@ elseif(UNIX)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbounds-check")
+    set(STATIC_EXE TRUE)
   else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
   endif()
 else()  # Windows
+  set(STATIC_EXE TRUE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
@@ -117,7 +121,7 @@ FOREACH( i RANGE 1 ${end} )
   TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
 
   if( "${i}" GREATER "22" )
-    install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
+    install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater ${STATIC_EXE} )
   endif()
 
 ENDFOREACH()

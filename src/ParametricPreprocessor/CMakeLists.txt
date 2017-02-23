@@ -4,9 +4,9 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
-SET(SRC 
-  ParametricPreprocessor.f90  
-) 
+set(SRC ParametricPreprocessor.f90)
+
+set(STATIC_EXE FALSE)
 
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
@@ -18,8 +18,10 @@ elseif(UNIX)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
   else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static" )
+    set(STATIC_EXE TRUE)
   endif()
 else()
+  set(STATIC_EXE TRUE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
     # Set release flags to be empty
     set(CMAKE_Fortran_FLAGS_RELEASE "")
@@ -37,5 +39,5 @@ SET_TARGET_PROPERTIES(parametricpreprocessor PROPERTIES
 )
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( parametricpreprocessor PreProcess/ParametricPreProcessor )
+install_and_fixup_exe_target( parametricpreprocessor PreProcess/ParametricPreProcessor ${STATIC_EXE} )
 
