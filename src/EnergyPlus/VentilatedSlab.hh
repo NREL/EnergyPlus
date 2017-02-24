@@ -164,7 +164,8 @@ namespace VentilatedSlab {
 		int MSlabInNode;
 		int MSlabOutNode;
 		std::string FanName; // name of fan
-		int Fan_Index;
+		int Fan_Index; // index of fan in array or vector
+		int FanType_Num; // type of fan 
 		int ControlCompTypeNum;
 		int CompErrIndex;
 		Real64 MaxAirVolFlow; // m3/s

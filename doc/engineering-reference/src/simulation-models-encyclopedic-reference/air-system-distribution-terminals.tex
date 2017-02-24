@@ -266,13 +266,13 @@ Both types of PIU are modeled as compound components. The series unit, in sequen
 
 1.~~~~AirLoopHVAC:ZoneMixer
 
-2.~~~~Fan:ConstantVolume
+2.~~~~Fan:SystemModel or Fan:ConstantVolume
 
 3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
 
 The parallel unit contains a fan (in the secondary air stream, an air mixer, and a heating coil. In terms of EnergyPlus objects this is:
 
-1.~~~~Fan:ConstantVolume
+1.~~~~Fan:SystemModel or Fan:ConstantVolume
 
 2.~~~~AirLoopHVAC:ZoneMixer
 
