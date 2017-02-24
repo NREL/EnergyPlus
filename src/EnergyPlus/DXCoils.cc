@@ -9907,6 +9907,7 @@ Label50: ;
 		Real64 DeltaT( 0.0 ); // Temperature drop across evaporator at given conditions [C]
 		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
 		Real64 OutletAirTemp( InletAirTemp ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 OutletAirTempSat( InletAirTemp ); // Saturation dry-bulb temperature from evaporator at outlet air enthalpy [C]
 		Real64 OutletAirEnthalpy; // Enthalpy of outlet air at given conditions [J/kg]
 		Real64 OutletAirHumRat( InletAirHumRat ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
 		Real64 OutletAirRH; // relative humidity of the outlet air
@@ -9931,6 +9932,12 @@ Label50: ;
 		DeltaHumRat = InletAirHumRat - OutletAirHumRat;
 		OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
 		OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+		OutletAirTempSat = PsyTsatFnHPb( OutletAirEnthalpy, BaroPress, RoutineName );
+		if( OutletAirTemp < OutletAirTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
+			OutletAirTemp = OutletAirTempSat + 0.01; // just right of the saturation curve so CBF does not equal 0
+			OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, RoutineName );
+			DeltaHumRat = InletAirHumRat - OutletAirHumRat;
+		}
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
 		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, BaroPress, RoutineName );
@@ -10026,14 +10033,19 @@ Label50: ;
 
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Pressure will have to be pass into this subroutine to fix this one
-				ADPHumRat = PsyWFnTdpPb( ADPTemp, BaroPress );
-				Slope = ( InletAirHumRat - ADPHumRat ) / ( InletAirTemp - ADPTemp );
+				ADPHumRat = min( OutletAirHumRat, PsyWFnTdpPb( ADPTemp, BaroPress ) );
+				Slope = ( InletAirHumRat - ADPHumRat ) / max( 0.001, ( InletAirTemp - ADPTemp ) );
 
 				//     check for convergence (slopes are equal to within error tolerance)
 
 				Error = ( Slope - SlopeAtConds ) / SlopeAtConds;
-				if ( ( Error > 0.0 ) && ( ErrorLast < 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.0;
-				if ( ( Error < 0.0 ) && ( ErrorLast > 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.0;
+				if ( ( Error > 0.0 ) && ( ErrorLast < 0.0 ) ) {
+					DeltaADPTemp = -DeltaADPTemp / 2.0;
+				} else if( ( Error < 0.0 ) && ( ErrorLast > 0.0 ) ) {
+					DeltaADPTemp = -DeltaADPTemp / 2.0;
+				} else if( abs( Error ) > abs( ErrorLast ) ) {
+					DeltaADPTemp = -DeltaADPTemp / 2.0;
+				}
 				ErrorLast = Error;
 
 				Tolerance = std::abs( Error );
