@@ -55,6 +55,10 @@
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
+#include <HeatBalanceKivaManager.hh>
+
+// C++ Headers
+#include <map>
 
 namespace EnergyPlus {
 
@@ -101,6 +105,8 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	extern Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	extern HeatBalanceKivaManager::KivaManager kivaManager;
+
 
 	// Functions
 
@@ -280,6 +286,19 @@ namespace SurfaceGeometry {
 	void
 	GetSurfaceHeatTransferAlgorithmOverrides( bool & ErrorsFound );
 
+	class ExposedFoundationPerimeter {
+		public:
+			void getData(bool& ErrorsFound);
+			struct Data {
+				double exposedFraction;
+				std::vector<bool> isExposedPerimeter;
+				bool useDetailedExposedPerimeter;
+			};
+			std::map<int, Data> surfaceMap;
+	};
+
+	extern ExposedFoundationPerimeter exposedFoundationPerimeter;
+
 	void
 	GetVertices(
 		int const SurfNum, // Current surface number
@@ -312,6 +331,9 @@ namespace SurfaceGeometry {
 
 	void
 	GetOSCMData( bool & ErrorsFound );
+
+	void
+	GetFoundationData( bool & ErrorsFound );
 
 	void
 	GetMovableInsulationData( bool & ErrorsFound ); // If errors found in input
@@ -380,7 +402,7 @@ namespace SurfaceGeometry {
 	isRectangle(
 		int const ThisSurf // Current surface number
 	);
-		
+
 } // SurfaceGeometry
 
 } // EnergyPlus

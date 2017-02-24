@@ -1,0 +1,43 @@
+\section{Group - Hybrid Model}\label{group---hybrid-model}
+
+This object is to provide a hybrid model feature to enhance the accuracy of the building energy simulation for existing buildings. The hybrid model feature replaces internal thermal mass and infiltration air flow rates with zone air temperature data. The hybrid model feature calculates a temperature capacitance multiplier, equivalent to the zone internal thermal mass and infiltration air change per hour (ACH) based on the inverse modeling of the heat balance algorithms. 
+
+\subsubsection{Inputs}\label{inputs-hm}
+
+\paragraph{Field: Name}\label{field-name-hm}
+
+The name of the HybridModel:Zone object.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-hm}
+
+This field is the name of the thermal zone (ref: Zone) and attaches a particular hybrid model input to a thermal zone in the building.
+
+\paragraph{Field: Calculate Zone Internal Thermal Mass}\label{field-calculate-zon-internal-thermal-mass-hm}
+
+This field is used to provide an option to calculate the temperature capacity multiplier (Ref: ZoneCapacitanceMultiplier:ResearchSpecial). The temperature capacity multiplier is represented as internal thermal mass multiplier in the hybrid model. 
+When YES is selected, the hybrid model calculates the multiplier based on the inverse heat balance algorithm using the measured zone air temperature.
+
+\paragraph{Field: Calculate Zone Air Infiltration Rate}\label{field-calculate-zone-air-fnfiltration-rate-hm}
+
+This field is used to provide an option to calculate the infiltration ACH using the hybrid modeling feature. When YES is selected, the hybrid model feature calculates the infiltration ACH based on the inverse heat balance algorithm using the measured zone air temperature.
+
+\paragraph{Field: Zone Measured Air Temperature Schedule Name}\label{field-zone-measured-air-temperature-schedule-name-hm}
+
+This field is the name of the schedule referenced by Schedule:File which contains the zone air measurement data. 
+
+\paragraph{Field: Begin Month}\label{field-begin-month-hm}
+
+This numeric field should contain the starting month number (1 = January, 2 = February, etc.) for the annual run period desired.
+
+\paragraph{Field: Begin Day of Month}\label{field-begin-day-of-month-hm}
+
+This numeric field should contain the starting day of the starting month (must be valid for month) for the annual run period desired.
+
+\paragraph{Field: End Month}\label{field-end-month-hm}
+
+This numeric field should contain the ending month number (1 = January, 2 = February, etc.) for the annual run period desired.
+
+\paragraph{Field: End Day of Month}\label{field-end-day-of-month-hm}
+
+This numeric field should contain the ending day of the ending month (must be valid for month) for the annual run period desired.
+

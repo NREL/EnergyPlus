@@ -72,6 +72,7 @@ namespace HeatingCoils {
 	extern int const COIL_DX_MULTISPEED;
 	extern int const COIL_DX_MULTIMODE;
 	extern int const CONDENSER_REFRIGERATION;
+	extern int const COIL_DX_VARIABLE_COOLING;
 
 	// DERIVED TYPE DEFINITIONS
 

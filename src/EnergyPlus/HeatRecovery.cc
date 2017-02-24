@@ -71,6 +71,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -222,7 +223,8 @@ namespace HeatRecovery {
 		Optional_int_const CompanionCoilIndex, // index of companion cooling coil
 		Optional_bool_const RegenInletIsOANode, // flag to determine if supply inlet is OA node, if so air flow cycles
 		Optional_bool_const EconomizerFlag, // economizer operation flag passed by airloop or OA sys
-		Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
+		Optional_bool_const HighHumCtrlFlag, // high humidity control flag passed by airloop or OA sys
+		Optional_int_const CompanionCoilType_Num // cooling coil type of coil 
 	)
 	{
 
@@ -296,6 +298,13 @@ namespace HeatRecovery {
 			CompanionCoilNum = 0;
 		}
 
+		int companionCoilType( 0 );
+		if ( present( CompanionCoilType_Num ) ) {
+			companionCoilType = CompanionCoilType_Num;
+		} else {
+			companionCoilType = 0;
+		}
+
 		if ( present( HXUnitEnable ) ) {
 			HXUnitOn = HXUnitEnable;
 			//   When CalledFromParentObject is TRUE, this SIM routine was called by a parent object that passed in HXUnitEnable.
@@ -309,7 +318,7 @@ namespace HeatRecovery {
 			CalledFromParentObject = false;
 		}
 
-		InitHeatRecovery( HeatExchNum, CompanionCoilNum );
+		InitHeatRecovery( HeatExchNum, CompanionCoilNum, companionCoilType );
 
 		// call the correct heat exchanger calculation routine
 		{ auto const SELECT_CASE_var( ExchCond( HeatExchNum ).ExchTypeNum );
@@ -1106,7 +1115,8 @@ namespace HeatRecovery {
 	void
 	InitHeatRecovery(
 		int const ExchNum, // number of the current heat exchanger being simulated
-		int const CompanionCoilIndex
+		int const CompanionCoilIndex,
+		int const CompanionCoilType_Num
 	)
 	{
 
@@ -1403,15 +1413,22 @@ namespace HeatRecovery {
 
 			if ( CompanionCoilIndex > 0 ) {
 
-				if ( DXCoilFullLoadOutAirTemp( CompanionCoilIndex ) == 0.0 || DXCoilFullLoadOutAirHumRat( CompanionCoilIndex ) == 0.0 ) {
-					//       DX Coil is OFF, read actual inlet conditions
-					FullLoadOutAirTemp = ExchCond( ExchNum ).SecInTemp;
-					FullLoadOutAirHumRat = ExchCond( ExchNum ).SecInHumRat;
-				} else {
-					//       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-					FullLoadOutAirTemp = DXCoilFullLoadOutAirTemp( CompanionCoilIndex );
-					FullLoadOutAirHumRat = DXCoilFullLoadOutAirHumRat( CompanionCoilIndex );
+				if ( CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed || CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) {
+					if ( DXCoilFullLoadOutAirTemp( CompanionCoilIndex ) == 0.0 || DXCoilFullLoadOutAirHumRat( CompanionCoilIndex ) == 0.0 ) {
+						//       DX Coil is OFF, read actual inlet conditions
+						FullLoadOutAirTemp = ExchCond( ExchNum ).SecInTemp;
+						FullLoadOutAirHumRat = ExchCond( ExchNum ).SecInHumRat;
+					} else {
+						//       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
+						FullLoadOutAirTemp = DXCoilFullLoadOutAirTemp( CompanionCoilIndex );
+						FullLoadOutAirHumRat = DXCoilFullLoadOutAirHumRat( CompanionCoilIndex );
+					}
+				} else if ( CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+					// how to support VS dx coil here?
+					FullLoadOutAirTemp =  VariableSpeedCoils::VarSpeedCoil( CompanionCoilIndex ). OutletAirDBTemp;
+					FullLoadOutAirHumRat = VariableSpeedCoils::VarSpeedCoil( CompanionCoilIndex ).OutletAirHumRat;
 				}
+
 
 			} else {
 
@@ -2492,6 +2509,7 @@ namespace HeatRecovery {
 					HXPartLoadRatio = min( 1.0, HXPartLoadRatio );
 
 				} else if ( CompanionCoilIndex > 0 ) {
+					//VS coil issue here?
 					HXPartLoadRatio = DXCoilPartLoadRatio( CompanionCoilIndex );
 				}
 

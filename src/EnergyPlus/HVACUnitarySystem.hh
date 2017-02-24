@@ -101,6 +101,7 @@ namespace HVACUnitarySystem {
 	// System Control Type
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
+	extern int const CCM_ASHRAE; // capacity control based on ASHRAE Standard 90.1
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -199,6 +200,10 @@ namespace HVACUnitarySystem {
 		int DehumidControlType_Num; // Set to Dehumid Control None, CoolReheat or MultiMode
 		int AirFlowControl; // UseCompressorOnFlow or UseCompressorOffFlow
 		int ControlType; // Setpoint or Load based control
+		bool validASHRAECoolCoil; // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
+		bool validASHRAEHeatCoil; // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
+		bool simASHRAEModel; // flag denoting that ASHRAE model should be used
+		int CapacityControlType; // operational system control
 		bool RequestAutoSize; // determines if inputs need autosizing
 		bool RunOnSensibleLoad; // logical determines if this system will run to
 		bool RunOnLatentLoad; // logical determines if this system will run to
@@ -252,6 +257,8 @@ namespace HVACUnitarySystem {
 		int HeatCoilCompNum; // Comp num of the heating coil in the plant loop
 		int HeatCoilFluidInletNode; // Heating coil fluid inlet node
 		Real64 MaxHeatCoilFluidFlow; // Maximum heating coil fluid flow for hot water or steam coil
+		Real64 CoolCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
+		Real64 HeatCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
 		Real64 HeatCompPartLoadRatio; // Unitary system compressor part load ratio in heating
 		// Supplemental heating coil specific data
 		std::string SuppHeatCoilName; // coil name (eliminate after blank is accepted in CALL)
@@ -271,6 +278,7 @@ namespace HVACUnitarySystem {
 		int SuppCoilBranchNum; // Branch of number of the supplemental coil in the plant loop
 		int SuppCoilCompNum; // Comp num of the supplemental coil in the plant loop
 		// fan specific data
+		std::string fanName; // TRANE
 		int FanType_Num; // Fan type num i.e. OnOff, ConstVol, VAV
 		int FanIndex; // index of fan of a particular type
 		Real64 ActualFanVolFlowRate; // Actual or design fan volume flow rate
@@ -372,6 +380,8 @@ namespace HVACUnitarySystem {
 		Real64 SensHeatEnergyRate; // Unitary System Sensible Heating Rate [W]
 		Real64 LatHeatEnergyRate; // Unitary System Latent Heating Rate [W]
 		Real64 TotalAuxElecPower; // Unitary System Ancillary Electric Power [W]
+		Real64 SensibleLoadPredicted; // Unitary System predicted sensible load [W]
+		Real64 MoistureLoadPredicted; // Unitary System predicted moisture load [W]
 		Real64 HeatingAuxElecConsumption; // Unitary System Heating Ancillary Electric Energy [J]
 		Real64 CoolingAuxElecConsumption; // Unitary System Cooling Ancillary Electric Energy [J]
 		Real64 HeatRecoveryRate; // Unitary System Heat Recovery Rate [W]
@@ -386,6 +396,8 @@ namespace HVACUnitarySystem {
 		Real64 SpeedRatio; // current compressor speed ratio (variable speed)
 		Real64 CycRatio; // cycling part load ratio (variable speed)
 		int TESOpMode; // operating mode of TES DX cooling coil
+		Real64 LowSpeedCoolFanRatio;
+		Real64 LowSpeedHeatFanRatio;
 		// Warning message variables
 		int HXAssistedSensPLRIter; // used in HX Assisted calculations
 		int HXAssistedSensPLRIterIndex; // used in HX Assisted calculations
@@ -493,6 +505,10 @@ namespace HVACUnitarySystem {
 			DehumidControlType_Num( 0 ),
 			AirFlowControl( 1 ),
 			ControlType( 0 ),
+			validASHRAECoolCoil( false ),
+			validASHRAEHeatCoil( false ),
+			simASHRAEModel( false ),
+			CapacityControlType( 0 ),
 			RequestAutoSize( false ),
 			RunOnSensibleLoad( true ),
 			RunOnLatentLoad( false ),
@@ -539,6 +555,8 @@ namespace HVACUnitarySystem {
 			HeatCoilCompNum( 0 ),
 			HeatCoilFluidInletNode( 0 ),
 			MaxHeatCoilFluidFlow( AutoSize ),
+			CoolCoilWaterFlowRatio( 0.0 ),
+			HeatCoilWaterFlowRatio( 0.0 ),
 			HeatCompPartLoadRatio( 0.0 ),
 			SuppHeatCoilType_Num( 0 ),
 			SuppHeatCoilIndex( 0 ),
@@ -654,6 +672,8 @@ namespace HVACUnitarySystem {
 			SpeedRatio( 0.0 ),
 			CycRatio( 0.0 ),
 			TESOpMode( 0 ),
+			LowSpeedCoolFanRatio( 0.0),
+			LowSpeedHeatFanRatio( 0.0 ),
 			HXAssistedSensPLRIter( 0 ),
 			HXAssistedSensPLRIterIndex( 0 ),
 			HXAssistedSensPLRFail( 0 ),
@@ -871,6 +891,12 @@ namespace HVACUnitarySystem {
 		Optional_int CompOn = _
 	);
 
+	Real64
+	CalcUnitarySystemWaterFlowResidual(
+		Real64 const PartLoadRatio, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
 	void
 	SetSpeedVariables(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
@@ -901,6 +927,13 @@ namespace HVACUnitarySystem {
 	);
 
 	void
+	calculateCapacity(
+		int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
+		Real64 & SensOutput, // sensible output of AirloopHVAC:UnitarySystem
+		Real64 & LatOutput // latent output of AirloopHVAC:UnitarySystem
+	);
+
+	void
 	CalcUnitaryCoolingSystem(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		int const AirLoopNum, // index to air loop
@@ -909,7 +942,7 @@ namespace HVACUnitarySystem {
 		int const CompOn, // compressor control (0=off, 1=on)
 		Real64 const OnOffAirFlowRatio,
 		Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
-		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
+		bool const HXUnitOn // Flag to control HX for HXAssisted Cooling Coil
 	);
 
 	void

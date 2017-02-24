@@ -72,6 +72,7 @@
 #include <DataZoneEquipment.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
@@ -85,6 +86,7 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SimAirServingZones.hh>
 #include <StandardRatings.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
@@ -5422,7 +5424,7 @@ namespace DXCoils {
 		// na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FanElecPower;
+
 		using DataAirLoop::AirLoopInputsFilled;
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
@@ -5488,7 +5490,7 @@ namespace DXCoils {
 			HPWHInletWBTemp = DXCoil( DXCoilNum ).RatedInletWBTemp;
 			DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
 			//   get rated coil bypass factor excluding fan heat
-			FanElecPower = 0.0;
+
 			//   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
 			CalcHPWHDXCoil( DXCoilNum, 1.0 );
 			if ( MySizeFlag( DXCoilNum ) ) {
@@ -7070,7 +7072,6 @@ namespace DXCoils {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
-		using DataHVACGlobals::FanElecPower;
 		using DataHVACGlobals::HPWHInletDBTemp;
 		using DataHVACGlobals::HPWHInletWBTemp;
 		using DataHVACGlobals::DXCoilTotalCapacity;
@@ -7296,25 +7297,32 @@ namespace DXCoils {
 
 		HPRTF = min( 1.0, ( PartLoadRatio / PartLoadFraction ) );
 
+		Real64 locFanElecPower = 0.0;
+		if ( Coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ Coil.SupplyFanIndex ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( Coil.SupplyFanIndex );
+		}
+		
 		// calculate evaporator total cooling capacity
 		if ( HPRTF > 0.0 ) {
 			if ( Coil.FanPowerIncludedInCOP ) {
 				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF - Coil.HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF - Coil.HPWHCondPumpElecNomPower;
 					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
 				} else {
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
+					CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF;
 					if ( ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower );
 				}
 			} else {
 				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
 					CompressorPower = OperatingHeatingPower - Coil.HPWHCondPumpElecNomPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF );
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + locFanElecPower / HPRTF );
 				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower );
+					if ( ( OperatingHeatingPower + locFanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + locFanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower );
 				}
 			}
 		}
@@ -12054,10 +12062,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
-		using Fans::GetFanPower;
-		using Fans::GetFanInletNode;
-		using Fans::GetFanOutletNode;
-		using Fans::SimulateFanComponents;
 		using DataEnvironment::OutBaroPress;
 		using General::SolveRegulaFalsi;
 		using General::RoundSigDigits;
@@ -12152,10 +12156,10 @@ Label50: ;
 		static gio::Fmt Format_891( "(' VAV DX Cooling Coil Standard Rating Information, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 
 		// Get fan index and name if not already available
-		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName );
-		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) { // didn't find VAV fan, do not rate this coil
+		if ( DXCoil( DXCoilNum ).SupplyFanIndex == -1 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName, DXCoil( DXCoilNum ).SupplyFan_TypeNum );
+		if ( DXCoil( DXCoilNum ).SupplyFanIndex == -1 ) { // didn't find VAV fan, do not rate this coil
 			DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject = false;
-			ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: Did not find a variable air volume fan associated with DX coil named = \"" + DXCoil( DXCoilNum ).Name + "\". Standard Ratings will not be calculated." );
+			ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" + DXCoil( DXCoilNum ).Name + "\". Standard Ratings will not be calculated." );
 			return;
 		}
 
@@ -12189,19 +12193,30 @@ Label50: ;
 					ExternalStatic = 190.0;
 				}
 				FanStaticPressureRise = ExternalStatic + DXCoil( DXCoilNum ).InternalStaticPressureDrop;
+				if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+					FanInletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->inletNodeNum;
+					FanOutletNode = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->outletNodeNum;
+				} else {
+					FanInletNode = Fans::GetFanInletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
+					FanOutletNode = Fans::GetFanOutletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
+				}
 
-				FanInletNode = GetFanInletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
-				FanOutletNode = GetFanOutletNode( "FAN:VARIABLEVOLUME", DXCoil( DXCoilNum ).SupplyFanName, ErrorsFound );
 				// set node state variables in preparation for fan model.
 				Node( FanInletNode ).MassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 				Node( FanOutletNode ).MassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 				Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 				Node( FanInletNode ).HumRat = PsyWFnTdbTwbPb( CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, RoutineName );
 				Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, Node( FanInletNode ).HumRat );
+				if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+					HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->simulate( _, true, false, FanStaticPressureRise );
+					FanPowerCorrection = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->fanPower();
+				} else {
+					Fans::SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+					FanPowerCorrection = Fans::GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
+				}
 
-				SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-				GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
+				
 
 				NetCoolingCapRated = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 			}
@@ -12323,9 +12338,16 @@ Label50: ;
 					Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 					Node( FanInletNode ).HumRat = SupplyAirHumRat;
 					Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat );
-					SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+
+					if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+						HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->simulate( _, true, false, FanStaticPressureRise );
+						FanPowerCorrection = HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->fanPower();
+					} else {
+						Fans::SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+						FanPowerCorrection = Fans::GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
+					}
+
 					FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-					GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
 
 				} else {
 					FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -12477,7 +12499,8 @@ Label50: ;
 	GetFanIndexForTwoSpeedCoil(
 		int const CoolingCoilIndex,
 		int & SupplyFanIndex,
-		std::string & SupplyFanName
+		std::string & SupplyFanName,
+		int & SupplyFan_TypeNum
 	)
 	{
 
@@ -12500,7 +12523,6 @@ Label50: ;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using DataAirSystems::PrimaryAirSystem;
-		using Fans::GetFanIndex;
 
 		using DataHVACGlobals::NumPrimaryAirSys;
 
@@ -12508,7 +12530,6 @@ Label50: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const DXSystem( 14 ); // must match SimAirServingZones.cc (not public)
-		int const Fan_Simple_VAV( 3 ); // must match SimAirServingZones.cc (not public)
 		int const UnitarySystem( 19 ); // must match SimAirServingZones.cc (not public)
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -12527,7 +12548,7 @@ Label50: ;
 
 		FoundBranch = 0;
 		FoundAirSysNum = 0;
-		SupplyFanIndex = 0;
+		SupplyFanIndex = -1;
 		SupplyFanName = "n/a";
 		for ( AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum ) {
 
@@ -12552,15 +12573,21 @@ Label50: ;
 
 				if ( FoundBranch > 0 && FoundAirSysNum > 0 ) {
 					for ( CompNum = 1; CompNum <= PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).TotalComponents; ++CompNum ) {
-						if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == Fan_Simple_VAV ) {
+						if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == SimAirServingZones::Fan_Simple_VAV ) {
 							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
-							GetFanIndex( SupplyFanName, SupplyFanIndex, ErrorsFound );
+							Fans::GetFanIndex( SupplyFanName, SupplyFanIndex, ErrorsFound );
+							SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
 							break;
 							// these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
+						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == SimAirServingZones::Fan_System_Object ) {
+							SupplyFanName = PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).Name;
+							SupplyFanIndex =  HVACFan::getFanObjectVectorIndex( SupplyFanName );
+							SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
+
 						} else if ( PrimaryAirSystem( FoundAirSysNum ).Branch( FoundBranch ).Comp( CompNum ).CompType_Num == UnitarySystem ) {
 							// fan may not be specified in a unitary system object, keep looking
 							// Unitary System will "set" the fan index to the DX coil if contained within the HVAC system
-							if ( DXCoil( CoolingCoilIndex ).SupplyFanIndex > 0 ) break;
+							if ( DXCoil( CoolingCoilIndex ).SupplyFanIndex > -1 ) break;
 						}
 					}
 				}
@@ -12593,7 +12620,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using Fans::SimulateFanComponents;
 		using CurveManager::CurveValue;
 
 		// Return value
@@ -12676,7 +12702,12 @@ Label50: ;
 			Node( FanInletNodeNum ).Temp = IndoorUnitInletDryBulb;
 			Node( FanInletNodeNum ).HumRat = PsyWFnTdbTwbPb( IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, RoutineName );
 			Node( FanInletNodeNum ).Enthalpy = PsyHFnTdbW( IndoorUnitInletDryBulb, Node( FanInletNodeNum ).HumRat );
-			SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+			if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->simulate( _, true, false, FanStaticPressureRise );
+			} else {
+				Fans::SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
+			}
+
 			FanHeatCorrection = Node( FanOutletNodeNum ).Enthalpy - Node( FanInletNodeNum ).Enthalpy;
 
 		} else {
@@ -13778,7 +13809,8 @@ Label50: ;
 		Optional< Real64 > HeatSizeRatio,
 		Optional< Real64 > TotCap,
 		Optional_int SupplyFanIndex,
-		Optional_string SupplyFanName
+		Optional_string SupplyFanName,
+		Optional_int SupplyFan_TypeNum
 	)
 	{
 
@@ -13911,6 +13943,10 @@ Label50: ;
 
 		if ( present( SupplyFanName ) ) {
 			DXCoil( DXCoilNum ).SupplyFanName = SupplyFanName;
+		}
+
+		if ( present( SupplyFan_TypeNum ) ) {
+			DXCoil( DXCoilNum ).SupplyFan_TypeNum = SupplyFan_TypeNum;
 		}
 
 	}

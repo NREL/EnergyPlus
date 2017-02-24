@@ -126,7 +126,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Zone( 1 ).Multiplier = 1.0;
 	Zone( 1 ).Volume = 1000.0;
 	Zone( 1 ).SystemZoneNodeNumber = 5;
-	ZoneVolCapMultpMoist = 1.0;
+	Zone( 1 ).ZoneVolCapMultpMoist = 1.0;
 	ZoneLatentGain.allocate( 1 );
 	ZoneLatentGain( 1 ) = 0.0;
 	SumLatentHTRadSys.allocate( 1 );
@@ -187,7 +187,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA( 1 ) = 0.0;
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
-	EXPECT_EQ( 0.008, Node( 5 ).HumRat );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 2 - Unbalanced exhaust flow
 	ZoneW1( 1 ) = 0.008;
@@ -212,7 +212,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA( 1 ) = 0.0;
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
-	EXPECT_EQ( 0.008, Node( 5 ).HumRat );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 3 - Balanced exhaust flow with proper source flow from mixing
 	ZoneW1( 1 ) = 0.008;
@@ -237,7 +237,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA( 1 ) = 0.0;
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
-	EXPECT_EQ( 0.008, Node( 5 ).HumRat );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 4 - Balanced exhaust flow without source flow from mixing
 	ZoneW1( 1 ) = 0.008;

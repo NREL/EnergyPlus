@@ -190,6 +190,7 @@ namespace DataHeatBalFanSys {
 	// of electric baseboard heaters
 	Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
 	// of simple cooling panels
+	Array1D< Real64 > QRadSurfAFNDuct; // Current radiant heat flux at a surface due to radiation from AFN ducts
 	Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -216,6 +217,10 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
+	// Hybrid Modeling
+	Array1D< Real64 > PreviousMeasuredZT1; // Hybrid model internal mass multiplier at previous timestep
+	Array1D< Real64 > PreviousMeasuredZT2; // Hybrid model internal mass multiplier at previous timestep
+	Array1D< Real64 > PreviousMeasuredZT3; // Hybrid model internal mass multiplier at previous timestep
 	// Exact and Euler solutions
 	Array1D< Real64 > ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	Array1D< Real64 > ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
@@ -223,16 +228,6 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	Array1D< Real64 > ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
 	Array1D< Real64 > ZoneW1; // Zone temperature at the previous time step used in Exact and Euler method
-
-	Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone temp in the predictor and corrector step
-	Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone humidity ratio in the predictor and corrector step
-	Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone CO2 concentration in the predictor and corrector step
-	Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone generic contaminant concentration in the predictor
-	// and corrector step
 
 	Array1D_int TempControlType;
 	Array1D_int ComfortControlType;
@@ -320,6 +315,7 @@ namespace DataHeatBalFanSys {
 		QSteamBaseboardSurf.deallocate();
 		QElecBaseboardSurf.deallocate();
 		QPoolSurfNumerator.deallocate();
+		QRadSurfAFNDuct.deallocate();
 		PoolHeatTransCoefs.deallocate();
 		RadSysTiHBConstCoef.deallocate();
 		RadSysTiHBToutCoef.deallocate();
@@ -345,10 +341,6 @@ namespace DataHeatBalFanSys {
 		ZoneWMX.deallocate();
 		ZoneWM2.deallocate();
 		ZoneW1.deallocate();
-		ZoneVolCapMultpSens= 0.0;
-		ZoneVolCapMultpMoist = 0.0;
-		ZoneVolCapMultpCO2 = 0.0;
-		ZoneVolCapMultpGenContam =0.0;
 		TempControlType.deallocate();
 		ComfortControlType.deallocate();
 		ZoneComfortControlsFanger.deallocate();
