@@ -48,6 +48,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -70,6 +71,7 @@
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
@@ -217,7 +219,7 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_ZoneLevel( 7 ); // ZoneLevel control for a heat transfer subsurface
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
-	int const FeeeOperation( 0 ); // Free operatio
+	int const FreeOperation( 0 ); // Free operation
 	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time
 	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time
 	int const ProbNoAction( 0 ); // No action from probability check
@@ -253,14 +255,12 @@ namespace AirflowNetworkBalanceManager {
 	int AirflowNetworkNumOfSurCracks( 0 );
 	int AirflowNetworkNumOfSurELA( 0 );
 	int AirflowNetworkNumOfExtNode( 0 );
-	int AirflowNetworkNumOfCPArray( 0 );
-	int AirflowNetworkNumOfCPValue( 0 );
 	int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-	int AirflowNetworkNumofWindDir;
 	int DisSysNumOfNodes( 0 );
 	int DisSysNumOfLeaks( 0 );
 	int DisSysNumOfELRs( 0 );
 	int DisSysNumOfDucts( 0 );
+	int DisSysNumOfDuctViewFactors( 0 );
 	int DisSysNumOfDampers( 0 );
 	int DisSysNumOfCVFs( 0 );
 	int DisSysNumOfDetFans( 0 );
@@ -319,14 +319,12 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkNumOfSurCracks = 0;
 		AirflowNetworkNumOfSurELA = 0;
 		AirflowNetworkNumOfExtNode = 0;
-		AirflowNetworkNumOfCPArray = 0;
-		AirflowNetworkNumOfCPValue = 0;
 		AirflowNetworkNumOfSingleSideZones = 0; // added default value
-		AirflowNetworkNumofWindDir = 0; // added default value
 		DisSysNumOfNodes = 0;
 		DisSysNumOfLeaks = 0;
 		DisSysNumOfELRs = 0;
 		DisSysNumOfDucts = 0;
+		DisSysNumOfDuctViewFactors = 0;
 		DisSysNumOfDampers = 0;
 		DisSysNumOfCVFs = 0;
 		DisSysNumOfDetFans = 0;
@@ -637,6 +635,9 @@ namespace AirflowNetworkBalanceManager {
 		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers );
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
@@ -826,7 +827,7 @@ namespace AirflowNetworkBalanceManager {
 			return;
 		}
 		if ( NumAirflowNetwork > 1 ) {
-			ShowFatalError( RoutineName + "Currently only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed." );
+			ShowFatalError( RoutineName + "Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed." );
 		}
 
 		SimObjectError = false;
@@ -835,9 +836,9 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkSimu.AirflowNetworkSimuName = Alphas( 1 );
 		AirflowNetworkSimu.Control = Alphas( 2 );
 		AirflowNetworkSimu.WPCCntr = Alphas( 3 );
-		AirflowNetworkSimu.CpArrayName = Alphas( 4 );
-		AirflowNetworkSimu.HeightOption = Alphas( 5 );
-		AirflowNetworkSimu.BldgType = Alphas( 6 );
+		//AirflowNetworkSimu.CpArrayName = Alphas( 4 );
+		AirflowNetworkSimu.HeightOption = Alphas( 4 );
+		AirflowNetworkSimu.BldgType = Alphas( 5 );
 
 		// Find a flag for possible combination of vent and distribution system
 		{ auto const SELECT_CASE_var( MakeUPPERCase( AirflowNetworkSimu.Control ) );
@@ -939,15 +940,9 @@ namespace AirflowNetworkBalanceManager {
 				ShowContinueError( ".." + cAlphaFields( 4 ) + " was not entered." );
 				ErrorsFound = true;
 				SimObjectError = true;
-			}
-			if ( lAlphaBlanks( 5 ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " = INPUT." );
-				ShowContinueError( ".." + cAlphaFields( 5 ) + " was not entered." );
-				ErrorsFound = true;
-				SimObjectError = true;
 			} else {
 				if ( ! ( SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) || SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
+					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) + " is invalid." );
 					ShowContinueError( "Valid choices are ExternalNode or OpeningHeight. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 					ErrorsFound = true;
 					SimObjectError = true;
@@ -960,14 +955,14 @@ namespace AirflowNetworkBalanceManager {
 			//     end if
 		} else if ( SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 			AirflowNetworkSimu.iWPCCntr = iWPCCntr_SurfAvg;
-			if ( ! lAlphaBlanks( 4 ) ) {
-				AirflowNetworkSimu.CpArrayName = "";
+			//if ( ! lAlphaBlanks( 4 ) ) {
+				//AirflowNetworkSimu.CpArrayName = "";
 				//        CALL ShowWarningError('GetAirflowNetworkInput: AirflowNetwork Wind Pressure Coefficient Type '// &
 				//             '= SURFACE-AVERAGE CALCULATION.'// &
 				//             ' CP ARRAY NAME was entered but will not be used. The simulation continues...')
-			}
+			//}
 			if ( ! ( SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " is invalid." );
+				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
 				ShowContinueError( "Valid choices are LowRise or HighRise. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 				ErrorsFound = true;
 				SimObjectError = true;
@@ -979,7 +974,7 @@ namespace AirflowNetworkBalanceManager {
 			SimObjectError = true;
 		}
 
-		AirflowNetworkSimu.InitType = Alphas( 7 );
+		AirflowNetworkSimu.InitType = Alphas( 6 );
 		if ( SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
 			AirflowNetworkSimu.InitFlag = 0;
 		} else if ( SameString( AirflowNetworkSimu.InitType, "ZeroNodePressures" ) ) {
@@ -989,13 +984,13 @@ namespace AirflowNetworkBalanceManager {
 		} else if ( SameString( AirflowNetworkSimu.InitType, "1" ) ) {
 			AirflowNetworkSimu.InitFlag = 1;
 		} else {
-			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) + " is invalid." );
+			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " is invalid." );
 			ShowContinueError( "Valid choices are LinearInitializationMethod or ZeroNodePressures. " + CurrentModuleObject + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 			ErrorsFound = true;
 			SimObjectError = true;
 		}
 
-		if ( !lAlphaBlanks( 8 ) && SameString( Alphas( 8 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
+		if ( !lAlphaBlanks( 7 ) && SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
 
 		if ( SimObjectError ) {
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
@@ -1213,13 +1208,34 @@ namespace AirflowNetworkBalanceManager {
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 					}
 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ); // Name of external node
-					MultizoneExternalNodeData( i ).Height = Numbers( 1 ); // Nodal height
+					MultizoneExternalNodeData( i ).height = Numbers( 1 ); // Nodal height
 					if ( SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + " object =" + Alphas( 1 ) + ". The input of " + cNumericFields( 1 ) + " is required, but a blank is found." );
 						ShowContinueError( "The default value is assigned as " + RoundSigDigits( Numbers( 1 ), 1 ) );
 					}
 					MultizoneExternalNodeData( i ).ExtNum = AirflowNetworkNumOfZones + i; // External node number
-					MultizoneExternalNodeData( i ).WPCName = Alphas( 2 ); // Name of Wind Pressure Coefficient Values Object
+					MultizoneExternalNodeData( i ).curve = CurveManager::GetCurveIndex( Alphas( 2 ) ); // Wind pressure curve
+					if ( MultizoneExternalNodeData( i ).curve == 0 ) {
+						ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + "=" + Alphas( 2 ) );
+						ShowContinueError( "Entered in " + CurrentModuleObject + '=' + Alphas( 1 ) );
+						ErrorsFound = true;
+					}
+					if ( NumAlphas >= 3 && !lAlphaBlanks( 3 ) ) { // Symmetric curve
+						if ( SameString( Alphas( 3 ), "Yes" ) ) {
+							MultizoneExternalNodeData( i ).symmetricCurve = true;
+						} else if ( !SameString(Alphas( 3 ), "No" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+							ShowContinueError( "The default value is assigned as No." );
+						}
+					}
+					if ( NumAlphas == 4 && !lAlphaBlanks( 4 ) ) { // Relative or absolute wind angle
+						if ( SameString( Alphas( 4 ), "Relative" ) ) {
+							MultizoneExternalNodeData( i ).useRelativeAngle = true;
+						} else if ( !SameString(Alphas( 4 ), "Absolute" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+							ShowContinueError( "The default value is assigned as Absolute." );
+						}
+					}
 				}
 			} else {
 				ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found when Wind Pressure Coefficient Type = Input." );
@@ -1419,7 +1435,7 @@ namespace AirflowNetworkBalanceManager {
 							if ( DisplayExtraWarnings ) {
 								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
 								ShowContinueError( "The entered choice of Equivalent Rectangle Method is PolygonHeight. This choice is not valid for a horizontal surface with a polygonal base surface." );
-								ShowContinueError( "The deafula aspect ratio at 1 is used. Simulation continues." );
+								ShowContinueError( "The default aspect ratio at 1 is used. Simulation continues." );
 							}
 						}
 					} else {
@@ -1463,7 +1479,7 @@ namespace AirflowNetworkBalanceManager {
 							if ( DisplayExtraWarnings ) {
 								ShowWarningError( RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData( i ).SurfName );
 								ShowContinueError( "The entered choice of Equivalent Rectangle Method is BaseSurfaceAspectRatio. This choice is not valid for a horizontal surface with a polygonal base surface." );
-								ShowContinueError( "The deafula aspect ratio at 1 is used. Simulation continues." );
+								ShowContinueError( "The default aspect ratio at 1 is used. Simulation continues." );
 							}
 						}
 					}
@@ -1568,7 +1584,7 @@ namespace AirflowNetworkBalanceManager {
 				StringOut = StringOut + ", " + RoundSigDigits( MultizoneSurfaceData( i ).Height, 2 ) +"," + RoundSigDigits( MultizoneSurfaceData( i ).Width, 2 );
 				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
-		} 
+		}
 
 		// Validate adjacent temperature and Enthalpy control for an interior surface only
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
@@ -2186,99 +2202,6 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// *** Read AirflowNetwork CP Array
-		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
-			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-			AirflowNetworkNumOfCPArray = GetNumObjectsFound( CurrentModuleObject );
-
-			if ( AirflowNetworkNumOfCPArray != 1 ) {
-				ShowSevereError( RoutineName + "Currently only one (\"1\") " + CurrentModuleObject + " object per simulation allowed when using the AirflowNetwork model." );
-				ErrorsFound = true;
-			}
-
-			if ( AirflowNetworkNumOfCPArray > 0 && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
-				MultizoneCPArrayData.allocate( AirflowNetworkNumOfCPArray );
-				for ( i = 1; i <= AirflowNetworkNumOfCPArray; ++i ) {
-
-					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-					MultizoneCPArrayData( i ).Name = Alphas( 1 ); // Name of CP array
-					MultizoneCPArrayData( i ).NumWindDir = NumNumbers;
-
-					MultizoneCPArrayData( i ).WindDir.allocate( NumNumbers );
-					for ( j = 1; j <= NumNumbers; ++j ) { // Wind direction
-						MultizoneCPArrayData( i ).WindDir( j ) = Numbers( j );
-						if ( j > 1 ) {
-							if ( MultizoneCPArrayData( i ).WindDir( j - 1 ) >= MultizoneCPArrayData( i ).WindDir( j ) ) {
-								ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object " );
-								ShowContinueError( "has either the same values for two consecutive wind directions, or a lower wind direction value after a higher wind direction value." );
-								ShowContinueError( "Wind direction values must be entered in ascending order." );
-								ShowContinueError( cNumericFields( j ) + " = " + RoundSigDigits( MultizoneCPArrayData( i ).WindDir( j - 1 ), 2 ) + ' ' + cNumericFields( j + 1 ) + " = " + RoundSigDigits( MultizoneCPArrayData( i ).WindDir( j ), 2 ) );
-								ErrorsFound = true;
-							}
-						}
-					}
-				}
-			} else {
-				if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Wind coefficient == Surface-Average does not need inputs of CP Array
-					ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required." );
-					ShowContinueError( "..but not found with Wind Pressure Coefficient Type = INPUT" );
-					ErrorsFound = true;
-				}
-			}
-		}
-
-		// Get the number of wind directions
-		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
-			AirflowNetworkSimu.NWind = NumNumbers;
-		} else {
-			//    AirflowNetworkSimu%NWind = 4
-		}
-
-		// Read AirflowNetwork CP Value
-		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
-			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
-			AirflowNetworkNumOfCPValue = GetNumObjectsFound( CurrentModuleObject );
-			if ( AirflowNetworkNumOfCPValue > 0 && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
-				MultizoneCPValueData.allocate( AirflowNetworkNumOfCPValue );
-
-				for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
-					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), MultizoneCPValueData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) Alphas( 2 ) = "xxxxx";
-					}
-					MultizoneCPValueData( i ).Name = Alphas( 1 ); // Name of CP value
-					MultizoneCPValueData( i ).CPArrayName = Alphas( 2 ); // CP array Name
-					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
-					if ( ! SameString( Alphas( 2 ), MultizoneCPArrayData( 1 ).Name ) ) {
-						ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " in " + CurrentModuleObject + " = " + Alphas( 1 ) );
-						ShowContinueError( "The valid name is " + MultizoneCPArrayData( 1 ).Name );
-						ErrorsFound = true;
-					}
-					MultizoneCPValueData( i ).CPValue.allocate( NumNumbers );
-					if ( NumNumbers < AirflowNetworkSimu.NWind ) {
-						ShowSevereError( RoutineName + "The number of WPC Values (" + RoundSigDigits( NumNumbers ) + ") in the " + CurrentModuleObject + " object " );
-						ShowContinueError( Alphas( 1 ) + " with " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " is less than the number of Wind Directions (" + RoundSigDigits( MultizoneCPArrayData( 1 ).NumWindDir ) + ") defined in the " );
-						ShowContinueError( CurrentModuleObject + " object." );
-						ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
-					}
-					for ( j = 1; j <= NumNumbers; ++j ) { // CP Value
-						MultizoneCPValueData( i ).CPValue( j ) = Numbers( j );
-					}
-				}
-
-			} else {
-				if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Wind coefficient == Surface-Average does not need inputs of CP Array
-					ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required and not found with Wind Pressure Coefficient Type = INPUT" );
-					ErrorsFound = true;
-				}
-			}
-		}
-
 		// Calculate CP values
 		if ( SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 			CalcWindPressureCoeffs();
@@ -2315,9 +2238,21 @@ namespace AirflowNetworkBalanceManager {
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
 					if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( j ).SurfNum ).ExtWind ) ) {
 						if ( SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
-							MultizoneExternalNodeData( i ).Height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
+							MultizoneExternalNodeData( i ).height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
 							break;
 						}
+					}
+				}
+			}
+		}
+
+		// Assign external node azimuth, should consider combining this with the above to avoid the repeated search
+		for (i = 1; i <= AirflowNetworkNumOfExtNode; ++i) {
+			for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
+				if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment || (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt && Surface(MultizoneSurfaceData(j).SurfNum).ExtWind)) {
+					if (SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
+						MultizoneExternalNodeData(i).azimuth = Surface(MultizoneSurfaceData(j).SurfNum).Azimuth;
+						break;
 					}
 				}
 			}
@@ -2328,28 +2263,35 @@ namespace AirflowNetworkBalanceManager {
 		// Write wind pressure coefficients in the EIO file
 		gio::write( OutputFileInits, fmtA ) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Direction, "; }
-		for ( i = 1; i <= AirflowNetworkSimu.NWind - 1; ++i ) {
-			StringOut = RoundSigDigits( MultizoneCPArrayData( 1 ).WindDir( i ), 1 );
+		std::vector< Real64 > dirs = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330 };
+		for ( i = 0; i < 11; ++i ) {
+			StringOut = RoundSigDigits( dirs[ i ], 1 );
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 		}
-		StringOut = RoundSigDigits( MultizoneCPArrayData( 1 ).WindDir( AirflowNetworkSimu.NWind ), 1 );
+		StringOut = RoundSigDigits( dirs[ 11 ], 1 );
 		gio::write( OutputFileInits, fmtA ) << StringOut;
 
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, "; }
 		gio::write( OutputFileInits, fmtA ) << "Wind Pressure Coefficients #1 to n (dimensionless)";
 
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) {
-			for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
+			std::set< int > curves;
+			for ( int i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
+				curves.insert( MultizoneExternalNodeData( i ).curve );
+			}
+			for ( auto index : curves ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneCPValueData( i ).Name + ", "; }
-				for ( j = 1; j <= AirflowNetworkSimu.NWind - 1; ++j ) {
-					StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( j ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << CurveManager::GetCurveName( index ) + ", "; }
+				for ( j = 0; j < 11; ++j ) {
+					StringOut = RoundSigDigits( CurveManager::CurveValue( index, dirs[ j ] ), 2 );
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				}
-				StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( AirflowNetworkSimu.NWind ), 2 );
+				StringOut = RoundSigDigits( CurveManager::CurveValue( index, dirs[ 11 ] ), 2 );
 				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
-		} else if ( AirflowNetworkNumOfSingleSideZones > 0 ) {
+		}
+		else if (AirflowNetworkNumOfSingleSideZones > 0) {
+			/*
 			for ( i = 1; i <= 4; ++i ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneCPValueData( i ).Name + ", "; }
@@ -2372,6 +2314,7 @@ namespace AirflowNetworkBalanceManager {
 					gio::write( OutputFileInits, fmtA ) << StringOut;
 				}
 			}
+			*/
 		}
 
 		// If no zone object, exit
@@ -2445,33 +2388,23 @@ namespace AirflowNetworkBalanceManager {
 
 		// Validate CP Value number
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
-			// Ensure no duplicated external names in CP Value
-			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
-			for ( j = 1; j <= AirflowNetworkNumOfExtNode; ++j ) {
-				found = false;
-				for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
-					if ( SameString( MultizoneExternalNodeData( j ).WPCName, MultizoneCPValueData( i ).Name ) ) {
-						MultizoneExternalNodeData( j ).CPVNum = i;
-						break;
-					}
-				}
-				if ( MultizoneExternalNodeData( j ).CPVNum == 0 ) {
-					ShowSevereError( RoutineName + "AirflowNetwork:MultiZone:ExternalNode: Wind Pressure Coefficient Values Object Name is not found in " + MultizoneExternalNodeData( j ).Name );
-					ShowContinueError( "Please ensure there is a WindPressureCoefficientValues name defined as " + MultizoneExternalNodeData( j ).WPCName + " in " + CurrentModuleObject );
-					ErrorsFound = true;
-				}
-			}
-			// Ensure different CPVNum is used to avoid a single side boundary condition
+			// Ensure different curve is used to avoid a single side boundary condition
 			found = false;
+			bool differentAngle = false;
 			for ( j = 2; j <= AirflowNetworkNumOfExtNode; ++j ) {
-				if ( MultizoneExternalNodeData( j - 1 ).CPVNum != MultizoneExternalNodeData( j ).CPVNum ) {
+				if ( MultizoneExternalNodeData( j - 1 ).curve != MultizoneExternalNodeData( j ).curve ) {
 					found = true;
 					break;
+				} else {
+					// If the curves are the same, then check to see if the azimuths are different
+					if ( MultizoneExternalNodeData( j - 1 ).azimuth != MultizoneExternalNodeData( j ).azimuth ) {
+						differentAngle = MultizoneExternalNodeData( j - 1 ).symmetricCurve || MultizoneExternalNodeData( j ).symmetricCurve;
+					}
 				}
 			}
-			if ( ! found ) {
-				ShowSevereError( "The same Wind Pressure Coefficient Values Object name is used in all AirflowNetwork:MultiZone:ExternalNode objects." );
-				ShowContinueError( "Please input at least two different Wind Pressure Coefficient Values Object names to avoid single side boundary condition." );
+			if ( !found && !differentAngle ) {
+				ShowSevereError( "The same Wind Pressure Coefficient Curve name is used in all AirflowNetwork:MultiZone:ExternalNode objects." );
+				ShowContinueError( "Please input at least two different Wind Pressure Coefficient Curve names to avoid single side boundary condition." );
 				ErrorsFound = true;
 			}
 
@@ -2529,7 +2462,7 @@ namespace AirflowNetworkBalanceManager {
 		// check model compatibility
 		if ( IntraZoneNumOfNodes > 0 ) {
 			if ( !SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " model requies Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
+				ShowSevereError( RoutineName + CurrentModuleObject + " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
 				ErrorsFound = true;
 				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );
 			}
@@ -2833,14 +2766,16 @@ namespace AirflowNetworkBalanceManager {
 				}
 				DisSysCompDuctData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompDuctData( i ).L = Numbers( 1 ); // Duct length [m]
-				DisSysCompDuctData( i ).D = Numbers( 2 ); // Hydrolic diameter [m]
+				DisSysCompDuctData( i ).D = Numbers( 2 ); // Hydraulic diameter [m]
 				DisSysCompDuctData( i ).A = Numbers( 3 ); // Cross section area [m2]
 				DisSysCompDuctData( i ).Rough = Numbers( 4 ); // Surface roughness [m]
 				DisSysCompDuctData( i ).TurDynCoef = Numbers( 5 ); // Turbulent dynamic loss coefficient
-				DisSysCompDuctData( i ).UThermal = Numbers( 6 ); // Overall heat transmittance [W/m2.K]
+				DisSysCompDuctData( i ).UThermConduct = Numbers( 6 ); // Conduction heat transmittance [W/m2.K]
 				DisSysCompDuctData( i ).UMoisture = Numbers( 7 ); // Overall moisture transmittance [kg/m2]
+				DisSysCompDuctData( i ).OutsideConvCoeff = Numbers( 8 ); // Outside convection coefficient [W/m2.K]
+				DisSysCompDuctData( i ).InsideConvCoeff = Numbers( 9 ); // Inside convection coefficient [W/m2.K]
 				DisSysCompDuctData( i ).MThermal = 0.0; // Thermal capacity [J/K]
-				DisSysCompDuctData( i ).MMoisture = 0.0; // Mositure capacity [kg]
+				DisSysCompDuctData( i ).MMoisture = 0.0; // Moisture capacity [kg]
 				DisSysCompDuctData( i ).LamDynCoef = 64.0; // Laminar dynamic loss coefficient
 				DisSysCompDuctData( i ).LamFriCoef = Numbers( 5 ); // Laminar friction loss coefficient
 				DisSysCompDuctData( i ).InitLamCoef = 128.0; // Coefficient of linear initialization
@@ -2853,6 +2788,82 @@ namespace AirflowNetworkBalanceManager {
 			if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
 				ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found." );
 				ErrorsFound = true;
+			}
+		}
+
+		// Read AirflowNetwork distribution system component: DuctViewFactors
+		CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
+		DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
+		if ( DisSysNumOfDuctViewFactors > 0 ) {
+			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
+			for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+
+				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
+
+				this_VF_object.LinkageName = Alphas( 1 ); // Name of linkage
+
+				// Surface exposure fraction
+				if ( Numbers( 2 ) > 1 ) {
+					ShowContinueError( "Duct surface exposure fraction greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+					ShowContinueError( "Using value of 1 for surface exposure fraction" );
+					this_VF_object.DuctExposureFraction = 1;
+				} else if ( Numbers( 2 ) < 0 ) {
+					ShowContinueError( "Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+					ShowContinueError( "Using value of 0 for surface exposure fraction" );
+					this_VF_object.DuctExposureFraction = 0;
+				} else {
+					this_VF_object.DuctExposureFraction = Numbers( 1 );
+				}
+
+				// Duct surface emittance
+				if ( Numbers( 2 ) > 1 ) {
+					ShowContinueError( "Duct surface emittance greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+					ShowContinueError( "Using value of 1 for surface emittance" );
+					this_VF_object.DuctEmittance = 1;
+				} else if ( Numbers( 2 ) < 0 ) {
+					ShowContinueError( "Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+					ShowContinueError( "Using value of 0 for surface exposure fraction" );
+					this_VF_object.DuctEmittance = 0;
+				} else {
+					this_VF_object.DuctEmittance = Numbers( 2 );
+				}
+
+				this_VF_object.ObjectNum = i;
+
+				int numSurfaces = NumAlphas - 1;
+
+				this_VF_object.LinkageSurfaceData.allocate( numSurfaces ) ;
+
+				for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
+				{
+					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceName = Alphas( surfNum + 1 ); // Surface name
+					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
+
+					if ( this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum == 0 ) {
+						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+					}
+
+					// Surface view factor
+					if ( Numbers( surfNum + 2 ) > 1 ) {
+						ShowContinueError( "View factor for surface " + Alphas( surfNum + 1 ) + " greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+						ShowContinueError( "Using value of 1 for view factor" );
+						this_VF_object.LinkageSurfaceData( surfNum ).ViewFactor = 1;
+					} else if ( Numbers( surfNum + 2 ) < 0 ) {
+						ShowContinueError( "View factor for surface " + Alphas( surfNum + 1 ) + " less than 0. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+						ShowContinueError( "Using value of 0 for view factor" );
+						this_VF_object.LinkageSurfaceData( surfNum ).ViewFactor = 0;
+					} else {
+						this_VF_object.LinkageSurfaceData( surfNum ).ViewFactor = Numbers( surfNum + 2 );
+					}
+				}
 			}
 		}
 
@@ -2930,7 +2941,7 @@ namespace AirflowNetworkBalanceManager {
 			i = GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" );
 			if ( i > 0 ) {
 				ShowSevereError( RoutineName + "Invalid terminal type for a VAV system = AirTerminal:SingleDuct:Uncontrolled" );
-				ShowContinueError( "A VAV system requires all ternimal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
+				ShowContinueError( "A VAV system requires all terminal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
 				ErrorsFound = true;
 			}
 		}
@@ -3144,7 +3155,7 @@ namespace AirflowNetworkBalanceManager {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 				}
-				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name 
+				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name
 				PressureControllerData( i ).ZoneName = Alphas( 2 ); // Zone name
 				PressureControllerData( i ).ZoneNum = FindItemInList( Alphas( 2 ), Zone );
 				PressureControllerData( i ).AFNNodeNum = FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
@@ -3234,7 +3245,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkNodeData( i ).Name = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).Name;
 				AirflowNetworkNodeData( i ).NodeTypeNum = 1;
 				AirflowNetworkNodeData( i ).EPlusZoneNum = 0;
-				AirflowNetworkNodeData( i ).NodeHeight = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).Height;
+				AirflowNetworkNodeData( i ).NodeHeight = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).height;
 				AirflowNetworkNodeData( i ).ExtNodeNum = i - AirflowNetworkNumOfZones;
 			}
 		} else { // Surface-Average input
@@ -3756,6 +3767,14 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkageData( count ).CompName = Alphas( 4 );
 				AirflowNetworkLinkageData( count ).ZoneName = Alphas( 5 );
 				AirflowNetworkLinkageData( count ).LinkNum = count;
+
+				for ( int i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
+					if ( AirflowNetworkLinkageData( count ).Name ==  AirflowNetworkLinkageViewFactorData( i ).LinkageName ) {
+						AirflowNetworkLinkageData( count ).LinkageViewFactorObjectNum = AirflowNetworkLinkageViewFactorData( i ).ObjectNum;
+						break;
+					}
+				}
+
 				if ( ! lAlphaBlanks( 5 ) ) {
 					AirflowNetworkLinkageData( count ).ZoneNum = FindItemInList( AirflowNetworkLinkageData( count ).ZoneName, Zone );
 					if ( AirflowNetworkLinkageData( count ).ZoneNum == 0 ) {
@@ -3986,7 +4005,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Ensure the name of each heat exchanger is shown either once ot twice in the field of
+		// Ensure the name of each heat exchanger is shown either once or twice in the field of
 		if ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ) {
 			for ( i = 1; i <= DisSysNumOfHXs; ++i ) {
 				count = 0;
@@ -3998,14 +4017,14 @@ namespace AirflowNetworkBalanceManager {
 
 				if ( DisSysCompHXData( i ).CoilParentExists && count != 2 ) {
 					ShowSevereError( RoutineName + "The inputs of component name field as a heat exchanger in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct" );
-					ShowContinueError( "The entered name of heat enchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
-					ShowContinueError( "The correct apperance number is 2. The entered apperance number is " + RoundSigDigits( count ) );
+					ShowContinueError( "The entered name of heat exchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
+					ShowContinueError( "The correct appearance number is 2. The entered appearance number is " + RoundSigDigits( count ) );
 					ErrorsFound = true;
 				}
 				if ( ( ! DisSysCompHXData( i ).CoilParentExists ) && count != 1 ) {
 					ShowSevereError( RoutineName + "The inputs of component name field as a heat exchanger in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct" );
-					ShowContinueError( "The entered name of heat enchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
-					ShowContinueError( "The correct apperance number is 1. The entered apperance number is " + RoundSigDigits( count ) );
+					ShowContinueError( "The entered name of heat exchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
+					ShowContinueError( "The correct appearance number is 1. The entered appearance number is " + RoundSigDigits( count ) );
 					ErrorsFound = true;
 				}
 			}
@@ -4223,6 +4242,7 @@ namespace AirflowNetworkBalanceManager {
 			e.LeakLat = 0.0;
 			e.CondSen = 0.0;
 			e.DiffLat = 0.0;
+			e.RadGain = 0.0;
 		}
 		if ( Contaminant.CO2Simulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalCO2 = 0.0;
 		if ( Contaminant.GenericContamSimulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalGC = 0.0;
@@ -4410,6 +4430,11 @@ namespace AirflowNetworkBalanceManager {
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).DiffLatGainJ, "System", "Sum", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).DiffLatLossW, "System", "Average", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).DiffLatLossJ, "System", "Sum", Zone( i ).Name );
+			// Radiation losses due to forced air systems
+			SetupOutputVariable( "AFN Zone Duct Radiation Heat Gain Rate [W]", AirflowNetworkReportData( i ).RadGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).RadGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Heat Loss Rate [W]", AirflowNetworkReportData( i ).RadLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).RadLossJ, "System", "Sum", Zone( i ).Name );
 			// Total losses due to force air systems
 			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).TotalSenGainW, "System", "Average", Zone( i ).Name );
 			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).TotalSenGainJ, "System", "Sum", Zone( i ).Name );
@@ -4537,12 +4562,15 @@ namespace AirflowNetworkBalanceManager {
 			if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) {
 				AirflowNetworkNodeSimu( n ).PZ = 0.0;
 			} else {
-				// Assing ambient conditions to external nodes
+				// Assigning ambient conditions to external nodes
 				i = AirflowNetworkNodeData( n ).ExtNodeNum;
 				if ( i > 0 ) {
 					if ( i <= AirflowNetworkNumOfExtNode ) {
-						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).Height );
-						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
+						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).height );
+						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve,
+							Vref, AirflowNetworkNodeData( n ).NodeHeight, MultizoneExternalNodeData( i ).azimuth,
+							MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle);
+						//AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
 					}
 					AirflowNetworkNodeSimu( n ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( n ).NodeHeight );
 					AirflowNetworkNodeSimu( n ).WZ = OutHumRat;
@@ -4559,7 +4587,7 @@ namespace AirflowNetworkBalanceManager {
 			j = MultizoneSurfaceData( i ).SurfNum;
 			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
 				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
-					if ( MultizoneSurfaceData( i ).OpeningStatus == FeeeOperation ) {
+					if ( MultizoneSurfaceData( i ).OpeningStatus == FreeOperation ) {
 						if ( MultizoneSurfaceData( i ).OpeningProbStatus == ProbForceChange ) {
 							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).Factor;
 						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbForceChange ) {
@@ -4654,7 +4682,7 @@ namespace AirflowNetworkBalanceManager {
 			AIRMOV( );
 			ZonePressure1 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 			if ( ZonePressure1 <= PressureSet ) {
-				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				// The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
 				if ( !WarmupFlag ) {
 					if ( ErrCountLowPre == 0 ) {
 						++ErrCountLowPre;
@@ -4670,7 +4698,7 @@ namespace AirflowNetworkBalanceManager {
 				AIRMOV( );
 				ZonePressure2 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 				if ( ZonePressure2 >= PressureSet ) {
-					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
 					if ( !WarmupFlag ) {
 						if ( ErrCountHighPre == 0 ) {
 							++ErrCountHighPre;
@@ -4701,7 +4729,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 			}
-		} else { // PressureCtrlRelief - Pressure control type is Relief Flow 
+		} else { // PressureCtrlRelief - Pressure control type is Relief Flow
 			MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
 			MaxReliefMassFlowrate = Node( DisSysCompReliefAirData( 1 ).OutletNode ).MassFlowRate;
 			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
@@ -4713,7 +4741,7 @@ namespace AirflowNetworkBalanceManager {
 			ZonePressure1 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 
 			if ( ZonePressure1 <= PressureSet ) {
-				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				// The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
 				if ( !WarmupFlag ) {
 					if ( ErrCountLowPre == 0 ) {
 						++ErrCountLowPre;
@@ -4730,7 +4758,7 @@ namespace AirflowNetworkBalanceManager {
 				AIRMOV( );
 				ZonePressure2 = AirflowNetworkNodeSimu( PressureControllerData( 1 ).AFNNodeNum ).PZ;
 				if ( ZonePressure2 >= PressureSet ) {
-					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
 					if ( !WarmupFlag ) {
 						if ( ErrCountHighPre == 0 ) {
 							++ErrCountHighPre;
@@ -4834,6 +4862,63 @@ namespace AirflowNetworkBalanceManager {
 
 	}
 
+	static int makeTable( const std::string &name, const std::vector< Real64 > &x, const std::vector< Real64 > &y )
+	{
+		// Add a new table and performance curve
+		int N = std::min( x.size(), y.size() );
+		int TableNum = CurveManager::TableData.size() + 1;
+		CurveManager::TableData.push_back( CurveManager::TableDataStruct() );
+		CurveManager::TableLookup.push_back( CurveManager::TableLookupData() );
+		CurveManager::PerfCurveTableData.push_back( CurveManager::PerfCurveTableDataStruct() );
+		int CurveNum = CurveManager::PerfCurve.size() + 1;
+		CurveManager::PerfCurve.push_back( CurveManager::PerfomanceCurveData() );
+
+		CurveManager::TableData( TableNum ).X1.allocate( N );
+		CurveManager::TableData( TableNum ).Y.allocate( N );
+
+		CurveManager::PerfCurve( CurveNum ).Name = name;
+		CurveManager::PerfCurve( CurveNum ).ObjectType = CurveManager::CurveType_TableOneIV;
+		CurveManager::PerfCurve( CurveNum ).TableIndex = TableNum;
+		CurveManager::PerfCurve( CurveNum ).CurveType = CurveManager::Linear;
+		CurveManager::TableLookup( TableNum ).InterpolationOrder = 2;
+
+		CurveManager::PerfCurve( CurveNum ).InterpolationType = CurveManager::LinearInterpolationOfTable;
+
+		CurveManager::PerfCurve( CurveNum ).Var1Min = 0.0;
+		CurveManager::PerfCurve( CurveNum ).Var1MinPresent = true;
+		CurveManager::PerfCurve( CurveNum ).Var1Max = 360.0;
+		CurveManager::PerfCurve( CurveNum ).Var1MaxPresent = true;
+
+		CurveManager::TableData( TableNum ).NormalPoint = 1.0;
+
+		CurveManager::PerfCurve( CurveNum ).CurveMin = -1.0;
+		CurveManager::PerfCurve( CurveNum ).CurveMinPresent = true;
+
+		CurveManager::PerfCurve( CurveNum ).CurveMax = 1.0;
+		CurveManager::PerfCurve( CurveNum ).CurveMaxPresent = true;
+
+		for (int TableDataIndex = 1; TableDataIndex <= N; ++TableDataIndex) {
+			CurveManager::TableData( TableNum ).X1( TableDataIndex ) = x[ TableDataIndex - 1 ];
+			CurveManager::TableData( TableNum ).Y( TableDataIndex ) = y[ TableDataIndex - 1 ];
+		}
+
+		// Move table data to performance curve table data structure
+		//CurveManager::PerfCurveTableData( TableNum ).X1.allocate( N - 1 );
+		CurveManager::PerfCurveTableData( TableNum ).Y.allocate( 1, N );
+		CurveManager::PerfCurveTableData( TableNum ).X1 = CurveManager::TableData( TableNum ).X1;
+		for ( int VarIndex = 1; VarIndex <= N; ++VarIndex ) {
+			CurveManager::PerfCurveTableData( TableNum ).Y( 1, VarIndex ) = CurveManager::TableData( TableNum ).Y( VarIndex );
+		}
+
+		// move table data to more compact array to allow interpolation using multivariable lookup table method
+		CurveManager::TableLookup( TableNum ).NumIndependentVars = 1;
+		CurveManager::TableLookup( TableNum ).NumX1Vars = N;
+		CurveManager::TableLookup( TableNum ).X1Var = CurveManager::PerfCurveTableData( TableNum ).X1;
+		//CurveManager::TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = CurveManager::PerfCurveTableData( TableNum ).Y( 1, _ );
+		CurveManager::NumCurves += 1;
+		return CurveNum;
+	}
+
 	void
 	CalcWindPressureCoeffs()
 	{
@@ -4844,6 +4929,7 @@ namespace AirflowNetworkBalanceManager {
 		//       MODIFIED       Revised by L. Gu, Nov. 2005, to meet requirements of AirflowNetwork
 		//       MODIFIED       Revised by L. Gu, Dec. 2008, to set the number of external nodes based on
 		//                      the number of external surfaces
+		//       MODIFIED       Revised by J. DeGraw, Feb. 2017, to use tables
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4900,8 +4986,19 @@ namespace AirflowNetworkBalanceManager {
 		Real64 AngDiff; // Angle difference between wind and surface direction (deg)
 		Real64 AngDiffMin; // Minimum angle difference between wind and surface direction (deg)
 		std::string Name; // External node name
+		std::vector< int > curveIndex = { 0, 0, 0, 0, 0 };
 
-		// Create five AirflowNetwork external node objects -- one for each of the four facades and one for the roof
+		// Facade azimuth angle
+		for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
+			FacadeAng( FacadeNum ) = AirflowNetworkSimu.Azimuth + ( FacadeNum - 1 ) * 90.0;
+			if ( FacadeAng( FacadeNum ) >= 360.0 ) {
+				FacadeAng( FacadeNum ) -= 360.0;
+			}
+		}
+
+		FacadeAng( 5 ) = AirflowNetworkSimu.Azimuth + 90.0;
+
+		// Create AirflowNetwork external node objects -- one for each of the external surfaces
 
 		MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtSurfaces );
 		AirflowNetworkNumOfExtNode = AirflowNetworkNumOfExtSurfaces;
@@ -4912,50 +5009,56 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneExternalNodeData( ExtNum ).Name = stripped( Name );
 		}
 
-		// Facade azimuth angle
-		for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
-			FacadeAng( FacadeNum ) = AirflowNetworkSimu.Azimuth + ( FacadeNum - 1 ) * 90.0;
-			if ( FacadeAng( FacadeNum ) >= 360.0 ) FacadeAng( FacadeNum ) -= 360.0;
-		}
-
-		FacadeAng( 5 ) = AirflowNetworkSimu.Azimuth + 90.0;
-
-		// Associate each SurfaceData with an external node
+		// Associate each external node with SurfaceData
 
 		ExtNum = 0;
 		for ( SurfDatNum = 1; SurfDatNum <= AirflowNetworkNumOfSurfaces; ++SurfDatNum ) {
-			if ( SurfDatNum > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone ) continue;
+			if ( SurfDatNum > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone ) {
+				continue;
+			}
 			SurfNum = MultizoneSurfaceData( SurfDatNum ).SurfNum;
-			if ( SurfNum == 0 ) continue; // Error caught earlier
-			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( SurfNum ).ExtWind ) ) {
+			if ( SurfNum == 0 ) {
+				continue; // Error caught earlier
+			}
+			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment
+				|| ( Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( SurfNum ).ExtWind ) ) {
 				++ExtNum;
 				if ( Surface( SurfNum ).Tilt >= 45.0 ) { // "Vertical" surface
 					SurfAng = Surface( SurfNum ).Azimuth;
 					FacadeNumThisSurf = 1;
-					AngDiffMin = std::abs( SurfAng - FacadeAng( 1 ) );
-					if ( AngDiffMin > 359.0 ) AngDiffMin = std::abs( AngDiffMin - 360.0 );
+					AngDiffMin = std::abs(SurfAng - FacadeAng(1));
+					if ( AngDiffMin > 359.0 ) {
+						AngDiffMin = std::abs( AngDiffMin - 360.0 );
+					}
 					for ( FacadeNum = 2; FacadeNum <= 4; ++FacadeNum ) {
 						AngDiff = std::abs( SurfAng - FacadeAng( FacadeNum ) );
-						if ( AngDiff > 359.0 ) AngDiff = std::abs( AngDiff - 360.0 );
-						if ( AngDiff < AngDiffMin ) {
+						if ( AngDiff > 359.0 ) {
+							AngDiff = std::abs( AngDiff - 360.0 );
+						}
+						if (AngDiff < AngDiffMin) {
 							AngDiffMin = AngDiff;
 							FacadeNumThisSurf = FacadeNum;
 						}
 					}
-					gio::write( Name, "('FacadeNum',I1)" ) << FacadeNumThisSurf;
-					MultizoneExternalNodeData( ExtNum ).CPVNum = FacadeNumThisSurf;
+					//gio::write( Name, "('FacadeNum',I1)" ) << FacadeNumThisSurf;
+					//MultizoneExternalNodeData( ExtNum ).CPVNum = FacadeNumThisSurf;
+					//MultizoneExternalNodeData(ExtNum).curve = curveIndex[FacadeNumThisSurf - 1];
+					MultizoneExternalNodeData( ExtNum ).facadeNum = FacadeNumThisSurf;
 				} else { // "Roof" surface
-					gio::write( Name, "('FacadeNum',I1)" ) << 5;
-					MultizoneExternalNodeData( ExtNum ).CPVNum = 5;
+					//gio::write(Name, "('FacadeNum',I1)") << 5;
+					//MultizoneExternalNodeData( ExtNum ).CPVNum = 5;
+					MultizoneExternalNodeData( ExtNum ).facadeNum = 5;
+					//MultizoneExternalNodeData(ExtNum).curve = curveIndex[4];
 				}
-				MultizoneExternalNodeData( ExtNum ).WPCName = stripped( Name );
-				MultizoneSurfaceData( SurfDatNum ).NodeNums( 2 ) = MultizoneExternalNodeData( ExtNum ).ExtNum;
+				MultizoneSurfaceData( SurfDatNum ).NodeNums(2) = MultizoneExternalNodeData( ExtNum ).ExtNum;
 				MultizoneSurfaceData( SurfDatNum ).ExternalNodeName = MultizoneExternalNodeData( ExtNum ).Name;
-			} else { // Not an exterior surface
-				//       MultizoneSurfaceData(SurfDatNum)%ExternalNodeName = ' '
 			}
+			//else { // Not an exterior surface
+						 //       MultizoneSurfaceData(SurfDatNum)%ExternalNodeName = ' '
+			//}
 		}
-		//check if using the advanced single sided model
+
+		// Check if using the advanced single sided model
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				++AirflowNetworkNumOfSingleSideZones;
@@ -4963,39 +5066,21 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) { //do the standard surface average coefficient calculation
-			// Create the CP Array of wind directions
-			MultizoneCPArrayData.allocate( 1 );
-			AirflowNetworkNumOfCPArray = 1;
-			MultizoneCPArrayData( 1 ).Name = "EVERY30DEGREES";
-			AirflowNetworkSimu.CpArrayName = "EVERY30DEGREESNAME";
-			MultizoneCPArrayData( 1 ).NumWindDir = 12;
-			AirflowNetworkSimu.NWind = 12;
-			MultizoneCPArrayData( 1 ).WindDir.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPArrayData( 1 ).WindDir = 0.0;
-			for ( WindDirNum = 1; WindDirNum <= 12; ++WindDirNum ) {
-				MultizoneCPArrayData( 1 ).WindDir( WindDirNum ) = ( WindDirNum - 1 ) * 30.0;
-			}
+			// Create the array of wind directions
+			std::vector< Real64 > dirs = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 };
 
-			// Calculate the wind pressure coefficients vs. wind direction for each external node
-
-			MultizoneCPValueData.allocate( 5 );
-			AirflowNetworkNumOfCPValue = 5;
-			for ( FacadeNum = 1; FacadeNum <= 5; ++FacadeNum ) {
-				gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
-				MultizoneCPValueData( FacadeNum ).Name = stripped( Name );
-				MultizoneCPValueData( FacadeNum ).CPArrayName = "EVERY30DEGREES";
-				MultizoneCPValueData( FacadeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-				MultizoneCPValueData( FacadeNum ).CPValue = 0.0;
-			}
-
+			// Create a curve for each facade
 			for ( FacadeNum = 1; FacadeNum <= 5; ++FacadeNum ) {
 				if ( FacadeNum == 1 || FacadeNum == 3 || FacadeNum == 5 ) {
 					SideRatio = AirflowNetworkSimu.AspectRatio;
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) SideRatio = 1.0 / SideRatio;
+				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+					SideRatio = 1.0 / SideRatio;
+				}
 				SideRatioFac = std::log( SideRatio );
+				std::vector< Real64 > vals( 13 );
 				for ( WindDirNum = 1; WindDirNum <= 12; ++WindDirNum ) {
 					WindAng = ( WindDirNum - 1 ) * 30.0;
 					IncAng = std::abs( WindAng - FacadeAng( FacadeNum ) );
@@ -5009,12 +5094,12 @@ namespace AirflowNetworkBalanceManager {
 					if ( SameString( AirflowNetworkSimu.BldgType, "LowRise" ) && FacadeNum <= 4 ) {
 						IncRad = IncAng * DegToRadians;
 						Real64 const cos_IncRad_over_2( std::cos( IncRad / 2.0 ) );
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * cos_IncRad_over_2 + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( cos_IncRad_over_2 ) );
+						vals[ WindDirNum - 1 ] = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * cos_IncRad_over_2 + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( cos_IncRad_over_2 ) );
 					}
 
 					// Wind-pressure coefficients for vertical facades, high-rise building
 
-					if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
+					else if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
 						SR = min( max( SideRatio, 0.25 ), 4.0 );
 						if ( SR >= 0.25 && SR < 1.0 ) {
 							ISR = 1;
@@ -5023,12 +5108,12 @@ namespace AirflowNetworkBalanceManager {
 							ISR = 2;
 							WtSR = ( 4.0 - SR ) / 3.0;
 						}
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = WtSR * ( WtAng * CPHighRiseWall( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseWall( ISR, IAng + 1 ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseWall( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseWall( ISR + 1, IAng + 1 ) );
+						vals[ WindDirNum - 1 ] = WtSR * ( WtAng * CPHighRiseWall( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseWall( ISR, IAng + 1 ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseWall( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseWall( ISR + 1, IAng + 1 ) );
 					}
 
 					// Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
 
-					if ( ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
+					else if ( ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
 						SR = min( max( SideRatio, 0.25 ), 1.0 );
 						if ( SR >= 0.25 && SR < 0.5 ) {
 							ISR = 1;
@@ -5037,35 +5122,23 @@ namespace AirflowNetworkBalanceManager {
 							ISR = 2;
 							WtSR = ( 1.0 - SR ) / 0.5;
 						}
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = WtSR * ( WtAng * CPHighRiseRoof( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR, IAng + 1 ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseRoof( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR + 1, IAng + 1 ) );
+						vals[ WindDirNum - 1 ] = WtSR * ( WtAng * CPHighRiseRoof( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR, IAng + 1 ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseRoof( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR + 1, IAng + 1 ) );
 					}
 
 				} // End of wind direction loop
+				// Add new table
+				vals[ 12 ] = vals[ 0 ]; // Enforce periodicity
+				curveIndex[ FacadeNum - 1 ] = makeTable("!WPCTABLE" + std::to_string( FacadeNum ), dirs, vals);
 			} // End of facade number loop
 
 		} else { //-calculate the advanced single sided wind pressure coefficients
+			std::vector< Real64 > dirs = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180,
+				190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360 };
 
-			// Create the CP Array of wind directions
-			MultizoneCPArrayData.allocate( 1 );
-			AirflowNetworkNumOfCPArray = 1;
-			MultizoneCPArrayData( 1 ).Name = "EVERY10DEGREES";
-			AirflowNetworkSimu.CpArrayName = "EVERY10DEGREESNAME";
-			MultizoneCPArrayData( 1 ).NumWindDir = 36;
-			AirflowNetworkSimu.NWind = 36;
-			MultizoneCPArrayData( 1 ).WindDir.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPArrayData( 1 ).WindDir = 0.0;
-			for ( WindDirNum = 1; WindDirNum <= 36; ++WindDirNum ) {
-				MultizoneCPArrayData( 1 ).WindDir( WindDirNum ) = ( WindDirNum - 1 ) * 10.0;
-			}
 			// Calculate the wind pressure coefficients vs. wind direction for each external node
-			MultizoneCPValueData.allocate( 4 );
-			AirflowNetworkNumOfCPValue = 4;
-			for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
-				gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
-				MultizoneCPValueData( FacadeNum ).Name = stripped( Name );
-				MultizoneCPValueData( FacadeNum ).CPArrayName = "EVERY10DEGREES";
-				MultizoneCPValueData( FacadeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-				MultizoneCPValueData( FacadeNum ).CPValue = 0.0;
+			std::vector< std::vector< Real64 > > valsByFacade( 4 );
+			for ( FacadeNum = 0; FacadeNum < 4; ++FacadeNum ) {
+				valsByFacade[ FacadeNum ] = std::vector< Real64 >( 36 );
 			}
 			for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
 				if ( FacadeNum == 1 || FacadeNum == 3 ) {
@@ -5073,7 +5146,9 @@ namespace AirflowNetworkBalanceManager {
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) SideRatio = 1.0 / SideRatio;
+				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+					SideRatio = 1.0 / SideRatio;
+				}
 				SideRatioFac = std::log( SideRatio );
 				for ( WindDirNum = 1; WindDirNum <= 36; ++WindDirNum ) {
 					WindAng = ( WindDirNum - 1 ) * 10.0;
@@ -5084,77 +5159,322 @@ namespace AirflowNetworkBalanceManager {
 					WtAng = 1.0 - DelAng / 10.0;
 					// Wind-pressure coefficients for vertical facades, low-rise building
 					IncRad = IncAng * DegToRadians;
-					MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * std::cos( IncRad / 2.0 ) + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( std::cos( IncRad / 2.0 ) ) );
+					valsByFacade[ FacadeNum - 1 ][ WindDirNum - 1 ] = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * std::cos( IncRad / 2.0 ) + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( std::cos( IncRad / 2.0 ) ) );
 				} // End of wind direction loop
 			} // End of facade number loop
-			CalcSingleSidedCps(); //run the advanced single sided subroutine if at least one zone calls for it
+			CalcSingleSidedCps( valsByFacade ); //run the advanced single sided subroutine if at least one zone calls for it
+			// Resize the curve index array
+			curveIndex.resize( valsByFacade.size() );
+			// Create the curves
+			FacadeNum = 1;
+			for ( auto vals : valsByFacade ) {
+				vals.push_back( vals[0] ); // Enforce periodicity
+				curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLE" + std::to_string(FacadeNum), dirs, vals);
+				FacadeNum += 1;
+			}
 		}
+		// Connect the external nodes to the new curves
+		for ( ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum ) {
+			MultizoneExternalNodeData( ExtNum ).curve = curveIndex[ MultizoneExternalNodeData( ExtNum ).facadeNum - 1 ];
+		}
+
 	}
 
 	Real64
-	CalcWindPressure(
-		int const CPVNum, // CP Value number
-		Real64 const Vref, // Velocity at reference height
-		Real64 const Height // Node height for outdoor temperature calculation
-	)
+		CalcWindPressure(
+			int const curve, // Curve index, change this to pointer after curve refactor
+			Real64 const Vref, // Velocity at reference height
+			Real64 const height, // Node height for outdoor temperature calculation
+			Real64 const azimuth, // Azimuthal angle of surface
+			bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+			bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Lixing Gu
 		//       DATE WRITTEN   Oct. 2005
-		//       MODIFIED       na
+		//       MODIFIED       Jason DeGraw, Feb. 2017, modify to use curves
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates surface wind pressure based on given CP values
 
-		// METHODOLOGY EMPLOYED:
-
 		// REFERENCES:
 		// COMIS Fundamentals
 
-		// Return value
-		Real64 CalcWindPressure;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// Output is Wind Pressure [Pa]
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		// Return value is wind pressure[Pa]
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int i;
-		int NWind;
-		Real64 RhoOut; // Outdoor air density
-		Real64 CPV; // CP value at given wind direction
-		bool FoundCPV;
+		Real64 angle( DataEnvironment::WindDir );
+		Real64 rho; // Outdoor air density
+		Real64 Cp; // Cp value at given wind direction
 
-		//     CODE  ************************************************************
 		// Calculate outdoor density
-		RhoOut = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTempAt( Height ), OutHumRat );
+		rho = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTempAt(height),
+			DataEnvironment::OutHumRat);
 
-		NWind = AirflowNetworkSimu.NWind;
-		// Calculate dynamic pressure
-		FoundCPV = false;
-		for ( i = 2; i <= NWind; ++i ) {
-			if ( MultizoneCPArrayData( 1 ).WindDir( i ) >= WindDir ) {
-				CPV = MultizoneCPValueData( CPVNum ).CPValue( i - 1 ) + ( WindDir - MultizoneCPArrayData( 1 ).WindDir( i - 1 ) ) * ( MultizoneCPValueData( CPVNum ).CPValue( i ) - MultizoneCPValueData( CPVNum ).CPValue( i - 1 ) ) / ( MultizoneCPArrayData( 1 ).WindDir( i ) - MultizoneCPArrayData( 1 ).WindDir( i - 1 ) );
-				FoundCPV = true;
-				break;
+		// Calculate pressure coefficient
+		if ( relativeAngle ) {
+			angle = angle - azimuth;
+			if ( angle < 0.0 ) {
+				angle += 360.0;
 			}
 		}
-		if ( ! FoundCPV ) {
-			CPV = MultizoneCPValueData( CPVNum ).CPValue( NWind ) + ( WindDir - MultizoneCPArrayData( 1 ).WindDir( NWind ) ) * ( MultizoneCPValueData( CPVNum ).CPValue( 1 ) - MultizoneCPValueData( CPVNum ).CPValue( NWind ) ) / ( MultizoneCPArrayData( 1 ).WindDir( 1 ) - MultizoneCPArrayData( 1 ).WindDir( NWind ) + 360 );
+		if ( symmetricCurve ) {
+			if ( angle > 180.0 ) {
+				angle = 360.0 - angle;
+			}
 		}
-		CalcWindPressure = CPV * 0.5 * RhoOut * Vref * Vref;
+		Cp = CurveManager::CurveValue(curve, angle);
 
-		return CalcWindPressure;
+		return Cp * 0.5 * rho * Vref * Vref;
+	}
+
+	Real64
+	airThermConductivity(
+		Real64 T // Temperature in Celsius
+	)
+	{
+		// Dry air thermal conductivity {W/m-K}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		Real64 const a = 0.02364;
+		Real64 const b = 0.0000754772569209165;
+		Real64 const c = -2.40977632412045e-8;
+
+		if ( T < LowerLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for conductivity calculation");
+			T = LowerLimit;
+		} else if ( T > UpperLimit ) {
+			ShowWarningMessage( "Air temperature out of limits for conductivity calculation");
+			T = UpperLimit;
+		}
+
+		return a + b * T + c * pow_2( T );
+	}
+
+	Real64
+	airDynamicVisc(
+		Real64 T  // Temperature in Celsius
+	)
+	{
+		return 1.71432e-5 + 4.828e-8 * T;
+	}
+
+	Real64
+	airKinematicVisc(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	)
+	{
+		// Dry air kinematic viscosity {m2/s}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		if ( T < LowerLimit ) {
+			T = LowerLimit;
+		} else if ( T > UpperLimit ) {
+			T = UpperLimit;
+		}
+
+		return airDynamicVisc( T ) / PsyRhoAirFnPbTdbW( P, T, W );
+	}
+
+	Real64
+	airThermalDiffusivity(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	)
+	{
+		// Dry air thermal diffusivity {-}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		if ( T < LowerLimit ) {
+			T = LowerLimit;
+		} else if ( T > UpperLimit ) {
+			T = UpperLimit;
+		}
+
+		return airThermConductivity( T ) / ( PsyCpAirFnWTdb( W, T ) * PsyRhoAirFnPbTdbW( P, T, W ) );
+	}
+
+	Real64
+	airPrandtl(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	)
+	{
+		// Dry air Prandtl number {-}
+		// Correlated over the range -20C to 70C
+		// Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+		Real64 const LowerLimit = -20;
+		Real64 const UpperLimit = 70;
+
+		if ( T < LowerLimit ) {
+			T = LowerLimit;
+		} else if ( T > UpperLimit ) {
+			T = UpperLimit;
+		}
+
+		return airKinematicVisc( T, W, P ) / airThermalDiffusivity( T, W, P );
+	}
+
+	Real64
+	CalcDuctInsideConvResist(
+		Real64 const Tair, // Average air temperature
+		Real64 const mdot, // Mass flow rate
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hIn // User defined convection coefficient
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell, Tony Fontanini
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates duct inside convection coefficients
+
+		// REFERENCES:
+		// ASTM C1340
+		// Jakob, F.E.,  Fischer, R.D., Flanigan, L.J. 1987. "Experimental Validation of the Duct Submodel for the SP43 Simulation Model." ASHRAE Trans. pp 1499-1514.
+
+		Real64 hIn_final = 0;
+
+		if ( hIn == 0 ) {
+
+			Real64 Tair_IP = Tair * 1.8 + 32.0; // Convert C to F
+			Real64 mdot_IP = mdot * 2.20462 * 3600; // Convert kg/s to lb/hr
+			Real64 Dh_IP = Dh * 3.28084; // Convert m to ft
+			Real64 Ai_IP = pow_2( Dh_IP ) * Pi / 4;
+
+			Real64 CorrelationCoeff = 0.00368 + 1.5e-6 * ( Tair_IP - 80 );
+			Real64 MassFlux = mdot_IP / Ai_IP; // lb/hr-ft2
+
+			Real64 DuctInsideConvCoeff_IP = CorrelationCoeff * pow( MassFlux, 0.8 ) / pow( Dh_IP, 0.2 ); // BTU/hr-ft2-F
+
+			hIn_final = DuctInsideConvCoeff_IP * pow_2( 3.28084 ) * 1.8 * 1055.06 / 3600; // Convert BTU/hr-ft2-F to W/m2-K
+
+		} else {
+			hIn_final = hIn;
+		}
+
+		if ( hIn_final == 0 ) {
+			return 0;
+		} else {
+			return 1 / hIn_final;
+		}
+	}
+
+	Real64
+	CalcDuctOutsideConvResist(
+		Real64 const Ts, // Surface temperature
+		Real64 const Tamb, // Free air temperature
+		Real64 const Wamb, // Free air humidity ratio
+		Real64 const Pamb, // Free air barometric pressure
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const ZoneNum, // Zone number
+		Real64 const hOut // User defined convection coefficient
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell, Tony Fontanini
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates duct outside convection coefficients
+
+		// REFERENCES:
+		// ASTM C1340
+
+		using DataEnvironment::WindSpeed;
+		using DataGlobals::GravityConstant;
+		using DataGlobals::KelvinConv;
+
+		Real64 k = airThermConductivity( Ts );
+
+		Real64 hOut_final = 0;
+
+		if ( hOut == 0 ) {
+
+			// Free convection
+			Real64 Pr = airPrandtl( ( Ts + Tamb ) / 2, Wamb, Pamb );
+			Real64 KinVisc = airKinematicVisc( ( Ts + Tamb ) / 2, Wamb, Pamb );
+			Real64 Beta = 2.0 / ( ( Tamb + KelvinConv ) + ( Ts + KelvinConv ) );
+			Real64 Gr = GravityConstant * Beta * std::abs( Ts - Tamb ) * pow_3( Dh ) / pow_2( KinVisc );
+			Real64 Ra = Gr * Pr;
+			Real64 Nu_free( 0 );
+
+			if ( Ra < 10e9 ) {
+				Nu_free = 0.53 * pow( Ra, 0.25 );
+			} else {
+				Nu_free = 0.13 * pow( Ra, 0.333 );
+			}
+
+			Real64 V = 0;
+			// Forced convection
+			if ( ZoneNum > 0 ) {
+				Real64 ACH = GetZoneInfilAirChangeRate( ZoneNum ); // Zone air change rate [1/hr]
+				Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
+				V = pow( Vol, 1/3 ) * ACH / 3600; // Average air speed in zone [m/s]
+			} else {
+				V = WindSpeed;
+			}
+
+			Real64 Re = V * Dh / KinVisc; // Reynolds number
+			Real64 c = 0;
+			Real64 n = 0;
+
+			if ( Re <= 4 ) {
+				c = 0.989;
+				n = 0.33;
+			} else if ( 4 < Re && Re <= 40 ) {
+				c = 0.911;
+				n = 0.385;
+			} else if ( 40 < Re && Re <= 4000 ) {
+				c = 0.683;
+				n = 0.466;
+			} else if ( 4000 < Re && Re <= 40000 ) {
+				c = 0.193;
+				n = 0.618;
+			} else if ( 40000 < Re ) {
+				c = 0.0266;
+				n = 0.805;
+			}
+
+			Real64 Nu_forced = c * pow( Re, n ) * pow( Pr, 1/3 );
+
+			Real64 Nu_combined = pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 1/3 );
+			hOut_final = Nu_combined * k / Dh;
+
+		} else {
+			hOut_final = hOut;
+		}
+
+		if ( hOut_final == 0 ) {
+			return 0;
+		} else {
+			return 1 / hOut_final;
+		}
 	}
 
 	void
@@ -5176,7 +5496,14 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// USE STATEMENTS:
-		// na
+		using DataEnvironment::OutHumRat;
+		using DataEnvironment::OutBaroPress;
+		using DataGlobals::KelvinConv;
+		using DataGlobals::StefanBoltzmann;
+		using DataHVACGlobals::TimeStepSys;
+		using DataHeatBalance::Construct;
+		using DataHeatBalSurface::TH;
+		using DataHeatBalFanSys::QRadSurfAFNDuct;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5205,6 +5532,8 @@ namespace AirflowNetworkBalanceManager {
 		Real64 Ei;
 		Real64 DirSign;
 		Real64 Tamb;
+		Real64 Wamb;
+		Real64 Pamb;
 		Real64 CpAir;
 		Real64 TZON;
 		Real64 load;
@@ -5226,7 +5555,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5240,17 +5569,139 @@ namespace AirflowNetworkBalanceManager {
 					ShowFatalError( "AirflowNetwork: The previous error causes termination." );
 				}
 
-				Ei = std::exp( -DisSysCompDuctData( TypeNum ).UThermal * DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
 				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
 					Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).NodeHeight );
+					Wamb = OutHumRat;
 				} else if ( AirflowNetworkLinkageData( i ).ZoneNum == 0 ) {
 					Tamb = AirflowNetworkNodeSimu( LT ).TZ;
+					Wamb = AirflowNetworkNodeSimu( LT ).WZ;
 				} else {
 					Tamb = ANZT( AirflowNetworkLinkageData( i ).ZoneNum );
+					Wamb = ANZW( AirflowNetworkLinkageData( i ).ZoneNum );
 				}
-				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
+
+				Pamb = OutBaroPress;
+
+				Real64 const tolerance = 0.001;
+				Real64 UThermal( 10 ); // Initialize. This will get updated.
+				Real64 UThermal_iter = 0;
+				Real64 Tsurr = Tamb;
+				Real64 Tsurr_K = Tsurr + KelvinConv;
+				Real64 Tin = AirflowNetworkNodeSimu( LF ).TZ;
+				Real64 TDuctSurf = ( Tamb + Tin ) / 2.0;
+				Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
+				Real64 DuctSurfArea = DisSysCompDuctData( TypeNum ).L * DisSysCompDuctData( TypeNum ).D * Pi;
+
+				// If user defined view factors not present, calculate air-to-air heat transfer
+				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum == 0 ) {
+
+					// Calculate convection coefficient if one or both not present
+					if ( DisSysCompDuctData( TypeNum ).InsideConvCoeff == 0 && DisSysCompDuctData( TypeNum ).OutsideConvCoeff == 0 ) {
+						while( abs( UThermal - UThermal_iter ) > tolerance ) {
+							UThermal_iter = UThermal;
+
+							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
+							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
+							UThermal = pow( RThermTotal , -1);
+
+							// Duct conduction, assuming effectiveness = 1 - exp(-NTU)
+							Real64 Ei = std::exp( -UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
+							Real64 QCondDuct = std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * ( Tamb - Tin ) * ( 1 - Ei );
+
+							TDuctSurf = Tamb - QCondDuct * RThermConvOut / DuctSurfArea;
+						}
+					} else { // Air-to-air only. U and h values are all known
+							Real64 RThermConvIn = CalcDuctInsideConvResist( Tin, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+							Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+							Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
+							Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct;
+							UThermal = pow( RThermTotal , -1);
+					}
+
+					Tsurr = Tamb;
+
+				} else { // Air-to-air + radiation heat transfer
+
+					auto & VFObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
+					VFObj.TSurr = 0;
+					VFObj.UThermalRad = 0;
+					VFObj.QRad = 0;
+
+					Real64 Tin_ave = Tin;
+
+					while( abs( UThermal - UThermal_iter ) > tolerance ) {
+						UThermal_iter = UThermal;
+
+						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin_ave, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
+						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
+						Real64 hOut = 1 / RThermConvOut;
+						Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
+
+						Real64 hrjTj_sum = 0;
+						Real64 hrj_sum = 0;
+
+						for ( int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j ) {
+
+							int ZoneSurfNum = VFObj.LinkageSurfaceData( j ).SurfaceNum;
+
+							Real64 TSurfj = TH( 1, 1, ZoneSurfNum );
+							Real64 TSurfj_K = TSurfj + KelvinConv;
+
+							Real64 ZoneSurfEmissivity = Construct( Surface( ZoneSurfNum ).Construction ).InsideAbsorpThermal;
+							Real64 ZoneSurfArea = Surface( ZoneSurfNum ).Area;
+
+							Real64 DuctEmissivity = VFObj.DuctEmittance;
+							Real64 DuctExposureFrac = VFObj.DuctExposureFraction;
+							Real64 DuctToZoneSurfViewFactor = VFObj.LinkageSurfaceData( j ).ViewFactor;
+
+							Real64 DuctSurfResistance = ( 1 - DuctEmissivity ) / ( DuctExposureFrac * DuctSurfArea * DuctEmissivity );
+							Real64 SpaceResistance = 1 / ( DuctExposureFrac * DuctSurfArea * DuctToZoneSurfViewFactor );
+							Real64 ZoneSurfResistance = ( 1 - ZoneSurfEmissivity ) / ( ZoneSurfArea * ZoneSurfEmissivity );
+
+							VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor = StefanBoltzmann / ( DuctSurfResistance + SpaceResistance + ZoneSurfResistance );
+
+							Real64 hrj =  VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor * ( TDuctSurf_K + TSurfj_K ) * ( pow_2( TDuctSurf_K ) + pow_2( TSurfj_K ) );
+
+							hrjTj_sum += hrj * TSurfj;
+							hrj_sum += hrj;
+						}
+
+						Real64 RThermRad = 1 / hrj_sum;
+
+						Tsurr = ( hOut * Tamb + hrjTj_sum ) / ( hOut + hrj_sum );	// Surroundings temperature [C]
+						Tsurr_K = Tsurr + KelvinConv;
+
+
+						Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct + RThermRad;
+						UThermal = pow( RThermTotal , -1);
+
+						Real64 NTU = UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir );
+						Tin_ave = Tsurr + ( Tin  - Tsurr ) * ( 1 / NTU ) * ( 1 - exp( - NTU ) );
+
+						TDuctSurf = Tin - UThermal * ( RThermConvIn + RThermConduct ) * ( Tin_ave - Tsurr );
+						TDuctSurf_K = TDuctSurf + KelvinConv;
+					}
+
+					for ( int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j ) {
+						int ZoneSurfNum = VFObj.LinkageSurfaceData( j ).SurfaceNum;
+						Real64 TSurfj = TH( 1, 1, ZoneSurfNum );
+						Real64 TSurfj_K = TSurfj + KelvinConv;
+						VFObj.LinkageSurfaceData( j ).SurfaceRadLoad = VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor * ( pow_4 ( TDuctSurf_K ) - pow_4( TSurfj_K ) ); // Radiant load for this surface [W]
+						int SurfNum = VFObj.LinkageSurfaceData( j ).SurfaceNum;
+						Real64 ZoneSurfaceArea = Surface( SurfNum ).Area;
+						QRadSurfAFNDuct( SurfNum ) += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad * TimeStepSys * SecInHour / ZoneSurfaceArea; // Energy to each surface per unit area [J/m2]
+						VFObj.QRad += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad; // Total radiant load from all surfaces for this system timestep [W]
+					}
+
+				}
+
+				Ei = std::exp( -UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir ) );
+ 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir;
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * CpAir * Ei;
-				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tamb * ( 1.0 - Ei ) * CpAir;
+				MV( LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW ) * Tsurr * ( 1.0 - Ei ) * CpAir;
+
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
 				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
@@ -5258,7 +5709,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5275,7 +5726,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5293,7 +5744,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -5412,7 +5863,7 @@ namespace AirflowNetworkBalanceManager {
 				MA( ( i - 1 )*AirflowNetworkNumOfNodes + i ) = 1.0e10;
 				ZoneNum = AirflowNetworkNodeData( i ).EPlusZoneNum;
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
-					MV( i ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp*1.0e10;
+					MV( i ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp * 1.0e10;
 		}
 			}
 		}
@@ -5448,7 +5899,7 @@ namespace AirflowNetworkBalanceManager {
 		//       RE-ENGINEERED  Revised based on Subroutine CalcADSMoistureBalance
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine performs AirflowNetwork mositure simulations.
+		// This subroutine performs AirflowNetwork moisture simulations.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -5505,7 +5956,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5528,7 +5979,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5545,7 +5996,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5563,7 +6014,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -5768,7 +6219,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5782,7 +6233,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5796,7 +6247,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5807,7 +6258,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -5981,7 +6432,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -5995,7 +6446,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -6009,7 +6460,7 @@ namespace AirflowNetworkBalanceManager {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					DirSign = 1.0;
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					DirSign = -1.0;
@@ -6020,7 +6471,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				} else { // flow direction is tha opposite as input from node 2 to node 1
+				} else { // flow direction is the opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				}
@@ -6318,6 +6769,10 @@ namespace AirflowNetworkBalanceManager {
 			e.DiffLatGainJ = 0.0;
 			e.DiffLatLossW = 0.0;
 			e.DiffLatLossJ = 0.0;
+			e.RadGainW = 0.0;
+			e.RadGainJ = 0.0;
+			e.RadLossW = 0.0;
+			e.RadLossJ = 0.0;
 			e.TotalSenGainW = 0.0;
 			e.TotalSenGainJ = 0.0;
 			e.TotalSenLossW = 0.0;
@@ -6439,7 +6894,13 @@ namespace AirflowNetworkBalanceManager {
 					AirflowNetworkReportData( i ).DiffLatLossW = -AirflowNetworkExchangeData( i ).DiffLat * Lam;
 					AirflowNetworkReportData( i ).DiffLatLossJ = -AirflowNetworkExchangeData( i ).DiffLat * Lam * ReportingConstant;
 				}
-
+				if ( AirflowNetworkExchangeData( i ).RadGain > 0.0 ) {
+					AirflowNetworkReportData( i ).RadGainW = AirflowNetworkExchangeData( i ).RadGain;
+					AirflowNetworkReportData( i ).RadGainJ = AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
+				} else {
+					AirflowNetworkReportData( i ).RadLossW = -AirflowNetworkExchangeData( i ).RadGain;
+					AirflowNetworkReportData( i ).RadLossJ = -AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
+				}
 				if ( AirflowNetworkExchangeData( i ).TotalSen > 0.0 ) {
 					AirflowNetworkReportData( i ).TotalSenGainW = AirflowNetworkExchangeData( i ).TotalSen;
 					AirflowNetworkReportData( i ).TotalSenGainJ = AirflowNetworkExchangeData( i ).TotalSen * ReportingConstant;
@@ -6644,7 +7105,7 @@ namespace AirflowNetworkBalanceManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine update varaibles used in the AirflowNetwork model.
+		// This subroutine update variables used in the AirflowNetwork model.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -6796,6 +7257,7 @@ namespace AirflowNetworkBalanceManager {
 			e.DiffLat = 0.0;
 			e.MultiZoneSen = 0.0;
 			e.MultiZoneLat = 0.0;
+			e.RadGain = 0.0;
 		}
 
 		// Rewrite AirflowNetwork airflow rate
@@ -6853,7 +7315,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkReport( i ).VolFLOW2 = 0.0;
 			}
 		}
-		
+
 		if ( !( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
@@ -7018,9 +7480,14 @@ namespace AirflowNetworkBalanceManager {
 			Node1 = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 			Node2 = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 			CpAir = PsyCpAirFnWTdb( ( AirflowNetworkNodeSimu( Node1 ).WZ + AirflowNetworkNodeSimu( Node2 ).WZ ) / 2.0, ( AirflowNetworkNodeSimu( Node1 ).TZ + AirflowNetworkNodeSimu( Node2 ).TZ ) / 2.0 );
-			// Calculate sensible loads from duct conduction losses
+			// Calculate sensible loads from duct conduction losses and loads from duct radiation
 			if ( AirflowNetworkLinkageData( i ).ZoneNum > 0 && AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_DWC ) {
 				Qsen = AirflowNetworkLinkSimu( i ).FLOW * CpAir * ( AirflowNetworkNodeSimu( Node2 ).TZ - AirflowNetworkNodeSimu( Node1 ).TZ );
+				if ( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum != 0 ) {
+					auto & DuctRadObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
+					Qsen -= DuctRadObj.QRad;
+					AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).RadGain -= DuctRadObj.QRad;
+				}
 				AirflowNetworkExchangeData( AirflowNetworkLinkageData( i ).ZoneNum ).CondSen -= Qsen;
 			}
 			// Calculate sensible leakage losses
@@ -7078,7 +7545,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Sum all the loads
 		for ( i = 1; i <= NumOfZones; ++i ) {
-			AirflowNetworkExchangeData( i ).TotalSen = AirflowNetworkExchangeData( i ).LeakSen + AirflowNetworkExchangeData( i ).CondSen;
+			AirflowNetworkExchangeData( i ).TotalSen = AirflowNetworkExchangeData( i ).LeakSen + AirflowNetworkExchangeData( i ).CondSen + AirflowNetworkExchangeData( i ).RadGain;
 			AirflowNetworkExchangeData( i ).TotalLat = AirflowNetworkExchangeData( i ).LeakLat + AirflowNetworkExchangeData( i ).DiffLat;
 		}
 
@@ -7091,6 +7558,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkExchangeData( i ).LeakLat *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).CondSen *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).DiffLat *= OnOffFanRunTimeFraction;
+				AirflowNetworkExchangeData( i ).RadGain *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).TotalSen *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).TotalLat *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).SumMCp *= OnOffFanRunTimeFraction;
@@ -7187,7 +7655,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 ZoneAirEnthalpy; // Enthalpy of zone air (J/kg)
 		Real64 OpenFactorMult; // Window/door opening modulation multiplier on venting open factor
 		Real64 DelTemp; // Inside-outside air temperature difference (K)
-		Real64 DelEnthal; // Inside-outsdie air enthalpy difference (J/kg)
+		Real64 DelEnthal; // Inside-outside air enthalpy difference (J/kg)
 		int IZ; // AirflowNetwork zone number
 		int ZoneNum; // EnergyPlus zone number
 		int SurfNum; // Heat transfer surface number
@@ -7398,8 +7866,8 @@ namespace AirflowNetworkBalanceManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine validates the inputs of distribution system, since node data from a pimary airloop
-		// are nor available in the first call during reading input data of airflownetwrok objects.
+		// This subroutine validates the inputs of distribution system, since node data from a primary airloop
+		// are not available in the first call during reading input data of airflownetwork objects.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -7543,11 +8011,11 @@ namespace AirflowNetworkBalanceManager {
 				//     this same node is specified in a Coil:DX:CoolingBypassFactorEmpirical object (and classified with
 				//     NodeConnectionType as OutsideAirReference). In the NodeConnectionType structure, both of these nodes have a
 				//     unique index but have the same node number. The Outside Air Node will usually be listed first. Search for all
-				//     indexs with the same node number and check if it is classified as NodeConnectionType = OutsideAirReference.
+				//     indexes with the same node number and check if it is classified as NodeConnectionType = OutsideAirReference.
 				//     Mark this node as found since it is not used in an airflownetwork simulation.
 				//     Example (using AirflowNetwork_MultiZone_SmallOffice.idf with a single OA Mixer):
 				//             (the example shown below is identical to AirflowNetwork_SimpleHouse.idf with no OA Mixer except
-				//              that the NodeConnections indexs are (7) and (31), respectively and the NodeNumber = 6)
+				//              that the NodeConnections indexes are (7) and (31), respectively and the NodeNumber = 6)
 				//   The GetNodeConnectionType CALL below returns NodeConnectionType_OutsideAir = 7 and NodeConnectionType_OutsideAirReference = 14.
 				//     NodeConnections info from OUTSIDE AIR NODE object read:
 				//     NodeConnections(9)NodeNumber      = 10
@@ -7689,7 +8157,7 @@ namespace AirflowNetworkBalanceManager {
 				}}
 			}
 
-			// Validate ternimal unit name and type
+			// Validate terminal unit name and type
 			for ( i = 1; i <= DisSysNumOfTermUnits; ++i ) {
 				if ( SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) || SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 					LocalError = false;
@@ -7700,7 +8168,7 @@ namespace AirflowNetworkBalanceManager {
 						if ( ! SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Invalid terminal type for a VAV system = " + DisSysCompTermUnitData( i ).Name );
 							ShowContinueError( "The input type = " + DisSysCompTermUnitData( i ).EPlusType );
-							ShowContinueError( "A VAV system requires all ternimal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
+							ShowContinueError( "A VAV system requires all terminal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
 							ErrorsFound = true;
 						}
 					}
@@ -7849,7 +8317,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 
-			// Assing inlet and oulet nodes for a splitter
+			// Assigning inlet and outlet nodes for a splitter
 			for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 				if ( AirflowNetworkNodeData( i ).EPlusNodeNum == SplitterNodeNumbers( 1 ) ) {
 					if ( AirflowNetworkNodeData( i ).EPlusTypeNum == 0 ) AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_SPI;
@@ -7867,7 +8335,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Catch a fan flow rate from EPlus input file and add a flag for VAV teminal damper
+		// Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 		for ( i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			{ auto const SELECT_CASE_var( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum );
 			if ( SELECT_CASE_var == CompTypeNum_CVF ) { // 'CVF'
@@ -8147,7 +8615,7 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	void
-	CalcSingleSidedCps()
+	CalcSingleSidedCps( std::vector< std::vector< Real64 > > &valsByFacade, int numWindDir )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Sam Brunswick
@@ -8206,7 +8674,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 ZoneAngDiff;
 		Array1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
 		Array1D< Real64 > PiFormula; // Formula for the mean pressure difference
-		Array1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
+		Array1D< Real64 > SigmaFormula; // Formula for the fluctuating pressure difference
 		Array1D< Real64 > Sprime; // The dimensionless ratio of the window separation to the building width
 		Array1D< Real64 > CPV1; // Wind pressure coefficient for the first opening in the zone
 		Array1D< Real64 > CPV2; // Wind pressure coefficient for the second opening in the zone
@@ -8225,7 +8693,8 @@ namespace AirflowNetworkBalanceManager {
 			int MZDZoneNum; // row index of the zone in the MultizoneZoneData array
 			int ExtNodeNum; // External node number; = row index in MultizoneExternalNodeData array + AirflowNetworkNumOfZones
 			std::string ZoneName; // EnergyPlus zone name
-			int CPVNum; // row index in MultizoneCPValueData
+			int CPVNum;
+			int curve; // wind pressure coefficient curve index
 			int CompTypeNum; // Opening type (detailed, simple, etc.)
 			Real64 NodeHeight; // Elevation of the opening node
 			Real64 OpeningArea; // Opening area (=Height*Width)
@@ -8241,6 +8710,7 @@ namespace AirflowNetworkBalanceManager {
 				MZDZoneNum( 0 ),
 				ExtNodeNum( 0 ),
 				CPVNum( 0 ),
+				curve( 0 ),
 				CompTypeNum( 0 ),
 				NodeHeight( 0.0 ),
 				OpeningArea( 0.0 ),
@@ -8254,9 +8724,9 @@ namespace AirflowNetworkBalanceManager {
 		// Object Data
 		Array1D< AFNExtSurfacesProp > AFNExtSurfaces; // Surface numbers of all exterior openings
 
-		//count the total number of exterior simple and detailed openings and the number in each zone
-		//verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
-		//if it doesn't have two openings, change "ADVANCED" to "STANDARD"
+		// Count the total number of exterior simple and detailed openings and the number in each zone
+		// Verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
+		// If it doesn't have two openings, change "ADVANCED" to "STANDARD"
 		NumofExtSurfInZone.dimension( AirflowNetworkNumOfZones, 0 );
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
@@ -8298,7 +8768,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 		if ( AFNNumOfExtOpenings == 0 ) return;
-		//count again the number of single sided zones
+		// Recount the number of single sided zones
 		AirflowNetworkNumOfSingleSideZones = 0;
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
@@ -8306,7 +8776,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) return; //Bail if no zones call for the advanced single sided model.
-		//count again the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
+		// Recount the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
 		AFNNumOfExtOpenings = 0;
 		for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
 			MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
@@ -8346,7 +8816,7 @@ namespace AirflowNetworkBalanceManager {
 							AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
 							AFNExtSurfaces( ExtOpenNum ).OpeningArea = MultizoneSurfaceData( SrfNum ).Width * MultizoneSurfaceData( SrfNum ).Height * MultizoneSurfaceData( SrfNum ).OpenFactor;
 							AFNExtSurfaces( ExtOpenNum ).ExtNodeNum = MultizoneSurfaceData( ExtOpenNum ).NodeNums( 2 );
-							AFNExtSurfaces( ExtOpenNum ).CPVNum = MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).CPVNum;
+							AFNExtSurfaces( ExtOpenNum ).curve = MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).curve;
 							AFNExtSurfaces( ExtOpenNum ).DischCoeff = MultizoneCompDetOpeningData( DetOpenNum ).DischCoeff2;
 							++ExtOpenNum;
 						}
@@ -8365,7 +8835,7 @@ namespace AirflowNetworkBalanceManager {
 						AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
 						AFNExtSurfaces( ExtOpenNum ).OpeningArea = MultizoneSurfaceData( SrfNum ).Width * MultizoneSurfaceData( SrfNum ).Height * MultizoneSurfaceData( SrfNum ).OpenFactor;
 						AFNExtSurfaces( ExtOpenNum ).ExtNodeNum = MultizoneSurfaceData( ExtOpenNum ).NodeNums( 2 );
-						AFNExtSurfaces( ExtOpenNum ).CPVNum = MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).CPVNum;
+						AFNExtSurfaces( ExtOpenNum ).curve = MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).curve;
 						AFNExtSurfaces( ExtOpenNum ).DischCoeff = MultizoneCompSimpleOpeningData( SimOpenNum ).DischCoeff;
 						++ExtOpenNum;
 					}
@@ -8374,17 +8844,16 @@ namespace AirflowNetworkBalanceManager {
 		}
 		//Calculate the azimuth and the coordinates of the centroid of each opening.
 		//Calculate Sprime and DeltaCp for each zone.
-		AirflowNetworkNumofWindDir = MultizoneCPArrayData( 1 ).NumWindDir;
-		PiFormula.allocate( AirflowNetworkNumofWindDir );
-		SigmaFormula.allocate( AirflowNetworkNumofWindDir );
+		PiFormula.allocate( numWindDir );
+		SigmaFormula.allocate( numWindDir );
 		DeltaCp.allocate( AirflowNetworkNumOfZones );
 		EPDeltaCP.allocate( AirflowNetworkNumOfZones );
 		Sprime.allocate( AirflowNetworkNumOfZones );
 		ZoneAng.allocate( AirflowNetworkNumOfZones );
 		for ( ZnNum = 1; ZnNum <= AirflowNetworkNumOfZones; ++ZnNum ) {
-			DeltaCp( ZnNum ).WindDir.allocate( AirflowNetworkNumofWindDir );
-			EPDeltaCP( ZnNum ).WindDir.allocate( AirflowNetworkNumofWindDir );
-			for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
+			DeltaCp( ZnNum ).WindDir.allocate( numWindDir );
+			EPDeltaCP( ZnNum ).WindDir.allocate( numWindDir );
+			for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 				DeltaCp( ZnNum ).WindDir( WindDirNum ) = 0.0;
 				EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = 0.0;
 			}
@@ -8418,7 +8887,7 @@ namespace AirflowNetworkBalanceManager {
 				ZoneAng( ZnNum ) = ZoneAng1;
 				Sprime( ZnNum ) = std::sqrt( pow_2( X1 - X2 ) + pow_2( Y1 - Y2 ) ) / MultizoneZoneData( ZnNum ).BuildWidth;
 				//Calculate DeltaCp for each wind direction for each zone
-				for ( WindDirNum = 1; WindDirNum <= AirflowNetworkNumofWindDir; ++WindDirNum ) {
+				for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 					WindDir = ( WindDirNum - 1 ) * 10.0;
 					WindAng = ( WindDirNum - 1 ) * 10.0;
 					IncAng = std::abs( WindAng - ZoneAng( ZnNum ) );
@@ -8435,27 +8904,29 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
-		AirflowNetworkNumOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
-		MultizoneCPValueDataTemp.allocate( AirflowNetworkNumOfCPValue ); //Allocate a temporary array for single sided Cps
-		MultizoneCPValueDataTempUnMod.allocate( AirflowNetworkNumOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
-		//Copy in Cp values for the 4 main facades
+		int numOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
+		MultizoneCPValueDataTemp.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps
+		MultizoneCPValueDataTempUnMod.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
+		// Copy in Cp values for the 4 main facades
 		for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
-			gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
-			MultizoneCPValueDataTemp( FacadeNum ).Name = MultizoneCPValueData( FacadeNum ).Name;
-			MultizoneCPValueDataTemp( FacadeNum ).CPArrayName = MultizoneCPValueData( FacadeNum ).CPArrayName;
-			MultizoneCPValueDataTemp( FacadeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPValueDataTemp( FacadeNum ).CPValue = MultizoneCPValueData( FacadeNum ).CPValue;
+			//gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
+			//MultizoneCPValueDataTemp( FacadeNum ).Name = MultizoneCPValueData( FacadeNum ).Name;
+			//MultizoneCPValueDataTemp( FacadeNum ).CPArrayName = MultizoneCPValueData( FacadeNum ).CPArrayName;
+			MultizoneCPValueDataTemp( FacadeNum ).CPValue.allocate( numWindDir );
+			for ( int i = 1; i <= numWindDir; ++i ) {
+				MultizoneCPValueDataTemp( FacadeNum ).CPValue( i ) = valsByFacade[ FacadeNum-1 ][ i ];
+			}
 		}
 		//Allocate the rest of the array for single sided openings
-		for ( SrfNum = 5; SrfNum <= AirflowNetworkNumOfCPValue; ++SrfNum ) {
-			MultizoneCPValueDataTemp( SrfNum ).CPArrayName = "EVERY10DEGREES";
-			MultizoneCPValueDataTemp( SrfNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
+		for ( SrfNum = 5; SrfNum <= numOfCPValue; ++SrfNum ) {
+			//MultizoneCPValueDataTemp( SrfNum ).CPArrayName = "EVERY10DEGREES";
+			MultizoneCPValueDataTemp( SrfNum ).CPValue.allocate( numWindDir );
+			MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( numWindDir );
 			MultizoneCPValueDataTemp( SrfNum ).CPValue = 0.0;
 		}
 		//Calculate the single sided Cp arrays from DeltaCp for each single sided opening
-		CPV1.allocate( AirflowNetworkNumofWindDir );
-		CPV2.allocate( AirflowNetworkNumofWindDir );
+		CPV1.allocate( numWindDir );
+		CPV2.allocate( numWindDir );
 		CPV1 = 0.0;
 		CPV2 = 0.0;
 		SrfNum = 5;
@@ -8468,7 +8939,7 @@ namespace AirflowNetworkBalanceManager {
 						Real64 const VelRatio_2( std::pow( 10.0 / AFNExtSurfaces( ExtOpenNum ).NodeHeight, 2.0 * SiteWindExp ) );
 						Real64 const AFNEExtSurface_fac( 0.5 * ( 1.0 / pow_2( AFNExtSurfaces( ExtOpenNum ).DischCoeff ) ) );
 						if ( OpenNuminZone == 1 ) {
-							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
+							for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
@@ -8480,7 +8951,7 @@ namespace AirflowNetworkBalanceManager {
 							++OpenNuminZone;
 							++SrfNum;
 						} else if ( OpenNuminZone == 2 ) {
-							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
+							for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
 								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
@@ -8488,7 +8959,8 @@ namespace AirflowNetworkBalanceManager {
 								CPV2( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 								EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = std::abs( CPV2( WindDirNum ) - CPV1( WindDirNum ) );
 							}
-							MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).CPVNum = SrfNum;
+							//MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).CPVNum = SrfNum;
+							MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).facadeNum = SrfNum;
 							AFNExtSurfaces( ExtOpenNum ).CPVNum = SrfNum;
 							++OpenNuminZone;
 							++SrfNum;
@@ -8497,14 +8969,19 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
-		MultizoneCPValueData.deallocate(); //Erase original Cp arrays
-		MultizoneCPValueData.allocate( AirflowNetworkNumOfCPValue ); //reallocate Cp arrays to include the new single sided Cps
+		//MultizoneCPValueData.deallocate(); //Erase original Cp arrays
+		//MultizoneCPValueData.allocate( AirflowNetworkNumOfCPValue ); //reallocate Cp arrays to include the new single sided Cps
+		valsByFacade = std::vector< std::vector< Real64 > >( numOfCPValue );
 		//Copy the temporary array onto the original array
-		for ( NodeNum = 1; NodeNum <= AirflowNetworkNumOfCPValue; ++NodeNum ) {
-			MultizoneCPValueData( NodeNum ).Name = MultizoneCPValueDataTemp( NodeNum ).Name;
-			MultizoneCPValueData( NodeNum ).CPArrayName = MultizoneCPValueDataTemp( NodeNum ).CPArrayName;
-			MultizoneCPValueData( NodeNum ).CPValue.allocate( MultizoneCPArrayData( 1 ).NumWindDir );
-			MultizoneCPValueData( NodeNum ).CPValue = MultizoneCPValueDataTemp( NodeNum ).CPValue;
+		for ( NodeNum = 1; NodeNum <= numOfCPValue; ++NodeNum ) {
+			//MultizoneCPValueData( NodeNum ).Name = MultizoneCPValueDataTemp( NodeNum ).Name;
+			//MultizoneCPValueData( NodeNum ).CPArrayName = MultizoneCPValueDataTemp( NodeNum ).CPArrayName;
+			//MultizoneCPValueData( NodeNum ).CPValue.allocate( numWindDir );
+			//MultizoneCPValueData( NodeNum ).CPValue = MultizoneCPValueDataTemp( NodeNum ).CPValue;
+			valsByFacade[ NodeNum - 1 ] = std::vector< Real64 >( numWindDir );
+			for ( int i = 0; i < numWindDir; ++i) {
+				valsByFacade[ NodeNum - 1 ][ i ] = MultizoneCPValueDataTemp( NodeNum ).CPValue( i + 1 );
+			}
 		}
 		//Rewrite the CPVNum for all nodes that correspond with a simple or detailed opening
 		for ( ZnNum = 1; ZnNum <= AirflowNetworkNumOfZones; ++ZnNum ) {
@@ -8587,21 +9064,21 @@ namespace AirflowNetworkBalanceManager {
 
 		Real64 Tcomfort; // Thermal comfort temperature
 		Real64 ComfortBand; // Thermal comfort band
-		Real64 Toperative; // Oprative temperature
+		Real64 Toperative; // Operative temperature
 		Real64 OutDryBulb; // Outdoor dry-bulb temperature
 
 		// flow
 
 		if ( TimeOpenDuration > 0 ) {
 			if ( TimeOpenDuration >= MinOpeningTime ) {
-				OpeningStatus = FeeeOperation; // free operation
+				OpeningStatus = FreeOperation; // free operation
 			} else {
 				OpeningStatus = MinCheckForceOpen; // forced to open
 			}
 		}
 		if ( TimeCloseDuration > 0 ) {
 			if ( TimeCloseDuration >= MinClosingTime ) {
-				OpeningStatus = FeeeOperation; // free operation
+				OpeningStatus = FreeOperation; // free operation
 			} else {
 				OpeningStatus = MinCheckForceClose; // forced to close
 			}
