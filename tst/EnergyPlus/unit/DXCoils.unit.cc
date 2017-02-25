@@ -1434,7 +1434,7 @@ namespace EnergyPlus {
 		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
 
 		EXPECT_NEAR( 0.67608322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
-		EXPECT_NEAR( 0.0003243, CBF_calculated, 0.0000001 );
+		EXPECT_NEAR( 0.003364795, CBF_calculated, 0.000001 );
 
 		DXCoil( 1 ).RatedTotCap( 1 ) = 40000.0; // reverse perturb SHR (i.e., decrease SHR), CalcCBF would have failed with RH >= 1.0
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
