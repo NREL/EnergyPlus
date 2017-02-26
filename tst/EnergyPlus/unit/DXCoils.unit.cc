@@ -902,15 +902,13 @@ namespace EnergyPlus {
 		InletWBTemp = 19.7; // 19.72 DB / 19.7 WB
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
 		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
-		EXPECT_NEAR( CBF_calculated, 0.0000549, 0.0000001 );
-		EXPECT_GT( CBF_calculated, 0.0 );
+		EXPECT_NEAR( CBF_calculated, 0.00021141, 0.0000001 );
 
 		InletDBTemp = 13.1; // colder and much less likely inlet air temperature
 		InletWBTemp = 13.08; // 13.1 DB / 13.08 WB - hard to find ADP (needed mod to CalcCBF function)
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
 		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
-		EXPECT_GT( CBF_calculated, 0.0 );
-		EXPECT_NEAR( CBF_calculated, 0.000133, 0.0000001 );
+		EXPECT_NEAR( CBF_calculated, 0.0001531, 0.0000001 );
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
@@ -1427,14 +1425,14 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
 
-		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // run right at the saturation curve
+		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // simulate outlet condition right at the saturation curve
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );
 		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
 
 		EXPECT_NEAR( 0.67608322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
-		EXPECT_NEAR( 0.003364795, CBF_calculated, 0.000001 );
+		EXPECT_NEAR( 0.0003243, CBF_calculated, 0.0000001 );
 
 		DXCoil( 1 ).RatedTotCap( 1 ) = 40000.0; // reverse perturb SHR (i.e., decrease SHR), CalcCBF would have failed with RH >= 1.0
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;

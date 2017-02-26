@@ -9932,12 +9932,6 @@ Label50: ;
 		DeltaHumRat = InletAirHumRat - OutletAirHumRat;
 		OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
 		OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
-		OutletAirTempSat = PsyTsatFnHPb( OutletAirEnthalpy, BaroPress, RoutineName );
-		if ( OutletAirTemp < OutletAirTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
-			OutletAirTemp = OutletAirTempSat + 0.01; // just right of the saturation curve so CBF does not equal 0
-			OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, RoutineName );
-			DeltaHumRat = InletAirHumRat - OutletAirHumRat;
-		}
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
 		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, BaroPress, RoutineName );
@@ -9962,7 +9956,13 @@ Label50: ;
 				}
 			}
 			ShowContinueErrorTimeStamp( "" );
-			ShowFatalError( "Check and revise the input data for this coil before rerunning the simulation." );
+			ShowContinueError( "SHR adjusted to achieve valid outlet air properties and the simulation continues." );
+			OutletAirTempSat = PsyTsatFnHPb(OutletAirEnthalpy, BaroPress, RoutineName);
+			if (OutletAirTemp < OutletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+				OutletAirTemp = OutletAirTempSat + 0.005;
+				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, RoutineName );
+				DeltaHumRat = InletAirHumRat - OutletAirHumRat;
+			}
 		}
 		DeltaT = InletAirTemp - OutletAirTemp;
 		if ( DeltaT <= 0.0 ) {
