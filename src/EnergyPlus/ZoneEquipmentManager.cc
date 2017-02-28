@@ -2929,7 +2929,22 @@ namespace ZoneEquipmentManager {
 
 		}}
 
-		TermUnitFinalZoneSizing = FinalZoneSizing;
+		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing
+		for ( int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum ) {
+			int NumZonesCooled = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
+			int NumZonesHeated = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
+			for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+				CtrlZoneNum = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+				int TermUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+				TermUnitFinalZoneSizing( TermUnitSizingIndex ) = FinalZoneSizing( CtrlZoneNum );
+			}
+			for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+				CtrlZoneNum = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+				int TermUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
+				TermUnitFinalZoneSizing( TermUnitSizingIndex ) = FinalZoneSizing( CtrlZoneNum );
+			}
+		}
+
 
 	}
 

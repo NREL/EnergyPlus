@@ -220,6 +220,7 @@ namespace ZoneAirLoopEquipmentManager {
 			}
 		}
 
+		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex;
 		InitZoneAirLoopEquipment( FirstHVACIteration, AirDistUnitNum, ActualZoneNum );
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
@@ -228,6 +229,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// ReportZoneAirLoopEquipment( AirDistUnitNum );
 
+		DataSizing::CurTermUnitSizingNum = 0;
 		SimZone = false;
 
 	}
@@ -365,11 +367,15 @@ namespace ZoneAirLoopEquipmentManager {
 					AirDistUnit( AirDistUnitNum ).DownStreamLeak = false;
 				}
 
+				// Increment and store pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+				++DataSizing::NumAirTerminalUnits;
+				AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
+
 				// DesignSpecification:AirTerminal:Sizing name
-				AirDistUnit( AirDistUnitNum ).AirTerminalSizingIndex = 0;
+				AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaBlanks( 5 )) {
-					AirDistUnit( AirDistUnitNum ).AirTerminalSizingIndex = InputProcessor::FindItemInList( AlphArray( 5 ), DataSizing::AirTerminalSizingSpec );
-					if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingIndex  == 0) {
+					AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( AlphArray( 5 ), DataSizing::AirTerminalSizingSpec );
+					if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex  == 0) {
 						ShowSevereError( cAlphaFields( 5 ) + " = " + AlphArray( 5 ) + " not found." );
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
 						ErrorsFound = true;
@@ -772,7 +778,6 @@ namespace ZoneAirLoopEquipmentManager {
 					AirDistUnit( AirDistUnitNum ).MinAvailDelta = MassFlowRateMinAvail - Node( OutNodeNum ).MassFlowRateMinAvail;
 				}
 			}
-
 		}
 		// Sign convention: SysOutputProvided <0 Zone is cooled
 		//                  SysOutputProvided >0 Zone is heated

@@ -307,6 +307,7 @@ namespace UserDefinedComponents {
 		// Members
 		std::string Name; // user identifier
 		int ActualCtrlZoneNum;
+		int ADUNum; // index of corresponding air distribution unit
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
 		AirConnectionStruct AirLoop;
@@ -323,6 +324,7 @@ namespace UserDefinedComponents {
 		// Default Constructor
 		UserAirTerminalComponentStruct() :
 			ActualCtrlZoneNum( 0 ),
+			ADUNum( 0 ),
 			ErlSimProgramMngr( 0 ),
 			ErlInitProgramMngr( 0 ),
 			NumPlantConnections( 0 ),

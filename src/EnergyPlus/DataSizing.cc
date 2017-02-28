@@ -207,6 +207,7 @@ namespace DataSizing {
 	int CurSysNum( 0 ); // Current Air System index (0 if not in air loop)
 	int CurOASysNum( 0 ); // Current outside air system index (0 if not in OA Sys)
 	int CurZoneEqNum( 0 ); // Current Zone Equipment index (0 if not simulating ZoneEq)
+	int CurTermUnitSizingNum; // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
 	int CurBranchNum( 0 ); // Index of branch being simulated (or 0 if not air loop)
 	int CurDuctType( 0 ); // Duct type of current branch
 	int CurLoopNum( 0 ); // the current plant loop index
@@ -272,8 +273,9 @@ namespace DataSizing {
 	Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop
 	int DataZoneUsedForSizing( 0 ); // pointer to control zone for air loop equipment
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
-	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
-	int NumAirTerminalSizingSpec( 0 ); // Number of air terminal sizing objects
+	int NumZoneHVACSizing( 0 ); // Number of design specification zone HVAC sizing objects
+	int NumAirTerminalSizingSpec( 0 ); // Number of design specfication air terminal sizing objects
+	int NumAirTerminalUnits( 0 ); // Number of air terminal units
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
@@ -298,13 +300,13 @@ namespace DataSizing {
 	Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
 	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
 	Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
-	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
+	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
 	Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
 	Array2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
 	Array1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
 	Array1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
 	Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
-	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
+	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines (indexed per terminal unit)
 	Array1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
 	Array1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
 	Array1D< ZoneEqSizingData > OASysEqSizing; // Data added in unitary system sizing routines
@@ -327,6 +329,7 @@ namespace DataSizing {
 		CurSysNum = 0;
 		CurOASysNum = 0;
 		CurZoneEqNum = 0;
+		CurTermUnitSizingNum = 0;
 		CurBranchNum = 0;
 		CurDuctType = 0;
 		CurLoopNum = 0;
@@ -392,6 +395,7 @@ namespace DataSizing {
 		DataZoneNumber = 0;
 		NumZoneHVACSizing = 0;
 		NumAirTerminalSizingSpec = 0;
+		NumAirTerminalUnits = 0;
 		DXCoolCap = 0.0;
 		GlobalHeatSizingFactor = 0.0;
 		GlobalCoolSizingFactor = 0.0;

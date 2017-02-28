@@ -554,24 +554,35 @@ Searching on `.ReturnAirNode` and `.AirLoopNum` shows relevant hits in:
 - Lots of sizing calcs are done here, and the most pertinent section is that it makes final adjustments to `TermUnitFinalZoneSizing`.
 
 #### Proposed Changes ####
-- Add new struct `DataSizing::AirTerminalSizingData` to hold input for the new `DesignSpecification:AirTerminal:Sizing` object. (Similar to ZoneHVACSizingData)
-- The new array will be called `AirTerminalSizingSpecifications`.
-- Add new function `SizingManager::GetAirTerminalSizing` to process input for the new ` DesignSpecification:AirTerminal:Sizing` object.
+- *Done* Add new struct `DataSizing::AirTerminalSizingData` to hold input for the new `DesignSpecification:AirTerminal:Sizing` object. (Similar to ZoneHVACSizingData)
+- *Done* The new array will be called `AirTerminalSizingSpec`.
+- *Done* Add new function `SizingManager::GetAirTerminalSizing` to process input for the new ` DesignSpecification:AirTerminal:Sizing` object.
+- *Done* in `ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment` add input processing for new Design Specification Air Terminal Sizing Object Name field. And add new field to `DataDefineEquip::AirDistUnit`(ZoneAirEquip struct).
+- *Done* in `DirectAirManager::GetDirectAirInput` add input processing for new Design Specification Air Terminal Sizing Object Name field. And add new field to `DirectAirManager::DirectAir` (DirectAirProps struct).
+- *Done* Also add a new field `TermUnitSizingIndex` for the pointer (index) to this terminal unit's TermUnitSizing data for both ADU and direct air.  This gets set during input processing.
+- *Done* And in the ZoneEquipConfig data structure add `TermUnitSizingIndex` also.  This gets set in each terminal unit's get input routine in the same place that `ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode` gets set (that's the best I could come up with where all the right info is available).
 
-- Change `TermUnitSizing` and `TermUnitFinalZoneSizing` to be indexed by air distribution unit (ADU) number instead of by zone. Direct air terminal units will be added to the end of the ADU list for this indexing.
+- *Done* In `DataSizing` add a new variable for `NumAirTerminalUnits` which is the number of air terminal units.  This will be incremented as ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled objects are created.
+- *Done* In `DataSizing` add a new variable for `CurTermUnitSizingNum` which is equivalent to `CurZoneEqNum`. Use only where the TermUnitSizingIndex cannot be determined directly from the component or ADU number.
+
+**ARRRGHHH!!!!** TermUnitSizing isn't filled for everyone, only some parts are used for certain type of terminal units. Ones that currently don't rely on that don't fill it.
+
+- *Done* Change `TermUnitSizing` and `TermUnitFinalZoneSizing` to be indexed separately, not by zone.
   - *If this proves to be too intrusive or risky, consider adding yet another array that is indexed by ADU.* 
 - Expand `TermUnitSizing` to include pertinent inputs from a referenced `DesignSpecification:AirTerminal:Sizing` object. These fields will default to 1.0 if there is no `DesignSpecification:AirTerminal:Sizing` object for a given ADU.
-- In `UpdateSysSizing`, change anything that is indexed by CtrlZoneNum (or equivalent) to be indexed by air distribution unit.
-- Add two arrays to `DataAirloop::AirLoopZoneEquipConnectData`
-  - `Array1D_int CoolZoneADUNums`
-  - `Array1D_int HeatZoneADUNums`
+- In `UpdateSysSizing`, change some things that are indexed by CtrlZoneNum (or equivalent) to be indexed by terminal unit sizing index.
+- *Done* Add two arrays to `DataAirloop::AirLoopZoneEquipConnectData`
+  - `Array1D_int TermUnitCoolSizingIndex`
+  - `Array1D_int TermUnitHeatSizingIndex`
+  - These get filled in `SimAirServingZones::InitAirLoops`
 - Wherever sizing calculations are made in the terminal unit sizing routines and in `RequestSizing`, apply the input factors from `DesignSpecification:AirTerminal:Sizing` which are stored in `TermUnitSizing`.
+ 
 
 ### 8. Allow an airloop with no return path *(if budget allows)*
 
 #### SimAirServingZones::GetAirPathData ####
-- Modify input processing for `AirLoopHVAC` to allow the Demand Side Outlet Node Name to be blank
-- Skip the check for proper return connection if the Demand Side Outlet Node Name is blank
+- *Done* Modify input processing for `AirLoopHVAC` to allow the Demand Side Outlet Node Name to be blank
+- ** No change needed?** Skip the check for proper return connection if the Demand Side Outlet Node Name is blank
 
 #### ReturnAirPathManager::InitReturnAirPath  ####
 - This function is currently just a placeholder and is not used.

@@ -304,6 +304,18 @@ namespace FourPipeBeam {
 		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Heating Rate [W]", thisBeam->supAirHeatingRate, "System", "Average", thisBeam->name );
 		SetupOutputVariable( "Zone Air Terminal Primary Air Flow Rate [m3/s]", thisBeam->primAirFlow, "System", "Average", thisBeam->name );
 
+		for ( aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex ) {
+			if ( thisBeam->airOutNodeNum == AirDistUnit( aDUIndex ).OutletNodeNum ) {
+				thisBeam->aDUNum = aDUIndex;
+			}
+		}
+		// assumes if there isn't one assigned, it's an error
+		if ( thisBeam->aDUNum == 0 ) {
+			ShowSevereError( routineName + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' + thisBeam->name + "]." );
+			ShowContinueError( "...should have outlet node=" + DataLoopNode::NodeID( thisBeam->airOutNodeNum ) );
+			ErrorsFound = true;
+		}
+
 		// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 		airNodeFound = false;
 		for ( ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
@@ -314,9 +326,11 @@ namespace FourPipeBeam {
 					thisBeam->zoneNodeIndex = ZoneEquipConfig( ctrlZone ).ZoneNode;
 					ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).InNode = thisBeam->airInNodeNum;
 					ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).OutNode = thisBeam->airOutNodeNum;
+					if ( thisBeam->aDUNum > 0 )ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).TermUnitSizingIndex = AirDistUnit(thisBeam->aDUNum ).TermUnitSizingIndex;
 					if ( thisBeam->beamHeatingPresent ) {
 						ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).InNode = thisBeam->airInNodeNum;
 						ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).OutNode =thisBeam->airOutNodeNum;
+						if ( thisBeam->aDUNum > 0 )ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).TermUnitSizingIndex = AirDistUnit(thisBeam->aDUNum ).TermUnitSizingIndex;
 					}
 					airNodeFound = true;
 					break;
@@ -326,19 +340,6 @@ namespace FourPipeBeam {
 		if ( ! airNodeFound ) {
 			ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " = " + thisBeam->name );
 			ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + cAlphaArgs( 5 ) );
-			ErrorsFound = true;
-		}
-
-
-		for ( aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex ) {
-			if ( thisBeam->airOutNodeNum == AirDistUnit( aDUIndex ).OutletNodeNum ) {
-				thisBeam->aDUNum = aDUIndex;
-			}
-		}
-		// assumes if there isn't one assigned, it's an error
-		if ( thisBeam->aDUNum == 0 ) {
-			ShowSevereError( routineName + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' + thisBeam->name + "]." );
-			ShowContinueError( "...should have outlet node=" + DataLoopNode::NodeID( thisBeam->airOutNodeNum ) );
 			ErrorsFound = true;
 		}
 
@@ -604,11 +605,11 @@ namespace FourPipeBeam {
 
 		noHardSizeAnchorAvailable = false;
 
-		if ( CurZoneEqNum > 0 ) {
-			originalTermUnitSizeMaxVDot = std::max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow,
-												TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-			originalTermUnitSizeCoolVDot = TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-			originalTermUnitSizeHeatVDot = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+		if ( CurTermUnitSizingNum > 0 ) {
+			originalTermUnitSizeMaxVDot = std::max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow,
+												TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
+			originalTermUnitSizeCoolVDot = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow;
+			originalTermUnitSizeHeatVDot = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow;
 		}
 
 		if ( this->totBeamLengthWasAutosized && this->vDotDesignPrimAirWasAutosized

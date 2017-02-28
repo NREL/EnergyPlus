@@ -291,6 +291,7 @@ namespace DataZoneEquipment {
 		int MainBranchIndex;
 		int SupplyBranchIndex;
 		int AirDistUnitIndex; // equipment number in EquipList
+		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 		int SupplyAirPathIndex;
 		Real64 NetBranchCoilDemand;
 		Array1D< SubSubEquipmentData > Coil;
@@ -303,6 +304,7 @@ namespace DataZoneEquipment {
 			MainBranchIndex( 0 ),
 			SupplyBranchIndex( 0 ),
 			AirDistUnitIndex( 0 ),
+			TermUnitSizingIndex( 0 ),
 			SupplyAirPathIndex( 0 ),
 			NetBranchCoilDemand( 0.0 )
 		{}

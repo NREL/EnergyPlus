@@ -197,6 +197,7 @@ namespace DataSizing {
 	extern int CurSysNum; // Current Air System index (0 if not in air loop)
 	extern int CurOASysNum; // Current outside air system index (0 if not in OA Sys)
 	extern int CurZoneEqNum; // Current Zone Equipment index (0 if not simulating ZoneEq)
+	extern int CurTermUnitSizingNum; // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
 	extern int CurBranchNum; // Index of branch being simulated (or 0 if not air loop)
 	extern int CurDuctType; // Duct type of current branch
 	extern int CurLoopNum; // the current plant loop index
@@ -262,8 +263,9 @@ namespace DataSizing {
 	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
 	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
 	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
-	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
-	extern int NumAirTerminalSizingSpec; // Number of air terminal sizing objects
+	extern int NumZoneHVACSizing; // Number of design specification zone HVAC sizing objects
+	extern int NumAirTerminalSizingSpec; // Number of design specification air terminal sizing objects
+	extern int NumAirTerminalUnits; // Number of air terminal units
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit

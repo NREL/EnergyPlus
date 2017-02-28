@@ -215,6 +215,7 @@ namespace DirectAirManager {
 			ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
 		}
 
+		DataSizing::CurTermUnitSizingNum = DirectAir( DirectAirNum ).TermUnitSizingIndex;
 		// With the correct DirectAirNum to Initialize the system
 		InitDirectAir( DirectAirNum, ControlledZoneNum, FirstHVACIteration );
 
@@ -224,6 +225,7 @@ namespace DirectAirManager {
 
 		// ReportDirectAir( DirectAirNum );
 
+		DataSizing::CurTermUnitSizingNum = 0;
 	}
 
 	void
@@ -320,11 +322,15 @@ namespace DirectAirManager {
 				//Load the maximum volume flow rate
 				DirectAir( DirectAirNum ).MaxAirVolFlowRate = rNumericArgs( 1 );
 
+				// Increment and store pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+				++DataSizing::NumAirTerminalUnits;
+				DirectAir( DirectAirNum ).TermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
+
 				// DesignSpecification:AirTerminal:Sizing name
-				DirectAir( DirectAirNum ).AirTerminalSizingIndex = 0;
+				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaFieldBlanks( 4 )) {
-					DirectAir( DirectAirNum ).AirTerminalSizingIndex = InputProcessor::FindItemInList( cAlphaArgs( 4 ), DataSizing::AirTerminalSizingSpec );
-					if (DirectAir( DirectAirNum ).AirTerminalSizingIndex  == 0) {
+					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 4 ), DataSizing::AirTerminalSizingSpec );
+					if (DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex  == 0) {
 						ShowSevereError(cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );
 						ErrorsFound = true;
@@ -338,6 +344,7 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DirectAir( DirectAirNum ).TermUnitSizingIndex;
 							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
 						}
 					}
@@ -581,7 +588,7 @@ namespace DirectAirManager {
 		MaxAirVolFlowRateUser = 0.0;
 		SizingDesRunThisZone = false;
 
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 
 			if ( DirectAir( DirectAirNum ).MaxAirVolFlowRate == AutoSize ) {
 				IsAutoSize = true;
@@ -595,7 +602,7 @@ namespace DirectAirManager {
 				}
 			} else { // AutoSize or hard-size with design run
 				CheckZoneSizing( DirectAir( DirectAirNum ).cObjectName, DirectAir( DirectAirNum ).EquipID );
-				MaxAirVolFlowRateDes = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				MaxAirVolFlowRateDes = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
 				if ( MaxAirVolFlowRateDes < SmallAirVolFlow ) {
 					MaxAirVolFlowRateDes = 0.0;
 				}
