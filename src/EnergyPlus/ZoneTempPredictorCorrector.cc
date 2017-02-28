@@ -5550,13 +5550,12 @@ namespace ZoneTempPredictorCorrector {
 				// determine supply air temperature as a weighted average of the inlet temperatures.
 				if ( SumSysMCp > 0.0 ) {
 					RefAirTemp = SumSysMCpT / SumSysMCp;
+					SumHATref += HA * RefAirTemp;
 				} else {
-					// no system flow (yet) so just use last value for inlet node temp, this can happen early in the environment
-					RefAirTemp = NodeTemp;
+					// no system flow (yet) so just use zone air temperature
+					// #5906
+					SumHA += HA;
 				}
-				// #5906
-				SumHA += HA;
-				SumHATref += HA * ( TempSurfInTmp( SurfNum ) - RefAirTemp );
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
@@ -5837,8 +5836,8 @@ namespace ZoneTempPredictorCorrector {
 				if ( SumSysMCp > 0.0 ) {
 					RefAirTemp = SumSysMCpT / SumSysMCp;
 				} else {
-					// no system flow (yet) so just use last value for inlet node temp, this can happen early in the environment
-					RefAirTemp = NodeTemp;
+					// no system flow (yet) so just use last value for zone air temp
+					RefAirTemp = MAT( ZoneNum );
 				}
 
 			} else {

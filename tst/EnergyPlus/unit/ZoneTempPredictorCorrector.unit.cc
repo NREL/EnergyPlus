@@ -1048,9 +1048,16 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	NumZoneSupplyPlenums = 0;
 
 	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	EXPECT_EQ( 5.0, SumHA );
+	EXPECT_EQ( 300.0, SumHATsurf );
+	EXPECT_EQ( 150.0, SumHATref );
+
+	Node( 1 ).MassFlowRate = 0.0;
+	Node( 2 ).MassFlowRate = 0.0;
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
 	EXPECT_EQ( 10.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
-	EXPECT_EQ( 75.0, SumHATref );
+	EXPECT_EQ( 50.0, SumHATref );
 
 	DataHeatBalance::ZoneIntGain.deallocate( );
 	DataHeatBalFanSys::SumConvHTRadSys.deallocate( );
