@@ -585,6 +585,40 @@ namespace OutputReportTabular {
 
 	};
 
+	struct CompLoadTablesType
+	{
+		// members
+		int desDayNum; // design day number
+		int timeStepMax; // times step of the day that the maximum occurs
+		Array2D < Real64 > cells; // main component table results (column, row)
+		Array2D_bool cellUsed; // flag if the cell is used for the table of results (column, row)
+		std::string peakDateHrMin; // string containing peak timestamp
+		Real64 outsideDryBulb;   // outside dry bulb temperature at peak
+		Real64 outsideWebBulb;   // outside web bulb temperature at peak
+		Real64 outsideHumRatio;  // outside humidity ratio at peak
+		Real64 zoneDryBulb;   // zone dry bulb temperature at peak
+		Real64 zoneRelHum;   // zone relative humidity at peak
+		Real64 zoneHumRatio;  // zone humidity ratio at peak
+		Real64 peakDesSensLoad; // peak design sensible load
+		Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
+		Real64 diffPeakEst; // difference between the peak design sensible load and the estimated instant plus delayed sensible load
+
+		// default constructor
+		CompLoadTablesType() :
+			desDayNum( 0 ),
+			timeStepMax( 0 ),
+			outsideDryBulb( 0. ),
+			outsideWebBulb( 0. ),
+			outsideHumRatio( 0. ),
+			zoneDryBulb( 0. ),
+			zoneRelHum( 0. ),
+			peakDesSensLoad( 0. ),
+			estInstDelSensLoad( 0. ),
+			diffPeakEst( 0. )
+		{}
+
+	};
+
 	// Object Data
 	extern Array1D< OutputTableBinnedType > OutputTableBinned;
 	extern Array2D< BinResultsType > BinResults; // table number, number of intervals
@@ -799,21 +833,77 @@ namespace OutputReportTabular {
 	WriteLoadComponentSummaryTables();
 
 	void
-	SetTableBodyCellToMovingAvgAtMaxTime(
-		int const & columnNum,
-		int const & rowNum,
+	GetDelaySequences(
+		int const & desDaySelected,
+		int const & zoneIndex,
+		Array1D< Real64 > & peopleDelaySeq,
+		Array1D< Real64 > & equipDelaySeq,
+		Array1D< Real64 > & hvacLossDelaySeq,
+		Array1D< Real64 > & powerGenDelaySeq,
+		Array1D< Real64 > & lightDelaySeq,
+		Array1D< Real64 > & feneSolarDelaySeq,
+		Array3D< Real64 > & feneCondInstantSeqLoc,
+		Array2D< Real64 > & surfDelaySeq
+	);
+
+	Real64
+	MovingAvgAtMaxTime(
 		Array1S< Real64 > const & dataSeq,
-		Real64 const & conversionMult,
 		int const & numTimeSteps,
 		int const & maxTimeStep
 	);
 
 	void
-	SetTableBodyCellToValue(
-		int const & columnNum,
-		int const & rowNum,
-		Real64 const & value
+	ComputeTableBodyUsingMovingAvg(
+		Array2D < Real64 > & resultCells,
+		Array2D_bool & resultCellsUsed,
+		int const & desDaySelected,
+		int const & timeOfMax,
+		int const & zoneIndex,
+		Array1D< Real64 > const & peopleDelaySeq,
+		Array1D< Real64 > const & equipDelaySeq,
+		Array1D< Real64 > const & hvacLossDelaySeq,
+		Array1D< Real64 > const & powerGenDelaySeq,
+		Array1D< Real64 > const & lightDelaySeq,
+		Array1D< Real64 > const & feneSolarDelaySeq,
+		Array3D< Real64 > const & feneCondInstantSeqLoc,
+		Array2D< Real64 > const & surfDelaySeq
 	);
+
+	void
+	ComputePeakConditions(
+		CompLoadTablesType & compLoad,
+		int const & desDaySelected,
+		int const & timeOfMax,
+		int const & zoneIndex,
+		bool const & isCooling
+	);
+
+	void
+	CombineLoadCompResults(
+		CompLoadTablesType & compLoadTotal,
+		CompLoadTablesType const & compLoadPartial,
+		Real64 const & multiplier
+	);
+
+	void
+	AddTotalRowsForLoadSummary(
+		CompLoadTablesType & compLoadTotal
+	);
+
+	void
+	LoadSummaryUnitConversion(
+		CompLoadTablesType & compLoadTotal
+    );
+
+	void
+	OutputCompLoadSummary(
+		int const & kind, // zone=1, airloop=2, facility=3
+		CompLoadTablesType const & compLoadCool,
+		CompLoadTablesType const & compLoadHeat,
+		int const & zoneOrAirLoopIndex
+	);
+
 
 	void
 	WriteReportHeaders(
