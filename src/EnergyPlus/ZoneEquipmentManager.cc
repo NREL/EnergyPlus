@@ -3001,7 +3001,6 @@ namespace ZoneEquipmentManager {
 		using CoolingPanelSimple::SimCoolingPanel;
 		using SplitterComponent::SimAirLoopSplitter;
 		using FanCoilUnits::SimFanCoilUnit;
-		using Fans::SimulateFanComponents;
 		using WindowAC::SimWindowAC;
 		using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
 		using ZoneDehumidifier::SimZoneDehumidifier;
@@ -3310,7 +3309,7 @@ namespace ZoneEquipmentManager {
 						TurnFansOff = true;
 					}
 
-					SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					Fans::SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;

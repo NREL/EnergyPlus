@@ -1964,6 +1964,8 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					*eiostream << "Ground" << "," << "N/A-Ground" << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == GroundFCfactorMethod ) {
 					*eiostream << "FCGround" << "," << "N/A-FCGround" << "," << IntConvCoeffCalc << ",";
+				} else if ( Surface( surf ).ExtBoundCond == KivaFoundation ) {
+					*eiostream << "Foundation" << "," << "N/A-Foundation" << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCoefNoCalcExt || Surface( surf ).ExtBoundCond == OtherSideCoefCalcExt ) {
 					*eiostream << OSC( Surface( surf ).OSCPtr).Name << "," << "N/A-OSC" << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCondModeledExt ) {

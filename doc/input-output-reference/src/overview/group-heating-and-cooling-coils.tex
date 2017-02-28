@@ -664,6 +664,8 @@ This alpha field defines the source of superheated refrigerant gas from which th
 \item
   Coil:Cooling:DX:TwoStageWithHumidityControlMode
 \item
+  Coil:Cooling:DX:VariableSpeed
+\item
   Refrigeration:CompressorRack
 \item
   Refrigeration:Condenser:AirCooled
@@ -673,7 +675,7 @@ This alpha field defines the source of superheated refrigerant gas from which th
   Refrigeration:Condenser:WaterCooled
 \end{itemize}
 
-When the heating coil source is a DX Coil, the air loop s supply air fan control mode may be auto fan (cycling fan cycling coil), constant fan, or variable volume. When the heating source is a compressor rack for refrigerated cases or a refrigeration condenser, the supply air fan control mode should be either variable volume or constant fan.
+When the heating coil source is a DX Coil, the air loop's supply air fan control mode may be auto fan (cycling fan cycling coil), constant fan, or variable volume. When the heating source is a compressor rack for refrigerated cases or a refrigeration condenser, the supply air fan control mode should be either variable volume or constant fan.
 
 NOTE: Use of the desuperheater heating coil in variable air volume systems should be done with caution since the model assumption of a fixed heat reclaim recovery efficiency may not be valid if the air flow rate over the coil varies significantly.
 
@@ -4585,7 +4587,7 @@ The output variable is the total electric energy usage of the coil for crankcase
 
 A simplified approach is used to determine the performance of this water heating coil. The model assumes that the heating energy provided by this coil is reclaimed from the superheated refrigerant gas leaving a compressor (i.e., a desuperheating refrigerant-to-water heating coil) and does not impact the performance of the compressor. This coil must be used with a water heater tank (e.g., WaterHeater:Mixed) which can supply heated potable water and/or hot water for use in a plant loop (e.g., hydronic air reheat coils).
 
-Except for detailed refrigeration system models, the amount of available superheat is simply a percentage of the total heat being rejected by the DX system s condenser. Approximately 25-30\% of the energy rejected by typical refrigeration system condensers is to reduce the superheated refrigerant vapor temperature to the condensing temperature. Recovery efficiencies higher than 30\% may cause the refrigerant gas to condense which in turn impacts the performance of the refrigeration system. For this reason, the maximum heat reclaim recovery efficiency for this coil is 30\% for most sources of waste heat, including refrigeration compressor racks. The one exception to this 30\% limit is a condenser that is part of a detailed refrigeration system. In a detailed refrigeration system, the portion of the rejected heat that lies within the superheated region is explicitly calculated. Therefore, the desuperheater coils supplied by a condenser attached to a detailed refrigeration system are subject to a maximum reclaim recovery efficiency of 90\% of the heat within the superheated region.
+Except for detailed refrigeration system models, the amount of available superheat is simply a percentage of the total heat being rejected by the DX system's condenser. Approximately 25-30\% of the energy rejected by typical refrigeration system condensers is to reduce the superheated refrigerant vapor temperature to the condensing temperature. Recovery efficiencies higher than 30\% may cause the refrigerant gas to condense which in turn impacts the performance of the refrigeration system. For this reason, the maximum heat reclaim recovery efficiency for this coil is 30\% for most sources of waste heat, including refrigeration compressor racks. The one exception to this 30\% limit is a condenser that is part of a detailed refrigeration system. In a detailed refrigeration system, the portion of the rejected heat that lies within the superheated region is explicitly calculated. Therefore, the desuperheater coils supplied by a condenser attached to a detailed refrigeration system are subject to a maximum reclaim recovery efficiency of 90\% of the heat within the superheated region.
 
 The model includes the ability to modify the heat reclaim recovery efficiency based on variations in inlet water temperature and outdoor air dry-bulb temperature.
 
@@ -4669,6 +4671,8 @@ This alpha (choice) field defines the source of superheated refrigerant gas from
   Coil:Cooling:DX:TwoSpeed
 \item
   Coil:Cooling:DX:TwoStageWithHumidityControlMode
+\item
+  Coil:Cooling:DX:VariableSpeed
 \item
   Refrigeration:CompressorRack
 \item
@@ -4836,6 +4840,8 @@ This alpha field specifies the type of DX cooling coil. The valid choices for th
   Coil:Cooling:DX:TwoStageWithHumidityControlMode
 \item
   Coil:Cooling:DX:VariableSpeed
+\item
+  Coil:Cooling:DX:SingleSpeed:ThermalStorage
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-000}
@@ -5045,7 +5051,7 @@ To model a heat exchanger-assisted DX cooling coil, the input data file should i
 \item
   Air-to-air heat exchanger object (HeatExchanger:AirToAir:FlatPlate, HeatExchanger:AirToAir:SensibleAndLatent, or HeatExchanger:Desiccant:BalancedFlow)
 \item
-  DX cooling coil object (Coil:Cooling:DX:SingleSpeed)
+  DX cooling coil object (Coil:Cooling:DX:SingleSpeed or Coil:Cooling:DX:VariableSpeed)
 \end{itemize}
 
 In terms of controlling the operation of the heat exchanger, the heat exchanger is assumed to always provide its heat transfer when the associated DX cooling coil is operating and no high humidity control mechanism is specified. However, the heat exchanger s energy transfer may be controlled (i.e., turned on and off) based on a zone air humidity level using either a humidistat (ref. AirLoopHVAC:Unitary:Furnace:HeatCool or AirLoopHVAC:UnitaryHeatCool) or a humidistat and a maximum humidity set point manager to place a humidity ratio set point on the appropriate control node (ref. CoilSystem:Cooling:DX). This model may also be used with the unitary changeover bypass system and the unitary air-to-air heat pump system (ref. AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass and AirLoopHVAC:UnitaryHeatPump:AirToAir); however, the heat exchanger is assumed to always provide its heat transfer when the cooling coil operates and cannot be turned on and off based on a zone air humidity set point. Two zone air conditioners may also use this model for improved dehumidification. The first type is the packaged terminal heat pump (ref. ZoneHVAC:PackagedTerminalHeatPump) where the heat exchanger s heat transfer is always active whenever the cooling coil operates. The second type is the window air conditioner (ref. ZoneHVAC:WindowAirConditioner) where the heat exchanger s heat transfer is always active when the cooling coil operates and no high humidity control mechanism is specified, OR the heat exchanger s heat transfer may be controlled based on zone air humidity level if a humidistat and high humidity set point manager are specified (maximum humidity ratio set point placed on the heat exchanger s exhaust air outlet node, ref. Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx}).
@@ -5085,7 +5091,7 @@ This alpha field denotes the name of the air-to-air heat exchanger being modeled
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-1}
 
-This alpha field denotes the type of DX cooling coil being modeled. The only valid choice is Coil:Cooling:DX:SingleSpeed.
+This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are Coil:Cooling:DX:SingleSpeed or Coil:Cooling:DX:VariableSpeed.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-1}
 

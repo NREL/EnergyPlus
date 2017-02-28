@@ -286,6 +286,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
 	extern int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
 	extern int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
+	extern int const IntGainTypeOf_FanSystemModel;
 
 	//Parameters for checking surface heat transfer models
 	extern Real64 const HighDiffusivityThreshold; // used to check if Material properties are out of line.
@@ -3376,6 +3377,7 @@ namespace DataHeatBalance {
 	extern Array1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;
 	extern Array1D< HeatReclaimRefrigCondenserData > HeatReclaimRefrigCondenser;
 	extern Array1D< HeatReclaimDXCoilData > HeatReclaimDXCoil;
+	extern Array1D< HeatReclaimDXCoilData > HeatReclaimVS_DXCoil;
 	extern Array1D< AirReportVars > ZnAirRpt;
 	extern Array1D< TCGlazingsType > TCGlazings;
 	extern Array1D< ZoneEquipData > ZoneCO2Gen;
