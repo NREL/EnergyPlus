@@ -72,6 +72,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 
 
 using namespace EnergyPlus;
@@ -1462,3 +1463,115 @@ TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
 
 }
 
+TEST_F( LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode )
+{
+	// # ZoneHVAC:LowTemperatureRadiant:VariableFlow array bounds error #5905
+
+	Real64 Load;
+
+	RadSysNum = 1;
+	LowTempRadiantSystem::clear_state( );
+	SystemType = ConstantFlowSystem;
+	NumOfCFloLowTempRadSys = 1;
+	CFloRadSys.allocate( NumOfCFloLowTempRadSys );
+	Schedule.allocate( 3 );
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	Schedule( 1 ).CurrentValue = 1;
+	Schedule( 2 ).CurrentValue = 22.0;
+	Schedule( 3 ).CurrentValue = 25.0;
+	DataHeatBalFanSys::MAT( 1 ) = 21.0;
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
+	TotalNumOfRadSystems = 0;
+	CFloRadSys( RadSysNum ).ZonePtr = 1;
+	CFloRadSys( RadSysNum ).SchedPtr = 1;
+	CFloRadSys( RadSysNum ).ControlType = 1;
+	CFloRadSys( RadSysNum ).HotCtrlHiTempSchedPtr = 2;
+	CFloRadSys( RadSysNum ).ColdCtrlLoTempSchedPtr = 3;
+
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	CFloRadSys( RadSysNum ).VolFlowSchedPtr = 0;
+	CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	CFloRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = 2.0;
+	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
+	CFloRadSys( RadSysNum ).CWLoopNum = 0;
+	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = 1.0;
+	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
+	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
+	CFloRadSys( RadSysNum ).MotorEffic = 1.2;
+
+	// heating
+	CFloRadSys( RadSysNum ).CoolingSystem = true;
+	CFloRadSys( RadSysNum ).HeatingSystem = false;
+	Load = 1000.0;
+	CalcLowTempCFloRadiantSystem( RadSysNum, Load );
+	EXPECT_EQ( NotOperating, OperatingMode );
+
+	// Cooling
+	CFloRadSys( RadSysNum ).CoolingSystem = false;
+	CFloRadSys( RadSysNum ).HeatingSystem = true;
+	DataHeatBalFanSys::MAT( 1 ) = 26.0;
+	CalcLowTempCFloRadiantSystem( RadSysNum, Load );
+	EXPECT_EQ( NotOperating, OperatingMode );
+
+	CFloRadSys.deallocate( );
+	Schedule.deallocate( );
+	DataHeatBalFanSys::MAT.deallocate( );
+
+}
+
+TEST_F( LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode )
+{
+	// # ZoneHVAC:LowTemperatureRadiant:VariableFlow array bounds error #5905
+
+	Real64 Load;
+
+	RadSysNum = 1;
+	LowTempRadiantSystem::clear_state( );
+
+	//	SystemType = ConstantFlowSystem;
+	NumOfHydrLowTempRadSys = 1;
+	HydrRadSys.allocate( NumOfHydrLowTempRadSys );
+	Schedule.allocate( 3 );
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	Schedule( 1 ).CurrentValue = 1;
+	Schedule( 2 ).CurrentValue = 22.0;
+	Schedule( 3 ).CurrentValue = 25.0;
+	DataHeatBalFanSys::MAT( 1 ) = 21.0;
+	HydrRadSys( RadSysNum ).NumOfSurfaces = 0;
+	TotalNumOfRadSystems = 0;
+	HydrRadSys( RadSysNum ).ZonePtr = 1;
+	HydrRadSys( RadSysNum ).SchedPtr = 1;
+	HydrRadSys( RadSysNum ).ControlType = 1;
+	HydrRadSys( RadSysNum ).HotSetptSchedPtr = 2;
+	HydrRadSys( RadSysNum ).ColdSetptSchedPtr = 3;
+
+	HydrRadSys( RadSysNum ).HotWaterInNode = 0;
+	HydrRadSys( RadSysNum ).ColdWaterInNode = 0;
+	HydrRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	HydrRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	HydrRadSys( RadSysNum ).CWLoopNum = 0;
+	HydrRadSys( RadSysNum ).HWLoopNum = 0;
+
+	// heating
+	OperatingMode = 0;
+	HydrRadSys( RadSysNum ).CoolingSystem = true;
+	HydrRadSys( RadSysNum ).HeatingSystem = false;
+	Load = 1000.0;
+	CalcLowTempHydrRadiantSystem( RadSysNum, Load );
+	EXPECT_EQ( 0, LowTempRadiantSystem::OperatingMode );
+
+	// Cooling
+	HydrRadSys( RadSysNum ).CoolingSystem = false;
+	HydrRadSys( RadSysNum ).HeatingSystem = true;
+	DataHeatBalFanSys::MAT( 1 ) = 26.0;
+	CalcLowTempHydrRadiantSystem( RadSysNum, Load );
+	EXPECT_EQ( NotOperating, OperatingMode );
+
+	HydrRadSys.deallocate( );
+	Schedule.deallocate( );
+	DataHeatBalFanSys::MAT.deallocate( );
+
+}
