@@ -72,8 +72,7 @@ enum AirTerminalUnitType {
 	singleDuctConstVolCooledBeam,
 	dualDuctVAVOutdoorAir,
 	singleDuctUserDefined,
-	singleDuctInletATMixer,
-	singleDuctSupplyATMixer,
+	singleDuctATMixer,
 	singleDuctConstVolFourPipeBeam
 };
 

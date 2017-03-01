@@ -85,8 +85,7 @@ namespace DataDefineEquip {
 	extern int const SingleDuctConstVolCooledBeam;
 	extern int const DualDuctVAVOutdoorAir;
 	extern int const SingleDuctUserDefined;
-	extern int const SingleDuctInletATMixer;
-	extern int const SingleDuctSupplyATMixer;
+	extern int const SingleDuctATMixer;
 	extern int const SingleDuctConstVolFourPipeBeam;
 
 	// DERIVED TYPE DEFINITIONS

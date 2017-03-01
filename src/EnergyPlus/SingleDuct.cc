@@ -86,6 +86,7 @@
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
+#include <ZoneAirLoopEquipmentManager.hh>
 
 namespace EnergyPlus {
 
@@ -640,6 +641,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
 					Sys( SysNum ).ADUNum = ADUNum;
+					break;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -855,6 +857,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
 					Sys( SysNum ).ADUNum = ADUNum;
+					break;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -1027,6 +1030,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
 					Sys( SysNum ).ADUNum = ADUNum;
+					break;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -1177,6 +1181,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
 					Sys( SysNum ).ADUNum = ADUNum;
+					break;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -1290,6 +1295,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
 					Sys( SysNum ).ADUNum = ADUNum;
+					break;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -1527,6 +1533,7 @@ namespace SingleDuct {
 				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
 					Sys( SysNum ).ADUNum = ADUNum;
+					break;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -4753,6 +4760,8 @@ namespace SingleDuct {
 		using DataGlobals::NumOfZones;
 		using DataHVACGlobals::ATMixer_InletSide;
 		using DataHVACGlobals::ATMixer_SupplySide;
+		using DataDefineEquip::AirDistUnit;
+		using DataDefineEquip::NumAirDistUnits;
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4781,6 +4790,9 @@ namespace SingleDuct {
 		cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
 		NumATMixers = GetNumObjectsFound( cCurrentModuleObject );
 		SysATMixer.allocate( NumATMixers );
+
+		// Need air disribution units to be gotten first
+		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 
 		for ( ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum ) {
 			GetObjectItem( cCurrentModuleObject, ATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -4835,6 +4847,20 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 
+			for ( int ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+				if ( SysATMixer( ATMixerNum ).MixedAirOutNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = SysATMixer( ATMixerNum ).PriInNode;
+					SysATMixer( ATMixerNum ).ADUNum = ADUNum;
+					break;
+				}
+			}
+			// one assumes if there isn't one assigned, it's an error?
+			if ( SysATMixer( ATMixerNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + cCurrentModuleObject + ',' + SysATMixer( ATMixerNum ).Name + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( SysATMixer( ATMixerNum ).MixedAirOutNode ) );
+				//          ErrorsFound=.TRUE.
+			}
+
 			if ( SysATMixer( ATMixerNum ).MixerType == ATMixer_InletSide ) {
 				// Air Terminal inlet node must be the same as a zone exhaust node
 				ZoneNodeNotFound = true;
@@ -4849,6 +4875,8 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
+									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
 								}
 							}
 							goto ControlledZoneLoop_exit;
@@ -4877,6 +4905,8 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
+									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
 								}
 							}
 							goto ControlZoneLoop_exit;
@@ -5085,183 +5115,6 @@ namespace SingleDuct {
 	}
 
 	void
-	GetATMixerPriNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerPriNode
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   April 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine gets the zone air inlet node for a given ATMixer
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ATMixerIndex; // local air terminal mixer index
-
-		bool ErrorsFound; // for error trapping
-
-		if ( GetATMixerFlag ) {
-			GetATMixers();
-			GetATMixerFlag = false;
-		}
-
-		ATMixerIndex = FindItemInList( ZoneEquipName, SysATMixer );
-		if ( ATMixerIndex > 0 ) {
-			ATMixerPriNode = SysATMixer( ATMixerIndex ).PriInNode;
-		}
-
-		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerPriNode: Air Terminal Mixer zone air inlet node not found for zone equipment=" + ZoneEquipName );
-			ErrorsFound = true;
-		}
-
-	}
-
-	void
-	GetATMixerSecNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerSecNode
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   April 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine gets the zone air inlet node for a given ATMixer
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ATMixerIndex; // local air terminal mixer index
-
-		bool ErrorsFound; // for error trapping
-
-		if ( GetATMixerFlag ) {
-			GetATMixers();
-			GetATMixerFlag = false;
-		}
-
-		ATMixerIndex = FindItemInList( ZoneEquipName, SysATMixer );
-		if ( ATMixerIndex > 0 ) {
-			ATMixerSecNode = SysATMixer( ATMixerIndex ).SecInNode;
-		}
-
-		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerSecNode: Air Terminal Mixer zone air inlet node not found for zone equipment=" + ZoneEquipName );
-			ErrorsFound = true;
-		}
-
-	}
-
-	void
-	GetATMixerOutNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerOutNode
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   April 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine gets the mixed air outlet node for a given ATMixer
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ATMixerIndex; // local air terminal mixer index
-
-		bool ErrorsFound; // for error trapping
-
-		if ( GetATMixerFlag ) {
-			GetATMixers();
-			GetATMixerFlag = false;
-		}
-
-		ATMixerIndex = FindItemInList( ZoneEquipName, SysATMixer );
-		if ( ATMixerIndex > 0 ) {
-			ATMixerOutNode = SysATMixer( ATMixerIndex ).MixedAirOutNode;
-		}
-
-		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerOutNode: Air Terminal Mixer outlet node not found for zone equipment=" + ZoneEquipName );
-			ErrorsFound = true;
-		}
-
-	}
-
-	void
 	GetATMixer(
 		std::string const & ZoneEquipName, // zone unit name name
 		std::string & ATMixerName, // air terminal mixer name
@@ -5397,57 +5250,6 @@ namespace SingleDuct {
 
 	}
 
-	void
-	GetATMixerTypeNum(
-		std::string const & ZoneEquipName,
-		int & ATMixerTypeNum
-		) {
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine gets the mixer connection type
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ATMixerIndex; // local air terminal mixer index
-
-		bool ErrorsFound; // for error trapping
-
-		if ( GetATMixerFlag ) {
-			GetATMixers();
-			GetATMixerFlag = false;
-		}
-
-		ATMixerIndex = FindItemInList( ZoneEquipName, SysATMixer );
-		if ( ATMixerIndex > 0 ) {
-			ATMixerTypeNum = SysATMixer( ATMixerIndex ).MixerType;
-		}
-
-		if ( ATMixerIndex == 0 ) {
-			ShowSevereError( "GetATMixerOutNode: Air Terminal Mixer outlet node not found for zone equipment=" + ZoneEquipName );
-			ErrorsFound = true;
-		}
-
-	}
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
 

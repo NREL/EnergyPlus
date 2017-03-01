@@ -265,10 +265,6 @@ namespace ZoneAirLoopEquipmentManager {
 		using BranchNodeConnections::SetUpCompSets;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DualDuct::GetDualDuctOutdoorAirRecircUse;
-		using SingleDuct::GetATMixerPriNode;
-		using SingleDuct::GetATMixerTypeNum;
-		using DataHVACGlobals::ATMixer_InletSide;
-		using DataHVACGlobals::ATMixer_SupplySide;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -472,11 +468,7 @@ namespace ZoneAirLoopEquipmentManager {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctUserDefined;
 				}
 				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {					
-					GetATMixerTypeNum( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerTypeNum );
-					if ( ATMixerTypeNum == ATMixer_InletSide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctInletATMixer;
-					if ( ATMixerTypeNum == ATMixer_SupplySide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctSupplyATMixer;
-					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
-					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
+					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctATMixer;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
 						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
@@ -746,10 +738,7 @@ namespace ZoneAirLoopEquipmentManager {
 			} else if ( SELECT_CASE_var == SingleDuctUserDefined ) {
 				SimAirTerminalUserDefined( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ) );
 
-			} else if ( SELECT_CASE_var == SingleDuctInletATMixer ) {
-				ProvideSysOutput = false;
-
-			} else if ( SELECT_CASE_var == SingleDuctSupplyATMixer ) {
+			} else if ( SELECT_CASE_var == SingleDuctATMixer ) {
 				ProvideSysOutput = false;
 
 			} else {

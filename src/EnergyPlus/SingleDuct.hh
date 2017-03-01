@@ -295,6 +295,8 @@ namespace SingleDuct {
 		Real64 MixedAirPressure; // mixed air in pressure
 		Real64 MixedAirMassFlowRate; // mixed air in mass flow rate
 		Real64 MaxAirMassFlowRate; // maximum air mass flow rate allowed through component
+		int ADUNum; // index of Air Distribution Unit
+		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 
 		// Default Constructor
 		AirTerminalMixerData() :
@@ -318,7 +320,9 @@ namespace SingleDuct {
 			MixedAirEnthalpy( 0.0 ),
 			MixedAirPressure( 0.0 ),
 			MixedAirMassFlowRate( 0.0 ),
-			MaxAirMassFlowRate( 0.0 )
+			MaxAirMassFlowRate( 0.0 ),
+			ADUNum( 0 ),
+			TermUnitSizingIndex( 0 )
 		{}
 
 	};
@@ -521,24 +525,6 @@ namespace SingleDuct {
 	UpdateATMixer( int const SysNum );
 
 	void
-	GetATMixerPriNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerPriNode
-	);
-
-	void
-	GetATMixerSecNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerSecNode
-	);
-
-	void
-	GetATMixerOutNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerOutNode
-	);
-
-	void
 	GetATMixer(
 		std::string const & ZoneEquipName, // zone unit name name
 		std::string & ATMixerName, // air terminal mixer name
@@ -555,11 +541,6 @@ namespace SingleDuct {
 		Optional< Real64 const > PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
 	);
 
-	void
-	GetATMixerTypeNum(
-		std::string const & ZoneEquipName,
-		int & ATMixerTypeNum
-	);
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
 
