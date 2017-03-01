@@ -71,6 +71,7 @@ set( test_src
   HVACFourPipeBeam.unit.cc
   HVACManager.unit.cc
   HVACInterfaceManager.unit.cc
+  HVACHXAssistedCoolingCoil.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
@@ -141,6 +142,7 @@ set( test_src
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WindowAC.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

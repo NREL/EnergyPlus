@@ -104,6 +104,7 @@ namespace DataSurfaces {
 	extern int const OtherSideCoefNoCalcExt;
 	extern int const OtherSideCoefCalcExt;
 	extern int const OtherSideCondModeledExt;
+	extern int const KivaFoundation;
 	extern int const GroundFCfactorMethod;
 
 	extern Array1D_string const cExtBoundCondition;
@@ -162,6 +163,7 @@ namespace DataSurfaces {
 	extern int const HeatTransferModel_Window5; // original detailed layer-by-layer based on window 4 and window 5
 	extern int const HeatTransferModel_ComplexFenestration; // BSDF
 	extern int const HeatTransferModel_TDD; // tubular daylighting device
+	extern int const HeatTransferModel_Kiva; // Kiva ground calculations
 
 	// Parameters for classification of outside face of surfaces
 	extern int const OutConvClass_WindwardVertWall;

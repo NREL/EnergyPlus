@@ -9464,6 +9464,7 @@ namespace OutputReportTabular {
 		using DataSurfaces::Ground;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using DataSurfaces::GroundFCfactorMethod;
+		using DataSurfaces::KivaFoundation;
 		using ScheduleManager::ScheduleAverageHoursPerWeek;
 		using ScheduleManager::GetScheduleName;
 		using ExteriorEnergyUse::ExteriorLights;
@@ -9739,7 +9740,7 @@ namespace OutputReportTabular {
 				//only exterior surfaces including underground
 				if ( ! Surface( iSurf ).HeatTransSurf ) continue;
 				isAboveGround = ( Surface( iSurf ).ExtBoundCond == ExternalEnvironment ) || ( Surface( iSurf ).ExtBoundCond == OtherSideCondModeledExt );
-				if ( isAboveGround || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) ) {
+				if ( isAboveGround || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) || ( Surface( iSurf ).ExtBoundCond == KivaFoundation ) ) {
 					curAzimuth = Surface( iSurf ).Azimuth;
 					curArea = Surface( iSurf ).GrossArea;
 					if ( Surface( iSurf ).FrameDivider != 0 ) {
