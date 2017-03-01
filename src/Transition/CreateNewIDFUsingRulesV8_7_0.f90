@@ -367,7 +367,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('COIL:COOLING:DX:MULTISPEED', 'COIL:HEATING:DX:MULTISPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs=InArgs
                  IF (SameString(InArgs(16), '')) THEN
                    OutArgs(16) = 'NaturalGas'
                  ELSEIF (SameString(InArgs(16), 'PropaneGas')) THEN
@@ -390,8 +389,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:20)=InArgs(1:20)  ! No change
                  OutArgs(21:24)=''           ! Added 4 New Input Fields, Set
                  OutArgs(25:CurArgs+4)=InArgs(21:CurArgs)  !
-                 CurArgs = CurArgs + 4
-
              CASE('COOLINGTOWER:VARIABLESPEED:MERKEL')
                  ObjectName='CoolingTower:VariableSpeed:Merkel'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -427,7 +424,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(35) = 'MutuallyExclusive'
                  END IF
 
-              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT')
+             CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT')
                   ObjectName='AirflowNetwork:Distribution:Component:Duct'
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
