@@ -637,15 +637,15 @@ namespace SingleDuct {
 			TestCompSet( Sys( SysNum ).SysType, Sys( SysNum ).SysName, NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ), "Air Nodes" );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-				if ( Sys( SysIndex ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysIndex ).InletNodeNum;
-					Sys( SysIndex ).ADUNum = ADUNum;
+				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
+					Sys( SysNum ).ADUNum = ADUNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
-			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
-				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
+			if ( Sys( SysNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysNum ).SysType + ',' + Sys( SysNum ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 
@@ -663,7 +663,7 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
+							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 
 						Sys( SysNum ).CtrlZoneNum = CtrlZone;
@@ -852,15 +852,15 @@ namespace SingleDuct {
 			TestCompSet( Sys( SysNum ).SysType, Sys( SysNum ).SysName, NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ), "Air Nodes" );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-				if ( Sys( SysIndex ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysIndex ).InletNodeNum;
-					Sys( SysIndex ).ADUNum = ADUNum;
+				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
+					Sys( SysNum ).ADUNum = ADUNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
-			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
-				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
+			if ( Sys( SysNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysNum ).SysType + ',' + Sys( SysNum ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 
@@ -878,7 +878,7 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
+							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -1024,15 +1024,15 @@ namespace SingleDuct {
 			TestCompSet( Sys( SysNum ).SysType, Sys( SysNum ).SysName, NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ), "Air Nodes" );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-				if ( Sys( SysIndex ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysIndex ).InletNodeNum;
-					Sys( SysIndex ).ADUNum = ADUNum;
+				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
+					Sys( SysNum ).ADUNum = ADUNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
-			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
-				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
+			if ( Sys( SysNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysNum ).SysType + ',' + Sys( SysNum ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 
@@ -1050,7 +1050,7 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).OutletNodeNum;
-							if ( Sys( SysIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
+							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -1174,15 +1174,15 @@ namespace SingleDuct {
 			TestCompSet( Sys( SysNum ).SysType, Sys( SysNum ).SysName, NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ), "Air Nodes" );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-				if ( Sys( SysIndex ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysIndex ).InletNodeNum;
-					Sys( SysIndex ).ADUNum = ADUNum;
+				if ( Sys( SysNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
+					Sys( SysNum ).ADUNum = ADUNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
-			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
-				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
+			if ( Sys( SysNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysNum ).SysType + ',' + Sys( SysNum ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 
@@ -1200,7 +1200,7 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
+							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 
 						Sys( SysNum ).CtrlZoneNum = CtrlZone;
@@ -1287,15 +1287,15 @@ namespace SingleDuct {
 			TestCompSet( Sys( SysNum ).SysType, Sys( SysNum ).SysName, NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ), "Air Nodes" );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-				if ( Sys( SysIndex ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysIndex ).InletNodeNum;
-					Sys( SysIndex ).ADUNum = ADUNum;
+				if ( Sys( SysNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
+					Sys( SysNum ).ADUNum = ADUNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
-			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
-				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
+			if ( Sys( SysNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysNum ).SysType + ',' + Sys( SysNum ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 
@@ -1313,7 +1313,7 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
+							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -1524,15 +1524,15 @@ namespace SingleDuct {
 			TestCompSet( Sys( SysNum ).SysType, Sys( SysNum ).SysName, NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ), "Air Nodes" );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-				if ( Sys( SysIndex ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysIndex ).InletNodeNum;
-					Sys( SysIndex ).ADUNum = ADUNum;
+				if ( Sys( SysNum ).ReheatAirOutletNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					AirDistUnit( ADUNum ).InletNodeNum = Sys( SysNum ).InletNodeNum;
+					Sys( SysNum ).ADUNum = ADUNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
-			if ( Sys( SysIndex ).ADUNum == 0 ) {
-				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysIndex ).SysType + ',' + Sys( SysIndex ).SysName + "]." );
-				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysIndex ).ReheatAirOutletNode ) );
+			if ( Sys( SysNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for System = [" + Sys( SysNum ).SysType + ',' + Sys( SysNum ).SysName + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 				//          ErrorsFound=.TRUE.
 			}
 
@@ -1553,7 +1553,7 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
+							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
