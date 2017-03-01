@@ -246,6 +246,29 @@ namespace EnergyPlus {
 			}
 		}
 
+		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
+		void
+		AnnualTable::checkAggregationOrder( )
+		{
+			std::vector<AnnualFieldSet>::iterator fldStIt;
+			for ( fldStIt = m_annualFields.begin( ); fldStIt != m_annualFields.end( ); ++fldStIt ) {
+				switch ( fldStIt->m_aggregate ) {
+				case AnnualFieldSet::AggregationKind::sumOrAvg:
+					break;
+				case AnnualFieldSet::AggregationKind::maximum:
+					break;
+				case AnnualFieldSet::AggregationKind::minimum:
+					break;
+				case AnnualFieldSet::AggregationKind::hoursNonZero:
+					break;
+				case AnnualFieldSet::AggregationKind::hoursZero:
+					break;
+				case AnnualFieldSet::AggregationKind::hoursPositive:
+					break;
+				}
+			}
+		}
+
 
 		void
 		GatherAnnualResultsForTimeStep( int kindOfTimeStep )

@@ -128,6 +128,9 @@ public:
 	addFieldSet( std::string, std::string, AnnualFieldSet::AggregationKind, int );
 
 	void
+	checkAggregationOrder();
+
+	void
 	setupGathering();
 
 	void
