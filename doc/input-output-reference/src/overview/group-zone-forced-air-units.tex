@@ -580,6 +580,8 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -587,13 +589,15 @@ This field specifies the type of supply air fan object used by this fan coil. Th
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.6 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-000}
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for \emph{ConstantFanVariableFlow~} a \emph{Fan:OnOff} or \emph{Fan:ConstantVolume} should be used. For \emph{CyclingFan}, a \emph{Fan:OnOff} should be used. For \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow} a \emph{Fan:VariableVolume} should be chosen. For \emph{MultiSpeedFan} a \emph{Fan:OnOff} should be used. And for \emph{ASHRAE90VariableFan}, a \emph{Fan:OnOff} or \emph{Fan:VariableVolume} should be chosen.
+The name of a fan component that composes part of the fan coil unit. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for \emph{ConstantFanVariableFlow~} a \emph{Fan:SystemModel}, \emph{Fan:OnOff}, or \emph{Fan:ConstantVolume} should be used. For \emph{CyclingFan}, a \emph{Fan:OnOff} or \emph{Fan:SystemModel} should be used. For \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow} a \emph{Fan:SystemModel} or \emph{Fan:VariableVolume} should be chosen. For \emph{MultiSpeedFan} a \emph{Fan:SystemModel} or \emph{Fan:OnOff} should be used. And for \emph{ASHRAE90VariableFan}, a \emph{Fan:SystemModel}, \emph{Fan:OnOff}, or \emph{Fan:VariableVolume} should be chosen.
 
 \begin{lstlisting}
-The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
-The fan’s outlet node should be the same as the cooling coil’s air inlet node.
+The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
+The fan's outlet node should be the same as the cooling coil's air inlet node.
 \end{lstlisting}
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-003}
@@ -988,6 +992,8 @@ This field specifies the type of supply air fan used by this unit ventilator. Th
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -995,9 +1001,11 @@ This field specifies the type of supply air fan used by this unit ventilator. Th
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-1-000}
 
-This field is the name of a fan (ref: Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
 
 \paragraph{Field: Coil Option}\label{field-coil-option}
 
@@ -1253,6 +1261,8 @@ This field specifies the type of supply air fan used by this unit heater. The su
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -1260,9 +1270,11 @@ This field specifies the type of supply air fan used by this unit heater. The su
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-2-000}
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan:VariableVolume) that is part of the unit heater system. This name links the unit heater to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit heater system.
+This field is the name of a fan (ref: FanSystemModel, Fan:ConstantVolume, Fan:VariableVolume) that is part of the unit heater system. This name links the unit heater to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit heater system.
 
 \paragraph{Field: Maximum Supply Air Flow Rate}\label{field-maximum-supply-air-flow-rate-2}
 
@@ -1445,7 +1457,8 @@ This optional alpha input field defines the name of an HVAC system node which ca
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-3-000}
 
-This alpha input field defines the type of fan used by the zone evaporative cooler unit.~ There are four valid choices: Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:ComponentModel.~ However the type of fan must be consistent with the control method defined below and a variable speed fan is needed with ZoneCoolingLoadVariableSpeedFan.
+This alpha input field defines the type of fan used by the zone evaporative cooler unit.  There are five valid choices: Fan:SystemModel, Fan:ComponentModel, Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume.  (Note that Fan:ConstantVolume, Fan:OnOff, and Fan:VariableVolume may be deprecated in a future version and as of version 8.7 these are being replaced by Fan:SystemModel.) 
+However the type of fan must be consistent with the control method defined below and a variable speed fan is needed with ZoneCoolingLoadVariableSpeedFan.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-3-000}
 
@@ -1505,23 +1518,23 @@ An example input object follows.
 \begin{lstlisting}
 
 ZoneHVAC:EvaporativeCoolerUnit,
-     Zone Evap Unit, !- Name
+     Zone Evap Unit,                !- Name
      System Availability Schedule , !- Availability Schedule Name
-     , !- Availability Manager List Name
-     Cooler Unit OA inlet , !- Outdoor Air Inlet Node Name
-     Main Zone Inlet Node, !- Cooler Outlet Node Name
-     Main Zone Relief Node , !- Zone Relief Air Node Name
-     Fan:ConstantVolume , !- Supply Air Fan Object Type
-     Supply Fan , !- Supply Air Fan Name
-     2.0, !- Design Supply Air Flow Rate
-     DrawThrough , !- Fan Placement
-     ZoneCoolingLoadOnOffCycling, !- Cooler Unit Control Method
-     1.1, !- Throttling Range Temperature Difference
-     100.0, !- Cooling Load Control Threshold Heat Transfer Rate
+     ,                              !- Availability Manager List Name
+     Cooler Unit OA inlet ,         !- Outdoor Air Inlet Node Name
+     Main Zone Inlet Node,          !- Cooler Outlet Node Name
+     Main Zone Relief Node ,        !- Zone Relief Air Node Name
+     Fan:SystemModel ,              !- Supply Air Fan Object Type
+     Supply Fan ,                   !- Supply Air Fan Name
+     2.0,                           !- Design Supply Air Flow Rate
+     DrawThrough ,                  !- Fan Placement
+     ZoneCoolingLoadOnOffCycling,   !- Cooler Unit Control Method
+     1.1,                           !- Throttling Range Temperature Difference
+     100.0,                         !- Cooling Load Control Threshold Heat Transfer Rate
      EvaporativeCooler:Direct:CelDekPad, !- First Evaporative Cooler Object Type
-     Evaporative Cooler, !- First Evaporative Cooler Object Name
-     , !- Second Evaporative Cooler Object Type
-     ; !- Second Evaporative Cooler Name
+     Evaporative Cooler,            !- First Evaporative Cooler Object Name
+     ,                              !- Second Evaporative Cooler Object Type
+     ;                              !- Second Evaporative Cooler Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-021}
@@ -1627,7 +1640,7 @@ This field contains a schedule name (ref: Schedule) that contains values for mod
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name-000}
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-1-001}
 
@@ -1644,7 +1657,7 @@ If the user does not select a fan placement type, \textbf{DrawThrough} is assume
 
 \paragraph{Field: Exhaust Fan Name}\label{field-exhaust-fan-name}
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
 
 \paragraph{Field: Exhaust Air Flow Rate}\label{field-exhaust-air-flow-rate}
 
@@ -1895,14 +1908,18 @@ This field specifies the type of supply air fan used by window air conditioner. 
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff and Fan:ConstantVolumemay be deprecated in a future version.
+
 \paragraph{Field:Supply Air Fan Name}\label{fieldsupply-air-fan-name}
 
-The name of a constant volume fan component that composes part of the window air conditioner. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the window air conditioner. A fan of type Fan:OnOff may be used with either cycling or continuous fan, and a fan of type Fan:ConstantVolume is used only with continuous fan (see Supply Air Fan Operating Mode Schedule field below). The fan's inlet node should be the same as the outdoor air mixer's mixed air node (for blow through) or the DX coil's outlet node (for draw through). The fan's outlet node should be the same as the DX coil's air inlet node (for blow through) or the window air conditioner's air outlet node (for draw through).
+The name of the fan component that composes part of the window air conditioner. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the window air conditioner. A fan of type Fan:SystemModel or Fan:OnOff may be used with either cycling or continuous fan, and a fan of type Fan:ConstantVolume is used only with continuous fan (see Supply Air Fan Operating Mode Schedule field below). The fan's inlet node should be the same as the outdoor air mixer's mixed air node (for blow through) or the DX coil's outlet node (for draw through). The fan's outlet node should be the same as the DX coil's air inlet node (for blow through) or the window air conditioner's air outlet node (for draw through).
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-2-001}
 
@@ -1911,6 +1928,8 @@ This field specifies the type of cooling coil to be modeled for this window air 
 \begin{itemize}
 \item
   Coil:Cooling:DX:SingleSpeed
+\item
+  Coil:Cooling:DX:VariableSpeed
 \item
   CoilSystem:Cooling:DX:HeatExchangerAssisted
 \end{itemize}
@@ -1951,7 +1970,7 @@ Following is an example input for the cycling window air conditioner, along with
 
 \begin{lstlisting}
 
-ZoneHVAC:WindowAirConditioner,
+  ZoneHVAC:WindowAirConditioner,
          Zone3WindAC,                  ! name of window AC unit
          FanAndCoilAvailSched,         ! Availability Schedule Name
          0.6,                          ! Maximum Supply Air Flow Rate {m3/s}
@@ -1960,14 +1979,13 @@ ZoneHVAC:WindowAirConditioner,
          Zone3WindACAirOutletNode,     ! Air Outlet Node Name
          OutdoorAir:Mixer,             ! Outdoor Air Mixer Object Type
          Zone3WindACOAMixer,           ! Outdoor Air Mixer Name
-         Fan:ConstantVolume,           ! Supply Air Fan Object Type
+         Fan:SystemModel,              ! Supply Air Fan Object Type
          Zone3WindACFan,               ! Fan Name
          Zone3WindACDXCoil,            ! DX Cooling Coil Name
          CyclingFanSch,                ! Supply Air Fan Operation Mode Schedule Name
          DrawThrough,                  ! Fan Placement
          0.001,                        ! Cooling Convergence Tolerance
          Coil:Cooling:DX:SingleSpeed;  ! Cooling Coil Object Type
-
 
   Schedule:Compact,
          CyclingFanSch,                !- Name
@@ -1977,7 +1995,6 @@ ZoneHVAC:WindowAirConditioner,
          Until: 24:00,                 !- Complex Field \#7
          0.0;                          !- Complex Field \#8
 
-
   OutdoorAir:Mixer,
          Zone3WindACOAMixer,           ! Name
          Zone3WindACOAMixerOutletNode, ! Mixed Air Node Name
@@ -1985,18 +2002,22 @@ ZoneHVAC:WindowAirConditioner,
          Zone3WindACExhNode,           ! Relief Air Stream Node Name
          Zone3WindACAirInletNode;      ! Return Air Stream Node Name
 
-
-  Fan:ConstantVolume,
-         Zone3WindACFan,               ! Name
-         FanAndCoilAvailSched,         ! Availability Schedule Name
-         0.5,                          ! Fan Total Efficiency
-         75.0,                         ! Pressure Rise {Pa}
-         0.6,                          ! Maximum Flow Rate {m3/s}
-         0.9,                          ! Motor Efficiency
-         1.0,                          ! Motor In Airstream Fraction
-         Zone3WindACDXOutletNode,      ! Air Inlet Node Name
-         Zone3WindACAirOutletNode;     ! Air Outlet Node Name
-
+  Fan:SystemModel,
+       Zone3WindACFan ,                !- Name
+       FanAndCoilAvailSched ,          !- Availability Schedule Name
+       Zone3WindACDXOutletNode,        !- Air Inlet Node Name
+       Zone3WindACAirOutletNode,       !- Air Outlet Node Name
+       0.6 ,                           !- Design Maximum Air Flow Rate
+       Discrete ,                      !- Speed Control Method
+       0.0,                            !- Electric Power Minimum Flow Rate Fraction
+       75.0,                           !- Design Pressure Rise
+       0.9 ,                           !- Motor Efficiency
+       1.0 ,                           !- Motor In Air Stream Fraction
+       AUTOSIZE,                       !- Design Electric Power Consumption
+       TotalEfficiencyAndPressure,     !- Design Power Sizing Method
+       ,                               !- Electric Power Per Unit Flow Rate
+       ,                               !- Electric Power Per Unit Flow Rate Per Unit Pressure
+       0.5;                            !- Fan Total Efficiency 
 
   Coil:Cooling:DX:SingleSpeed,
       Zone3WindACDXCoil,       !- Name
@@ -2157,7 +2178,7 @@ This numeric field defines the outdoor air flow rate through the air conditioner
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-5}
 
-This alpha field defines the type of fan used by this PTAC. The only valid choices are \textbf{Fan:OnOff} and \textbf{Fan:ConstantVolume}. A fan of type Fan:OnOff is used with cycling fan operating mode, and a fan of type Fan:ConstantVolume is used with continuous fan operating mode (see Supply Air Fan Operating Mode Schedule field below). The input requirements for these fan objects are described elsewhere in this document.
+This alpha field defines the type of fan used by this PTAC. The only valid choices are \textbf{Fan:SystemModel}, \textbf{Fan:OnOff}, and \textbf{Fan:ConstantVolume}. A fan of type Fan:SystemModel or Fan:OnOff is used with cycling fan operating mode, and a fan of type Fan:SystemModel or Fan:ConstantVolume is used with continuous fan operating mode (see Supply Air Fan Operating Mode Schedule field below). The input requirements for these fan objects are described elsewhere in this document. Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff and Fan:ConstantVolume may be deprecated in a future version.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-4}
 

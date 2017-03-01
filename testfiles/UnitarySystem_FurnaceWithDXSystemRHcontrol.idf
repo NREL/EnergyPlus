@@ -224,7 +224,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Jan4,                        !- Name
     1,                       !- Begin Month
     4,                       !- Begin Day of Month
     1,                       !- End Month
@@ -237,7 +237,7 @@
     No;                      !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Mar22,                        !- Name
     3,                       !- Begin Month
     22,                      !- Begin Day of Month
     3,                       !- End Month
@@ -250,7 +250,7 @@
     No;                      !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Jul7,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     7,                       !- End Month
@@ -1230,16 +1230,22 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
-  Fan:OnOff,
-    Supply Fan 1,            !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    600.0,                   !- Pressure Rise {Pa}
-    1.6,                     !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Mixed Air Node,          !- Air Inlet Node Name
-    DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Supply Fan 1, !- Name
+   FanAndCoilAvailSched , !- Availability Schedule Name
+  Mixed Air Node,  !- Air Inlet Node Name
+  DX Cooling Coil Air Inlet Node,  !- Air Outlet Node Name
+  1.6 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  600.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.7;  !- Fan Total Efficiency 
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
@@ -1314,7 +1320,7 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Fan Object Type
+    Fan:SystemModel,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
