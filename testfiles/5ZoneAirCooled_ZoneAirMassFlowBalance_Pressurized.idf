@@ -7,7 +7,7 @@
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Zone Air Mass Flow Conservation calculation with pressurized HVAC system. 
+! Highlights:              Zone Air Mass Flow Conservation calculation with pressurized HVAC system.
 !                          The interior (core) zone is connected to each of the
 !                          the four perimeter zones using ZoneMixing Objects.  Zone Mixing air flow from the perimeter zones
 !                          to the core zone is driven by an exhaust fan in the core zone. Additional infiltration is drawn in
@@ -124,8 +124,8 @@
   ZoneAirMassFlowConservation,
     Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
     AdjustInfiltrationFlow,  !- Infiltration Balancing Method
-    AllZones;                !- Infiltration Balancing Zones  
-    
+    AllZones;                !- Infiltration Balancing Zones
+
   SurfaceConvectionAlgorithm:Inside,Simple;
 
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
@@ -668,10 +668,7 @@
     For: AllDays,            !- Field 2
     Until: 24:00,0.0;        !- Field 3
 
-  Schedule:Constant,
-    Always-0.8,              !- Name
-    Fraction,                !- Schedule Type Limits Name
-    0.8;                     !- Hourly Value
+  Schedule:Constant,Always-0.8,Fraction,0.8;
 
   Zone,
     PLENUM-1,                !- Name
@@ -2007,17 +2004,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3184,16 +3181,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3447,16 +3444,16 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3542,11 +3539,20 @@
   Output:Variable,SPACE5-1 Exhaust Fan Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Infiltration Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,*,Zone Mixing Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Supply Mass Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Exhaust Mass Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Return Mass Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Mixing Receiving Mass Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Mixing Source Mass Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Infiltration Mass Flow Rate,hourly;
+
   Output:Variable,*,Zone Air Mass Balance Infiltration Status,hourly;
+

@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -670,62 +670,76 @@ static void dimension_initializer_function( Array1D_int & A )
 
 TEST( Array1Test, Dimension )
 {
-	Array1D_int A( 3 );
-	EXPECT_EQ( 1, A.l() );
-	EXPECT_EQ( 3, A.u() );
-	EXPECT_EQ( 3u, A.size() );
+	{
+		Array1D_int A;
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 0, A.u() );
+		EXPECT_EQ( 0u, A.size() );
 
-	A.dimension( { 3, 7 } );
-	EXPECT_EQ( 3, A.l() );
-	EXPECT_EQ( 7, A.u() );
-	EXPECT_EQ( 5u, A.size() );
+		A.dimension( 9 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 9, A.u() );
+		EXPECT_EQ( 9u, A.size() );
+	}
 
-	A.dimension( { 2, 4 }, 17 );
-	EXPECT_EQ( 2, A.l() );
-	EXPECT_EQ( 4, A.u() );
-	EXPECT_EQ( 3u, A.size() );
-	EXPECT_EQ( 17, A( 2 ) );
-	EXPECT_EQ( 17, A( 3 ) );
-	EXPECT_EQ( 17, A( 4 ) );
+	{
+		Array1D_int A( 3 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 3, A.u() );
+		EXPECT_EQ( 3u, A.size() );
 
-	A.dimension( { 1, 5 }, 42 );
-	EXPECT_EQ( 1, A.l() );
-	EXPECT_EQ( 5, A.u() );
-	EXPECT_EQ( 5u, A.size() );
-	EXPECT_EQ( 42, A( 1 ) );
-	EXPECT_EQ( 42, A( 2 ) );
-	EXPECT_EQ( 42, A( 3 ) );
-	EXPECT_EQ( 42, A( 4 ) );
-	EXPECT_EQ( 42, A( 5 ) );
+		A.dimension( { 3, 7 } );
+		EXPECT_EQ( 3, A.l() );
+		EXPECT_EQ( 7, A.u() );
+		EXPECT_EQ( 5u, A.size() );
 
-	A.dimension( { 4, 6 }, dimension_initializer_function );
-	EXPECT_EQ( 4, A.l() );
-	EXPECT_EQ( 6, A.u() );
-	EXPECT_EQ( 3u, A.size() );
-	EXPECT_EQ( 44, A( 4 ) );
-	EXPECT_EQ( 55, A( 5 ) );
-	EXPECT_EQ( 66, A( 6 ) );
+		A.dimension( { 2, 4 }, 17 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 3u, A.size() );
+		EXPECT_EQ( 17, A( 2 ) );
+		EXPECT_EQ( 17, A( 3 ) );
+		EXPECT_EQ( 17, A( 4 ) );
 
-	A.dimension( Array1D_int( { 3, 7 } ) );
-	EXPECT_EQ( 3, A.l() );
-	EXPECT_EQ( 7, A.u() );
-	EXPECT_EQ( 5u, A.size() );
+		A.dimension( { 1, 5 }, 42 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_EQ( 5u, A.size() );
+		EXPECT_EQ( 42, A( 1 ) );
+		EXPECT_EQ( 42, A( 2 ) );
+		EXPECT_EQ( 42, A( 3 ) );
+		EXPECT_EQ( 42, A( 4 ) );
+		EXPECT_EQ( 42, A( 5 ) );
 
-	A.dimension( Array1D_int( { 2, 4 } ), 17 );
-	EXPECT_EQ( 2, A.l() );
-	EXPECT_EQ( 4, A.u() );
-	EXPECT_EQ( 3u, A.size() );
-	EXPECT_EQ( 17, A( 2 ) );
-	EXPECT_EQ( 17, A( 3 ) );
-	EXPECT_EQ( 17, A( 4 ) );
+		A.dimension( { 4, 6 }, dimension_initializer_function );
+		EXPECT_EQ( 4, A.l() );
+		EXPECT_EQ( 6, A.u() );
+		EXPECT_EQ( 3u, A.size() );
+		EXPECT_EQ( 44, A( 4 ) );
+		EXPECT_EQ( 55, A( 5 ) );
+		EXPECT_EQ( 66, A( 6 ) );
 
-	A.dimension( Array1D_int( { 4, 6 } ), dimension_initializer_function );
-	EXPECT_EQ( 4, A.l() );
-	EXPECT_EQ( 6, A.u() );
-	EXPECT_EQ( 3u, A.size() );
-	EXPECT_EQ( 44, A( 4 ) );
-	EXPECT_EQ( 55, A( 5 ) );
-	EXPECT_EQ( 66, A( 6 ) );
+		A.dimension( Array1D_int( { 3, 7 } ) );
+		EXPECT_EQ( 3, A.l() );
+		EXPECT_EQ( 7, A.u() );
+		EXPECT_EQ( 5u, A.size() );
+
+		A.dimension( Array1D_int( { 2, 4 } ), 17 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 3u, A.size() );
+		EXPECT_EQ( 17, A( 2 ) );
+		EXPECT_EQ( 17, A( 3 ) );
+		EXPECT_EQ( 17, A( 4 ) );
+
+		A.dimension( Array1D_int( { 4, 6 } ), dimension_initializer_function );
+		EXPECT_EQ( 4, A.l() );
+		EXPECT_EQ( 6, A.u() );
+		EXPECT_EQ( 3u, A.size() );
+		EXPECT_EQ( 44, A( 4 ) );
+		EXPECT_EQ( 55, A( 5 ) );
+		EXPECT_EQ( 66, A( 6 ) );
+	}
 }
 
 TEST( Array1Test, Redimension )
@@ -1338,18 +1352,7 @@ TEST( Array1Test, Reserve )
 	EXPECT_EQ( 9, A( 9 ) );
 }
 
-TEST( Array1Test, Swap )
-{
-	Array1D_int A( 4, 11 );
-	Array1D_int( 5, 22 ).swap( A );
-	EXPECT_EQ( IR( 1, 5 ), A.I() );
-	EXPECT_EQ( 5u, A.size() );
-	for ( int i = A.l(); i <= A.u(); ++i ) {
-		EXPECT_EQ( 22, A( i ) );
-	}
-}
-
-TEST( Array1Test, Resize )
+TEST( Array1Test, ReserveAllocate )
 {
 	Array1D_int A;
 	A.reserve( 6u );
@@ -1363,6 +1366,17 @@ TEST( Array1Test, Resize )
 	EXPECT_EQ( 3, A.u() );
 	EXPECT_EQ( 3u, A.size() );
 	EXPECT_EQ( 3u, A.capacity() );
+}
+
+TEST( Array1Test, Swap )
+{
+	Array1D_int A( 4, 11 );
+	Array1D_int( 5, 22 ).swap( A );
+	EXPECT_EQ( IR( 1, 5 ), A.I() );
+	EXPECT_EQ( 5u, A.size() );
+	for ( int i = A.l(); i <= A.u(); ++i ) {
+		EXPECT_EQ( 22, A( i ) );
+	}
 }
 
 TEST( Array1Test, Functions )

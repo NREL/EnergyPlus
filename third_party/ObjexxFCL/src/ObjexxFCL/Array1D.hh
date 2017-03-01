@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -73,26 +73,30 @@ public: // Types
 
 	typedef  std::function< void( Array1D< T > & ) >  InitializerFunction;
 
-	using Super::assign;
-	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
 	using Super::index;
-	using Super::initialize;
 	using Super::isize1;
 	using Super::l;
+	using Super::operator ();
+	using Super::operator [];
+	using Super::size1;
+	using Super::u;
+
+protected: // Types
+
+	using Super::assign;
+	using Super::clear_move;
+	using Super::initialize;
 	using Super::move_if;
 	using Super::move_or_copy;
 	using Super::move_or_copy_backward;
-	using Super::operator ();
-	using Super::operator [];
 	using Super::resize;
 	using Super::shift_set;
 	using Super::shift_only_set;
-	using Super::size1;
 	using Super::size_of;
 	using Super::swap1;
-	using Super::u;
+
 	using Super::capacity_;
 	using Super::data_;
 	using Super::I_;

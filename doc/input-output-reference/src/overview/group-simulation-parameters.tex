@@ -690,6 +690,14 @@ This field is used to alter the effective carbon dioxide capacitance of the zone
 
 This field is used to alter the effective generic contaminant capacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
 
+\paragraph{Field: Name}\label{field-name-hybrid-model}
+
+The name of the ZoneCapacitanceMultiplier:ResearchSpecial object.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-Zone-or-zonelist-name-hybrid-model}
+
+This field is the name of the thermal zone (ref: Zone) and attaches a particular zone capacitance multiplier to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then capacity multiplier is applied to each of the zones in the zone list.
+
 \subsection{SimulationControl}\label{simulationcontrol}
 
 The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
@@ -743,7 +751,7 @@ SimulationControl,
 
 \subsection{Meter:Custom}\label{metercustom}
 
-A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar.
+A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar. A Meter:Custom cannot reference another Meter:Custom.
 
 \subsubsection{Inputs}\label{inputs-17-008}
 
@@ -794,7 +802,7 @@ A key name field is used when the following field specifies an output variable. 
 
 \paragraph{Field: Output Variable or Meter Name \#}\label{field-output-variable-or-meter-name}
 
-This field must be a valid output variable name or a valid meter name.
+This field must be a valid output variable name or a valid meter name. If a Meter:Custom references another Meter:Custom it will generate a warning and not product any output.
 
 \subsection{Meter:CustomDecrement}\label{metercustomdecrement}
 

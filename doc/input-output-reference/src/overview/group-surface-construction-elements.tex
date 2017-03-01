@@ -988,7 +988,7 @@ MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         2.602;     !- Thermal Conductivity \#2
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-2-021}
+\subsubsection{Surface Outputs}\label{outputs-2-021}
 
 \begin{itemize}
 \item
@@ -1003,8 +1003,6 @@ MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
   Zone,Average,HAMT Surface Outside Face Temperature {[}C{]}
 \item
   Zone,Average,HAMT Surface Outside Face Relative Humidity {[}\%{]}
-\item
-  Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
 \end{itemize}
 
 \paragraph{HAMT Surface Average Water Content Ratio {[}kg/kg{]}}\label{hamt-surface-average-water-content-ratio-kgkg}
@@ -1033,13 +1031,29 @@ This output is the temperature on the external ``surface'' of the surface.
 
 This output is the relative humidity on the external ``surface'' of the surface.
 
-Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
-
-Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
+\subsubsection{Internal Cell Outputs}\label{outputs-2-021}
 
 Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
+
+Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format. The output also contains the HAMT cell origins and cell number for each surface combination. The coordinate system origin is defined as the exterior surface of the construction.
+
+\begin{lstlisting}
+! <HAMT cells>, Surface Name, Construction Name, Cell Numbers
+! <HAMT origins>, Surface Name, Construction Name, Cell origins (m)
+HAMT cells, FLOOR,FLOOR,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17
+HAMT origins,FLOOR,FLOOR, 0.0000000, 0.0122726, 0.0601616, 0.1512518, 0.2766268, 0.4240140, 0.5789860, 0.7263732, 0.8517482, 0.9428384, 0.9907274, 1.0035729, 1.0056459, 1.0090000, 1.0123541, 1.0144271, 1.0150000
+\end{lstlisting}
+
+Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
+ 
+\begin{itemize}
+\item
+  Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
+\item
+  Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
+\item
+  Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
+\end{itemize}
 
 \paragraph{HAMT Surface Relative Humidity Cell \textless{}N\textgreater{} {[}\%{]}}\label{hamt-surface-relative-humidity-cell-n}
 
@@ -1052,31 +1066,6 @@ This is the temperature of the cell in the surface.
 \paragraph{HAMT Surface Water Content Cell \textless{}N\textgreater{} {[}kg/kg{]}}\label{hamt-surface-water-content-cell-n-kgkg}
 
 This is the relative water content of the cell in the surface.
-
-Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
-
-\begin{lstlisting}
-! <HAMT cells>, Surface Name, Construction Name, Cell Numbers
-! <HAMT origins>, Surface Name, Construction Name, Cell origins (m)
-\end{lstlisting}
-
-The output also contains the HAMT cell origins and cell number for each construction -- surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
-
-HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell\#\textgreater{}
-
-It is better to specify the ``key'' or Surface Name in this output.
-
-So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
-
-\begin{lstlisting}
-
-Output:Variable,
-      East Wall,               !- Key Value
-      HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-      Hourly;                  !- Reporting Frequency
-\end{lstlisting}
-
-By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
 
 \subsection{Materials for Glass Windows and Doors}\label{materials-for-glass-windows-and-doors}
 
@@ -2075,7 +2064,7 @@ Transmittance averaged over the solar spectrum and weighted by the response of t
 
 Reflectance averaged over the solar spectrum and weighted by the response of the human eye. Assumed same on both side of shade and independent of incidence angle.
 
-\paragraph{Field: Thermal Hemispherical Emissivity}\label{field-thermal-hemispherical-emissivity}
+\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity}
 
 Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
@@ -2085,7 +2074,7 @@ Effective long-wave emissivity. Assumed same on both sides of shade. We can appr
 
 For most non-metallic materials \(\varepsilon\) is about 0.9.
 
-\paragraph{Field: Thermal Transmittance}\label{field-thermal-transmittance}
+\paragraph{Field: Infrared Transmittance}\label{field-infrared-transmittance}
 
 Effective long-wave transmittance. Assumed independent of incidence angle. We can approximate this effective long-wave transmittance, \(T_{\rm{eff}}\) as follows. Let \(\eta\) be the ``openness'' of the shade, i.e., the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \(T\). Then
 
@@ -2154,8 +2143,8 @@ WindowMaterial:Shade,
   0.3000000,                    !- Solar Reflectance
   .05,                          !- Visible transmittance
   0.3000000,                    !- Visible reflectance
-  0.9000000,                    !- Thermal Hemispherical Emissivity
-  0.0,                          !- Thermal Transmittance
+  0.9000000,                    !- Infrared Hemispherical Emissivity
+  0.0,                          !- Infrared Transmittance
   0.003,                        !- Thickness {m}
   0.1,                          !- Conductivity {W/m-K}
   0.050,                        !- Shade to glass distance {m}
@@ -2290,11 +2279,11 @@ The back-side slat reflectance for hemispherically diffuse visible radiation. Th
 
 The slat Infrared transmittance. It is zero for solid metallic, wooden or glass slats, but may be non-zero in some cases (e.g., thin plastic slats).
 
-\paragraph{Field: Front Side Slat Infrared~ Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
+\paragraph{Field: Front Side Slat Infrared Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
 
 Front-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
-\paragraph{Field: Back Side Slat Infrared~ Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
+\paragraph{Field: Back Side Slat Infrared Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
 
 Back-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
@@ -2814,7 +2803,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -2994,7 +2983,7 @@ This value is the slat front side diffuse-diffuse visible reflectance for hemisp
 
 This value is the slat back side diffuse-diffuse visible reflectance for hemispherically diffuse visible spectrum range of solar radiation. Minimum value is 0.0, and the maximum value is less than 1.0.~ This input field is not used currently.
 
-\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-infrared-transmittance}
+\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-Infrared-transmittance}
 
 This value is the long-wave hemispherical transmittance of the slat material. Assumed to be the same for both sides of the slat. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
 
@@ -3712,91 +3701,7 @@ This field is a user specified name that will be used as a reference by other in
 
 \paragraph{Field: Outside Layer}\label{field-outside-layer}
 
-Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of the construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Zone,Average,HAMT Surface Average Water Content Ratio {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Inside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Vapor Pressure {[}Pa{]}
-
-Zone,Average,HAMT Surface Outside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Outside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-\paragraph{HAMT Surface Average Water Content Ratio {[}kg/kg{]}}\label{hamt-surface-average-water-content-ratio-kgkg-1}
-
-This output is the summed water content {[}kg/kg{]} of all cells in a surface expressed as a fraction of the mass of the water to the material mass.
-
-\paragraph{HAMT Surface Inside Face Temperature {[}C{]}}\label{hamt-surface-inside-face-temperature-c-1}
-
-This output is the temperature {[}C{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-2}
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-3}
-
-This output is the relative humidity on the internal ``surface'' of the surface expressed as a percentage.
-
-\paragraph{HAMT Surface Inside Face Vapor Pressure {[}Pa{]}}\label{hamt-surface-inside-face-vapor-pressure-pa-1}
-
-This output is the vapor pressure {[}Pa{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Temperature {[}C{]}}\label{hamt-surface-outside-face-temperature-c-1}
-
-This output is the temperature on the external ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Relative Humidity {[}\%{]}}\label{hamt-surface-outside-face-relative-humidity-1}
-
-This output is the relative humidity on the external ``surface'' of the surface.
-
-Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
-
-Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
-
-Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
-
-\paragraph{HAMT Surface Relative Humidity Cell \textless{}N\textgreater{} {[}\%{]}}\label{hamt-surface-relative-humidity-cell-n-1}
-
-This is the relative humidity of the cell in the surface.
-
-\paragraph{HAMT Surface Temperature Cell \textless{}N\textgreater{} {[}C{]}}\label{hamt-surface-temperature-cell-n-c-1}
-
-This is the temperature of the cell in the surface.
-
-\paragraph{HAMT Surface Water Content Cell \textless{}N\textgreater{} {[}kg/kg{]}}\label{hamt-surface-water-content-cell-n-kgkg-1}
-
-This is the relative water content of the cell in the surface.
-
-Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
-
-! \textless{}HAMT cells\textgreater{}, Surface Name, Construction Name, Cell Numbers
-
-! \textless{}HAMT origins\textgreater{}, Surface Name, Construction Name, Cell origins (m)
-
-The output also contains the HAMT cell origins and cell number for each construction -- surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
-
-HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell\#\textgreater{}
-
-It is better to specify the ``key'' or Surface Name in this output.
-
-So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
-
-\begin{lstlisting}
-
-Output:Variable,
-      East Wall,               !- Key Value
-      HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-      Hourly;                  !- Reporting Frequency
-\end{lstlisting}
-
-By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
-
-Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate outside convection and radiation heat transfer more precisely.
+Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of the construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate outside convection and radiation heat transfer more precisely.
 
 \paragraph{Field(s) 2-10: Layers}\label{fields-2-10-layers}
 
@@ -3988,95 +3893,27 @@ This field defines how far apart in meters the hydronic tubing or electrical res
 
 \paragraph{Field: Outside Layer}\label{field-outside-layer-1}
 
-Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of this construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Zone,Average,HAMT Surface Average Water Content Ratio {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Inside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Vapor Pressure {[}Pa{]}
-
-Zone,Average,HAMT Surface Outside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Outside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-\paragraph{HAMT Surface Average Water Content Ratio {[}kg/kg{]}}\label{hamt-surface-average-water-content-ratio-kgkg-2}
-
-This output is the summed water content {[}kg/kg{]} of all cells in a surface expressed as a fraction of the mass of the water to the material mass.
-
-\paragraph{HAMT Surface Inside Face Temperature {[}C{]}}\label{hamt-surface-inside-face-temperature-c-2}
-
-This output is the temperature {[}C{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-4}
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-5}
-
-This output is the relative humidity on the internal ``surface'' of the surface expressed as a percentage.
-
-\paragraph{HAMT Surface Inside Face Vapor Pressure {[}Pa{]}}\label{hamt-surface-inside-face-vapor-pressure-pa-2}
-
-This output is the vapor pressure {[}Pa{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Temperature {[}C{]}}\label{hamt-surface-outside-face-temperature-c-2}
-
-This output is the temperature on the external ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Relative Humidity {[}\%{]}}\label{hamt-surface-outside-face-relative-humidity-2}
-
-This output is the relative humidity on the external ``surface'' of the surface.
-
-Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
-
-Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
-
-Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
-
-\paragraph{HAMT Surface Relative Humidity Cell \textless{}N\textgreater{} {[}\%{]}}\label{hamt-surface-relative-humidity-cell-n-2}
-
-This is the relative humidity of the cell in the surface.
-
-\paragraph{HAMT Surface Temperature Cell \textless{}N\textgreater{} {[}C{]}}\label{hamt-surface-temperature-cell-n-c-2}
-
-This is the temperature of the cell in the surface.
-
-\paragraph{HAMT Surface Water Content Cell \textless{}N\textgreater{} {[}kg/kg{]}}\label{hamt-surface-water-content-cell-n-kgkg-2}
-
-This is the relative water content of the cell in the surface.
-
-Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
-
-! \textless{}HAMT cells\textgreater{}, Surface Name, Construction Name, Cell Numbers
-
-! \textless{}HAMT origins\textgreater{}, Surface Name, Construction Name, Cell origins (m)
-
-The output also contains the HAMT cell origins and cell number for each construction -- surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
-
-HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell\#\textgreater{}
-
-It is better to specify the ``key'' or Surface Name in this output.
-
-So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
-
-\begin{lstlisting}
-
-Output:Variable,
-      East Wall,               !- Key Value
-      HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-      Hourly;                  !- Reporting Frequency
-\end{lstlisting}
-
-By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
-
-Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of this construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
 
 \paragraph{Field(s) 2-10: Layers}\label{fields-2-10-layers-1}
 
 The next fields are optional and the number of them showing up in a particular Construction definition depends solely on the number of material layers present in that particular construction. The data expected is identical to the outside layer field (see previous field description). The order of the remaining layers is important and should be listed in order of occurrence from the one just inside the outside layer until the inside layer is reached. As noted above, the inside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+
+\subsubsection{Outputs}\label{outputs-36-1}
+
+\begin{itemize}
+\item  Zone,Average,Surface Internal Source Location Temperature [C]
+\item  Zone,Average,Surface Internal User Specified Location Temperature [C]
+\end{itemize}
+
+\paragraph{Surface Internal Source Location Temperature {[}C{]}}\label{surface-internal-source-location-temperature-c}
+
+This output is the temperature within the surface at the location of the source/sink.
+
+\paragraph{Surface Internal User Specified Location Temperature {[}C{]}}\label{surface-internal-user—specified-location-temperature-c}
+
+This output is the temperature within the surface at the location requested by the user.
+
 
 \subsection{Composite Wall Constructions}\label{composite-wall-constructions}
 
@@ -4370,7 +4207,7 @@ Matrix:TwoDimension,       !- matrix for basis definition
 
 \subsection{Construction:WindowEquivalentLayer}\label{constructionwindowequivalentlayer}
 
-This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM.This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
+This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. The equivalent-layer window model does not support daylighting control. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM. This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
 
 \begin{lstlisting}
 WindowMaterial:Glass:EquivalentLayer

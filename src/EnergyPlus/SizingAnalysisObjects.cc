@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <string>
@@ -512,8 +500,6 @@ namespace EnergyPlus {
 	)
 	{
 		using DataGlobals::OutputFileInits;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
 		using DataSizing::NoSizingFactorMode;
 		using DataSizing::GlobalHeatingSizingFactorMode;
@@ -542,7 +528,7 @@ namespace EnergyPlus {
 
 		// first make sure we have valid time stamps to work with
 		if ( CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )
-				|| CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {
+				&& CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {
 			// problem, don't have valid stamp, don't have any info to report either
 			nullStampProblem =  true;
 		} else {
@@ -551,14 +537,14 @@ namespace EnergyPlus {
 
 		previousVolDesignFlowRate = PlantSizData( plantSizingIndex ).DesVolFlowRate;
 
-		if ( newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) {
+		if ( ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp ) && ( newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) ) { // issue 5665, was ||
 			newFoundMassFlowRate = newFoundMassFlowRateTimeStamp.runningAvgDataValue;
 		} else {
 			newFoundMassFlowRate = 0.0;
 		}
 
 		//step 3 calculate mdot from max load and delta T
-		if ( ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) && 
+		if ( ( ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) && ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) ) && 
 			( ( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT ) > 0.0 ) )  {
 				peakLoadCalculatedMassFlow = NewFoundMaxDemandTimeStamp.runningAvgDataValue /
 											( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT );
@@ -615,7 +601,8 @@ namespace EnergyPlus {
 				PlantLoop( plantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
 			}
 			if ( PlantLoop( plantLoopIndex ).VolumeWasAutoSized ) {
-				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+				// Note this calculation also appears in PlantManager::SizePlantLoop and PlantManager::ResizePlantLoopLevelSizes
+				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * PlantLoop( plantLoopIndex ).CirculationTime * 60.0;
 				PlantLoop( plantLoopIndex ).Mass = PlantLoop( plantLoopIndex ).Volume* densityForSizing;
 			}
 
@@ -666,7 +653,7 @@ namespace EnergyPlus {
 		}
 
 		if ( ! nullStampProblem ) {
-			if ( ! changedByDemand ) {
+			if ( ! changedByDemand && ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )) { //Trane: bug fix #5665
 				if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
 				}
@@ -676,7 +663,7 @@ namespace EnergyPlus {
 					newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
 				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
-			} else {
+			} else if ( changedByDemand && ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {    //Trane: bug fix #5665
 				if ( NewFoundMaxDemandTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title );
 				}

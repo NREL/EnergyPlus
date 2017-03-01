@@ -25,7 +25,7 @@ The IAQP (ASHRAE 2007) is a design procedure in which outdoor air intake and oth
 For the i-th zone, first the breathing-zone outdoor air flow is calculated:
 
 \begin{equation}
-{V_{bz,i}} = {R_{p,i}} \times {P_i} + {R_{a,i}} \times {A_i}
+{V_{bz,i}} = {R_{p,i}} \times {P_i} + {R_{a,i}} \times {A_i} \times {SchedFrac_i}
 \end{equation}
 
 Where:
@@ -39,6 +39,8 @@ Where:
 \({R_{a,i}}\) = the ventilation rate per floor area, m³/s-m²
 
 \({A_i}\) ~ = the floor area of the zone, m²
+
+\({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
 \(i\) ~~~ = the index of the zone or zone list
 
@@ -85,7 +87,7 @@ Where:
 \({V_{ou}}\) ~the uncorrected system outdoor air flow, m³/s
 
 \begin{equation}
-{V_{ou}} = \mathop \sum \limits_{i = 1}^{allzones} ({R_{p,i}} \times {P_i}) + \mathop \sum \limits_{i = 1}^{allzones} ({R_{a,i}} \times {A_i})
+{V_{ou}} = \mathop \sum \limits_{i = 1}^{allzones} ({R_{p,i}} \times {P_i} \times {SchedFrac_i}) + \mathop \sum \limits_{i = 1}^{allzones} ({R_{a,i}} \times {A_i} \times {SchedFrac_i})
 \end{equation}
 
 \({X_s}\) ~ = the uncorrected system outdoor air fraction
@@ -251,20 +253,22 @@ Finally, the relief air flow rate is calculated as the difference between the ou
 Like VRP, the user must include the following three objects in their input data file in order to model CO\(_{2}\)-based DCV with IAQP:
 
 \begin{itemize}
-  \item AirLoopHVAC:OutdoorAirSystem to simulate the mixed air box of the air loop
-  \item Controller:MechanicalVentilation to determine the minimum outside air flow rate to be provided by the mixed air box
-  \item Controller:OutdoorAir to control the outside air flow rate introduced via the mixed air box
+  \item \textbf{AirLoopHVAC:OutdoorAirSystem} to simulate the mixed air box of the air loop
+  \item \textbf{Controller:MechanicalVentilation} to determine the minimum outside air flow rate to be provided by the mixed air box
+  \item \textbf{Controller:OutdoorAir} to control the outside air flow rate introduced via the mixed air box
 \end{itemize}
 
 The outdoor air mass flow rate provided by the air loop is calculated as below:
 
 \begin{equation}
-{\dot m_{OA}} = \sum\limits_i^N {{{\dot m}_{OA,z,i}}}
+{\dot m_{OA}} = \sum\limits_i^N {{{\dot m}_{OA,z,i}} \times {SchedFrac_i}}
 \end{equation}
 
 where:
 
 \({\dot m_{OA,z,i}}\) = outdoor air mass flow rate for the ith zone as calculated according to section Carbon Dioxide Prediction located elsewhere in this document.
+
+\({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
 N = number of zones served by the air loop, which is provided in the input for a Controller:MechanicalVentilation object
 
@@ -283,13 +287,13 @@ For the i-th zone, the outdoor air mass flow rate provided by the air loop is ca
 1)~~~The required intake flow of outdoor air for the design zone population, \emph{P\(_{z,i}\)}
 
 \begin{equation}
-{V_{ot - design,i}} = \frac{{\left( {{R_{p,i}}.{P_{z,i}}} \right) + ({R_{a,i}}.{A_{z,i}})}}{{{E_i}}}
+{V_{ot - design,i}} = \frac{{\left( {{R_{p,i}}.{P_{z,i}} \times {SchedFrac_i}} \right) + ({R_{a,i}}.{A_{z,i}} \times {SchedFrac_i})}}{{{E_i}}}
 \end{equation}
 
 2)~~~The required intake flow of outdoor air when the zone is unoccupied i.e.~ \emph{P\(_{z,i}\)} = 0
 
 \begin{equation}
-{V_{ot - min,i}} = \frac{{({R_{a,i}}.{A_{z,i}})}}{{{E_i}}}
+{V_{ot - min,i}} = \frac{{({R_{a,i}}.{A_{z,i}} \times {SchedFrac_i})}}{{{E_i}}}
 \end{equation}
 
 3)~~~The target indoor CO\(_{2}\) concentration at \({V_{ot - design,i}}\)
@@ -317,6 +321,8 @@ Where,
 \({R_{a,i}}\) ~ = Required outdoor air flow rate per unit area, (m\(^{3}\)/s)/m\(^{2}\)
 
 \({P_{z,i}}\) ~ = Design zone population, number of people
+
+\({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
 When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
 

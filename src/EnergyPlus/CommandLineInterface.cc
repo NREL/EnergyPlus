@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // CLI Headers
 #include <ezOptionParser.hpp>
@@ -195,9 +183,7 @@ ProcessArgs(int argc, const char * argv[])
 	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
 
-	std::string dirPathName;
-
-	opt.get("-d")->getString(dirPathName);
+	opt.get("-d")->getString(outDirPathName);
 
 	runReadVars = opt.isSet("-r");
 
@@ -228,7 +214,7 @@ ProcessArgs(int argc, const char * argv[])
 	makeNativePath(inputIdfFileName);
 	makeNativePath(inputWeatherFileName);
 	makeNativePath(inputIddFileName);
-	makeNativePath(dirPathName);
+	makeNativePath(outDirPathName);
 
 	std::vector<std::string> badOptions;
 	if (opt.lastArgs.size() > 1u) {
@@ -268,12 +254,12 @@ ProcessArgs(int argc, const char * argv[])
 
 	if (opt.isSet("-d") ) {
 		// Add the trailing path character if necessary
-		if (dirPathName[dirPathName.size()-1]!=pathChar) {
-			dirPathName+=pathChar;
+		if (outDirPathName[outDirPathName.size()-1]!=pathChar) {
+			outDirPathName+=pathChar;
 		}
 
 		// Create directory if it doesn't already exist
-		makeDirectory(dirPathName);
+		makeDirectory(outDirPathName);
 	}
 
 	// File naming scheme
@@ -282,9 +268,9 @@ ProcessArgs(int argc, const char * argv[])
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
 		makeNativePath(prefixOutName);
-		outputFilePrefix = dirPathName + prefixOutName;
+		outputFilePrefix = outDirPathName + prefixOutName;
 	} else {
-		outputFilePrefix = dirPathName + "eplus";
+		outputFilePrefix = outDirPathName + "eplus";
 	}
 
 	std::string suffixType;
@@ -386,7 +372,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
 	if (suffixType == "L" || suffixType == "l") {
-		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+		outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
 	}
 	else {
 		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";

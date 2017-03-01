@@ -120,6 +120,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
     1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier
@@ -776,8 +778,8 @@
     1.000000,                !- Conductivity {W/m-K}
     ,                        !- Dirt Correction Factor for Solar and Visible Transmittance
     ,                        !- Solar Diffusing
-    7.2e10,                  !- Young’s modulus {Pa}
-    0.22;                    !- Poisson’s ratio
+    7.2e10,                  !- Young's modulus {Pa}
+    0.22;                    !- Poisson's ratio
 
 !----------------------------------------------------------------------
 !         Complex Shade
