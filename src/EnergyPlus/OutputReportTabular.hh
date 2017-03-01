@@ -835,6 +835,7 @@ namespace OutputReportTabular {
 	void
 	GetDelaySequences(
 		int const & desDaySelected,
+		bool const & isCooling,
 		int const & zoneIndex,
 		Array1D< Real64 > & peopleDelaySeq,
 		Array1D< Real64 > & equipDelaySeq,
@@ -889,6 +890,12 @@ namespace OutputReportTabular {
 	void
 	AddTotalRowsForLoadSummary(
 		CompLoadTablesType & compLoadTotal
+	);
+
+
+	void
+	ComputePeakDifference(
+		CompLoadTablesType & compLoad
 	);
 
 	void
