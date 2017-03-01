@@ -60,8 +60,10 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <OutputProcessor.hh>
 
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -691,4 +693,18 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5
 
 
 }
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
+{
 
+	createFacilityElectricPowerServiceObject();
+	bool SimElecCircuitsFlag = false;
+	facilityElectricServiceObj->manageElectricPowerService( true, SimElecCircuitsFlag, false );
+	// GetInput for load centers will not be called, nor rest of model so SimElectricCircuits will be false
+	EXPECT_FALSE( SimElecCircuitsFlag );
+
+	DataErrorTracking::AskForPlantCheckOnAbort = true;
+	// GetInput and other code will be executed and SimElectricCircuits will be true
+	facilityElectricServiceObj->manageElectricPowerService( true, SimElecCircuitsFlag, false );
+	EXPECT_TRUE( SimElecCircuitsFlag );
+
+}

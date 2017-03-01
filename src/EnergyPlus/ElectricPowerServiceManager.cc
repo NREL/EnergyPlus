@@ -77,6 +77,7 @@
 #include <WindTurbine.hh>
 #include <DataPlant.hh>
 #include <OutputReportPredefined.hh>
+#include <DataErrorTracking.hh>
 
 namespace EnergyPlus {
 
@@ -116,6 +117,7 @@ namespace EnergyPlus {
 	)
 	{
 		if ( getInputFlag_ ) {
+			if ( !DataErrorTracking::AskForPlantCheckOnAbort ) return;
 			getPowerManagerInput();
 			getInputFlag_ = false;
 		}
@@ -287,7 +289,7 @@ namespace EnergyPlus {
 			}
 		} // if transformers
 
-		if ( numLoadCenters_ > 0 ) { 
+		if ( numLoadCenters_ > 0 ) {
 			SetupOutputVariable( "Facility Total Purchased Electric Power [W]", electPurchRate_, "System", "Average", name_ );
 			SetupOutputVariable( "Facility Total Purchased Electric Energy [J]", electricityPurch_, "System", "Sum", name_, _, "ElectricityPurchased", "COGENERATION", _, "Plant" );
 
