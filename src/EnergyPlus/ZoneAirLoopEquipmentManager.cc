@@ -298,8 +298,6 @@ namespace ZoneAirLoopEquipmentManager {
 		static Array1D_bool lAlphaBlanks( 5 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
 		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
-		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
-		static int ATMixerTypeNum( 0 ); // terminal mixer type number
 		// make sure the input data is read in only once
 		if ( ! GetAirDistUnitsFlag ) {
 			return;

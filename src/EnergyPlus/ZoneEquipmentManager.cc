@@ -407,6 +407,8 @@ namespace ZoneEquipmentManager {
 
 		if ( InitZoneEquipmentOneTimeFlag ) {
 			InitZoneEquipmentOneTimeFlag = false;
+			int numTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
+			TermUnitSizing.allocate( numTerminalUnits );
 			ZoneEqSizing.allocate( NumOfZones );
 			// setup zone equipment sequenced demand storage
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
@@ -1034,7 +1036,6 @@ namespace ZoneEquipmentManager {
 		CalcZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		CalcFinalZoneSizing.allocate( NumOfZones );
 		int numTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
-		TermUnitSizing.allocate( numTerminalUnits );
 		TermUnitFinalZoneSizing.allocate( numTerminalUnits );
 		DesDayWeath.allocate( TotDesDays + TotRunDesPersDays );
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
