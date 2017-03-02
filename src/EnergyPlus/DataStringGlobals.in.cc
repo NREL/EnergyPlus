@@ -172,6 +172,7 @@ namespace DataStringGlobals {
 
 	std::string idfFileNameOnly;
 	std::string idfDirPathName;
+	std::string outDirPathName;
 	std::string exeDirectory;
 
 	std::string ProgramPath; // Path for Program from INI file

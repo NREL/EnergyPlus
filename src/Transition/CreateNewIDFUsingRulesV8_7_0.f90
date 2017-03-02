@@ -122,6 +122,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   REAL, EXTERNAL :: CalculateMuEMPD
   LOGICAL FoundMaterial
 
+  CHARACTER(len=10) :: AFNString
+  REAL :: AFNDuctUVal = 0.0
+  REAL :: AFNDuctFracRcond = 0.815384615
+  REAL :: AFNDuctFracRout = 0.153846154
+  REAL :: AFNDuctFracRin = 0.030769231
+
   LOGICAL :: ErrFlag
 
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
@@ -361,7 +367,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('COIL:COOLING:DX:MULTISPEED', 'COIL:HEATING:DX:MULTISPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs=InArgs 
+                 OutArgs=InArgs
                  IF (SameString(InArgs(16), '')) THEN
                    OutArgs(16) = 'NaturalGas'
                  ELSEIF (SameString(InArgs(16), 'PropaneGas')) THEN
@@ -384,8 +390,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:20)=InArgs(1:20)  ! No change
                  OutArgs(21:24)=''           ! Added 4 New Input Fields, Set
                  OutArgs(25:CurArgs+4)=InArgs(21:CurArgs)  !
-                 CurArgs = CurArgs + 4            
- 
+                 CurArgs = CurArgs + 4
+
              CASE('COOLINGTOWER:VARIABLESPEED:MERKEL')
                  ObjectName='CoolingTower:VariableSpeed:Merkel'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -395,6 +401,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(21:CurArgs+4)=InArgs(17:CurArgs)  !
                  CurArgs = CurArgs + 4
 
+             CASE('AIRFLOWNETWORK:SIMULATIONCONTROL')
+                 ObjectName='AirflowNetwork:SimulationControl'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:3)=InArgs(1:3)
+                 OutArgs(4:(CurArgs-1))=InArgs(5:(CurArgs))
+                 CurArgs = CurArgs-1
+
+             CASE('ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL')
+                 ObjectName='ZoneCapacitanceMultiplier:ResearchSpecial'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1)='Multiplier'     ! Add new Name field
+                 OutArgs(2)=''               ! Add new Zone Name Field
+                 OutArgs(3:CurArgs+2)=InArgs(1:CurArgs)
+                 CurArgs = CurArgs + 2
+
              CASE('WATERHEATER:HEATPUMP:WRAPPEDCONDENSER')
                  ObjectName='WaterHeater:HeatPump:WrappedCondenser'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -403,6 +426,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  IF (SameString(InArgs(35), 'MutuallyExlcusive')) THEN
                    OutArgs(35) = 'MutuallyExclusive'
                  END IF
+
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT')
+                  ObjectName='AirflowNetwork:Distribution:Component:Duct'
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:6)=InArgs(1:6)
+                  READ(InArgs(7), '(f10.6)') AFNDuctUVal
+                  WRITE(OutArgs(7), '(f10.6)') AFNDuctUVal/AFNDuctFracRcond
+                  OutArgs(8)=InArgs(8)
+                  WRITE(OutArgs(9), '(f10.6)') AFNDuctUVal/AFNDuctFracRout
+                  WRITE(OutArgs(10), '(f10.6)') AFNDuctUVal/AFNDuctFracRin
+                  CurArgs = CurArgs + 2
 
 
     !!!   Changes for report variables, meters, tables -- update names

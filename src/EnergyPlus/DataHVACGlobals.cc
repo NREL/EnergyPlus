@@ -117,12 +117,14 @@ namespace DataHVACGlobals {
 	int const AutoCalculateSizing( 25 ); // identifies an autocalulate input
 	int const ZoneCoolingLoadSizing( 26 ); // zone cooling sensible load (zsz file)
 	int const ZoneHeatingLoadSizing( 27 ); // zome heating sensible load (zsz file)
-	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
-	int const HeatingCoilDesAirInletTempSizing( 30 ); // design inlet air temperature for heating coil
-	int const HeatingCoilDesAirOutletTempSizing( 31 ); // design outlet air temperature for heating coil
-	int const HeatingCoilDesAirInletHumRatSizing( 32 ); // design inlet air humidity ratio for heating coil
-	int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing( 33 ); // identifies desiccant performance data face velocity autosisizing input
+	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling
+	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating
+	int const ASHRAEMinSATCoolingSizing( 30 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	int const ASHRAEMaxSATHeatingSizing( 31 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	int const HeatingCoilDesAirInletTempSizing( 32 ); // design inlet air temperature for heating coil
+	int const HeatingCoilDesAirOutletTempSizing( 33 ); // design outlet air temperature for heating coil
+	int const HeatingCoilDesAirInletHumRatSizing( 34 ); // design inlet air humidity ratio for heating coil
+	int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing( 35 ); // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser
@@ -147,14 +149,16 @@ namespace DataHVACGlobals {
 	int const Other( 4 );
 	int const RAB( 5 );
 	// parameters describing fan types
-	int const NumAllFanTypes( 5 ); // cpw22Aug2010 (was 4)
+	int const NumAllFanTypes( 6 ); // cpw22Aug2010 (was 4)
 
 	// fan types
 	int const FanType_SimpleConstVolume( 1 );
 	int const FanType_SimpleVAV( 2 );
 	int const FanType_SimpleOnOff( 3 );
 	int const FanType_ZoneExhaust( 4 );
-	int const FanType_ComponentModel( 5 ); // cpw22Aug2010 (new)
+	int const FanType_ComponentModel( 5 ); // cpw22Aug2010 
+	int const FanType_SystemModelObject( 6 ); // new for V8.7, simple versatile fan object
+
 	// Fan Minimum Flow Fraction Input Method
 	int const MinFrac( 1 );
 	int const FixedMin( 2 );
@@ -168,7 +172,7 @@ namespace DataHVACGlobals {
 	int const BypassWhenWithinEconomizerLimits( 0 ); // heat recovery controlled by economizer limits
 	int const BypassWhenOAFlowGreaterThanMinimum( 1 ); // heat recovery ON at minimum OA in economizer mode
 
-	Array1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel" } ); // cpw22Aug2010 | cpw22Aug2010 (new)
+	Array1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel" } ); 
 
 	// parameters describing unitary systems
 	int const NumUnitarySystemTypes( 7 );
@@ -327,7 +331,6 @@ namespace DataHVACGlobals {
 	int NumElecCircuits( 0 ); // Number of electric circuits specified in simulation
 	int NumGasMeters( 0 ); // Number of gas meters specified in simulation
 	int NumPrimaryAirSys( 0 ); // Number of primary HVAC air systems
-	Real64 FanElecPower( 0.0 ); // fan power from last fan simulation
 	Real64 OnOffFanPartLoadFraction( 1.0 ); // fan part-load fraction (Fan:OnOff)
 	Real64 DXCoilTotalCapacity( 0.0 ); // DX coil total cooling capacity (eio report var for HPWHs)
 	Real64 DXElecCoolingPower( 0.0 ); // Electric power consumed by DX cooling coil last DX simulation
@@ -526,7 +529,6 @@ namespace DataHVACGlobals {
 		NumElecCircuits = 0;
 		NumGasMeters = 0;
 		NumPrimaryAirSys = 0;
-		FanElecPower = 0.0;
 		OnOffFanPartLoadFraction = 1.0;
 		DXCoilTotalCapacity = 0.0;
 		DXElecCoolingPower = 0.0;

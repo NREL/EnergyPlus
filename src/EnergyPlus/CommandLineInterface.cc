@@ -183,9 +183,7 @@ ProcessArgs(int argc, const char * argv[])
 	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
 
-	std::string dirPathName;
-
-	opt.get("-d")->getString(dirPathName);
+	opt.get("-d")->getString(outDirPathName);
 
 	runReadVars = opt.isSet("-r");
 
@@ -216,7 +214,7 @@ ProcessArgs(int argc, const char * argv[])
 	makeNativePath(inputIdfFileName);
 	makeNativePath(inputWeatherFileName);
 	makeNativePath(inputIddFileName);
-	makeNativePath(dirPathName);
+	makeNativePath(outDirPathName);
 
 	std::vector<std::string> badOptions;
 	if (opt.lastArgs.size() > 1u) {
@@ -256,12 +254,12 @@ ProcessArgs(int argc, const char * argv[])
 
 	if (opt.isSet("-d") ) {
 		// Add the trailing path character if necessary
-		if (dirPathName[dirPathName.size()-1]!=pathChar) {
-			dirPathName+=pathChar;
+		if (outDirPathName[outDirPathName.size()-1]!=pathChar) {
+			outDirPathName+=pathChar;
 		}
 
 		// Create directory if it doesn't already exist
-		makeDirectory(dirPathName);
+		makeDirectory(outDirPathName);
 	}
 
 	// File naming scheme
@@ -270,9 +268,9 @@ ProcessArgs(int argc, const char * argv[])
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
 		makeNativePath(prefixOutName);
-		outputFilePrefix = dirPathName + prefixOutName;
+		outputFilePrefix = outDirPathName + prefixOutName;
 	} else {
-		outputFilePrefix = dirPathName + "eplus";
+		outputFilePrefix = outDirPathName + "eplus";
 	}
 
 	std::string suffixType;
@@ -374,7 +372,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
 	if (suffixType == "L" || suffixType == "l") {
-		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+		outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
 	}
 	else {
 		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";

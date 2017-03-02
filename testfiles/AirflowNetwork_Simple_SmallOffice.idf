@@ -1937,7 +1937,6 @@
     AirflowNetwork_All,      !- Name
     MultizoneWithDistributionOnlyDuringFanOperation,  !- AirflowNetwork Control
     SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
-    ,                        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ,                        !- Height Selection for Local Wind Pressure Calculation
     LowRise,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
