@@ -375,6 +375,15 @@ namespace ZoneAirLoopEquipmentManager {
 						ShowSevereError( cAlphaFields( 5 ) + " = " + AlphArray( 5 ) + " not found." );
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
 						ErrorsFound = true;
+					} else {
+						// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
+						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex ) );
+						auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex ) );
+						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
+						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
+						thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
+						thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
+						thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
 					}
 				}
 				// Validate EquipType for Air Distribution Unit

@@ -715,6 +715,11 @@ namespace DataSizing {
 		Real64 ReheatLoadMult; // multiplier for load in reheat coil UA calculation
 		Real64 DesCoolingLoad; // design cooling load used for zone equipment [W]
 		Real64 DesHeatingLoad; // design heating load used for zone equipment [W]
+		Real64 SpecDesSensCoolingFrac; // Fraction of Design Sensible Cooling Load from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesCoolSATRatio; // Cooling Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesSensHeatingFrac; // Fraction of Design Sensible Heating Load from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesHeatSATRatio; // Heating Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecMinOAFrac; // Fraction of Minimum Outdoor Air Flow from DesignSpecification:AirTerminal:Sizing
 
 		// Default Constructor
 		TermUnitSizingData() :
@@ -728,7 +733,12 @@ namespace DataSizing {
 			ReheatAirFlowMult( 1.0 ),
 			ReheatLoadMult( 1.0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 )
+			DesHeatingLoad( 0.0 ),
+			SpecDesSensCoolingFrac( 1.0 ),
+			SpecDesCoolSATRatio( 1.0 ),
+			SpecDesSensHeatingFrac( 1.0 ),
+			SpecDesHeatSATRatio( 1.0 ),
+			SpecMinOAFrac ( 1.0 )
 		{}
 
 	};

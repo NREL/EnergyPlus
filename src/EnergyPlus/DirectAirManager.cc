@@ -330,10 +330,19 @@ namespace DirectAirManager {
 				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaFieldBlanks( 4 )) {
 					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 4 ), DataSizing::AirTerminalSizingSpec );
-					if (DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex  == 0) {
+					if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex == 0 ) {
 						ShowSevereError(cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );
 						ErrorsFound = true;
+					} else {
+						// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
+						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DirectAir( DirectAirNum ).TermUnitSizingIndex ) );
+						auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
+						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
+						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
+						thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
+						thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
+						thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
 					}
 				}
 
