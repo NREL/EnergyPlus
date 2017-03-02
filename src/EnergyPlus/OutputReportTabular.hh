@@ -843,7 +843,7 @@ namespace OutputReportTabular {
 		Array1D< Real64 > & powerGenDelaySeq,
 		Array1D< Real64 > & lightDelaySeq,
 		Array1D< Real64 > & feneSolarDelaySeq,
-		Array3D< Real64 > & feneCondInstantSeqLoc,
+		Array3D< Real64 > & feneCondInstantSeq,
 		Array2D< Real64 > & surfDelaySeq
 	);
 
@@ -874,7 +874,6 @@ namespace OutputReportTabular {
 	void
 	ComputePeakConditions(
 		CompLoadTablesType & compLoad,
-		int const & desDaySelected,
 		int const & timeOfMax,
 		int const & zoneIndex,
 		bool const & isCooling
