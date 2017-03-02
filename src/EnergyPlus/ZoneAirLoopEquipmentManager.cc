@@ -628,6 +628,7 @@ namespace ZoneAirLoopEquipmentManager {
 		using DataAirLoop::AirLoopFlow;
 		using DualDuct::SimulateDualDuct;
 		using SingleDuct::SimulateSingleDuct;
+		using SingleDuct::GetATMixers;
 		using PoweredInductionUnits::SimPIU;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using HVACSingleDuctInduc::SimIndUnit;
@@ -739,6 +740,7 @@ namespace ZoneAirLoopEquipmentManager {
 				SimAirTerminalUserDefined( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ) );
 
 			} else if ( SELECT_CASE_var == SingleDuctATMixer ) {
+				GetATMixers(); // Needed here if mixer used only with unitarysystem which gets its input late
 				ProvideSysOutput = false;
 
 			} else {

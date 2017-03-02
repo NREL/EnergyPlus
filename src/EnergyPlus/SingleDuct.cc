@@ -4787,11 +4787,16 @@ namespace SingleDuct {
 		int SupAirIn; // Supply air inlet node index
 		bool errFlag; // error flag from component validation
 
+		if ( !GetATMixerFlag ) {
+			return;
+		}
+		GetATMixerFlag = false;
+
 		cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
 		NumATMixers = GetNumObjectsFound( cCurrentModuleObject );
 		SysATMixer.allocate( NumATMixers );
 
-		// Need air disribution units to be gotten first
+		// Need air disribution units first
 		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 
 		for ( ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum ) {
