@@ -12371,7 +12371,7 @@ namespace OutputReportTabular {
 				compLoad.peakDesSensLoad = -CalcFinalZoneSizing( zoneIndex ).DesHeatLoad / mult; //change sign
 			}
 		}
-	};
+	}
 
 	// Used for the AirLoop and Facility level load component tables to sum the results from invidual zones
 	void
@@ -12404,7 +12404,7 @@ namespace OutputReportTabular {
 		compLoadTotal.peakDesSensLoad += compLoadPartial.peakDesSensLoad * multiplier;
 		compLoadTotal.estInstDelSensLoad += compLoadPartial.estInstDelSensLoad * multiplier;
 		compLoadTotal.diffPeakEst +=compLoadPartial.diffPeakEst * multiplier;
-	};
+	}
 
 	// create the total row and total columns for the load summary tables
 	void
@@ -12441,7 +12441,7 @@ namespace OutputReportTabular {
 				compLoadTotal.cellUsed( cPerc, row ) = true;
 			}
 		}
-	};
+	}
 
 	// compute the peak difference between actual and estimated load in load component summary peak conditions table
 	void
@@ -12482,7 +12482,7 @@ namespace OutputReportTabular {
 			compLoadTotal.estInstDelSensLoad *= powerConversion;
 			compLoadTotal.diffPeakEst *= powerConversion;
 		}
-	};
+	}
 
 	// provide output from the load component summary tables
 	void
@@ -12654,7 +12654,7 @@ namespace OutputReportTabular {
 				}
 			}
 		}
-	};
+	}
 
 	void
 	WriteReportHeaders(
