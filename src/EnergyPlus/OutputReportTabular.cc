@@ -6380,6 +6380,10 @@ namespace OutputReportTabular {
 		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
 			// loop through each report and
 			digitsShown = MonthlyInput( iInput ).showDigits;
+			bool foundMinOrMax = false;
+			bool foundHourAgg = false;
+			bool missingMaxOrMinError = false;
+			bool missingHourAggError = false;
 			for ( jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
 				curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
 				// first loop through and count how many 'columns' are defined
@@ -6395,244 +6399,302 @@ namespace OutputReportTabular {
 						columnUsedCount += 2;
 					}}
 				} //jColumn
-				columnHead.allocate( columnUsedCount );
-				columnWidth.dimension( columnUsedCount, 14 ); //array assignment - same for all columns
-				tableBody.allocate( columnUsedCount, 16 );
-				tableBody = ""; //set entire table to blank as default
-				columnRecount = 0;
+				// test if the aggregation types are in the correct order
 				for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
 					curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
-					curAggString = aggString( MonthlyColumns( curCol ).aggType );
-					if ( len( curAggString ) > 0 ) {
-						curAggString = " {" + stripped( curAggString ) + '}';
+					switch ( MonthlyColumns( curCol ).aggType ) {
+						case aggTypeMaximum:
+							foundMinOrMax = true;
+							break;
+						case aggTypeMinimum:
+							foundMinOrMax = true;
+							break;
+						case aggTypeHoursNonZero:
+							foundHourAgg = true;
+							break;
+						case aggTypeHoursZero:
+							foundHourAgg = true;
+							break;
+						case aggTypeHoursPositive:
+							foundHourAgg = true;
+							break;
+						case aggTypeHoursNonPositive:
+							foundHourAgg = true;
+							break;
+						case aggTypeHoursNegative:
+							foundHourAgg = true;
+							break;
+						case aggTypeHoursNonNegative:
+							foundHourAgg = true;
+							break;
+						case aggTypeValueWhenMaxMin:
+							if ( !foundMinOrMax ) {
+								missingMaxOrMinError = true;
+							}
+							break;
+						case aggTypeSumOrAverageHoursShown:
+							if ( !foundHourAgg ) {
+								missingHourAggError = true;
+							}
+							break;
+						case aggTypeMaximumDuringHoursShown:
+							if ( !foundHourAgg ) {
+								missingHourAggError = true;
+							}
+							break;
+						case aggTypeMinimumDuringHoursShown:
+							if ( !foundHourAgg ) {
+								missingHourAggError = true;
+							}
+							break;
 					}
-					//do the unit conversions
-					if ( unitsStyle == unitsStyleInchPound ) {
-						varNameWithUnits = MonthlyColumns( curCol ).varName + '[' + MonthlyColumns( curCol ).units + ']';
-						LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
-						GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
-					} else { //just do the Joule conversion
-						//if units is in Joules, convert if specified
-						if ( SameString( MonthlyColumns( curCol ).units, "J" ) ) {
-							curUnits = energyUnitsString;
-							curConversionFactor = energyUnitsConversionFactor;
-							curConversionOffset = 0.0;
-						} else { //if not joules don't perform conversion
-							curUnits = MonthlyColumns( curCol ).units;
-							curConversionFactor = 1.0;
-							curConversionOffset = 0.0;
+				}
+				if ( missingHourAggError || missingMaxOrMinError ) {
+					columnHead.allocate( columnUsedCount );
+					columnWidth.dimension( columnUsedCount, 14 ); //array assignment - same for all columns
+					tableBody.allocate( columnUsedCount, 16 );
+					tableBody = ""; //set entire table to blank as default
+					columnRecount = 0;
+					for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+						curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+						curAggString = aggString( MonthlyColumns( curCol ).aggType );
+						if ( len( curAggString ) > 0 ) {
+							curAggString = " {" + stripped( curAggString ) + '}';
 						}
-					}
-					{ auto const SELECT_CASE_var( MonthlyColumns( curCol ).aggType );
-					if ( ( SELECT_CASE_var == aggTypeSumOrAvg ) || ( SELECT_CASE_var == aggTypeSumOrAverageHoursShown ) ) {
-						++columnRecount;
-						// put in the name of the variable for the column
-						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
-						sumVal = 0.0;
-						sumDuration = 0.0;
-						minVal = storedMaxVal;
-						maxVal = storedMinVal;
-						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
-							if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
-								if ( MonthlyColumns( curCol ).duration( lMonth ) != 0 ) {
-									curVal = ( ( MonthlyColumns( curCol ).reslt( lMonth ) / MonthlyColumns( curCol ).duration( lMonth ) ) * curConversionFactor ) + curConversionOffset;
+						//do the unit conversions
+						if ( unitsStyle == unitsStyleInchPound ) {
+							varNameWithUnits = MonthlyColumns( curCol ).varName + '[' + MonthlyColumns( curCol ).units + ']';
+							LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+							GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+						} else { //just do the Joule conversion
+							//if units is in Joules, convert if specified
+							if ( SameString( MonthlyColumns( curCol ).units, "J" ) ) {
+								curUnits = energyUnitsString;
+								curConversionFactor = energyUnitsConversionFactor;
+								curConversionOffset = 0.0;
+							} else { //if not joules don't perform conversion
+								curUnits = MonthlyColumns( curCol ).units;
+								curConversionFactor = 1.0;
+								curConversionOffset = 0.0;
+							}
+						}
+						{ auto const SELECT_CASE_var( MonthlyColumns( curCol ).aggType );
+						if ( ( SELECT_CASE_var == aggTypeSumOrAvg ) || ( SELECT_CASE_var == aggTypeSumOrAverageHoursShown ) ) {
+							++columnRecount;
+							// put in the name of the variable for the column
+							columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
+							sumVal = 0.0;
+							sumDuration = 0.0;
+							minVal = storedMaxVal;
+							maxVal = storedMinVal;
+							for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
+								if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
+									if ( MonthlyColumns( curCol ).duration( lMonth ) != 0 ) {
+										curVal = ( ( MonthlyColumns( curCol ).reslt( lMonth ) / MonthlyColumns( curCol ).duration( lMonth ) ) * curConversionFactor ) + curConversionOffset;
+									} else {
+										curVal = 0.0;
+									}
+									sumVal += ( MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor ) + curConversionOffset;
+									sumDuration += MonthlyColumns( curCol ).duration( lMonth );
 								} else {
-									curVal = 0.0;
+									curVal = ( MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor ) + curConversionOffset;
+									sumVal += curVal;
 								}
-								sumVal += ( MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor ) + curConversionOffset;
-								sumDuration += MonthlyColumns( curCol ).duration( lMonth );
-							} else {
-								curVal = ( MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor ) + curConversionOffset;
-								sumVal += curVal;
-							}
-							if ( IsMonthGathered( lMonth ) ) {
-								tableBody( columnRecount, lMonth ) = RealToStr( curVal, digitsShown );
-								if ( curVal > maxVal ) maxVal = curVal;
-								if ( curVal < minVal ) minVal = curVal;
-							} else {
-								tableBody( columnRecount, lMonth ) = "-";
-							}
-						} //lMonth
-						// add the summary to bottom
-						if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
-							if ( sumDuration > 0 ) {
-								tableBody( columnRecount, 14 ) = RealToStr( sumVal / sumDuration, digitsShown );
-							} else {
-								tableBody( columnRecount, 14 ) = "";
-							}
-						} else {
-							tableBody( columnRecount, 14 ) = RealToStr( sumVal, digitsShown );
-						}
-						if ( minVal != storedMaxVal ) {
-							tableBody( columnRecount, 15 ) = RealToStr( minVal, digitsShown );
-						}
-						if ( maxVal != storedMinVal ) {
-							tableBody( columnRecount, 16 ) = RealToStr( maxVal, digitsShown );
-						}
-					} else if ( ( SELECT_CASE_var == aggTypeHoursZero ) || ( SELECT_CASE_var == aggTypeHoursNonZero ) || ( SELECT_CASE_var == aggTypeHoursPositive ) || ( SELECT_CASE_var == aggTypeHoursNonPositive ) || ( SELECT_CASE_var == aggTypeHoursNegative ) || ( SELECT_CASE_var == aggTypeHoursNonNegative ) ) {
-
-						++columnRecount;
-						// put in the name of the variable for the column
-						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [HOURS]";
-						sumVal = 0.0;
-						minVal = storedMaxVal;
-						maxVal = storedMinVal;
-						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
-							curVal = MonthlyColumns( curCol ).reslt( lMonth );
-							if ( IsMonthGathered( lMonth ) ) {
-								tableBody( columnRecount, lMonth ) = RealToStr( curVal, digitsShown );
-								sumVal += curVal;
-								if ( curVal > maxVal ) maxVal = curVal;
-								if ( curVal < minVal ) minVal = curVal;
-							} else {
-								tableBody( columnRecount, lMonth ) = "-";
-							}
-						} //lMonth
-						// add the summary to bottom
-						tableBody( columnRecount, 14 ) = RealToStr( sumVal, digitsShown );
-						if ( minVal != storedMaxVal ) {
-							tableBody( columnRecount, 15 ) = RealToStr( minVal, digitsShown );
-						}
-						if ( maxVal != storedMinVal ) {
-							tableBody( columnRecount, 16 ) = RealToStr( maxVal, digitsShown );
-						}
-					} else if ( SELECT_CASE_var == aggTypeValueWhenMaxMin ) {
-						++columnRecount;
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) {
-							curUnits += "/s";
-						}
-						if ( SameString( curUnits, "J/s" ) ) {
-							curUnits = "W";
-						}
-						//CR7783 fix
-						if ( SameString( curUnits, "kWh/s" ) ) {
-							curUnits = "W";
-							curConversionFactor *= 3600000.0;
-						}
-						if ( SameString( curUnits, "GJ/s" ) ) {
-							curUnits = "kW";
-							curConversionFactor *= 1000000.0;
-						}
-						if ( SameString( curUnits, "MJ/s" ) ) {
-							curUnits = "kW";
-							curConversionFactor *= 1000.0;
-						}
-						if ( SameString( curUnits, "therm/s" ) ) {
-							curUnits = "kBtu/h";
-							curConversionFactor *= 360000.0;
-						}
-						if ( SameString( curUnits, "kBtu/s" ) ) {
-							curUnits = "kBtu/h";
-							curConversionFactor *= 3600.0;
-						}
-						if ( SameString( curUnits, "ton-hrs/s" ) ) {
-							curUnits = "ton";
-							curConversionFactor *= 3600.0;
-						}
-						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
-						minVal = storedMaxVal;
-						maxVal = storedMinVal;
-						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
-							curVal = MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor + curConversionOffset;
-							if ( IsMonthGathered( lMonth ) ) {
-								tableBody( columnRecount, lMonth ) = RealToStr( curVal, digitsShown );
-								if ( curVal > maxVal ) maxVal = curVal;
-								if ( curVal < minVal ) minVal = curVal;
-							} else {
-								tableBody( columnRecount, lMonth ) = "-";
-							}
-						} //lMonth
-						// add the summary to bottom
-						if ( minVal != storedMaxVal ) {
-							tableBody( columnRecount, 15 ) = RealToStr( minVal, digitsShown );
-						}
-						if ( maxVal != storedMinVal ) {
-							tableBody( columnRecount, 16 ) = RealToStr( maxVal, digitsShown );
-						}
-					} else if ( ( SELECT_CASE_var == aggTypeMaximum ) || ( SELECT_CASE_var == aggTypeMinimum ) || ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) || ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) ) {
-						columnRecount += 2;
-						// put in the name of the variable for the column
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
-							curUnits += "/s";
-						}
-						if ( SameString( curUnits, "J/s" ) ) {
-							curUnits = "W";
-						}
-						//CR7783 fix
-						if ( SameString( curUnits, "kWh/s" ) ) {
-							curUnits = "W";
-							curConversionFactor *= 3600000.0;
-						}
-						if ( SameString( curUnits, "GJ/s" ) ) {
-							curUnits = "kW";
-							curConversionFactor *= 1000000.0;
-						}
-						if ( SameString( curUnits, "MJ/s" ) ) {
-							curUnits = "kW";
-							curConversionFactor *= 1000.0;
-						}
-						if ( SameString( curUnits, "therm/s" ) ) {
-							curUnits = "kBtu/h";
-							curConversionFactor *= 360000.0;
-						}
-						if ( SameString( curUnits, "kBtu/s" ) ) {
-							curUnits = "kBtu/h";
-							curConversionFactor *= 3600.0;
-						}
-						if ( SameString( curUnits, "ton-hrs/s" ) ) {
-							curUnits = "ton";
-							curConversionFactor *= 3600.0;
-						}
-						columnHead( columnRecount - 1 ) = MonthlyColumns( curCol ).varName + curAggString + '[' + curUnits + ']';
-						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + " {TIMESTAMP} ";
-						minVal = storedMaxVal;
-						maxVal = storedMinVal;
-						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
-							if ( IsMonthGathered( lMonth ) ) {
-								curVal = MonthlyColumns( curCol ).reslt( lMonth );
-								//CR7788 the conversion factors were causing an overflow for the InchPound case since the
-								//value was very small
-								//restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
-								if ( ( curVal < veryLarge ) && ( curVal > verySmall ) ) {
-									curVal = curVal * curConversionFactor + curConversionOffset;
+								if ( IsMonthGathered( lMonth ) ) {
+									tableBody( columnRecount, lMonth ) = RealToStr( curVal, digitsShown );
 									if ( curVal > maxVal ) maxVal = curVal;
 									if ( curVal < minVal ) minVal = curVal;
-									if ( curVal < veryLarge && curVal > verySmall ) {
-										tableBody( columnRecount - 1, lMonth ) = RealToStr( curVal, digitsShown );
+								} else {
+									tableBody( columnRecount, lMonth ) = "-";
+								}
+							} //lMonth
+							// add the summary to bottom
+							if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
+								if ( sumDuration > 0 ) {
+									tableBody( columnRecount, 14 ) = RealToStr( sumVal / sumDuration, digitsShown );
+								} else {
+									tableBody( columnRecount, 14 ) = "";
+								}
+							} else {
+								tableBody( columnRecount, 14 ) = RealToStr( sumVal, digitsShown );
+							}
+							if ( minVal != storedMaxVal ) {
+								tableBody( columnRecount, 15 ) = RealToStr( minVal, digitsShown );
+							}
+							if ( maxVal != storedMinVal ) {
+								tableBody( columnRecount, 16 ) = RealToStr( maxVal, digitsShown );
+							}
+						} else if ( ( SELECT_CASE_var == aggTypeHoursZero ) || ( SELECT_CASE_var == aggTypeHoursNonZero ) || ( SELECT_CASE_var == aggTypeHoursPositive ) || ( SELECT_CASE_var == aggTypeHoursNonPositive ) || ( SELECT_CASE_var == aggTypeHoursNegative ) || ( SELECT_CASE_var == aggTypeHoursNonNegative ) ) {
+
+							++columnRecount;
+							// put in the name of the variable for the column
+							columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [HOURS]";
+							sumVal = 0.0;
+							minVal = storedMaxVal;
+							maxVal = storedMinVal;
+							for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
+								curVal = MonthlyColumns( curCol ).reslt( lMonth );
+								if ( IsMonthGathered( lMonth ) ) {
+									tableBody( columnRecount, lMonth ) = RealToStr( curVal, digitsShown );
+									sumVal += curVal;
+									if ( curVal > maxVal ) maxVal = curVal;
+									if ( curVal < minVal ) minVal = curVal;
+								} else {
+									tableBody( columnRecount, lMonth ) = "-";
+								}
+							} //lMonth
+							// add the summary to bottom
+							tableBody( columnRecount, 14 ) = RealToStr( sumVal, digitsShown );
+							if ( minVal != storedMaxVal ) {
+								tableBody( columnRecount, 15 ) = RealToStr( minVal, digitsShown );
+							}
+							if ( maxVal != storedMinVal ) {
+								tableBody( columnRecount, 16 ) = RealToStr( maxVal, digitsShown );
+							}
+						} else if ( SELECT_CASE_var == aggTypeValueWhenMaxMin ) {
+							++columnRecount;
+							if ( MonthlyColumns( curCol ).avgSum == isSum ) {
+								curUnits += "/s";
+							}
+							if ( SameString( curUnits, "J/s" ) ) {
+								curUnits = "W";
+							}
+							//CR7783 fix
+							if ( SameString( curUnits, "kWh/s" ) ) {
+								curUnits = "W";
+								curConversionFactor *= 3600000.0;
+							}
+							if ( SameString( curUnits, "GJ/s" ) ) {
+								curUnits = "kW";
+								curConversionFactor *= 1000000.0;
+							}
+							if ( SameString( curUnits, "MJ/s" ) ) {
+								curUnits = "kW";
+								curConversionFactor *= 1000.0;
+							}
+							if ( SameString( curUnits, "therm/s" ) ) {
+								curUnits = "kBtu/h";
+								curConversionFactor *= 360000.0;
+							}
+							if ( SameString( curUnits, "kBtu/s" ) ) {
+								curUnits = "kBtu/h";
+								curConversionFactor *= 3600.0;
+							}
+							if ( SameString( curUnits, "ton-hrs/s" ) ) {
+								curUnits = "ton";
+								curConversionFactor *= 3600.0;
+							}
+							columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
+							minVal = storedMaxVal;
+							maxVal = storedMinVal;
+							for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
+								curVal = MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor + curConversionOffset;
+								if ( IsMonthGathered( lMonth ) ) {
+									tableBody( columnRecount, lMonth ) = RealToStr( curVal, digitsShown );
+									if ( curVal > maxVal ) maxVal = curVal;
+									if ( curVal < minVal ) minVal = curVal;
+								} else {
+									tableBody( columnRecount, lMonth ) = "-";
+								}
+							} //lMonth
+							// add the summary to bottom
+							if ( minVal != storedMaxVal ) {
+								tableBody( columnRecount, 15 ) = RealToStr( minVal, digitsShown );
+							}
+							if ( maxVal != storedMinVal ) {
+								tableBody( columnRecount, 16 ) = RealToStr( maxVal, digitsShown );
+							}
+						} else if ( ( SELECT_CASE_var == aggTypeMaximum ) || ( SELECT_CASE_var == aggTypeMinimum ) || ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) || ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) ) {
+							columnRecount += 2;
+							// put in the name of the variable for the column
+							if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
+								curUnits += "/s";
+							}
+							if ( SameString( curUnits, "J/s" ) ) {
+								curUnits = "W";
+							}
+							//CR7783 fix
+							if ( SameString( curUnits, "kWh/s" ) ) {
+								curUnits = "W";
+								curConversionFactor *= 3600000.0;
+							}
+							if ( SameString( curUnits, "GJ/s" ) ) {
+								curUnits = "kW";
+								curConversionFactor *= 1000000.0;
+							}
+							if ( SameString( curUnits, "MJ/s" ) ) {
+								curUnits = "kW";
+								curConversionFactor *= 1000.0;
+							}
+							if ( SameString( curUnits, "therm/s" ) ) {
+								curUnits = "kBtu/h";
+								curConversionFactor *= 360000.0;
+							}
+							if ( SameString( curUnits, "kBtu/s" ) ) {
+								curUnits = "kBtu/h";
+								curConversionFactor *= 3600.0;
+							}
+							if ( SameString( curUnits, "ton-hrs/s" ) ) {
+								curUnits = "ton";
+								curConversionFactor *= 3600.0;
+							}
+							columnHead( columnRecount - 1 ) = MonthlyColumns( curCol ).varName + curAggString + '[' + curUnits + ']';
+							columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + " {TIMESTAMP} ";
+							minVal = storedMaxVal;
+							maxVal = storedMinVal;
+							for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
+								if ( IsMonthGathered( lMonth ) ) {
+									curVal = MonthlyColumns( curCol ).reslt( lMonth );
+									//CR7788 the conversion factors were causing an overflow for the InchPound case since the
+									//value was very small
+									//restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
+									if ( ( curVal < veryLarge ) && ( curVal > verySmall ) ) {
+										curVal = curVal * curConversionFactor + curConversionOffset;
+										if ( curVal > maxVal ) maxVal = curVal;
+										if ( curVal < minVal ) minVal = curVal;
+										if ( curVal < veryLarge && curVal > verySmall ) {
+											tableBody( columnRecount - 1, lMonth ) = RealToStr( curVal, digitsShown );
+										} else {
+											tableBody( columnRecount - 1, lMonth ) = "-";
+										}
+										tableBody( columnRecount, lMonth ) = DateToString( MonthlyColumns( curCol ).timeStamp( lMonth ) );
 									} else {
 										tableBody( columnRecount - 1, lMonth ) = "-";
+										tableBody( columnRecount, lMonth ) = "-";
 									}
-									tableBody( columnRecount, lMonth ) = DateToString( MonthlyColumns( curCol ).timeStamp( lMonth ) );
 								} else {
 									tableBody( columnRecount - 1, lMonth ) = "-";
 									tableBody( columnRecount, lMonth ) = "-";
 								}
+							} //lMonth
+							// add the summary to bottom
+							// Don't include if the original min and max values are still present
+							if ( minVal < veryLarge ) {
+								tableBody( columnRecount - 1, 15 ) = RealToStr( minVal, digitsShown );
 							} else {
-								tableBody( columnRecount - 1, lMonth ) = "-";
-								tableBody( columnRecount, lMonth ) = "-";
+								tableBody( columnRecount - 1, 15 ) = "-";
 							}
-						} //lMonth
-						// add the summary to bottom
-						// Don't include if the original min and max values are still present
-						if ( minVal < veryLarge ) {
-							tableBody( columnRecount - 1, 15 ) = RealToStr( minVal, digitsShown );
-						} else {
-							tableBody( columnRecount - 1, 15 ) = "-";
-						}
-						if ( maxVal > verySmall ) {
-							tableBody( columnRecount - 1, 16 ) = RealToStr( maxVal, digitsShown );
-						} else {
-							tableBody( columnRecount - 1, 15 ) = "-";
-						}
-					}}
-				} //KColumn
-				WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, isAverage );
-				WriteSubtitle( "Custom Monthly Report" );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
-				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
-				}
+							if ( maxVal > verySmall ) {
+								tableBody( columnRecount - 1, 16 ) = RealToStr( maxVal, digitsShown );
+							} else {
+								tableBody( columnRecount - 1, 15 ) = "-";
+							}
+						}}
+					} //KColumn
+					WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, isAverage );
+					WriteSubtitle( "Custom Monthly Report" );
+					WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
+					}
+				} // if ( missingHourAggError || missingMaxOrMinError )
 			} //jTables
+			if ( missingMaxOrMinError ) {
+				ShowWarningError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
+			}
+			if ( missingHourAggError ) {
+				ShowWarningError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
+			}
 		} // iInput
 	}
 
