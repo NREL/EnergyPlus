@@ -6402,51 +6402,21 @@ namespace OutputReportTabular {
 				// test if the aggregation types are in the correct order
 				for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
 					curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
-					switch ( MonthlyColumns( curCol ).aggType ) {
-						case aggTypeMaximum:
-							foundMinOrMax = true;
-							break;
-						case aggTypeMinimum:
-							foundMinOrMax = true;
-							break;
-						case aggTypeHoursNonZero:
-							foundHourAgg = true;
-							break;
-						case aggTypeHoursZero:
-							foundHourAgg = true;
-							break;
-						case aggTypeHoursPositive:
-							foundHourAgg = true;
-							break;
-						case aggTypeHoursNonPositive:
-							foundHourAgg = true;
-							break;
-						case aggTypeHoursNegative:
-							foundHourAgg = true;
-							break;
-						case aggTypeHoursNonNegative:
-							foundHourAgg = true;
-							break;
-						case aggTypeValueWhenMaxMin:
-							if ( !foundMinOrMax ) {
-								missingMaxOrMinError = true;
-							}
-							break;
-						case aggTypeSumOrAverageHoursShown:
-							if ( !foundHourAgg ) {
-								missingHourAggError = true;
-							}
-							break;
-						case aggTypeMaximumDuringHoursShown:
-							if ( !foundHourAgg ) {
-								missingHourAggError = true;
-							}
-							break;
-						case aggTypeMinimumDuringHoursShown:
-							if ( !foundHourAgg ) {
-								missingHourAggError = true;
-							}
-							break;
+					int curAggType = MonthlyColumns( curCol ).aggType;
+					if ( ( curAggType == aggTypeMaximum ) || ( curAggType == aggTypeMinimum ) ) {
+						foundMinOrMax = true;
+					} else if ( ( curAggType == aggTypeHoursNonZero ) || ( curAggType == aggTypeHoursZero ) ||
+								( curAggType == aggTypeHoursPositive ) || ( curAggType == aggTypeHoursNonPositive ) ||
+								( curAggType == aggTypeHoursNegative ) || ( curAggType == aggTypeHoursNonNegative ) ) {
+						foundHourAgg = true;
+					} else if ( curAggType == aggTypeValueWhenMaxMin ) {
+						if ( !foundMinOrMax ) {
+							missingMaxOrMinError = true;
+						}
+					} else if ( ( curAggType == aggTypeSumOrAverageHoursShown ) || ( curAggType == aggTypeMaximumDuringHoursShown ) || ( curAggType == aggTypeMinimumDuringHoursShown ) ) {
+						if ( !foundHourAgg ) {
+							missingHourAggError = true;
+						}
 					}
 				}
 				if ( missingHourAggError || missingMaxOrMinError ) {

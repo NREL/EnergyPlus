@@ -256,51 +256,26 @@ namespace EnergyPlus {
 			bool missingMaxOrMinError = false;
 			bool missingHourAggError = false;
 			for ( fldStIt = m_annualFields.begin( ); fldStIt != m_annualFields.end( ); ++fldStIt ) {
-				switch ( fldStIt->m_aggregate ) {
-				case AnnualFieldSet::AggregationKind::maximum:
-				    foundMinOrMax = true;
-					break;
-				case AnnualFieldSet::AggregationKind::minimum:
+				if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum ) ||
+					 ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum ) ) {
 					foundMinOrMax = true;
-				    break;
-				case AnnualFieldSet::AggregationKind::hoursNonZero:
+				} else if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonZero ) ||
+					        ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursZero ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursPositive ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonPositive ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNegative ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonNegative ) ){
 					foundHourAgg = true;
-				    break;
-				case AnnualFieldSet::AggregationKind::hoursZero:
-					foundHourAgg = true;
-					break;
-				case AnnualFieldSet::AggregationKind::hoursPositive:
-					foundHourAgg = true;
-					break;
-				case AnnualFieldSet::AggregationKind::hoursNonPositive:
-					foundHourAgg = true;
-				    break;
-				case AnnualFieldSet::AggregationKind::hoursNegative:
-					foundHourAgg = true;
-					break;
-				case AnnualFieldSet::AggregationKind::hoursNonNegative:
-					foundHourAgg = true;
-					break;
-				case AnnualFieldSet::AggregationKind::valueWhenMaxMin:
-				    if ( !foundMinOrMax ) {
+				} else if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::valueWhenMaxMin ){
+					if ( !foundMinOrMax ) {
 						missingMaxOrMinError = true;
 					}
-				    break;
-				case AnnualFieldSet::AggregationKind::sumOrAverageHoursShown:
-				    if ( !foundHourAgg ) {
-						missingHourAggError = true;
-					}
-				    break;
-				case AnnualFieldSet::AggregationKind::maximumDuringHoursShown:
+				} else if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::sumOrAverageHoursShown ) ||
+					        ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ) ){
 					if ( !foundHourAgg ) {
 						missingHourAggError = true;
 					}
-					break;
-				case AnnualFieldSet::AggregationKind::minimumDuringHoursShown:
-					if ( !foundHourAgg ) {
-						missingHourAggError = true;
-					}
-					break;
 				}
 			}
 			if ( missingMaxOrMinError ) {
