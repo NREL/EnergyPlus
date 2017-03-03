@@ -705,6 +705,7 @@ namespace DataZoneEquipment {
 				ZoneEquipConfig( ControlledZoneNum ).NumInletNodes = NumNodes;
 
 				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
 
@@ -716,6 +717,7 @@ namespace DataZoneEquipment {
 						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
 						GetZoneEquipmentDataErrorsFound = true;
 					}
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
@@ -760,7 +762,7 @@ namespace DataZoneEquipment {
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
-					// Save the first return air node number in ReturnAirNode (this wil be removed later)
+					// Save the first return air node number for now in ReturnAirNode (this wil be removed later)
 					if ( NodeNum == 1 ) ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = NodeNums( NodeNum );
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );

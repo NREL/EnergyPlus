@@ -328,6 +328,7 @@ namespace DataZoneEquipment {
 		int ReturnFlowSchedPtrNum; // return air flow fraction schedule pointer
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
+		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
 		Array1D_int ReturnNode; // zone return air nodes
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node

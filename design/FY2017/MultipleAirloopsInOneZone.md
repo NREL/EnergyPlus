@@ -372,7 +372,11 @@ New example files will be made to show various combinations of systems.
 
 10/31 - Scheier - The proposed DesignSpecification:AirTerminal:Sizing object contains many fields that currently exist on some AirTerminal objects, but not others.
 
-1. Should users expect the new fields to be used solely for sizing the AT or will some also have an effect on the HVAC simulation? For example, for VAV AT's, will the "Design Spec OA Object Name" field on the new DesignSpecification:AirTerminal:Sizing object have an effect on the HVAC simulation of minimum airflow as is now done for the AT:SingleDuct:VAV:NoReheat and AT:SingleDuct:VAV:Reheat objects?
+1. Should users expect the new fields to be used solely for sizing the AT or will some also have an effect on the HVAC simulation? For example, for VAV AT's, will the "
+2. 
+3. 
+4. 
+5.  Spec OA Object Name" field on the new DesignSpecification:AirTerminal:Sizing object have an effect on the HVAC simulation of minimum airflow as is now done for the AT:SingleDuct:VAV:NoReheat and AT:SingleDuct:VAV:Reheat objects?
 
 	*MJW 1. Good point - I didn't think about those overlaps.  The intent of the proposal was that the new sizing object would work the same way that `Sizing:Zone` currently works - just for sizing.  Maybe a better solution is to allow generic `Sizing:Zone` objects that aren't linked to a specific zone?  Or to shorten the proposed new object to be exactly like `Sizing:Zone`.*
 
@@ -443,7 +447,7 @@ In struct `DefinePrimaryAirSystem`
 *2/19/2017  - At this point, added design return frac, but that's all basically.*
 
 #### ZoneEquipmentManager::CalcZoneMassBalance ####
-This function will be refactored into multiple smaller functions reflecting the steps outlined in the above NFP section plus other sections currently in this function:
+This function may be refactored into multiple smaller functions reflecting the steps outlined in the above NFP section plus other sections currently in this function:
 
   - Initialize values to zero
   - Sum zone inlet, exhaust, and mixing flows
@@ -565,17 +569,17 @@ Searching on `.ReturnAirNode` and `.AirLoopNum` shows relevant hits in:
 - *Done* In `DataSizing` add a new variable for `NumAirTerminalUnits` which is the number of air terminal units.  This will be incremented as ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled objects are created.
 - *Done* In `DataSizing` add a new variable for `CurTermUnitSizingNum` which is equivalent to `CurZoneEqNum`. Use only where the TermUnitSizingIndex cannot be determined directly from the component or ADU number.
 
-**ARRRGHHH!!!!** TermUnitSizing isn't filled for everyone, only some parts are used for certain type of terminal units. Ones that currently don't rely on that don't fill it.
+*Hmmm* `TermUnitSizing` isn't filled for everyone, only some parts are used for certain type of terminal units. Ones that currently don't rely on that don't fill it. But that may be ok.  The important info ends up in `TermUnitFinalZoneSizing`.
 
 - *Done* Change `TermUnitSizing` and `TermUnitFinalZoneSizing` to be indexed separately, not by zone.
   - *If this proves to be too intrusive or risky, consider adding yet another array that is indexed by ADU.* 
-- Expand `TermUnitSizing` to include pertinent inputs from a referenced `DesignSpecification:AirTerminal:Sizing` object. These fields will default to 1.0 if there is no `DesignSpecification:AirTerminal:Sizing` object for a given ADU.
-- In `UpdateSysSizing`, change some things that are indexed by CtrlZoneNum (or equivalent) to be indexed by terminal unit sizing index.
+- *Done* Expand `TermUnitSizing` to include pertinent inputs from a referenced `DesignSpecification:AirTerminal:Sizing` object. These fields will default to 1.0 if there is no `DesignSpecification:AirTerminal:Sizing` object for a given ADU.
+- *Done* In `UpdateSysSizing`, change some things that are indexed by CtrlZoneNum (or equivalent) to be indexed by terminal unit sizing index.
 - *Done* Add two arrays to `DataAirloop::AirLoopZoneEquipConnectData`
   - `Array1D_int TermUnitCoolSizingIndex`
   - `Array1D_int TermUnitHeatSizingIndex`
   - These get filled in `SimAirServingZones::InitAirLoops`
-- Wherever sizing calculations are made in the terminal unit sizing routines and in `RequestSizing`, apply the input factors from `DesignSpecification:AirTerminal:Sizing` which are stored in `TermUnitSizing`.
+- *Done* Wherever sizing calculations are made in the ~~terminal unit~~ system sizing routines and ~~in `RequestSizing`~~ and when filling `TermUnitFinalZoneSizing`, apply the input factors from `DesignSpecification:AirTerminal:Sizing` which are stored in `TermUnitSizing`.
  
 
 ### 8. Allow an airloop with no return path *(if budget allows)*

@@ -1810,6 +1810,7 @@ namespace SingleDuct {
 			// Find air loop associated with terminal unit
 			if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheat || Sys( SysNum ).SysType_Num == SingleDuctVAVNoReheat ) {
 				if ( Sys( SysNum ).CtrlZoneNum > 0 ) {
+					// MJW This will need more smarts - ok for now
 					Sys( SysNum ).AirLoopNum = ZoneEquipConfig( Sys( SysNum ).CtrlZoneNum ).AirLoopNum;
 				}
 			}
