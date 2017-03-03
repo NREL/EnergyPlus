@@ -2358,9 +2358,9 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
-							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-							ZoneDesHumRat = CalcFinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad * FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneDesTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
+							ZoneDesHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {

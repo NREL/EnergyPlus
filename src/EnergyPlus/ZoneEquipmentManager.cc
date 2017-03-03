@@ -777,10 +777,6 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = Node( ZoneNode ).HumRat;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutTemp = OutDryBulbTemp;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutHumRat = OutHumRat;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolLoad = 0.0;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = 0.0;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneTemp = 0.0;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneHumRat = 0.0;
 			} else {
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolLoad = -SysOutputProvided;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = MassFlowRate;
@@ -788,10 +784,6 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneHumRat = Node( ZoneNode ).HumRat;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutTemp = OutDryBulbTemp;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutHumRat = OutHumRat;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatLoad = 0.0;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatMassFlow = 0.0;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneTemp = 0.0;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = 0.0;
 			}
 
 			if ( SupplyAirNode > 0 ) {
@@ -2774,7 +2766,12 @@ namespace ZoneEquipmentManager {
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepAtPeakF );
+						// issue 6006, heating coils sizing to 0 when no heating load in zone
+						if( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.empty() ) {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepAtPeakF );
+						} else {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.end() );
+						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
@@ -2894,7 +2891,12 @@ namespace ZoneEquipmentManager {
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepAtPeakF );
+						// issue 6006, heating coils sizing to 0 when no heating load in zone
+						if( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.empty() ) {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepAtPeakF );
+						} else {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = *std::max_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.end() );
+						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, RoutineName ) );
