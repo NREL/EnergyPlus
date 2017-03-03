@@ -4729,13 +4729,15 @@ namespace SimAirServingZones {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				// Use first non-zero airdistunit for now
+				int TermUnitSizingIndex = 0;
 				for ( int InletNode = 1; InletNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++InletNode ) {
-					int TermUnitSizingIndex = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( InletNode ).TermUnitSizingIndex;
+					TermUnitSizingIndex = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( InletNode ).TermUnitSizingIndex;
 					if ( TermUnitSizingIndex == 0 ) continue;
 					termunitsizingtemp = ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					termunitsizingtempfrac = ( 1.0 / termunitsizingtemp );
 					if ( TermUnitSizingIndex > 0 ) break;
 				}
+				if ( TermUnitSizingIndex == 0 ) continue; // Skip this if there are no terminal units
 				RetTempRise = ZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneRetTempAtCoolPeak - ZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtCoolPeak;
 				if ( RetTempRise > 0.01 ) {
 					//avoid possible compiler bug
@@ -4796,7 +4798,8 @@ namespace SimAirServingZones {
 			// ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				// Use first non-zero airdistunit for now
+				// Use first non-zero airdistunit for now, if there is one
+				termunitsizingtempfrac = 1.0;
 				int TermUnitSizingIndex = 0;
 				for ( int InletNode = 1; InletNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++InletNode ) {
 					TermUnitSizingIndex = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( InletNode ).TermUnitSizingIndex;
@@ -4805,6 +4808,7 @@ namespace SimAirServingZones {
 					termunitsizingtempfrac = ( 1.0 / termunitsizingtemp );
 					if ( TermUnitSizingIndex > 0 ) break;
 				}
+				if ( TermUnitSizingIndex == 0 ) continue; // Skip this if there are no terminal units
 				RetTempRise = ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepInDay ) - ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepInDay );
 				if ( RetTempRise > 0.01 ) {
 					//avoid possible compiler bug
@@ -5548,14 +5552,17 @@ namespace SimAirServingZones {
 			// ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				// Use first non-zero airdistunit for now
+				// Use first non-zero airdistunit for now, if there is one
+				termunitsizingtempfrac = 1.0;
+				int TermUnitSizingIndex = 0;
 				for ( int InletNode = 1; InletNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++InletNode ) {
-					int TermUnitSizingIndex = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( InletNode ).TermUnitSizingIndex;
+					TermUnitSizingIndex = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( InletNode ).TermUnitSizingIndex;
 					if ( TermUnitSizingIndex == 0 ) continue;
 					termunitsizingtemp = ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					termunitsizingtempfrac = ( 1.0 / termunitsizingtemp );
 					if ( TermUnitSizingIndex > 0 ) break;
 				}
+				if ( TermUnitSizingIndex == 0 ) continue; // Skip this if there are no terminal units
 				RetTempRise = FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak - FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 				if ( RetTempRise > 0.01 ) {
 					//avoid possible compiler bug
