@@ -173,6 +173,7 @@ namespace DesiccantDehumidifiers {
 		std::string ExhaustFanCurveObject; // exhaust fan curve object
 		std::string CoolingCoilType; // type of cooling coil used with desiccant heat exchanger
 		std::string CoolingCoilName; // name of cooling coil used with desiccant heat exchanger
+		int coolingCoil_TypeNum;  // type of cooling coil, DataHVACGlobals coil type constants
 		int Preheat; // determine condenser waste heat usage for pre heating regen air
 		Real64 RegenSetPointTemp; // heating set-point for regeneration air [C]
 		Real64 ExhaustFanMaxVolFlowRate; // exhaust fan maximum allowable air flow rate [m3/s]
@@ -274,6 +275,7 @@ namespace DesiccantDehumidifiers {
 			RegenFanErrorIndex3( 0 ),
 			RegenFanErrorIndex4( 0 ),
 			HXTypeNum( 0 ),
+			coolingCoil_TypeNum( 0 ),
 			Preheat( 0 ),
 			RegenSetPointTemp( 0.0 ),
 			ExhaustFanMaxVolFlowRate( 0.0 ),

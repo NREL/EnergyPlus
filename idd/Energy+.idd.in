@@ -9252,6 +9252,7 @@ BuildingSurface:Detailed,
        \key Surface
        \key Zone
        \key Outdoors
+       \key Foundation
        \key Ground
        \key GroundFCfactorMethod
        \key OtherSideCoefficients
@@ -9272,6 +9273,8 @@ BuildingSurface:Detailed,
        \note specify current surface name for internal partition separating like zones
        \note If Zone, specify the name of the corresponding zone and
        \note the program will generate the corresponding interzone surface
+       \note If Foundation, specify the name of the corresponding Foundation object and
+       \note the program will calculate the heat transfer appropriately
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A7 , \field Sun Exposure
@@ -10429,6 +10432,7 @@ Wall:Detailed,
        \key Surface
        \key Zone
        \key Outdoors
+       \key Foundation
        \key Ground
        \key GroundFCfactorMethod
        \key OtherSideCoefficients
@@ -10449,6 +10453,7 @@ Wall:Detailed,
        \note specify current surface name for internal partition separating like zones
        \note If Zone, specify the name of the corresponding zone and
        \note the program will generate the corresponding interzone surface
+       \note If Foundation, specify the name of the corresponding Foundation object and
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A6 , \field Sun Exposure
@@ -10799,6 +10804,7 @@ Floor:Detailed,
        \key Surface
        \key Zone
        \key Outdoors
+       \key Foundation
        \key Ground
        \key GroundFCfactorMethod
        \key OtherSideCoefficients
@@ -10819,6 +10825,7 @@ Floor:Detailed,
        \note specify current surface name for internal partition separating like zones
        \note If Zone, specify the name of the corresponding zone and
        \note the program will generate the corresponding interzone surface
+       \note If Foundation, specify the name of the corresponding Foundation object and
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A6 , \field Sun Exposure
@@ -16067,6 +16074,372 @@ SurfaceProperty:OtherSideConditionsModel,
       \note  in contact with GroundDomain objects
       \default GapConvectionRadiation
 
+Foundation:Kiva,
+       \memo Refined definition of the foundation surface construction used to
+       \memo inform two-dimensional heat transfer calculated using the Kiva
+       \memo ground heat transfer methodology.
+       \extensible:4
+  A1,  \field Name
+       \required-field
+       \type alpha
+       \reference OutFaceEnvNames
+  A2,  \field Interior Horizontal Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N1,  \field Interior Horizontal Insulation Depth
+       \note Distance from the slab bottom to the top of interior horizontal
+       \note insulation
+       \units m
+       \type real
+       \minimum 0.0
+       \default 0.0
+  N2,  \field Interior Horizontal Insulation Width
+       \note Extent of insulation as measured from the wall interior
+       \units m
+       \type real
+       \minimum> 0.0
+  A3,  \field Interior Vertical Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N3,  \field Interior Vertical Insulation Depth
+       \note Extent of insulation as measured from the wall top to the bottom
+       \note edge of the interior vertical insulation
+       \units m
+       \type real
+       \minimum> 0.0
+  A4,  \field Exterior Horizontal Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N4,  \field Exterior Horizontal Insulation Depth
+       \note Distance from the exterior grade to the top of exterior horizontal
+       \note insulation
+       \units m
+       \type real
+       \minimum 0.0
+  N5,  \field Exterior Horizontal Insulation Width
+       \note Extent of insulation as measured from the wall exterior
+       \units m
+       \type real
+       \minimum 0.0
+       \default 0.0
+  A5,  \field Exterior Vertical Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N6,  \field Exterior Vertical Insulation Depth
+       \note Extent of insulation as measured from the wall top to the bottom
+       \note edge of the exterior vertical insulation
+       \units m
+       \type real
+       \minimum> 0.0
+  N7,  \field Wall Height Above Grade
+       \note Distance from the exterior grade to the wall top
+       \units m
+       \type real
+       \minimum 0.0
+       \default 0.2
+  N8,  \field Wall Depth Below Slab
+       \note Distance from the slab bottom to the bottom of the foundation wall
+       \units m
+       \type real
+       \minimum 0.0
+       \default 0.0
+  A6,  \field Footing Wall Construction Name
+       \note Defines the below-grade surface construction for slabs. Required
+       \note if foundation wall is not exposed to the zone.
+       \type object-list
+       \object-list ConstructionNames
+  A7,  \field Footing Material Name
+       \type object-list
+       \object-list MaterialName
+  N9,  \field Footing Depth
+       \note Top-to-bottom dimension of the footing (not to be confused with its
+       \note depth in the ground). The width of the footing is defined by the
+       \note material's thickness.
+       \units m
+       \type real
+       \minimum> 0.0
+       \default 0.3
+  A8,  \field Custom Block 1 Material Name
+       \begin-extensible
+       \type object-list
+       \object-list MaterialName
+  N10, \field Custom Block 1 Depth
+       \note Top-to-bottom dimension of the block downward.
+       \units m
+       \type real
+       \minimum> 0.0
+  N11, \field Custom Block 1 X Position
+       \note Position outward (+) or inward (-) relative to the foundation wall
+       \note interior
+       \units m
+       \type real
+  N12, \field Custom Block 1 Z Position
+       \note Position downward (+) relative to the foundation wall top
+       \units m
+       \type real
+  A9,  \field Custom Block 2 Material Name
+       \type object-list
+       \object-list MaterialName
+  N13, \field Custom Block 2 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N14, \field Custom Block 2 X Position
+       \units m
+       \type real
+  N15, \field Custom Block 2 Z Position
+       \units m
+       \type real
+  A10, \field Custom Block 3 Material Name
+       \type object-list
+       \object-list MaterialName
+  N16, \field Custom Block 3 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N17, \field Custom Block 3 X Position
+       \units m
+       \type real
+  N18, \field Custom Block 3 Z Position
+       \units m
+       \type real
+  A11, \field Custom Block 4 Material Name
+       \type object-list
+       \object-list MaterialName
+  N19, \field Custom Block 4 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N20, \field Custom Block 4 X Position
+       \units m
+       \type real
+  N21, \field Custom Block 4 Z Position
+       \units m
+       \type real
+  A12, \field Custom Block 5 Material Name
+       \type object-list
+       \object-list MaterialName
+  N22, \field Custom Block 5 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N23, \field Custom Block 5 X Position
+       \units m
+       \type real
+  N24, \field Custom Block 5 Z Position
+       \units m
+       \type real
+  A13, \field Custom Block 6 Material Name
+       \type object-list
+       \object-list MaterialName
+  N25, \field Custom Block 6 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N26, \field Custom Block 6 X Position
+       \units m
+       \type real
+  N27, \field Custom Block 6 Z Position
+       \units m
+       \type real
+  A14, \field Custom Block 7 Material Name
+       \type object-list
+       \object-list MaterialName
+  N16, \field Custom Block 7 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N29, \field Custom Block 7 X Position
+       \units m
+       \type real
+  N30, \field Custom Block 7 Z Position
+       \units m
+       \type real
+  A15, \field Custom Block 8 Material Name
+       \type object-list
+       \object-list MaterialName
+  N31, \field Custom Block 8 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N32, \field Custom Block 8 X Position
+       \units m
+       \type real
+  N33, \field Custom Block 8 Z Position
+       \units m
+       \type real
+  A16, \field Custom Block 9 Material Name
+       \type object-list
+       \object-list MaterialName
+  N34, \field Custom Block 9 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N35, \field Custom Block 9 X Position
+       \units m
+       \type real
+  N36, \field Custom Block 9 Z Position
+       \units m
+       \type real
+  A17, \field Custom Block 10 Material Name
+       \type object-list
+       \object-list MaterialName
+  N37, \field Custom Block 10 Depth
+       \units m
+       \type real
+  N38, \field Custom Block 10 X Position
+       \units m
+       \type real
+       \minimum> 0.0
+  N39; \field Custom Block 10 Z Position
+       \units m
+       \type real
+
+Foundation:Kiva:Settings,
+       \memo Settings applied across all Kiva foundation calculations.
+       \memo Object is not required. If not defined, defaults will be applied.
+  N1,  \field Soil Conductivity
+       \type real
+       \default 1.73
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \type real
+       \default 1842
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \type real
+       \default 419
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Ground Solar Absorptivity
+       \type real
+       \default 0.9
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+  N5,  \field Ground Thermal Absorptivity
+       \type real
+       \default 0.9
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+  N6,  \field Ground Surface Roughness
+       \type real
+       \default 0.03
+       \units m
+       \minimum> 0.0
+  N7,  \field Far-Field Width
+       \type real
+       \default 40
+       \units m
+       \minimum> 0.0
+  A1,  \field Deep-Ground Boundary Condition
+       \type choice
+       \key ZeroFlux
+       \key GroundWater
+       \key Autoselect
+       \default Autoselect
+  N8,  \field Deep-Ground Depth
+       \type real
+       \default 40
+       \units m
+       \minimum> 0.0
+       \autocalculatable
+       \default autocalculate
+  N9,  \field Minimum Cell Dimension
+       \type real
+       \default 0.02
+       \units m
+       \minimum> 0.0
+  N10, \field Maximum Cell Growth Coefficient
+       \type real
+       \default 1.5
+       \units dimensionless
+       \minimum 1.0
+  A2;  \field Simulation Timestep
+       \type choice
+       \key Hourly
+       \key Timestep
+       \default Hourly
+
+SurfaceProperty:ExposedFoundationPerimeter,
+       \memo Defines the perimeter of a foundation floor that is exposed to the
+       \memo exterior environment through the floor. User may either define the
+       \memo total exposed perimeter or individually define which segments of
+       \memo the floor surface perimeter are exposed. This object is optional.
+       \memo by default it is assumed that the entire perimeter of each
+       \memo foundation is exposed.
+       \extensible:1
+  A1 , \field Surface Name
+       \required-field
+       \type object-list
+       \object-list FloorSurfaceNames
+  N1 , \field Total Exposed Perimeter
+       \type real
+       \units m
+       \minimum> 0.0
+  N2 , \field Exposed Perimeter Fraction
+       \type real
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  A2 , \field Surface Segment 1 Exposed
+       \note Surface Segment N is the perimeter between the Nth and (N+1)th
+       \note vertices
+       \begin-extensible
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A3 , \field Surface Segment 2 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A4 , \field Surface Segment 3 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A5 , \field Surface Segment 4 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A6 , \field Surface Segment 5 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A7 , \field Surface Segment 6 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A8 , \field Surface Segment 7 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A9 , \field Surface Segment 8 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A10, \field Surface Segment 9 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A11; \field Surface Segment 10 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
        \unique-object
        \memo Options to change the individual convection model equations for dynamic selection when using AdaptiveConvectiongAlgorithm
@@ -17345,6 +17718,7 @@ ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
+
 
 ZoneProperty:UserViewFactors:bySurfaceName,
        \memo View factors for Surface to Surface in a zone.
@@ -23963,22 +24337,30 @@ AirflowNetwork:Distribution:Component:Duct,
       \default 0.0
       \minimum 0.0
       \note Enter the coefficient used to calculate dynamic losses of fittings (e.g. elbows).
- N6 , \field Overall Heat Transmittance Coefficient (U-Factor) from Air to Air
-      \note including film coefficients at both surfaces
+ N6 , \field Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction
+      \note conduction only
       \type real
       \units W/m2-K
       \minimum> 0.0
-      \default 0.772
-      \note Enter the overall U-value for this duct.
-      \note Default value of 0.772 is equivalent to 1.06 m2-K/W (R6) duct insulation with
-      \note film coefficients for outside and inside equal to 5 and 25 W/m2-K, respectively.
- N7 ; \field Overall Moisture Transmittance Coefficient from Air to Air
+      \default 0.943
+      \note Default value of 0.943 is equivalent to 1.06 m2-K/W (R6) duct insulation.
+ N7 , \field Overall Moisture Transmittance Coefficient from Air to Air
       \type real
       \units kg/m2
       \minimum> 0.0
       \default 0.001
       \note Enter the overall moisture transmittance coefficient
       \note including moisture film coefficients at both surfaces.
+ N8 , \field Outside Convection Coefficient
+      \note optional. convection coefficient calculated automatically, unless specified
+      \type real
+      \units W/m2-K
+      \minimum> 0.0
+ N9 ; \field Inside Convection Coefficient
+      \note optional. convection coefficient calculated automatically, unless specified
+      \type real
+      \units W/m2-K
+      \minimum> 0.0
 
 AirflowNetwork:Distribution:Component:Fan,
       \min-fields 2
@@ -24208,6 +24590,165 @@ AirflowNetwork:Distribution:Linkage,
       \note Only used if component = AirflowNetwork:Distribution:Component:Duct
       \note The zone name is where AirflowNetwork:Distribution:Component:Duct is exposed. Leave this field blank if the duct
       \note conduction loss is ignored.
+
+AirflowNetwork:Distribution:DuctViewFactors,
+       \memo This object is used to allow user-defined view factors to be used for duct-surface radiation
+       \memo calculations.
+  A1,  \field Linkage Name
+       \required-field
+       \type object-list
+       \object-list AirflowNetworkComponentNames
+  N1,  \field Duct Surface Exposure Fraction
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N2,  \field Duct Surface Emittance
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.9
+  A2,  \field Surface 1 Name
+       \begin-extensible
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N3,  \field Surface 1 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A3,  \field Surface 2 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N4,  \field Surface 2 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A4,  \field Surface 3 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N5,  \field Surface 3 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A5,  \field Surface 4 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N6,  \field Surface 4 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A6,  \field Surface 5 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N7,  \field Surface 5 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A7,  \field Surface 6 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N8,  \field Surface 6 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A8,  \field Surface 7 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N9,  \field Surface 7 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A9,  \field Surface 8 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N10, \field Surface 8 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A10, \field Surface 9 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N11, \field Surface 9 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A11, \field Surface 10 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N12, \field Surface 10 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A12, \field Surface 11 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N13, \field Surface 11 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A13, \field Surface 12 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N14, \field Surface 12 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A14, \field Surface 13 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N15, \field Surface 13 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A15, \field Surface 14 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N16, \field Surface 14 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A16, \field Surface 15 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N17, \field Surface 15 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A17, \field Surface 16 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N18, \field Surface 16 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A18, \field Surface 17 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N19, \field Surface 17 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A19, \field Surface 18 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N20, \field Surface 18 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A20, \field Surface 19 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N21, \field Surface 19 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A21, \field Surface 20 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  N22; \field Surface 20 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
 
 AirflowNetwork:OccupantVentilationControl,
       \memo This object is used to provide advanced thermal comfort control of window opening and closing
@@ -32800,10 +33341,12 @@ ZoneHVAC:WindowAirConditioner,
         \type choice
         \key Coil:Cooling:DX:SingleSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
+        \key Coil:Cooling:DX:VariableSpeed
    A10, \field DX Cooling Coil Name
         \required-field
         \type object-list
         \object-list CoolingCoilsDXSingleSpeed
+        \object-list CoolingCoilsDXVariableSpeed
    A11, \field Supply Air Fan Operating Mode Schedule Name
         \type object-list
         \object-list ScheduleNames
@@ -41842,13 +42385,13 @@ Fan:SystemModel,
        \ip-units W/(ft3/min)
   N8 , \field Electric Power Per Unit Flow Rate Per Unit Pressure
        \type real
-       \units W/((m3/s) -Pa)
+       \units W/((m3/s)-Pa)
        \ip-units W/((ft3/min)-inH2O)
        \default 1.66667
   N9,  \field Fan Total Efficiency
        \type real
        \default 0.7
-       \minimum>0.0
+       \minimum> 0.0
        \maximum 1.0
   A7 , \field Electric Power Function of Flow Fraction Curve Name
        \note independent variable is normalized flow rate, current flow divided by Design Maximum Air Flow Rate.
@@ -43901,6 +44444,7 @@ Coil:Cooling:DX:VariableSpeed,
         \required-field
         \type alpha
         \reference CoolingCoilsDXVariableSpeed
+        \reference DesuperHeatingCoilSources
    A2,  \field Indoor Air Inlet Node Name
         \required-field
         \type node
@@ -45531,6 +46075,7 @@ Coil:Heating:Desuperheater,
        \required-field
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
+       \key Coil:Cooling:DX:VariableSpeed
        \key Coil:Cooling:DX:TwoSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
        \key Refrigeration:CompressorRack
@@ -50737,6 +51282,7 @@ Coil:WaterHeating:Desuperheater,
        \key Coil:Cooling:DX:SingleSpeed
        \key Coil:Cooling:DX:TwoSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:VariableSpeed
        \key Refrigeration:CompressorRack
        \key Refrigeration:Condenser:AirCooled
        \key Refrigeration:Condenser:EvaporativeCooled
@@ -50974,10 +51520,12 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
        \required-field
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
+       \key Coil:Cooling:DX:VariableSpeed
   A5 ; \field Cooling Coil Name
        \required-field
        \type object-list
        \object-list CoolingCoilsDXSingleSpeed
+       \object-list CoolingCoilsDXVariableSpeed
 
 CoilSystem:IntegratedHeatPump:AirSource,
       \memo This object is used for air-source integrated heat pump, a collection of its working modes.
@@ -52766,9 +53314,11 @@ Dehumidifier:Desiccant:System,
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:VariableSpeed
   A12, \field Companion Cooling Coil Name
        \type object-list
        \object-list CoolingCoilsDXMultiModeOrSingleSpeed
+       \object-list CoolingCoilsDXVariableSpeed
   A13, \field Companion Cooling Coil Upstream of Dehumidifier Process Inlet
        \type choice
        \key Yes
@@ -54764,6 +55314,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type choice
         \key Coil:Cooling:DX:SingleSpeed
+        \key Coil:Cooling:DX:VariableSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
         \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
         \note Specify the type of cooling coil used in this unitary system.
@@ -54771,11 +55322,13 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type object-list
         \object-list CoolingCoilsDXMultiModeOrSingleSpeed
+        \object-list CoolingCoilsDXVariableSpeed
         \note Enter the name of the cooling coil used in this unitary system.
    A16, \field Heating Coil Object Type
         \required-field
         \type choice
         \key Coil:Heating:DX:SingleSpeed
+        \key Coil:Heating:DX:VariableSpeed
         \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
@@ -54786,6 +55339,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type object-list
         \object-list HeatingCoilName
+        \object-list HeatingCoilsDXVariableSpeed
         \note Enter the name of the heating coil used in this unitary system.
    A18, \field Priority Control Mode
         \type choice
@@ -61898,7 +62452,7 @@ LoadProfile:Plant,
        \required-field
        \type object-list
        \object-list ScheduleNames
-   
+
 \group Solar Collectors
 
 SolarCollectorPerformance:FlatPlate,

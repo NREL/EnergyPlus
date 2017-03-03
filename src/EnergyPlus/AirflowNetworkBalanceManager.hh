@@ -101,6 +101,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int DisSysNumOfLeaks;
 	extern int DisSysNumOfELRs;
 	extern int DisSysNumOfDucts;
+	extern int DysSysNumOfDuctViewFactors;
 	extern int DisSysNumOfDampers;
 	extern int DisSysNumOfCVFs;
 	extern int DisSysNumOfDetFans;
@@ -197,14 +198,64 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
-		CalcWindPressure(
-			int const curve, // Curve index, change this to pointer after curve refactor
-			Real64 const Vref, // Velocity at reference height
-			Real64 const height, // Node height for outdoor temperature calculation
-			Real64 const azimuth, // Azimuthal angle of surface
-			bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
-			bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
-		);
+	airThermConductivity(
+		Real64 T // Temperature in Celsius
+	);
+
+	Real64
+	airDynamicVisc(
+		Real64 T  // Temperature in Celsius
+	);
+
+	Real64
+	airKinematicVisc(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	airThermalDiffusivity(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	airPrandtl(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	CalcDuctInsideConvResist(
+		Real64 const Tair, // Average air temperature
+		Real64 const mdot, // Mass flow rate
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hIn // User defined convection coefficient
+	);
+
+	Real64
+	CalcDuctOutsideConvResist(
+		Real64 const Ts, // Surface temperature
+		Real64 const Tamb, // Free air temperature
+		Real64 const Wamb, // Free air humidity ratio
+		Real64 const Pamb, // Free air barometric pressure
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const ZoneNum, // Zone number
+		Real64 const hOut // User defined convection coefficient
+	);
+
+	Real64
+    CalcWindPressure(
+        int const curve, // Curve index, change this to pointer after curve refactor
+        Real64 const Vref, // Velocity at reference height
+        Real64 const height, // Node height for outdoor temperature calculation
+        Real64 const azimuth, // Azimuthal angle of surface
+        bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+        bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
+    );
 
 	void
 	CalcAirflowNetworkHeatBalance();

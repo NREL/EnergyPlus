@@ -1934,7 +1934,7 @@ namespace SimAirServingZones {
 					PrimaryAirSystem(AirLoopNum).RetFanNum = RetFanIndex;
 				} else if ( retFanModelType == objectVectorOOFanSystemModel ) {
 					PrimaryAirSystem(AirLoopNum).retFanModelTypeEnum = objectVectorOOFanSystemModel;
-					PrimaryAirSystem(AirLoopNum).RetFanNum = RetFanIndex;
+					PrimaryAirSystem(AirLoopNum).retFanVecIndex = RetFanIndex;
 				}
 			}
 			// Check whether there are Central Heating Coils in the Primary Air System

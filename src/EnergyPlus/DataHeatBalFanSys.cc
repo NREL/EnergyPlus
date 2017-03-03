@@ -190,6 +190,7 @@ namespace DataHeatBalFanSys {
 	// of electric baseboard heaters
 	Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
 	// of simple cooling panels
+	Array1D< Real64 > QRadSurfAFNDuct; // Current radiant heat flux at a surface due to radiation from AFN ducts
 	Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -314,6 +315,7 @@ namespace DataHeatBalFanSys {
 		QSteamBaseboardSurf.deallocate();
 		QElecBaseboardSurf.deallocate();
 		QPoolSurfNumerator.deallocate();
+		QRadSurfAFNDuct.deallocate();
 		PoolHeatTransCoefs.deallocate();
 		RadSysTiHBConstCoef.deallocate();
 		RadSysTiHBToutCoef.deallocate();
