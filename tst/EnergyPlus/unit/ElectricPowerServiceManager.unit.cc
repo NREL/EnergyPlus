@@ -696,15 +696,24 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
 {
 
+	std::string const idf_objects = delimited_string( { 
+
+	"  LoadProfile:Plant,",
+	"    Toyota Campus Load Profile, !- Name",
+	"    Node 41, !- Inlet Node Name",
+	"    Node 42, !- Outlet Node Name",
+	"    Toyota Campus output Load, !- Load Schedule Name",
+	"    0.320003570569675, !- Peak Flow Rate{ m3 / s }",
+	"    Toyota Campus output Flow Frac;         !- Flow Rate Fraction Schedule Name",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
 	createFacilityElectricPowerServiceObject();
 	bool SimElecCircuitsFlag = false;
-	facilityElectricServiceObj->manageElectricPowerService( true, SimElecCircuitsFlag, false );
-	// GetInput for load centers will not be called, nor rest of model so SimElectricCircuits will be false
-	EXPECT_FALSE( SimElecCircuitsFlag );
-
-	DataErrorTracking::AskForPlantCheckOnAbort = true;
 	// GetInput and other code will be executed and SimElectricCircuits will be true
 	facilityElectricServiceObj->manageElectricPowerService( true, SimElecCircuitsFlag, false );
 	EXPECT_TRUE( SimElecCircuitsFlag );
-
+	EXPECT_EQ( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->numGenerators, 0 ); // dummy generator has been added and report variables are available
+	
 }
