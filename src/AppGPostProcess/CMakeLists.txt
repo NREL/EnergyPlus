@@ -1,9 +1,5 @@
 project(AppGPostProcess Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-
 set(SRC AppGPostProcess.f90)
 
 set(STATIC_EXE FALSE)
@@ -41,9 +37,12 @@ else()  # Windows
   endif()
 endif()
 
-set(SKIP_BUILD_RPATH true)
-ADD_EXECUTABLE( AppGPostProcess ${SRC} )
+set(SKIP_BUILD_RPATH TRUE)
+add_executable( AppGPostProcess ${SRC} )
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( AppGPostProcess "./PostProcess/" ${STATIC_EXE} )
+install( TARGETS AppGPostProcess DESTINATION "./PostProcess/" )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( AppGPostProcess "./PostProcess/" ${STATIC_EXE} )
+endif()
 

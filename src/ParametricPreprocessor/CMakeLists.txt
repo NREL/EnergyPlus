@@ -1,9 +1,5 @@
 project(ParametricPreprocessor Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-
 set(SRC ParametricPreprocessor.f90)
 
 set(STATIC_EXE FALSE)
@@ -32,12 +28,15 @@ else()
 endif()
 
 set(SKIP_BUILD_RPATH true)
-ADD_EXECUTABLE( parametricpreprocessor ${SRC} )
+add_executable( ParametricPreprocessor ${SRC} )
 
-SET_TARGET_PROPERTIES(parametricpreprocessor PROPERTIES
+set_target_properties(ParametricPreprocessor PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( parametricpreprocessor PreProcess/ParametricPreProcessor ${STATIC_EXE} )
+install( TARGETS ParametricPreprocessor DESTINATION PreProcess )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( ParametricPreprocessor PreProcess )
+endif()
 

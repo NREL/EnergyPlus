@@ -1,9 +1,5 @@
 project(ExpandObjects Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-
 set(SRC epfilter.f90) 
 
 set(STATIC_EXE FALSE)
@@ -41,9 +37,12 @@ else()  # Windows
   endif()
 endif()
 
-set(SKIP_BUILD_RPATH true)
-ADD_EXECUTABLE( ExpandObjects ${SRC} )
-  
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( ExpandObjects "./" ${STATIC_EXE} )
+set(SKIP_BUILD_RPATH TRUE)
+add_executable( ExpandObjects ${SRC} )
+
+install( TARGETS ExpandObjects DESTINATION "./" )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( ExpandObjects "./" )
+endif()
 
