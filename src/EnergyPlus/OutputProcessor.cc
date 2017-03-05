@@ -697,14 +697,18 @@ namespace OutputProcessor {
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! (
-				SameString( ReqRepVars( Loop ).Key, KeyedValue ) ||  // straight case-insensitive string comparison
-				RE2::FullMatch( KeyedValue, ReqRepVars( Loop ).Key ) || // match against regex as written
-				RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) // attempt case-insensitive regex comparison
-			) )
-			{
-				continue;
-			}
+			// if ( ! SameString( ReqRepVars( Loop ).Key, KeyedValue ) ) continue;
+			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
+			// auto const found = DataOutputs::OutputVariablesNames.find( InputProcessor::MakeUPPERCase( ReqRepVars( Loop ).VarName ) );
+			// if ( found == DataOutputs::OutputVariablesNames.end() ) continue;
+			// if ( ! (
+			// 	SameString( ReqRepVars( Loop ).Key, KeyedValue ) ||  // straight case-insensitive string comparison
+			// 	RE2::FullMatch( KeyedValue, *found->second.pattern ) || // match against regex as written
+			// 	RE2::FullMatch( KeyedValue, *found->second.case_insensitive_pattern ) // attempt case-insensitive regex comparison
+			// ) )
+			// {
+			// 	continue;
+			// }
 
 			//   A match.  Make sure doesnt duplicate
 
@@ -5175,6 +5179,14 @@ SetupOutputVariable(
 		}
 		ShowSevereError( "Variable Name has no units in call=" + VariableName );
 		ShowFatalError( "Program terminates." );
+	}
+
+	if ( InputProcessor::MakeUPPERCase( KeyedValue ) == "ENVIRONMENT" ) {
+		std::string const test = "";
+	}
+
+	if ( MakeUPPERCase( VarName ) == "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) {
+		std::string const test = "";
 	}
 
 	// Determine whether to Report or not

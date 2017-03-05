@@ -1010,42 +1010,42 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( InputProcessorFixture, addRecordToOutputVariableStructure )
-		{
-			using namespace DataOutputs;
+		// TEST_F( InputProcessorFixture, addRecordToOutputVariableStructure )
+		// {
+		// 	using namespace DataOutputs;
 
-			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
-			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
-			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" );
+		// 	AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
+		// 	AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
+		// 	AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
+		// 	AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" );
+		// 	AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" );
 
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 1 ).Key );
-			EXPECT_EQ( "ZONE AIR SYSTEM SENSIBLE COOLING RATE", OutputVariablesForSimulation( 1 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 1 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 1 ).Next );
+		// 	EXPECT_EQ( "*", OutputVariablesForSimulation( 1 ).Key );
+		// 	EXPECT_EQ( "ZONE AIR SYSTEM SENSIBLE COOLING RATE", OutputVariablesForSimulation( 1 ).VarName );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 1 ).Previous );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 1 ).Next );
 
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 2 ).Key );
-			EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", OutputVariablesForSimulation( 2 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 2 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 2 ).Next );
+		// 	EXPECT_EQ( "*", OutputVariablesForSimulation( 2 ).Key );
+		// 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", OutputVariablesForSimulation( 2 ).VarName );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 2 ).Previous );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 2 ).Next );
 
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 3 ).Key );
-			EXPECT_EQ( "SITE OUTDOOR AIR WETBULB TEMPERATURE", OutputVariablesForSimulation( 3 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 3 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 3 ).Next );
+		// 	EXPECT_EQ( "*", OutputVariablesForSimulation( 3 ).Key );
+		// 	EXPECT_EQ( "SITE OUTDOOR AIR WETBULB TEMPERATURE", OutputVariablesForSimulation( 3 ).VarName );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 3 ).Previous );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 3 ).Next );
 
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 4 ).Key );
-			EXPECT_EQ( "ZONE TOTAL INTERNAL LATENT GAIN ENERGY", OutputVariablesForSimulation( 4 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 4 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 4 ).Next );
+		// 	EXPECT_EQ( "*", OutputVariablesForSimulation( 4 ).Key );
+		// 	EXPECT_EQ( "ZONE TOTAL INTERNAL LATENT GAIN ENERGY", OutputVariablesForSimulation( 4 ).VarName );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 4 ).Previous );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 4 ).Next );
 
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 5 ).Key );
-			EXPECT_EQ( "ZONE TOTAL INTERNAL LATENT GAIN RATE", OutputVariablesForSimulation( 5 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 5 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 5 ).Next );
+		// 	EXPECT_EQ( "*", OutputVariablesForSimulation( 5 ).Key );
+		// 	EXPECT_EQ( "ZONE TOTAL INTERNAL LATENT GAIN RATE", OutputVariablesForSimulation( 5 ).VarName );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 5 ).Previous );
+		// 	EXPECT_EQ( 0, OutputVariablesForSimulation( 5 ).Next );
 
-		}
+		// }
 
 		TEST_F( InputProcessorFixture, addVariablesForMonthlyReport )
 		{
@@ -1490,20 +1490,20 @@ namespace EnergyPlus {
 				}
 			});
 
-			for ( auto const result : results_map ) {
-				int index = 1;
-				DataOutputs::OutputVariablesForSimulation.allocate( 10000 );
-				AddVariablesForMonthlyReport( result.first );
-				for ( auto const result_tuple : result.second ) {
-					EXPECT_EQ( std::get<0>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Key );
-					EXPECT_EQ( std::get<1>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).VarName );
-					EXPECT_EQ( std::get<2>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Previous );
-					EXPECT_EQ( std::get<3>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Next );
-					++index;
-				}
-				DataOutputs::OutputVariablesForSimulation.deallocate();
-				DataOutputs::NumConsideredOutputVariables = 0;
-			}
+			// for ( auto const result : results_map ) {
+			// 	int index = 1;
+			// 	DataOutputs::OutputVariablesForSimulation.allocate( 10000 );
+			// 	AddVariablesForMonthlyReport( result.first );
+			// 	for ( auto const result_tuple : result.second ) {
+			// 		EXPECT_EQ( std::get<0>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Key );
+			// 		EXPECT_EQ( std::get<1>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).VarName );
+			// 		EXPECT_EQ( std::get<2>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Previous );
+			// 		EXPECT_EQ( std::get<3>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Next );
+			// 		++index;
+			// 	}
+			// 	DataOutputs::OutputVariablesForSimulation.deallocate();
+			// 	DataOutputs::NumConsideredOutputVariables = 0;
+			// }
 
 		}
 
@@ -1524,10 +1524,10 @@ namespace EnergyPlus {
 			EXPECT_FALSE( has_cout_output() );
 			EXPECT_FALSE( has_cerr_output() );
 
-			EXPECT_EQ( "*", DataOutputs::OutputVariablesForSimulation( 1 ).Key );
-			EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", DataOutputs::OutputVariablesForSimulation( 1 ).VarName );
-			EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Previous );
-			EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Next );
+			// EXPECT_EQ( "*", DataOutputs::OutputVariablesForSimulation( 1 ).Key );
+			// EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", DataOutputs::OutputVariablesForSimulation( 1 ).VarName );
+			// EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Previous );
+			// EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Next );
 
 		}
 

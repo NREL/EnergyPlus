@@ -5315,9 +5315,10 @@ namespace InputProcessor {
 		int Loop;
 		int Loop1;
 
-		OutputVariablesForSimulation.allocate( 10000 );
+		// OutputVariablesForSimulation.allocate( 10000 );
+		// OutputVariablesForSimulation.reserve( 10000 );
 		MaxConsideredOutputVariables = 10000;
-		OutputVariablesNames.reserve(1000);
+		// OutputVariablesNames.reserve(1000);
 
 		// Output Variable
 		CurrentRecord = FindFirstRecord( OutputVariable );
@@ -5432,10 +5433,10 @@ namespace InputProcessor {
 			CurrentRecord = FindNextRecord( OutputTableSummaries, CurrentRecord );
 		}
 
-		if ( NumConsideredOutputVariables > 0 ) {
-			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
-			MaxConsideredOutputVariables = NumConsideredOutputVariables;
-		}
+		// if ( NumConsideredOutputVariables > 0 ) {
+		// 	OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
+		// 	MaxConsideredOutputVariables = NumConsideredOutputVariables;
+		// }
 
 	}
 
@@ -5962,9 +5963,9 @@ namespace InputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CurNum;
-		int NextNum;
-		bool FoundOne;
+		// int CurNum;
+		// int NextNum;
+		// bool FoundOne;
 		std::string::size_type vnameLen; // if < length, there were units on the line/name
 
 		std::string::size_type const rbpos = index( VariableName, '[' );
@@ -5973,59 +5974,154 @@ namespace InputProcessor {
 		} else {
 			vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
 		}
-
-		FoundOne = false;
 		std::string const VarName( VariableName.substr( 0, vnameLen ) );
-		for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
-			if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
-				FoundOne = true;
-				break;
-			}
-		}
 
-		if ( ! FoundOne ) {
-			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-				ReAllocateAndPreserveOutputVariablesForSimulation();
-			}
-			++NumConsideredOutputVariables;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
-			//store first index of the list for specific VarName(in lower case) into map for faster look-up
-			std::string LowerCaseVarName;
-			ConvertCaseToLower(VarName, LowerCaseVarName);
-			OutputVariablesNames[LowerCaseVarName] = NumConsideredOutputVariables;
+		// if ( InputProcessor::MakeUPPERCase( KeyValue ) == "ENVIRONMENT" ) {
+		// 	std::string const test = "";
+		// }
+
+		// if ( MakeUPPERCase( VarName ) == "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) {
+		// 	std::string const test = "";
+		// }
+
+		// OutputReportingVariablesBase reportingPair( KeyValue, VarName );
+		// std::string const combinedName( InputProcessor::MakeUPPERCase( KeyValue + VarName ) );
+
+		// auto const found = OutputVariablesForSimulation.find( VarName );
+		// if ( found == OutputVariablesForSimulation.end() ) {
+		// 	OutputVariablesForSimulation.emplace( combinedName, OutputReportingVariables( KeyValue, VarName ) );
+		// 	NumConsideredOutputVariables = OutputVariablesForSimulation.size();
+		// }
+
+		auto const found = OutputVariablesForSimulation.find( VarName );
+		if ( found == OutputVariablesForSimulation.end() ) {
+			std::unordered_map< std::string, OutputReportingVariables > data;
+			data.emplace( KeyValue, OutputReportingVariables( KeyValue, VarName ) );
+			OutputVariablesForSimulation.emplace( VarName, std::move( data ) );
+			NumConsideredOutputVariables = OutputVariablesForSimulation.size();
 		} else {
-			if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
-				NextNum = CurNum;
-				if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-					while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-						CurNum = NextNum;
-						NextNum = OutputVariablesForSimulation( NextNum ).Next;
-					}
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
-					OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
-				} else {
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
-					OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
-				}
-			}
+			found->second.emplace( KeyValue, OutputReportingVariables( KeyValue, VarName ) );
 		}
 
 	}
+
+	// void
+	// AddRecordToOutputVariableStructure(
+	// 	std::string const & KeyValue,
+	// 	std::string const & VariableName
+	// )
+	// {
+
+	// 	// SUBROUTINE INFORMATION:
+	// 	//       AUTHOR         Linda Lawrie
+	// 	//       DATE WRITTEN   July 2010
+	// 	//       MODIFIED       na
+	// 	//       RE-ENGINEERED  na
+
+	// 	// PURPOSE OF THIS SUBROUTINE:
+	// 	// This routine adds a new record (if necessary) to the Output Variable
+	// 	// reporting structure.  DataOutputs, OutputVariablesForSimulation
+
+	// 	// METHODOLOGY EMPLOYED:
+	// 	// OutputVariablesForSimulation is a linked list structure for later
+	// 	// semi-easy perusal.
+
+	// 	// REFERENCES:
+	// 	// na
+
+	// 	// Using/Aliasing
+	// 	using namespace DataOutputs;
+
+	// 	// Locals
+	// 	// SUBROUTINE ARGUMENT DEFINITIONS:
+
+	// 	// SUBROUTINE PARAMETER DEFINITIONS:
+	// 	// na
+
+	// 	// INTERFACE BLOCK SPECIFICATIONS:
+	// 	// na
+
+	// 	// DERIVED TYPE DEFINITIONS:
+	// 	// na
+
+	// 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	// 	int CurNum;
+	// 	int NextNum;
+	// 	bool FoundOne;
+	// 	std::string::size_type vnameLen; // if < length, there were units on the line/name
+
+	// 	std::string::size_type const rbpos = index( VariableName, '[' );
+	// 	if ( rbpos == std::string::npos ) {
+	// 		vnameLen = len_trim( VariableName );
+	// 	} else {
+	// 		vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
+	// 	}
+
+	// 	FoundOne = false;
+	// 	std::string const VarName( VariableName.substr( 0, vnameLen ) );
+	// 	for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
+	// 		if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
+	// 			FoundOne = true;
+	// 			break;
+	// 		}
+	// 	}
+
+	// 	if ( ! FoundOne ) {
+	// 		if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
+	// 			ReAllocateAndPreserveOutputVariablesForSimulation();
+	// 		}
+	// 		++NumConsideredOutputVariables;
+	// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
+	// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
+	// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
+	// 		OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
+	// 		//store first index of the list for specific VarName(in lower case) into map for faster look-up
+	// 		// std::string LowerCaseVarName;
+	// 		// ConvertCaseToLower(VarName, LowerCaseVarName);
+	// 		// RE2 pattern( KeyValue );
+	// 		// if ( ! pattern.ok() ) {
+	// 		// 	ShowSevereError( "Regular expression \"" + KeyValue + "\" for variable name \"" + VarName + "\" in input file is incorrect" );
+	// 		// 	ShowContinueError( pattern.error() );
+	// 		// 	ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
+	// 		// }
+	// 		// RE2 ipattern( "(?i)" + KeyValue );
+	// 		// auto const test = std::make_tuple( NumConsideredOutputVariables, pattern, ipattern  );
+	// 		// OutputVariableNameCache cache( NumConsideredOutputVariables, KeyValue, VariableName );
+	// 		// OutputVariablesNames.emplace( LowerCaseVarName, std::forward_as_tuple( NumConsideredOutputVariables, pattern, ipattern ) );
+	// 		// OutputVariablesNames.emplace( LowerCaseVarName, std::forward_as_tuple( NumConsideredOutputVariables, KeyValue, VariableName ) );
+	// 		// OutputVariablesNames.insert( std::make_pair( LowerCaseVarName, test ) );
+	// 		// OutputVariablesNames[LowerCaseVarName] = std::move( cache );
+	// 		OutputVariablesNames[ InputProcessor::MakeUPPERCase( VarName ) ] = OutputVariableNameCache( NumConsideredOutputVariables, KeyValue, VarName );
+	// 	} else {
+	// 		if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
+	// 			NextNum = CurNum;
+	// 			if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
+	// 				while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
+	// 					CurNum = NextNum;
+	// 					NextNum = OutputVariablesForSimulation( NextNum ).Next;
+	// 				}
+	// 				if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
+	// 					ReAllocateAndPreserveOutputVariablesForSimulation();
+	// 				}
+	// 				++NumConsideredOutputVariables;
+	// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
+	// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
+	// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
+	// 				OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
+	// 			} else {
+	// 				if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
+	// 					ReAllocateAndPreserveOutputVariablesForSimulation();
+	// 				}
+	// 				++NumConsideredOutputVariables;
+	// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
+	// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
+	// 				OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
+	// 				OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
+	// 			}
+	// 		}
+	// 	}
+
+	// }
 
 	void
 	ReAllocateAndPreserveOutputVariablesForSimulation()
@@ -6048,14 +6144,14 @@ namespace InputProcessor {
 		// na
 
 		// Using/Aliasing
-		using namespace DataOutputs;
+		// using namespace DataOutputs;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const OutputVarAllocInc( ObjectsIDFAllocInc );
+		// int const OutputVarAllocInc( ObjectsIDFAllocInc );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6067,7 +6163,7 @@ namespace InputProcessor {
 		// na
 
 		// up allocation by OutputVarAllocInc
-		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
+		// OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
 	}
 
 	void

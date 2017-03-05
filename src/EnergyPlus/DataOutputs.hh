@@ -54,6 +54,10 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <unordered_map>
+#include <vector>
+#include <cstddef>
+// #include <tuple>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -81,25 +85,75 @@ namespace DataOutputs {
 
 	// Types
 
-	struct OutputReportingVariables // Linked list of variables and keys
+	// struct OutputReportingVariables // Linked list of variables and keys
+	// {
+	// 	// Members
+	// 	std::string Key; // could be a key or "*"  (upper case)
+	// 	std::string VarName; // variable name (upper case)
+	// 	int Previous; // Pointer to Previous of same variable name
+	// 	int Next; // Pointer to Next of same variable name
+
+	// 	// Default Constructor
+	// 	OutputReportingVariables() :
+	// 		Previous( 0 ),
+	// 		Next( 0 )
+	// 	{}
+
+	// };
+
+	// // Object Data
+	// extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
+
+	struct OutputReportingVariablesBase
 	{
-		// Members
-		std::string Key; // could be a key or "*"  (upper case)
-		std::string VarName; // variable name (upper case)
-		int Previous; // Pointer to Previous of same variable name
-		int Next; // Pointer to Next of same variable name
+		// OutputReportingVariablesBase() = default;
 
-		// Default Constructor
-		OutputReportingVariables() :
-			Previous( 0 ),
-			Next( 0 )
-		{}
+		OutputReportingVariablesBase(
+			std::string const & KeyValue,
+			std::string const & VariableName
+		);
 
+		virtual ~OutputReportingVariablesBase(){};
+
+		bool operator==( OutputReportingVariablesBase const & other ) const
+		{
+			return ( key == other.key && variableName == other.variableName );
+		}
+
+		std::string const key;
+		std::string const variableName;
+		// std::string const combinedName;
+		size_t const hashValue;
+		bool is_simple_string = true;
 	};
 
-	// Object Data
-	extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
-	extern std::unordered_map <std::string, int> OutputVariablesNames;
+	struct OutputReportingVariables {
+		// OutputReportingVariables() : OutputReportingVariablesBase() {};
+
+		OutputReportingVariables(
+			std::string const & KeyValue,
+			std::string const & VariableName
+		);
+
+		// OutputVariableNameCache( OutputVariableNameCache&& ) = default;
+		// OutputVariableNameCache( OutputVariableNameCache const & ) = delete;
+
+		// bool operator==( OutputReportingVariables const & other ) const
+		// {
+		// 	return ( reportingPair == other.reportingPair );
+		// }
+
+		std::string const key;
+		std::string const variableName;
+		// // std::string const combinedName;
+		// size_t const hashValue;
+		bool is_simple_string = true;
+		std::unique_ptr< RE2 > pattern;
+		std::unique_ptr< RE2 > case_insensitive_pattern;
+	};
+	extern std::unordered_map < std::string, std::unordered_map< std::string, OutputReportingVariables > > OutputVariablesForSimulation;
+
+	// extern std::unordered_map <std::string, std::tuple< int, RE2, RE2 > > OutputVariablesNames;
 	// Functions
 
 	// Clears the global data in DataOutputs.
@@ -116,5 +170,26 @@ namespace DataOutputs {
 } // DataOutputs
 
 } // EnergyPlus
+
+namespace std {
+	// template <>
+	// struct std::hash< EnergyPlus::DataOutputs::OutputReportingVariables >
+	// {
+	// 	size_t operator()( EnergyPlus::DataOutputs::OutputReportingVariables const & reportingVariable ) const
+	// 	{
+	// 		// return std::hash< std::string >()( reportingVariable.combinedName );
+	// 		return reportingVariable.hashValue;
+	// 	}
+	// };
+	template <>
+	struct std::hash< EnergyPlus::DataOutputs::OutputReportingVariablesBase >
+	{
+		size_t operator()( EnergyPlus::DataOutputs::OutputReportingVariablesBase const & reportingVariable ) const
+		{
+			// return std::hash< std::string >()( reportingVariable.combinedName );
+			return reportingVariable.hashValue;
+		}
+	};
+}
 
 #endif
