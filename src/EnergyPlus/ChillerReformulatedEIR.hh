@@ -193,7 +193,7 @@ namespace ChillerReformulatedEIR {
 		int EIRFPLRPLRIterIndex; // Index for part-load ratio EIRFPLR warning messages
 		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
 		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
-		Real64 FaultyChillerSWTOffset; // True if the chiller has SWT sensor fault
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
 		int IterLimitExceededNum; // Iteration limit exceeded for RegulaFalsi routine
 		int IterLimitErrIndex; // Index to iteration limit warning for RegulaFalsi routine
 		int IterFailed; // Iteration limit failed for RegulaFalsi routine
@@ -220,6 +220,10 @@ namespace ChillerReformulatedEIR {
 		//  INTEGER           :: MsgErrorCount = 0   ! number of occurrences of warning
 		//  INTEGER           :: ErrCount1     = 0   ! for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+		//Operational fault parameters
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
 
 		// Default Constructor
 		ReformulatedEIRChillerSpecs() :
@@ -321,7 +325,10 @@ namespace ChillerReformulatedEIR {
 			HRBranchNum( 0 ),
 			HRCompNum( 0 ),
 			CondMassFlowIndex( 0 ),
-			PossibleSubcooling( false )
+			PossibleSubcooling( false ),
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 	};
 

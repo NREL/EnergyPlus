@@ -6849,7 +6849,7 @@ namespace SolarShading {
 
 			} // End of first loop over surfaces in zone
 
-			// It is importatnt to do this only one time
+			// It is important to do this only one time
 			//IF (ZoneNum == 1) THEN
 			BABSZoneSSG = 0.0;
 			BTOTZoneSSG = 0.0;

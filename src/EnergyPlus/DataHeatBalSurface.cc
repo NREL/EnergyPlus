@@ -249,7 +249,7 @@ namespace DataHeatBalSurface {
 	void
 	clear_state()
 	{
-		SUMH.deallocate(); 
+		SUMH.deallocate();
 		MaxSurfaceTempLimit = 200.0 ;
 		MaxSurfaceTempLimitBeforeFatal = 500.0 ;
 		CTFConstInPart.deallocate();
@@ -269,7 +269,7 @@ namespace DataHeatBalSurface {
 		QRadNetSurfInReport.deallocate();
 		QdotRadNetSurfInRep.deallocate();
 		QdotRadNetSurfInRepPerArea.deallocate();
-		QRadSolarInReport.deallocate(); 
+		QRadSolarInReport.deallocate();
 		QdotRadSolarInRep.deallocate();
 		QdotRadSolarInRepPerArea.deallocate();
 		QRadLightsInReport.deallocate();
@@ -300,7 +300,7 @@ namespace DataHeatBalSurface {
 		OpaqSurfAvgFaceCondGainRep.deallocate();
 		OpaqSurfAvgFaceCondLossRep.deallocate();
 		OpaqSurfAvgFaceConduction.deallocate();
-		OpaqSurfAvgFaceConductionFlux.deallocate(); 
+		OpaqSurfAvgFaceConductionFlux.deallocate();
 		OpaqSurfAvgFaceConductionEnergy.deallocate();
 		OpaqSurfStorageGainRep.deallocate();
 		OpaqSurfStorageCondLossRep.deallocate();

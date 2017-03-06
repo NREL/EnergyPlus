@@ -1274,6 +1274,14 @@ Numeric field indicates the depth measured in meters from the ground surface to 
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include ``timestep'' and ``hourly''.
 
+\paragraph{Field: Geometric Mesh Coefficient}
+
+This numeric field represents the compression of cell distribution A value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution. Values for this field should be limited from $1.0$ to $2.0$. If this field is omitted, the default value is 1.6.
+
+\paragraph{Field: Mesh Density Parameter}
+
+This numeric integer field represents the number of cells to be placed between any two ``domain partitions'' during mesh development.~ A domain partition may be thought of as a slab edge or insulation edge. Once these components are laid out in the domain, this field number of cells are placed between the partitions. If this field is omitted, the default value is 6.
+
 An IDF example of an in-grade slab.
 
 \begin{lstlisting}
