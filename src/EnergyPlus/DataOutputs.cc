@@ -100,16 +100,8 @@ namespace DataOutputs {
 	int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
 
 	// Object Data
-	// Array1D< OutputReportingVariables > OutputVariablesForSimulation;
 	std::unordered_map < std::string, std::unordered_map< std::string, OutputReportingVariables > > OutputVariablesForSimulation;
-	// std::unordered_map <std::string, std::tuple< int, RE2, RE2 > > OutputVariablesNames;
 	// Functions
-
-	// std::string const key;
-	// 	std::string const variableName;
-	// 	// std::string const combinedName;
-	// 	std::size_t const hashValue;
-	// 	bool is_simple_string;
 
 	OutputReportingVariables::OutputReportingVariables(
 		std::string const & KeyValue,
@@ -134,17 +126,6 @@ namespace DataOutputs {
 		}
 	}
 
-	// OutputReportingVariablesBase::OutputReportingVariablesBase(
-	// 	std::string const & KeyValue,
-	// 	std::string const & VariableName
-	// ) :
-	// 	key( KeyValue ),
-	// 	variableName( VariableName ),
-	// 	hashValue( std::hash< std::string >()( KeyValue + VariableName ) )
-	// {
-
-	// }
-
 	// Clears the global data in DataOutputs.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -160,7 +141,6 @@ namespace DataOutputs {
 		iNumberOfAutoCalcedFields = int();
 		iTotalAutoCalculatableFields = int();
 		OutputVariablesForSimulation.clear();
-		// OutputVariablesNames.clear();
 	}
 
 	bool
@@ -180,18 +160,6 @@ namespace DataOutputs {
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		// OutputReportingVariablesBase reportingPair( KeyedValue, InputProcessor::MakeUPPERCase( VariableName ) );
-
-		// std::string const combinedName( InputProcessor::MakeUPPERCase( KeyedValue + VariableName ) );
-
-		// if ( InputProcessor::MakeUPPERCase( KeyedValue ) == "ENVIRONMENT" ) {
-		// 	std::string const test = "";
-		// }
-
-		// if ( VariableName == "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) {
-		// 	std::string const test = "";
-		// }
-
 		auto const found_variable = OutputVariablesForSimulation.find( InputProcessor::MakeUPPERCase( VariableName ) );
 		if ( found_variable == OutputVariablesForSimulation.end() ) return false;
 
@@ -203,23 +171,8 @@ namespace DataOutputs {
 
 		for ( auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it ) {
 			if ( it->second.key == "*" ) return true;
-//			if ( it->second.is_simple_string ) {
-//				if ( equali( KeyedValue, it->second.key ) ) return true;
-//			} else {
-//				if (
-//					RE2::FullMatch( KeyedValue, *it->second.pattern ) || // match against regex as written
-//					RE2::FullMatch( KeyedValue, *it->second.case_insensitive_pattern ) // attempt case-insensitive regex comparison
-//					)
-//				{
-//					return true;
-//				}
-//			}
 			if ( equali( KeyedValue, it->second.key ) ) return true;
 			if ( it->second.is_simple_string ) continue;
-			// if ( equali( KeyedValue, it->second.key ) ) return true;
-			// if ( it->second.is_simple_string && equali( KeyedValue, it->second.key ) ) return true;
-			// auto const * base = &(*found);
-			// auto const * found_cast = dynamic_cast< OutputReportingVariables const * >( base );
 			if (
 				( it->second.pattern != nullptr && RE2::FullMatch( KeyedValue, *it->second.pattern ) ) || // match against regex as written
 				( it->second.case_insensitive_pattern != nullptr && RE2::FullMatch( KeyedValue, *it->second.case_insensitive_pattern ) ) // attempt case-insensitive regex comparison
@@ -228,148 +181,8 @@ namespace DataOutputs {
 				return true;
 			}
 		}
-
-		// for ( auto const & k : found_variable->second ) {
-		// 	if ( k.key == "*" ) return true;
-		// 	if ( k.is_simple_string && equali( KeyedValue, k.key ) ) return true;
-		// 	// auto const * base = &(*found);
-		// 	// auto const * found_cast = dynamic_cast< OutputReportingVariables const * >( base );
-		// 	if (
-		// 		RE2::FullMatch( KeyedValue, *k.pattern ) || // match against regex as written
-		// 		RE2::FullMatch( KeyedValue, *k.case_insensitive_pattern ) // attempt case-insensitive regex comparison
-		// 		)
-		// 	{
-		// 		return true;
-		// 	}
-		// }
 		return false;
-
-		// if ( found->second.key == "*" ) return true;
-		// if ( found->second.is_simple_string && equali( KeyedValue, found->second.key ) ) return true;
-		// // auto const * base = &(*found);
-		// // auto const * found_cast = dynamic_cast< OutputReportingVariables const * >( base );
-		// if (
-		// 	RE2::FullMatch( KeyedValue, *found->second.pattern ) || // match against regex as written
-		// 	RE2::FullMatch( KeyedValue, *found->second.case_insensitive_pattern ) // attempt case-insensitive regex comparison
-		// 	)
-		// {
-		// 	return true;
-		// }
-
-		// int Found = 0;
-		// // std::string LowerCaseVarName;
-		// // // case-insensitive search
-		// // ConvertCaseToLower( VariableName, LowerCaseVarName);
-		// auto const FirstIndex = OutputVariablesNames.find( InputProcessor::MakeUPPERCase( VariableName ) );
-
-		// if ( FirstIndex != OutputVariablesNames.end() ) {
-		// 	Found = FirstIndex->second.index;
-		// }
-		// if ( Found != 0 ) {
-		// 	do {
-		// 		if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
-		// 			return true;
-		// 		}
-
-		// 		bool is_simple_string = true;
-		// 		for ( auto const & c : KeyValue ) {
-		// 			if ( c == ' ' || c == '_' || std::isalnum( c ) ) continue;
-		// 			is_simple_string = false;
-		// 			break;
-		// 		}
-
-		// 		if ( is_simple_string ) {
-		// 			if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
-		// 				return true;
-		// 			}
-		// 		} else {
-		// 			// RE2 pattern( OutputVariablesForSimulation( Found ).Key );
-		// 			// if ( ! pattern.ok() ) {
-		// 			// 	ShowSevereError( "Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
-		// 			// 	ShowContinueError( pattern.error() );
-		// 			// 	ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
-		// 			// 	break;
-		// 			// }
-		// 			if (
-		// 				// equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || // straight case-insensitive string comparison
-		// 				RE2::FullMatch( KeyedValue, *FirstIndex->second.pattern ) || // match against regex as written
-		// 				RE2::FullMatch( KeyedValue, *FirstIndex->second.case_insensitive_pattern ) // attempt case-insensitive regex comparison
-		// 				)
-		// 			{
-		// 				return true;
-		// 			}
-		// 		}
-		// 		Found = OutputVariablesForSimulation( Found ).Next;
-		// 	} while ( Found != 0 );
-		// }
-		// return false;
 	}
-
-	// bool
-	// FindItemInVariableList(
-	// 	std::string const & KeyedValue,
-	// 	std::string const & VariableName
-	// )
-	// {
-
-	// 	// FUNCTION INFORMATION:
-	// 	//       AUTHOR         Linda Lawrie
-	// 	//       DATE WRITTEN   July 2010
-	// 	//       MODIFIED       December 2016
-	// 	//       RE-ENGINEERED  na
-
-	// 	// PURPOSE OF THIS FUNCTION:
-	// 	// This function looks up a key and variable name value and determines if they are
-	// 	// in the list of required variables for a simulation.
-
-	// 	int Found = 0;
-	// 	// std::string LowerCaseVarName;
-	// 	// // case-insensitive search
-	// 	// ConvertCaseToLower( VariableName, LowerCaseVarName);
-	// 	auto const FirstIndex = OutputVariablesNames.find( InputProcessor::MakeUPPERCase( VariableName ) );
-
-	// 	if ( FirstIndex != OutputVariablesNames.end() ) {
-	// 		Found = FirstIndex->second.index;
-	// 	}
-	// 	if ( Found != 0 ) {
-	// 		do {
-	// 			if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
-	// 				return true;
-	// 			}
-
-	// 			bool is_simple_string = true;
-	// 			for ( auto const & c : KeyValue ) {
-	// 				if ( c == ' ' || c == '_' || std::isalnum( c ) ) continue;
-	// 				is_simple_string = false;
-	// 				break;
-	// 			}
-
-	// 			if ( is_simple_string ) {
-	// 				if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) ) {
-	// 					return true;
-	// 				}
-	// 			} else {
-	// 				// RE2 pattern( OutputVariablesForSimulation( Found ).Key );
-	// 				// if ( ! pattern.ok() ) {
-	// 				// 	ShowSevereError( "Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
-	// 				// 	ShowContinueError( pattern.error() );
-	// 				// 	ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
-	// 				// 	break;
-	// 				// }
-	// 				if (
-	// 					// equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || // straight case-insensitive string comparison
-	// 					RE2::FullMatch( KeyedValue, *FirstIndex->second.pattern ) || // match against regex as written
-	// 					RE2::FullMatch( KeyedValue, *FirstIndex->second.case_insensitive_pattern ) // attempt case-insensitive regex comparison
-	// 					)
-	// 				{
-	// 					return true;
-	// 				}
-	// 			}
-	// 			Found = OutputVariablesForSimulation( Found ).Next;
-	// 		} while ( Found != 0 );
-	// 	}
-	// 	return false;
-	// }
 
 } // DataOutputs
 
