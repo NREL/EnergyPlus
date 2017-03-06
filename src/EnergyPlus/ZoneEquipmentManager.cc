@@ -2986,7 +2986,6 @@ namespace ZoneEquipmentManager {
 		using CoolingPanelSimple::SimCoolingPanel;
 		using SplitterComponent::SimAirLoopSplitter;
 		using FanCoilUnits::SimFanCoilUnit;
-		using Fans::SimulateFanComponents;
 		using WindowAC::SimWindowAC;
 		using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
 		using ZoneDehumidifier::SimZoneDehumidifier;
@@ -3301,7 +3300,7 @@ namespace ZoneEquipmentManager {
 						TurnFansOff = true;
 					}
 
-					SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					Fans::SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;
@@ -4537,7 +4536,6 @@ namespace ZoneEquipmentManager {
 		VentMCP = 0.0;
 		MDotCPOA = 0.0;
 		MDotOA = 0.0;
-
 		MCPThermChim = 0.0;
 		ThermChimAMFL = 0.0;
 		MCPTThermChim = 0.0;
@@ -5241,7 +5239,6 @@ namespace ZoneEquipmentManager {
 				OAMFL( NZ ) += MCpI_temp / CpAir;
 				MCPTI( NZ ) += MCpI_temp * TempExt;
 			}
-
 		}
 
 		// Add infiltration rate enhanced by the existence of thermal chimney

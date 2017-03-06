@@ -270,6 +270,7 @@ namespace DataSizing {
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
 	Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop
+	int DataZoneUsedForSizing( 0 ); // pointer to control zone for air loop equipment
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
 	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
@@ -285,6 +286,8 @@ namespace DataSizing {
 	int DataDesicDehumNum( 0 ); // index to desiccant dehumidifier
 	bool DataDesicRegCoil( false ); // TRUE if heating coil desiccant regeneration coil
 	bool HRFlowSizingFlag( false ); // True, if it is a heat recovery heat exchanger flow sizing
+	Real64 DataWaterCoilSizCoolDeltaT( 0.0 ); // used for sizing cooling coil water design flow rate
+	Real64 DataWaterCoilSizHeatDeltaT( 0.0 ); // used for sizing heating coil water design flow rate
 
 	// Object Data
 	Array1D< OARequirementsData > OARequirements;
@@ -420,6 +423,8 @@ namespace DataSizing {
 		ZoneHVACSizing.deallocate();
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
+		DataWaterCoilSizCoolDeltaT = 0.0;
+		DataWaterCoilSizHeatDeltaT = 0.0;
 	}
 
 } // DataSizing

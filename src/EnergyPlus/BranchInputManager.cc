@@ -656,7 +656,7 @@ namespace BranchInputManager {
 		} else {
 			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
-					if ( SameString( "Fan:OnOff", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:ConstantVolume", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:VariableVolume", Branch( BranchNum ).Component( CompNum ).CType ) ) {
+					if ( SameString( "Fan:OnOff", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:ConstantVolume", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:VariableVolume", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:SystemModel", Branch( BranchNum ).Component( CompNum ).CType ) ) {
 						FanType = Branch( BranchNum ).Component( CompNum ).CType;
 						FanName = Branch( BranchNum ).Component( CompNum ).Name;
 						break;
