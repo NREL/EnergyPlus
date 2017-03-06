@@ -1678,7 +1678,7 @@ namespace PoweredInductionUnits {
 				Node( PriNode ).MassFlowRate = 0.0;
 
 				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, _, PIUTurnFansOn, PIUTurnFansOff );
+					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, PIUTurnFansOn, PIUTurnFansOff, _ );
 				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
 					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff  ); // fire the fan
 				}
@@ -1718,7 +1718,7 @@ namespace PoweredInductionUnits {
 		// fire the fan
 
 		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, _, PIUTurnFansOn, PIUTurnFansOff );
+			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, PIUTurnFansOn, PIUTurnFansOff, _ );
 		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
 			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff ); // fire the fan
 		}
