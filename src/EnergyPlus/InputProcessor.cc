@@ -5316,7 +5316,7 @@ namespace InputProcessor {
 		int Loop1;
 
 		OutputVariablesForSimulation.reserve( 1024 );
-		MaxConsideredOutputVariables = 1024;
+		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
 		CurrentRecord = FindFirstRecord( OutputVariable );

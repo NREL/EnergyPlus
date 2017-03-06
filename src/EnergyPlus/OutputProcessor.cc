@@ -5171,14 +5171,6 @@ SetupOutputVariable(
 		ShowFatalError( "Program terminates." );
 	}
 
-	if ( InputProcessor::MakeUPPERCase( KeyedValue ) == "ENVIRONMENT" ) {
-		std::string const test = "";
-	}
-
-	if ( MakeUPPERCase( VarName ) == "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) {
-		std::string const test = "";
-	}
-
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
 

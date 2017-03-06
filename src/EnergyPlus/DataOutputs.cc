@@ -170,7 +170,6 @@ namespace DataOutputs {
 		if ( found_key != found_variable->second.end() ) return true;
 
 		for ( auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it ) {
-			if ( it->second.key == "*" ) return true;
 			if ( equali( KeyedValue, it->second.key ) ) return true;
 			if ( it->second.is_simple_string ) continue;
 			if (
