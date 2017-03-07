@@ -77,6 +77,7 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -170,6 +171,8 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	HeatBalanceKivaManager::KivaManager kivaManager;
+	ExposedFoundationPerimeter exposedFoundationPerimeter;
 
 	// Functions
 
@@ -383,7 +386,7 @@ namespace SurfaceGeometry {
 							gio::write( OutputFileDebug, fmtA ) << Surface( SurfNum ).Name + ",Wall," + RoundSigDigits( Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
 						}
 					}
-				} else if ( Surface( SurfNum ).ExtBoundCond == Ground || Surface( SurfNum ).ExtBoundCond == GroundFCfactorMethod ) {
+				} else if ( Surface( SurfNum ).ExtBoundCond == Ground || Surface( SurfNum ).ExtBoundCond == GroundFCfactorMethod || Surface( SurfNum ).ExtBoundCond == KivaFoundation) {
 					Zone( ZoneNum ).ExteriorTotalGroundSurfArea += Surface( SurfNum ).GrossArea;
 					if ( Surface( SurfNum ).Class == SurfaceClass_Wall ) {
 						Zone( ZoneNum ).ExtGrossGroundWallArea += Surface( SurfNum ).GrossArea;
@@ -588,7 +591,7 @@ namespace SurfaceGeometry {
 			Surface( SurfNum ).UNomFilm = cNominalUwithConvCoeffs;
 			//populate the predefined report related to u-values with films
 			//only exterior surfaces including underground
-			if ( ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) || ( Surface( SurfNum ).ExtBoundCond == Ground ) ) {
+			if ( ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) || ( Surface( SurfNum ).ExtBoundCond == Ground ) || ( Surface( SurfNum ).ExtBoundCond == KivaFoundation )) {
 				{ auto const SELECT_CASE_var( Surface( SurfNum ).Class );
 				if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Floor ) || ( SELECT_CASE_var == SurfaceClass_Roof ) ) {
 					PreDefTableEntry( pdchOpUfactFilm, Surface( SurfNum ).Name, NominalUwithConvCoeffs, 3 );
@@ -1833,11 +1836,16 @@ namespace SurfaceGeometry {
 		}
 
 		// Set flag that determines whether a surface can be an exterior obstruction
+		// Also set associated surfaces for Kiva foundations
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			Surface( SurfNum ).ShadowSurfPossibleObstruction = false;
 			// Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond > 0 ) continue;
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == Ground ) continue;
+			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == KivaFoundation) {
+				if (!ErrorsFound) kivaManager.foundationInputs[Surface( SurfNum ).OSCPtr].surfaces.push_back( SurfNum );
+				continue;
+			}
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt ) continue;
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == OtherSideCoefCalcExt ) continue;
 			// Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
@@ -1908,6 +1916,8 @@ namespace SurfaceGeometry {
 		}
 
 		GetHTSurfExtVentedCavityData( ErrorsFound );
+
+		exposedFoundationPerimeter.getData( ErrorsFound );
 
 		GetSurfaceHeatTransferAlgorithmOverrides( ErrorsFound );
 
@@ -2721,6 +2731,7 @@ namespace SurfaceGeometry {
 
 		GetOSCData( ErrorsFound );
 		GetOSCMData( ErrorsFound );
+		GetFoundationData( ErrorsFound );
 
 		NeedToAddSurfaces = 0;
 
@@ -2907,10 +2918,45 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					}
 
+				} else if ( SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
+
+					if ( !WeatherManager::WeatherFileExists ){
+						ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file");
+				    ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+						ErrorsFound = true;
+				  }
+
+					// Find foundation object, if blank use default
+					if ( lAlphaFieldBlanks(ArgPointer + 1) ) {
+
+						if (!kivaManager.defaultSet) {
+							// Apply default foundation if no other foundation object specified
+							if ( kivaManager.foundationInputs.size() == 0 ) {
+								kivaManager.defineDefaultFoundation();
+							}
+							kivaManager.addDefaultFoundation();
+						}
+						SurfaceTmp( SurfNum ).OSCPtr = kivaManager.defaultIndex; // Reuse OSC pointer...shouldn't be used for non OSC surfaces anyway.
+					} else {
+						Found = kivaManager.findFoundation(SurfaceTmp( SurfNum ).ExtBoundCondName);
+						if (Found != (int)kivaManager.foundationInputs.size()) {
+							SurfaceTmp( SurfNum ).OSCPtr = Found;
+						} else {
+							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1) + "\"." );
+							ErrorsFound = true;
+						}
+					}
+
+					if (Construct(SurfaceTmp(SurfNum).Construction).SourceSinkPresent) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", construction may not have an internal source/sink");
+						ErrorsFound = true;
+					}
+					SurfaceTmp( SurfNum ).ExtBoundCond = KivaFoundation;
+
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
 					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
 					if ( Found == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1 ) + "\"." );
 						ErrorsFound = true;
 					}
 					SurfaceTmp( SurfNum ).OSCMPtr = Found;
@@ -3822,6 +3868,11 @@ namespace SurfaceGeometry {
 
 				if ( SurfaceTmp( SurfNum ).ExtBoundCond == Ground ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Exterior boundary condition = Ground is not be allowed with windows." );
+					ErrorsFound = true;
+				}
+
+				if ( SurfaceTmp( SurfNum ).ExtBoundCond == KivaFoundation ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Exterior boundary condition = Foundation is not be allowed with windows." );
 					ErrorsFound = true;
 				}
 
@@ -5806,6 +5857,90 @@ namespace SurfaceGeometry {
 	}
 
 	void
+	ExposedFoundationPerimeter::getData( bool& ErrorsFound ) {
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
+		using DataSurfaces::Surface;
+		using General::TrimSigDigits;
+		using General::RoundSigDigits;
+
+		int IOStatus; // Used in GetObjectItem
+		int NumAlphas;
+		int NumNumbers;
+
+		std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
+		int numObjects = GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( int obj = 1; obj <= numObjects; ++obj ) {
+			int alpF = 1;
+			int numF = 1;
+			GetObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			int Found = FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface" );
+				ErrorsFound = true;
+			} alpF++;
+			if ( Surface(Found).Class != SurfaceClass_Floor ) {
+				ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", surface is not a floor surface" );
+				ShowContinueError( cCurrentModuleObject + " will not be used" );
+				continue;
+			}
+
+
+			Data data;
+			data.useDetailedExposedPerimeter = true;
+			int optionsUsed = 0;
+			if ( !lNumericFieldBlanks( numF ) ) {
+				data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
+				if (data.exposedFraction > 1.0) {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", "+ cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
+					ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
+					ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
+					data.exposedFraction = 1.0;
+				}
+
+				data.useDetailedExposedPerimeter = false;
+				optionsUsed++;
+			} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
+
+			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
+			if (numRemainingFields > 0) {
+				optionsUsed++;
+				if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
+					ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
+					ErrorsFound = true;
+				}
+				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
+					if ( lAlphaFieldBlanks( alpF ) || SameString(cAlphaArgs( alpF ), "YES") ) {
+						data.isExposedPerimeter.push_back(true);
+					} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
+						data.isExposedPerimeter.push_back(false);
+					} else {
+						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
+						ErrorsFound = true;
+					} alpF++;
+				}
+			}
+			if (optionsUsed == 0) {
+				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define at least one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
+				ErrorsFound = true;
+			}
+
+			if (optionsUsed > 1) {
+				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", may only define one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
+				ErrorsFound = true;
+			}
+
+			surfaceMap[Found] = data;
+		}
+	}
+
+	void
 	GetSurfaceHeatTransferAlgorithmOverrides( bool & ErrorsFound )
 	{
 
@@ -6148,6 +6283,24 @@ namespace SurfaceGeometry {
 			}
 		}
 
+		// Change algorithm for Kiva foundaiton surfaces
+		bool hasKivaHeatTransferAlgo = any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva );
+		for (auto& surf : Surface) {
+		    if (surf.ExtBoundCond == KivaFoundation) {
+		        surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
+		        if ( ! hasKivaHeatTransferAlgo ) { // add new algo
+		            HeatTransferAlgosUsed.push_back( HeatTransferModel_Kiva );
+		            ++NumberOfHeatTransferAlgosUsed;
+		            hasKivaHeatTransferAlgo = true;
+		        }
+		    }
+		}
+
+		// Setup Kiva intances
+		if ( hasKivaHeatTransferAlgo ) {
+			if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
+		}
+
 		// test for missing materials for algorithms selected
 		NumEMPDMat = GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
 		NumPCMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" ); // needs detailed algo
@@ -6208,6 +6361,8 @@ namespace SurfaceGeometry {
 				AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
 			} else if ( SELECT_CASE_var == HeatTransferModel_HAMT ) {
 				AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+			} else if ( SELECT_CASE_var == HeatTransferModel_Kiva ) {
+				AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
 			}}
 
 			gio::write( OutputFileInits, Format_725 ) << AlgoName << RoundSigDigits( MaxSurfaceTempLimit, 0 ) << RoundSigDigits( LowHConvLimit, 2 ) << RoundSigDigits( HighHConvLimit, 1 );
@@ -7509,6 +7664,387 @@ namespace SurfaceGeometry {
 	}
 
 	void
+	GetFoundationData( bool & ErrorsFound )
+	{
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
+
+		int NumAlphas;
+		int NumProps;
+		int IOStat;
+
+		// Read Kiva Settings
+		cCurrentModuleObject = "Foundation:Kiva:Settings";
+		int TotKivaStgs = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotKivaStgs > 1 ) {
+			ErrorsFound = true;
+			ShowSevereError( "Multiple " + cCurrentModuleObject + " objects found. Only one is allowed." );
+		}
+
+		if ( TotKivaStgs == 1) {
+			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			int numF = 1;
+			int alpF = 1;
+
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.soilK = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.soilRho = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.soilCp = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.groundSolarAbs = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.groundThermalAbs = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.groundRoughness = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.farFieldWidth = rNumericArgs( numF );} numF++;
+
+			if ( !lAlphaFieldBlanks( alpF ) ) {
+				if (SameString(cAlphaArgs( alpF ), "ZeroFlux")) {
+					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
+				} else if (SameString(cAlphaArgs( alpF ), "GroundWater")) {
+					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
+				} else /* if (SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
+					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
+				}
+			} alpF++;
+
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.minCellDim = rNumericArgs( numF );} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.maxGrowthCoeff = rNumericArgs( numF );} numF++;
+
+			if ( !lAlphaFieldBlanks( alpF ) ) {
+				if (SameString(cAlphaArgs( alpF ), "Hourly")) {
+					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
+				} else /* if (SameString(cAlphaArgs( alpF ), "Timestep")) */ {
+					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
+				}
+			} alpF++;
+
+		}
+
+		/* ====================================================================== */
+
+		// Read Foundation objects
+		cCurrentModuleObject = "Foundation:Kiva";
+		int TotKivaFnds = GetNumObjectsFound( cCurrentModuleObject );
+
+		if (TotKivaFnds > 0) {
+			kivaManager.defineDefaultFoundation();
+
+			Array1D_string fndNames;
+			fndNames.allocate(TotKivaFnds + 1);
+			fndNames( 1 ) = "<Default Foundation>";
+
+			for (int Loop = 1; Loop <= TotKivaFnds; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+				int numF = 1;
+				int alpF = 1;
+
+				bool ErrorInName = false;
+				bool IsBlank = false;
+
+				HeatBalanceKivaManager::FoundationKiva fndInput;
+
+				fndInput.name = cAlphaArgs( alpF ); alpF++;
+				VerifyName( fndInput.name, fndNames, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ErrorsFound = true;
+					continue;
+				} else {
+					fndNames( Loop ) = fndInput.name;
+				}
+
+				// Start with copy of default
+				auto& fnd = fndInput.foundation;
+				fnd = kivaManager.defaultFoundation.foundation;
+
+				// Interior horizontal insulation
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					if ( index == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& m = Material( index );
+					if ( m.Group != RegularMaterial || m.ROnly ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Must be of type \"Material\"" );
+						continue;
+					}
+					fndInput.intHIns.x = 0.0;
+					fndInput.intHIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.intHIns.depth = m.Thickness;
+				} alpF++;
+
+				if ( !lAlphaFieldBlanks( alpF - 1 ) ) {
+					if ( lNumericFieldBlanks( numF ) ) {
+						fndInput.intHIns.z = 0.0;
+					} else {
+						fndInput.intHIns.z = rNumericArgs( numF );
+					} numF++;
+					if ( lNumericFieldBlanks( numF ) ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+						continue;
+					} else {
+						fndInput.intHIns.width = -rNumericArgs( numF );
+					} numF++;
+				} else {
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+				}
+
+				// Interior vertical insulation
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					if ( index == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& m = Material( index );
+					if ( m.Group != RegularMaterial || m.ROnly ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Must be of type \"Material\"" );
+						continue;
+					}
+					fndInput.intVIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.intVIns.width = -m.Thickness;
+					fndInput.intVIns.x = 0.0;
+					fndInput.intVIns.z = 0.0;
+				} alpF++;
+
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
+					if ( lNumericFieldBlanks( numF ) ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+						continue;
+					} else {
+						fndInput.intVIns.depth = rNumericArgs( numF );
+					} numF++;
+				} else {
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+				}
+
+				// Exterior horizontal insulation
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					if ( index == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& m = Material( index );
+					if ( m.Group != RegularMaterial || m.ROnly ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Must be of type \"Material\"" );
+						continue;
+					}
+					fndInput.extHIns.x = 0.0;
+					fndInput.extHIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.extHIns.depth = m.Thickness;
+				} alpF++;
+
+				if ( !lAlphaFieldBlanks( alpF - 1 ) ) {
+					if ( lNumericFieldBlanks( numF ) ) {
+						fndInput.extHIns.z = 0.0;
+					} else {
+						fndInput.extHIns.z = rNumericArgs( numF );
+					} numF++;
+					if ( lNumericFieldBlanks( numF ) ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+						continue;
+					} else {
+						fndInput.extHIns.width = rNumericArgs( numF );
+					} numF++;
+				} else {
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+				}
+
+				// Exterior vertical insulation
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					if ( index == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& m = Material( index );
+					if ( m.Group != RegularMaterial || m.ROnly ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Must be of type \"Material\"" );
+						continue;
+					}
+					fndInput.extVIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.extVIns.width = m.Thickness;
+					fndInput.extVIns.x = 0.0;
+					fndInput.extVIns.z = 0.0;
+				} alpF++;
+
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
+					if ( lNumericFieldBlanks( numF ) ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+						continue;
+					} else {
+						fndInput.extVIns.depth = rNumericArgs( numF );
+					} numF++;
+				} else {
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+				}
+
+				// Foundation wall
+				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.heightAboveGrade = rNumericArgs( numF );} numF++;
+
+				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.depthBelowSlab = rNumericArgs( numF );} numF++;
+
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					fndInput.wallConstructionIndex = FindItemInList( cAlphaArgs( alpF ), Construct );
+					if ( fndInput.wallConstructionIndex == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching construction for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing construction = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& c = Construct( fndInput.wallConstructionIndex );
+					c.IsUsed = true;
+					if ( c.TypeIsWindow ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Cannot be a window construction" );
+						continue;
+					}
+				} else {
+					fndInput.wallConstructionIndex = 0; // Use default wall construction
+				} alpF++;
+
+				// Footing
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					if ( index == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& m = Material( index );
+					if ( m.Group != RegularMaterial || m.ROnly ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Must be of type \"Material\"" );
+						continue;
+					}
+					fndInput.footing.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.footing.width = m.Thickness;
+					fndInput.footing.x = 0.0;
+					fndInput.footing.z = 0.0;
+				} alpF++;
+
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
+					if ( lNumericFieldBlanks( numF ) ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+						continue;
+					} else {
+						fndInput.footing.depth = rNumericArgs( numF );
+					} numF++;
+				} else {
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+				}
+
+				// General Blocks
+				int numRemainingFields = NumAlphas - (alpF - 1) + NumProps - (numF -1);
+				if (numRemainingFields > 0) {
+					int numBlocks = numRemainingFields/4;
+					if ( mod( numRemainingFields, 4 ) != 0 ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", number of Block fields not even multiple of 4. Will read in " + General::TrimSigDigits( numBlocks ) );
+					}
+					for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
+						Kiva::InputBlock block;
+						if ( !lAlphaFieldBlanks( alpF ) ) {
+							int index = FindItemInList( cAlphaArgs( alpF ), Material );
+							if ( index == 0 ) {
+								ErrorsFound = true;
+								ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+								continue;
+							}
+							auto& m = Material( index );
+							if ( m.Group != RegularMaterial || m.ROnly ) {
+								ErrorsFound = true;
+								ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+								ShowContinueError( "Must be of type \"Material\"" );
+								continue;
+							}
+							block.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+							block.width = m.Thickness;
+						} else {
+							ErrorsFound = true;
+							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + " is required and not given." );
+							continue;
+						} alpF++;
+
+						if ( lNumericFieldBlanks( numF ) ) {
+							block.depth = 0.0;
+						} else {
+							block.depth = rNumericArgs( numF );
+						} numF++;
+
+						if ( lNumericFieldBlanks( numF ) ) {
+							ErrorsFound = true;
+							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+							continue;
+						} else {
+							block.x = rNumericArgs( numF );
+						} numF++;
+
+						if ( lNumericFieldBlanks( numF ) ) {
+							block.z = 0.0;
+						} else {
+							block.z = rNumericArgs( numF );
+						} numF++;
+
+						fnd.inputBlocks.push_back(block);
+					}
+				}
+
+				kivaManager.foundationInputs.push_back(fndInput);
+			}
+		}
+
+
+
+	}
+
+	void
 	GetOSCData( bool & ErrorsFound )
 	{
 
@@ -8460,7 +8996,7 @@ namespace SurfaceGeometry {
 				// Processing of 4-sided but non-rectangular Window, Door or GlassDoor, for use in calc of convective air flow.
 				if ( ! isRectangle( ThisSurf ) ) {
 
-					// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio. 
+					// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 					MakeEquivalentRectangle( ThisSurf, ErrorsFound );
 
 					if( DisplayExtraWarnings ){
@@ -10583,7 +11119,7 @@ namespace SurfaceGeometry {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Processing of 4-sided but non-rectangular Window, Door or GlassDoor.
 		// Calculate the effective height and width of the surface.
-		// 
+		//
 		// METHODOLOGY EMPLOYED:
 		// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 
@@ -10604,7 +11140,7 @@ namespace SurfaceGeometry {
 
 		// DERIVED TYPE DEFINITIONS:
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 BaseCosAzimuth;
 		static Real64 BaseCosTilt;
@@ -10624,19 +11160,19 @@ namespace SurfaceGeometry {
 		Real64 XLLC;
 		Real64 YLLC;
 		Real64 ZLLC;
-		
-		if( SurfNum == 0 ){ 
-		// invalid surface 
+
+		if( SurfNum == 0 ){
+		// invalid surface
 			ErrorsFound = true;
-			return; 
+			return;
 		} else if( Surface( SurfNum ).Sides != 4 ){
-		// the method is designed for 4-sided surface 
-			return; 
+		// the method is designed for 4-sided surface
+			return;
 		} else if( isRectangle( SurfNum )){
 		// no need to transform
-			return;  
+			return;
 		}
-		
+
 		SurfWorldAz = Surface( SurfNum ).Azimuth;
 		SurfTilt = Surface( SurfNum ).Tilt;
 		BaseCosAzimuth = std::cos( SurfWorldAz * DegToRadians );
@@ -10650,22 +11186,22 @@ namespace SurfaceGeometry {
 		HeightMax = 0.0;
 		for ( int i = 1; i < NumSurfSides; ++i ) {
 			for ( int j = i + 1; j <= NumSurfSides; ++j ) {
-			
+
 				Xp = Surface( SurfNum ).Vertex( j ).x - Surface( SurfNum ).Vertex( i ).x ;
 				Yp = Surface( SurfNum ).Vertex( j ).y - Surface( SurfNum ).Vertex( i ).y ;
 				Zp = Surface( SurfNum ).Vertex( j ).z - Surface( SurfNum ).Vertex( i ).z ;
-				
+
 				XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
 				YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
 				ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-			
+
 				if( std::abs( XLLC ) > WidthMax ) WidthMax = std::abs( XLLC );
 				if( std::abs( YLLC ) > WidthMax ) HeightMax = std::abs( YLLC );
-			
+
 			}
 		}
-		
-		// Perform transformation by calculating WidthEff and HeightEff 
+
+		// Perform transformation by calculating WidthEff and HeightEff
 		if(( WidthMax > 0 ) && ( HeightMax > 0 )){
 			AspectRatio = WidthMax / HeightMax;
 		} else {
@@ -10673,13 +11209,13 @@ namespace SurfaceGeometry {
 		}
 		WidthEff = std::sqrt( Surface( SurfNum ).Area * AspectRatio );
 		HeightEff = std::sqrt( Surface( SurfNum ).Area / AspectRatio );
-		
+
 		// Assign the effective width and length to the surface
 		Surface( SurfNum ).Width = WidthEff;
 		Surface( SurfNum ).Height = HeightEff;
 
 	}
-	
+
 } // SurfaceGeometry
 
 } // EnergyPlus
