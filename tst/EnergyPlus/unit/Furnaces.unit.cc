@@ -1075,7 +1075,7 @@ namespace EnergyPlus {
 		// check the cooling mode is Off
 		EXPECT_FALSE( Furnaces::CoolingLoad );
 		// check if the air-to-air heat pump outlet temperature is capped at 45.0C
-		EXPECT_DOUBLE_EQ( 45.0, Node( Furnace( 1 ).FurnaceOutletNodeNum ).Temp );	
+		EXPECT_NEAR( 45.0, Node( Furnace( 1 ).FurnaceOutletNodeNum ).Temp, 0.000001 );	
 
 	}
 
