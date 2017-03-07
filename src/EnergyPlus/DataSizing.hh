@@ -260,7 +260,8 @@ namespace DataSizing {
 	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
-	extern int DataZoneNumber; // a pointer to a served by zoneHVAC equipment
+	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
+	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
@@ -287,7 +288,8 @@ namespace DataSizing {
 	extern int DataDesicDehumNum; // index to desiccant dehumidifier
 	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
 	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
-
+	extern Real64 DataWaterCoilSizCoolDeltaT; // used for sizing cooling coil water design flow rate
+	extern Real64 DataWaterCoilSizHeatDeltaT; // used for sizing heating coil water design flow rate
 	// Types
 
 	struct ZoneSizingInputData

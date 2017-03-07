@@ -82,6 +82,7 @@
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -693,11 +694,17 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! SameString( ReqRepVars( Loop ).Key, KeyedValue ) ) continue;
+			if ( ! (
+				SameString( ReqRepVars( Loop ).Key, KeyedValue ) ||  // straight case-insensitive string comparison
+				RE2::FullMatch( KeyedValue, ReqRepVars( Loop ).Key ) || // match against regex as written
+				RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) // attempt case-insensitive regex comparison
+			) )
+			{
+				continue;
+			}
 
 			//   A match.  Make sure doesnt duplicate
 
@@ -770,7 +777,6 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;

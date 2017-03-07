@@ -30,6 +30,7 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/infrared-radiation-transfer-material.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/transparent-insulation-material.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/surface-heat-balance-with-moveable-insulation.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/ground-heat-transfer-calculations-using-kiva.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/ground-heat-transfer-calculations-using-c.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/ground-heat-transfer-calculations-using-site.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/ground-heat-transfer-calculations-using-site-001.tex
@@ -518,7 +519,7 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image8006.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image8007.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image8008.png
-) 
+)
 
 SET( SOURCE_FILENAME "engineering-reference" )
 SET( OUTPUT_FILENAME "EngineeringReference" )
@@ -529,7 +530,7 @@ add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
 	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
 		    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME}
 		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
-                 ) 
+                 )
 add_custom_target( zPDF_${OUTPUT_FILENAME} ALL
                    DEPENDS ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
                  )

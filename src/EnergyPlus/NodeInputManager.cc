@@ -133,6 +133,8 @@ namespace NodeInputManager {
 	Array1D< NodeListDef > NodeLists; // Node Lists
 	namespace {
 		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
+		Array1D_int GetOnlySingleNodeNodeNums;
+		bool GetOnlySingleNodeFirstTime( true );
 	}
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -156,6 +158,9 @@ namespace NodeInputManager {
 		MaxCheckNodes = 0;
 		NodeVarsSetup = false;
 		NodeLists.deallocate();
+		GetOnlySingleNodeNodeNums.deallocate();
+		GetOnlySingleNodeFirstTime = true;
+		NodeWetBulbRepReq.deallocate();
 	}
 
 	void
@@ -813,23 +818,23 @@ namespace NodeInputManager {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NumNodes;
-		static Array1D_int NodeNums;
+
 		int FluidType;
 		std::string ConnectionType;
-		static bool firstTime( true );
+
 		int NumParams;
 		int NumAlphas;
 		int NumNums;
 
-		if ( firstTime ) {
+		if ( GetOnlySingleNodeFirstTime ) {
 			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-			NodeNums.dimension( NumParams, 0 );
-			firstTime = false;
+			GetOnlySingleNodeNodeNums.dimension( NumParams, 0 );
+			GetOnlySingleNodeFirstTime = false;
 		}
 
 		FluidType = NodeFluidType;
 
-		GetNodeNums( NodeName, NumNodes, NodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
+		GetNodeNums( NodeName, NumNodes, GetOnlySingleNodeNodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 
 		if ( NumNodes > 1 ) {
 			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
@@ -838,7 +843,7 @@ namespace NodeInputManager {
 			ShowContinueError( "...a Nodelist may not be valid in this context." );
 			errFlag = true;
 		} else if ( NumNodes == 0 ) {
-			NodeNums( 1 ) = 0;
+			GetOnlySingleNodeNodeNums( 1 ) = 0;
 		}
 		if ( NumNodes > 0 ) {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
@@ -850,7 +855,7 @@ namespace NodeInputManager {
 			//                                  ConnectionType,NodeFluidStream,ObjectIsParent,errFlag)
 		}
 
-		GetSingleNodeResult = NodeNums( 1 );
+		GetSingleNodeResult = GetOnlySingleNodeNodeNums( 1 );
 
 		return GetSingleNodeResult;
 

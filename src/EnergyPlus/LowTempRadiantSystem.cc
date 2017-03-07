@@ -2734,12 +2734,12 @@ namespace LowTempRadiantSystem {
 
 			} else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
 
-				if ( ControlTemp < OffTempHeat ) { // Heating mode
+				if ( ControlTemp < OffTempHeat && HydrRadSys( RadSysNum ).HeatingSystem ) { // Heating mode
 					OperatingMode = HeatingMode;
 					ControlNode = HydrRadSys( RadSysNum ).HotWaterInNode;
 					MaxWaterFlow = HydrRadSys( RadSysNum ).WaterFlowMaxHeat;
 					MassFlowFrac = ( OffTempHeat - ControlTemp ) / HydrRadSys( RadSysNum ).HotThrottlRange;
-				} else if ( ControlTemp > OffTempCool ) { // Cooling mode
+				} else if ( ControlTemp > OffTempCool && HydrRadSys( RadSysNum ).CoolingSystem ) { // Cooling mode
 					OperatingMode = CoolingMode;
 					ControlNode = HydrRadSys( RadSysNum ).ColdWaterInNode;
 					MaxWaterFlow = HydrRadSys( RadSysNum ).WaterFlowMaxCool;
@@ -3348,7 +3348,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			// Now actually decide what to do based on the setpoint temperature in relation to the control temperatures
-			if ( SetPointTemp < OffTempHeat ) { // HEATING MODE
+			if ( SetPointTemp < OffTempHeat && CFloRadSys( RadSysNum ).HeatingSystem ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
 				
@@ -3390,7 +3390,7 @@ namespace LowTempRadiantSystem {
 
 				}
 
-			} else if ( SetPointTemp > OffTempCool ) { // COOLING MODE
+			} else if ( SetPointTemp > OffTempCool && CFloRadSys( RadSysNum ).CoolingSystem ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
 				
