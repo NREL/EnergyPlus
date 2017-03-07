@@ -374,7 +374,7 @@
     Main Cooling Coil 1,     !- Name
     System Availability Schedule,  !- Availability Schedule Name
     148300,                  !- Gross Rated Total Cooling Capacity {W}
-    0.85,                    !- Gross Rated Sensible Heat Ratio
+    0.83,                    !- Gross Rated Sensible Heat Ratio
     4.5669,                  !- Gross Rated Cooling COP {W/W}
     8.5,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
