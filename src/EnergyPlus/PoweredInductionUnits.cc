@@ -1519,8 +1519,7 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   August 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       MODIFIED       September 2016, March 2017
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulate a parallel powered induction unit; adjust its primary air flow
@@ -1532,9 +1531,10 @@ namespace PoweredInductionUnits {
 		//     off. Obtains fan temperature increase.
 		// (2) Calculates primary and secomdary air flow to meet zone load.
 		//     (a) Assume fan is off and calculate primary air flow to meet cooling load.
-		//     (b) If calculated primary air flow is above the fan turn on ratio, fan is off.
+		//     (b1) If calculated primary air flow is above the fan turn on ratio, fan is off.
 		//         Otherwise fan is on; calculate mixed secondary and primary air flow that
 		//         will meet the zone load
+		//     (b2) If the fan turn on ratio is zero, then the fan is on only if reheat is needed.
 		//  (3) Simulate fan, mixer, and (off) heating coil to obtain zone inlet conditions.
 		// If unit is on and there is a heating load
 		// (1) sets primary air flow to a minimum.
@@ -1544,10 +1544,6 @@ namespace PoweredInductionUnits {
 		// (4) if reheat is electric or gas calls SimulateHeatingCoilComponents to
 		//     simulate coil at coil output that matches the zone load
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 		using MixerComponent::SimAirMixer;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -1555,17 +1551,6 @@ namespace PoweredInductionUnits {
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 QZnReq; // heating or cooling needed by zone [Watts]
 		Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
 		Real64 QActualHeating; // the heating load seen by the reheat coil [W]
@@ -1590,8 +1575,6 @@ namespace PoweredInductionUnits {
 		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
 		bool PIUTurnFansOn( false ); // If True, overrides fan schedule and cycles PIU fan on
 		bool PIUTurnFansOff( false ); // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
-		//unusedREAL(r64)    :: MaxSteamFlow
-		//unusedREAL(r64)    :: MinSteamFlow
 		Real64 mdot; // local fluid flow rate kg/s
 
 		// FLOW
@@ -1648,7 +1631,7 @@ namespace PoweredInductionUnits {
 						PIUTurnFansOn = false;
 					} else {
 						SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-						PIUTurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+						PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
 					}
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
