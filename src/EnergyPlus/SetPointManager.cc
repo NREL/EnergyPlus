@@ -3477,12 +3477,9 @@ namespace SetPointManager {
 							ColdestSetPtMgr( SetPtMgrNum ).AirLoopNum = AirLoopNum;
 						}
 						if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated == 0 ) {
-							//ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating found:" );
-							//ShowContinueError( "Air Loop provides no heating, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
-							//ErrorsFound = true;
 							if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled == 0 ) {
-								ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating found:" );
-								ShowContinueError( "Air Loop provides no heating, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
+								ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating or cooling found:" );
+								ShowContinueError( "Air Loop provides no heating or cooling, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
 								ErrorsFound = true;
 							}
 						}
