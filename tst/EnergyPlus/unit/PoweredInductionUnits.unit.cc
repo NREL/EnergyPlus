@@ -202,7 +202,6 @@ TEST_F( EnergyPlusFixture, ParallelPIUTest1 ) {
 	int ZoneNum = 1;
 	int SysNum = 1;
 	int ZoneNodeNum = 1;
-	int InletNodeNum = PoweredInductionUnits::PIU( SysNum ).PriAirInNode;
 	int SecNodeNum = PoweredInductionUnits::PIU( SysNum ).SecAirInNode;
 	bool FirstHVACIteration = true;
 	Real64 SecMaxMassFlow = 0.05 * DataEnvironment::StdRhoAir; // From inputs
