@@ -1573,8 +1573,6 @@ namespace PoweredInductionUnits {
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 CpAirZn; // zone air specific heat [J/kg-C]
 		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
-		bool PIUTurnFansOn( false ); // If True, overrides fan schedule and cycles PIU fan on
-		bool PIUTurnFansOff( false ); // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 		Real64 mdot; // local fluid flow rate kg/s
 
 		// FLOW
@@ -1594,8 +1592,8 @@ namespace PoweredInductionUnits {
 		QToHeatSetPt = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP;
 		CpAirZn = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 		// Initialize local fan flags to global system flags
-		PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
-		PIUTurnFansOff = DataHVACGlobals::TurnFansOff;
+		bool PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );  // If True, overrides fan schedule and cycles PIU fan on
+		bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
 		//On the first HVAC iteration the system values are given to the controller, but after that
 		// the demand limits are in place and there needs to be feedback to the Zone Equipment
