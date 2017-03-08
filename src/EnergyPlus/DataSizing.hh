@@ -451,6 +451,7 @@ namespace DataSizing {
 		bool EMSOverrideDesCoolMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolMassFlow; // Value EMS directing to use for Design Cooling air mass flow [kg/s]
 		Real64 DesHeatLoad; // zone design heating load [W]
+		Real64 NonAirSysDesHeatLoad; // same as zone design heating load without special multipliers from Sizing:Zone object [W]
 		bool EMSOverrideDesHeatLoadOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatLoad; // Value EMS directing to use for zone design heating load  [W]
 		Real64 DesCoolLoad; // zone design cooling load [W]
@@ -612,6 +613,7 @@ namespace DataSizing {
 			EMSOverrideDesCoolMassOn( false ),
 			EMSValueDesCoolMassFlow( 0.0 ),
 			DesHeatLoad( 0.0 ),
+			NonAirSysDesHeatLoad( 0.0 ),
 			EMSOverrideDesHeatLoadOn( false ),
 			EMSValueDesHeatLoad( 0.0 ),
 			DesCoolLoad( 0.0 ),

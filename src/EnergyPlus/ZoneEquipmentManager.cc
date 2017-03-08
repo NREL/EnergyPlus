@@ -2601,6 +2601,7 @@ namespace ZoneEquipmentManager {
 				z.CoolDDNum = c.CoolDDNum;
 
 				z.DesHeatLoad = c.DesHeatLoad;
+				z.NonAirSysDesHeatLoad = c.DesHeatLoad;
 				z.DesHeatMassFlow = c.DesHeatMassFlow;
 				z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
 				z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
@@ -2668,8 +2669,9 @@ namespace ZoneEquipmentManager {
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				// Now take into account the user specified sizing factor and user specified cooling design air flow
-				// rate
+				// update non air system design heating load to include the sizing factor
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatLoad *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				// Now take into account the user specified sizing factor and user specified cooling design air flow rate
 				TotCoolSizMult = 0.0;
 				// Calculate a sizing factor from the user specified cooling design air flow rate
 				if ( FinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow > 0.0 && FinalZoneSizing( CtrlZoneNum ).CoolAirDesMethod == InpDesAirFlow && FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
