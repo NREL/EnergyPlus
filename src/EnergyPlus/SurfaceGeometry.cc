@@ -1642,6 +1642,7 @@ namespace SurfaceGeometry {
 						Zone( ZoneNum ).HasFloor = true;
 					}
 					if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) {
+						Zone( ZoneNum ).CeilingArea += Surface( SurfNum ).Area;
 						Zone( ZoneNum ).HasRoof = true;
 					}
 				}
@@ -8627,8 +8628,8 @@ namespace SurfaceGeometry {
 			}
 			ZoneStruct.NumSurfaceFaces = NActFaces;
 			SurfCount = double( NActFaces );
-			if ( areAnySurfacesNonConvex ) {
-				CalcVolume = CalcPolyhedronVolumeWithNonConvex( ZoneStruct );
+			if ( areAnySurfacesNonConvex && Zone( ZoneNum).FloorArea == Zone(ZoneNum).CeilingArea) {
+				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 			} else {
 				CalcPolyhedronVolume( ZoneStruct, CalcVolume );
 			}
