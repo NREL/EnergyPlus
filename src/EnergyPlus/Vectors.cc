@@ -870,6 +870,15 @@ namespace Vectors {
 
 	}
 
+
+	Real64
+	CalcPolyhedronVolumeWithNonConvex(
+		Polyhedron const & Poly
+	)
+	{
+		return 1.0;
+	}
+
 } // Vectors
 
 } // EnergyPlus
