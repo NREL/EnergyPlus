@@ -2614,6 +2614,7 @@ namespace ZoneEquipmentManager {
 				z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
 
 				z.DesCoolLoad = c.DesCoolLoad;
+				z.NonAirSysDesCoolLoad = c.DesCoolLoad;
 				z.DesCoolMassFlow = c.DesCoolMassFlow;
 				z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
 				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
@@ -2669,8 +2670,8 @@ namespace ZoneEquipmentManager {
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				// update non air system design heating load to include the sizing factor
-				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatLoad *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				// update non air system design load to include the sizing factor
+				FinalZoneSizing(CtrlZoneNum).NonAirSysDesCoolLoad *= FinalZoneSizing(CtrlZoneNum).CoolSizingFactor;
 				// Now take into account the user specified sizing factor and user specified cooling design air flow rate
 				TotCoolSizMult = 0.0;
 				// Calculate a sizing factor from the user specified cooling design air flow rate
@@ -2789,8 +2790,9 @@ namespace ZoneEquipmentManager {
 						FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 					}
 				}
-				// Now take into account the user specified sizing factor or user specified heating design air flow
-				// rate (which overrides the sizing factor)
+				// update non air system design load to include the sizing factor
+				FinalZoneSizing(CtrlZoneNum).NonAirSysDesHeatLoad *= FinalZoneSizing(CtrlZoneNum).HeatSizingFactor;
+				// Now take into account the user specified sizing factor or user specified heating design air flow rate (which overrides the sizing factor)
 				TotHeatSizMult = 0.0;
 				// Calculate a sizing factor from the user specified heating design air flow rate
 				if ( FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow > 0.0 && FinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod == InpDesAirFlow && FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
