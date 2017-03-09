@@ -2288,9 +2288,9 @@ namespace SingleDuct {
 			TermUnitSizing( CurZoneEqNum ).ReheatLoadMult = 1.0;
 			if ( ZoneSizingRunDone ) {
 				if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheatVSFan ) {
-					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( UserInputMaxHeatAirVolFlowRate, CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
+					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( UserInputMaxHeatAirVolFlowRate, FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
 				} else {
-					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
+					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
 				}
 			} else {
 				if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheatVSFan ) {
@@ -2358,7 +2358,7 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
-							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
 							ZoneDesHumRat = CalcFinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load
@@ -2430,7 +2430,7 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
-							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
 							ZoneDesHumRat = CalcFinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load

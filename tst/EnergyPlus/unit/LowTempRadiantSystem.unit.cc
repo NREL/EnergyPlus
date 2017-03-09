@@ -118,7 +118,7 @@ protected:
 		ElecRadSys.allocate( 1 );
 		HydrRadSys.allocate( 1 );
 		CFloRadSys.allocate( 1 );
-		CalcFinalZoneSizing.allocate( 1 );
+		FinalZoneSizing.allocate( 1 );
 		ZoneEqSizing.allocate( 1 );
 		Zone.allocate( 1 );
 		CurZoneEqNum = 1;
@@ -187,7 +187,6 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantElectric )
 	ElecRadSys( RadSysNum ).MaxElecPower = AutoSize;
 	ElecRadSys( RadSysNum ).HeatingCapMethod = HeatingDesignCapacity;
 	ElecRadSys( RadSysNum ).ScaledHeatingCapacity = AutoSize;
-	FinalZoneSizing.allocate( CurZoneEqNum );
 	FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 1200.0;
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( 1200.0, ElecRadSys( RadSysNum ).MaxElecPower, 0.1 );
@@ -231,7 +230,6 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 	HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat = AutoSize;
 	HydrRadSys( RadSysNum ).HeatingCapMethod = HeatingDesignCapacity;
 	HydrRadSys( RadSysNum ).ScaledHeatingCapacity = AutoSize;
-	FinalZoneSizing.allocate( CurZoneEqNum );
 	FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 1200.0;
 	ExpectedResult1 = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
@@ -378,7 +376,6 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow )
 	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
 	CFloRadSys( RadSysNum ).ColdWaterOutNode = 0;
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
-	FinalZoneSizing.allocate( CurZoneEqNum );
 	FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 1200.0;
 	ExpectedResult1 = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
@@ -1128,14 +1125,14 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 	DataSizing::CurZoneEqNum = 1;
 	ZoneSizingRunDone = true;
-	FinalZoneSizing.allocate(DataSizing::CurZoneEqNum);
+	FinalZoneSizing.allocate( DataSizing::CurZoneEqNum );
 	ZoneEqSizing.allocate( DataSizing::CurZoneEqNum );
 
 	ZoneEqSizing( DataSizing::CurZoneEqNum ).SizingMethod.allocate( 25 );
 	ZoneEqSizing( DataSizing::CurZoneEqNum ).SizingMethod( DataHVACGlobals::HeatingCapacitySizing ) = DataSizing::FractionOfAutosizedHeatingCapacity;
 	ZoneEqSizing( DataSizing::CurZoneEqNum ).SizingMethod( DataHVACGlobals::CoolingCapacitySizing ) = DataSizing::FractionOfAutosizedCoolingCapacity;
 	// heating capacity sizing calculation
-	FinalZoneSizing(DataSizing::CurZoneEqNum).NonAirSysDesHeatLoad = 10000.0;
+	FinalZoneSizing( DataSizing::CurZoneEqNum ).NonAirSysDesHeatLoad = 10000.0;
 	HeatingCapacity = FinalZoneSizing( DataSizing::CurZoneEqNum ).NonAirSysDesHeatLoad * HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
 	// cooling capacity sizing calculation
 	FinalZoneSizing( DataSizing::CurZoneEqNum ).NonAirSysDesCoolLoad = 10000.0;

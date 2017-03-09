@@ -2610,6 +2610,7 @@ namespace ZoneEquipmentManager {
 				z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
 				z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
 				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.NonAirSysDesHeatVolFlow = c.DesHeatVolFlow;
 				z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
 				z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
 
@@ -2790,8 +2791,9 @@ namespace ZoneEquipmentManager {
 						FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 					}
 				}
-				// update non air system design load to include the sizing factor
+				// update non air system design load and air flow to include the sizing factor
 				FinalZoneSizing(CtrlZoneNum).NonAirSysDesHeatLoad *= FinalZoneSizing(CtrlZoneNum).HeatSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatVolFlow *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
 				// Now take into account the user specified sizing factor or user specified heating design air flow rate (which overrides the sizing factor)
 				TotHeatSizMult = 0.0;
 				// Calculate a sizing factor from the user specified heating design air flow rate

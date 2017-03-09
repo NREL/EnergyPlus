@@ -461,6 +461,7 @@ namespace DataSizing {
 		Real64 DesHeatDens; // zone design heating air density [kg/m3]
 		Real64 DesCoolDens; // zone design cooling air density [kg/m3]
 		Real64 DesHeatVolFlow; // zone design heating air volume flow rate [m3/s]
+		Real64 NonAirSysDesHeatVolFlow; // zone design heating air volume flow rate without scaling adjustment in Sizing:Zone [m3/s]
 		bool EMSOverrideDesHeatVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatVolFlow; // Value EMS directing to use for Design Heating air volume flow [m3/s]
 		Real64 DesCoolVolFlow; // zone design cooling air volume flow rate [m3/s]
@@ -624,6 +625,7 @@ namespace DataSizing {
 			DesHeatDens( 0.0 ),
 			DesCoolDens( 0.0 ),
 			DesHeatVolFlow( 0.0 ),
+			NonAirSysDesHeatVolFlow( 0.0 ),
 			EMSOverrideDesHeatVolOn( false ),
 			EMSValueDesHeatVolFlow( 0.0 ),
 			DesCoolVolFlow( 0.0 ),
