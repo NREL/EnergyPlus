@@ -107,6 +107,7 @@ set( test_src
   PlantPipingSystemsManager.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
+  PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc

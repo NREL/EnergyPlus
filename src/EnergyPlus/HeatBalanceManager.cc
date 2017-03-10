@@ -1323,6 +1323,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::ScanForReports;
+		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3249,6 +3250,16 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
 				ShowContinueError( cNumericFieldNames( 7 ) + " is <=0." );
 				ErrorsFound = true;
+			}
+
+			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
+				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
 			}
 
 		}

@@ -50,7 +50,6 @@
 // EnergyPlus Headers
 #include <DataOutputs.hh>
 #include <InputProcessor.hh>
-#include "re2/re2.h"
 #include "UtilityRoutines.hh"
 
 namespace EnergyPlus {
@@ -101,9 +100,31 @@ namespace DataOutputs {
 	int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
 
 	// Object Data
-	Array1D< OutputReportingVariables > OutputVariablesForSimulation;
-	std::unordered_map <std::string, int> OutputVariablesNames;
+	std::unordered_map < std::string, std::unordered_map< std::string, OutputReportingVariables > > OutputVariablesForSimulation;
 	// Functions
+
+	OutputReportingVariables::OutputReportingVariables(
+		std::string const & KeyValue,
+		std::string const & VariableName
+	) :
+		key( KeyValue ),
+		variableName( VariableName )
+	{
+		if ( KeyValue == "*" ) return;
+		for ( auto const & c : KeyValue ) {
+			if ( c == ' ' || c == '_' || std::isalnum( c ) ) continue;
+			is_simple_string = false;
+			break;
+		}
+		if ( is_simple_string ) return;
+		pattern = std::unique_ptr< RE2 >( new RE2( KeyValue ) );
+		case_insensitive_pattern = std::unique_ptr< RE2 >( new RE2( "(?i)" + KeyValue ) );
+		if ( ! pattern->ok() ) {
+			ShowSevereError( "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
+			ShowContinueError( pattern->error() );
+			ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
+		}
+	}
 
 	// Clears the global data in DataOutputs.
 	// Needed for unit tests, should not be normally called.
@@ -119,8 +140,7 @@ namespace DataOutputs {
 		iTotalAutoSizableFields = int();
 		iNumberOfAutoCalcedFields = int();
 		iTotalAutoCalculatableFields = int();
-		OutputVariablesForSimulation.deallocate();
-		OutputVariablesNames.clear();
+		OutputVariablesForSimulation.clear();
 	}
 
 	bool
@@ -140,38 +160,25 @@ namespace DataOutputs {
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		int Found = 0;
-		std::string LowerCaseVarName;
-		// case-insensitive search
-		ConvertCaseToLower( VariableName, LowerCaseVarName);
-		auto const FirstIndex = OutputVariablesNames.find( LowerCaseVarName );
+		auto const found_variable = OutputVariablesForSimulation.find( InputProcessor::MakeUPPERCase( VariableName ) );
+		if ( found_variable == OutputVariablesForSimulation.end() ) return false;
 
-		if ( FirstIndex != OutputVariablesNames.end() ) {
-			Found = FirstIndex->second;
-		}
-		if ( Found != 0 ) {
-			do {
-				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
-					return true;
-				} else {
-					RE2 pattern( OutputVariablesForSimulation( Found ).Key );
-					if ( ! pattern.ok() ) {
-						ShowSevereError( "Regular expression \"" + OutputVariablesForSimulation( Found ).Key + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
-						ShowContinueError( pattern.error() );
-						ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
-						break;
-					}
-					if (
-						RE2::FullMatch( KeyedValue, pattern ) || // match against regex as written
-						equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || // straight case-insensitive string comparison
-						RE2::FullMatch( KeyedValue, "(?i)" + OutputVariablesForSimulation( Found ).Key ) // attempt case-insensitive regex comparison
-						)
-					{
-						return true;
-					}
-				}
-				Found = OutputVariablesForSimulation( Found ).Next;
-			} while ( Found != 0 );
+		auto found_key = found_variable->second.find( KeyedValue );
+		if ( found_key != found_variable->second.end() ) return true;
+
+		found_key = found_variable->second.find( "*" );
+		if ( found_key != found_variable->second.end() ) return true;
+
+		for ( auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it ) {
+			if ( equali( KeyedValue, it->second.key ) ) return true;
+			if ( it->second.is_simple_string ) continue;
+			if (
+				( it->second.pattern != nullptr && RE2::FullMatch( KeyedValue, *it->second.pattern ) ) || // match against regex as written
+				( it->second.case_insensitive_pattern != nullptr && RE2::FullMatch( KeyedValue, *it->second.case_insensitive_pattern ) ) // attempt case-insensitive regex comparison
+				)
+			{
+				return true;
+			}
 		}
 		return false;
 	}
