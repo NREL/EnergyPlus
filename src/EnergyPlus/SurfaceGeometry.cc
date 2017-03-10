@@ -498,6 +498,7 @@ namespace SurfaceGeometry {
 				}
 			}
 			if ( ( Zone( ZoneNum ).CeilingHeight <= 0.0 ) && ( AverageHeight > 0.0 ) ) Zone( ZoneNum ).CeilingHeight = AverageHeight;
+			Zone( ZoneNum ).AverageCalcCeilingHeight = AverageHeight;
 
 		}
 
@@ -8628,7 +8629,7 @@ namespace SurfaceGeometry {
 			}
 			ZoneStruct.NumSurfaceFaces = NActFaces;
 			SurfCount = double( NActFaces );
-			if ( areAnySurfacesNonConvex && Zone( ZoneNum).FloorArea == Zone(ZoneNum).CeilingArea) {
+			if ( areAnySurfacesNonConvex && Zone( ZoneNum).FloorArea == Zone(ZoneNum).CeilingArea && Zone( ZoneNum ).CeilingHeight > 0.0 && Zone( ZoneNum ).CeilingHeight == Zone(ZoneNum).AverageCalcCeilingHeight) {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 			} else {
 				CalcPolyhedronVolume( ZoneStruct, CalcVolume );
