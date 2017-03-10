@@ -244,11 +244,13 @@ namespace EnergyPlus {
 
 		show_message();
 
+		this->json_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
+		DataGlobals::json_stream = this->json_stream.get();
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
@@ -452,6 +454,14 @@ namespace EnergyPlus {
 		return compare_text.str();
 	}
 
+	bool EnergyPlusFixture::compare_json_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->json_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if ( reset_stream ) this->json_stream->str( std::string() );
+		return are_equal;
+	}
+
 	bool EnergyPlusFixture::compare_eso_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->eso_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -498,6 +508,13 @@ namespace EnergyPlus {
 		bool are_equal = ( expected_string == stream_str );
 		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
 		return are_equal;
+	}
+
+	bool EnergyPlusFixture::has_json_output( bool reset_stream )
+	{
+		auto const has_output = this->json_stream->str().size() > 0;
+		if ( reset_stream ) this->json_stream->str( std::string() );
+		return has_output;
 	}
 
 	bool EnergyPlusFixture::has_eso_output( bool reset_stream )

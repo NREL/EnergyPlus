@@ -48,7 +48,6 @@ namespace EnergyPlus {
 			void setNumErrorsWarmup(const std::string  numWarningsDuringWarmup, const std::string  numSevereDuringWarmup);
 			void setNumErrorsSizing(const std::string  numWarningsDuringSizing, const std::string  numSevereDuringSizing);
 			void setNumErrorsSummary(const std::string  numWarnings, const std::string  numSevere);
-			//cJSON* getJSON();
 			json getJSON();
 		protected:
 			std::string ProgramVersion;
