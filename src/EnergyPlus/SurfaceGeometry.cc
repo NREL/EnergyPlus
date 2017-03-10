@@ -498,7 +498,6 @@ namespace SurfaceGeometry {
 				}
 			}
 			if ( ( Zone( ZoneNum ).CeilingHeight <= 0.0 ) && ( AverageHeight > 0.0 ) ) Zone( ZoneNum ).CeilingHeight = AverageHeight;
-			Zone( ZoneNum ).AverageCalcCeilingHeight = AverageHeight;
 
 		}
 
@@ -1643,7 +1642,6 @@ namespace SurfaceGeometry {
 						Zone( ZoneNum ).HasFloor = true;
 					}
 					if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) {
-						Zone( ZoneNum ).CeilingArea += Surface( SurfNum ).Area;
 						Zone( ZoneNum ).HasRoof = true;
 					}
 				}
@@ -8606,7 +8604,6 @@ namespace SurfaceGeometry {
 			ZoneStruct.SurfaceFace.allocate( NFaces );
 			NActFaces = 0;
 			surfacenotused.dimension( NFaces, 0 );
-			bool areAnySurfacesNonConvex = false;
 
 			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
 
@@ -8617,7 +8614,6 @@ namespace SurfaceGeometry {
 					surfacenotused( notused ) = SurfNum;
 					continue;
 				}
-				if (Surface(SurfNum ).IsConvex == false ) areAnySurfacesNonConvex = true;
 
 				++NActFaces;
 				ZoneStruct.SurfaceFace( NActFaces ).FacePoints.allocate( Surface( SurfNum ).Sides );
@@ -8629,11 +8625,7 @@ namespace SurfaceGeometry {
 			}
 			ZoneStruct.NumSurfaceFaces = NActFaces;
 			SurfCount = double( NActFaces );
-			if ( areAnySurfacesNonConvex && Zone( ZoneNum).FloorArea == Zone(ZoneNum).CeilingArea && Zone( ZoneNum ).CeilingHeight > 0.0 && Zone( ZoneNum ).CeilingHeight == Zone(ZoneNum).AverageCalcCeilingHeight) {
-				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
-			} else {
-				CalcPolyhedronVolume( ZoneStruct, CalcVolume );
-			}
+			CalcPolyhedronVolume( ZoneStruct, CalcVolume );
 
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				MinimumVolume = Zone( ZoneNum ).FloorArea * 2.5;

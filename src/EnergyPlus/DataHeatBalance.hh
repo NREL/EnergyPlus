@@ -1282,7 +1282,6 @@ namespace DataHeatBalance {
 		Real64 OriginY; // Y origin  [m]
 		Real64 OriginZ; // Z origin  [m]
 		Real64 CeilingHeight; // Ceiling Height entered by user [m] or calculated
-		Real64 AverageCalcCeilingHeight; // Ceiling height calculated based on average difference in Z coordinates
 		Real64 Volume; // Volume entered by user [m3] or calculated
 		int OfType; // 1=Standard Zone, Not yet used:
 		// 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
@@ -1290,7 +1289,6 @@ namespace DataHeatBalance {
 		// Calculated after input
 		Real64 FloorArea; // Floor area used for this zone
 		Real64 CalcFloorArea; // Calculated floor area used for this zone
-		Real64 CeilingArea; // Ceiling area for the zone
 		bool HasFloor; // Has "Floor" surface
 		bool HasRoof; // Has "Roof" or "Ceiling" Surface
 		bool HasInterZoneWindow; // Interzone Window(s) present in this zone
@@ -1369,13 +1367,11 @@ namespace DataHeatBalance {
 			OriginY( 0.0 ),
 			OriginZ( 0.0 ),
 			CeilingHeight( AutoCalculate ),
-			AverageCalcCeilingHeight( 0.0 ),
 			Volume( AutoCalculate ),
 			OfType( 1 ),
 			UserEnteredFloorArea( AutoCalculate ),
 			FloorArea( 0.0 ),
 			CalcFloorArea( 0.0 ),
-			CeilingArea( 0.0 ),
 			HasFloor( false ),
 			HasRoof( false ),
 			HasInterZoneWindow( false ),
