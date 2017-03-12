@@ -18,6 +18,7 @@ compilers:
     collect_performance_results: true
     build_tag: AnnualSimulation
     release_only: true
+    skip_packaging: true
 
   - name: "gcc"
     version: "4.8"
@@ -27,6 +28,7 @@ compilers:
     collect_performance_results: true
     build_tag: ReverseDD
     release_only: true
+    skip_packaging: true
 
 
   - name: cppcheck
