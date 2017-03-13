@@ -5461,9 +5461,9 @@ namespace AirflowNetworkBalanceManager {
 				n = 0.805;
 			}
 
-			Real64 Nu_forced = c * pow( Re, n ) * pow( Pr, 1/3 );
+			Real64 Nu_forced = c * pow( Re, n ) * pow( Pr, 0.333 );
 
-			Real64 Nu_combined = pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 1/3 );
+			Real64 Nu_combined = pow( pow_3( Nu_free ) + pow_3( Nu_forced ), 0.333 );
 			hOut_final = Nu_combined * k / Dh;
 
 		} else {
@@ -5636,7 +5636,12 @@ namespace AirflowNetworkBalanceManager {
 
 						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin_ave, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
 						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
-						Real64 hOut = 1 / RThermConvOut;
+
+						Real64 hOut = 0;
+						if ( RThermConvOut > 0.0 ) {
+							hOut = 1 / RThermConvOut;
+						}
+
 						Real64 RThermConduct = 1.0 / DisSysCompDuctData( TypeNum ).UThermConduct;
 
 						Real64 hrjTj_sum = 0;
@@ -5662,25 +5667,22 @@ namespace AirflowNetworkBalanceManager {
 
 							VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor = StefanBoltzmann / ( DuctSurfResistance + SpaceResistance + ZoneSurfResistance );
 
-							Real64 hrj =  VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor * ( TDuctSurf_K + TSurfj_K ) * ( pow_2( TDuctSurf_K ) + pow_2( TSurfj_K ) );
+							Real64 hrj = VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor * ( TDuctSurf_K + TSurfj_K ) * ( pow_2( TDuctSurf_K ) + pow_2( TSurfj_K ) ) / DuctSurfArea;
 
 							hrjTj_sum += hrj * TSurfj;
 							hrj_sum += hrj;
 						}
 
-						Real64 RThermRad = 1 / hrj_sum;
-
 						Tsurr = ( hOut * Tamb + hrjTj_sum ) / ( hOut + hrj_sum );	// Surroundings temperature [C]
 						Tsurr_K = Tsurr + KelvinConv;
 
-
-						Real64 RThermTotal = RThermConvIn + RThermConvOut + RThermConduct + RThermRad;
-						UThermal = pow( RThermTotal , -1);
+						Real64 RThermTotal = RThermConvIn + RThermConduct + 1 / ( hOut + hrj_sum );
+						UThermal = pow( RThermTotal , -1 );
 
 						Real64 NTU = UThermal * DuctSurfArea / ( DirSign * AirflowNetworkLinkSimu( i ).FLOW * CpAir );
-						Tin_ave = Tsurr + ( Tin  - Tsurr ) * ( 1 / NTU ) * ( 1 - exp( - NTU ) );
+						Tin_ave = Tsurr + ( Tin  - Tsurr ) * ( 1 / NTU ) * ( 1 - exp( -NTU ) );
 
-						TDuctSurf = Tin - UThermal * ( RThermConvIn + RThermConduct ) * ( Tin_ave - Tsurr );
+						TDuctSurf = Tin_ave - UThermal * ( RThermConvIn + RThermConduct ) * ( Tin_ave - Tsurr );
 						TDuctSurf_K = TDuctSurf + KelvinConv;
 					}
 
