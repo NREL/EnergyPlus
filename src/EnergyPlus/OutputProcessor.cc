@@ -696,17 +696,11 @@ namespace OutputProcessor {
 		bool Dup;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
+			if ( ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! (
-				SameString( ReqRepVars( Loop ).Key, KeyedValue ) ||  // straight case-insensitive string comparison
-				RE2::FullMatch( KeyedValue, ReqRepVars( Loop ).Key ) || // match against regex as written
-				RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) // attempt case-insensitive regex comparison
-			) )
-			{
-				continue;
-			}
+			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
 
-			//   A match.  Make sure doesnt duplicate
+			//   A match.  Make sure doesn't duplicate
 
 			ReqRepVars( Loop ).Used = true;
 			Dup = false;
