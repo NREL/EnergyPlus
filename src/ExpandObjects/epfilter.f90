@@ -1521,19 +1521,19 @@ INTEGER,PARAMETER :: chlreirLastFieldOff = 26
 INTEGER,PARAMETER :: twrssNameOff = 1
 INTEGER,PARAMETER :: twrssInletNodeOff = 2
 INTEGER,PARAMETER :: twrssOutletNodeOff = 3
-INTEGER,PARAMETER :: twrssLastFieldOff = 33
+INTEGER,PARAMETER :: twrssLastFieldOff = 37
 
   ! CoolingTower:TwoSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrtsNameOff = 1
 INTEGER,PARAMETER :: twrtsInletNodeOff = 2
 INTEGER,PARAMETER :: twrtsOutletNodeOff = 3
-INTEGER,PARAMETER :: twrtsLastFieldOff = 40
+INTEGER,PARAMETER :: twrtsLastFieldOff = 44
 
   ! CoolingTower:VariableSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrvsNameOff = 1
 INTEGER,PARAMETER :: twrvsInletNodeOff = 2
 INTEGER,PARAMETER :: twrvsOutletNodeOff = 3
-INTEGER,PARAMETER :: twrvsLastFieldOff = 30
+INTEGER,PARAMETER :: twrvsLastFieldOff = 34
 
 !following objects are identified just by the first and last fields
 INTEGER,PARAMETER :: ghtBsSimParamFirstOff = 1
@@ -27662,6 +27662,10 @@ DO iTower = 1, numCompactTower
       CALL AddToObjStr('Nominal Capacity {W}','')
       CALL AddToObjStr('Free Convection Capacity {W}','autocalculate')
       CALL AddToObjStr('Free Convection Nominal Capacity Sizing Factor','')
+      CALL AddToObjStr('Design Inlet Air Dry-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Inlet Air Wet-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Approach Temperature {deltaT}','')
+      CALL AddToObjStr('Design Range Temperature {deltaT}','')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
       CALL AddToObjStr('Basin Heater Operating Schedule Name','')
@@ -27693,6 +27697,10 @@ DO iTower = 1, numCompactTower
       CALL AddToObjFld('Nominal Capacity {W}', base + twrHiSpdCapacityOff,'')
       CALL AddToObjFld('Free Convection Capacity {W}', base + twrFreeConvCapacityOff,'')
       CALL AddToObjStr('Free Convection Nominal Capacity Sizing Factor','')
+      CALL AddToObjStr('Design Inlet Air Dry-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Inlet Air Wet-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Approach Temperature {deltaT}','')
+      CALL AddToObjStr('Design Range Temperature {deltaT}','')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
       CALL AddToObjStr('Basin Heater Operating Schedule Name','')
@@ -27777,6 +27785,10 @@ DO iTower = 1, numCompactTower
       CALL AddToObjStr('Low Speed Nominal Capacity Sizing Factor {m3/s}','')
       CALL AddToObjStr('Free Convection Capacity {W}','autocalculate')
       CALL AddToObjStr('Free Convection Capacity Sizing Factor {m3/s}','')
+      CALL AddToObjStr('Design Inlet Air Dry-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Inlet Air Wet-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Approach Temperature {deltaT}','')
+      CALL AddToObjStr('Design Range Temperature {deltaT}','')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
       CALL AddToObjStr('Basin Heater Operating Schedule Name','')
@@ -27815,6 +27827,10 @@ DO iTower = 1, numCompactTower
       CALL AddToObjStr('Low Speed Nominal Capacity Sizing Factor {m3/s}','')
       CALL AddToObjFld('Free Convection Capacity {W}', base + twrFreeConvCapacityOff,'')
       CALL AddToObjStr('Free Convection Capacity Sizing Factor {m3/s}','')
+      CALL AddToObjStr('Design Inlet Air Dry-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Inlet Air Wet-Bulb Temperature {C}','')
+      CALL AddToObjStr('Design Approach Temperature {deltaT}','')
+      CALL AddToObjStr('Design Range Temperature {deltaT}','')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
       CALL AddToObjStr('Basin Heater Operating Schedule Name','')

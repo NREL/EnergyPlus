@@ -62,6 +62,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
@@ -91,7 +92,6 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPlantPipingSystems.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -132,9 +132,11 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -156,6 +158,7 @@
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
@@ -215,11 +218,13 @@ namespace EnergyPlus {
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
+		DataGlobals::eio_stream = this->eio_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
@@ -267,6 +272,7 @@ namespace EnergyPlus {
 		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
 		CoolingPanelSimple::clear_state();
+		ChillerElectricEIR::clear_state();
 		ChillerExhaustAbsorption::clear_state();
 		ChillerGasAbsorption::clear_state();
 		ChillerIndirectAbsorption::clear_state();
@@ -295,7 +301,6 @@ namespace EnergyPlus {
 		DataMoistureBalanceEMPD::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
-		DataPlantPipingSystems::clear_state();
 		DataRoomAirModel::clear_state();
 		DataRuntimeLanguage::clear_state();
 		DataSizing::clear_state();
@@ -333,10 +338,12 @@ namespace EnergyPlus {
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
 		HVACDXSystem::clear_state();
+		HVACFan::clearHVACFanObjects();
 		HVACManager::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
+		HybridModel::clear_state();
 		InputProcessor::clear_state();
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
@@ -358,6 +365,7 @@ namespace EnergyPlus {
 		PlantLoadProfile::clear_state();
 		PlantLoopSolver::clear_state();
 		PlantManager::clear_state();
+		PlantPipingSystemsManager::clear_state();
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
@@ -442,6 +450,14 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::compare_eio_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->eio_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if ( reset_stream ) this->eio_stream->str( std::string() );
+		return are_equal;
+	}
+
 	bool EnergyPlusFixture::compare_mtr_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->mtr_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -486,6 +502,13 @@ namespace EnergyPlus {
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
 		if ( reset_stream ) this->eso_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_eio_output( bool reset_stream )
+	{
+		auto const has_output = this->eio_stream->str().size() > 0;
+		if ( reset_stream ) this->eio_stream->str( std::string() );
 		return has_output;
 	}
 
@@ -574,6 +597,7 @@ namespace EnergyPlus {
 		if ( errors_found ) {
 			if ( use_assertions ) {
 				compare_eso_stream( "" );
+				compare_eio_stream( "" );
 				compare_mtr_stream( "" );
 				compare_echo_stream( "" );
 				compare_err_stream( "" );
@@ -700,6 +724,7 @@ namespace EnergyPlus {
 
 		if ( use_assertions ) {
 			compare_eso_stream( "" );
+			compare_eio_stream( "" );
 			compare_mtr_stream( "" );
 			compare_echo_stream( "" );
 			compare_err_stream( "" );

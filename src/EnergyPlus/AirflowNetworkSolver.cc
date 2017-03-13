@@ -2800,7 +2800,7 @@ Label90: ;
 				DF( 1 ) = 0.5 * FT / PDROP;
 			}
 		}
-		// If damper, setup the airflows from nodal values calculated from teminal
+		// If damper, setup the airflows from nodal values calculated from terminal
 		if ( AirflowNetworkLinkageData( i ).VAVTermDamper ) {
 			F( 1 ) = Node( DisSysCompTermUnitData( CompNum ).DamperInletNode ).MassFlowRate;
 			if ( VAVTerminalRatio > 0.0 ) {
