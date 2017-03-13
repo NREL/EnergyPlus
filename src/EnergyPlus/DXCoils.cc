@@ -5573,7 +5573,7 @@ namespace DXCoils {
 				}
 				
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
-				if( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Cooling ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Cooling ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
 						ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total cooling capacity is out of range." );
@@ -5639,7 +5639,7 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName );
 				
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
-				if( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
 						ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ": Rated air volume flow rate per watt of rated total heating capacity is out of range." );
@@ -5995,7 +5995,7 @@ namespace DXCoils {
 				} else {
 					PrintFlag = true;
 					FieldNum = 0;
-					if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
 						FieldNum = 4;
@@ -6038,7 +6038,7 @@ namespace DXCoils {
 					}
 
 					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-					if( FieldNum > 0 ){
+					if ( FieldNum > 0 ){
 						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
 					} else {
 						SizingString = "Rated Air Flow Rate [m3/s]";
@@ -9088,7 +9088,7 @@ Label50: ;
 			InputPowerMultiplier = 1.0;
 
 			// Check outdoor temperature to determine of defrost is active
-			if( OutdoorDryBulb <= DXCoil( DXCoilNum ).MaxOATDefrost && DXCoil( DXCoilNum ).CondenserType( Mode ) != WaterCooled ) {
+			if ( OutdoorDryBulb <= DXCoil( DXCoilNum ).MaxOATDefrost && DXCoil( DXCoilNum ).CondenserType( Mode ) != WaterCooled ) {
 				// Calculate defrost adjustment factors depending on defrost control type
 				if ( DXCoil( DXCoilNum ).DefrostControl == Timed ) {
 					FractionalDefrostTime = DXCoil( DXCoilNum ).DefrostTime;
@@ -9907,6 +9907,7 @@ Label50: ;
 		Real64 DeltaT( 0.0 ); // Temperature drop across evaporator at given conditions [C]
 		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
 		Real64 OutletAirTemp( InletAirTemp ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 OutletAirTempSat( InletAirTemp ); // Saturation dry-bulb temperature from evaporator at outlet air enthalpy [C]
 		Real64 OutletAirEnthalpy; // Enthalpy of outlet air at given conditions [J/kg]
 		Real64 OutletAirHumRat( InletAirHumRat ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
 		Real64 OutletAirRH; // relative humidity of the outlet air
@@ -9955,7 +9956,13 @@ Label50: ;
 				}
 			}
 			ShowContinueErrorTimeStamp( "" );
-			ShowFatalError( "Check and revise the input data for this coil before rerunning the simulation." );
+			ShowContinueError( "SHR adjusted to achieve valid outlet air properties and the simulation continues." );
+			OutletAirTempSat = PsyTsatFnHPb(OutletAirEnthalpy, BaroPress, RoutineName);
+			if (OutletAirTemp < OutletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
+				OutletAirTemp = OutletAirTempSat + 0.005;
+				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, RoutineName );
+				DeltaHumRat = InletAirHumRat - OutletAirHumRat;
+			}
 		}
 		DeltaT = InletAirTemp - OutletAirTemp;
 		if ( DeltaT <= 0.0 ) {
@@ -10026,14 +10033,19 @@ Label50: ;
 
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Pressure will have to be pass into this subroutine to fix this one
-				ADPHumRat = PsyWFnTdpPb( ADPTemp, BaroPress );
-				Slope = ( InletAirHumRat - ADPHumRat ) / ( InletAirTemp - ADPTemp );
+				ADPHumRat = min( OutletAirHumRat, PsyWFnTdpPb( ADPTemp, BaroPress ) );
+				Slope = ( InletAirHumRat - ADPHumRat ) / max( 0.001, ( InletAirTemp - ADPTemp ) );
 
 				//     check for convergence (slopes are equal to within error tolerance)
 
 				Error = ( Slope - SlopeAtConds ) / SlopeAtConds;
-				if ( ( Error > 0.0 ) && ( ErrorLast < 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.0;
-				if ( ( Error < 0.0 ) && ( ErrorLast > 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.0;
+				if ( ( Error > 0.0 ) && ( ErrorLast < 0.0 ) ) {
+					DeltaADPTemp = -DeltaADPTemp / 2.0;
+				} else if ( ( Error < 0.0 ) && ( ErrorLast > 0.0 ) ) {
+					DeltaADPTemp = -DeltaADPTemp / 2.0;
+				} else if ( abs( Error ) > abs( ErrorLast ) ) {
+					DeltaADPTemp = -DeltaADPTemp / 2.0;
+				}
 				ErrorLast = Error;
 
 				Tolerance = std::abs( Error );
@@ -10160,7 +10172,7 @@ Label50: ;
 				if ( OutletAirRH >= 1.0 ) { // if RH > 1, reduce SHR until it crosses the saturation curve
 					SHR -= 0.001;
 					bReversePerturb = true;
-					if( SHR < 0.5 ) bStillValidating = false; // have to stop somewhere, this is lower than the lower limit of SHR empirical model (see ReportSizingManager SizingType == CoolingSHRSizing)
+					if ( SHR < 0.5 ) bStillValidating = false; // have to stop somewhere, this is lower than the lower limit of SHR empirical model (see ReportSizingManager SizingType == CoolingSHRSizing)
 				} else {
 					if ( bReversePerturb ) {
 						bStillValidating = false; // stop iterating once SHR causes ADP to cross back under saturation curve, take what you get
@@ -14779,7 +14791,7 @@ Label50: ;
 
 			TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 			QCoilReq = -PartLoadRatio * TotCap;
-			if( PartLoadRatio == 0.0 ){
+			if ( PartLoadRatio == 0.0 ){
 				AirMassFlowMin = OACompOffMassFlow;
 			} else {
 				AirMassFlowMin = OACompOnMassFlow;
@@ -15098,7 +15110,7 @@ Label50: ;
 
 			TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 			QCoilReq = PartLoadRatio * TotCap;
-			if( PartLoadRatio == 0.0 ){
+			if ( PartLoadRatio == 0.0 ){
 				AirMassFlowMin = OACompOffMassFlow;
 			} else {
 				AirMassFlowMin = OACompOnMassFlow;
@@ -15692,10 +15704,10 @@ Label50: ;
 		BFC_rate = DXCoil( CoilNum ).RateBFVRFIUEvap;
 		BFH_rate = DXCoil( CoilNum ).RateBFVRFIUCond;
 
-		if( OperationMode == FlagCoolMode ) {
+		if ( OperationMode == FlagCoolMode ) {
 		//Cooling: OperationMode 0
 			
-			if( present( BF ) ) {
+			if ( present( BF ) ) {
 				BF_real = BF;
 			} else {
 				BF_real = BFC_rate;
