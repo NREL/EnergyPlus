@@ -118,6 +118,8 @@ namespace EnergyPlus {
 			InputProcessor::GetObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
 			alphArray.allocate( numAlphas );
 			numArray.dimension( numNums, 0.0 );
+
+			bool invalidAggregationOrderFound = false;
 			for ( int tabNum = 1 ; tabNum <= objCount; ++tabNum ) {
 				InputProcessor::GetObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
 				if ( numAlphas >= 5 ) {
@@ -148,6 +150,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
+
 
 		void
 		AnnualTable::addFieldSet( std::string varName, AnnualFieldSet::AggregationKind aggKind, int dgts)
@@ -246,6 +249,21 @@ namespace EnergyPlus {
 			}
 		}
 
+		void
+		checkAggregationOrderForAnnual( )
+		{
+			std::vector<AnnualTable>::iterator annualTableIt;
+			bool invalidAggregationOrderFound = false;
+			for ( annualTableIt = annualTables.begin( ); annualTableIt != annualTables.end( ); ++annualTableIt ) {
+				if ( !annualTableIt->invalidAggregationOrder( ) ) {
+					invalidAggregationOrderFound = true;
+				}
+			}
+			if ( invalidAggregationOrderFound ) {
+				ShowFatalError( "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed." );
+			}
+		}
+
 		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
 		bool
 		AnnualTable::invalidAggregationOrder( )
@@ -279,10 +297,10 @@ namespace EnergyPlus {
 				}
 			}
 			if ( missingMaxOrMinError ) {
-				ShowWarningError( "The Output:Table:Annual report named=\"" + m_name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
+				ShowSevereError( "The Output:Table:Annual report named=\"" + m_name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
 			}
 			if ( missingHourAggError ) {
-				ShowWarningError( "The Output:Table:Annual report named=\"" + m_name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
+				ShowSevereError( "The Output:Table:Annual report named=\"" + m_name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
 			}
 			return ( missingHourAggError || missingMaxOrMinError );
 		}
@@ -633,9 +651,7 @@ namespace EnergyPlus {
 			// invoking the writeTable member function for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
 			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
-				if ( !annualTableIt->invalidAggregationOrder() ) {
-					annualTableIt->writeTable( OutputReportTabular::unitsStyle );
-				}
+				annualTableIt->writeTable( OutputReportTabular::unitsStyle );
 			}
 		}
 

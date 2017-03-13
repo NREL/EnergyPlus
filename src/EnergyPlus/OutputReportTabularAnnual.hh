@@ -76,6 +76,9 @@ namespace OutputReportTabularAnnual {
 	GetInputTabularAnnual();
 
 	void
+	checkAggregationOrderForAnnual();
+
+	void
 	GatherAnnualResultsForTimeStep( int kindOfTypeStep );
 
 	void
@@ -127,11 +130,11 @@ public:
 	void
 	addFieldSet( std::string, std::string, AnnualFieldSet::AggregationKind, int );
 
-	bool
-	invalidAggregationOrder();
-
 	void
 	setupGathering();
+
+	bool
+	invalidAggregationOrder();
 
 	void
 	gatherForTimestep( int kindOfTypeStep );
