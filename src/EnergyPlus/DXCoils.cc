@@ -6025,12 +6025,12 @@ namespace DXCoils {
 						CompName = DXCoil( DXCoilNum ).Name;
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
 						SizingMethod = CoolingAirflowSizing;
-						DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = AutoSize;
+						DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
 						CompName = DXCoil( DXCoilNum ).Name;
 						PrintFlag = false;
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 						SizingMethod = HeatingAirflowSizing;
-						DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = AutoSize;
+						DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
 						CompName = DXCoil( DXCoilNum ).Name;
 						PrintFlag = false;
 					} else {
