@@ -8625,29 +8625,24 @@ namespace SurfaceGeometry {
 			}
 			ZoneStruct.NumSurfaceFaces = NActFaces;
 			SurfCount = double( NActFaces );
-			CalcPolyhedronVolume( ZoneStruct, CalcVolume );
 
-			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-				MinimumVolume = Zone( ZoneNum ).FloorArea * 2.5;
-				if ( Zone( ZoneNum ).CeilingHeight > 0.0 ) {
-					MinimumVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
-				}
+			AnalyzeZoneVolume( ZoneStruct, isEnclosedVolume, isFloorAndCeilingSame, isFloorHorizontal, isCeilingHorizontal, areWallsVertical , areWallHeightSame, areOppositeWallsSame, oppositeWallArea, distanceBetweenOppositeWalls );
+			if ( isEnclosedVolume ) {
+				CalcPolyhedronVolume( ZoneStruct, CalcVolume );
+			} else if ( isFloorAndCeilingSame && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
+				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
+			} else if ( isFloorHorizontal && areWallsVertical && areWallHeightSame && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
+				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
+			} else if ( isCeilingHorizontal && areWallsVertical && areWallHeightSame && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
+			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
+			} else if ( areOppositesWallsSame ) {
+				CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
 			} else {
-				if ( SurfCount > 0 ) {
-					MinimumVolume = pow_3( std::sqrt( SumAreas / SurfCount ) );
-				} else {
-					MinimumVolume = 0.0;
-				}
+				ShowSevereError("For such an odd shape zone, please define all the surfaces to fully enclose the zone.");
 			}
-			if ( CalcVolume > MinimumVolume ) {
-				TempVolume = CalcVolume;
-			} else {
-				TempVolume = MinimumVolume;
-			}
-
 			if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
-				if ( TempVolume > 0.0 ) {
-					if ( std::abs( TempVolume - Zone( ZoneNum ).Volume ) / Zone( ZoneNum ).Volume > 0.05 ) {
+				if ( CalcVolume > 0.0 ) {
+					if ( std::abs( CalcVolume - Zone( ZoneNum ).Volume ) / Zone( ZoneNum ).Volume > 0.05 ) {
 						++ErrCount;
 						if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
 							if ( initmsg ) {
@@ -8672,10 +8667,10 @@ namespace SurfaceGeometry {
 				if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 					Zone( ZoneNum ).Volume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				} else { // ceiling height entered but floor area zero
-					Zone( ZoneNum ).Volume = TempVolume;
+					Zone( ZoneNum ).Volume = CalcVolume;
 				}
 			} else { // Neither ceiling height nor volume entered
-				Zone( ZoneNum ).Volume = TempVolume;
+				Zone( ZoneNum ).Volume = CalcVolume;
 			}
 
 			if ( Zone( ZoneNum ).Volume <= 0.0 ) {
