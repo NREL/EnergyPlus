@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::DXCoils unit tests
 // DX heating coil defrost capacity with electric resistance
@@ -892,8 +880,8 @@ namespace EnergyPlus {
 		using DataEnvironment::StdPressureSeaLevel;
 		const std::string CoilType( "Coil:WaterHeating:AirToWaterHeatPump:Wrapped" );
 		const std::string CoilName( "The Coil" );
-		const Real64 InletDBTemp( 19.722222222222221 );
-		const Real64 InletWBTemp( 13.078173565729553 );
+		Real64 InletDBTemp( 19.722222222222221 );
+		Real64 InletWBTemp( 13.078173565729553 );
 		Real64 InletAirHumRat;
 		const Real64 TotalCap( 1303.5987246916557 );
 		const Real64 AirVolFlowRate( 0.085422486640000003 );
@@ -909,6 +897,18 @@ namespace EnergyPlus {
 		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
+
+		// push inlet condition towards saturation curve to test CBF calculation robustness
+		InletWBTemp = 19.7; // 19.72 DB / 19.7 WB
+		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
+		EXPECT_NEAR( CBF_calculated, 0.00021141, 0.0000001 );
+
+		InletDBTemp = 13.1; // colder and much less likely inlet air temperature
+		InletWBTemp = 13.08; // 13.1 DB / 13.08 WB - hard to find ADP (needed mod to CalcCBF function)
+		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
+		EXPECT_NEAR( CBF_calculated, 0.0001531, 0.0000001 );
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
@@ -1425,7 +1425,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
 
-		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // run right at the saturation curve
+		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // simulate outlet condition right at the saturation curve
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );
