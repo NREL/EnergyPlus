@@ -699,12 +699,12 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
 	std::string const idf_objects = delimited_string( { 
 
 	"  LoadProfile:Plant,",
-	"    Toyota Campus Load Profile, !- Name",
+	"    Campus Load Profile, !- Name",
 	"    Node 41, !- Inlet Node Name",
 	"    Node 42, !- Outlet Node Name",
-	"    Toyota Campus output Load, !- Load Schedule Name",
+	"    Campus output Load, !- Load Schedule Name",
 	"    0.320003570569675, !- Peak Flow Rate{ m3 / s }",
-	"    Toyota Campus output Flow Frac;         !- Flow Rate Fraction Schedule Name",
+	"    Campus output Flow Frac;         !- Flow Rate Fraction Schedule Name",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
