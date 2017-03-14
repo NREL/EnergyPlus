@@ -69,13 +69,14 @@ TEST_F( EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest )
 	PlantChillers::GTChiller( 1 ).HeatRecActive = true;
 	PlantChillers::GTChiller( 1 ).Base.CondenserType = PlantChillers::WaterCooled;
 	PlantChillers::GTChiller( 1 ).Base.CWLoopNum = 1;
+	PlantChillers::GTChiller( 1 ).Base.CDLoopNum = 2;
 	PlantChillers::GTChiller( 1 ).Base.EvapVolFlowRate = 1.0;
 	PlantChillers::GTChiller( 1 ).Base.CondVolFlowRate = 1.0;
 	PlantChillers::GTChiller( 1 ).Base.NomCap = 10000;
 	PlantChillers::GTChiller( 1 ).Base.COP = 3.0;
 	PlantChillers::GTChiller( 1 ).engineCapacityScalar = 1.0;
 
-	DataPlant::PlantLoop.allocate( 1 );
+	DataPlant::PlantLoop.allocate( 2 );
 	DataSizing::PlantSizData.allocate( 1 );
 	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
 	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
@@ -106,12 +107,13 @@ TEST_F( EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest )
 	PlantChillers::EngineDrivenChiller( 1 ).HeatRecActive = true;
 	PlantChillers::EngineDrivenChiller( 1 ).Base.CondenserType = PlantChillers::WaterCooled;
 	PlantChillers::EngineDrivenChiller( 1 ).Base.CWLoopNum = 1;
+	PlantChillers::EngineDrivenChiller( 1 ).Base.CDLoopNum = 2;
 	PlantChillers::EngineDrivenChiller( 1 ).Base.EvapVolFlowRate = 1.0;
 	PlantChillers::EngineDrivenChiller( 1 ).Base.CondVolFlowRate = 1.0;
 	PlantChillers::EngineDrivenChiller( 1 ).Base.NomCap = 10000;
 	PlantChillers::EngineDrivenChiller( 1 ).Base.COP = 3.0;
-
-	DataPlant::PlantLoop.allocate( 1 );
+		
+	DataPlant::PlantLoop.allocate( 2 );
 	DataSizing::PlantSizData.allocate( 1 );
 	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
 	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
