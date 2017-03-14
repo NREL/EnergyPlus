@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -75,6 +63,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -108,6 +97,7 @@ using namespace EnergyPlus::WaterCoils;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataAirLoop;
+using namespace EnergyPlus::OutputReportPredefined;
 
 namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1 ) {
@@ -326,6 +316,7 @@ namespace EnergyPlus {
 			FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
+		OutputReportPredefined::SetPredefinedTables();
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
 		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 199.86, 0.01 );
@@ -1223,6 +1214,209 @@ namespace EnergyPlus {
 		UnitarySysEqSizing.deallocate();
 		PrimaryAirSystem.deallocate();
 		AirLoopControlInfo.deallocate();
+
+	}
+
+	TEST_F( EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6 ) {
+
+		// test whether autosizing of zone reheat coil works for performance input method = UFactorTimesAreaAndDesignWaterFlowRate,
+		// UA and water flow are user input with rated capacity autosized. No sizing run.
+
+		bool ErrorsFound( false );
+
+		InitializePsychRoutines();
+		DataEnvironment::StdRhoAir = 1.20;
+
+		std::string const idf_objects = delimited_string( {
+
+			" Zone,",
+			"	SPACE1-1,      !- Name",
+			"	0,             !- Direction of Relative North { deg }",
+			"	0,             !- X Origin { m }",
+			"	0,             !- Y Origin { m }",
+			"	0,             !- Z Origin { m }",
+			"	1,             !- Type",
+			"	1,             !- Multiplier",
+			"	2.438400269,   !- Ceiling Height {m}",
+			"	239.247360229; !- Volume {m3}",
+
+			" Sizing:Zone,",
+			"	SPACE1-1,      !- Zone or ZoneList Name",
+			"	SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method",
+			"	14.,           !- Zone Cooling Design Supply Air Temperature { C }",
+			"	,              !- Zone Cooling Design Supply Air Temperature Difference { deltaC }",
+			"	SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method",
+			"	50.,           !- Zone Heating Design Supply Air Temperature { C }",
+			"	,              !- Zone Heating Design Supply Air Temperature Difference { deltaC }",
+			"	0.009,         !- Zone Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+			"	0.004,         !- Zone Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+			"	SZ DSOA SPACE1-1, !- Design Specification Outdoor Air Object Name",
+			"	0.0,           !- Zone Heating Sizing Factor",
+			"	0.0,           !- Zone Cooling Sizing Factor",
+			"	DesignDayWithLimit, !- Cooling Design Air Flow Method",
+			"	,              !- Cooling Design Air Flow Rate { m3/s }",
+			"	,              !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+			"	,              !- Cooling Minimum Air Flow { m3/s }",
+			"	,              !- Cooling Minimum Air Flow Fraction",
+			"	DesignDay,     !- Heating Design Air Flow Method",
+			"	,              !- Heating Design Air Flow Rate { m3/s }",
+			"	,              !- Heating Maximum Air Flow per Zone Floor Area { m3/s-m2 }",
+			"	,              !- Heating Maximum Air Flow { m3/s }",
+			"	,              !- Heating Maximum Air Flow Fraction",
+			"	SZ DZAD SPACE1-1;   !- Design Specification Zone Air Distribution Object Name",
+
+			" DesignSpecification:ZoneAirDistribution,",
+			"	SZ DZAD SPACE1-1, !- Name",
+			"	1,                !- Zone Air Distribution Effectiveness in Cooling Mode { dimensionless }",
+			"	1;                !- Zone Air Distribution Effectiveness in Heating Mode { dimensionless }",
+
+			" DesignSpecification:OutdoorAir,",
+			"	SZ DSOA SPACE1-1, !- Name",
+			"	sum,              !- Outdoor Air Method",
+			"	0.00236,          !- Outdoor Air Flow per Person { m3/s-person }",
+			"	0.000305,         !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
+			"	0.0;              !- Outdoor Air Flow per Zone { m3/s }",
+
+			" ScheduleTypeLimits,",
+			"	Fraction,         !- Name",
+			"	0.0,              !- Lower Limit Value",
+			"	1.0,              !- Upper Limit Value",
+			"	CONTINUOUS;       !- Numeric Type",
+
+			" Schedule:Compact,",
+			"	ReheatCoilAvailSched, !- Name",
+			"	Fraction,         !- Schedule Type Limits Name",
+			"	Through: 12/31,   !- Field 1",
+			"	For: AllDays,     !- Field 2",
+			"	Until: 24:00,1.0; !- Field 3",
+
+			" ZoneHVAC:EquipmentConnections,",
+			"	SPACE1-1,         !- Zone Name",
+			"	SPACE1-1 Eq,      !- Zone Conditioning Equipment List Name",
+			"	SPACE1-1 In Node, !- Zone Air Inlet Node or NodeList Name",
+			"	,                 !- Zone Air Exhaust Node or NodeList Name",
+			"	SPACE1-1 Node,    !- Zone Air Node Name",
+			"	SPACE1-1 Out Node; !- Zone Return Air Node Name",
+
+			" ZoneHVAC:EquipmentList,",
+			"	SPACE1-1 Eq,      !- Name",
+			"	ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
+			"	SPACE1-1 ATU,     !- Zone Equipment 1 Name",
+			"	1,                !- Zone Equipment 1 Cooling Sequence",
+			"	1;                !- Zone Equipment 1 Heating or No - Load Sequence",
+
+			" ZoneHVAC:AirDistributionUnit,",
+			"	SPACE1-1 ATU,     !- Name",
+			"	SPACE1-1 In Node, !- Air Distribution Unit Outlet Node Name",
+			"	AirTerminal:SingleDuct:VAV:Reheat, !- Air Terminal Object Type",
+			"	SPACE1-1 VAV Reheat; !- Air Terminal Name",
+
+			" Coil:Heating:Water,",
+			"	Gronk1 Zone Coil, !- Name",
+			"	ReheatCoilAvailSched, !- Availability Schedule Name",
+			"	300.,             !- U-Factor Times Area Value { W/K }",
+			"	0.0000850575,     !- Maximum Water Flow Rate { m3/s }",
+			"	SPACE1-1 Zone Coil Water In Node, !- Water Inlet Node Name",
+			"	SPACE1-1 Zone Coil Water Out Node, !- Water Outlet Node Name",
+			"	SPACE1-1 Zone Coil Air In Node, !- Air Inlet Node Name",
+			"	SPACE1-1 In Node, !- Air Outlet Node Name",
+			"	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+			"	autosize,         !- Rated Capacity { W }",
+			"	82.2,             !- Rated Inlet Water Temperature { C }",
+			"	16.6,             !- Rated Inlet Air Temperature { C }",
+			"	71.1,             !- Rated Outlet Water Temperature { C }",
+			"	32.2,             !- Rated Outlet Air Temperature { C }",
+			"	;                 !- Rated Ratio for Air and Water Convection",
+
+			" AirTerminal:SingleDuct:VAV:Reheat,",
+			"	SPACE1-1 VAV Reheat,  !- Name",
+			"	ReheatCoilAvailSched, !- Availability Schedule Name",
+			"	SPACE1-1 Zone Coil Air In Node, !- Damper Air Outlet Node Name",
+			"	SPACE1-1 ATU In Node, !- Air Inlet Node Name",
+			"	0.12046,              !- Maximum Air Flow Rate { m3/s }",
+			"	,                     !- Zone Minimum Air Flow Input Method",
+			"	0.3,                  !- Constant Minimum Air Flow Fraction",
+			"	,                     !- Fixed Minimum Air Flow Rate { m3/s }",
+			"	,                     !- Minimum Air Flow Fraction Schedule Name",
+			"	Coil:Heating:Water,   !- Reheat Coil Object Type",
+			"	Gronk1 Zone Coil,     !- Reheat Coil Name",
+			"	0.0000850575,         !- Maximum Hot Water or Steam Flow Rate { m3/s }",
+			"	0.0,                  !- Minimum Hot Water or Steam Flow Rate { m3/s }",
+			"	SPACE1-1 In Node,     !- Air Outlet Node Name",
+			"	0.001,                !- Convergence Tolerance",
+			"	,                     !- Damper Heating Action",
+			"	,                     !- Maximum Flow per Zone Floor Area During Reheat { m3/s-m2 }",
+			"	;                     !- Maximum Flow Fraction During Reheat",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		TermUnitSizing.allocate( 1 );
+		TotNumLoops = 1;
+		PlantLoop.allocate( TotNumLoops );
+		WaterCoils::MySizeFlag.allocate( 1 );
+		WaterCoils::MyUAAndFlowCalcFlag.allocate( 1 );
+		for( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+		GetZoneData( ErrorsFound );
+		EXPECT_EQ( "SPACE1-1", Zone( 1 ).Name );
+		GetOARequirements(); // get the OA requirements object
+		GetZoneAirDistribution(); // get zone air distribution objects
+		GetZoneSizingInput();
+		GetZoneEquipmentData1();
+		ProcessScheduleInput();
+		ScheduleInputProcessed = true;
+		GetZoneAirLoopEquipment();
+		GetWaterCoilInput();
+		WaterCoils::GetWaterCoilsInputFlag = false;
+		WaterCoils::MySizeFlag( 1 ) = true;
+		WaterCoils::MyUAAndFlowCalcFlag( 1 ) = false;
+		GetSysInput();
+		DataSizing::TermUnitSingDuct = true;
+		WaterCoil( 1 ).WaterLoopNum = 1;
+		WaterCoil( 1 ).WaterLoopSide = 1;
+		WaterCoil( 1 ).WaterLoopBranchNum = 1;
+		WaterCoil( 1 ).WaterLoopCompNum = 1;
+		PlantLoop( 1 ).Name = "HotWaterLoop";
+		PlantLoop( 1 ).FluidName = "HotWater";
+		PlantLoop( 1 ).FluidIndex = 1;
+		PlantLoop( 1 ).FluidName = "WATER";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = WaterCoil( 1 ).Name;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_SimpleHeating;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = WaterCoil( 1 ).WaterOutletNodeNum;
+		Sys( 1 ).HWLoopNum = 1;
+		Sys( 1 ).HWLoopSide = 1;
+		Sys( 1 ).HWBranchIndex = 1;
+		CurZoneEqNum = 1;
+		CurSysNum = 0;
+		Zone( 1 ).FloorArea = 99.16;
+		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
+
+		OutputReportPredefined::SetPredefinedTables();
+		SizeSys( 1 );
+		DataGlobals::BeginEnvrnFlag = true;
+
+		// water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate
+		EXPECT_NEAR( WaterCoil( 1 ).MaxWaterVolFlowRate, .0000850575, 0.000000001 );
+		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 300.00, 0.01 );
+		EXPECT_EQ( WaterCoil( 1 ).DesTotWaterCoilLoad, DataSizing::AutoSize );
+		EXPECT_EQ( WaterCoil( 1 ).DesWaterHeatingCoilRate, 0.0 ); 
+
+		// sizing will be called and skipped with Init setting DesWaterHeatingCoilRate based on above inputs
+		InitWaterCoil( 1, false );
+		EXPECT_NEAR( WaterCoil( 1 ).DesWaterHeatingCoilRate, 7390.73, 0.01 );
+
+		Sys.deallocate();
 
 	}
 
