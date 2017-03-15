@@ -1060,8 +1060,6 @@
 
   Output:Variable,*,Facility Total Electric Demand Power,Hourly;
 
-  Output:Variable,*,Zone Electric Equipment Total Heating Rate,Hourly;
-
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 
   Output:Variable,*,Site Outdoor Air Dewpoint Temperature,Hourly;

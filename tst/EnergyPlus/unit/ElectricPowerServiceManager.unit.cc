@@ -60,8 +60,10 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <OutputProcessor.hh>
 
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -691,4 +693,27 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5
 
 
 }
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
+{
 
+	std::string const idf_objects = delimited_string( { 
+
+	"  LoadProfile:Plant,",
+	"    Campus Load Profile, !- Name",
+	"    Node 41, !- Inlet Node Name",
+	"    Node 42, !- Outlet Node Name",
+	"    Campus output Load, !- Load Schedule Name",
+	"    0.320003570569675, !- Peak Flow Rate{ m3 / s }",
+	"    Campus output Flow Frac;         !- Flow Rate Fraction Schedule Name",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	createFacilityElectricPowerServiceObject();
+	bool SimElecCircuitsFlag = false;
+	// GetInput and other code will be executed and SimElectricCircuits will be true
+	facilityElectricServiceObj->manageElectricPowerService( true, SimElecCircuitsFlag, false );
+	EXPECT_TRUE( SimElecCircuitsFlag );
+	EXPECT_EQ( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->numGenerators, 0 ); // dummy generator has been added and report variables are available
+	
+}
