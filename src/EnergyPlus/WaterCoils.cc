@@ -1696,7 +1696,7 @@ namespace WaterCoils {
 			if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
 				DataWaterCoilSizCoolDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 			} else {
-				if( PltSizCoolNum > 0 ) {
+				if ( PltSizCoolNum > 0 ) {
 					DataWaterCoilSizCoolDeltaT = PlantSizData( PltSizCoolNum ).DeltaT;
 				} 
 			}
@@ -1966,7 +1966,7 @@ namespace WaterCoils {
 				// use water design deltaT specified in the heating water coils
 				DataWaterCoilSizHeatDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 			} else {
-				if( PltSizHeatNum > 0 ) {
+				if ( PltSizHeatNum > 0 ) {
 					DataWaterCoilSizHeatDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
 				}
 			}

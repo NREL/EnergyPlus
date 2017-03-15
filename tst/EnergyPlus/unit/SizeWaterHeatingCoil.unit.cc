@@ -1406,15 +1406,17 @@ namespace EnergyPlus {
 		SizeSys( 1 );
 		DataGlobals::BeginEnvrnFlag = true;
 
-		// water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate
-		EXPECT_NEAR( WaterCoil( 1 ).MaxWaterVolFlowRate, .0000850575, 0.000000001 );
-		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 300.00, 0.01 );
-		EXPECT_EQ( WaterCoil( 1 ).DesTotWaterCoilLoad, DataSizing::AutoSize );
-		EXPECT_EQ( WaterCoil( 1 ).DesWaterHeatingCoilRate, 0.0 ); 
+		// water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate and Rated Capacity = autosize
+		EXPECT_NEAR( WaterCoil( 1 ).MaxWaterVolFlowRate, .0000850575, 0.000000001 ); // water flow rate input by user
+		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 300.00, 0.01 ); // Ua input by user
+		EXPECT_EQ( WaterCoil( 1 ).DesTotWaterCoilLoad, DataSizing::AutoSize ); // Rated Capacity input by user
+		EXPECT_EQ( WaterCoil( 1 ).DesWaterHeatingCoilRate, 0.0 ); // model output not yet set
 
 		// sizing will be called and skipped with Init setting DesWaterHeatingCoilRate based on above inputs
 		InitWaterCoil( 1, false );
 		EXPECT_NEAR( WaterCoil( 1 ).DesWaterHeatingCoilRate, 7390.73, 0.01 );
+		// not set in Init for water heating coils and not used elsewhere other than sizing
+		EXPECT_EQ( WaterCoil( 1 ).DesTotWaterCoilLoad, DataSizing::AutoSize );
 
 		Sys.deallocate();
 
