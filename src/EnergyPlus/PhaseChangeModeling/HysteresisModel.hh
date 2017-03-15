@@ -31,6 +31,17 @@ namespace HysteresisPhaseChange {
 
 	struct HysteresisPhaseChange : public PhaseChangeModel {
 
+		Real64 tempCoeffForThermalConductivity;
+		Real64 totalLatentHeat;
+		Real64 specificHeatLiquid;
+		Real64 deltaTempMeltingHigh;
+		Real64 peakTempMelting;
+		Real64 deltaTempMeltingLow;
+		Real64 specificHeatSolid;
+		Real64 deltaTempFreezingHigh;
+		Real64 peakTempFreezing;
+		Real64 deltaTempFreezingLow;
+
 		virtual
 		~HysteresisPhaseChange()
 		{}

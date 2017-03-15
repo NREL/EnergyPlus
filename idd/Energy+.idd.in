@@ -7040,21 +7040,21 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units deltaC
        \type real
-  N8 , \field Solid State Specific Heat
+  N7 , \field Solid State Specific Heat
        \required-field
        \units J/kg-K
        \type real
-  N9 , \field High Temperature Difference of Freezing Curve
+  N8 , \field High Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
- N10 , \field Peak Freezing Temperature
+  N9 , \field Peak Freezing Temperature
        \required-field
        \units C
        \type real
        \note Must be different than Peak Melting Temperature
- N11 ; \field Low Temperature Difference of Freezing Curve
+ N10 ; \field Low Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC

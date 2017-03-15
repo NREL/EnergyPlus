@@ -52,7 +52,49 @@ namespace HysteresisPhaseChange {
 		numHysteresisModels = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 
 		if ( numHysteresisModels > 0 ) {
-			// loop over the idf instances and populate the vector, setup outputs? no.
+			for ( int hmNum = 1; hmNum <= numHysteresisModels; ++ hmNum ) {
+				bool errorsFound = false;
+				int ioStatus;
+				int numAlphas;
+				int numNumbers;
+			    	InputProcessor::GetObjectItem(
+					DataIPShortCuts::cCurrentModuleObject,
+					hmNum,
+					DataIPShortCuts::cAlphaArgs,
+					numAlphas,
+					DataIPShortCuts::rNumericArgs,
+					numNumbers,
+					ioStatus,
+					DataIPShortCuts::lNumericFieldBlanks,
+					DataIPShortCuts::lAlphaFieldBlanks,
+					DataIPShortCuts::cAlphaFieldNames,
+					DataIPShortCuts::cNumericFieldNames
+				);
+				bool isNotOK = false;
+				bool isBlank = false;
+				// InputProcessor::VerifyName( DataIPShortCuts::cAlphaArgs( 1 ), 
+				if ( isNotOK ) {
+					errorsFound = true;
+					if ( isBlank ) {
+						DataIPShortCuts::cAlphaArgs( 1 ) = "xxxxx";
+					}
+				}
+				HysteresisPhaseChange thisHM;
+				thisHM.name = DataIPShortCuts::cAlphaArgs( 1 );
+				thisHM.tempCoeffForThermalConductivity = DataIPShortCuts::rNumericArgs( 1 );
+				thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 2 );
+				thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 3 );
+				thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 4 );
+				thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 5 );
+				thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 6 );
+				thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 7 );
+				thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 8 );
+				thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 9 );
+				thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 10 );	
+				if ( errorsFound ) {
+					ShowFatalError( "Error processing " + DataIPShortCuts::cCurrentModuleObject + " named \"" +DataIPShortCuts::cAlphaArgs( 1 ) + "\"" );
+				}
+			}
 		}
 	}
 
