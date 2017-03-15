@@ -141,7 +141,7 @@ namespace EnergyPlus {
 			json getVariablesJSON();
 			json getJSON();
 
-			void writeFile();
+			void writeReport();
 
 		protected:
 			bool IDataFrameEnabled;
@@ -219,8 +219,8 @@ namespace EnergyPlus {
 			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
 			static DataFrame TSMeters, HRMeters, DYMeters, MNMeters, SMMeters;
 
-			void writeTimeSeriesFiles();
-			void writeFile();
+			void writeTimeSeriesReports();
+			void WriteReport();
 
 			SimInfo SimulationInformation;
 

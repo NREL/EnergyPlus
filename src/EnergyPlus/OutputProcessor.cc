@@ -114,7 +114,7 @@ namespace OutputProcessor {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::OutputFileMeters;
-	//using DataGlobals::OutputFileSchema;
+	//using DataGlobals::OutputFileJson;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::DayOfSim;
 	using DataGlobals::DayOfSimChr;
@@ -223,6 +223,7 @@ namespace OutputProcessor {
 	bool OutputInitialized( false );
 	int ProduceReportVDD( ReportVDD_No );
 	int OutputFileMeterDetails( 0 ); // Unit number for Meter Details file (output)
+	//int OutputFileJson( 0 );
 	int NumHoursInDay( 24 );
 	int NumHoursInMonth( 0 );
 	int NumHoursInSim( 0 );

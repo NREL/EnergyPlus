@@ -25,7 +25,7 @@
 #include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
-#include <DataStringGlobals.hh>
+#include <DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -395,21 +395,28 @@ namespace EnergyPlus {
 			return root;
 		}
 
-		void DataFrame::writeFile() {
-			std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout_" + ReportFrequency + ".json";
-			std::ofstream jsonfile(jsonfilename);
+		void DataFrame::writeReport() {
+			//std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout_" + ReportFrequency + ".json";
+			//std::string jsonfilename =  "eplusout_" + ReportFrequency + ".json";
+			//std::ofstream jsonfile(jsonfilename);
 			
 			json root;
 			
-			if (jsonfile.is_open())
-			{
-				root = getJSON();
-				jsonfile << std::setw(4) << root << std::endl;
-				jsonfile.close();
-			}
+//			if (jsonfile.is_open())
+//			{
+//				root = getJSON();
+//				jsonfile << std::setw(4) << root << std::endl;
+//				jsonfile.close();
+//			}
+//
+//			if (DataGlobals::json_stream){
+//				root = getJSON();
+//				*(DataGlobals::json_stream) << std::setw(4) << root << std::endl;
+//			}
+
 			// does this need to go to error?
-			else
-				ShowWarningError("Unable to open file for time-series output.");
+			//else
+			//	ShowWarningError("Unable to open file for time-series output.");
 			//cJSON_Delete(_root);
 		}
 
@@ -841,35 +848,35 @@ namespace EnergyPlus {
 			}
 		}
 
-		void ResultsSchema::writeTimeSeriesFiles()
+		void ResultsSchema::writeTimeSeriesReports()
 		{
 			// Output detailed Zone time series data
 			if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled())
-				OutputSchema->RIDetailedZoneTSData.writeFile();
+				OutputSchema->RIDetailedZoneTSData.writeReport();
 
 			// Output detailed HVAC time series data
 			if (OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled())
-				OutputSchema->RIDetailedHVACTSData.writeFile();
+				OutputSchema->RIDetailedHVACTSData.writeReport();
 
 			// Output timestep time series data
 			if (OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled())
-				OutputSchema->RITimestepTSData.writeFile();
+				OutputSchema->RITimestepTSData.writeReport();
 
 			// Output hourly time series data
 			if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled())
-				OutputSchema->RIHourlyTSData.writeFile();
+				OutputSchema->RIHourlyTSData.writeReport();
 
 			// Output daily time series data
 			if (OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled())
-				OutputSchema->RIDailyTSData.writeFile();
+				OutputSchema->RIDailyTSData.writeReport();
 
 			// Output monthly time series data
 			if (OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled())
-				OutputSchema->RIMonthlyTSData.writeFile();
+				OutputSchema->RIMonthlyTSData.writeReport();
 
 			// Output run period time series data
 			if (OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled())
-				OutputSchema->RIRunPeriodTSData.writeFile();
+				OutputSchema->RIRunPeriodTSData.writeReport();
 		}
 
 		char* ResultsSchema::convert(const std::string & s) {
@@ -878,11 +885,7 @@ namespace EnergyPlus {
 			return pc;
 		}
 
-		void ResultsSchema::writeFile()
-		{
-			std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout.json";
-			std::ofstream jsonfile(jsonfilename);
-
+		void ResultsSchema::WriteReport() {
 			json root, outputVars, rdd, meterVars, meterData;
 			json rddvals = json::array();
 			root = {
@@ -893,7 +896,6 @@ namespace EnergyPlus {
 			};
 
 			//output variables
-
 			if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled())
 				outputVars[ "Detailed-Zone" ] = RIDetailedZoneTSData.getVariablesJSON();
 			
@@ -978,15 +980,12 @@ namespace EnergyPlus {
 
 			// reports
 			root[ "TabularReports" ] = TabularReportsCollection.getJSON();
-			
 
-			// write json
-			if (jsonfile.is_open())	{
-				jsonfile << std::setw(4) << root << std::endl;
-				jsonfile.close();
+			if(DataGlobals::json_stream){
+				*(DataGlobals::json_stream) << std::setw(4) << root << std::endl;
+				gio::close(DataGlobals::OutputFileJson);
+				DataGlobals::json_stream = nullptr;
 			}
-
-			//cJSON_Delete(_root);
 		}
 	} // ResultsFramework
 

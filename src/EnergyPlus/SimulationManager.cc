@@ -613,7 +613,7 @@ namespace SimulationManager {
 
 		// Output detailed ZONE time series data
 		if (OutputSchema->timeSeriesEnabled())
-			OutputSchema->writeTimeSeriesFiles();
+			OutputSchema->writeTimeSeriesReports();
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -1296,16 +1296,16 @@ namespace SimulationManager {
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
-		//// Open the Schema Output File
-		//// timeSeriesEnabled() will return true if any of the options JSON options is set
-		//if (OutputSchema->timeSeriesEnabled() )
-		//{
-		//	OutputFileSchema = GetNewUnitNumber();
-		//	{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open(OutputFileSchema, "eplusout.json", flags); write_stat = flags.ios(); }
-		//	if (write_stat != 0) {
-		//		ShowFatalError("OpenOutputFiles: Could not open file \"eplusout.json\" for output (write).");
-		//	}
-		//}
+		//// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
+		if (OutputSchema->timeSeriesAndTabularEnabled() )
+		{
+			OutputFileJson = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileJson, DataStringGlobals::outputJsonFileName, flags); write_stat = flags.ios(); }
+			if (write_stat != 0) {
+				ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputJsonFileName+ " for output (write).");
+			}
+			json_stream = gio::out_stream( OutputFileJson );
+		}
 	}
 
 	void
@@ -1502,8 +1502,10 @@ namespace SimulationManager {
 		mtr_stream = nullptr;
 
 		//// Close the Schema Output File if JSON output is enabled
-		//if(OutputSchema->timeSeriesEnabled())
-		//	gio::close(OutputFileSchema);
+//		if(OutputSchema->timeSeriesEnabled()) {
+//			gio::close(OutputFileJson);
+//			json_stream = nullptr;
+//		}
 	}
 
 	void

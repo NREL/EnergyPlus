@@ -68,6 +68,7 @@ namespace DataStringGlobals {
 	extern std::string outputEndFileName;
 	extern std::string outputErrFileName;
 	extern std::string outputEsoFileName;
+	extern std::string outputJsonFileName;
 	extern std::string outputMtdFileName;
 	extern std::string outputMddFileName;
 	extern std::string outputMtrFileName;

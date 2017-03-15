@@ -369,6 +369,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputEndFileName = outputFilePrefix + normalSuffix + ".end";
 	outputErrFileName = outputFilePrefix + normalSuffix + ".err";
 	outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+	outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
 	outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
 	outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
 	outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";

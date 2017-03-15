@@ -256,7 +256,7 @@ AbortEnergyPlus()
 
 	gio::close( tempfl );
 	if(OutputSchema->timeSeriesAndTabularEnabled())
-		OutputSchema->writeFile();
+		OutputSchema->WriteReport();
 
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
@@ -497,7 +497,7 @@ EndEnergyPlus()
 	gio::close( tempfl );
 
 	if (OutputSchema->timeSeriesAndTabularEnabled())
-		OutputSchema->writeFile();
+		OutputSchema->WriteReport();
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif

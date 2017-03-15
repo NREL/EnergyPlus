@@ -125,6 +125,7 @@ namespace DataStringGlobals {
 	std::string outputEndFileName("eplusout.end");
 	std::string outputErrFileName("eplusout.err");
 	std::string outputEsoFileName("eplusout.eso");
+	std::string outputJsonFileName("eplusout.json");
 	std::string outputMtdFileName("eplusout.mtd");
 	std::string outputMddFileName("eplusout.mdd");
 	std::string outputMtrFileName("eplusout.mtr");

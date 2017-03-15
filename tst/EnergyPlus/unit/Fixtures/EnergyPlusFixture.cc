@@ -278,6 +278,7 @@ namespace EnergyPlus {
 			flags.DISPOSE( "DELETE" );
 			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
 			gio::close( DataGlobals::OutputFileStandard, flags );
+			gio::close( DataGlobals::OutputFileJson, flags );
 			gio::close( DataGlobals::OutputStandardError, flags );
 			gio::close( DataGlobals::OutputFileInits, flags );
 			gio::close( DataGlobals::OutputFileDebug, flags );

@@ -174,7 +174,7 @@ namespace DataGlobals {
 	extern int OutputFileZoneSizing; // Unit number of zone sizing calc output file
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
-	//extern int OutputFileSchema; // Unit number for Schema output
+	extern int OutputFileJson; // Unit number for Schema output
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
