@@ -82327,36 +82327,8 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \default 0.0
        \units deltaC
 
-FaultModel:EnthalpySensorOffset:ReturnAir,
-   \memo This object describes return air enthalpy sensor offset
-   \min-fields 3
-   A1, \field Name
-       \note Enter the name of the fault
-       \required-field
-       \type alpha
-   A2, \field Availability Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   A3, \field Severity Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   A4, \field Controller Object Type
-       \required-field
-       \type choice
-       \key Controller:OutdoorAir
-   A5, \field Controller Object Name
-       \required-field
-       \type object-list
-       \object-list OAControllerNames
-   N1; \field Enthalpy Sensor Offset
-       \type real
-       \minimum> -20000
-       \maximum< 20000
-       \default 0.0
-       \units J/kg
-
-FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
-   \memo This object describes fault of chiller supply water temperature sensor offset
+FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
+   \memo This object describes fault of condenser supply water temperature sensor offset
    \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
