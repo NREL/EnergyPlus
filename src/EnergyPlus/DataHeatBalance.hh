@@ -788,32 +788,31 @@ namespace DataHeatBalance {
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
 
 		Real64 tk1; // Temperature coefficient for thermal conductivity
-		Array2D<Real64> TempEnth(25,2) = -100.; //  Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
+		Array2D< Real64 > TempEnth; //  (25, 2) = -100 Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
 		                             //  TempEnth(1,2) = First Enthalpy, TempEnth(2,1) = second  Temp, etc.
-		Array2D<Real64> TempCond(25,2) = -100.; //  Temperature thermal conductivity Function Pairs,TempCond(1,1)= first Temp
+		Array2D<Real64> TempCond; //  (25, 2) = -100 Temperature thermal conductivity Function Pairs,TempCond(1,1)= first Temp
 		                             //  Tempcond(1,2) = First conductivity, TempEnth(2,1) = second  Temp, etc.
 		//-------------------------------------------------------------------------------------------------------------------
-		Array2D<Real64> TempEnthMelting(25,2) = -100.; //  Temperature enthalpy Function Pairs for melting curve of PCM,
+		Array2D<Real64> TempEnthMelting; //  (25, 2) = -100 Temperature enthalpy Function Pairs for melting curve of PCM,
 		                             //  TempEnthMelting(1,1)= first Temp, TempEnthMelting(1,2) = First Enthalpy,
 									 //  TempEnthMelting(2,1) = second  Temp, etc.
-		Array2D<Real64> TempEnthFreezing(25,2) = -100.; //  Temperature enthalpy Function Pairs for freezing curve of PCM,
+		Array2D<Real64> TempEnthFreezing; //  (25, 2) = -100 Temperature enthalpy Function Pairs for freezing curve of PCM,
 		                             //  TempEnthFreezing(1,1)= first Temp, TempEnthFreezing(1,2) = First Enthalpy,
 									 //  TempEnthFreezing(2,1) = second  Temp, etc.
-		Array2D<Real64> TempEnthCrystallizationPoint(1,2) = -100.; //  Temperature enthalpy Function Pairs for crystallization point of PCM,
+		Array2D<Real64> TempEnthCrystallizationPoint; // (1,2) = -100.; //  Temperature enthalpy Function Pairs for crystallization point of PCM,
 		                             //  TempEnthCrystallizationPoint(1,1)= first Temp, TempEnthCrystallizationPoint(1,2) = First Enthalpy,
 									 //  TempEnthCrystallizationPoint(2,1) = second  Temp, etc.
 
-		Array3D<Real64> TempEnthModified(50,6,2) = -100.; //  Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
+		Array3D<Real64> TempEnthModified; // (50,6,2) = -100.; //  Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
 		                             //  TempEnth(1,2) = First Enthalpy, TempEnth(2,1) = second  Temp, etc.
-		Array3D<Real64> TempEnthMeltingModified(50,6,2) = -100.; //  Temperature enthalpy Function Pairs for melting curve of PCM,
+		Array3D<Real64> TempEnthMeltingModified; // (50,6,2) = -100.; //  Temperature enthalpy Function Pairs for melting curve of PCM,
 		                             //  TempEnthMelting(1,1)= first Temp, TempEnthMelting(1,2) = First Enthalpy,
 									 //  TempEnthMelting(2,1) = second  Temp, etc.
-		Array3D<Real64> TempEnthFreezingModified(50,6,2) = -100.; //  Temperature enthalpy Function Pairs for freezing curve of PCM,
+		Array3D<Real64> TempEnthFreezingModified; // (50,6,2) = -100.; //  Temperature enthalpy Function Pairs for freezing curve of PCM,
 		                             //  TempEnthFreezing(1,1)= first Temp, TempEnthFreezing(1,2) = First Enthalpy,
 									 //  TempEnthFreezing(2,1) = second Temp, etc.
 
-		Real64 DeltaHF;       // Latent Heat of Fusion/ Melting of PCM
-		Real64 DeltaHS;       // Latent Heat of Solidification/freezing of PCM
+		Real64 DeltaH;        // Latent Heat of PCM
 		Real64 CpSolid;       // Specific Heat of PCM in Solid State {kJ/kg-K}
 		Real64 CpLiquid;      // Specific Heat of PCM in Liquid State {kJ/kg-K}
 		Real64 Tm;            // Melting Temperature of PCM {C}

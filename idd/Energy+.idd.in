@@ -7017,7 +7017,7 @@ MaterialProperty:PhaseChangeHysteresis,
        \units W/m-K2
        \type real
        \default 0.0
-  N2 , \field Latent Heat of Fusion
+  N2 , \field Latent Heat during the Entire Phase Change Process 
        \required-field
        \units J/kg
        \type real
@@ -7039,10 +7039,6 @@ MaterialProperty:PhaseChangeHysteresis,
        \note Note: The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
-       \type real
-  N7 , \field Latent Heat of Solidification
-       \required-field
-       \units J/kg
        \type real
   N8 , \field Solid State Specific Heat
        \required-field

@@ -5213,9 +5213,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	}
 
 	bool const PartialResimulate( present( ZoneToResimulate ) );
-	SurfaceEnthalpyRead = .False.
-	ZnAirRpt.SumEnthalpyM = 0.0
-	ZnAirRpt.SumEnthalpyH = 0.0
+	SurfaceEnthalpyRead = false;
+	//ZnAirRpt.SumEnthalpyM = 0.0;
+	//ZnAirRpt.SumEnthalpyH = 0.0;
 
 	//Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
 	std::vector< int > SurfToResimulate;
@@ -5447,8 +5447,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							ZnAirRpt( ZoneNum ).SumEnthalpyH = 0.0;
 							SurfaceEnthalpyRead( SurfNum ) = true;
 						}
-						ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
-						ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
+						// ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
+						// ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
 					}
 
 					TH11 = TempSurfOutTmp;
