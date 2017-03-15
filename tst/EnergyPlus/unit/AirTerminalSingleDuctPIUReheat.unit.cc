@@ -96,6 +96,17 @@ namespace EnergyPlus {
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0001;                  !- Convergence Tolerance",
 
+			"  Fan:ConstantVolume,",
+			"    SPACE1-1 PIU Fan,        !- Name",
+			"    ReheatCoilAvailSched,    !- Availability Schedule Name",
+			"    0.5,                     !- Fan Total Efficiency",
+			"    50.0,                    !- Pressure Rise {Pa}",
+			"    autosize,                !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    SPACE1-1 ATU Fan Inlet Node,  !- Air Inlet Node Name",
+			"    SPACE1-1 Zone Coil Air In Node;  !- Air Outlet Node Name",
+
 			"  Coil:Heating:Water,",
 			"    SPACE1-1 Zone Coil,      !- Name",
 			"    ReheatCoilAvailSched,    !- Availability Schedule Name",

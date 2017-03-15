@@ -1977,7 +1977,11 @@ namespace Furnaces {
 						// get the actual index to the DX cooling coil object
 						DXCoilIndex = GetActualDXCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
 						Furnace( FurnaceNum ).ActualDXCoilIndexForHXAssisted = DXCoilIndex;
-						SetDXCoolingCoilData( DXCoilIndex, ErrorsFound, HeatingCoilPLFCurveIndex );
+						int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum( CoolingCoilType, CoolingCoilName, errFlag, true );
+						if( ActualCoolCoilType == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) {
+							SetDXCoolingCoilData( DXCoilIndex, ErrorsFound, HeatingCoilPLFCurveIndex );
+						}
+						// what could we do for VS coil here? odd thing here
 					}
 
 				} // IF (IsNotOK) THEN
@@ -6369,7 +6373,7 @@ namespace Furnaces {
 							//  because Node(FurnaceOutletNode)%Temp will have been calc'd with full DX heat in last faux call to CalcFurnaceOutput
 
 							deltaT = ( Furnace( FurnaceNum ).DesignMaxOutletTemp - TempOutHeatingCoil );
-							HeatCoilLoad -= ( Node( FurnaceInletNode ).MassFlowRate * cpair * deltaT );
+							HeatCoilLoad += ( Node( FurnaceInletNode ).MassFlowRate * cpair * deltaT );
 							HeatCoilLoad = max( 0.0, HeatCoilLoad );
 						}
 					} else {
@@ -6888,6 +6892,8 @@ namespace Furnaces {
 						Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
 					} else {
 						if ( Furnace( FurnaceNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted ) {
+
+				//VS coil issue here...
 							if ( DXCoilPartLoadRatio( Furnace( FurnaceNum ).ActualDXCoilIndexForHXAssisted ) > 0.0 ) {
 								Furnace( FurnaceNum ).CoolPartLoadRatio = 1.0;
 								Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
@@ -8529,8 +8535,7 @@ namespace Furnaces {
 
 		// to be removed by furnace/unitary system
 
-		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
+		// zero DX coils, and supplemental electric heater electricity consumption
 		DXElecHeatingPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		SaveCompressorPLR = 0.0;

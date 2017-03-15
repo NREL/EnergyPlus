@@ -82,6 +82,7 @@
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -693,13 +694,13 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
+			if ( ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! SameString( ReqRepVars( Loop ).Key, KeyedValue ) ) continue;
+			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
 
-			//   A match.  Make sure doesnt duplicate
+			//   A match.  Make sure doesn't duplicate
 
 			ReqRepVars( Loop ).Used = true;
 			Dup = false;
@@ -770,7 +771,6 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;

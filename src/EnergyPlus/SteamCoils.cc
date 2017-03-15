@@ -61,6 +61,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -896,7 +897,8 @@ namespace SteamCoils {
 		// SUBROUTINE INFORMATION:
 		//   AUTHOR         Rahul Chillar
 		//   DATE WRITTEN   Jan 2005
-		//   MODIFIED       Sept. 2012, B. Griffith, add calls to SetComponentFlowRate for plant interactions
+		//   MODIFIED       Sep. 2012, B. Griffith, add calls to SetComponentFlowRate for plant interactions
+		//                  Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset fault model
 		//   RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -913,7 +915,11 @@ namespace SteamCoils {
 		// na
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -964,6 +970,15 @@ namespace SteamCoils {
 		SubcoolDeltaTemp = SteamCoil( CoilNum ).DegOfSubcooling;
 		TempSetPoint = SteamCoil( CoilNum ).DesiredOutletTemp;
 
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( SteamCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = SteamCoil( CoilNum ).FaultyCoilSATIndex;
+			SteamCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= SteamCoil( CoilNum ).FaultyCoilSATOffset;
+		}
+		
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
