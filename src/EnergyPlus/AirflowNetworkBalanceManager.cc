@@ -97,6 +97,8 @@
 #include <UtilityRoutines.hh>
 #include <ZoneDehumidifier.hh>
 
+#include <fstream>
+
 namespace EnergyPlus {
 
 namespace AirflowNetworkBalanceManager {
@@ -5508,6 +5510,9 @@ namespace AirflowNetworkBalanceManager {
 		using DataHeatBalSurface::TH;
 		using DataHeatBalFanSys::QRadSurfAFNDuct;
 
+		using DataGlobals::HourOfDay;
+		using DataGlobals::TimeStep;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5543,6 +5548,8 @@ namespace AirflowNetworkBalanceManager {
 		int ZoneNum;
 		bool found;
 		bool OANode;
+
+		std::ofstream static file("AFN_debug.csv", std::ofstream::out);
 
 		MA = 0.0;
 		MV = 0.0;
@@ -5628,11 +5635,11 @@ namespace AirflowNetworkBalanceManager {
 				} else { // Air-to-air + radiation heat transfer
 
 					auto & VFObj( AirflowNetworkLinkageViewFactorData( AirflowNetworkLinkageData( i ).LinkageViewFactorObjectNum ) );
-					VFObj.TSurr = 0;
-					VFObj.UThermalRad = 0;
 					VFObj.QRad = 0;
+					VFObj.QConv = 0;
 
 					Real64 Tin_ave = Tin;
+					Real64 hOut = 0;
 
 					while( abs( UThermal - UThermal_iter ) > tolerance ) {
 						UThermal_iter = UThermal;
@@ -5640,7 +5647,6 @@ namespace AirflowNetworkBalanceManager {
 						Real64 RThermConvIn = CalcDuctInsideConvResist( Tin_ave, AirflowNetworkLinkSimu( i ).FLOW, DisSysCompDuctData( TypeNum ).D, DisSysCompDuctData( TypeNum ).InsideConvCoeff );
 						Real64 RThermConvOut = CalcDuctOutsideConvResist( TDuctSurf, Tamb, Wamb, Pamb, DisSysCompDuctData( TypeNum ).D, AirflowNetworkLinkageData( i ).ZoneNum, DisSysCompDuctData( TypeNum ).OutsideConvCoeff );
 
-						Real64 hOut = 0;
 						if ( RThermConvOut > 0.0 ) {
 							hOut = 1 / RThermConvOut;
 						}
@@ -5698,7 +5704,15 @@ namespace AirflowNetworkBalanceManager {
 						Real64 ZoneSurfaceArea = Surface( SurfNum ).Area;
 						QRadSurfAFNDuct( SurfNum ) += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad * TimeStepSys * SecInHour / ZoneSurfaceArea; // Energy to each surface per unit area [J/m2]
 						VFObj.QRad += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad; // Total radiant load from all surfaces for this system timestep [W]
+
+						if ( !WarmupFlag ) {
+							file << HourOfDay << "," << TimeStep << "," << ZoneSurfNum << "," << VFObj.LinkageSurfaceData( j ).SurfaceRadLoad << "," << TSurfj << "," << TDuctSurf << "," << Tsurr << "," << VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor << std::endl;
+						}
 					}
+
+					VFObj.QConv = hOut * DuctSurfArea * ( TDuctSurf - Tamb );
+
+					UThermal = ( VFObj.QRad + VFObj.QConv ) / ( DuctSurfArea * abs( Tsurr - Tin ) );
 
 				}
 
@@ -6899,12 +6913,12 @@ namespace AirflowNetworkBalanceManager {
 					AirflowNetworkReportData( i ).DiffLatLossW = -AirflowNetworkExchangeData( i ).DiffLat * Lam;
 					AirflowNetworkReportData( i ).DiffLatLossJ = -AirflowNetworkExchangeData( i ).DiffLat * Lam * ReportingConstant;
 				}
-				if ( AirflowNetworkExchangeData( i ).RadGain > 0.0 ) {
-					AirflowNetworkReportData( i ).RadGainW = AirflowNetworkExchangeData( i ).RadGain;
-					AirflowNetworkReportData( i ).RadGainJ = AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
+				if ( AirflowNetworkExchangeData( i ).RadGain < 0.0 ) {
+					AirflowNetworkReportData( i ).RadGainW = -AirflowNetworkExchangeData( i ).RadGain;
+					AirflowNetworkReportData( i ).RadGainJ = -AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
 				} else {
-					AirflowNetworkReportData( i ).RadLossW = -AirflowNetworkExchangeData( i ).RadGain;
-					AirflowNetworkReportData( i ).RadLossJ = -AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
+					AirflowNetworkReportData( i ).RadLossW = AirflowNetworkExchangeData( i ).RadGain;
+					AirflowNetworkReportData( i ).RadLossJ = AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
 				}
 				if ( AirflowNetworkExchangeData( i ).TotalSen > 0.0 ) {
 					AirflowNetworkReportData( i ).TotalSenGainW = AirflowNetworkExchangeData( i ).TotalSen;
