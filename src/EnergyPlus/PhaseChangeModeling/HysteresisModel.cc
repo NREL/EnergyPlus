@@ -14,6 +14,9 @@
 // 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <ObjexxFCL/Array1D.hh>
+
+#include <DataHeatBalance.hh>
 #include <EnergyPlus.hh>
 #include <PhaseChangeModeling/HysteresisModel.hh>
 #include <DataIPShortCuts.hh>
@@ -42,161 +45,187 @@ namespace HysteresisPhaseChange {
 		return nullptr; // just for the compiler warning
 	}
 
-	Real64 HysteresisPhaseChange::getCurrentSpecificHeat() {
-		// this is pulled directly from a chunk of the Fortran PCM code changes
-		if ( Material( Matlay ).phaseChange ) {
-			auto & thisPCM( Materail( MatLay ).phaseChange );
-			if ( phaseChangeDeltaT( I ) < 0 ) {
-				if ( TDT( I ) < TempLowPCM ) {
-					PhaseChangeState( I ) = 2;
-					Tc = TcM;
-					Tau1 = Material( MatLay ).tau1;
-					Tau2 = Material( MatLay ).tau2;
-					DeltaH = Material( MatLay ).deltaHF;
-				} else if ( TDT( I ) >= TempLowPCM && TDT ( I ) <= TempHighPCM ) {
-					PhaseChangeState( I ) = -1;
-					Tc = TcM;
-					Tau1 = Material( MatLay ).tau1;
-					Tau2 = Material( MatLay ).tau2;
-					DeltaH = Material( MatLay ).deltaHF;
-					if ( ( PhaseChangeStateOld( I ) == 1 && PhaseChangeState( I ) == -1 ) || ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == -1 ) ) {
-						PhaseChangeState( I ) = 0;
-					}
-				} else if ( TDT( I ) > TempHighPCM ) {
-					PhaseChangeState( I ) = -2;
-					Tc = TcM;
-					Tau1 = Material( MatLay ).tau1;
-					Tau2 = Material( MatLay ).tau2;
-					DeltaH = Material( MatLay ).DeltaHF;
-				}
-			} else if ( PhaseChangeDeltaT( I ) > 0 ) {
-				if ( TDT( I ) < TempLowPCF ) { 
-					PhaseChangeState( I ) = 2;
-					Tc = TcF;
-					Tau1 = Material( MatLay ).tau1Prime;
-					Tau2 = Material( MatLay ).tau2Prime;
-					DeltaH = Material( MatLay ).DeltaHS;
-				} else if ( TDT( I ) >= TempLowPCF && TDT( I ) <= TempHighPCF ) {
-					PhaseChangeState( I ) = 1;
-					Tc = TcF;
-					Tau1 = Material( MatLay ).tau1Prime;
-					DeltaH = Material( MatLay ).DeltaHS;
-				if ( ( PhaseChangeStateOld( I ) == -1 && PhaseChangeState( I ) == 1 ) || ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == 1 ) ) {
-					PhaseChangeState( I ) = 0;
-				} else if ( TDT( I ) > TempHighPCF ) {
-					PhaseChangeState( I ) = -2;
-					Tc = TcF;
-					Tau1 = Material( MatLay ).tau1Prime;
-					Tau2 = Material( MatLay ).tau2Prime;
-					DeltaH = Material( MatLay ).DeltaHS;
-				}
-			}
-			if ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == 2 ) {
-				PhaseChangeTransition( I ) = 1;
-			} else if ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == 1 ) {
-				PhaseChangeTransition( I ) = 1;
-				// PhaseChangeState( I ) = 0; ?????
-			} else if ( PhaseChangeStateOld( I ) == 1 && PhaseChangeState( I ) == 0 ) {
-				PhaseChangeTransition( I ) = 1;
-			} else if ( PhaseChangeStateOld( I ) == 2 && PhaseChangeState( I ) == 0 ) {
-				PhaseChangeTransition( I ) = 1;
-			} else {
-				PhaseChangeTransition( I ) = 0;
-			}
+	Real64 HysteresisPhaseChange::getEnthalpy( Real64 T, Real64 EXTRATERMS ) {
+		return 0;
+	}
 
-			// if ( hysteresis flag == 1 )  -- implied by this derived class
-			if ( PhaseChangeTransition( I ) == 0 ) {
-				EnthOld( I ) = SpecEnthalpy( I, TD( I ), ... );
-				EnthNew( I ) = SpecEnthalpy( I, TDT( I ), ... );
-	              	} else if ( PhaseChangeTransition( I ) == 1 ) {
-				if ( PhaseChangeStateOld( I ) == 1 && PhaseChangeState( I ) == 0 ) {
-					EnthRev( I ) = SpecEnthalpy( I, TR( I ), ... );
-					EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthOld( I ) - ( SpecHeatTransition * TD( I ) ) );
-					EnthalpyM( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					EnthalpyF( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					if ( EnthNew( I ) < EnthRev( I ) && EnthNew( I ) >= EnthalpyF( I ) && TDT( I ) <= TD( I ) ) {
-						PhaseChangeState( I ) = 1;
-						EnthNew( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					} else if ( EnthNew( I ) < EnthalpyF( I ) && EnthNew( I ) > EnthalpyM( I ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthOld( I ) - ( SpecHeatTransition * TD( I ) ) );
-					} else if ( EnthNew( I ) < EnthalpyF( I ) && TDT( I ) > TR( I ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					} else if ( EnthNew( I ) <= EnthalpyM( I ) && TDT( I ) <= TR( I ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					}	
-				} else if ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == 0 ) {
-					if ( TDT( I ) < TR( I ) ) {
-						Tc = TcM;
-						Tau1 = Tau1M;
-						Tau2 = Tau2M;
- 						DeltaH = DeltaHM;                       
- 					} else if ( TDT( I ) > TR( I ) ) {
-						Tc = TcF;
-						Tau1 = Tau1F;
-						Tau2 = Tau2F;
-						DeltaH = DeltaHF;
-					}
-					EnthRev( I ) = SpecEnthalpy( I, TR( I ), ... );
-					EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthOld( I ) - ( SpecHeatTransition * TD( I ) ) );
-					EnthalpyM( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					EnthalpyF( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					if ( TDT( I ) < TR( I ) && EnthNew( I ) > EnthalpyF( I ) ) {
-						PhaseChangeState( I ) = 1;
-						EnthNew( I ) = SpecEnthalpy( I, TDT( I ) );
-					} else if ( EnthNew( I ) < EnthalpyF( I ) && EnthNew( I ) > EnthalpyM( I ) && ( TDT( I ) < TD( I ) || TDT( I ) > TD( I ) ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					} else if ( EnthNew( I ) <= EnthalpyM( I ) && TDT( I ) >= TD( I ) && EnthNew( I ) > EnthOld( I ) ) {
-						PhaseChangeState( I ) = -1;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					}
-				} else if ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == -1 ) {
-					EnthRev( I ) = SpecEnthalpy( I, TR( I ), ... );
-					EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					EnthalpyM( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					EnthalpyF( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					if ( EnthNew( I ) < EnthalpyF( I ) && EnthNew( I ) > EnthalpyM( I ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					} else if ( EnthNew( I ) <= EnthalpyM( I ) && TDT( I ) >= TD( I ) ) {
-						PhaseChangeState( I ) = -1;
-						EnthNew( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					}
-				} else if ( PhaseChangeStateOld( I ) == -1 && PhaseChangeState( I ) == 0 ) {
-					EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthOld( I ) - ( SpecHeatTransition * TD( I ) ) );
-					EnthalpyM( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					EnthalpyF( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					if ( EnthNew( I ) < EnthOld( I ) && TDT( I ) < TD( I ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthOld( I ) - ( SpecHeatTransition * TD( I ) ) );
-					} else if ( EnthNew( I ) < EnthalpyF( I ) && EnthNew( I ) > EnthalpyM( I ) && TDT( I ) < TD( I )) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					} else if ( EnthNew( I ) >= EnthalpyF( I ) && TDT( I ) <= TR( I ) ) {
-						PhaseChangeState( I ) = 0;
-						EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
-					}
-				} else if ( PhaseChangeStateOld( I ) == 0 && PhaseChangeState( I ) == 1 ) {
-					EnthalpyM( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					EnthalpyF( I ) = SpecEnthalpy( I, TDT( I ), ... );
-					EnthRev( I ) = SpecEnthalpy( I, TR( I ), ... );
-					EnthNew( I ) = ( SpecHeatTransition * TDT( I ) ) + ( EnthRev( I ) - ( SpecHeatTransition * TR( I ) ) );
+	Real64 HysteresisPhaseChange::getCurrentSpecificHeat() {
+	//	int MatLay = 0; // this was previously passed in as an arg, now we shouldn't need it, just operate on ourself
+	//	int I = 0; // need to get this somehow else
+		Array1D< Real64 > phaseChangeDeltaT; // this was previouly a standalone array, this should now be stored on the class itself
+		Array1D< Real64 > TDT; // ditto
+		Array1D< Real64 > PhaseChangeState; // ditto
+
+		Real64 TempLowPCM = 0; // need to init this from the class members
+		Real64 TempHighPCM = 0; // ditto
+		Real64 TempLowPCF = 0; // ditto
+		Real64 TempHighPCF = 0; // ditto
+		Real64 Tc = 0;
+		Real64 TcF = 0;
+		Real64 TcM = 0;
+		Real64 Tau1 = 0;
+		Real64 Tau2 = 0;
+		Real64 Tau2M = 0;
+		Real64 Tau1M = 0;
+		Real64 Tau1F = 0;
+		Real64 Tau2F = 0;
+		Real64 DeltaHM = 0;
+		Real64 DeltaH = 0;
+		Real64 EXTRATERMS = 0;
+		Real64 Cp;
+
+		// this is pulled directly from a chunk of the Fortran PCM code changes
+		if ( this->phaseChangeDeltaT < 0 ) {
+			if ( this->TDT < TempLowPCM ) {
+				this->phaseChangeState = 2;
+				Tc = TcM;
+				Tau1 = this->tau1;
+				Tau2 = this->tau2;
+				DeltaH = this->deltaHF;
+			} else if ( this->TDT >= TempLowPCM && this->TDT <= TempHighPCM ) {
+				this->phaseChangeState = -1;
+				Tc = TcM;
+				Tau1 = this->tau1;
+				Tau2 = this->tau2;
+				DeltaH = this->deltaHF;
+				if ( ( this->phaseChangeState == 1 && this->phaseChangeState == -1 ) || ( this->phaseChangeState == 0 && this->phaseChangeState == -1 ) ) {
+					this->phaseChangeState = 0;
 				}
+			} else if ( this->TDT > TempHighPCM ) {
+				this->phaseChangeState = -2;
+				Tc = TcM;
+				Tau1 = this->tau1;
+				Tau2 = this->tau2;
+				DeltaH = this->deltaHF;
+			}
+		} else if ( this->phaseChangeDeltaT > 0 ) {
+			if ( this->TDT < TempLowPCF ) { 
+				this->phaseChangeState = 2;
+				Tc = TcF;
+				Tau1 = this->tau1Prime;
+				Tau2 = this->tau2Prime;
+				DeltaH = this->deltaHS;
+			} else if ( this->TDT >= TempLowPCF && this->TDT <= TempHighPCF ) {
+				this->phaseChangeState = 1;
+				Tc = TcF;
+				Tau1 = this->tau1Prime;
+				DeltaH = this->deltaHS;
+			}
+			if ( ( this->phaseChangeState == -1 && this->phaseChangeState == 1 ) || ( this->phaseChangeState == 0 && this->phaseChangeState == 1 ) ) {
+				this->phaseChangeState = 0;
+			} else if ( this->TDT > TempHighPCF ) {
+				this->phaseChangeState = -2;
+				Tc = TcF;
+				Tau1 = this->tau1Prime;
+				Tau2 = this->tau2Prime;
+				DeltaH = this->deltaHS;
 			}
 		}
-		if ( PhaseChangeTransition( I ) = 0 ) {
-			if ( EnthNew( I ) == EnthOld( I ) ) {
-				Cp = CpOld( I );
+		if ( this->phaseChangeState == 0 && this->phaseChangeState == 2 ) {
+			this->phaseChangeTransition = 1;
+		} else if ( this->phaseChangeState == 0 && this->phaseChangeState == 1 ) {
+			this->phaseChangeTransition = 1;
+			// this->phaseChangeState = 0; ?????
+		} else if ( this->phaseChangeState == 1 && this->phaseChangeState == 0 ) {
+			this->phaseChangeTransition = 1;
+		} else if ( this->phaseChangeState == 2 && this->phaseChangeState == 0 ) {
+			this->phaseChangeTransition = 1;
+		} else {
+			this->phaseChangeTransition = 0;
+		}
+
+		// if ( hysteresis flag == 1 )  -- implied by this derived class
+		if ( this->phaseChangeTransition == 0 ) {
+			this->enthOld = this->getEnthalpy(this->TD, EXTRATERMS );
+			this->enthNew = this->getEnthalpy(this->TDT, EXTRATERMS );
+              	} else if ( this->phaseChangeTransition == 1 ) {
+			if ( this->phaseChangeState == 1 && this->phaseChangeState == 0 ) {
+				this->enthRev = this->getEnthalpy(this->TR, EXTRATERMS );
+				this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthOld - ( this->specHeatTransition * this->TD ) );
+				this->enthalpyM = this->getEnthalpy(this->TDT, EXTRATERMS );
+				this->enthalpyF = this->getEnthalpy(this->TDT, EXTRATERMS );
+				if ( this->enthNew < this->enthRev && this->enthNew >= this->enthalpyF && this->TDT <= this->TD ) {
+					this->phaseChangeState = 1;
+					this->enthNew = this->getEnthalpy(this->TDT, EXTRATERMS );
+				} else if ( this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthOld - ( this->specHeatTransition * this->TD ) );
+				} else if ( this->enthNew < this->enthalpyF && this->TDT > this->TR ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				} else if ( this->enthNew <= this->enthalpyM && this->TDT <= this->TR ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				}	
+			} else if ( this->phaseChangeState == 0 && this->phaseChangeState == 0 ) {
+				if ( this->TDT < this->TR ) {
+					Tc = TcM;
+					Tau1 = Tau1M;
+					Tau2 = Tau2M;
+					DeltaH = DeltaHM;                       
+				} else if ( this->TDT > this->TR ) {
+					Tc = TcF;
+					Tau1 = Tau1F;
+					Tau2 = Tau2F;
+					DeltaH = deltaHF;
+				}
+				this->enthRev = this->getEnthalpy(this->TR, EXTRATERMS );
+				this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthOld - ( this->specHeatTransition * this->TD ) );
+				this->enthalpyM = this->getEnthalpy(this->TDT, EXTRATERMS );
+				this->enthalpyF = this->getEnthalpy(this->TDT, EXTRATERMS );
+				if ( this->TDT < this->TR && this->enthNew > this->enthalpyF ) {
+					this->phaseChangeState = 1;
+					this->enthNew = this->getEnthalpy(this->TDT, EXTRATERMS );
+				} else if ( this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM && ( this->TDT < this->TD || this->TDT > this->TD ) ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				} else if ( this->enthNew <= this->enthalpyM && this->TDT >= this->TD && this->enthNew > this->enthOld ) {
+					this->phaseChangeState = -1;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				}
+			} else if ( this->phaseChangeState == 0 && this->phaseChangeState == -1 ) {
+				this->enthRev = this->getEnthalpy(this->TR, EXTRATERMS );
+				this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				this->enthalpyM = this->getEnthalpy(this->TDT, EXTRATERMS );
+				this->enthalpyF = this->getEnthalpy(this->TDT, EXTRATERMS );
+				if ( this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				} else if ( this->enthNew <= this->enthalpyM && this->TDT >= this->TD ) {
+					this->phaseChangeState = -1;
+					this->enthNew = this->getEnthalpy(this->TDT, EXTRATERMS );
+				}
+			} else if ( this->phaseChangeState == -1 && this->phaseChangeState == 0 ) {
+				this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthOld - ( this->specHeatTransition * this->TD ) );
+				this->enthalpyM = this->getEnthalpy(this->TDT, EXTRATERMS );
+				this->enthalpyF = this->getEnthalpy(this->TDT, EXTRATERMS );
+				if ( this->enthNew < this->enthOld && this->TDT < this->TD ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthOld - ( this->specHeatTransition * this->TD ) );
+				} else if ( this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM && this->TDT < this->TD) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				} else if ( this->enthNew >= this->enthalpyF && this->TDT <= this->TR ) {
+					this->phaseChangeState = 0;
+					this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+				}
+			} else if ( this->phaseChangeState == 0 && this->phaseChangeState == 1 ) {
+				this->enthalpyM = this->getEnthalpy(this->TDT, EXTRATERMS );
+				this->enthalpyF = this->getEnthalpy(this->TDT, EXTRATERMS );
+				this->enthRev = this->getEnthalpy(this->TR, EXTRATERMS );
+				this->enthNew = ( this->specHeatTransition * this->TDT ) + ( this->enthRev - ( this->specHeatTransition * this->TR ) );
+			}
+		}
+		if ( this->phaseChangeTransition == 0 ) {
+			if ( this->enthNew == this->enthOld ) {
+				Cp = this->CpOld;
 			} else {
-				Cp = SpecHeat( I, TD( I ), TDT( I ), ... );
+				Cp = 0; // SpecHeat( I, this->TD, this->TDT, EXTRATERMS );
 			}
-		} else if ( PhaseChangeTransition( I ) == 1 ) {
-			Cp = SpecHeatTransition;
+		} else if ( this->phaseChangeTransition == 1 ) {
+			Cp = this->specHeatTransition;
 		}
-		Cp_node( 1 ) = Cp;
+		// Cp_node( 1 ) = Cp;
 		return Cp;
 	}
 

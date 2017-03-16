@@ -63,6 +63,7 @@
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <PhaseChangeModeling/PhaseChangeModel.hh>
 
 namespace EnergyPlus {
 
@@ -786,7 +787,7 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
-
+		std::shared_ptr< PhaseChangeModel > phaseChange = nullptr;
 		Real64 tk1; // Temperature coefficient for thermal conductivity
 		Array2D< Real64 > TempEnth; //  (25, 2) = -100 Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
 		                             //  TempEnth(1,2) = First Enthalpy, TempEnth(2,1) = second  Temp, etc.
