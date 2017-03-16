@@ -347,8 +347,6 @@ namespace EnergyPlus {
 
 	}
 
-
-
 	TEST_F( EnergyPlusFixture, TestAFNPressureStat ) {
 
 		// Unit test for a new feature of PressureStat and #5687
@@ -2298,6 +2296,20 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.0, AirflowNetworkLinkReport( 50 ).FLOW, 0.0001 );
 
 		AirflowNetworkExchangeData.deallocate( );
+
+		// Start a test for #6005
+		ANZT = 26.0;
+		MultizoneSurfaceData( 2 ).HybridVentClose = true;
+		MultizoneSurfaceData( 5 ).HybridVentClose = true;
+		MultizoneSurfaceData( 14 ).HybridVentClose = true;
+		CalcAirflowNetworkAirBalance( );
+		EXPECT_EQ( 0.0, MultizoneSurfaceData( 2 ).OpenFactor );
+		EXPECT_EQ( 0.0, MultizoneSurfaceData( 5 ).OpenFactor );
+		EXPECT_EQ( 0.0, MultizoneSurfaceData( 14 ).OpenFactor );
+		EXPECT_EQ( 0.0, SurfaceWindow( 2 ).VentingOpenFactorMultRep );
+		EXPECT_EQ( 0.0, SurfaceWindow( 5 ).VentingOpenFactorMultRep );
+		EXPECT_EQ( 0.0, SurfaceWindow( 14 ).VentingOpenFactorMultRep );
+
 		Node.deallocate( );
 
 	}
