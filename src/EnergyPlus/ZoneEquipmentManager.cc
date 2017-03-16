@@ -2776,7 +2776,8 @@ namespace ZoneEquipmentManager {
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak == 0.0 ) {
 						// issue 6006, heating coils sizing to 0 when no heating load in zone
 						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.empty() ) {
-							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepAtPeakF );
+							ShowSevereError( RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.end() );
 						}
@@ -2903,7 +2904,8 @@ namespace ZoneEquipmentManager {
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak == 0.0 ) {
 						// issue 6006, heating coils sizing to 0 when no heating load in zone
 						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.empty() ) {
-							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepAtPeakF );
+							ShowSevereError( RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = *std::max_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.end() );
 						}
