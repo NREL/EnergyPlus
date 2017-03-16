@@ -1414,17 +1414,23 @@ namespace OutputReportTabular {
 	bool
 	isInvalidAggregationOrder( )
 	{
+		DisplayString( "isInvalidAggregationOrder Monthly started" );
 		bool foundError = false;
 		for ( int iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
+			DisplayString( "isInvalidAggregationOrder for iInput " + std::to_string(iInput) );
 			bool foundMinOrMax = false;
 			bool foundHourAgg = false;
 			bool missingMaxOrMinError = false;
 			bool missingHourAggError = false;
 			for ( int jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
+				DisplayString( "isInvalidAggregationOrder for jTable " + std::to_string( jTable ) );
 				int curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
-  			    // test if the aggregation types are in the correct order
+				DisplayString( "isInvalidAggregationOrder for curTable " + std::to_string( curTable ) );
+				// test if the aggregation types are in the correct order
 				for ( int kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+					DisplayString( "isInvalidAggregationOrder for kColumn " + std::to_string( kColumn ) );
 					int curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+					DisplayString( "isInvalidAggregationOrder for curCol " + std::to_string( curCol ) );
 					int curAggType = MonthlyColumns( curCol ).aggType;
 					if ( ( curAggType == aggTypeMaximum ) || ( curAggType == aggTypeMinimum ) ) {
 						foundMinOrMax = true;
@@ -1441,6 +1447,10 @@ namespace OutputReportTabular {
 							missingHourAggError = true;
 						}
 					}
+					DisplayString( "isInvalidAggregationOrder for missingMaxOrMinError "); 
+					DisplayString( missingMaxOrMinError ? " true" : " false" );
+					DisplayString( "isInvalidAggregationOrder for missingHourAggError ");
+					DisplayString( missingHourAggError ? " true" : " false"  );
 				}
 			}
 			if ( missingMaxOrMinError ) {
@@ -1452,6 +1462,8 @@ namespace OutputReportTabular {
 				foundError = true;
 			}
 		}	
+		DisplayString( "isInvalidAggregationOrder Monthly ended with foundError " );
+		DisplayString( foundError ? " true" : " false" );
 		return foundError;
 	}
 

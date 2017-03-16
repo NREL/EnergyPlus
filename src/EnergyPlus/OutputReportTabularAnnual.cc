@@ -71,6 +71,7 @@
 #include <General.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
+#include <DisplayRoutines.hh>
 
 
 namespace EnergyPlus {
@@ -251,28 +252,37 @@ namespace EnergyPlus {
 		void
 		checkAggregationOrderForAnnual( )
 		{
+			DisplayString( "checkAggregationOrderForAnnual started" );
 			std::vector<AnnualTable>::iterator annualTableIt;
 			bool invalidAggregationOrderFound = false;
+			int i =0;
 			for ( annualTableIt = annualTables.begin( ); annualTableIt != annualTables.end( ); ++annualTableIt ) {
-				if ( !annualTableIt->invalidAggregationOrder( ) ) {
+				DisplayString( "for annualTableIt " + std::to_string(++i ));
+				if ( annualTableIt->invalidAggregationOrder( ) ) {
 					invalidAggregationOrderFound = true;
 				}
 			}
 			if ( invalidAggregationOrderFound ) {
 				ShowFatalError( "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed." );
 			}
+			DisplayString( "invalidAggregationOrderFound " );
+			DisplayString( invalidAggregationOrderFound ? " true" : " false" );
+			DisplayString( "checkAggregationOrderForAnnual ended" );
 		}
 
 		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
 		bool
 		AnnualTable::invalidAggregationOrder( )
 		{
+			DisplayString( "invalidAggregationOrder annual started" );
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			bool foundMinOrMax = false;
 			bool foundHourAgg = false;
 			bool missingMaxOrMinError = false;
 			bool missingHourAggError = false;
+			int i = 0;
 			for ( fldStIt = m_annualFields.begin( ); fldStIt != m_annualFields.end( ); ++fldStIt ) {
+				DisplayString( "for fldStIt " + std::to_string( ++i ) );
 				if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum ) ||
 					 ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum ) ) {
 					foundMinOrMax = true;
@@ -294,6 +304,10 @@ namespace EnergyPlus {
 						missingHourAggError = true;
 					}
 				}
+				DisplayString( "invalidAggregationOrder for missingMaxOrMinError " );
+				DisplayString( missingMaxOrMinError ? " true" : " false" );
+				DisplayString( "invalidAggregationOrder for missingHourAggError " );
+				DisplayString( missingHourAggError ? " true" : " false" );
 			}
 			if ( missingMaxOrMinError ) {
 				ShowSevereError( "The Output:Table:Annual report named=\"" + m_name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
@@ -301,6 +315,9 @@ namespace EnergyPlus {
 			if ( missingHourAggError ) {
 				ShowSevereError( "The Output:Table:Annual report named=\"" + m_name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
 			}
+			DisplayString( "return " );
+			DisplayString( (missingHourAggError || missingMaxOrMinError) ? " true" : " false" );
+			DisplayString( "invalidAggregationOrder annual ended" );
 			return ( missingHourAggError || missingMaxOrMinError );
 		}
 
