@@ -183,6 +183,14 @@ namespace EnergyPlus {
 		EXPECT_EQ(3ul, result.size());
 	}
 
+	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWithinTransaction ) {
+		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+		sqlite_test->sqliteBegin();
+		EXPECT_TRUE( sqlite_test->sqliteWithinTransaction() );
+		sqlite_test->sqliteCommit();
+		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+	}
+
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
 	{
 		sqlite_test->sqliteBegin();
