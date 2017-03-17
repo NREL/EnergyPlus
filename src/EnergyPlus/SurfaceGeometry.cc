@@ -1642,6 +1642,7 @@ namespace SurfaceGeometry {
 						Zone( ZoneNum ).HasFloor = true;
 					}
 					if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) {
+						Zone( ZoneNum ).CeilingArea += Surface( SurfNum ).Area;
 						Zone( ZoneNum ).HasRoof = true;
 					}
 				}
@@ -8626,19 +8627,32 @@ namespace SurfaceGeometry {
 			ZoneStruct.NumSurfaceFaces = NActFaces;
 			SurfCount = double( NActFaces );
 
-			AnalyzeZoneVolume( ZoneStruct, isEnclosedVolume, isFloorAndCeilingSame, isFloorHorizontal, isCeilingHorizontal, areWallsVertical , areWallHeightSame, areOppositeWallsSame, oppositeWallArea, distanceBetweenOppositeWalls );
+			bool isEnclosedVolume = false;
+			bool areFloorAndCeilingSame = false;
+			bool isFloorHorizontal = false;
+			bool isCeilingHorizontal = false;
+			bool areWallsVertical = false;
+			bool areWallHeightSame = false;
+			bool areOppositeWallsSame = false;
+			Real64 oppositeWallArea = 0.;
+			Real64 distanceBetweenOppositeWalls = 0.;
+
+			AnalyzeZoneVolume( ZoneStruct, isEnclosedVolume, areFloorAndCeilingSame, isFloorHorizontal, isCeilingHorizontal, areWallsVertical, areWallHeightSame, areOppositeWallsSame, oppositeWallArea, distanceBetweenOppositeWalls );
 			if ( isEnclosedVolume ) {
 				CalcPolyhedronVolume( ZoneStruct, CalcVolume );
-			} else if ( isFloorAndCeilingSame && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
+			} else if ( areFloorAndCeilingSame && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 			} else if ( isFloorHorizontal && areWallsVertical && areWallHeightSame && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
 			} else if ( isCeilingHorizontal && areWallsVertical && areWallHeightSame && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
 			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
-			} else if ( areOppositesWallsSame ) {
+			} else if ( areOppositeWallsSame ) {
 				CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
+			} else if ( Zone( ZoneNum ).Volume == AutoCalculate ) { // no user entered zone volume
+				ShowSevereError("For zone: " + Zone( ZoneNum ).Name + " it is not possible to calculate the volume from the surrounding surfaces so either provide the volume value or define all the surfaces to fully enclose the zone.");
+				CalcVolume = 0.;
 			} else {
-				ShowSevereError("For such an odd shape zone, please define all the surfaces to fully enclose the zone.");
+				CalcVolume = 0.;
 			}
 			if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
 				if ( CalcVolume > 0.0 ) {
@@ -8727,6 +8741,236 @@ namespace SurfaceGeometry {
 			ErrorsFound = true;
 		}
 
+	}
+
+	void
+	AnalyzeZoneVolume(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		bool & isEncldVolume, //done
+		bool & areFlrAndClgSame, //done
+		bool & isFlrHoriz, //done
+		bool & isClgHoriz, //done
+		bool & areWlVert, //done
+		bool & areWlHgtSame, //done
+		bool & areOppWlsSame,
+		Real64 & oppWallArea,
+		Real64 & distBtwnOppWalls )
+	{
+		using DataVectorTypes::Vector;
+		using DataVectorTypes::Vector_2d;
+
+		std::vector<Vector> uniqueVertices;
+		uniqueVertices.reserve( zonePoly.NumSurfaceFaces * 6 );
+
+		struct EdgeByPts
+		{
+			int start;
+			int end;
+			int count;
+			EdgeByPts( ):
+				start( 0 ), 
+				end (0 ),
+				count(0 )
+			{}
+		};
+		std::vector<EdgeByPts> uniqueEdges;
+		uniqueEdges.reserve( zonePoly.NumSurfaceFaces * 6 );
+
+		// first make a list of all vertices
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
+				Vector curVertex =  zonePoly.SurfaceFace(iFace ).FacePoints( jVertex );
+				for ( auto unqV : uniqueVertices ) {
+					if ( !isAlmostEqual3dPt( curVertex, unqV ) ) {
+						uniqueVertices.emplace_back( curVertex );
+						break;
+					}
+				}
+			}
+		}
+		// construct list of unique edges
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			Vector prevVertex;
+			int prevVertexIndex;
+			for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
+				Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
+				int curVertexIndex = findIndexOfVertex( curVertex, uniqueVertices );
+				if ( jVertex == 1 ) {
+					prevVertex = zonePoly.SurfaceFace( iFace ).FacePoints( zonePoly.SurfaceFace( iFace ).NSides ); // the last point
+					prevVertexIndex = findIndexOfVertex( prevVertex, uniqueVertices );
+				} else {
+					prevVertex = curVertex;
+					prevVertexIndex = curVertexIndex;
+				}
+				int found = -1;
+				for ( int i = 0; i < uniqueEdges.size( ); i++ ) {
+					if ( ( uniqueEdges[ i ].start == curVertexIndex && uniqueEdges[ i ].end == prevVertexIndex ) || ( uniqueEdges[ i ].start == prevVertexIndex && uniqueEdges[ i ].end == curVertexIndex ) ) {
+						found = i;
+						break;
+					}
+				}
+				if ( found == -1 ) {
+					EdgeByPts curEdge;
+					curEdge.start = prevVertexIndex;
+					curEdge.end = curVertexIndex;
+					curEdge.count = 1;
+					uniqueEdges.emplace_back( curEdge );
+				} else {
+					++uniqueEdges[found].count;
+				}
+			}
+		}
+		// All edges for an enclosed polyhedron should be shared by two (and only two) sides. 
+        // So if the count is not two for all edges, the polyhedron is not enclosed
+		bool edgeNotTwoFound = false;
+		for ( auto anEdge : uniqueEdges ) {
+			if ( anEdge.count != 2 ) {
+				edgeNotTwoFound = true;
+				break;
+			}
+		}
+		isEncldVolume = !edgeNotTwoFound;
+
+		// check if floors and ceilings are horizonatal and walls are vertical
+		isFlrHoriz = true;
+		isClgHoriz = true;
+		areWlVert = true;
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor ) {
+				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle  
+					isFlrHoriz = false;
+				}
+			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Roof ) { //includes ceilings
+				if ( abs( Surface( curSurfNum ).Tilt) > 1. ) {  // with 1 degree angle of 
+					isClgHoriz = false;
+				}
+			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) { 
+				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle  
+					areWlVert = false;
+				}
+			}
+		}
+
+
+		// check if the floor and ceiling are the same
+		// this is almost equivent to saying, if you ignore the z-coordinate, are the vertices the same
+		// so if you could all the unique vertices of the floor and ceiling, ignorign the z-coordinate, they 
+		// should always be even (they would be two but you might define multiple surfaces that meet in a corner)
+		struct Vector2dCount : Vector_2d {
+			int count;
+			Vector2dCount():
+				count(0 )
+			{}
+		};
+
+		std::vector<Vector2dCount> floorCeilingXY;
+		floorCeilingXY.reserve( zonePoly.NumSurfaceFaces * 6 );
+
+		// make list of x and y coordinates for all faces that are on the floor
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor || Surface( curSurfNum ).Class == SurfaceClass_Roof ) {
+				for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
+					Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
+					Vector_2d curXY;
+					curXY.x = curVertex.x;
+					curXY.y = curVertex.y;
+					for ( auto curFloorCeiling : floorCeilingXY ) {
+						Vector_2d curFloorCeilingXY;
+						curFloorCeilingXY.x = curFloorCeiling.x;
+						curFloorCeilingXY.y = curFloorCeiling.x;
+						if ( isAlmostEqual2dPt( curXY, curFloorCeilingXY ) ) {
+							++curFloorCeiling.count;
+						} else {
+							Vector2dCount curXYcount;
+							curXYcount.x = curXY.x;
+							curXYcount.y = curXY.y;
+							curXYcount.count = 1;
+							floorCeilingXY.emplace_back( curXYcount );
+							break;
+						}
+					}
+ 				}
+			}
+		}
+		// now make sure every point has been counted and even number of times (usually twice)
+		// if they are then the ceiling and floor are (almost certainly) the same x and y coordinates.
+		areFlrAndClgSame = true;
+		for ( auto curFloorCeiling : floorCeilingXY ) {
+			if (curFloorCeiling.count % 2 != 0 ){
+				areFlrAndClgSame = false;
+				break;
+			}
+		}
+
+
+		// test if all the wall heights are the same (all walls have the same maximum z-coordinate
+		areWlHgtSame = true;
+		Real64 wallHeightZ = -1.0E50;
+		bool foundWallHeight = false;
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+			if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
+				Real64 maxZ = -1.0E50;
+				for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
+					Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
+					if ( maxZ < curVertex.z) {
+						maxZ = curVertex.z;
+					}
+				}
+				if ( foundWallHeight ) {
+					if ( abs( maxZ - wallHeightZ) > 0.0254) {    //  2.54 cm = 1 inch 
+						areWlHgtSame = false;
+						break;
+					}
+				} else {
+					wallHeightZ = maxZ;
+					foundWallHeight = true;
+				}
+			}
+		}
+
+
+
+		//NOTE: MAYBE BREAK THIS UP INTO A GROUP OF INDIVIDUAL FUNCTIONS TO MAKE IT EASIER TO UNIT TEST
+		// MAYBE MAKE ALL RETURN VALUES INSTEAD OF PARAMETERS - USE TUPLE IF NECESSARY
+
+	}
+
+	bool 
+	isAlmostEqual3dPt(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	)
+	{
+		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) && ( abs( v1.z - v2.z ) < tol ) ) ;
+	}
+
+	bool
+	isAlmostEqual2dPt(
+		DataVectorTypes::Vector_2d v1,
+		DataVectorTypes::Vector_2d v2
+	)
+	{
+		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
+	}
+
+
+	int
+	findIndexOfVertex(
+		DataVectorTypes::Vector vertexToFind,
+		std::vector<Vector> listOfVertices
+	)
+	{
+		for ( int i = 0; i < listOfVertices.size( ); i++ ) {
+			if ( isAlmostEqual3dPt( listOfVertices[ i ], vertexToFind ) ) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	void

@@ -345,6 +345,38 @@ namespace SurfaceGeometry {
 	);
 
 	void
+	AnalyzeZoneVolume(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		bool & isEncldVolume,
+		bool & areFlrAndClgSame,
+		bool & isFlrHoriz,
+		bool & isClgHoriz,
+		bool & areWlVert,
+		bool & areWlHgtSame,
+		bool & areOppWlsSame,
+		Real64 & oppWallArea,
+		Real64 & distBtwnOppWalls 
+	);
+
+	bool
+	isAlmostEqual3dPt(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	);
+
+	bool
+	isAlmostEqual2dPt(
+		DataVectorTypes::Vector_2d v1,
+		DataVectorTypes::Vector_2d v2
+	);
+
+	int
+	findIndexOfVertex(
+		DataVectorTypes::Vector vertexToFind,
+		std::vector<Vector> listOfVertices
+	);
+
+	void
 	ProcessSurfaceVertices(
 		int const ThisSurf, // Surface Number
 		bool & ErrorsFound
