@@ -257,7 +257,6 @@ namespace EnergyPlus {
 			if ( !DataGlobals::DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
 				return;
 			}
-			int i = 0;
 			for ( annualTableIt = annualTables.begin( ); annualTableIt != annualTables.end( ); ++annualTableIt ) {
 				if ( annualTableIt->invalidAggregationOrder( ) ) {
 					invalidAggregationOrderFound = true;
@@ -277,7 +276,6 @@ namespace EnergyPlus {
 			bool foundHourAgg = false;
 			bool missingMaxOrMinError = false;
 			bool missingHourAggError = false;
-			int i = 0;
 			for ( fldStIt = m_annualFields.begin( ); fldStIt != m_annualFields.end( ); ++fldStIt ) {
 				if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum ) ||
 					 ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum ) ) {
