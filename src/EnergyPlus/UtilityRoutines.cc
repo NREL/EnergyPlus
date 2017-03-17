@@ -861,6 +861,7 @@ ShowFatalError(
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
 	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
+		if( sqlite->sqliteWithinTransaction() ) sqlite->sqliteCommit();
 	}
 	throw std::runtime_error( ErrorMessage );
 

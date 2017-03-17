@@ -183,6 +183,15 @@ namespace EnergyPlus {
 		EXPECT_EQ(3ul, result.size());
 	}
 
+
+	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWithinTransaction ) {
+		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+		sqlite_test->sqliteBegin();
+		EXPECT_TRUE( sqlite_test->sqliteWithinTransaction() );
+		sqlite_test->sqliteCommit();
+		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+	}
+
 	TEST_F( SQLiteFixture, SQLiteProcedures_informationalErrorRecords ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
@@ -204,6 +213,7 @@ namespace EnergyPlus {
 		});
 
 		compare_err_stream(errMsg);
+
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
