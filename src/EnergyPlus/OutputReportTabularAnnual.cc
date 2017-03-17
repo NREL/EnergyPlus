@@ -255,7 +255,11 @@ namespace EnergyPlus {
 			DisplayString( "checkAggregationOrderForAnnual started" );
 			std::vector<AnnualTable>::iterator annualTableIt;
 			bool invalidAggregationOrderFound = false;
-			int i =0;
+			if ( !DataGlobals::DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
+				DisplayString( "checkAggregationOrderForAnnual exit early since no weather simulation" );
+				return;
+			}
+			int i = 0;
 			for ( annualTableIt = annualTables.begin( ); annualTableIt != annualTables.end( ); ++annualTableIt ) {
 				DisplayString( "for annualTableIt " + std::to_string(++i ));
 				if ( annualTableIt->invalidAggregationOrder( ) ) {
