@@ -1151,6 +1151,9 @@ ShowMessage(
 		ShowErrorMessage( " *************", OutUnit1, OutUnit2 );
 	} else {
 		ShowErrorMessage( " ************* " + Message, OutUnit1, OutUnit2 );
+		if ( sqlite ) {
+			sqlite->createSQLiteErrorRecord( 1, -1, Message, 0 );
+		}
 	}
 
 }
