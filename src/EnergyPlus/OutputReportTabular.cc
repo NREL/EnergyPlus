@@ -1416,10 +1416,10 @@ namespace OutputReportTabular {
 	{
 		DisplayString( "isInvalidAggregationOrder Monthly started" );
 		bool foundError = false;
-//		if ( !DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
-//			DisplayString( "isInvalidAggregationOrder exit early since no weather simulation" );
-//			return foundError;
-//		}
+		if ( !DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
+			DisplayString( "isInvalidAggregationOrder exit early since no weather simulation" );
+			return foundError;
+		}
 		for ( int iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
 			DisplayString( "isInvalidAggregationOrder for iInput " + std::to_string(iInput) );
 			bool foundMinOrMax = false;
