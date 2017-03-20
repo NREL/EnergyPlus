@@ -12111,7 +12111,7 @@ Label50: ;
 		Real64 PartLoadAirMassFlowRate;
 		Real64 AirMassFlowRatio;
 		static Real64 AccuracyTolerance( 0.2 ); // tolerance in AHRI 340/360 Table 6 note 1
-		static int MaximumIterations( 500 );
+		static int MaximumIterations( 1000 );
 		int SolverFlag;
 		Array1D< Real64 > Par( 12 ); // Parameter array passed to solver
 		Real64 EIR_HighSpeed;
