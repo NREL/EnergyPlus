@@ -135,7 +135,11 @@ void KivaInstanceMap::initGround(const KivaWeatherData& kivaWeather)
 
 	// Use simple radiative model for initialization
 	ground.foundation.slab.emissivity = DataHeatBalance::Construct( DataSurfaces::Surface(floorSurface).Construction ).InsideAbsorpThermal;
-	ground.foundation.wall.interiorEmissivity = DataHeatBalance::Construct( constructionNum ).InsideAbsorpThermal;
+	if (constructionNum > 0) {
+		ground.foundation.wall.interiorEmissivity = DataHeatBalance::Construct( constructionNum ).InsideAbsorpThermal;
+	} else {
+		ground.foundation.wall.interiorEmissivity = 0.9;
+	}
 
 	// Initialize with steady state before accelerated timestepping
 	ground.foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
