@@ -86,14 +86,14 @@ void kivaErrorCallback(
 	void*
 )
 {
-	if (messageType == Kiva::MSG_INFO) {
-		ShowMessage("Kiva: " + message);
-  } else if (messageType == Kiva::MSG_WARN) {
-		ShowWarningError("Kiva: " + message);
-  } else /* if (messageType == Kiva::MSG_ERR) */ {
-		ShowSevereError("Kiva: " + message);
-		ShowFatalError("Kiva: Errors discovered, program terminates.");
-  }
+	if ( messageType == Kiva::MSG_INFO ) {
+		ShowMessage( "Kiva: " + message );
+	} else if ( messageType == Kiva::MSG_WARN ) {
+		ShowWarningError( "Kiva: " + message );
+	} else /* if (messageType == Kiva::MSG_ERR) */ {
+		ShowSevereError( "Kiva: " + message );
+		ShowFatalError( "Kiva: Errors discovered, program terminates." );
+	}
 }
 
 KivaInstanceMap::KivaInstanceMap(
