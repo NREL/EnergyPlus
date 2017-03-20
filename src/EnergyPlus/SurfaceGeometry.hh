@@ -344,18 +344,24 @@ namespace SurfaceGeometry {
 		Array1S_bool const CeilingHeightEntered
 	);
 
-	void
-	AnalyzeZoneVolume(
-		DataVectorTypes::Polyhedron const & zonePoly,
-		bool & isEncldVolume,
-		bool & areFlrAndClgSame,
-		bool & isFlrHoriz,
-		bool & isClgHoriz,
-		bool & areWlVert,
-		bool & areWlHgtSame,
-		bool & areOppWlsSame,
-		Real64 & oppWallArea,
-		Real64 & distBtwnOppWalls 
+	bool
+	isEnclosedVolume(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areFloorAndCeilingSame(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areWallHeightSame(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	std::tuple< bool, bool, bool >
+	areSurfaceHorizAndVert(
+		DataVectorTypes::Polyhedron const & zonePoly
 	);
 
 	bool
