@@ -49,6 +49,8 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
+// Kiva Headers
+#include <libkiva/Errors.hpp>
 #ifdef GROUND_PLOT
 #include <libgroundplot/GroundPlot.hpp>
 #endif
@@ -77,6 +79,22 @@
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
+
+void kivaErrorCallback(
+	const int messageType,
+	const std::string message,
+	void*
+)
+{
+	if (messageType == Kiva::MSG_INFO) {
+		ShowMessage("Kiva: " + message);
+  } else if (messageType == Kiva::MSG_WARN) {
+		ShowWarningError("Kiva: " + message);
+  } else /* if (messageType == Kiva::MSG_ERR) */ {
+		ShowSevereError("Kiva: " + message);
+		ShowFatalError("Kiva: Errors discovered, program terminates.");
+  }
+}
 
 KivaInstanceMap::KivaInstanceMap(
 	Kiva::Foundation& foundation,
@@ -578,6 +596,7 @@ void KivaManager::readWeatherData()
 
 bool KivaManager::setupKivaInstances()
 {
+	Kiva::setMessageCallback(kivaErrorCallback, NULL);
 	bool ErrorsFound = false;
 
 	if ( DataZoneControls::GetZoneAirStatsInputFlag ) {

@@ -7,6 +7,7 @@
 #undef PRNTSURF
 
 #include "Ground.hpp"
+#include "Errors.hpp"
 //#include <unsupported/Eigen/SparseExtra>
 
 namespace Kiva {
@@ -1885,10 +1886,10 @@ void Ground::solveLinearSystem()
     if (!success) {
       iters = pSolver->iterations();
       residual = pSolver->error();
-      // TODO Kiva: Make error wrapper inteface
-      std::cerr << "Warning: Solution did not converge after ";
-      std::cerr << iters << " iterations." << "\n";
-      std::cerr << "  The final residual was: " << residual << "\n";
+
+      std::stringstream ss;
+      ss << "Solution did not converge after " << iters << " iterations. The final residual was: (" << residual << ").";
+      showMessage(MSG_ERR, ss.str());
     }
   }
 }
@@ -2313,8 +2314,7 @@ double Ground::getBoundaryDistance(double val)
   double dist = 0.0;
   if (val > 1.0 || val < 0.0)
   {
-    std::cerr << "ERROR: Boundary value passed not between 0.0 and 1.0." << std::endl;
-    exit (EXIT_FAILURE);
+    showMessage(MSG_ERR, "Boundary value passed not between 0.0 and 1.0.");
   }
   else
   {
