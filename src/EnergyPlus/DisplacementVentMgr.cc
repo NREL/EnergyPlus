@@ -873,7 +873,7 @@ namespace DisplacementVentMgr {
 				TempIndCoef = HAT_FLOOR + MCpT_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZTFloor( ZoneNum ) = ( TempHistTerm + HAT_FLOOR + MCpT_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult ) / ( ( 11.0 / 6.0 ) * AirCap + HA_FLOOR + MCp_Total );
+					ZTFloor( ZoneNum ) = ( TempHistTerm + HAT_FLOOR + MCpT_Total + 0.6 * ZTOC( ZoneNum ) * MCp_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult ) / ( ( 11.0 / 6.0 ) * AirCap + HA_FLOOR + 1.6 * MCp_Total );
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTFloor( ZoneNum ) = Zone1Floor( ZoneNum ) + TempIndCoef / AirCap;
@@ -889,7 +889,7 @@ namespace DisplacementVentMgr {
 				TempIndCoef = ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + ZTFloor( ZoneNum ) * MCp_Total;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZTOC( ZoneNum ) = ( TempHistTerm + ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + ZTFloor( ZoneNum ) * MCp_Total ) / ( ( 11.0 / 6.0 ) * AirCap + HA_OC + MCp_Total );
+					ZTOC( ZoneNum ) = ( TempHistTerm + ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + 1.6 * ZTFloor( ZoneNum ) * MCp_Total ) / ( ( 11.0 / 6.0 ) * AirCap + HA_OC + 1.6 * MCp_Total );
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTOC( ZoneNum ) = Zone1OC( ZoneNum ) + TempIndCoef / AirCap;
