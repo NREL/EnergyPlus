@@ -1133,9 +1133,6 @@ namespace InputProcessor {
 	);
 
 	void
-	ReAllocateAndPreserveOutputVariablesForSimulation();
-
-	void
 	DumpCurrentLineBuffer(
 		int const StartLine,
 		std::string const & cStartLine,

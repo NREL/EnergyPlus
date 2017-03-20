@@ -3477,9 +3477,11 @@ namespace SetPointManager {
 							ColdestSetPtMgr( SetPtMgrNum ).AirLoopNum = AirLoopNum;
 						}
 						if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated == 0 ) {
-							ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating found:" );
-							ShowContinueError( "Air Loop provides no heating, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
-							ErrorsFound = true;
+							if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled == 0 ) {
+								ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating or cooling found:" );
+								ShowContinueError( "Air Loop provides no heating or cooling, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
+								ErrorsFound = true;
+							}
 						}
 					} else {
 						ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no AirLoopHVAC objects found:" );
@@ -5619,23 +5621,46 @@ namespace SetPointManager {
 		TotHeatLoad = 0.0;
 		SetPointTemp = this->MinSetTemp;
 
-		for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated; ++ZonesHeatedIndex ) {
-			CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedIndex );
-			ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).HeatZoneInletNodes( ZonesHeatedIndex );
-			ZoneNode = ZoneEquipConfig( CtrlZoneNum ).ZoneNode;
-			ZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-			ZoneMassFlowMax = Node( ZoneInletNode ).MassFlowRateMax;
-			ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
-			ZoneTemp = Node( ZoneNode ).Temp;
-			ZoneSetPointTemp = this->MinSetTemp;
-			if ( ZoneLoad > 0.0 ) {
-				TotHeatLoad += ZoneLoad;
-				CpAir = PsyCpAirFnWTdb( Node( ZoneInletNode ).HumRat, Node( ZoneInletNode ).Temp );
-				if ( ZoneMassFlowMax > SmallMassFlow ) {
-					ZoneSetPointTemp = ZoneTemp + ZoneLoad / ( CpAir * ZoneMassFlowMax );
+		if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated > 0 ) {
+			// dual-duct heated only zones
+			for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated; ++ZonesHeatedIndex ) {
+				CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedIndex );
+				ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).HeatZoneInletNodes( ZonesHeatedIndex );
+				ZoneNode = ZoneEquipConfig( CtrlZoneNum ).ZoneNode;
+				ZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+				ZoneMassFlowMax = Node( ZoneInletNode ).MassFlowRateMax;
+				ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
+				ZoneTemp = Node( ZoneNode ).Temp;
+				ZoneSetPointTemp = this->MinSetTemp;
+				if ( ZoneLoad > 0.0 ) {
+					TotHeatLoad += ZoneLoad;
+					CpAir = PsyCpAirFnWTdb( Node( ZoneInletNode ).HumRat, Node( ZoneInletNode ).Temp );
+					if (ZoneMassFlowMax > SmallMassFlow) {
+						ZoneSetPointTemp = ZoneTemp + ZoneLoad / ( CpAir * ZoneMassFlowMax );
+					}
 				}
+				SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
 			}
-			SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
+		} else {
+			// single-duct or central heated and cooled zones 
+			for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++ZonesHeatedIndex ) {
+				CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedIndex );
+				ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).CoolZoneInletNodes( ZonesHeatedIndex );
+				ZoneNode = ZoneEquipConfig( CtrlZoneNum ).ZoneNode;
+				ZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+				ZoneMassFlowMax = Node( ZoneInletNode ).MassFlowRateMax;
+				ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
+				ZoneTemp = Node( ZoneNode ).Temp;
+				ZoneSetPointTemp = this->MinSetTemp;
+				if ( ZoneLoad > 0.0 ) {
+					TotHeatLoad += ZoneLoad;
+					CpAir = PsyCpAirFnWTdb( Node( ZoneInletNode ).HumRat, Node( ZoneInletNode ).Temp );
+					if ( ZoneMassFlowMax > SmallMassFlow ) {
+						ZoneSetPointTemp = ZoneTemp + ZoneLoad / ( CpAir * ZoneMassFlowMax );
+					}
+				}
+				SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
+			}
 		}
 
 		SetPointTemp = min( this->MaxSetTemp, max( SetPointTemp, this->MinSetTemp ) );

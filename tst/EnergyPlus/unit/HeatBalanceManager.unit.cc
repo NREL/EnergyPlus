@@ -573,4 +573,46 @@ namespace EnergyPlus {
 		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
 
 	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation )
+	{
+		std::string const idf_objects = delimited_string( {
+		"  Version,8.6;",
+  
+		"  Material:RoofVegetation,",
+		"    ThickSoil,               !- Name",
+		"    0.5,                     !- Height of Plants {m}",
+		"    5,                       !- Leaf Area Index {dimensionless}",
+		"    0.2,                     !- Leaf Reflectivity {dimensionless}",
+		"    0.95,                    !- Leaf Emissivity",
+		"    180,                     !- Minimum Stomatal Resistance {s/m}",
+		"    EcoRoofSoil,             !- Soil Layer Name",
+		"    MediumSmooth,            !- Roughness",
+		"    0.36,                    !- Thickness {m}",
+		"    0.4,                     !- Conductivity of Dry Soil {W/m-K}",
+		"    641,                     !- Density of Dry Soil {kg/m3}",
+		"    1100,                    !- Specific Heat of Dry Soil {J/kg-K}",
+		"    0.95,                    !- Thermal Absorptance",
+		"    0.8,                     !- Solar Absorptance",
+		"    0.7,                     !- Visible Absorptance",
+		"    0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer",
+		"    0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer",
+		"    0.45,                    !- Initial Volumetric Moisture Content of the Soil Layer",
+		"    Advanced;                !- Moisture Diffusion Calculation Method",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+		GetMaterialData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		// check the "Material:RoofVegetation" names
+		EXPECT_EQ( Material( 1 ).Name, "THICKSOIL" );
+		// check maximum (saturated) moisture content 
+		EXPECT_EQ( 0.4, Material( 1 ).Porosity );
+		// check initial moisture Content was reset
+		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
+
+	}
 }
