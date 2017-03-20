@@ -5057,6 +5057,7 @@ namespace SimAirServingZones {
 
 									// Calc zone ventilation efficiency
 									if ( Fa > 0.0 ) {
+										// MJW ?? - Std 62.1
 										SysCoolingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
 									} else {
 										SysCoolingEv = 1.0;
@@ -6606,6 +6607,8 @@ namespace SimAirServingZones {
 		// PURPOSE OF THIS FUNCTION:
 		// Check that system ventilation eff is not less than input minimum system ventilation efficiency.
 		// If it is, back calculate and reset ZpzClgByZone and DesCoolVolFlowMin and system ventilation efficiency
+		// Also increase DesCoolVolFlow if needed to match the new DesCoolVolFlowMin
+		// Why does this look only at cooling?  Shouldn't heating also be checked?
 
 		// METHODOLOGY EMPLOYED:
 		// Ventilation Rate Procedure for single pass system
@@ -6628,6 +6631,8 @@ namespace SimAirServingZones {
 			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
 			// save new (increased) minimum flow rate
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			// make sure the max flow rate is >= the new minimum flow rate
+			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = max( AvailSAFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
 			// set the system ventilation efficiency to the user specified minimum
 			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
 		}
