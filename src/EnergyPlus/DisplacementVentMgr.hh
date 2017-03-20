@@ -94,7 +94,6 @@ namespace DisplacementVentMgr {
 
 	//**************************************************************************************************
 
-	inline
 	Real64
 	calculateThirdOrderFloorTemperature(
 		Real64 temperatureHistoryTerm,
