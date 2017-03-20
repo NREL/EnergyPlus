@@ -200,9 +200,9 @@ private: // methods
 	std::vector< Real64 > m_totEfficAtSpeed;
 	Real64 m_inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
 	Real64 m_outletAirMassFlowRate;
-	Real64 m_minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
+//	Real64 m_minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
 	Real64 m_maxAirMassFlowRate; // Max flow rate of fan in kg/sec
-	Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
+//	Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
 //	int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
 //	Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
 	Real64 m_inletAirTemp;

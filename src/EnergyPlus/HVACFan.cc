@@ -179,12 +179,14 @@ namespace HVACFan {
 
 		if ( DataGlobals::BeginEnvrnFlag && m_objEnvrnFlag ) {
 
-			m_minAirFlowRate = designAirVolFlowRate * m_minPowerFlowFrac;
-			m_minAirMassFlowRate = m_minAirFlowRate * m_rhoAirStdInit;
+			// Currently, fan does not force minimum mass flow, only used for power calculation
+			//m_minAirFlowRate = designAirVolFlowRate * m_minPowerFlowFrac;
+			//m_minAirMassFlowRate = m_minAirFlowRate * m_rhoAirStdInit;
 
 			//Init the Node Control variables
 			DataLoopNode::Node( outletNodeNum ).MassFlowRateMax = m_maxAirMassFlowRate;
-			DataLoopNode::Node( outletNodeNum ).MassFlowRateMin = m_minAirMassFlowRate;
+			// Currently, fan does not force minimum mass flow, only used for power calculation
+			// DataLoopNode::Node( outletNodeNum ).MassFlowRateMin = m_minAirMassFlowRate;
 
 			//Initialize all report variables to a known state at beginning of simulation
 			m_fanPower = 0.0;
@@ -329,9 +331,7 @@ namespace HVACFan {
 		m_numSpeeds( 0 ),
 		m_inletAirMassFlowRate( 0.0 ),
 		m_outletAirMassFlowRate( 0.0 ),
-		m_minAirFlowRate( 0.0 ),
 		m_maxAirMassFlowRate( 0.0 ),
-		m_minAirMassFlowRate( 0.0 ),
 		m_inletAirTemp( 0.0 ),
 		m_outletAirTemp( 0.0 ),
 		m_inletAirHumRat( 0.0 ),

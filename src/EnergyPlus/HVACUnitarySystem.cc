@@ -2058,6 +2058,8 @@ namespace HVACUnitarySystem {
 		if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 
 			SizingMethod = SystemAirflowSizing;
+			EqSizing.SystemAirFlow = true;
+			EqSizing.AirVolFlow = max( EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow );
 			if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate <= 0.0 ) { // attempt to catch any missed logic in GetUnitarySystem
 				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 			}
@@ -2069,6 +2071,7 @@ namespace HVACUnitarySystem {
 			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 			UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = TempSize;
 			DataEMSOverrideON = false;
+			EqSizing.SystemAirFlow = false;
 
 		}
 
@@ -2447,11 +2450,13 @@ namespace HVACUnitarySystem {
 
 			PrintFlag = true;
 			TempSize = UnitarySystem( UnitarySysNum ).DesignCoolingCapacity;
+			DataFlowUsedForSizing = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 			SizingString = "Nominal Cooling Capacity [W]";
 			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 			UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = TempSize;
 			DataConstantUsedForSizing = 0.0;
 			DataFractionUsedForSizing = 0.0;
+			DataFlowUsedForSizing = 0.0;
 
 		}
 
@@ -3541,6 +3546,8 @@ namespace HVACUnitarySystem {
 					ErrorsFound = true;
 					errFlag = false;
 				}
+
+				UnitarySystem(UnitarySysNum).DesignHeatingCapacity = GetDXCoilCapacity(HeatingCoilType, HeatingCoilName, errFlag);
 
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
 
