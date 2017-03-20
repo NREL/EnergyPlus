@@ -2442,6 +2442,6 @@
     Simple;                  !- Option Type
 
   Output:JSON,
-      TimeSeriesAndTabular;    !- Option Type
+      TimeSeriesAndTabular;  !- Option Type
 
 
