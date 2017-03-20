@@ -576,6 +576,23 @@ namespace DisplacementVentMgr {
 
 	//**************************************************************************************************
 
+	inline
+	Real64
+	calculateThirdOrderFloorTemperature(
+		Real64 temperatureHistoryTerm,
+		Real64 HAT_floor,
+		Real64 HA_floor,
+		Real64 MCpT_Total,
+		Real64 MCp_Total,
+		Real64 occupiedTemp,
+		Real64 nonAirSystemResponse,
+		Real64 zoneMultiplier,
+		Real64 airCap
+	) {
+		static const Real64 elevenOverSix = 11.0 / 6.0;
+		return ( temperatureHistoryTerm + HAT_floor + MCpT_Total + 0.6 * occupiedTemp * MCp_Total + nonAirSystemResponse / zoneMultiplier ) / ( elevenOverSix * airCap + HA_floor + 1.6 * MCp_Total );
+	}
+
 	void
 	CalcUCSDDV( int const ZoneNum ) // Which Zonenum
 	{
@@ -873,7 +890,7 @@ namespace DisplacementVentMgr {
 				TempIndCoef = HAT_FLOOR + MCpT_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZTFloor( ZoneNum ) = ( TempHistTerm + HAT_FLOOR + MCpT_Total + 0.6 * ZTOC( ZoneNum ) * MCp_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult ) / ( ( 11.0 / 6.0 ) * AirCap + HA_FLOOR + 1.6 * MCp_Total );
+					ZTFloor( ZoneNum ) = calculateThirdOrderFloorTemperature( TempHistTerm, HAT_FLOOR, HA_FLOOR, MCpT_Total, MCp_Total, ZTOC( ZoneNum ), NonAirSystemResponse( ZoneNum ), ZoneMult, AirCap );
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTFloor( ZoneNum ) = Zone1Floor( ZoneNum ) + TempIndCoef / AirCap;
