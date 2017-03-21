@@ -124,7 +124,10 @@ Infiltration is an uncontrolled outside air into a building depending on the air
 The infiltration modeling is relatively simplified in the energy simulation because of the lack of knowledge about the sizes and distribution of cracks in the building envelope, the permeability of the envelope, the air flow to the building, and the pressure distribution in and around the building. EnergyPlus allows a simple approach to model the infiltration for users. This requires to define a design flow rate and coefficients for temperature and wind velocity using the ZoneInfiltration:DesignFlowRate object. EnergyPlus calculates airflow rates by adjusting for the indoor-outdoor temperature differences and the outdoor wind speed using the following equation.
 
 \begin{equation}
-\text{Infiltration} = \text{Infiltration}_\text{design} F_\text{schedule} [A+B|T_z -T_o|+C (\text{WindSpeed})+D(\text{Windspeed}^2 )]
+\begin{aligned}
+\text{Infiltration} = \text{Infiltration}_\text{design} F_\text{schedule} \left[A+B|T_z -T_o|&+C (\text{WindSpeed})\\
+&+D(\text{WindSpeed}^2 )\right]
+\end{aligned}
 \end{equation}
 Where $A$ is the constant term coefficient, $B$ is the temperature term coefficient, $C$ is the velocity term coefficient, $D$ is the velocity squared coefficient, and $F_\text{schedule}$ is a user-defined schedule value between 0 and 1.
 
@@ -135,13 +138,13 @@ The simplified infiltration model using a constant infiltration flow rate is des
 It is not easy to estimate as the infiltration is caused by various sources of unknown leakages. The development of the hybrid model fills the gap when estimating the infiltration that reflects all complexities of design flow rate, coefficients, and climate conditions by only requiring easily attainable zone air temperature data to derive zone. The development of the infiltration hybrid modeling algorithm is consistent with the EnergyPlus source code. The approach derives the infiltration mass flow rate, $\dot{m}_{inf}$ by reformulating the zone air heat balance algorithm. The 3rd order backward difference method is used for the inverse model development for the infiltration hybrid modeling. The inverse model using the analytical solution cannot be realized in a mathematical form. The time-series zone air temperature, $T_z$ using the 3rd order method is shown in the following equation.
 
 \begin{equation}
-T_z^t = \\ \frac {\Sigma Q_i +\Sigma(h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t - \frac {C_z} {\delta t}(-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t})} { \frac {11} {6} \frac {C_z} {\delta t} + \Sigma (h_i A_i)  + \Sigma (\dot{m}_i C_p) + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}
+T_z^t = \\ \frac {\left(\begin{aligned}\Sigma Q_i &+ \Sigma(h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o\\ &+ \dot{m}_{sys} C_p T_{sup}^t - \frac{C_z}{\delta t}\left(-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t}\right)\end{aligned}\right)} { \frac {11}{6} \frac {C_z} {\delta t} + \Sigma (h_i A_i)  + \Sigma (\dot{m}_i C_p) + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}
 \end{equation}
 
 The equation below shows the inverse algorithm for infiltration hybrid modeling method to derive the zone infiltration mass flow rate using the measured zone air temperature.
 
 \begin{equation}
-\dot{m}_{inf} C_p = \frac {\Sigma Q_i + \Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{sys} C_p T_{sup}^t - \frac {C_z} {\delta t} (-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t}) - T_z^t [ \frac {11} {6} \frac {C_z} {\delta t} + \Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p) + \dot{m}_{sys} C_p]} {T_z^t - T_o}
+\dot{m}_{inf} C_p = \frac {\left(\begin{aligned}\Sigma Q_i &+ \Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{sys} C_p T_{sup}^t\\ &- \frac {C_z} {\delta t} \left(-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t}\right)\\ &- T_z^t \left[ \frac {11} {6} \frac {C_z} {\delta t} + \Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p) + \dot{m}_{sys} C_p\right]\end{aligned}\right)} {T_z^t - T_o}
 \end{equation}
 
 The infiltration air flow rate, $q_{inf}$ is then calculated from the derived infiltration mass flow rate from the following equation.
