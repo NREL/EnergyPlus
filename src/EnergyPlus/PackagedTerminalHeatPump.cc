@@ -1327,33 +1327,6 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
-				//   check that OA flow in cooling must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
-				}
-				//   check that OA flow in heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
-				}
-				//   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
-				}
-			}
-
 			CompSetFanInlet = NodeID( FanInletNodeNum );
 			CompSetFanOutlet = NodeID( FanOutletNodeNum );
 			CompSetCoolInlet = NodeID( CoolCoilInletNodeNum );
@@ -1953,33 +1926,6 @@ namespace PackagedTerminalHeatPump {
 				if ( errFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
-				}
-			}
-
-			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
-				//   check that OA flow in cooling must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
-				}
-				//   check that OA flow in heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
-				}
-				//  check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
 				}
 			}
 
@@ -2705,54 +2651,54 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).AirFlowControl = UseCompressorOffFlow;
 			}
 
-			if ( OANodeNums( 1 ) > 0 ) {
-				PTUnit( PTUnitNum ).CoolOutAirVolFlow = Numbers( 4 );
-				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow < 0 && PTUnit( PTUnitNum ).CoolOutAirVolFlow != AutoSize ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( " illegal " + cNumericFields( 4 ) + " = " + TrimSigDigits( Numbers( 4 ), 7 ) );
-					ErrorsFound = true;
-				}
-
-				//     only check that SA flow in cooling is >= OA flow in cooling when either or both are not autosized
-				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow > PTUnit( PTUnitNum ).MaxCoolAirVolFlow && PTUnit( PTUnitNum ).CoolOutAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxCoolAirVolFlow != AutoSize ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( ".." + cNumericFields( 4 ) + " cannot be greater than " + cNumericFields( 1 ) );
-					ShowContinueError( ".." + cNumericFields( 1 ) + " = " + TrimSigDigits( Numbers( 1 ), 7 ) );
-					ShowContinueError( ".." + cNumericFields( 4 ) + " = " + TrimSigDigits( Numbers( 4 ), 7 ) );
-					ErrorsFound = true;
-				}
-
-				PTUnit( PTUnitNum ).HeatOutAirVolFlow = Numbers( 5 );
-				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow < 0 && PTUnit( PTUnitNum ).HeatOutAirVolFlow != AutoSize ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( " illegal " + cNumericFields( 5 ) + " = " + TrimSigDigits( Numbers( 5 ), 7 ) );
-					ErrorsFound = true;
-				}
-
-				//     only check that SA flow in heating is >= OA flow in heating when either or both are not autosized
-				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow > PTUnit( PTUnitNum ).MaxHeatAirVolFlow && PTUnit( PTUnitNum ).HeatOutAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxHeatAirVolFlow != AutoSize ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( ".." + cNumericFields( 5 ) + " cannot be greater than " + cNumericFields( 2 ) );
-					ShowContinueError( ".." + cNumericFields( 2 ) + " = " + TrimSigDigits( Numbers( 2 ), 7 ) );
-					ShowContinueError( ".." + cNumericFields( 5 ) + " = " + TrimSigDigits( Numbers( 5 ), 7 ) );
-					ErrorsFound = true;
-				}
-
-				PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = Numbers( 6 );
-				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow < 0 && PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != AutoSize ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( " illegal " + cNumericFields( 6 ) + " = " + TrimSigDigits( Numbers( 6 ), 7 ) );
-					ErrorsFound = true;
-				}
-			} else {
-				PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0.0;
-				PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0.0;
-				PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0.0;
-				if ( ! lNumericBlanks( 4 ) || ! lNumericBlanks( 5 ) || ! lNumericBlanks( 6 ) ) {
-					// user entered values for OA with no outdoor air mixer name specified
-					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0.0;
-				}
+			//if ( OANodeNums( 1 ) > 0 ) {
+			PTUnit( PTUnitNum ).CoolOutAirVolFlow = Numbers( 4 );
+			if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow < 0 && PTUnit( PTUnitNum ).CoolOutAirVolFlow != AutoSize ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+				ShowContinueError( " illegal " + cNumericFields( 4 ) + " = " + TrimSigDigits( Numbers( 4 ), 7 ) );
+				ErrorsFound = true;
 			}
+
+			//     only check that SA flow in cooling is >= OA flow in cooling when either or both are not autosized
+			if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow > PTUnit( PTUnitNum ).MaxCoolAirVolFlow && PTUnit( PTUnitNum ).CoolOutAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxCoolAirVolFlow != AutoSize ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+				ShowContinueError( ".." + cNumericFields( 4 ) + " cannot be greater than " + cNumericFields( 1 ) );
+				ShowContinueError( ".." + cNumericFields( 1 ) + " = " + TrimSigDigits( Numbers( 1 ), 7 ) );
+				ShowContinueError( ".." + cNumericFields( 4 ) + " = " + TrimSigDigits( Numbers( 4 ), 7 ) );
+				ErrorsFound = true;
+			}
+
+			PTUnit( PTUnitNum ).HeatOutAirVolFlow = Numbers( 5 );
+			if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow < 0 && PTUnit( PTUnitNum ).HeatOutAirVolFlow != AutoSize ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+				ShowContinueError( " illegal " + cNumericFields( 5 ) + " = " + TrimSigDigits( Numbers( 5 ), 7 ) );
+				ErrorsFound = true;
+			}
+
+			//     only check that SA flow in heating is >= OA flow in heating when either or both are not autosized
+			if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow > PTUnit( PTUnitNum ).MaxHeatAirVolFlow && PTUnit( PTUnitNum ).HeatOutAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxHeatAirVolFlow != AutoSize ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+				ShowContinueError( ".." + cNumericFields( 5 ) + " cannot be greater than " + cNumericFields( 2 ) );
+				ShowContinueError( ".." + cNumericFields( 2 ) + " = " + TrimSigDigits( Numbers( 2 ), 7 ) );
+				ShowContinueError( ".." + cNumericFields( 5 ) + " = " + TrimSigDigits( Numbers( 5 ), 7 ) );
+				ErrorsFound = true;
+			}
+
+			PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = Numbers( 6 );
+			if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow < 0 && PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != AutoSize ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
+				ShowContinueError( " illegal " + cNumericFields( 6 ) + " = " + TrimSigDigits( Numbers( 6 ), 7 ) );
+				ErrorsFound = true;
+			}
+			//} else {
+			//	PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0.0;
+			//	PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0.0;
+			//	PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0.0;
+			//	if ( ! lNumericBlanks( 4 ) || ! lNumericBlanks( 5 ) || ! lNumericBlanks( 6 ) ) {
+			//		// user entered values for OA with no outdoor air mixer name specified
+			//		PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0.0;
+			//	}
+			//}
 
 			//Set the heat pump heating coil capacity
 			//  Get from coil module.
@@ -3340,6 +3286,8 @@ namespace PackagedTerminalHeatPump {
 			InNode = PTUnit( PTUnitNum ).AirInNode;
 			OutNode = PTUnit( PTUnitNum ).AirOutNode;
 			OutsideAirNode = PTUnit( PTUnitNum ).OutsideAirNode;
+			// set it here for use with ATM
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) { OutsideAirNode = PTUnit( PTUnitNum ).ATMixerPriNode;	}
 			RhoAir = StdRhoAir;
 			// set the mass flow rates from the input volume flow rates
 			PTUnit( PTUnitNum ).MaxCoolAirMassFlow = RhoAir * PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
@@ -3352,6 +3300,7 @@ namespace PackagedTerminalHeatPump {
 			// outside air mixer is optional, check that node num > 0
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRateMax = max( PTUnit( PTUnitNum ).CoolOutAirMassFlow, PTUnit( PTUnitNum ).HeatOutAirMassFlow );
+				Node( OutsideAirNode ).MassFlowRateMaxAvail = Node( OutsideAirNode ).MassFlowRateMax;
 				Node( OutsideAirNode ).MassFlowRateMin = 0.0;
 				Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
 			}
@@ -5165,6 +5114,7 @@ namespace PackagedTerminalHeatPump {
 
 		InletNode = PTUnit( PTUnitNum ).AirInNode;
 		OutsideAirNode = PTUnit( PTUnitNum ).OutsideAirNode;
+		if ( PTUnit( PTUnitNum ).ATMixerExists ) { OutsideAirNode = PTUnit( PTUnitNum ).ATMixerPriNode; }
 		AirRelNode = PTUnit( PTUnitNum ).AirReliefNode;
 
 		AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
@@ -5182,8 +5132,10 @@ namespace PackagedTerminalHeatPump {
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRate = AverageOAMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				if ( !PTUnit( PTUnitNum ).ATMixerExists ) {
+					Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
+					Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				}
 			}
 			if ( AverageUnitMassFlow > 0.0 ) {
 				OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
@@ -5196,7 +5148,9 @@ namespace PackagedTerminalHeatPump {
 			Node( InletNode ).MassFlowRate = 0.0;
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRate = 0.0;
-				Node( AirRelNode ).MassFlowRate = 0.0;
+				if ( !PTUnit( PTUnitNum ).ATMixerExists ) {
+					Node( AirRelNode ).MassFlowRate = 0.0;
+				}
 			}
 			OnOffAirFlowRatio = 0.0;
 
