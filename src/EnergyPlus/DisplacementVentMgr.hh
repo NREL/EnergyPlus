@@ -94,6 +94,19 @@ namespace DisplacementVentMgr {
 
 	//**************************************************************************************************
 
+	Real64
+	calculateThirdOrderFloorTemperature(
+		Real64 temperatureHistoryTerm,
+		Real64 HAT_floor,
+		Real64 HA_floor,
+		Real64 MCpT_Total,
+		Real64 MCp_Total,
+		Real64 occupiedTemp,
+		Real64 nonAirSystemResponse,
+		Real64 zoneMultiplier,
+		Real64 airCap
+	);
+
 	void
 	CalcUCSDDV( int const ZoneNum ); // Which Zonenum
 
