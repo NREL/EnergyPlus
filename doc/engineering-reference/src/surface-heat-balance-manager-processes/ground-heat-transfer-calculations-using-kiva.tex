@@ -289,9 +289,9 @@ calculations:
   history and likely take much longer to converge.
 \end{itemize}
 
-In light of these limitations, the ground is initialized using a
-steady-state solution with the boundary conditions defined at the
-beginning of the year.
+Instead, Kiva instances are initialized independently from the rest of the simulation using the accelerated initialization method developed by Kruis (2015). This method looks back in the weather file and simulates long timestep (on the order of weeks or months) calculations using an implicit numerical scheme. These long timesteps allow Kiva to capture a long term history of the ground without running the entire building model.
+
+The initialization of the ground relies on assumptions of indoor air temperatures (as they are not yet calculated by EnergyPlus). When a thermostat is assigned to a zone with Kiva foundation surfaces, the assumed temperature is equal to the setpoint (or a weighted average of heating and cooling setpoints depending on outdoor temperature). For zones without thermostats, a constant 22 \textsuperscript{o}C indoor temperature is assumed.
 
 \subsection{Validation}\label{validation}
 
@@ -304,16 +304,14 @@ accuracy within 3\% of the reference solutions (Kruis and Krarti, 2015).
 Framework for Improving Foundation Heat Transfer Calculations,'' Journal
 of Building Performance Simulation, vol.~8, no. 6, pp.~449-468, 2015.
 
-{[}2{]} N. Kruis and M. Krarti, ``Three-dimensional accuracy with
+{[}2{]} N. Kruis, ``Development and Application of a Numerical Framework for Improving Building Foundation Heat Transfer Calculations,''
+Ph.D. Dissertation. University of Colorado, 2015.
+
+{[}3{]} N. Kruis and M. Krarti, ``Three-dimensional accuracy with
 two-dimensional computation speed: using the Kiva\textsuperscript{TM}
 numerical framework to improve foundation heat transfer calculations,''
 Journal of Building Performance Simulation, vol.~10, no. 2, pp.~161?182,
 2017.
-
-{[}3{]} N. Kruis and M. Krarti, ``Three-Dimensional Accuracy with
-Two-Dimensional Computation Speed: Using the Kiva\textsuperscript{TM}
-Numerical Framework to Improve Foundation Heat Transfer Calculations,''
-Journal of Building Performance Simulation, in-publication.
 
 {[}4{]} T. Williams and A. Williamson, ``Estimating Water-Table
 Altitudes for Regional Ground-Water Flow Modeling, U.S. Gulf Coast,''
