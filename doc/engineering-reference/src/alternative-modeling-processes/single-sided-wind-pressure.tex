@@ -71,7 +71,7 @@ direction relative to the fa\c{c}ade is
 \end{equation}
 In these definitions, $\ang{0} \leq \varphi_n, \varphi_w \leq \ang{360}$, while
 $|\theta| \leq \ang{180}$. Note that if $\theta$ initially falls outside the range
-indicated it should be replaced by $\sgn(\theta) \left[|\theta| - \ang{360}\right]$.
+indicated it should be replaced by $\operatorname{sgn}(\theta) \left[|\theta| - \ang{360}\right]$.
 
 According to the above discussion, the flow rate is modeled as comprising two terms,
 arising, respectively, from the mean and fluctuating components of the pressure
@@ -124,8 +124,8 @@ The formulae for the components are as follows.
 \begin{equation}\label{eqn:ss-first-formula}
 \Pi(\theta) = 
 \begin{cases}
-0.44\sgn(\theta)\sin(2.67|\theta|),& |\theta| \leq \theta_0 \\
--0.69 \sgn(\theta)\sin(288-1.6|\theta|),& \theta_0\leq|\theta|\leq\ang{180}.
+0.44\operatorname{sgn}(\theta)\sin(2.67|\theta|),& |\theta| \leq \theta_0 \\
+-0.69 \operatorname{sgn}(\theta)\sin(288-1.6|\theta|),& \theta_0\leq|\theta|\leq\ang{180}.
 \end{cases}
 \end{equation}
 \begin{equation}\label{eqn:ss-second-formula}

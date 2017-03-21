@@ -85,7 +85,8 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/demand-limiting.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes/airflownetwork-model.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/slternative-modeling-processes/single-sided-wind-pressure.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes/room-air-models.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes/hybrid-model.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/engineering-reference-encyclopedia.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference/air-system-distribution-terminals.tex
