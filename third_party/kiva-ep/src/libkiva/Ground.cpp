@@ -128,18 +128,18 @@ void Ground::calculateADEUpwardSweep()
         case Cell::BOUNDARY:
           {
           double tilt;
-          if (domain.cell[i][j][k].surface.orientation == Surface::Z_POS)
+          if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_POS)
             tilt = 0;
-          else if (domain.cell[i][j][k].surface.orientation == Surface::Z_NEG)
+          else if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_NEG)
             tilt = PI;
           else
             tilt = PI/2.0;
 
-          switch (domain.cell[i][j][k].surface.boundaryConditionType)
+          switch (domain.cell[i][j][k].surfacePtr->boundaryConditionType)
           {
           case Surface::ZERO_FLUX:
             {
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               U[i][j][k] = UOld[i+1][j][k];
@@ -165,7 +165,7 @@ void Ground::calculateADEUpwardSweep()
 
           case Surface::CONSTANT_TEMPERATURE:
 
-            U[i][j][k] = domain.cell[i][j][k].surface.temperature;
+            U[i][j][k] = domain.cell[i][j][k].surfacePtr->temperature;
             break;
 
           case Surface::INTERIOR_TEMPERATURE:
@@ -185,10 +185,10 @@ void Ground::calculateADEUpwardSweep()
 
             double hc = getConvectionCoeff(TOld[i][j][k],
                     Tair,0.0,0.00208,false,tilt);  // TODO Make roughness a property of the interior surfaces
-            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,
+            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,
                                TOld[i][j][k],Tair);
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               U[i][j][k] = (domain.getKXP(i,j,k)*UOld[i+1][j][k]/domain.getDXP(i) +
@@ -225,10 +225,10 @@ void Ground::calculateADEUpwardSweep()
             double eSky = bcs.skyEmissivity;
             double F = getEffectiveExteriorViewFactor(eSky,tilt);
             double hc = getConvectionCoeff(TOld[i][j][k],Tair,v,foundation.surfaceRoughness,true,tilt);
-            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,TOld[i][j][k],Tair,eSky,tilt);
+            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,TOld[i][j][k],Tair,eSky,tilt);
             double q = domain.cell[i][j][k].heatGain;
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               U[i][j][k] = (domain.getKXP(i,j,k)*UOld[i+1][j][k]/domain.getDXP(i) +
@@ -338,18 +338,18 @@ void Ground::calculateADEDownwardSweep()
         case Cell::BOUNDARY:
           {
           double tilt;
-          if (domain.cell[i][j][k].surface.orientation == Surface::Z_POS)
+          if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_POS)
             tilt = 0;
-          else if (domain.cell[i][j][k].surface.orientation == Surface::Z_NEG)
+          else if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_NEG)
             tilt = PI;
           else
             tilt = PI/2.0;
 
-          switch (domain.cell[i][j][k].surface.boundaryConditionType)
+          switch (domain.cell[i][j][k].surfacePtr->boundaryConditionType)
           {
           case Surface::ZERO_FLUX:
             {
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               V[i][j][k] = V[i+1][j][k];
@@ -375,7 +375,7 @@ void Ground::calculateADEDownwardSweep()
 
           case Surface::CONSTANT_TEMPERATURE:
 
-            V[i][j][k] = domain.cell[i][j][k].surface.temperature;
+            V[i][j][k] = domain.cell[i][j][k].surfacePtr->temperature;
             break;
 
           case Surface::INTERIOR_TEMPERATURE:
@@ -395,10 +395,10 @@ void Ground::calculateADEDownwardSweep()
 
             double hc = getConvectionCoeff(TOld[i][j][k],
                     Tair,0.0,0.00208,false,tilt);
-            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,
+            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,
                                TOld[i][j][k],Tair);
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               V[i][j][k] = (domain.getKXP(i,j,k)*V[i+1][j][k]/domain.getDXP(i) +
@@ -435,10 +435,10 @@ void Ground::calculateADEDownwardSweep()
             double& eSky = bcs.skyEmissivity;
             double F = getEffectiveExteriorViewFactor(eSky,tilt);
             double hc = getConvectionCoeff(TOld[i][j][k],Tair,v,foundation.surfaceRoughness,true,tilt);
-            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,TOld[i][j][k],Tair,eSky,tilt);
+            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,TOld[i][j][k],Tair,eSky,tilt);
             double q = domain.cell[i][j][k].heatGain;
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               V[i][j][k] = (domain.getKXP(i,j,k)*V[i+1][j][k]/domain.getDXP(i) +
@@ -548,18 +548,18 @@ void Ground::calculateExplicit()
         case Cell::BOUNDARY:
           {
           double tilt;
-          if (domain.cell[i][j][k].surface.orientation == Surface::Z_POS)
+          if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_POS)
             tilt = 0;
-          else if (domain.cell[i][j][k].surface.orientation == Surface::Z_NEG)
+          else if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_NEG)
             tilt = PI;
           else
             tilt = PI/2.0;
 
-          switch (domain.cell[i][j][k].surface.boundaryConditionType)
+          switch (domain.cell[i][j][k].surfacePtr->boundaryConditionType)
           {
           case Surface::ZERO_FLUX:
             {
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               TNew[i][j][k] = TOld[i+1][j][k];
@@ -585,7 +585,7 @@ void Ground::calculateExplicit()
 
           case Surface::CONSTANT_TEMPERATURE:
 
-            TNew[i][j][k] = domain.cell[i][j][k].surface.temperature;
+            TNew[i][j][k] = domain.cell[i][j][k].surfacePtr->temperature;
             break;
 
           case Surface::INTERIOR_TEMPERATURE:
@@ -605,10 +605,10 @@ void Ground::calculateExplicit()
 
             double hc = getConvectionCoeff(TOld[i][j][k],
                     Tair,0.0,0.00208,false,tilt);
-            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,
+            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,
                                TOld[i][j][k],Tair);
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               TNew[i][j][k] = (domain.getKXP(i,j,k)*TOld[i+1][j][k]/domain.getDXP(i) +
@@ -645,10 +645,10 @@ void Ground::calculateExplicit()
             double& eSky = bcs.skyEmissivity;
             double F = getEffectiveExteriorViewFactor(eSky,tilt);
             double hc = getConvectionCoeff(TOld[i][j][k],Tair,v,foundation.surfaceRoughness,true,tilt);
-            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,TOld[i][j][k],Tair,eSky,tilt);
+            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,TOld[i][j][k],Tair,eSky,tilt);
             double q = domain.cell[i][j][k].heatGain;
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               TNew[i][j][k] = (domain.getKXP(i,j,k)*TOld[i+1][j][k]/domain.getDXP(i) +
@@ -777,18 +777,18 @@ void Ground::calculateMatrix(Foundation::NumericalScheme scheme)
         case Cell::BOUNDARY:
           {
           double tilt;
-          if (domain.cell[i][j][k].surface.orientation == Surface::Z_POS)
+          if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_POS)
             tilt = 0;
-          else if (domain.cell[i][j][k].surface.orientation == Surface::Z_NEG)
+          else if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_NEG)
             tilt = PI;
           else
             tilt = PI/2.0;
 
-          switch (domain.cell[i][j][k].surface.boundaryConditionType)
+          switch (domain.cell[i][j][k].surfacePtr->boundaryConditionType)
           {
           case Surface::ZERO_FLUX:
             {
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               A = 1.0;
@@ -849,7 +849,7 @@ void Ground::calculateMatrix(Foundation::NumericalScheme scheme)
             break;
           case Surface::CONSTANT_TEMPERATURE:
             A = 1.0;
-            bVal = domain.cell[i][j][k].surface.temperature;
+            bVal = domain.cell[i][j][k].surfacePtr->temperature;
 
             setAmatValue(index,index,A);
             setbValue(index,bVal);
@@ -875,10 +875,10 @@ void Ground::calculateMatrix(Foundation::NumericalScheme scheme)
 
             double hc = getConvectionCoeff(TOld[i][j][k],
                     Tair,0.0,0.00208,false,tilt);
-            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,
+            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,
                                TOld[i][j][k],Tair);
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               A = domain.getKXP(i,j,k)/domain.getDXP(i) + (hc + hr);
@@ -945,10 +945,10 @@ void Ground::calculateMatrix(Foundation::NumericalScheme scheme)
             double& eSky = bcs.skyEmissivity;
             double F = getEffectiveExteriorViewFactor(eSky,tilt);
             double hc = getConvectionCoeff(TOld[i][j][k],Tair,v,foundation.surfaceRoughness,true,tilt);
-            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,TOld[i][j][k],Tair,eSky,tilt);
+            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,TOld[i][j][k],Tair,eSky,tilt);
             double q = domain.cell[i][j][k].heatGain;
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               A = domain.getKXP(i,j,k)/domain.getDXP(i) + (hc + hr);
@@ -1245,18 +1245,18 @@ void Ground::calculateADI(int dim)
         case Cell::BOUNDARY:
           {
           double tilt;
-          if (domain.cell[i][j][k].surface.orientation == Surface::Z_POS)
+          if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_POS)
             tilt = 0;
-          else if (domain.cell[i][j][k].surface.orientation == Surface::Z_NEG)
+          else if (domain.cell[i][j][k].surfacePtr->orientation == Surface::Z_NEG)
             tilt = PI;
           else
             tilt = PI/2.0;
 
-          switch (domain.cell[i][j][k].surface.boundaryConditionType)
+          switch (domain.cell[i][j][k].surfacePtr->boundaryConditionType)
           {
           case Surface::ZERO_FLUX:
             {
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               A = 1.0;
@@ -1366,7 +1366,7 @@ void Ground::calculateADI(int dim)
             break;
           case Surface::CONSTANT_TEMPERATURE:
             A = 1.0;
-            bVal = domain.cell[i][j][k].surface.temperature;
+            bVal = domain.cell[i][j][k].surfacePtr->temperature;
 
             setAmatValue(index,index,A);
             setbValue(index,bVal);
@@ -1392,10 +1392,10 @@ void Ground::calculateADI(int dim)
 
             double hc = getConvectionCoeff(TOld[i][j][k],
                     Tair,0.0,0.00208,false,tilt);
-            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,
+            double hr = getSimpleInteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,
                                TOld[i][j][k],Tair);
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               A = domain.getKXP(i,j,k)/domain.getDXP(i) + (hc + hr);
@@ -1510,10 +1510,10 @@ void Ground::calculateADI(int dim)
             double eSky = bcs.skyEmissivity;
             double F = getEffectiveExteriorViewFactor(eSky,tilt);
             double hc = getConvectionCoeff(TOld[i][j][k],Tair,v,foundation.surfaceRoughness,true,tilt);
-            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,TOld[i][j][k],Tair,eSky,tilt);
+            double hr = getExteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,TOld[i][j][k],Tair,eSky,tilt);
             double q = domain.cell[i][j][k].heatGain;
 
-            switch (domain.cell[i][j][k].surface.orientation)
+            switch (domain.cell[i][j][k].surfacePtr->orientation)
             {
             case Surface::X_NEG:
               A = domain.getKXP(i,j,k)/domain.getDXP(i) + (hc + hr);
@@ -2014,7 +2014,7 @@ void Ground::calculateSurfaceAverages(){
             std::size_t k = std::get<2>(foundation.surfaces[s].indices[index]);
 
             double h = getConvectionCoeff(TNew[i][j][k],Tair,0.0,0.00208,false,tilt)
-                 + getSimpleInteriorIRCoeff(domain.cell[i][j][k].surface.emissivity,
+                 + getSimpleInteriorIRCoeff(domain.cell[i][j][k].surfacePtr->emissivity,
                      TNew[i][j][k],Tair);
 
             double& A = domain.cell[i][j][k].area;
@@ -2126,7 +2126,7 @@ std::vector<double> Ground::calculateHeatFlux(const size_t &i, const size_t &j, 
   {
     case Cell::BOUNDARY:
       {
-        switch (domain.cell[i][j][k].surface.orientation)
+        switch (domain.cell[i][j][k].surfacePtr->orientation)
         {
           case Surface::X_NEG:
             {
@@ -2566,7 +2566,7 @@ void Ground::setSolarBoundaryConditions()
         std::size_t j = std::get<1>(foundation.surfaces[s].indices[index]);
         std::size_t k = std::get<2>(foundation.surfaces[s].indices[index]);
 
-        double alpha = domain.cell[i][j][k].surface.absorptivity;
+        double alpha = domain.cell[i][j][k].surfacePtr->absorptivity;
 
         if (qGH > 0.0)
         {
