@@ -6025,10 +6025,12 @@ namespace DXCoils {
 						CompName = DXCoil( DXCoilNum ).Name;
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
 						SizingMethod = CoolingAirflowSizing;
+						DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
 						CompName = DXCoil( DXCoilNum ).Name;
 						PrintFlag = false;
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 						SizingMethod = HeatingAirflowSizing;
+						DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
 						CompName = DXCoil( DXCoilNum ).Name;
 						PrintFlag = false;
 					} else {
@@ -6819,29 +6821,66 @@ namespace DXCoils {
 				// Sizing rated air flow rate
 				if ( Mode == DXCoil( DXCoilNum ).NumOfSpeeds ) {
 					if ( CurSysNum > 0 ) {
-						if ( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
-						if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
+						if ( UnitarySysEqSizing.allocated() ) {
+							if( UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
+								MSRatedAirVolFlowRateDes = UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow;
+							} else {
+								if( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
+								if( !IsAutoSize && !SizingDesRunThisAirSys ) {
+									HardSizeNoDesRun = true;
+									if( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
+										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
+									}
+								} else {
+									CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+									if( CurOASysNum > 0 ) {
+										MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+									} else {
+										MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+									}
+								}
 							}
 						} else {
-							CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-							if ( CurOASysNum > 0 ) {
-								MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+							if( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
+							if( !IsAutoSize && !SizingDesRunThisAirSys ) {
+								HardSizeNoDesRun = true;
+								if( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
+									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
+								}
 							} else {
-								MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								CheckSysSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+								if( CurOASysNum > 0 ) {
+									MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+								} else {
+									MSRatedAirVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								}
 							}
 						}
-					} else if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
-							HardSizeNoDesRun = true;
-							if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
-								ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
+					} else if( CurZoneEqNum > 0 ) {
+						if ( ZoneEqSizing.allocated() ) {
+							if( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+								MSRatedAirVolFlowRateDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							} else {
+								if( !IsAutoSize && !SizingDesRunThisZone ) {
+									HardSizeNoDesRun = true;
+									if( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
+										ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
+									}
+								} else {
+									CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+									MSRatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+								}
 							}
 						} else {
-							CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
-							MSRatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							if( !IsAutoSize && !SizingDesRunThisZone ) {
+								HardSizeNoDesRun = true;
+								if( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > 0.0 ) {
+									ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " User-Specified Rated Air Flow Rate [m3/s]", DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) );
+								}
+							} else {
+								CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
+								MSRatedAirVolFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							}
 						}
 					}
 					if ( MSRatedAirVolFlowRateDes < SmallAirVolFlow ) {
@@ -6918,10 +6957,15 @@ namespace DXCoils {
 				}
 				if ( Mode == DXCoil( DXCoilNum ).NumOfSpeeds ) {
 					// Heating capacity is assumed to be equal to the cooling capacity
-					NumOfSpeedCompanion = DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).NumOfSpeeds;
-					MSRatedTotCapDes = DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).MSRatedTotCap( NumOfSpeedCompanion );
+					if ( DXCoil(DXCoilNum).CompanionUpstreamDXCoil > 0 ) {
+						NumOfSpeedCompanion = DXCoil(DXCoil(DXCoilNum).CompanionUpstreamDXCoil).NumOfSpeeds;
+						MSRatedTotCapDes = DXCoil(DXCoil(DXCoilNum).CompanionUpstreamDXCoil).MSRatedTotCap(NumOfSpeedCompanion);
+					} else {
+						MSRatedTotCapDes = DXCoil( DXCoilNum ).RatedTotCap( 1 ); // sized above
+					}
 				} else {
 					MSRatedTotCapDes = DXCoil( DXCoilNum ).MSRatedTotCap( DXCoil( DXCoilNum ).NumOfSpeeds ) * Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
+					MSRatedTotCapDes = max(0.0, MSRatedTotCapDes);
 				}
 				if ( IsAutoSize ) {
 					DXCoil( DXCoilNum ).MSRatedTotCap( Mode ) = MSRatedTotCapDes;
@@ -12860,7 +12904,7 @@ Label50: ;
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
-		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
+		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) || SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
 			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).MSRatedTotCap( DXCoil( WhichCoil ).NumOfSpeeds );
