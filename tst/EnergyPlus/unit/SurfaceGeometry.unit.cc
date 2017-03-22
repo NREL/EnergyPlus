@@ -645,7 +645,7 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 		"  1,                       !- Multiplier",
 		"  2.0,                     !- Ceiling Height {m}",
 		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
+		"  6.,                      !- Floor Area {m2}",
 		"  ,                        !- Zone Inside Convection Algorithm",
 		"  ,                        !- Zone Outside Convection Algorithm",
 		"  Yes;                     !- Part of Total Floor Area",
@@ -692,7 +692,7 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 	HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
 	SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
 
-	//compare_err_stream( "" ); // just for debugging
+	compare_err_stream( "" ); // just for debugging
 
 	EXPECT_FALSE( FoundError );
 

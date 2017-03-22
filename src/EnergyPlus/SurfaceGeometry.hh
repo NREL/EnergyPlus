@@ -349,6 +349,31 @@ namespace SurfaceGeometry {
 		DataVectorTypes::Polyhedron const & zonePoly
 	);
 
+	int
+	numberOfEdgesNotTwoForEnclosedVolumeTest(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqueVertices
+	);
+
+	void
+	makeListOfUniqueVertices(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> & uniqVertices
+	);
+
+	DataVectorTypes::Polyhedron
+	updateZonePolygonsForMissingColinearPoints(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqVertices
+	);
+
+	void
+	insertVertexOnFace(
+		DataVectorTypes::Face & face,
+		int const & indexBefore,
+		DataVectorTypes::Vector const & vertexToInsert
+	);
+
 	bool
 	areFloorAndCeilingSame(
 		DataVectorTypes::Polyhedron const & zonePoly
@@ -362,6 +387,13 @@ namespace SurfaceGeometry {
 	std::tuple< bool, bool, bool >
 	areSurfaceHorizAndVert(
 		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areOppositeWallsSame(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 & oppositeWallArea,
+		Real64 & distanceBetweenOppositeWalls
 	);
 
 	bool
@@ -379,7 +411,20 @@ namespace SurfaceGeometry {
 	int
 	findIndexOfVertex(
 		DataVectorTypes::Vector vertexToFind,
-		std::vector<Vector> listOfVertices
+		std::vector<DataVectorTypes::Vector> listOfVertices
+	);
+
+	Real64
+	distance(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	);
+
+	bool
+	isPointOnLineBetweenPoints(
+		DataVectorTypes::Vector start,
+		DataVectorTypes::Vector end,
+		DataVectorTypes::Vector test
 	);
 
 	void

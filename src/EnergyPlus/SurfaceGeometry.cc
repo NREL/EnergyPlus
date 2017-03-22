@@ -8567,13 +8567,11 @@ namespace SurfaceGeometry {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 MinimumVolume; // The minimum allowable Zone volume (equivalent to a ceiling height of 2.5 meters)
 		Real64 SumAreas; // Sum of the Zone surface areas that are not "internal mass"
 		Real64 SurfCount; // Surface Count
 		int SurfNum; // Loop counter for surfaces
 		int ZoneNum; // Loop counter for Zones
 		bool ErrorFlag;
-		Real64 TempVolume; // Temporary for calculating volume
 		Array1D_int surfacenotused;
 		int notused;
 		int NFaces;
@@ -8631,6 +8629,8 @@ namespace SurfaceGeometry {
 			bool isCeilingHorizontal;
 			bool areWallsVertical;
 			std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical)  = areSurfaceHorizAndVert( ZoneStruct );
+			Real64 oppositeWallArea;
+			Real64 distanceBetweenOppositeWalls;
 
 			bool areWallsSameHeight = areWallHeightSame( ZoneStruct );
 
@@ -8642,8 +8642,8 @@ namespace SurfaceGeometry {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
 			} else if ( isCeilingHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
 			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
-//			} else if ( areOppositeWallsSame( ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls ) {
-//				CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
+			} else if ( areOppositeWallsSame( ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls ) ) {
+				CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
 			} else if ( Zone( ZoneNum ).Volume == AutoCalculate ) { // no user entered zone volume
 				ShowSevereError("For zone: " + Zone( ZoneNum ).Name + " it is not possible to calculate the volume from the surrounding surfaces so either provide the volume value or define all the surfaces to fully enclose the zone.");
 				CalcVolume = 0.;
@@ -8669,7 +8669,7 @@ namespace SurfaceGeometry {
 							}
 							// Warn user of using specified Zone Volume
 							ShowWarningError( "Entered Volume entered for Zone=\"" + Zone( ZoneNum ).Name + "\" significantly different from calculated Volume" );
-							ShowContinueError( "Entered Zone Volume value=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) + ", Calculated Zone Volume value=" + RoundSigDigits( TempVolume, 2 ) + ", entered volume will be used in calculations." );
+							ShowContinueError( "Entered Zone Volume value=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) + ", Calculated Zone Volume value=" + RoundSigDigits( CalcVolume, 2 ) + ", entered volume will be used in calculations." );
 						}
 					}
 				}
@@ -8744,10 +8744,31 @@ namespace SurfaceGeometry {
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
-		using DataVectorTypes::Vector;
+		std::vector<Vector>  uniqueVertices;
+		makeListOfUniqueVertices( zonePoly, uniqueVertices);
 
-		std::vector<Vector> uniqueVertices;
-		uniqueVertices.reserve( zonePoly.NumSurfaceFaces * 6 );
+		int numEdgesNotUsedTwice = numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
+
+		// if all edges had two counts then it is fully enclosed
+		if ( numEdgesNotUsedTwice == 0 ) {
+			return true;
+		} else if ( numEdgesNotUsedTwice < 3 ) { // less than three means that it is not a colinear point issue
+			return false;
+		} else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the "other side" of the edge
+				 // Go through all the points looking for the number that are colinear and see if that is consistent with the number of edges found that didn't have a count of two
+			DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints( zonePoly, uniqueVertices ); // this is done after initial test since it is computationally intensive.
+			numEdgesNotUsedTwice = numberOfEdgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
+			return ( numEdgesNotUsedTwice == 0 );
+		}
+	}
+
+	int
+	numberOfEdgesNotTwoForEnclosedVolumeTest(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqueVertices
+	)
+	{
+		using DataVectorTypes::Vector;
 
 		struct EdgeByPts
 		{
@@ -8763,25 +8784,13 @@ namespace SurfaceGeometry {
 		std::vector<EdgeByPts> uniqueEdges;
 		uniqueEdges.reserve( zonePoly.NumSurfaceFaces * 6 );
 
-		// first make a list of all vertices
-		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
-			for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
-				Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
-				for ( auto unqV : uniqueVertices ) {
-					if ( !isAlmostEqual3dPt( curVertex, unqV ) ) {
-						uniqueVertices.emplace_back( curVertex );
-						break;
-					}
-				}
-			}
-		}
 		// construct list of unique edges
+		Vector curVertex;
+		int curVertexIndex;
 		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
 			Vector prevVertex;
 			int prevVertexIndex;
 			for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
-				Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
-				int curVertexIndex = findIndexOfVertex( curVertex, uniqueVertices );
 				if ( jVertex == 1 ) {
 					prevVertex = zonePoly.SurfaceFace( iFace ).FacePoints( zonePoly.SurfaceFace( iFace ).NSides ); // the last point
 					prevVertexIndex = findIndexOfVertex( prevVertex, uniqueVertices );
@@ -8789,8 +8798,10 @@ namespace SurfaceGeometry {
 					prevVertex = curVertex;
 					prevVertexIndex = curVertexIndex;
 				}
+				curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
+				curVertexIndex = findIndexOfVertex( curVertex, uniqueVertices );
 				int found = -1;
-				for ( int i = 0; i < uniqueEdges.size( ); i++ ) {
+				for ( std::size_t i = 0; i < uniqueEdges.size( ); i++ ) {
 					if ( ( uniqueEdges[ i ].start == curVertexIndex && uniqueEdges[ i ].end == prevVertexIndex ) || ( uniqueEdges[ i ].start == prevVertexIndex && uniqueEdges[ i ].end == curVertexIndex ) ) {
 						found = i;
 						break;
@@ -8809,14 +8820,101 @@ namespace SurfaceGeometry {
 		}
 		// All edges for an enclosed polyhedron should be shared by two (and only two) sides. 
 		// So if the count is not two for all edges, the polyhedron is not enclosed
-		bool edgeNotTwoFound = false;
+		int edgeNotTwoFoundCount = 0;
 		for ( auto anEdge : uniqueEdges ) {
 			if ( anEdge.count != 2 ) {
-				edgeNotTwoFound = true;
-				break;
+				++edgeNotTwoFoundCount;
 			}
 		}
-		return !edgeNotTwoFound;
+		return edgeNotTwoFoundCount;
+	}
+
+
+	void
+	makeListOfUniqueVertices(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> & uniqVertices
+	)
+	{
+		using DataVectorTypes::Vector;
+		uniqVertices.clear();
+		uniqVertices.reserve( zonePoly.NumSurfaceFaces * 6 );
+
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
+				Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
+				if ( uniqVertices.size( ) == 0 ) {
+					uniqVertices.emplace_back( curVertex );
+				} else {
+					bool found = false;
+					for ( auto unqV : uniqVertices ) {
+						if ( isAlmostEqual3dPt( curVertex, unqV ) ) {
+							found = true;
+							break;
+						}
+					}
+					if ( !found ) {
+						uniqVertices.emplace_back( curVertex );
+					}
+				}
+			}
+		}
+	}
+
+
+	DataVectorTypes::Polyhedron
+	updateZonePolygonsForMissingColinearPoints(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqVertices
+	)
+	{
+		using DataVectorTypes::Vector;
+
+		DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
+
+		for ( int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace ) {
+			bool faceUpdated = false;
+			DataVectorTypes::Face updFace = updZonePoly.SurfaceFace( iFace );
+			for ( int jVertex = updZonePoly.SurfaceFace( iFace ).NSides; jVertex > 1; --jVertex ) { // go through array from end
+				Vector curVertex = updZonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
+				Vector nextVertex;
+				if ( jVertex == updZonePoly.SurfaceFace( iFace ).NSides ) {
+					nextVertex = updZonePoly.SurfaceFace( iFace ).FacePoints( 1 );
+				} else {
+					nextVertex = updZonePoly.SurfaceFace( iFace ).FacePoints( jVertex + 1 );
+				}
+				// now go through all the vertices and see if they are colinear with start and end vertices
+				for ( auto testVertex : uniqVertices ) {
+					if ( !isAlmostEqual3dPt( curVertex, testVertex ) && !isAlmostEqual3dPt( nextVertex, testVertex ) ) {
+						if ( isPointOnLineBetweenPoints( curVertex, nextVertex, testVertex ) ) {
+							insertVertexOnFace( updFace, jVertex, testVertex );
+							faceUpdated = true;
+						}
+					}
+				}
+			}
+			if ( faceUpdated ) {
+				updZonePoly.SurfaceFace( iFace ) = updFace;
+			}
+		}
+		return updZonePoly;
+	}
+
+	void
+	insertVertexOnFace(
+		DataVectorTypes::Face & face,
+		int const & indexBefore,
+		DataVectorTypes::Vector const & vertexToInsert
+	)
+	{
+		int origNumSides = face.NSides;
+		DataVectorTypes::Vector emptyVector( 0., 0., 0. );
+		face.FacePoints.append(emptyVector); // just to add new item to the end of array
+		for (int i = origNumSides; i > indexBefore + 1; --i ){
+			face.FacePoints(i) = face.FacePoints(i - 1); // move existing items one location further
+		}
+		face.FacePoints(indexBefore + 1) = vertexToInsert;
+		++face.NSides;
 	}
 
 	bool
@@ -8829,6 +8927,7 @@ namespace SurfaceGeometry {
 		// so if you could all the unique vertices of the floor and ceiling, ignorign the z-coordinate, they 
 		// should always be even (they would be two but you might define multiple surfaces that meet in a corner)
 
+		using DataVectorTypes::Vector;
 		using DataVectorTypes::Vector_2d;
 
 		struct Vector2dCount: Vector_2d {
@@ -8943,6 +9042,42 @@ namespace SurfaceGeometry {
 		return std::make_tuple( isFlrHoriz , isClgHoriz, areWlVert );
 	}
 
+	bool
+	areOppositeWallsSame(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 & oppositeWallArea,
+		Real64 & distanceBetweenOppositeWalls 
+	)
+	{
+		using DataVectorTypes::Vector;
+
+		struct AzTilt 
+		{
+			Real64 azimuth;
+			Real64 tilt;
+			std::vector<int> listOfFaces;
+			AzTilt():
+				azimuth(0),
+				tilt(0)
+			{}
+		};
+
+		std::vector<AzTilt> uniqueAzimuthTilt;
+		uniqueAzimuthTilt.reserve(zonePoly.NumSurfaceFaces);
+
+		return false;
+
+		// gather the unique azimuths and tilts
+		//for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+		//	int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+		//	if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
+		//		AzTilt curAzTilt;
+		//		curAzTilt = 
+		//		if (Surface( curSurfNum ).Azimuth == 1){
+		//		}
+		//	}
+		//}
+	}
 
 	bool 
 	isAlmostEqual3dPt(
@@ -8968,15 +9103,35 @@ namespace SurfaceGeometry {
 	int
 	findIndexOfVertex(
 		DataVectorTypes::Vector vertexToFind,
-		std::vector<Vector> listOfVertices
+		std::vector<DataVectorTypes::Vector> listOfVertices
 	)
 	{
-		for ( int i = 0; i < listOfVertices.size( ); i++ ) {
+		for ( std::size_t i = 0; i < listOfVertices.size( ); i++ ) {
 			if ( isAlmostEqual3dPt( listOfVertices[ i ], vertexToFind ) ) {
 				return i;
 			}
 		}
 		return -1;
+	}
+
+	Real64
+	distance(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	)
+	{
+		return sqrt( pow(v1.x - v2.x, 2) + pow( v1.y - v2.y, 2 ) + pow( v1.z - v2.z, 2 ) );
+	}
+
+	bool
+	isPointOnLineBetweenPoints(
+		DataVectorTypes::Vector start,
+		DataVectorTypes::Vector end,
+		DataVectorTypes::Vector test
+	)
+	{
+		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		return ( abs( (distance(start, end ) - (distance(start, test ) + distance(test, end) ) ) ) < tol );
 	}
 
 	void
