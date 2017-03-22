@@ -16,6 +16,7 @@ set( test_src
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BoilerHotWater.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
