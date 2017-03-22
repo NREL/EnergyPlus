@@ -44,74 +44,65 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DisplacementVentMgr_hh_INCLUDED
-#define DisplacementVentMgr_hh_INCLUDED
+// EnergyPlus::Boilers Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-namespace DisplacementVentMgr {
+using namespace EnergyPlus;
+using namespace EnergyPlus::Boilers;
+using namespace EnergyPlus::DataSizing;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
+TEST_F( EnergyPlusFixture, Boiler_HotWaterSizingTest )
+{
+	// unit test for autosizing boiler nominal capacity in Boiler:HotWater
+	Boilers::Boiler.allocate( 1 );
+	// Hardsized Hot Water Boiler
+	Boilers::Boiler( 1 ).LoopNum = 1;
+	Boilers::Boiler( 1 ).SizFac = 1.2;
+	Boilers::Boiler( 1 ).NomCap = 40000.0;
+	Boilers::Boiler( 1 ).NomCapWasAutoSized = false;
+	Boilers::Boiler( 1 ).VolFlowRate = 1.0;
+	Boilers::Boiler( 1 ).VolFlowRateWasAutoSized = false;
+	Boilers::Boiler( 1 ).TempDesBoilerOut = 82.0;
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+	DataPlant::PlantLoop.allocate( 1 );
+	DataSizing::PlantSizData.allocate( 1 );
+	// Hot Water Loop
+	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
+	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
+	DataSizing::PlantSizData( 1 ).DeltaT = 10.0;
+	DataPlant::PlantFirstSizesOkayToFinalize = true;
+	//now call sizing routine
+	Boilers::SizeBoiler( 1 );
+	// see if boiler volume flow rate returned is hard-sized value
+	EXPECT_DOUBLE_EQ( Boilers::Boiler( 1 ).VolFlowRate, 1.0 );
+	// see if boiler nominal capacity returned is hard-sized value
+	EXPECT_DOUBLE_EQ( Boilers::Boiler( 1 ).NomCap, 40000.0 );
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Real64 HAT_MX; // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
-	extern Real64 HA_MX; // HA_MX Convection Coefficient times Area for the upper subzone
-	extern Real64 HAT_OC; // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
-	extern Real64 HA_OC; // HA_OC Convection Coefficient times Area for the lower subzone
-	extern Real64 HAT_FLOOR; // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
-	extern Real64 HA_FLOOR; // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
-	extern Real64 HeightFloorSubzoneTop; // Assumed thickness of floor subzone
-	extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
-	extern Real64 HeightIntMass; // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
-	extern Real64 HeightIntMassDefault; // Default height of internal mass surfaces
+	// Autosized Hot Water Boiler
+	Boilers::Boiler( 1 ).NomCapWasAutoSized = true;
+	Boilers::Boiler( 1 ).VolFlowRateWasAutoSized = true;
+	Boilers::Boiler( 1 ).NomCap = DataSizing::AutoSize;
+	Boilers::Boiler( 1 ).VolFlowRate = DataSizing::AutoSize;
+	//now call sizing routine
+	Boilers::SizeBoiler( 1 );
+	// see if boiler volume flow rate returned is autosized value
+	EXPECT_NEAR( Boilers::Boiler( 1 ).VolFlowRate, 1.2, 0.000001 );
+	// see if boiler nominal capacity returned is autosized value
+	EXPECT_NEAR( Boilers::Boiler( 1 ).NomCap, 50409257.0, 1.0 );
+	// clear
+	Boilers::Boiler.deallocate();
+	DataSizing::PlantSizData.deallocate();
+	DataPlant::PlantLoop.deallocate();
 
-	// SUBROUTINE SPECIFICATIONS:
-
-	// Functions
-
-	void
-	ManageUCSDDVModel( int const ZoneNum ); // index number for the specified zone
-
-	//**************************************************************************************************
-
-	void
-	InitUCSDDV( int const ZoneNum );
-
-	//**************************************************************************************************
-
-	void
-	HcUCSDDV(
-		int const ZoneNum,
-		Real64 const FractionHeight
-	);
-
-	//**************************************************************************************************
-
-	Real64
-	calculateThirdOrderFloorTemperature(
-		Real64 temperatureHistoryTerm,
-		Real64 HAT_floor,
-		Real64 HA_floor,
-		Real64 MCpT_Total,
-		Real64 MCp_Total,
-		Real64 occupiedTemp,
-		Real64 nonAirSystemResponse,
-		Real64 zoneMultiplier,
-		Real64 airCap
-	);
-
-	void
-	CalcUCSDDV( int const ZoneNum ); // Which Zonenum
-
-} // DisplacementVentMgr
-
-} // EnergyPlus
-
-#endif
+}
