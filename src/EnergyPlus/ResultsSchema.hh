@@ -41,6 +41,7 @@ namespace EnergyPlus {
 		class SimInfo : public BaseResultObject {
 		public:
 			void setProgramVersion(const std::string programVersion);
+			std::string getProgramVersion();
 			void setSimulationEnvironment(const std::string simulationEnvironment);
 			void setInputModelURI(const std::string inputModelURI);
 			void setStartDateTimeStamp(const std::string startDateTimeStamp);

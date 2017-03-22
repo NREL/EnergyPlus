@@ -47,247 +47,91 @@
 // EnergyPlus::OutputProcessor Unit Tests
 
 // Google Test Headers
-// Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneControls.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 
+//Fixture
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/OutAirNodeManager.hh>
 
-using namespace EnergyPlus::MixedAir;
-using namespace EnergyPlus::DataContaminantBalance;
-using namespace EnergyPlus::DataAirLoop;
-using namespace EnergyPlus::DataAirSystems;
-using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::ScheduleManager;
-using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DataZoneControls;
-using namespace EnergyPlus::HeatBalanceManager;
-using namespace EnergyPlus::Humidifiers;
-using namespace EnergyPlus::SizingManager;
+using namespace EnergyPlus::OutputProcessor;
+using namespace EnergyPlus::ResultsFramework;
 
 namespace EnergyPlus {
 
 
-	TEST_F( EnergyPlusFixture , Output1 ){
+	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject1){
 		std::string const idf_objects = delimited_string({
-				                                                 "Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
-				                                                 "Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
-				                                                 "Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
-				                                                 "Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
-				                                                 "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-				                                                 "Output:Meter,Electricity:Facility,timestep;",
-				                                                 "Output:Meter,Electricity:Facility,hourly;",
-				                                                 "Output:Meter,Electricity:Facility,daily;",
-				                                                 "Output:Meter,Electricity:Facility,monthly;",
-				                                                 "Output:Meter,Electricity:Facility,runperiod;",
+				                                                 "Output:JSON,",
+				                                                 "TimeSeriesAndTabular;",
 		                                                 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
-		if (ResultsFramework::OutputSchema->HRMeters.rDataFrameEnabled())
-			ResultsFramework::OutputSchema->HRMeters.setRDataFrameEnabled(false);
-		if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled())
-			ResultsFramework::OutputSchema->DYMeters.setRDataFrameEnabled(false);
-		if (ResultsFramework::OutputSchema->DYMeters.rVariablesScanned())
-			ResultsFramework::OutputSchema->DYMeters.setRVariablesScanned(false);
-		if (ResultsFramework::OutputSchema->MNMeters.rVariablesScanned())
-			ResultsFramework::OutputSchema->MNMeters.setRVariablesScanned(false);
-		if (ResultsFramework::OutputSchema->SMMeters.rVariablesScanned())
-			ResultsFramework::OutputSchema->SMMeters.setRVariablesScanned(false);
+		OutputSchema->setupOutputOptions();
 
-		DataGlobals::DayOfSim = 365;
-		DataGlobals::DayOfSimChr = "365";
-		DataEnvironment::Month = 12;
-		DataEnvironment::DayOfMonth = 31;
-		DataEnvironment::DSTIndicator = 0;
-		DataEnvironment::DayOfWeek = 3;
-		DataEnvironment::HolidayIndex = 0;
-		DataGlobals::HourOfDay = 24;
-		DataGlobals::NumOfDayInEnvrn = 365;
-		DataGlobals::MinutesPerTimeStep = 10;
+		EXPECT_TRUE( OutputSchema->timeSeriesAndTabularEnabled() );
+	}
 
-		if ( DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour ) {
-			DataGlobals::EndHourFlag = true;
-			if ( DataGlobals::HourOfDay == 24 ) {
-				DataGlobals::EndDayFlag = true;
-				if ( ( ! DataGlobals::WarmupFlag ) && ( DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn ) ) {
-					DataGlobals::EndEnvrnFlag = true;
-				}
-			}
-		}
-
-		if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
-			DataEnvironment::EndMonthFlag = true;
-		}
-
-		TimeValue.allocate( 2 );
-
-		auto timeStep = 1.0 / 6;
-
-		SetupTimePointers( "Zone", timeStep );
-		SetupTimePointers( "HVAC", timeStep );
-
-		TimeValue( 1 ).CurMinute = 50;
-		TimeValue( 2 ).CurMinute = 50;
-
-		EnergyPlus::sqlite = std::move( sqlite_test );
-		GetReportVariableInput();
-		SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
-		Real64 light_consumption = 999;
-		SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-		SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-		SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-		SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-		SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
-		Real64 zone_infil_total_loss = 999;
-		SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-		SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-		SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-		SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-		SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
-
-		UpdateMeterReporting();
-
-		UpdateDataandReport( DataGlobals::ZoneTSReporting );
-
-		sqlite_test = std::move( EnergyPlus::sqlite );
-
-		auto timeResults = queryResult("SELECT * FROM Time;", "Time");
-
-		std::vector< std::vector<std::string> > timeData({
-				                                                 {"1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
-				                                                 {"2", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
-				                                                 {"3", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
-				                                                 {"4", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
-				                                                 {"5", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
+	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject2){
+		std::string const idf_objects = delimited_string({
+				                                                 "Output:JSON,",
+				                                                 "TimeSeries;",
 		                                                 });
 
-		EXPECT_EQ( timeData, timeResults );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
-		auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+		OutputSchema->setupOutputOptions();
 
-		std::vector< std::vector<std::string> > reportDataDictionary({
-				                                                             { "1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Zone Timestep", "", "C" },
-				                                                             { "2", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C" },
-				                                                             { "3", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Daily", "", "C" },
-				                                                             { "4", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Monthly", "", "C" },
-				                                                             { "5", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" },
-				                                                             { "7", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Zone Timestep", "", "J" },
-				                                                             { "8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
-				                                                             { "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
-				                                                             { "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
-				                                                             { "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
-		                                                             });
+		EXPECT_TRUE( OutputSchema->timeSeriesEnabled() );
+		//compare_json_stream( "" );
+	}
 
-		EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+	TEST_F( EnergyPlusFixture , JsonOutput_ParseJson_getJson){
+		std::string const idf_objects = delimited_string({
+				                                                 "Output:JSON,",
+				                                                 "TimeSeries;",
+		                                                 });
 
-		auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
-		auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		OutputSchema->setupOutputOptions();
 
-		std::vector< std::vector<std::string> > reportData({
-				                                                   { "1", "1", "1", "0.0" },
-				                                                   { "2", "1", "7", "4995.0" },
-				                                                   { "3", "2", "2", "0.0" },
-				                                                   { "4", "2", "8", "4995.0" },
-				                                                   { "5", "3", "3", "0.0" },
-				                                                   { "6", "3", "9", "4995.0" },
-				                                                   { "7", "4", "4", "0.0" },
-				                                                   { "8", "4", "10", "4995.0" },
-				                                                   { "9", "5", "5", "0.0" },
-				                                                   { "10", "5", "11", "4995.0" },
-		                                                   });
 
-		std::vector< std::vector<std::string> > reportExtendedData({
-				                                                           { "1", "5", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
-				                                                           { "2", "6", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
-				                                                           { "3", "7", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
-				                                                           { "4", "8", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
-				                                                           { "5", "9", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
-				                                                           { "6", "10", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }
-		                                                           });
+		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
+		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
+		OutputSchema->SimulationInformation.setUUID("b307f053-6c0a-8ca8-4d76-81841cd48f20");
+		OutputSchema->SimulationInformation.setInputModelURI("");
+		OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
+		OutputSchema->SimulationInformation.setNumErrorsSummary("1","2");
+		OutputSchema->SimulationInformation.setNumErrorsSizing("0","0");
+		OutputSchema->SimulationInformation.setNumErrorsWarmup("0","2");
+		OutputSchema->SimulationInformation.setSimulationEnvironment("");
 
-		EXPECT_EQ( reportData, reportDataResults );
-		EXPECT_EQ( reportExtendedData, reportExtendedDataResults );
-
-		compare_eso_stream( delimited_string( {
-				                                      "1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
-				                                      "2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
-				                                      "3,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
-				                                      "4,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				                                      "5,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-				                                      "7,1,Electricity:Facility [J] !TimeStep",
-				                                      "8,1,Electricity:Facility [J] !Hourly",
-				                                      "9,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
-				                                      "10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				                                      "11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-				                                      ",365,12,31, 0,24,50.00,60.00,Tuesday",
-				                                      "1,0.0",
-				                                      "7,4995.0",
-				                                      ",365,12,31, 0,24, 0.00,60.00,Tuesday",
-				                                      "2,0.0",
-				                                      "8,4995.0",
-				                                      ",365,12,31, 0,Tuesday",
-				                                      "3,0.0,0.0,24,60,0.0,24,60",
-				                                      "9,4995.0,4995.0,24,60,4995.0,24,60",
-				                                      ",365,12",
-				                                      "4,0.0,0.0,31,24,60,0.0,31,24,60",
-				                                      "10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
-				                                      ",365",
-				                                      "5,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				                                      "11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
-		                                      } ) );
-
-		compare_mtr_stream( delimited_string( {
-				                                      "7,1,Electricity:Facility [J] !TimeStep",
-				                                      "8,1,Electricity:Facility [J] !Hourly",
-				                                      "9,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
-				                                      "10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				                                      "11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-				                                      ",365,12,31, 0,24,50.00,60.00,Tuesday",
-				                                      "7,4995.0",
-				                                      ",365,12,31, 0,24, 0.00,60.00,Tuesday",
-				                                      "8,4995.0",
-				                                      ",365,12,31, 0,Tuesday",
-				                                      "9,4995.0,4995.0,24,60,4995.0,24,60",
-				                                      ",365,12",
-				                                      "10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
-				                                      ",365",
-				                                      "11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
-		                                      } ) );
-
-		compare_json_stream( delimited_string ({
-				                                       "{",
-				                                       "}"
-		                                       }) );
+		json result = OutputSchema->SimulationInformation.getJSON();
+		json expectedResult = R"( {
+					"ErrorSummary": {
+						"NumSevere": "2",
+								"NumWarnings": "1"
+					},
+					"ErrorSummarySizing": {
+						"NumSevere": "0",
+								"NumWarnings": "0"
+					},
+					"ErrorSummaryWarmup": {
+						"NumSevere": "2",
+								"NumWarnings": "0"
+					},
+					"InputModelURI": "",
+					"ProgramVersion": "EnergyPlus, Version 8.6.0-0f5a10914b",
+					"RunTime": "00hr 08min  6.67sec",
+					"SimulationEnvironment": "",
+					"StartDateTimeStamp": "2017.03.22 11:03",
+					"UUID": "b307f053-6c0a-8ca8-4d76-81841cd48f20"
+		} )"_json;
+		EXPECT_EQ( result.dump(), expectedResult.dump() );
+		//compare_json_stream( "" );
 	}
 
 }

@@ -101,6 +101,10 @@ namespace EnergyPlus {
 			ProgramVersion = programVersion;
 		}
 
+		std::string SimInfo::getProgramVersion() {
+			return ProgramVersion;
+		}
+
 		void SimInfo::setSimulationEnvironment(const std::string simulationEnvironment) {
 			SimulationEnvironment = simulationEnvironment;
 		}
@@ -374,7 +378,7 @@ namespace EnergyPlus {
 			vals.reserve(10000);
 
 			// if DataFrame is enabled and control reaches here, there must be at least one o/p variable
-			assert(TS.size() == variableMap.begin()->second->values().size());
+			//assert(TS.size() == variableMap.begin()->second->values().size());
 
 			for (int row = 0; row < TS.size(); ++row) {
 				vals.clear();
@@ -983,7 +987,7 @@ namespace EnergyPlus {
 
 			if(DataGlobals::json_stream){
 				*(DataGlobals::json_stream) << std::setw(4) << root << std::endl;
-				gio::close(DataGlobals::OutputFileJson);
+				//gio::close(DataGlobals::OutputFileJson);
 				DataGlobals::json_stream = nullptr;
 			}
 		}
