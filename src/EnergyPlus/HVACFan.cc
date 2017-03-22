@@ -877,8 +877,8 @@ namespace HVACFan {
 							fanPoweratLowMinimum = powerFractionAtLowMin * m_maxAirMassFlowRate * localPressureRise[ mode ] / ( localFanTotEff * m_rhoAirStdInit );
 							localfanPower = locFlowRatio * fanPoweratLowMinimum / minFlowFracLimitFanHeat;
 						}
-						m_fanPower += localfanPower;
 					}
+					m_fanPower += localfanPower;
 					break;
 				} // continuous speed control case
 				case SpeedControlMethod::NotSet: {
