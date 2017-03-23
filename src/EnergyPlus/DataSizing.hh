@@ -630,6 +630,7 @@ namespace DataSizing {
 			EMSOverrideDesHeatVolOn( false ),
 			EMSValueDesHeatVolFlow( 0.0 ),
 			DesCoolVolFlow( 0.0 ),
+			NonAirSysDesCoolVolFlow( 0.0 ),
 			EMSOverrideDesCoolVolOn( false ),
 			EMSValueDesCoolVolFlow( 0.0 ),
 			DesHeatVolFlowMax( 0.0 ),
