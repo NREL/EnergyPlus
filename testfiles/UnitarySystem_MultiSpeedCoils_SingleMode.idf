@@ -1631,7 +1631,7 @@ Fan:SystemModel,
    FanAndCoilAvailSched , !- Availability Schedule Name
   Mixed Air Node,  !- Air Inlet Node Name
   DX Cooling Coil Air Inlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
+  1.7 , !- Design Maximum Air Flow Rate
   Continuous , !- Speed Control Method
   0.0, !- Electric Power Minimum Flow Rate Fraction
   300.0, !- Design Pressure Rise

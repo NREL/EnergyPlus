@@ -130,9 +130,9 @@ namespace HVACFan {
 		Optional_bool_const zoneCompTurnFansOn, // can be used as turn fans ON signal from ZoneHVAC component
 		Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
 		Optional< Real64 const > pressureRise, // Pressure difference to use for DeltaPress, for rating DX coils at a different pressure without entire duct system
-		Optional< Real64 const > flowRatio1, // Flow ratio in operating mode 1
+		Optional< Real64 const > massFlowRate1, // Mass flow rate in operating mode 1 [kg/s]
 		Optional< Real64 const > runTimeFraction1, // Run time fraction in operating mode 1
-		Optional< Real64 const > flowRatio2, // Flow ratio in operating mode 2
+		Optional< Real64 const > massFlowRate2, // Mass flow rate in operating mode 2 [kg/s]
 		Optional< Real64 const > runTimeFraction2, // Run time fraction in opearating mode 2
 		Optional< Real64 const > pressureRise2 // Pressure difference for operating mode 2
 	)
@@ -158,9 +158,13 @@ namespace HVACFan {
 			m_objTurnFansOn = DataHVACGlobals::TurnFansOn;
 			m_objTurnFansOff = DataHVACGlobals::TurnFansOff;
 		}
-		if ( present( pressureRise ) &&  present( flowRatio1 ) && present( runTimeFraction1 ) && present( flowRatio2 ) && present( runTimeFraction2 ) && present( pressureRise2 ) ) {
+		if ( present( pressureRise ) &&  present( massFlowRate1 ) && present( runTimeFraction1 ) && present( massFlowRate2 ) && present( runTimeFraction2 ) && present( pressureRise2 ) ) {
+			Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;
+			Real64 flowRatio2 = massFlowRate2 / m_maxAirMassFlowRate;
 			calcSimpleSystemFan( _, pressureRise, flowRatio1, runTimeFraction1, flowRatio2, runTimeFraction2, pressureRise2 );
-		} else if ( !present( pressureRise ) &&  present( flowRatio1 ) && present( runTimeFraction1 ) && present( flowRatio2 ) && present( runTimeFraction2 ) && !present( pressureRise2 ) ) {
+		} else if ( !present( pressureRise ) &&  present( massFlowRate1 ) && present( runTimeFraction1 ) && present( massFlowRate2 ) && present( runTimeFraction2 ) && !present( pressureRise2 ) ) {
+			Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;
+			Real64 flowRatio2 = massFlowRate2 / m_maxAirMassFlowRate;
 			calcSimpleSystemFan( flowFraction, _, flowRatio1, runTimeFraction1, flowRatio2, runTimeFraction2, _ );
 		} else if ( present( pressureRise ) &&  present( flowFraction ) ) {
 			calcSimpleSystemFan( flowFraction, pressureRise, _, _, _, _, _ );
@@ -622,6 +626,7 @@ namespace HVACFan {
 		std::vector< Real64 > localFlowRatio;
 		std::vector< Real64 > localRunTimeFrac;
 		bool localUseFlowRatiosAndRunTimeFracs = false;
+		static bool localMismatchErrorShown = false;
 
 		int localNumModes = 1; // Number of operating modes, 1 or 2 ( e.g. heating, ventilating, cooling)
 		if ( present( flowRatio2 ) && present( runTimeFrac2 ) ) localNumModes = 2;
@@ -629,6 +634,13 @@ namespace HVACFan {
 		localAirMassFlow.resize( 2, 0.0 );
 		localFlowRatio.resize( 2, 0.0 );
 		localRunTimeFrac.resize( 2, 1.0 );
+
+		Real64 massFlowFromFlowRatios = ( m_maxAirMassFlowRate * ( flowRatio1 * runTimeFrac1 + flowRatio2 * runTimeFrac2 ) );
+		if ( abs ( m_inletAirMassFlowRate - massFlowFromFlowRatios ) > DataHVACGlobals::SmallMassFlow ) {
+			if( !localMismatchErrorShown ) ShowWarningError( "Flow rate mismatch in calcSimpleSystemFan (only first instance is reported)" );
+			localMismatchErrorShown = true;
+		}
+
 
 		if ( DataHVACGlobals::NightVentOn ) {
 		// assume if non-zero inputs for night data then this fan is to be used with that data

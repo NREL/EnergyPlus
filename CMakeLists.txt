@@ -84,7 +84,7 @@ if( BUILD_TESTING )
       set( ARCH_FLAG "" )
     endif()
 
-    set( REGRESSION_BASELINE_SHA "" CACHE STRING "SHA of baseline comparison" )
+    set( REGRESSION_BASELINE_SHA "ba9e01f" CACHE STRING "SHA of baseline comparison" )
     set( COMMIT_SHA "" CACHE STRING "Commit sha of this build" )
     set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
     set( REGRESSION_BASELINE_PATH "" CACHE PATH "Path to energyplus baseline folder to compare against" )
