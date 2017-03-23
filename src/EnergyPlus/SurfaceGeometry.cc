@@ -8924,7 +8924,7 @@ namespace SurfaceGeometry {
 	{
 		// check if the floor and ceiling are the same
 		// this is almost equivent to saying, if you ignore the z-coordinate, are the vertices the same
-		// so if you could all the unique vertices of the floor and ceiling, ignorign the z-coordinate, they 
+		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they 
 		// should always be even (they would be two but you might define multiple surfaces that meet in a corner)
 
 		using DataVectorTypes::Vector;
@@ -8940,7 +8940,7 @@ namespace SurfaceGeometry {
 		std::vector<Vector2dCount> floorCeilingXY;
 		floorCeilingXY.reserve( zonePoly.NumSurfaceFaces * 6 );
 
-		// make list of x and y coordinates for all faces that are on the floor
+		// make list of x and y coordinates for all faces that are on the floor or ceiling
 		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
 			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
 			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor || Surface( curSurfNum ).Class == SurfaceClass_Roof ) {
@@ -9045,39 +9045,88 @@ namespace SurfaceGeometry {
 	bool
 	areOppositeWallsSame(
 		DataVectorTypes::Polyhedron const & zonePoly,
-		Real64 & oppositeWallArea,
-		Real64 & distanceBetweenOppositeWalls 
+		Real64 & oppositeWallArea,  // return the area of the wall that has an opposite wall
+		Real64 & distanceBetweenOppositeWalls //returns distance
 	)
 	{
+		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the 
+		// vertices( one counting backwards ) and if it is the same distance than assume that it is the same.
 		using DataVectorTypes::Vector;
+		bool foundOppEqual = false;
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+			if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
+				std::vector<int> facesAtAz = listOfFacesFacingAzimuth( zonePoly, Surface( curSurfNum ).Azimuth );
+				bool allFacesEquidistant = true;
+				oppositeWallArea = 0.;
+				for ( auto curFace : facesAtAz ) {
+					int possOppFace = findPossibleOppositeFace( zonePoly, curFace );
+					oppositeWallArea += Surface( zonePoly.SurfaceFace( curFace ).SurfNum ).Area;
+					if ( !areCornersEquidistant( zonePoly, curFace, possOppFace, distanceBetweenOppositeWalls ) ) {
+						allFacesEquidistant = false;
+						break;
+					}
+				}
+				if ( allFacesEquidistant ) {
+					foundOppEqual = true;
+					break; // only need to find the first case where opposite walls are the same
+				}
+			}
+		}
+		return foundOppEqual;
+    }
 
-		struct AzTilt 
-		{
-			Real64 azimuth;
-			Real64 tilt;
-			std::vector<int> listOfFaces;
-			AzTilt():
-				azimuth(0),
-				tilt(0)
-			{}
-		};
+	std::vector<int> 
+	listOfFacesFacingAzimuth(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 const & azimuth
+	)
+	{
+		std::vector<int> facingAzimuth;
+		facingAzimuth.reserve(zonePoly.NumSurfaceFaces);
 
-		std::vector<AzTilt> uniqueAzimuthTilt;
-		uniqueAzimuthTilt.reserve(zonePoly.NumSurfaceFaces);
-
-		return false;
-
-		// gather the unique azimuths and tilts
-		//for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
-		//	int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
-		//	if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
-		//		AzTilt curAzTilt;
-		//		curAzTilt = 
-		//		if (Surface( curSurfNum ).Azimuth == 1){
-		//		}
-		//	}
-		//}
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+			if ( abs( Surface( curSurfNum ).Azimuth - azimuth ) < 1. ) {
+				facingAzimuth.emplace_back( iFace );
+			}
+		}
+		return facingAzimuth;
 	}
+
+	int 
+	findPossibleOppositeFace(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex 
+	)
+	{
+		int selectedSurNum = zonePoly.SurfaceFace( faceIndex ).SurfNum;
+		Real64 selectedAzimuth = Surface( selectedSurNum ).Azimuth;
+		Real64 oppositeAzimuth = Real64((int(selectedAzimuth) + 180 ) % 360);
+		Real64 selectedArea = Surface( selectedSurNum ).Area;
+		int found = -1;
+
+		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
+			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
+			if ( ( abs(Surface( curSurfNum ).Area - selectedArea) < 0.01) && ( abs( Surface( curSurfNum ).Azimuth - oppositeAzimuth ) < 1. ) ){
+				found = iFace;
+				break;
+			}
+		}
+		return found;
+	}
+
+	bool
+	areCornersEquidistant(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex,
+		int const & opFaceIndex,
+		Real64 & distanceBetween
+	)
+	{
+
+	}
+
 
 	bool 
 	isAlmostEqual3dPt(

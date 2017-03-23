@@ -396,6 +396,26 @@ namespace SurfaceGeometry {
 		Real64 & distanceBetweenOppositeWalls
 	);
 
+	std::vector<int>
+	listOfFacesFacingAzimuth(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 const & azimuth
+	);
+
+	int
+	findPossibleOppositeFace(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex
+	);
+
+	bool
+	areCornersEquidistant(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex,
+		int const & opFaceIndex,
+		Real64 & distanceBetween
+	);
+
 	bool
 	isAlmostEqual3dPt(
 		DataVectorTypes::Vector v1,
