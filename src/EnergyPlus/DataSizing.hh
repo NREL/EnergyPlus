@@ -450,21 +450,22 @@ namespace DataSizing {
 		Real64 DesCoolOAFlowFrac; // zone design cooling OA air volume fraction [-]
 		bool EMSOverrideDesCoolMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolMassFlow; // Value EMS directing to use for Design Cooling air mass flow [kg/s]
-		Real64 DesHeatLoad; // zone design heating load [W]
-		Real64 NonAirSysDesHeatLoad; // same as zone design heating load without special multipliers from Sizing:Zone object [W]
+		Real64 DesHeatLoad; // zone design heating load including sizing factor and scaled to match airflow sizing [W]
+		Real64 NonAirSysDesHeatLoad; // base zone design heating load including sizing factor [W]
 		bool EMSOverrideDesHeatLoadOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatLoad; // Value EMS directing to use for zone design heating load  [W]
-		Real64 DesCoolLoad; // zone design cooling load [W]
-		Real64 NonAirSysDesCoolLoad; // same as zone design cooling load without special multipliers from Sizing:Zone object [W]
+		Real64 DesCoolLoad; // zone design cooling load including sizing factor and scaled to match airflow sizing [W]
+		Real64 NonAirSysDesCoolLoad; // base zone design cooling load including sizing factor [W]
 		bool EMSOverrideDesCoolLoadOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolLoad; // Value EMS directing to use for zone design cooling load  [W]
 		Real64 DesHeatDens; // zone design heating air density [kg/m3]
 		Real64 DesCoolDens; // zone design cooling air density [kg/m3]
-		Real64 DesHeatVolFlow; // zone design heating air volume flow rate [m3/s]
-		Real64 NonAirSysDesHeatVolFlow; // zone design heating air volume flow rate without scaling adjustment in Sizing:Zone [m3/s]
+		Real64 DesHeatVolFlow; // zone design heating air volume flow rate including sizing factor and scaled to match airflow sizing [m3/s]
+		Real64 NonAirSysDesHeatVolFlow; // base zone design heating air volume flow rate including sizing factor [m3/s]
 		bool EMSOverrideDesHeatVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatVolFlow; // Value EMS directing to use for Design Heating air volume flow [m3/s]
 		Real64 DesCoolVolFlow; // zone design cooling air volume flow rate [m3/s]
+		Real64 NonAirSysDesCoolVolFlow; // base zone design cooling air volume flow rate including sizing factor [m3/s]
 		bool EMSOverrideDesCoolVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolVolFlow; // Value EMS directing to use for Design cooling air volume flow [m3/s]
 		Real64 DesHeatVolFlowMax; // zone design heating maximum air volume flow rate [m3/s]
