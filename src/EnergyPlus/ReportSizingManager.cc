@@ -722,10 +722,16 @@ namespace ReportSizingManager {
 					} else if ( ZoneEqUnitHeater || ZoneEqVentedSlab ) {  // for unit ventilator the cp value is calculated at 5.05(InitConvTemp) for the child and 60.0C for the unit ventilator //|| ZoneEqUnitVent
 						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow;
 					} else {
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
+						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow * StdRhoAir;
+						} else {
+							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						}
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 						if ( DesCoilLoad >= SmallLoad ) {
 							Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
@@ -1094,10 +1100,16 @@ namespace ReportSizingManager {
 						NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
 						// if coil is part of a zonal unit, calc coil load to get hot water flow rate
 					} else {
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
+						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow * StdRhoAir;
+						} else {
+							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						}
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 						NominalCapacityDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 					}
 					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
@@ -1123,7 +1135,13 @@ namespace ReportSizingManager {
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataWaterFlowUsedForSizing * DataWaterCoilSizHeatDeltaT * Cp * rho;
 					} else {
-						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
+						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow * StdRhoAir;
+						} else {
+							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						}
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
@@ -1144,6 +1162,10 @@ namespace ReportSizingManager {
 						AutosizeDes = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow * TermUnitSizing( CurZoneEqNum ).ReheatAirFlowMult;
 					} else if ( ZoneEqFanCoil ) {
 						AutosizeDes = StdRhoAir * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+					} else if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
+					} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow * StdRhoAir;
 					} else {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 					}
