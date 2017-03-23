@@ -635,13 +635,6 @@ namespace HVACFan {
 		localFlowRatio.resize( 2, 0.0 );
 		localRunTimeFrac.resize( 2, 1.0 );
 
-		Real64 massFlowFromFlowRatios = ( m_maxAirMassFlowRate * ( flowRatio1 * runTimeFrac1 + flowRatio2 * runTimeFrac2 ) );
-		if ( abs ( m_inletAirMassFlowRate - massFlowFromFlowRatios ) > DataHVACGlobals::SmallMassFlow ) {
-			if( !localMismatchErrorShown ) ShowWarningError( "Flow rate mismatch in calcSimpleSystemFan (only first instance is reported)" );
-			localMismatchErrorShown = true;
-		}
-
-
 		if ( DataHVACGlobals::NightVentOn ) {
 		// assume if non-zero inputs for night data then this fan is to be used with that data
 			if ( m_nightVentPressureDelta > 0.0 ) { 
@@ -686,6 +679,12 @@ namespace HVACFan {
 				localAirMassFlow[ 0 ] = localFlowRatio[ 0 ] * m_maxAirMassFlowRate * localRunTimeFrac[ 0 ];
 				localFlowRatio[ 1 ] = flowRatio2;
 				localAirMassFlow[ 1 ] = localFlowRatio[ 1 ] * m_maxAirMassFlowRate * localRunTimeFrac[ 1 ];
+
+				Real64 massFlowFromFlowRatios = ( m_maxAirMassFlowRate * ( flowRatio1 * runTimeFrac1 + flowRatio2 * runTimeFrac2 ) );
+				if ( abs ( m_inletAirMassFlowRate - massFlowFromFlowRatios ) > DataHVACGlobals::SmallMassFlow ) {
+					if( !localMismatchErrorShown ) ShowWarningError( "Flow rate mismatch in calcSimpleSystemFan (only first instance is reported)" );
+					localMismatchErrorShown = true;
+				}
 			} else {
 				localRunTimeFrac[ 0 ] = 1.0; // if runTimeFracs are not present, assume single-mode operation
 				localRunTimeFrac[ 1 ] = 0.0; // if runTimeFracs are not present, assume single-mode operation
