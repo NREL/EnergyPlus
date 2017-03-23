@@ -419,8 +419,10 @@ namespace ReportSizingManager {
 		std::string ScalableSM; // scalable sizing methods label for reporting
 		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
 		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+		Real64 rRawDesValue; // used to pass final sizing information to warning messages
 
 		AutosizeDes = 0.0;
+		rRawDesValue = 0.0;
 		AutosizeUser = 0.0;
 		IsAutoSize = false;
 		OASysFlag = false;
@@ -584,7 +586,16 @@ namespace ReportSizingManager {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 							}
 						}
-					}
+					}}
+					//save raw sizing data for warning messages only if they were overwritten by parent object override
+					if( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow > 0.0 || ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow > 0.0 || ZoneEqSizing( CurZoneEqNum ).SystemAirFlow > 0.0 ) {
+						if( ZoneCoolingOnlyFan ) {
+							rRawDesValue = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+						} else if( ZoneHeatingOnlyFan ) {
+							rRawDesValue = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+						} else {
+							rRawDesValue = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+						}
 					}
 				} else if ( SizingType == CoolingAirflowSizing || SizingType == HeatingAirflowSizing ) {
 					{ auto const SELECT_CASE_var( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType ) );
@@ -687,6 +698,22 @@ namespace ReportSizingManager {
 							AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 						}
 					}}
+					//save raw sizing data for warning messages only if they were overwritten by parent object override
+					if( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow > 0.0 || ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow > 0.0 || ZoneEqSizing( CurZoneEqNum ).SystemAirFlow > 0.0 ) {
+						if( ZoneCoolingOnlyFan ) {
+							rRawDesValue = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+						} else if( ZoneHeatingOnlyFan ) {
+							rRawDesValue = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+						} else if( SizingType == CoolingAirflowSizing && SizingType == HeatingAirflowSizing ) {
+							rRawDesValue = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+						} else if( SizingType == CoolingAirflowSizing ) {
+							rRawDesValue = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+						} else if( SizingType == HeatingAirflowSizing ) {
+							rRawDesValue = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+						} else {
+							rRawDesValue = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+						}
+					}
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
 					Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 5.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
@@ -2160,6 +2187,8 @@ namespace ReportSizingManager {
 		} else {
 			AutosizeUser = SizingResult;
 		}
+		if ( rRawDesValue > 0.0 && AutosizeUser > 0.0 ) AutosizeDes = rRawDesValue; // revert to raw design value for warning messages
+
 		if ( DataScalableSizingON ) {
 			if ( SizingType == CoolingAirflowSizing || SizingType == HeatingAirflowSizing || SizingType == SystemAirflowSizing ) {
 				{ auto const SELECT_CASE_var( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType ) );
@@ -2181,7 +2210,7 @@ namespace ReportSizingManager {
 			{ auto const SELECT_CASE_var( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType ) );
 			if ( SELECT_CASE_var == HeatingDesignCapacity || SELECT_CASE_var == CoolingDesignCapacity ) {
 				ScalableSM = "User-Specified ";
-				if ( SizingResult == AutoSize ) ScalableSM = "Design Size ";
+				if ( SizingResult == AutoSize ) ScalableSM = "Design Size "; // how can the SizingResult == AutoSize here ?? It's set a few lines up.
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
 				ScalableSM = "User-Specified (scaled by capacity / area) ";
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity || SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {

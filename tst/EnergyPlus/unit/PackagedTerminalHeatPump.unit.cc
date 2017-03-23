@@ -499,9 +499,9 @@ namespace EnergyPlus {
 		EXPECT_TRUE( ZoneEqSizing( 1 ).SystemAirFlow );
 		EXPECT_TRUE( ZoneEqSizing( 1 ).CoolingAirFlow );
 		EXPECT_TRUE( ZoneEqSizing( 1 ).HeatingAirFlow );
-		EXPECT_NEAR( ZoneEqSizing( 1 ).AirVolFlow, 6.615644, 0.000001 );
-		EXPECT_NEAR( ZoneEqSizing( 1 ).CoolingAirVolFlow, 6.615644, 0.000001 );
-		EXPECT_NEAR( ZoneEqSizing( 1 ).HeatingAirVolFlow, 5.095331, 0.000001 );
-		EXPECT_NEAR( Fan( 1 ).MaxAirFlowRate, 6.615644, 0.000001);
+		EXPECT_EQ( ZoneEqSizing( 1 ).CoolingAirVolFlow, PTUnit( 1 ).MaxCoolAirVolFlow );
+		EXPECT_EQ( ZoneEqSizing( 1 ).HeatingAirVolFlow, PTUnit( 1 ).MaxHeatAirVolFlow );
+		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, ZoneEqSizing( 1 ).AirVolFlow );
+		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, max( ZoneEqSizing( 1 ).CoolingAirVolFlow, ZoneEqSizing( 1 ).HeatingAirVolFlow ) );
 	}
 }
