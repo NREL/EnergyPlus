@@ -581,7 +581,7 @@ namespace BaseboardElectric {
 					if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing(CompType, CompName);
 						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					}
 					TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
 				} else if ( CapSizingMethod == CapacityPerFloorArea ) {
@@ -593,7 +593,7 @@ namespace BaseboardElectric {
 					CheckZoneSizing( CompType, CompName );
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					TempSize = AutoSize;
 					DataScalableCapSizingON = true;
 				} else {

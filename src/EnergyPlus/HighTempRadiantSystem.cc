@@ -841,7 +841,7 @@ namespace HighTempRadiantSystem {
 				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing( CompType, CompName );
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					} else {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
 					}
@@ -856,7 +856,7 @@ namespace HighTempRadiantSystem {
 					CheckZoneSizing( CompType, CompName );
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					TempSize = AutoSize;
 					DataScalableCapSizingON = true;
 				} else {
