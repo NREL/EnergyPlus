@@ -64,6 +64,8 @@ set(kiva_src Algorithms.cpp
              BoundaryConditions.hpp
              Domain.cpp
              Domain.hpp
+             Errors.cpp
+             Errors.hpp
              Foundation.cpp
              Foundation.hpp
              Functions.cpp
