@@ -378,7 +378,7 @@ namespace EnergyPlus {
 			vals.reserve(10000);
 
 			// if DataFrame is enabled and control reaches here, there must be at least one o/p variable
-			//assert(TS.size() == variableMap.begin()->second->values().size());
+			assert(TS.size() == variableMap.begin()->second->values().size());
 
 			for (int row = 0; row < TS.size(); ++row) {
 				vals.clear();

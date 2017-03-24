@@ -89,15 +89,7 @@ namespace EnergyPlus {
 		//compare_json_stream( "" );
 	}
 
-	TEST_F( EnergyPlusFixture , JsonOutput_ParseJson_getJson){
-		std::string const idf_objects = delimited_string({
-				                                                 "Output:JSON,",
-				                                                 "TimeSeries;",
-		                                                 });
-
-		ASSERT_TRUE( process_idf( idf_objects ) );
-		OutputSchema->setupOutputOptions();
-
+	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo){
 
 		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
 		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
@@ -131,7 +123,28 @@ namespace EnergyPlus {
 					"UUID": "b307f053-6c0a-8ca8-4d76-81841cd48f20"
 		} )"_json;
 		EXPECT_EQ( result.dump(), expectedResult.dump() );
-		//compare_json_stream( "" );
 	}
+
+	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo_String) {
+		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
+		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
+		OutputSchema->SimulationInformation.setUUID("b307f053-6c0a-8ca8-4d76-81841cd48f20");
+		OutputSchema->SimulationInformation.setInputModelURI("");
+		OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
+		OutputSchema->SimulationInformation.setNumErrorsSummary("1","2");
+		OutputSchema->SimulationInformation.setNumErrorsSizing("0","0");
+		OutputSchema->SimulationInformation.setNumErrorsWarmup("0","2");
+		OutputSchema->SimulationInformation.setSimulationEnvironment("");
+
+		json result = OutputSchema->SimulationInformation.getJSON();
+
+		std::string expectedResult =
+				"{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        \"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummaryWarmup\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    \"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\",\n    \"UUID\": \"b307f053-6c0a-8ca8-4d76-81841cd48f20\"\n}";
+		EXPECT_EQ( result.dump(4), expectedResult );
+	};
+
+	TEST_F( EnergyPlusFixture , JsonOutput_Variable) {
+		OutputSchema->
+	};
 
 }
