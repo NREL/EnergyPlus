@@ -9061,8 +9061,13 @@ namespace SurfaceGeometry {
 				oppositeWallArea = 0.;
 				for ( auto curFace : facesAtAz ) {
 					int possOppFace = findPossibleOppositeFace( zonePoly, curFace );
-					oppositeWallArea += Surface( zonePoly.SurfaceFace( curFace ).SurfNum ).Area;
-					if ( !areCornersEquidistant( zonePoly, curFace, possOppFace, distanceBetweenOppositeWalls ) ) {
+					if ( possOppFace > 0 ) { // an opposite fact was found
+						oppositeWallArea += Surface( zonePoly.SurfaceFace( curFace ).SurfNum ).Area;
+						if ( !areCornersEquidistant( zonePoly, curFace, possOppFace, distanceBetweenOppositeWalls ) ) {
+							allFacesEquidistant = false;
+							break;
+						}
+					} else {
 						allFacesEquidistant = false;
 						break;
 					}
@@ -9104,11 +9109,12 @@ namespace SurfaceGeometry {
 		Real64 selectedAzimuth = Surface( selectedSurNum ).Azimuth;
 		Real64 oppositeAzimuth = Real64((int(selectedAzimuth) + 180 ) % 360);
 		Real64 selectedArea = Surface( selectedSurNum ).Area;
+		int selectedNumCorners = zonePoly.SurfaceFace( faceIndex ).NSides;
 		int found = -1;
 
 		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
 			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
-			if ( ( abs(Surface( curSurfNum ).Area - selectedArea) < 0.01) && ( abs( Surface( curSurfNum ).Azimuth - oppositeAzimuth ) < 1. ) ){
+			if ( ( zonePoly.SurfaceFace( iFace ).NSides == selectedNumCorners ) && ( abs(Surface( curSurfNum ).Area - selectedArea) < 0.01) && ( abs( Surface( curSurfNum ).Azimuth - oppositeAzimuth ) < 1. ) ){
 				found = iFace;
 				break;
 			}
@@ -9124,7 +9130,26 @@ namespace SurfaceGeometry {
 		Real64 & distanceBetween
 	)
 	{
-
+		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		bool allAreEquidistant = true;
+		Real64 firstDistance = -99.;
+		if ( zonePoly.SurfaceFace( faceIndex ).NSides == zonePoly.SurfaceFace( opFaceIndex ).NSides ) { // double check that the number of sides match
+			for ( int iVertex = 1; iVertex <= zonePoly.SurfaceFace( faceIndex ).NSides; ++iVertex ) {
+				int iVertexOpp = 1 + zonePoly.SurfaceFace( faceIndex ).NSides - iVertex; // count backwards for opposite face
+				Real64 curDistBetwCorners =  distance( zonePoly.SurfaceFace(faceIndex).FacePoints( iVertex ), zonePoly.SurfaceFace( opFaceIndex ).FacePoints( iVertexOpp ) );
+				if ( iVertex == 1 ) {
+					firstDistance = curDistBetwCorners;
+				} else {
+					if ( abs( curDistBetwCorners - firstDistance ) > tol ) {
+						allAreEquidistant = false;
+						break; 
+					}
+				}
+			}
+		} else {
+			allAreEquidistant = false;
+		}
+		return allAreEquidistant;
 	}
 
 
