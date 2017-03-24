@@ -964,3 +964,209 @@ TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
 	EXPECT_NEAR( 1.13, Surface( 4 ).Height, 0.01 );
 
 }
+
+TEST( SurfaceGeometryUnitTests, distance )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, distance" );
+
+	DataVectorTypes::Vector a;
+	DataVectorTypes::Vector b;
+
+	a.x = 0.;
+	a.y = 0.;
+	a.z = 0.;
+
+	b.x = 0.;
+	b.y = 0.;
+	b.z = 0.;
+
+	EXPECT_EQ( 0., distance( a, b ) );
+
+	b.x = 1.;
+	b.y = 1.;
+	b.z = 1.;
+
+	EXPECT_NEAR( 1.7321, distance( a, b ), 0.0001 );
+
+	b.x = 7.;
+	b.y = 11.;
+	b.z = 17.;
+
+	EXPECT_NEAR( 21.4243, distance( a, b ), 0.0001 );
+
+	a.x = 2.;
+	a.y = 3.;
+	a.z = 4.;
+
+	EXPECT_NEAR( 16.0624, distance( a, b ), 0.0001 );
+
+	a.x = -2.;
+	a.y = -3.;
+	a.z = -4.;
+
+	EXPECT_NEAR( 26.7955, distance( a, b ), 0.0001 );
+
+}
+
+
+TEST( SurfaceGeometryUnitTests, isAlmostEqual3dPt )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isAlmostEqual3dPt" );
+
+	DataVectorTypes::Vector a;
+	DataVectorTypes::Vector b;
+
+	a.x = 0.;
+	a.y = 0.;
+	a.z = 0.;
+
+	b.x = 0.;
+	b.y = 0.;
+	b.z = 0.;
+
+	EXPECT_TRUE( isAlmostEqual3dPt( a, b ) );
+
+	b.x = 7.;
+	b.y = 11.;
+	b.z = 17.;
+
+	EXPECT_FALSE( isAlmostEqual3dPt( a, b ) );
+
+	a.x = 7.;
+	a.y = 11.;
+	a.z = 17.;
+
+	EXPECT_TRUE( isAlmostEqual3dPt( a, b ) );
+
+	b.x = 7.01;
+	b.y = 11.01;
+	b.z = 17.01;
+
+	EXPECT_TRUE( isAlmostEqual3dPt( a, b ) );
+
+	b.x = 7.05;
+	b.y = 11.05;
+	b.z = 17.05;
+
+	EXPECT_FALSE( isAlmostEqual3dPt( a, b ) );
+
+	a.x = -7.;
+	a.y = -11.;
+	a.z = -17.;
+
+	b.x = -7.01;
+	b.y = -11.01;
+	b.z = -17.01;
+
+	EXPECT_TRUE( isAlmostEqual3dPt( a, b ) );
+}
+
+TEST( SurfaceGeometryUnitTests, isAlmostEqual2dPt )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isAlmostEqual2dPt" );
+
+	DataVectorTypes::Vector_2d a;
+	DataVectorTypes::Vector_2d b;
+
+	a.x = 0.;
+	a.y = 0.;
+
+	b.x = 0.;
+	b.y = 0.;
+
+	EXPECT_TRUE( isAlmostEqual2dPt( a, b ) );
+
+	b.x = 7.;
+	b.y = 11.;
+
+	EXPECT_FALSE( isAlmostEqual2dPt( a, b ) );
+
+	a.x = 7.;
+	a.y = 11.;
+
+	EXPECT_TRUE( isAlmostEqual2dPt( a, b ) );
+
+	b.x = 7.01;
+	b.y = 11.01;
+
+	EXPECT_TRUE( isAlmostEqual2dPt( a, b ) );
+
+	b.x = 7.05;
+	b.y = 11.05;
+
+	EXPECT_FALSE( isAlmostEqual2dPt( a, b ) );
+
+	a.x = -7.;
+	a.y = -11.;
+
+	b.x = -7.01;
+	b.y = -11.01;
+
+	EXPECT_TRUE( isAlmostEqual2dPt( a, b ) );
+}
+
+TEST( SurfaceGeometryUnitTests, isPointOnLineBetweenPoints )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isPointOnLineBetweenPoints" );
+
+	DataVectorTypes::Vector a;
+	DataVectorTypes::Vector b;
+	DataVectorTypes::Vector t;
+
+	a.x = 0.;
+	a.y = 0.;
+	a.z = 0.;
+
+	b.x = 10.;
+	b.y = 10.;
+	b.z = 10.;
+
+	t.x = 6.;
+	t.y = 6.;
+	t.z = 6.;
+
+	EXPECT_TRUE( isPointOnLineBetweenPoints( a, b, t ) );
+
+	t.x = 6.00;
+	t.y = 6.01;
+	t.z = 6.00;
+
+	EXPECT_TRUE( isPointOnLineBetweenPoints( a, b, t ) );
+
+	t.x = 7.;
+	t.y = 11.;
+	t.z = 17.;
+
+	EXPECT_FALSE( isPointOnLineBetweenPoints( a, b, t ) );
+
+	a.x = 5.;
+	a.y = 3.;
+	a.z = 13.;
+
+	b.x = 7.;
+	b.y = 11.;
+	b.z = 4.;
+
+	t.x = 6.;
+	t.y = 7.;
+	t.z = 8.5;
+
+	EXPECT_TRUE( isPointOnLineBetweenPoints( a, b, t ) );
+
+	a.x = -5.;
+	a.y = 3.;
+	a.z = -13.;
+
+	b.x = 7.;
+	b.y = -11.;
+	b.z = 4.;
+
+	t.x = 1.;
+	t.y = -4.;
+	t.z = -4.5;
+
+	EXPECT_TRUE( isPointOnLineBetweenPoints( a, b, t ) );
+
+}
+
+
