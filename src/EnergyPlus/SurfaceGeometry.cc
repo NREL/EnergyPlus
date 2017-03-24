@@ -8521,6 +8521,7 @@ namespace SurfaceGeometry {
 
 	}
 
+	// Calculates the volume (m3) of a zone using the surfaces as possible.
 	void
 	CalculateZoneVolume(
 		bool & ErrorsFound, // If errors found in input
@@ -8533,10 +8534,6 @@ namespace SurfaceGeometry {
 		//       DATE WRITTEN   1992-1994
 		//       MODIFIED       Sep 2007
 		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine calculates the volume (m3) of a zone using the
-		// surfaces as possible.
 
 		// METHODOLOGY EMPLOYED:
 		// Uses surface area information for calculations.  Modified to use the
@@ -8739,11 +8736,14 @@ namespace SurfaceGeometry {
 
 	}
 
+	// test if the volume described by the polyhedron if full enclosed (would not leak)
 	bool
 	isEnclosedVolume(
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
+		// J. Glazer - March 2017
+
 		std::vector<Vector>  uniqueVertices;
 		makeListOfUniqueVertices( zonePoly, uniqueVertices);
 
@@ -8762,12 +8762,15 @@ namespace SurfaceGeometry {
 		}
 	}
 
+	// returns the number of times the edges of the polyhedron of the zone are not used twice by the sides
 	int
 	numberOfEdgesNotTwoForEnclosedVolumeTest(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		std::vector<Vector> const & uniqueVertices
 	)
 	{
+		// J. Glazer - March 2017
+
 		using DataVectorTypes::Vector;
 
 		struct EdgeByPts
@@ -8829,13 +8832,15 @@ namespace SurfaceGeometry {
 		return edgeNotTwoFoundCount;
 	}
 
-
+	// create a list of unique vertices given the polyhedron describing the zone
 	void
 	makeListOfUniqueVertices(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		std::vector<Vector> & uniqVertices
 	)
 	{
+		// J. Glazer - March 2017
+
 		using DataVectorTypes::Vector;
 		uniqVertices.clear();
 		uniqVertices.reserve( zonePoly.NumSurfaceFaces * 6 );
@@ -8861,13 +8866,15 @@ namespace SurfaceGeometry {
 		}
 	}
 
-
+	// updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing the edge
 	DataVectorTypes::Polyhedron
 	updateZonePolygonsForMissingColinearPoints(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		std::vector<Vector> const & uniqVertices
 	)
 	{
+		// J. Glazer - March 2017
+
 		using DataVectorTypes::Vector;
 
 		DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
@@ -8900,6 +8907,7 @@ namespace SurfaceGeometry {
 		return updZonePoly;
 	}
 
+	// inserts a vertex in the polygon describing the face (wall) of polyhedron (zone)
 	void
 	insertVertexOnFace(
 		DataVectorTypes::Face & face,
@@ -8907,6 +8915,8 @@ namespace SurfaceGeometry {
 		DataVectorTypes::Vector const & vertexToInsert
 	)
 	{
+		// J. Glazer - March 2017
+
 		int origNumSides = face.NSides;
 		DataVectorTypes::Vector emptyVector( 0., 0., 0. );
 		face.FacePoints.append(emptyVector); // just to add new item to the end of array
@@ -8917,11 +8927,14 @@ namespace SurfaceGeometry {
 		++face.NSides;
 	}
 
+	// test if the ceiling and floor are the same except for their height difference by looking at the corners
 	bool
 	areFloorAndCeilingSame( 
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
+		// J. Glazer - March 2017
+
 		// check if the floor and ceiling are the same
 		// this is almost equivent to saying, if you ignore the z-coordinate, are the vertices the same
 		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they 
@@ -8979,12 +8992,15 @@ namespace SurfaceGeometry {
 		return areFlrAndClgSame;
 	}
 
+	// test if the walls of a zone are all the same height using the polyhedron describing the zone geometry
 	bool
 	areWallHeightSame(
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
-	  // test if all the wall heights are the same (all walls have the same maximum z-coordinate
+		// J. Glazer - March 2017
+
+		// test if all the wall heights are the same (all walls have the same maximum z-coordinate
 
 	    bool areWlHgtSame = true;
 		Real64 wallHeightZ = -1.0E50;
@@ -9013,12 +9029,14 @@ namespace SurfaceGeometry {
 		return areWlHgtSame;
 	}
 
-
+	// tests if the floor is horizontal, ceiling is horizontal, and walls are vertical and returns all three as a tuple of booleans
 	std::tuple< bool, bool, bool >
 	areSurfaceHorizAndVert(
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
+		// J. Glazer - March 2017
+
 		// check if floors and ceilings are horizonatal and walls are vertical
 		bool isFlrHoriz = true;
 		bool isClgHoriz = true;
@@ -9042,6 +9060,7 @@ namespace SurfaceGeometry {
 		return std::make_tuple( isFlrHoriz , isClgHoriz, areWlVert );
 	}
 
+	// tests whether a pair of walls in the zone are the same except offset from one another and facing the opposite direction and also returns the wall area and distance between
 	bool
 	areOppositeWallsSame(
 		DataVectorTypes::Polyhedron const & zonePoly,
@@ -9049,6 +9068,8 @@ namespace SurfaceGeometry {
 		Real64 & distanceBetweenOppositeWalls //returns distance
 	)
 	{
+		// J. Glazer - March 2017
+
 		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the 
 		// vertices( one counting backwards ) and if it is the same distance than assume that it is the same.
 		using DataVectorTypes::Vector;
@@ -9081,12 +9102,15 @@ namespace SurfaceGeometry {
 		return foundOppEqual;
     }
 
+	// provides a list of indices of polyhedron faces that are facing a specific azimuth
 	std::vector<int> 
 	listOfFacesFacingAzimuth(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		Real64 const & azimuth
 	)
 	{
+		// J. Glazer - March 2017
+
 		std::vector<int> facingAzimuth;
 		facingAzimuth.reserve(zonePoly.NumSurfaceFaces);
 
@@ -9099,12 +9123,15 @@ namespace SurfaceGeometry {
 		return facingAzimuth;
 	}
 
+	// returns the index of the face of a polyhedron that is probably opposite of the face index provided
 	int 
 	findPossibleOppositeFace(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		int const & faceIndex 
 	)
 	{
+		// J. Glazer - March 2017
+
 		int selectedSurNum = zonePoly.SurfaceFace( faceIndex ).SurfNum;
 		Real64 selectedAzimuth = Surface( selectedSurNum ).Azimuth;
 		Real64 oppositeAzimuth = Real64((int(selectedAzimuth) + 180 ) % 360);
@@ -9122,6 +9149,7 @@ namespace SurfaceGeometry {
 		return found;
 	}
 
+	// tests if the corners of one face of the polyhedron are the same distance from corners of another face
 	bool
 	areCornersEquidistant(
 		DataVectorTypes::Polyhedron const & zonePoly,
@@ -9130,6 +9158,8 @@ namespace SurfaceGeometry {
 		Real64 & distanceBetween
 	)
 	{
+		// J. Glazer - March 2017
+
 		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
 		bool allAreEquidistant = true;
 		Real64 firstDistance = -99.;
@@ -9152,34 +9182,41 @@ namespace SurfaceGeometry {
 		return allAreEquidistant;
 	}
 
-
+	// test if two points in space are in the same position based on a small tolerance
 	bool 
 	isAlmostEqual3dPt(
 		DataVectorTypes::Vector v1,
 		DataVectorTypes::Vector v2
 	)
 	{
+		// J. Glazer - March 2017
+
 		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) && ( abs( v1.z - v2.z ) < tol ) ) ;
 	}
 
+	// test if two points on a plane are in the same position based on a small tolerance
 	bool
 	isAlmostEqual2dPt(
 		DataVectorTypes::Vector_2d v1,
 		DataVectorTypes::Vector_2d v2
 	)
 	{
+		// J. Glazer - March 2017
+
 		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
-
+	// returns the index of vertex in a list that is in the same position in space as the given vertex
 	int
 	findIndexOfVertex(
 		DataVectorTypes::Vector vertexToFind,
 		std::vector<DataVectorTypes::Vector> listOfVertices
 	)
 	{
+		// J. Glazer - March 2017
+
 		for ( std::size_t i = 0; i < listOfVertices.size( ); i++ ) {
 			if ( isAlmostEqual3dPt( listOfVertices[ i ], vertexToFind ) ) {
 				return i;
@@ -9188,15 +9225,19 @@ namespace SurfaceGeometry {
 		return -1;
 	}
 
+	// returns the distance between two points in space
 	Real64
 	distance(
 		DataVectorTypes::Vector v1,
 		DataVectorTypes::Vector v2
 	)
 	{
+		// J. Glazer - March 2017
+
 		return sqrt( pow(v1.x - v2.x, 2) + pow( v1.y - v2.y, 2 ) + pow( v1.z - v2.z, 2 ) );
 	}
 
+	// tests if a point in space lies on the line segment defined by two other points
 	bool
 	isPointOnLineBetweenPoints(
 		DataVectorTypes::Vector start,
@@ -9204,6 +9245,8 @@ namespace SurfaceGeometry {
 		DataVectorTypes::Vector test
 	)
 	{
+		// J. Glazer - March 2017
+
 		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
 		return ( abs( (distance(start, end ) - (distance(start, test ) + distance(test, end) ) ) ) < tol );
 	}
