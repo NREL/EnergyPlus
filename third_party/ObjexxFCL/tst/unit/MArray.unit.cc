@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -18,6 +18,7 @@
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
@@ -199,4 +200,81 @@ TEST( MArrayTest, CountOp2D )
 	EXPECT_EQ( 1u, count_ge( M, 9 ) );
 	EXPECT_EQ( 9u, count_lt( M, 11 ) );
 	EXPECT_EQ( 3u, count_gt( M, 3 ) );
+}
+
+TEST( MArrayTest, Function2DMinMaxLoc )
+{
+	{
+		Array2D< C > const A( 4, 4, reshape( {
+		  4,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+		auto M( make_MArray2( A, &C::m ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( M ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( M ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( M, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( M, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( M, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( M, 2 ) ) ); // Max of rows
+	}
+	{
+		Array2D< C > const A( 4, 4, reshape( {
+		 -9,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+		auto M( make_MArray2( A, &C::m ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), minloc( M ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 2 } ), maxloc( M ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 1, 2, 2, 1 } ), minloc( M, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 1, 3, 3, 1 } ), minloc( M, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 3, 1, 1, 3 } ), maxloc( M, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 2, 4, 1, 3 } ), maxloc( M, 2 ) ) ); // Max of rows
+	}
+	{
+		Array2D< C > const A( 4, 4, reshape( {
+		  9,  9,  8, -8,
+		  2,  1, -1,  5,
+		  9,  4, -1,  9,
+		 -7,  5,  7, -3
+		}, std::array< int, 2 >{ { 4, 4 } } ) );
+		auto M( make_MArray2( A, &C::m ) );
+
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 4 } ), minloc( M ) ) );
+		EXPECT_TRUE( eq( Array1D_int( 2, { 1, 1 } ), maxloc( M ) ) ); // First max encountered in row-major order
+
+		EXPECT_TRUE( eq( Array1D_int( { 4, 2, 2, 1 } ), minloc( M, 1 ) ) ); // Min of cols
+		EXPECT_TRUE( eq( Array1D_int( { 4, 3, 3, 1 } ), minloc( M, 2 ) ) ); // Min of rows
+
+		EXPECT_TRUE( eq( Array1D_int( { 1, 1, 1, 3 } ), maxloc( M, 1 ) ) ); // Max of cols
+		EXPECT_TRUE( eq( Array1D_int( { 1, 4, 1, 3 } ), maxloc( M, 2 ) ) ); // Max of rows
+	}
+}
+
+TEST( MArrayTest, StreamOut )
+{
+	Array1D< C > const A( 3, { 1, 2, 3 } );
+	auto M( make_MArray1( A, &C::m ) );
+	std::ostringstream stream;
+	stream << M;
+	EXPECT_EQ( "           1            2            3 ", stream.str() );
+}
+
+TEST( MArrayTest, StreamIn )
+{
+	Array1D< C > A( 3, { 1, 2, 3 } );
+	auto M( make_MArray1( A, &C::m ) );
+	std::string const text( "1  2  3" );
+	std::istringstream stream( text );
+	stream >> M;
+	EXPECT_TRUE( eq( Array1D_int( 3, { 1, 2, 3 } ), M ) );
 }

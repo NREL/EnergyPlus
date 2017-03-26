@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  VERSION,8.3;
+  VERSION,8.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -43,9 +43,11 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    1,                       !- Temperature Capacity Multiplier
-    1,                       !- Humidity Capacity Multiplier
-    1,                       !- Carbon Dioxide Capacity Multiplier
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
+    1.0,                     !- Temperature Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    1.0,                     !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier
 
 !-   ===========  ALL OBJECTS IN CLASS: RUN CONTROL ===========
@@ -963,6 +965,7 @@
 
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -1041,17 +1044,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ZoneSum,                 !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1153,13 +1156,11 @@
 
   Branch,
     AHU 1 Main Branch,       !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 1 Object Type
     AHU 1 Furnace with DX Cooling,  !- Component 1 Name
     AHU 1 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 1 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    AHU 1 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
@@ -1216,14 +1217,14 @@
     AHU 1 Air Loop Outlet,   !- Furnace Air Outlet Node Name
     FURNACE:HEATCOOL AHU 1 Furnace with DX Cooling Cycling Schedule,  !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    0,                       !- No Load Supply Air Flow Rate {m3/s}
     ZONE ONE,                !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     AHU 1 Supply Fan,        !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     AHU 1 Heating Coil,      !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     AHU 1 Cooling Coil,      !- Cooling Coil Name
@@ -1304,10 +1305,11 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:GAS:HEATING ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     AHU 1 Heating Coil,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     AHU 1 Supply Fan Outlet, !- Air Inlet Node Name
     AHU 1 Heating Coil Outlet,  !- Air Outlet Node Name

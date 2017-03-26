@@ -183,7 +183,7 @@ The current relative humidity (calculated from the node temperature, node humidi
 
 The current pressure at a system node in Pa.
 
-\paragraph{\texorpdfstring{System Node Standard Density Volume Flow Rate {[}m\(^{3}\)/s{]}}{System Node Standard Density Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{system-node-standard-density-volume-flow-rate-m3s}
+\paragraph{System Node Standard Density Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{system-node-standard-density-volume-flow-rate-m3s}
 
 The current volume flow rate at a system node in m\(^{3}\)/s.~ This is report is calculated from the mass flow using standardized values for density that do not vary over time (except for steam which varies with quality).~ For water nodes this density is determined at a temperature of 5.05ºC.~ For air nodes this density is determined for dry air at the standard barometric pressure for the location's elevation, and a temperature of 20.0ºC.~ For air nodes, also see the report ``System Node Current Density Volume Flow Rate.''
 
@@ -203,7 +203,7 @@ The current wet-bulb temperature at a system node in degrees C. Not applicable f
 
 The current dewpoint temperature at a system node in degrees C. It is calculated from the System Node Temperature, the System Node Humidity Ratio and the Site Outdoor Air Barometric Pressure. Not applicable for liquid nodes.
 
-\paragraph{\texorpdfstring{System Node Quality {[]}}{System Node Quality }}\label{system-node-quality}
+\paragraph{System Node Quality {[]}}\label{system-node-quality}
 
 The current system node vapor fraction/percent \{0.0-1.0\}.
 
@@ -219,7 +219,7 @@ The current specific heat capacity of the fluid at the node in units of J/kg-K. 
 
 The following system node variable is available for nodes with a fluid type of air.
 
-\paragraph{\texorpdfstring{System Node Current Density Volume Flow Rate {[}m\(^{3}\)/s{]}}{System Node Current Density Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{system-node-current-density-volume-flow-rate-m3s}
+\paragraph{System Node Current Density Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{system-node-current-density-volume-flow-rate-m3s}
 
 The current volume flow rate at a system node in m\(^{3}\)/s based on the current density.~ This report differs from the one called ``System Node Standard Density Volume Flow Rate'' in that it uses an air density calculated for the current moist air conditions rather than a standard density.
 
@@ -312,17 +312,13 @@ It should be noted that each component also has at least two nodes associated wi
 
 This alpha field is the unique, user-defined name that allows the branch to be referenced by other elements such as the PlantLoop and CondenserLoop statements.
 
-\paragraph{Field: Maximum Flow Rate}\label{field-maximum-flow-rate-001}
-
-This field is the maximum flow rate (m\(^{3}\)/sec) allowed on a particular branch. This number will set an absolute maximum flow rate for all components on the loop. Even if components are defined with a higher flow rate, EnergyPlus will limit the flow on this particular branch to the value entered here by the user. Currently this is used in the Air Loop and is not a required field in the Plant and Condenser Loop. The example files for the Plant and Condenser Loops leave this field blank to simplify flow input.
-
 \paragraph{Field: Pressure Drop Curve Name}\label{field-pressure-drop-curve-name}
 
 This is an optional field used to specify pressure drop information for this particular branch. Currently this is only available in plant/condenser fluid loops: PlantLoop and CondenserLoop. Air loops require a full airflow network, so this field is ignored if found on an air loop. The value entered for this field must match a pressure curve object also found in the input. This curve can be of the type: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Exponent, or Curve:Functional:PressureDrop. In order to then perform a pressure simulation for the loop that this branch is located on, a flag must be set in the loop object. Reference the PlantLoop and CondenserLoop field ``Pressure Simulation Type'' for allowable settings. See the Engineering Reference document for further information on pressure simulation in plant loops.
 
 \paragraph{Field Set (Branch Specifications)}\label{field-set-branch-specifications}
 
-Following the two introductory items, there are groups of 5 repeated items: a type, a name, inlet and outlet node names, and a branch control type. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed.
+Following the two introductory items, there are groups of 4 repeated items: a type, a name, inlet and outlet node names. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed.
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type-000}
 
@@ -340,23 +336,17 @@ This field references an inlet node name that will be found in the actual compon
 
 This field references an outlet node name that will be found in the actual component specification.
 
-\paragraph{Field: Component \textless{}\#\textgreater{} Branch Control Type}\label{field-component-branch-control-type}
-
-This field is being deprecated and is no longer used or required. Prior to version 7 it was used by plant to resolve branch flow rates but now this is handled automatically by the program.~ The field will be removed in a future version.
-
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
 Branch,
       Air Loop Main Branch,    !- Branch Name
-      1.75,                    !- Maximum Branch Flow Rate {m3/s}
       ,                        !- Pressure Drop Curve Name
       AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,  !- Comp1 Type
       GasHeat CBVAV System,    !- Comp1 Name
       Air Loop Inlet Node,     !- Comp1 Inlet Node Name
-      Air Loop Outlet Node,    !- Comp1 Outlet Node Name
-      ;                  !- Comp1 Branch Control Type
+      Air Loop Outlet Node;    !- Comp1 Outlet Node Name
 \end{lstlisting}
 
 And a more complex one:
@@ -365,18 +355,15 @@ And a more complex one:
 
   BRANCH,
       Air Loop Main Branch,    !- Branch Name
-      1.3,                     !- Maximum Branch Flow Rate {m3/s}
       ,                        !- Pressure Drop Curve Name
       FAN:SIMPLE:ConstVolume,  !- Comp1 Type
       Supply Fan 1,            !- Comp1 Name
       Air Loop Inlet Node,     !- Comp1 Inlet Node Name
       Cooling Coil Air Inlet Node,  !- Comp1 Outlet Node Name
-      ,                  !- Comp1 Branch Control Type
       COIL:Water:DetailedFlatCooling,  !- Comp2 Type
       Detailed Cooling Coil,   !- Comp2 Name
       Cooling Coil Air Inlet Node,  !- Comp2 Inlet Node Name
-      Air Loop Outlet Node,    !- Comp2 Outlet Node Name
-      ;                 !- Comp2 Branch Control Type
+      Air Loop Outlet Node;    !- Comp2 Outlet Node Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-014}

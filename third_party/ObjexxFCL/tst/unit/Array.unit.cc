@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -374,70 +374,6 @@ TEST( ArrayTest, Matmul11 )
 	R( 2, 1 ) = 21;
 	R( 2, 2 ) = 15;
 	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-}
-
-TEST( ArrayTest, Matmul12 )
-{
-	Array1D_int A( 3 );
-	Array2D_int B( 3, 2 );
-	A( 1 ) = 4;
-	A( 2 ) = 3;
-	A( 3 ) = 5;
-	B( 1, 1 ) = 7;
-	B( 1, 2 ) = 2;
-	B( 2, 1 ) = 5;
-	B( 2, 2 ) = 0;
-	B( 3, 1 ) = 4;
-	B( 3, 2 ) = 6;
-	Array1D_int R( 2 );
-	R( 1 ) = 63;
-	R( 2 ) = 38;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-}
-
-TEST( ArrayTest, Matmul21 )
-{
-	Array2D_int A( 2, 3 );
-	Array1D_int B( 3 );
-	A( 1, 1 ) = 4;
-	A( 1, 2 ) = 3;
-	A( 1, 3 ) = 5;
-	A( 2, 1 ) = 9;
-	A( 2, 2 ) = 2;
-	A( 2, 3 ) = 8;
-	B( 1 ) = 7;
-	B( 2 ) = 5;
-	B( 3 ) = 4;
-	Array1D_int R( 2 );
-	R( 1 ) = 63;
-	R( 2 ) = 105;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-}
-
-TEST( ArrayTest, Matmul22 )
-{
-	Array2D_int A( 2, 3 );
-	Array2D_int B( 3, 2 );
-	A( 1, 1 ) = 4;
-	A( 1, 2 ) = 3;
-	A( 1, 3 ) = 5;
-	A( 2, 1 ) = 9;
-	A( 2, 2 ) = 2;
-	A( 2, 3 ) = 8;
-	B( 1, 1 ) = 7;
-	B( 1, 2 ) = 2;
-	B( 2, 1 ) = 5;
-	B( 2, 2 ) = 0;
-	B( 3, 1 ) = 4;
-	B( 3, 2 ) = 6;
-	Array2D_int R( 2, 2 );
-	R( 1, 1 ) = 63;
-	R( 1, 2 ) = 38;
-	R( 2, 1 ) = 105;
-	R( 2, 2 ) = 66;
-	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
-	Array2D_int BT( transposed( B ) );
-	EXPECT_TRUE( eq( R, matmul_T( A, BT ) ) );
 }
 
 TEST( ArrayTest, Matrix2DMultiplication )

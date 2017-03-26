@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -68,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <HeatBalanceIntRadExchange.hh>
+#include <HeatBalanceMovableInsulation.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
@@ -169,15 +158,11 @@ namespace HeatBalanceIntRadExchange {
 		//       MODIFIED       6/18/01, FCW: calculate IR on windows
 		//                      Jan 2002, FCW: add blinds with movable slats
 		//                      Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determines the interior radiant exchange between surfaces using
 		// Hottel's ScriptF method for the grey interchange between surfaces
 		// in an enclosure.
-
-		// METHODOLOGY EMPLOYED:
-		// See reference
 
 		// REFERENCES:
 		// Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
@@ -190,21 +175,13 @@ namespace HeatBalanceIntRadExchange {
 		using namespace DataTimings;
 		using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 		using InputProcessor::SameString;
+		using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 
 		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENTS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
 		static gio::Fmt fmtLD( "*" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -224,7 +201,6 @@ namespace HeatBalanceIntRadExchange {
 		int ShadeFlagPrev; // Window shading status previous time step
 
 		//variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
-//		Real64 SendSurfTempInKTo4th; // Sending surface temperature in K to 4th power
 		Real64 RecSurfTempInKTo4th; // Receiving surface temperature in K to 4th power
 		static Array1D< Real64 > SendSurfaceTempInKto4thPrecalc;
 
@@ -301,24 +277,32 @@ namespace HeatBalanceIntRadExchange {
 			// emissivity does not change if the glazing is switched on or off.
 
 			// Determine if status of interior shade/blind on one or more windows in the zone has changed
-			// from previous time step.
+			// from previous time step.  Also make a check for any changes in interior movable insulation.
 
 			if ( SurfIterations == 0 ) {
 
+				Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
+				Real64 AbsInt; // Absorptivity of movable insulation material (supercedes that of the construction if interior movable insulation is present)
+				bool IntMovInsulChanged; // True if the status of interior movable insulation has changed
+
 				IntShadeOrBlindStatusChanged = false;
+				IntMovInsulChanged = false;
 
 				if ( ! BeginEnvrnFlag ) { // Check for change in shade/blind status
 					for ( SurfNum = zone.SurfaceFirst; SurfNum <= zone.SurfaceLast; ++SurfNum ) {
-						if ( IntShadeOrBlindStatusChanged ) break; // Need only check of one window's status has changed
+						if ( IntShadeOrBlindStatusChanged || IntMovInsulChanged ) break; // Need only check if one window's status or one movable insulation status has changed
 						ConstrNum = Surface( SurfNum ).Construction;
-						if ( ! Construct( ConstrNum ).TypeIsWindow ) continue;
-						ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
-						ShadeFlagPrev = SurfaceWindow( SurfNum ).ExtIntShadePrevTS;
-						if ( ( ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn ) || ( ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn ) || ( ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn ) || ( ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn ) ) IntShadeOrBlindStatusChanged = true;
+						if ( Construct( ConstrNum ).TypeIsWindow ) {
+							ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+							ShadeFlagPrev = SurfaceWindow( SurfNum ).ExtIntShadePrevTS;
+							if ( ( ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn ) || ( ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn ) || ( ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn ) || ( ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn ) ) IntShadeOrBlindStatusChanged = true;
+						} else {
+							UpdateMovableInsulationFlag( IntMovInsulChanged, SurfNum );
+						}
 					}
 				}
 
-				if ( IntShadeOrBlindStatusChanged || BeginEnvrnFlag ) { // Calc inside surface emissivities for this time step
+				if ( IntShadeOrBlindStatusChanged || IntMovInsulChanged || BeginEnvrnFlag ) { // Calc inside surface emissivities for this time step
 					for ( int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum ) {
 						SurfNum = zone_SurfacePtr( ZoneSurfNum );
 						ConstrNum = Surface( SurfNum ).Construction;
@@ -326,6 +310,10 @@ namespace HeatBalanceIntRadExchange {
 						auto const & surface_window( SurfaceWindow( SurfNum ) );
 						if ( Construct( ConstrNum ).TypeIsWindow && ( surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn ) ) {
 							zone_info.Emissivity( ZoneSurfNum ) = InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss ) + InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss );
+						}
+						if ( Surface( SurfNum ).MovInsulIntPresent ) {
+							HeatBalanceMovableInsulation::EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsInt );
+							zone_info.Emissivity( ZoneSurfNum ) = Material( Surface( SurfNum ).MaterialMovInsulInt ).AbsorpThermal;
 						}
 					}
 
@@ -457,6 +445,38 @@ namespace HeatBalanceIntRadExchange {
 
 	}
 
+	void
+	UpdateMovableInsulationFlag(
+		bool & MovableInsulationChange,
+		int const SurfNum )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   July 2016
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// To determine if any changes in interior movable insulation have happened.
+		// If there have been changes due to a schedule change AND a change in properties,
+		// then the matrices which are used to calculate interior radiation must be recalculated.
+				
+		MovableInsulationChange = false;
+		if ( Surface( SurfNum ).MaterialMovInsulInt > 0 ) {
+			Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
+			Real64 AbsInt; // Absorptivity of movable insulation material (supercedes that of the construction if interior movable insulation is present)
+			HeatBalanceMovableInsulation::EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsInt );
+		} else {
+			Surface( SurfNum ).MovInsulIntPresent = false;
+		}
+		if ( ( Surface( SurfNum ).MovInsulIntPresent != Surface( SurfNum ).MovInsulIntPresentPrevTS ) ) {
+			auto const & thissurf( Surface( SurfNum ) );
+			Real64 AbsorpDiff;
+			AbsorpDiff = abs( Construct( thissurf.Construction ).InsideAbsorpThermal - Material( thissurf.MaterialMovInsulInt ).AbsorpThermal );
+			if ( AbsorpDiff > 0.01 ) MovableInsulationChange = true;
+		}
+
+	}
+	
 	void
 	InitInteriorRadExchange()
 	{
@@ -1185,11 +1205,43 @@ namespace HeatBalanceIntRadExchange {
 			}
 
 			ShowWarningError( "Surfaces in Zone=\"" + Zone( ZoneNum ).Name + "\" do not define an enclosure." );
-			ShowContinueError( "Number of surfaces <= 3, view factors are set to force reciprocity." );
+			ShowContinueError( "Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness." );
+			ShowContinueError( "Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss." );
+			ShowContinueError( "Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity." );
+			ShowContinueError( "So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but" );
+			ShowContinueError( "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure." );
 
-			F = FixedF;
 			RowSum = sum( FixedF );
+			if ( RowSum > ( N + 0.01 ) ) {
+				// Reciprocity enforced but there is more radiation than possible somewhere since the sum of one of the rows
+				// is now greater than unity.  This should not be allowed as it can cause issues with the heat balance.
+				// Correct this by finding the largest row summation and dividing all of the elements in the F matrix by
+				// this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
+				// and will still maintain reciprocity.
+				Array1D< Real64 > sumFixedF;
+				Real64 MaxFixedFRowSum;
+				sumFixedF.allocate( N );
+				sumFixedF = 0.0;
+				for ( i = 1; i <= N; ++i ) {
+					for ( j = 1; j <= N; ++j ) {
+						sumFixedF( i ) += FixedF( i, j );
+					}
+					if ( i == 1 ) {
+						MaxFixedFRowSum	= sumFixedF( i );
+					} else {
+						if ( sumFixedF( i ) > MaxFixedFRowSum ) MaxFixedFRowSum = sumFixedF( i );
+					}
+				}
+				sumFixedF.deallocate();
+				if ( MaxFixedFRowSum < 1.0 ) {
+					ShowFatalError( " FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
+				} else {
+					FixedF *= ( 1.0 / MaxFixedFRowSum );
+				}
+				RowSum = sum( FixedF ); // needs to be recalculated
+			}
 			FinalCheckValue = FixedCheckValue = std::abs( RowSum - N );
+			F = FixedF;
 			Zone( ZoneNum ).EnforcedReciprocity = true;
 			return; // Do not iterate, stop with reciprocity satisfied.
 

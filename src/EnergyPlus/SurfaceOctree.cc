@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <EnergyPlus/SurfaceOctree.hh>
@@ -159,7 +147,7 @@ namespace EnergyPlus {
 	SurfaceOctreeCube::
 	valid() const
 	{
-		if ( le( l_, c_ ) && le( c_, u_ ) ) {
+		if ( ( ( l_.x <= c_.x ) && ( l_.y <= c_.y ) && ( l_.z <= c_.z ) ) && ( ( c_.x <= u_.x ) && ( c_.y <= u_.y ) && ( c_.z <= u_.z ) ) ) {
 			Real const tol2( std::max( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
 			if ( ObjexxFCL::distance_squared( c_, cen( l_, u_ ) ) <= tol2 ) {
 				Real const tol( std::max( std::sqrt( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
@@ -221,7 +209,7 @@ namespace EnergyPlus {
 		std::uint8_t const k( ctr.z <= c_.z ? 0 : 1 );
 		SurfaceOctreeCube * & cube = cubes_[ ( i << 2 ) + ( j << 1 ) + k ];
 		if ( cube != nullptr ) { // Candidate cube exists
-			if ( le( cube->l_, sl ) && le( su, cube->u_ ) ) { // Surface is contained in sub-cube
+			if ( ( ( cube->l_.x <= sl.x ) && ( cube->l_.y <= sl.y ) && ( cube->l_.z <= sl.z ) ) && ( ( su.x <= cube->u_.x ) && ( su.y <= cube->u_.y ) && ( su.z <= cube->u_.z ) ) ) { // Surface is contained in sub-cube
 				cube->add( surface );
 			} else { // Surface stays in this cube
 				surfaces_.push_back( &surface );
@@ -232,7 +220,7 @@ namespace EnergyPlus {
 			Real const z( k * h );
 			Vertex const l( l_.x + x, l_.y + y, l_.z + z );
 			Vertex const u( c_.x + x, c_.y + y, c_.z + z );
-			if ( le( l, sl ) && le( su, u ) ) { // Surface is contained in sub-cube
+			if ( ( ( l.x <= sl.x ) && ( l.y <= sl.y ) && ( l.z <= sl.z ) ) && ( ( su.x <= u.x ) && ( su.y <= u.y ) && ( su.z <= u.z ) ) ) { // Surface is contained in sub-cube
 				cube = new SurfaceOctreeCube( d_ + 1, l, u, h );
 				cube->add( surface );
 			} else { // Surface stays in this cube

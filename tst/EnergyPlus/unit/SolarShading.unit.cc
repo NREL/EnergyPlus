@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::SolarShading Unit Tests
 
@@ -64,12 +52,18 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -81,6 +75,7 @@ using namespace EnergyPlus::DataSystemVariables;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
 using namespace EnergyPlus::DataVectorTypes;
+using namespace EnergyPlus::DataShadowingCombinations;
 using namespace ObjexxFCL;
 
 TEST_F( EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest )
@@ -298,3 +293,382 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_polygon_contains_point )
 	EXPECT_FALSE( polygon_contains_point( numSides, Rectangle3d, PointOutside, true, false, false ) );
 
 }
+
+TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
+{
+	std::string const idf_objects = delimited_string( {
+		"  Version,8.7;                                                                       ",
+		"  Building,                                                                          ",
+		"    DemoFDT,                 !- Name                                                 ",
+		"    0,                       !- North Axis {deg}                                     ",
+		"    Suburbs,                 !- Terrain                                              ",
+		"    3.9999999E-02,           !- Loads Convergence Tolerance Value                    ",
+		"    4.0000002E-03,           !- Temperature Convergence Tolerance Value {deltaC}     ",
+		"    FullExterior,            !- Solar Distribution                                   ",
+		"    ,                        !- Maximum Number of Warmup Days                        ",
+		"    6;                       !- Minimum Number of Warmup Days                        ",
+		"  ShadowCalculation,                                                                 ",
+		"    TimestepFrequency,       !- Calculation Method                                   ",
+		"    ,                        !- Calculation Frequency                                ",
+		"    ,                        !- Maximum Figures in Shadow Overlap Calculations       ",
+		"    ,                        !- Polygon Clipping Algorithm                           ",
+		"    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm                   ",
+		"  SurfaceConvectionAlgorithm:Inside,TARP;                                            ",
+		"  SurfaceConvectionAlgorithm:Outside,TARP;                                           ",
+		"  HeatBalanceAlgorithm,ConductionTransferFunction;                                   ",
+		"  Timestep,6;                                                                        ",
+		"  RunPeriod,                                                                         ",
+		"    ,                        !- Name                                                 ",
+		"    1,                       !- Begin Month                                          ",
+		"    1,                       !- Begin Day of Month                                   ",
+		"    12,                      !- End Month                                            ",
+		"    31,                      !- End Day of Month                                     ",
+		"    ,                        !- Day of Week for Start Day                            ",
+		"    ,                        !- Use Weather File Holidays and Special Days           ",
+		"    ,                        !- Use Weather File Daylight Saving Period              ",
+		"    ,                        !- Apply Weekend Holiday Rule                           ",
+		"    ,                        !- Use Weather File Rain Indicators                     ",
+		"    ;                        !- Use Weather File Snow Indicators                     ",
+		"  ScheduleTypeLimits,                                                                ",
+		"    Fraction,                !- Name                                                 ",
+		"    0.0,                     !- Lower Limit Value                                    ",
+		"    1.0,                     !- Upper Limit Value                                    ",
+		"    Continuous;              !- Numeric Type                                         ",
+		"  ScheduleTypeLimits,                                                                ",
+		"    ON/OFF,                  !- Name                                                 ",
+		"    0,                       !- Lower Limit Value                                    ",
+		"    1,                       !- Upper Limit Value                                    ",
+		"    Discrete;                !- Numeric Type                                         ",
+		"  Schedule:Compact,                                                                  ",
+		"    SunShading,              !- Name                                                 ",
+		"    ON/OFF,                  !- Schedule Type Limits Name                            ",
+		"    Through: 4/30,           !- Field 1                                              ",
+		"    For: AllDays,            !- Field 2                                              ",
+		"    until: 24:00,1,          !- Field 3                                              ",
+		"    Through: 10/31,          !- Field 5                                              ",
+		"    For: AllDays,            !- Field 6                                              ",
+		"    until: 24:00,0,          !- Field 7                                              ",
+		"    Through: 12/31,          !- Field 9                                              ",
+		"    For: AllDays,            !- Field 10                                             ",
+		"    until: 24:00,1;          !- Field 11                                             ",
+		"  Material,                                                                          ",
+		"    A2 - 4 IN DENSE FACE BRICK,  !- Name                                             ",
+		"    Rough,                   !- Roughness                                            ",
+		"    0.1014984,               !- Thickness {m}                                        ",
+		"    1.245296,                !- Conductivity {W/m-K}                                 ",
+		"    2082.400,                !- Density {kg/m3}                                      ",
+		"    920.4800,                !- Specific Heat {J/kg-K}                               ",
+		"    0.9000000,               !- Thermal Absorptance                                  ",
+		"    0.9300000,               !- Solar Absorptance                                    ",
+		"    0.9300000;               !- Visible Absorptance                                  ",
+		"  Material,                                                                          ",
+		"    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name                                     ",
+		"    Smooth,                  !- Roughness                                            ",
+		"    1.9050000E-02,           !- Thickness {m}                                        ",
+		"    0.7264224,               !- Conductivity {W/m-K}                                 ",
+		"    1601.846,                !- Density {kg/m3}                                      ",
+		"    836.8000,                !- Specific Heat {J/kg-K}                               ",
+		"    0.9000000,               !- Thermal Absorptance                                  ",
+		"    0.9200000,               !- Solar Absorptance                                    ",
+		"    0.9200000;               !- Visible Absorptance                                  ",
+		"  Material,                                                                          ",
+		"    E2 - 1 / 2 IN SLAG OR STONE,  !- Name                                            ",
+		"    Rough,                   !- Roughness                                            ",
+		"    1.2710161E-02,           !- Thickness {m}                                        ",
+		"    1.435549,                !- Conductivity {W/m-K}                                 ",
+		"    881.0155,                !- Density {kg/m3}                                      ",
+		"    1673.600,                !- Specific Heat {J/kg-K}                               ",
+		"    0.9000000,               !- Thermal Absorptance                                  ",
+		"    0.5500000,               !- Solar Absorptance                                    ",
+		"    0.5500000;               !- Visible Absorptance                                  ",
+		"  Material,                                                                          ",
+		"    C12 - 2 IN HW CONCRETE,  !- Name                                                 ",
+		"    MediumRough,             !- Roughness                                            ",
+		"    5.0901599E-02,           !- Thickness {m}                                        ",
+		"    1.729577,                !- Conductivity {W/m-K}                                 ",
+		"    2242.585,                !- Density {kg/m3}                                      ",
+		"    836.8000,                !- Specific Heat {J/kg-K}                               ",
+		"    0.9000000,               !- Thermal Absorptance                                  ",
+		"    0.6500000,               !- Solar Absorptance                                    ",
+		"    0.6500000;               !- Visible Absorptance                                  ",
+		"  Material:NoMass,                                                                   ",
+		"    R13LAYER,                !- Name                                                 ",
+		"    Rough,                   !- Roughness                                            ",
+		"    2.290965,                !- Thermal Resistance {m2-K/W}                          ",
+		"    0.9000000,               !- Thermal Absorptance                                  ",
+		"    0.7500000,               !- Solar Absorptance                                    ",
+		"    0.7500000;               !- Visible Absorptance                                  ",
+		"  WindowMaterial:Glazing,                                                            ",
+		"    GLASS - CLEAR PLATE 1 / 4 IN,  !- Name                                           ",
+		"    SpectralAverage,         !- Optical Data Type                                    ",
+		"    ,                        !- Window Glass Spectral Data Set Name                  ",
+		"    0.006,                   !- Thickness {m}                                        ",
+		"    0.80,                    !- Solar Transmittance at Normal Incidence              ",
+		"    0.10,                    !- Front Side Solar Reflectance at Normal Incidence     ",
+		"    0.10,                    !- Back Side Solar Reflectance at Normal Incidence      ",
+		"    0.80,                    !- Visible Transmittance at Normal Incidence            ",
+		"    0.10,                    !- Front Side Visible Reflectance at Normal Incidence   ",
+		"    0.10,                    !- Back Side Visible Reflectance at Normal Incidence    ",
+		"    0.0,                     !- Infrared Transmittance at Normal Incidence           ",
+		"    0.84,                    !- Front Side Infrared Hemispherical Emissivity         ",
+		"    0.84,                    !- Back Side Infrared Hemispherical Emissivity          ",
+		"    0.9;                     !- Conductivity {W/m-K}                                 ",
+		"  WindowMaterial:Gas,                                                                ",
+		"    AIRGAP,                  !- Name                                                 ",
+		"    AIR,                     !- Gas Type                                             ",
+		"    0.0125;                  !- Thickness {m}                                        ",
+		"  Construction,                                                                      ",
+		"    R13WALL,                 !- Name                                                 ",
+		"    R13LAYER;                !- Outside Layer                                        ",
+		"  Construction,                                                                      ",
+		"    EXTWALL09,               !- Name                                                 ",
+		"    A2 - 4 IN DENSE FACE BRICK,  !- Outside Layer                                    ",
+		"    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4                                  ",
+		"  Construction,                                                                      ",
+		"    INTERIOR,                !- Name                                                 ",
+		"    C12 - 2 IN HW CONCRETE;  !- Layer 4                                              ",
+		"  Construction,                                                                      ",
+		"    SLAB FLOOR,              !- Name                                                 ",
+		"    C12 - 2 IN HW CONCRETE;  !- Layer 4                                              ",
+		"  Construction,                                                                      ",
+		"    ROOF31,                  !- Name                                                 ",
+		"    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer                                   ",
+		"    C12 - 2 IN HW CONCRETE;  !- Layer 4                                              ",
+		"  Construction,                                                                      ",
+		"    DOUBLE PANE HW WINDOW,   !- Name                                                 ",
+		"    GLASS - CLEAR PLATE 1 / 4 IN,  !- Outside Layer                                  ",
+		"    AIRGAP,                  !- Layer 2                                              ",
+		"    GLASS - CLEAR PLATE 1 / 4 IN;  !- Layer 3                                        ",
+		"  Construction,                                                                      ",
+		"    PARTITION02,             !- Name                                                 ",
+		"    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer                            ",
+		"    C12 - 2 IN HW CONCRETE,  !- Layer 4                                              ",
+		"    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3                                  ",
+		"  Construction,                                                                      ",
+		"    single PANE HW WINDOW,   !- Name                                                 ",
+		"    GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer                                  ",
+		"  Construction,                                                                      ",
+		"    EXTWALLdemo,             !- Name                                                 ",
+		"    A2 - 4 IN DENSE FACE BRICK,  !- Outside Layer                                    ",
+		"    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4                                  ",
+		"  GlobalGeometryRules,                                                               ",
+		"    UpperLeftCorner,         !- Starting Vertex Position                             ",
+		"    Counterclockwise,        !- Vertex Entry Direction                               ",
+		"    Relative;                !- Coordinate System                                    ",
+		"  Zone,                                                                              ",
+		"    ZONE ONE,                !- Name                                                 ",
+		"    0,                       !- Direction of Relative North {deg}                    ",
+		"    0,                       !- X Origin {m}                                         ",
+		"    0,                       !- Y Origin {m}                                         ",
+		"    0,                       !- Z Origin {m}                                         ",
+		"    1,                       !- Type                                                 ",
+		"    1,                       !- Multiplier                                           ",
+		"    0,                       !- Ceiling Height {m}                                   ",
+		"    0;                       !- Volume {m3}                                          ",
+		"  BuildingSurface:Detailed,                                                          ",
+		"    Zn001:Wall-North,        !- Name                                                 ",
+		"    Wall,                    !- Surface Type                                         ",
+		"    EXTWALLdemo,             !- Construction Name                                    ",
+		"    ZONE ONE,                !- Zone Name                                            ",
+		"    Outdoors,                !- Outside Boundary Condition                           ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    SunExposed,              !- Sun Exposure                                         ",
+		"    WindExposed,             !- Wind Exposure                                        ",
+		"    0.5000000,               !- View Factor to Ground                                ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    5,5,3,  !- X,Y,Z ==> Vertex 1 {m}                                                ",
+		"    5,5,0,  !- X,Y,Z ==> Vertex 2 {m}                                                ",
+		"    -5,5,0,  !- X,Y,Z ==> Vertex 3 {m}                                               ",
+		"    -5,5,3;  !- X,Y,Z ==> Vertex 4 {m}                                               ",
+		"  BuildingSurface:Detailed,                                                          ",
+		"    Zn001:Wall-East,         !- Name                                                 ",
+		"    Wall,                    !- Surface Type                                         ",
+		"    EXTWALL09,               !- Construction Name                                    ",
+		"    ZONE ONE,                !- Zone Name                                            ",
+		"    Outdoors,                !- Outside Boundary Condition                           ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    SunExposed,              !- Sun Exposure                                         ",
+		"    WindExposed,             !- Wind Exposure                                        ",
+		"    0.5000000,               !- View Factor to Ground                                ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}                                               ",
+		"    5,-5,0,  !- X,Y,Z ==> Vertex 2 {m}                                               ",
+		"    5,5,0,  !- X,Y,Z ==> Vertex 3 {m}                                                ",
+		"    5,5,3;  !- X,Y,Z ==> Vertex 4 {m}                                                ",
+		"  BuildingSurface:Detailed,                                                          ",
+		"    Zn001:Wall-South,        !- Name                                                 ",
+		"    Wall,                    !- Surface Type                                         ",
+		"    R13WALL,                 !- Construction Name                                    ",
+		"    ZONE ONE,                !- Zone Name                                            ",
+		"    Outdoors,                !- Outside Boundary Condition                           ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    SunExposed,              !- Sun Exposure                                         ",
+		"    WindExposed,             !- Wind Exposure                                        ",
+		"    0.5000000,               !- View Factor to Ground                                ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    -5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}                                              ",
+		"    -5,-5,0,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+		"    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}                                               ",
+		"    5,-5,3;  !- X,Y,Z ==> Vertex 4 {m}                                               ",
+		"  BuildingSurface:Detailed,                                                          ",
+		"    Zn001:Wall-West,         !- Name                                                 ",
+		"    Wall,                    !- Surface Type                                         ",
+		"    EXTWALL09,               !- Construction Name                                    ",
+		"    ZONE ONE,                !- Zone Name                                            ",
+		"    Outdoors,                !- Outside Boundary Condition                           ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    SunExposed,              !- Sun Exposure                                         ",
+		"    WindExposed,             !- Wind Exposure                                        ",
+		"    0.5000000,               !- View Factor to Ground                                ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    -5,5,3,  !- X,Y,Z ==> Vertex 1 {m}                                               ",
+		"    -5,5,0,  !- X,Y,Z ==> Vertex 2 {m}                                               ",
+		"    -5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}                                              ",
+		"    -5,-5,3;  !- X,Y,Z ==> Vertex 4 {m}                                              ",
+		"  BuildingSurface:Detailed,                                                          ",
+		"    Zn001:roof,              !- Name                                                 ",
+		"    Roof,                    !- Surface Type                                         ",
+		"    ROOF31,                  !- Construction Name                                    ",
+		"    ZONE ONE,                !- Zone Name                                            ",
+		"    Outdoors,                !- Outside Boundary Condition                           ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    SunExposed,              !- Sun Exposure                                         ",
+		"    WindExposed,             !- Wind Exposure                                        ",
+		"    0.0000000,               !- View Factor to Ground                                ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    -5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}                                              ",
+		"    5,-5,3,  !- X,Y,Z ==> Vertex 2 {m}                                               ",
+		"    5,5,3,  !- X,Y,Z ==> Vertex 3 {m}                                                ",
+		"    -5,5,3;  !- X,Y,Z ==> Vertex 4 {m}                                               ",
+		"  BuildingSurface:Detailed,                                                          ",
+		"    Zn001:floor,             !- Name                                                 ",
+		"    Floor,                   !- Surface Type                                         ",
+		"    SLAB FLOOR,              !- Construction Name                                    ",
+		"    ZONE ONE,                !- Zone Name                                            ",
+		"    Outdoors,                !- Outside Boundary Condition                           ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    SunExposed,              !- Sun Exposure                                         ",
+		"    WindExposed,             !- Wind Exposure                                        ",
+		"    0.0000000,               !- View Factor to Ground                                ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    -5,5,0,  !- X,Y,Z ==> Vertex 1 {m}                                               ",
+		"    5,5,0,  !- X,Y,Z ==> Vertex 2 {m}                                                ",
+		"    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}                                               ",
+		"    -5,-5,0;  !- X,Y,Z ==> Vertex 4 {m}                                              ",
+		"  FenestrationSurface:Detailed,                                                      ",
+		"    Zn001:Wall-South:Win001, !- Name                                                 ",
+		"    Window,                  !- Surface Type                                         ",
+		"    DOUBLE PANE HW WINDOW,   !- Construction Name                                    ",
+		"    Zn001:Wall-South,        !- Building Surface Name                                ",
+		"    ,                        !- Outside Boundary Condition Object                    ",
+		"    0.5000000,               !- View Factor to Ground                                ",
+		"    ,                        !- Shading Control Name                                 ",
+		"    TestFrameAndDivider,     !- Frame and Divider Name                               ",
+		"    1.0,                     !- Multiplier                                           ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}                                            ",
+		"    -3,-5,0.5,  !- X,Y,Z ==> Vertex 2 {m}                                            ",
+		"    3,-5,0.5,  !- X,Y,Z ==> Vertex 3 {m}                                             ",
+		"    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}                                             ",
+		"  WindowProperty:FrameAndDivider,                                                    ",
+		"    TestFrameAndDivider,     !- Name                                                 ",
+		"    0.05,                    !- Frame Width {m}                                      ",
+		"    0.05,                    !- Frame Outside Projection {m}                         ",
+		"    0.05,                    !- Frame Inside Projection {m}                          ",
+		"    5.0,                     !- Frame Conductance {W/m2-K}                           ",
+		"    1.2,                     !- Ratio of Frame-Edge Glass Conductance to Center-Of-Gl",
+		"    0.8,                     !- Frame Solar Absorptance                              ",
+		"    0.8,                     !- Frame Visible Absorptance                            ",
+		"    0.9,                     !- Frame Thermal Hemispherical Emissivity               ",
+		"    DividedLite,             !- Divider Type                                         ",
+		"    0.02,                    !- Divider Width {m}                                    ",
+		"    2,                       !- Number of Horizontal Dividers                        ",
+		"    2,                       !- Number of Vertical Dividers                          ",
+		"    0.02,                    !- Divider Outside Projection {m}                       ",
+		"    0.02,                    !- Divider Inside Projection {m}                        ",
+		"    5.0,                     !- Divider Conductance {W/m2-K}                         ",
+		"    1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-",
+		"    0.8,                     !- Divider Solar Absorptance                            ",
+		"    0.8,                     !- Divider Visible Absorptance                          ",
+		"    0.9;                     !- Divider Thermal Hemispherical Emissivity             ",
+		"  Shading:Zone:Detailed,                                                             ",
+		"    Zn001:Wall-South:Shade001,  !- Name                                              ",
+		"    Zn001:Wall-South,        !- Base Surface Name                                    ",
+		"    SunShading,              !- Transmittance Schedule Name                          ",
+		"    4,                       !- Number of Vertices                                   ",
+		"    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}                                            ",
+		"    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}                                            ",
+		"    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}                                             ",
+		"    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}                                             ",
+		"  ShadingProperty:Reflectance,                                                       ",
+		"    Zn001:Wall-South:Shade001,  !- Shading Surface Name                              ",
+		"    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
+		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	SimulationManager::GetProjectData();
+	bool FoundError = false;
+
+	HeatBalanceManager::GetProjectControlData( FoundError ); // read project control data
+	EXPECT_FALSE( FoundError ); // expect no errors
+
+	HeatBalanceManager::SetPreConstructionInputParameters();
+	ScheduleManager::ProcessScheduleInput(); // read schedules
+
+	HeatBalanceManager::GetMaterialData( FoundError );
+	EXPECT_FALSE( FoundError );
+
+	HeatBalanceManager::GetFrameAndDividerData( FoundError );
+	EXPECT_FALSE( FoundError );
+
+	HeatBalanceManager::GetConstructData( FoundError );
+	EXPECT_FALSE( FoundError );
+
+	HeatBalanceManager::GetZoneData( FoundError ); // Read Zone data from input file
+	EXPECT_FALSE( FoundError );
+
+	SurfaceGeometry::GetGeometryParameters( FoundError );
+	EXPECT_FALSE( FoundError );
+
+	SurfaceGeometry::CosZoneRelNorth.allocate( 1 );
+	SurfaceGeometry::SinZoneRelNorth.allocate( 1 );
+
+	SurfaceGeometry::CosZoneRelNorth( 1 ) = std::cos( -Zone( 1 ).RelNorth * DegToRadians );
+	SurfaceGeometry::SinZoneRelNorth( 1 ) = std::sin( -Zone( 1 ).RelNorth * DegToRadians );
+	SurfaceGeometry::CosBldgRelNorth = 1.0;
+	SurfaceGeometry::SinBldgRelNorth = 0.0;
+
+	SurfaceGeometry::GetSurfaceData( FoundError ); // setup zone geometry and get zone data
+	EXPECT_FALSE( FoundError ); // expect no errors
+
+	compare_err_stream( "" ); // just for debugging
+
+	SurfaceGeometry::SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
+	EXPECT_FALSE( FoundError );
+
+	SolarShading::AllocateModuleArrays();
+	SolarShading::DetermineShadowingCombinations();
+	DataEnvironment::DayOfYear_Schedule = 168;
+	DataEnvironment::DayOfWeek = 6;
+	DataGlobals::TimeStep = 4;
+	DataGlobals::HourOfDay = 9;
+
+	compare_err_stream( "" ); // just for debugging
+
+	DataSurfaces::ShadingTransmittanceVaries = true;
+	DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
+	SolarDistribution = FullExterior;
+
+	CalcSkyDifShading = true;
+	SolarShading::SkyDifSolarShading();
+	CalcSkyDifShading = false;
+
+	FigureSolarBeamAtTimestep( DataGlobals::HourOfDay, DataGlobals::TimeStep );
+
+	EXPECT_NEAR( 0.6504, DifShdgRatioIsoSkyHRTS( 4, 9, 6 ), 0.0001 );
+	EXPECT_NEAR( 0.9152, DifShdgRatioHorizHRTS( 4, 9, 6 ), 0.0001 );
+
+}
+

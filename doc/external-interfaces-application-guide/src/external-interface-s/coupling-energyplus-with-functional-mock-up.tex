@@ -1,6 +1,6 @@
 \section{Coupling EnergyPlus with Functional Mock-up Units for co-simulation}\label{coupling-energyplus-with-functional-mock-up-units-for-co-simulation}
 
-The Functional Mock-up Unit (FMU) for co-simulation import for EnergyPlus allows EnergyPlus to conduct co-simulation with various programs that are packaged as FMUs. A FMU is a component which implements the Functional Mock-up Interface (FMI) standard (http://www.modelisar.com).
+The Functional Mock-up Unit (FMU) for co-simulation import for EnergyPlus allows EnergyPlus to conduct co-simulation with various programs that are packaged as FMUs. A FMU is a component which implements the Functional Mock-up Interface (FMI) standard (\url{http://www.modelisar.com}).
 
 A FMU is distributed in the form of a zip file that may contain physical models, model descriptions, source code, and executable programs for various platforms. The FMU for co-simulation import provides EnergyPlus with a standard interface to conduct and control co-simulation with an arbitrary number of FMUs without any middle-ware, such as the Building Controls Virtual Test Bed (BCVTB Documentation, 2011).
 
@@ -65,8 +65,10 @@ Figure~\ref{fig:system-with-one-fmu-linked-to-energyplus.}~shows a case where a 
 \begin{figure}[hbtp] % fig 6
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image016.png}
-\caption{System with one FMU linked to EnergyPlus. HERHERHEHERHERHERHERH Table 2 shows the different system configurations that are possible. \protect \label{fig:system-with-one-fmu-linked-to-energyplus.}}
+\caption{System with one FMU linked to EnergyPlus. \protect \label{fig:system-with-one-fmu-linked-to-energyplus.}}
 \end{figure}
+
+Table \ref{table:use-cases-with-different-system-configurations} shows the different system configurations that are possible. 
 
 \begin{itemize}
 \item
@@ -81,14 +83,14 @@ Figure~\ref{fig:system-with-one-fmu-linked-to-energyplus.}~shows a case where a 
 
 In the current implementation, it will be focused on the first and the second cases since the third and the fourth cases will constrain the FMU to be solved numerically in the iteration solver loop of EnergyPlus. This will necessitate the ability of the FMU to reject time steps (Modelisar, 2010) which is currently not implemented in the EnergyPlus FMU for co-simulation import. Applications for case 1 and 2 are described in the next sections.
 
-Table 2:~Use cases with different system configurations
-
 \begin{longtable}[c]{@{}lll@{}}
+\caption{Use cases with different system configurations \label{table:use-cases-with-different-system-configurations}} \tabularnewline
 \toprule 
 Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline
 \midrule
 \endfirsthead
 
+\caption[]{Use cases with different system configurations} \tabularnewline
 \toprule 
 Case & EnergyPlus & FMU (e.g. from Modelica) \tabularnewline
 \midrule

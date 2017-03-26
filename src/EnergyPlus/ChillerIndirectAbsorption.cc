@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -77,6 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -118,7 +107,6 @@ namespace ChillerIndirectAbsorption {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using General::TrimSigDigits;
@@ -135,8 +123,6 @@ namespace ChillerIndirectAbsorption {
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 	static std::string const calcChillerAbsorptionIndirect( "CALC Chiller:Absorption:Indirect " );
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumIndirectAbsorbers( 0 ); // number of Absorption Chillers specified in input
@@ -157,6 +143,8 @@ namespace ChillerIndirectAbsorption {
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
 	Real64 EnergyLossToEnvironment( 0.0 ); // J - piping energy loss from generator outlet to pump inlet
 	Real64 ChillerONOFFCyclingFrac( 0.0 ); // fraction of time chiller is on
+	
+	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -224,7 +212,6 @@ namespace ChillerIndirectAbsorption {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 		int ChillNum; // Chiller number pointer
 
 		if ( CompIndex != 0 ) {
@@ -691,9 +678,6 @@ namespace ChillerIndirectAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -711,17 +695,8 @@ namespace ChillerIndirectAbsorption {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSatDensityRefrig;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitIndirectAbsorpChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -736,8 +711,6 @@ namespace ChillerIndirectAbsorption {
 		Real64 mdotEvap; // local fluid mass flow rate thru evaporator
 		Real64 mdotCond; // local fluid mass flow rate thru condenser
 		Real64 mdotGen; // local fluid mass flow rate thru generator
-
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -818,13 +791,13 @@ namespace ChillerIndirectAbsorption {
 		//Initialize Supply Side Variables
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			IndirectAbsorber( ChillNum ).EvapMassFlowRateMax = IndirectAbsorber( ChillNum ).EvapVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, IndirectAbsorber( ChillNum ).EvapMassFlowRateMax, IndirectAbsorber( ChillNum ).EvapInletNodeNum, IndirectAbsorber( ChillNum ).EvapOutletNodeNum, IndirectAbsorber( ChillNum ).CWLoopNum, IndirectAbsorber( ChillNum ).CWLoopSideNum, IndirectAbsorber( ChillNum ).CWBranchNum, IndirectAbsorber( ChillNum ).CWCompNum );
 
-			rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 			IndirectAbsorber( ChillNum ).CondMassFlowRateMax = rho * IndirectAbsorber( ChillNum ).CondVolFlowRate;
 
@@ -836,7 +809,7 @@ namespace ChillerIndirectAbsorption {
 
 				if ( IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 
-					rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 					IndirectAbsorber( ChillNum ).GenMassFlowRateMax = rho * IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
 
 				} else {
@@ -900,9 +873,6 @@ namespace ChillerIndirectAbsorption {
 		// the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		// is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -917,18 +887,9 @@ namespace ChillerIndirectAbsorption {
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeIndirectAbsorpChiller" );
 		static std::string const SizeChillerAbsorptionIndirect( "SIZE Chiller:Absorption:Indirect" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizIndex; // Plant Sizing Do loop index
@@ -1024,9 +985,9 @@ namespace ChillerIndirectAbsorption {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * IndirectAbsorber( ChillNum ).SizFac;
 				if ( ! IndirectAbsorber( ChillNum ).NomCapWasAutoSized ) tmpNomCap = IndirectAbsorber( ChillNum ).NomCap;
 			} else {
@@ -1181,9 +1142,9 @@ namespace ChillerIndirectAbsorption {
 			if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				//       QCondenser = QEvaporator + QGenerator + PumpingPower
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IndirectAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = IndirectAbsorber( ChillNum ).CondVolFlowRate;
 			} else {
@@ -1372,7 +1333,7 @@ namespace ChillerIndirectAbsorption {
 			if ( PltSizHeatingNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 				IndirectAbsorber( ChillNum ).GeneratorDeltaTemp = max( 0.5, PlantSizData( PltSizHeatingNum ).DeltaT );
 			} else if ( IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
-				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 				CpWater = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, PlantSizData( PltSizHeatingNum ).ExitTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 				if ( PlantFirstSizesOkayToFinalize ) {
 					IndirectAbsorber( ChillNum ).GeneratorDeltaTemp = ( SteamInputRatNom * IndirectAbsorber( ChillNum ).NomCap ) / ( CpWater * rho * IndirectAbsorber( ChillNum ).GeneratorVolFlowRate );
@@ -1409,7 +1370,7 @@ namespace ChillerIndirectAbsorption {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         R. Raustad (FSEC)
 		//       DATE WRITTEN   May 2008
-		//       MODIFIED       na
+		//       MODIFIED       Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1424,8 +1385,6 @@ namespace ChillerIndirectAbsorption {
 
 		// Using/Aliasing
 		using namespace FluidProperties;
-		using General::TrimSigDigits;
-		using General::RoundSigDigits;
 		using DataPlant::DeltaTempTol;
 		using DataPlant::PlantLoop;
 		using DataPlant::CompSetPtBasedSchemeType;
@@ -1435,10 +1394,15 @@ namespace ChillerIndirectAbsorption {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::OutBaroPress;
+		using FaultsManager::FaultsChillerSWTSensor;
+		using General::TrimSigDigits;
+		using General::RoundSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -1588,6 +1552,19 @@ namespace ChillerIndirectAbsorption {
 		LoopSideNum = IndirectAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( IndirectAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset ));
+			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		if ( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr > 0 ) {
 			CapacityfAbsorberTemp = CurveValue( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr, TempCondIn );
@@ -1662,6 +1639,20 @@ namespace ChillerIndirectAbsorption {
 					ShowRecurringWarningErrorAtEnd( "CalcIndirectAbsorberModel: Name=\"" + IndirectAbsorber( ChillNum ).Name + "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.", IndirectAbsorber( ChillNum ).ErrCount2 );
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( IndirectAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				//PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				//PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				//ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -1713,6 +1704,7 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
+
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
@@ -1723,6 +1715,16 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 		} //This is the end of the FlowLock Block
@@ -1754,7 +1756,7 @@ namespace ChillerIndirectAbsorption {
 			HeatInputfEvapTemp = 1.0;
 		}
 
-		//Calculate steam input ratio. Inlcude impact of generator and evaporator temperatures
+		//Calculate steam input ratio. Include impact of generator and evaporator temperatures
 		if ( IndirectAbsorber( ChillNum ).GeneratorInputCurvePtr > 0 ) {
 			HeatInputRat = CurveValue( IndirectAbsorber( ChillNum ).GeneratorInputCurvePtr, PartLoadRat ) * HeatInputfCondTemp * HeatInputfEvapTemp;
 		} else {

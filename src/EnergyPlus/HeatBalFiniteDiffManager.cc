@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -141,6 +129,7 @@ namespace HeatBalFiniteDiffManager {
 	using DataHeatBalSurface::QRadSWInAbs;
 	using DataHeatBalSurface::QRadSWOutMvIns;
 	using DataHeatBalSurface::TempSource;
+	using DataHeatBalSurface::TempUserLoc;
 	using DataHeatBalSurface::OpaqSurfInsFaceConductionFlux;
 	using DataHeatBalSurface::OpaqSurfOutsideFaceConductionFlux;
 	using DataHeatBalSurface::OpaqSurfOutsideFaceConduction;
@@ -161,6 +150,7 @@ namespace HeatBalFiniteDiffManager {
 	using DataHeatBalFanSys::QHWBaseboardSurf;
 	using DataHeatBalFanSys::QSteamBaseboardSurf;
 	using DataHeatBalFanSys::QElecBaseboardSurf;
+	using DataHeatBalFanSys::QCoolingPanelSurf;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::IsRain;
 	using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
@@ -2183,6 +2173,11 @@ namespace HeatBalFiniteDiffManager {
 						SurfaceFD( Surf ).SourceNodeNum = i;
 					}
 
+					if ( construct.SourceSinkPresent && ( Lay == construct.TempAfterLayer ) ) {
+						TempUserLoc( Surf ) = TDT_i; // Transfer node temp to DataHeatBalSurface module
+					}
+					
+					
 				} // End of R-layer and Regular check
 
 				TDT( i ) = TDT_i;
@@ -2235,6 +2230,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalFanSys::QHWBaseboardSurf;
 		using DataHeatBalFanSys::QSteamBaseboardSurf;
 		using DataHeatBalFanSys::QElecBaseboardSurf;
+		using DataHeatBalFanSys::QCoolingPanelSurf;
 		using DataSurfaces::HeatTransferModel_CondFD;
 
 		// Locals
@@ -2264,6 +2260,7 @@ namespace HeatBalFiniteDiffManager {
 		Real64 const QHWBaseboardSurfFD( QHWBaseboardSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of hot water baseboard heaters
 		Real64 const QSteamBaseboardSurfFD( QSteamBaseboardSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of steam baseboard heaters
 		Real64 const QElecBaseboardSurfFD( QElecBaseboardSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
+		Real64 const QCoolingPanelSurfFD( QCoolingPanelSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of simple cooling panels
 		Real64 const QRadThermInFD( QRadThermInAbs( Surf ) ); // Thermal radiation absorbed on inside surfaces
 
 		// Boundary Conditions from Simulation for Interior
@@ -2276,7 +2273,7 @@ namespace HeatBalFiniteDiffManager {
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		//    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
 		auto TDT_i( TDT( i ) );
-		Real64 const QFac( NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD + QRadThermInFD );
+		Real64 const QFac( NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD + QRadThermInFD + QCoolingPanelSurfFD );
 		if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 			int const MatLay( Construct( ConstrNum ).LayerPoint( Lay ) );
 			auto const & mat( Material( MatLay ) );

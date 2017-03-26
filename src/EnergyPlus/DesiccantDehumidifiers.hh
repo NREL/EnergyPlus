@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DesiccantDehumidifiers_hh_INCLUDED
 #define DesiccantDehumidifiers_hh_INCLUDED
@@ -128,6 +116,7 @@ namespace DesiccantDehumidifiers {
 		Real64 NomRotorPower; // rotor power consumption at full output [W]
 		int RegenCoilIndex; // Index for regen coil
 		int RegenFanIndex; // Index for regen fan
+		int regenFanType_Num; // Fan type number (see DataHVACGlobals)
 		int ProcDryBulbCurvefTW; // number of process leaving dry bulb f(edb,ew) curve
 		int ProcDryBulbCurvefV; // number of process leaving dry bulb f(v) curve
 		int ProcHumRatCurvefTW; // number of process leaving humidity ratio f(edb,ew) curve
@@ -184,6 +173,7 @@ namespace DesiccantDehumidifiers {
 		std::string ExhaustFanCurveObject; // exhaust fan curve object
 		std::string CoolingCoilType; // type of cooling coil used with desiccant heat exchanger
 		std::string CoolingCoilName; // name of cooling coil used with desiccant heat exchanger
+		int coolingCoil_TypeNum;  // type of cooling coil, DataHVACGlobals coil type constants
 		int Preheat; // determine condenser waste heat usage for pre heating regen air
 		Real64 RegenSetPointTemp; // heating set-point for regeneration air [C]
 		Real64 ExhaustFanMaxVolFlowRate; // exhaust fan maximum allowable air flow rate [m3/s]
@@ -237,6 +227,7 @@ namespace DesiccantDehumidifiers {
 			NomRotorPower( 0.0 ),
 			RegenCoilIndex( 0 ),
 			RegenFanIndex( 0 ),
+			regenFanType_Num( 0 ),
 			ProcDryBulbCurvefTW( 0 ),
 			ProcDryBulbCurvefV( 0 ),
 			ProcHumRatCurvefTW( 0 ),
@@ -284,6 +275,7 @@ namespace DesiccantDehumidifiers {
 			RegenFanErrorIndex3( 0 ),
 			RegenFanErrorIndex4( 0 ),
 			HXTypeNum( 0 ),
+			coolingCoil_TypeNum( 0 ),
 			Preheat( 0 ),
 			RegenSetPointTemp( 0.0 ),
 			ExhaustFanMaxVolFlowRate( 0.0 ),

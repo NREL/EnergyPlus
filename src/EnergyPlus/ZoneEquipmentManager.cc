@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -70,6 +58,7 @@
 #include <ZoneEquipmentManager.hh>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
+#include <ChilledCeilingPanelSimple.hh>
 #include <CoolTower.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
@@ -1097,6 +1086,7 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
@@ -1125,6 +1115,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
@@ -1162,6 +1153,7 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
@@ -1190,6 +1182,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
@@ -1334,6 +1327,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
+				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
 				FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
 				FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
@@ -1347,6 +1341,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( ZoneSizNum ).ZoneADEffCooling;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( ZoneSizNum ).ZoneADEffHeating;
 				FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = ZoneSizingInput( ZoneSizNum ).ZoneSecondaryRecirculation;
+				FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = ZoneSizingInput( ZoneSizNum ).ZoneVentilationEff;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
@@ -1366,6 +1361,7 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
+				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
@@ -1398,6 +1394,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
+				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
 				FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
 				FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
@@ -1411,6 +1408,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( 1 ).ZoneADEffCooling;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( 1 ).ZoneADEffHeating;
 				FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = ZoneSizingInput( 1 ).ZoneSecondaryRecirculation;
+				FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = ZoneSizingInput( 1 ).ZoneVentilationEff;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;
@@ -1430,6 +1428,7 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
+				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
@@ -2602,6 +2601,7 @@ namespace ZoneEquipmentManager {
 				z.CoolDDNum = c.CoolDDNum;
 
 				z.DesHeatLoad = c.DesHeatLoad;
+				z.NonAirSysDesHeatLoad = c.DesHeatLoad;
 				z.DesHeatMassFlow = c.DesHeatMassFlow;
 				z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
 				z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
@@ -2610,10 +2610,12 @@ namespace ZoneEquipmentManager {
 				z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
 				z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
 				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.NonAirSysDesHeatVolFlow = c.DesHeatVolFlow;
 				z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
 				z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
 
 				z.DesCoolLoad = c.DesCoolLoad;
+				z.NonAirSysDesCoolLoad = c.DesCoolLoad;
 				z.DesCoolMassFlow = c.DesCoolMassFlow;
 				z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
 				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
@@ -2622,6 +2624,7 @@ namespace ZoneEquipmentManager {
 				z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
 				z.TimeStepNumAtCoolMax = c.TimeStepNumAtCoolMax;
 				z.DesCoolVolFlow = c.DesCoolVolFlow;
+				z.NonAirSysDesCoolVolFlow = c.DesCoolVolFlow;
 				z.DesCoolCoilInTemp = c.DesCoolCoilInTemp;
 				z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
 			}
@@ -2669,8 +2672,10 @@ namespace ZoneEquipmentManager {
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				// Now take into account the user specified sizing factor and user specified cooling design air flow
-				// rate
+				// update non air system design load and air flow to include the sizing factor
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesCoolLoad *= FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesCoolVolFlow *= FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor; // NonAirSysDesCoolVolFlow not currently used
+				// Now take into account the user specified sizing factor and user specified cooling design air flow rate
 				TotCoolSizMult = 0.0;
 				// Calculate a sizing factor from the user specified cooling design air flow rate
 				if ( FinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow > 0.0 && FinalZoneSizing( CtrlZoneNum ).CoolAirDesMethod == InpDesAirFlow && FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
@@ -2775,7 +2780,13 @@ namespace ZoneEquipmentManager {
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepAtPeakF );
+						// issue 6006, heating coils sizing to 0 when no heating load in zone
+						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.empty() ) {
+							ShowSevereError( RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
+						} else {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.end() );
+						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
@@ -2783,13 +2794,17 @@ namespace ZoneEquipmentManager {
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolDesHumRat;
 						}
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRat = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 					}
 				}
-				// Now take into account the user specified sizing factor or user specified heating design air flow
-				// rate (which overrides the sizing factor)
+				// update non air system design load and air flow to include the sizing factor
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatLoad *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatVolFlow *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				// Now take into account the user specified sizing factor or user specified heating design air flow rate (which overrides the sizing factor)
 				TotHeatSizMult = 0.0;
 				// Calculate a sizing factor from the user specified heating design air flow rate
 				if ( FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow > 0.0 && FinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod == InpDesAirFlow && FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
@@ -2895,13 +2910,21 @@ namespace ZoneEquipmentManager {
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepAtPeakF );
+						// issue 6006, heating coils sizing to 0 when no heating load in zone
+						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.empty() ) {
+							ShowSevereError( RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
+						} else {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = *std::max_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.end() );
+						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, RoutineName ) );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatDesHumRat;
 						}
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRat = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
@@ -2910,10 +2933,14 @@ namespace ZoneEquipmentManager {
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
 				// minimum flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
+					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
+					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
+				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, 
+					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) *
+					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
 				// Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
 				if ( FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod == TemperatureDifference ) {
 					FinalZoneSizing( CtrlZoneNum ).CoolDesTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak - std::abs( FinalZoneSizing( CtrlZoneNum ).CoolDesTempDiff );
@@ -2980,9 +3007,9 @@ namespace ZoneEquipmentManager {
 		using SteamBaseboardRadiator::SimSteamBaseboard;
 		using BaseboardRadiator::SimBaseboard;
 		using BaseboardElectric::SimElectricBaseboard;
+		using CoolingPanelSimple::SimCoolingPanel;
 		using SplitterComponent::SimAirLoopSplitter;
 		using FanCoilUnits::SimFanCoilUnit;
-		using Fans::SimulateFanComponents;
 		using WindowAC::SimWindowAC;
 		using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
 		using ZoneDehumidifier::SimZoneDehumidifier;
@@ -3117,6 +3144,7 @@ namespace ZoneEquipmentManager {
 			// Air loop system availability manager status only applies to PIU and exhaust fans
 			// Reset fan SAM operation flags for zone fans.
 			TurnFansOn = false;
+			TurnZoneFansOnlyOn = false;
 			TurnFansOff = false;
 
 			for ( EquipTypeNum = 1; EquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++EquipTypeNum ) {
@@ -3188,6 +3216,10 @@ namespace ZoneEquipmentManager {
 					if ( ZoneEquipAvail( ControlledZoneNum ) == CycleOn || ZoneEquipAvail( ControlledZoneNum ) == CycleOnZoneFansOnly ) {
 						TurnFansOn = true;
 					}
+					if ( ZoneEquipAvail( ControlledZoneNum ) == CycleOnZoneFansOnly ) {
+						// Currently used only by parallel powered induction unit
+						TurnZoneFansOnlyOn = true;
+					}
 					if ( ZoneEquipAvail( ControlledZoneNum ) == ForceOff ) {
 						TurnFansOff = true;
 					}
@@ -3196,6 +3228,7 @@ namespace ZoneEquipmentManager {
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;
+					TurnZoneFansOnlyOn = false;
 					TurnFansOff = false;
 
 					NonAirSystemResponse( ActualZoneNum ) += NonAirSysOutput;
@@ -3263,6 +3296,12 @@ namespace ZoneEquipmentManager {
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
 					LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
+				} else if ( SELECT_CASE_var == CoolingPanel_Num ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					
+					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
+					LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
+					
 				} else if ( SELECT_CASE_var == HiTempRadiant_Num ) { // 'ZoneHVAC:HighTemperatureRadiant'
 					SimHighTempRadiantSystem( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 					LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
@@ -3285,7 +3324,7 @@ namespace ZoneEquipmentManager {
 						TurnFansOff = true;
 					}
 
-					SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					Fans::SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;
@@ -4505,7 +4544,6 @@ namespace ZoneEquipmentManager {
 		MCPTM = 0.0;
 		MixingMassFlowZone = 0.0;
 		MixingMassFlowXHumRat = 0.0;
-		CrossMixingFlag = false;
 		CrossMixingReportFlag = false;
 		MixingReportFlag = false;
 		if ( Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0 ) MixingMassFlowCO2 = 0.0;
@@ -4522,7 +4560,6 @@ namespace ZoneEquipmentManager {
 		VentMCP = 0.0;
 		MDotCPOA = 0.0;
 		MDotOA = 0.0;
-
 		MCPThermChim = 0.0;
 		ThermChimAMFL = 0.0;
 		MCPTThermChim = 0.0;
@@ -4936,7 +4973,7 @@ namespace ZoneEquipmentManager {
 		for ( j = 1; j <= TotCrossMixing; ++j ) {
 			n = CrossMixing( j ).ZonePtr;
 			m = CrossMixing( j ).FromZone;
-			TD = MTC( j );
+			TD = CrossMixing( j ).DeltaTemperature;
 			// Get scheduled delta temperature
 			if ( CrossMixing( j ).DeltaTempSchedPtr > 0 ) {
 				TD = GetCurrentScheduleValue( CrossMixing( j ).DeltaTempSchedPtr );
@@ -5020,36 +5057,33 @@ namespace ZoneEquipmentManager {
 					CrossMixingReportFlag( j ) = true; // set reporting flag
 				}
 
-				if ( ( ( TD <= 0.0 ) && ( ! CrossMixingFlag( n ) && ! CrossMixingFlag( m ) ) ) || ( ( TD > 0.0 ) && ( TZM - TZN >= TD ) ) ) {
-					//                                      SET COEFFICIENTS .
-					CrossMixingFlag( n ) = true;
-					CrossMixingFlag( m ) = true;
-
+				if ( ( TD <= 0.0 ) || ( ( TD > 0.0 ) && ( TZM - TZN >= TD ) ) ) {
+						//                                      SET COEFFICIENTS .
 					Tavg = ( TZN + TZM ) / 2.0;
 					Wavg = ( ZHumRat( n ) + ZHumRat( m ) ) / 2.0;
 					AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing );
 					CpAir = PsyCpAirFnWTdb( Wavg, Tavg );
-					MCPxN = MVFC( j ) * CpAir * AirDensity;
+					MCPxN = CrossMixing( j ).DesiredAirFlowRate * CpAir * AirDensity;
 					MCPM( n ) += MCPxN;
 
-					MCPxM = MVFC( j ) * CpAir * AirDensity;
+					MCPxM = CrossMixing( j ).DesiredAirFlowRate * CpAir * AirDensity;
 					MCPM( m ) += MCPxM;
 					MCPTM( n ) += MCPxM * TZM;
 					MCPTM( m ) += MCPxN * TZN;
 
 					// Now to determine the moisture conditions
-					MixingMassFlowZone( m ) += MVFC( j ) * AirDensity;
-					MixingMassFlowXHumRat( m ) += MVFC( j ) * AirDensity * ZHumRat( n );
+					MixingMassFlowZone( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity;
+					MixingMassFlowXHumRat( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZHumRat( n );
 
-					MixingMassFlowZone( n ) += MVFC( j ) * AirDensity;
-					MixingMassFlowXHumRat( n ) += MVFC( j ) * AirDensity * ZHumRat( m );
+					MixingMassFlowZone( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity;
+					MixingMassFlowXHumRat( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZHumRat( m );
 					if ( Contaminant.CO2Simulation ) {
-						MixingMassFlowCO2( m ) += MVFC( j ) * AirDensity * ZoneAirCO2( n );
-						MixingMassFlowCO2( n ) += MVFC( j ) * AirDensity * ZoneAirCO2( m );
+						MixingMassFlowCO2( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirCO2( n );
+						MixingMassFlowCO2( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirCO2( m );
 					}
 					if ( Contaminant.GenericContamSimulation ) {
-						MixingMassFlowGC( m ) += MVFC( j ) * AirDensity * ZoneAirGC( n );
-						MixingMassFlowGC( n ) += MVFC( j ) * AirDensity * ZoneAirGC( m );
+						MixingMassFlowGC( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirGC( n );
+						MixingMassFlowGC( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirGC( m );
 					}
 				}
 			}
@@ -5229,7 +5263,6 @@ namespace ZoneEquipmentManager {
 				OAMFL( NZ ) += MCpI_temp / CpAir;
 				MCPTI( NZ ) += MCpI_temp * TempExt;
 			}
-
 		}
 
 		// Add infiltration rate enhanced by the existence of thermal chimney

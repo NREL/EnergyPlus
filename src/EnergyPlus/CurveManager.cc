@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -380,6 +368,20 @@ namespace CurveManager {
 	void
 	GetCurveInput()
 	{
+		// wrapper for GetInput to allow unit testing when fatal inputs are detected - follow pattern from GetSetPointManagerInputs()
+		bool GetInputErrorsFound = false;
+
+		GetCurveInputData( GetInputErrorsFound );
+
+		if ( GetInputErrorsFound ) {
+			ShowFatalError( "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination." );
+		}
+
+	}
+
+	void
+	GetCurveInputData( bool & ErrorsFound )
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
@@ -393,6 +395,7 @@ namespace CurveManager {
 		//                          FanPressureRise, ExponentialSkewNormal, Sigmoid, RectangularHyperbola1,
 		//                          RectangularHyperbola2, ExponentialDecay
 		//                      Aug.  2014, Rongpeng Zhang, added a new curve type (ChillerPartLoadWithLift)
+		//                      Jan. 2017, Jason DeGraw, added WPC input into tables
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -440,6 +443,7 @@ namespace CurveManager {
 		int NumTriQuad; // Number of triquadratic curve objects in the input file
 		int NumExponent; // Number of exponent curve objects in the input file
 		int NumOneVarTab; // Number of one variable table objects in the input file
+		int NumWPCValTab; // Number of wind pressure coefficient value table objects in the input file
 		int NumTwoVarTab; // Number of two variable table objects in the input file
 		int NumChillerPartLoadWithLift; // Number of ChillerPartLoadWithLift curve objects in the input data file
 		int NumMultVarLookup; // Number of multivariable tables
@@ -459,7 +463,6 @@ namespace CurveManager {
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in renaming.
@@ -513,20 +516,26 @@ namespace CurveManager {
 		NumChillerPartLoadWithLift = GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
 
 		NumOneVarTab = GetNumObjectsFound( "Table:OneIndependentVariable" );
+		NumWPCValTab = GetNumObjectsFound( "AirflowNetwork:MultiZone:WindPressureCoefficientValues" );
 		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
 					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
-					NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift;
+					NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift + NumWPCValTab;
 
 		// intermediate count for one and two variable performance tables
-		NumTables = NumOneVarTab + NumTwoVarTab;
+		NumTables = NumOneVarTab + NumTwoVarTab + NumWPCValTab;
 		// final count for all tables
-		NumLookupTables = NumOneVarTab + NumTwoVarTab + NumMultVarLookup;
+		NumLookupTables = NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumWPCValTab;
 		if ( NumLookupTables > 0 ) TableLookup.allocate( NumLookupTables );
 
 		if ( NumOneVarTab > 0 ) {
 			GetObjectDefMaxArgs( "Table:OneIndependentVariable", TotalArgs, NumAlphas, NumNumbers );
+			MaxTableNums = max( MaxTableNums, NumNumbers );
+			MaxTableData = max( MaxTableData, MaxTableNums );
+		}
+		if (NumWPCValTab > 0) {
+			GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
@@ -1873,22 +1882,22 @@ namespace CurveManager {
 			}}
 
 			if ( lNumericFieldBlanks( 1 ) ) {
-				PerfCurve( CurveNum ).Var1Min = 99999999999.0;
+				PerfCurve( CurveNum ).Var1Min = -99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
+				PerfCurve( CurveNum ).Var1MinPresent = true;
 			}
 			if ( lNumericFieldBlanks( 2 ) ) {
-				PerfCurve( CurveNum ).Var1Max = -99999999999.0;
+				PerfCurve( CurveNum ).Var1Max = 99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
+				PerfCurve( CurveNum ).Var1MaxPresent = true;
 			}
 
-			if ( ! lNumericFieldBlanks( 1 ) && ! lNumericFieldBlanks( 2 ) ) {
-				if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
-					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Numbers( 1 ), 2 ) + "] > " + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 2 ) + ']' );
-					ErrorsFound = true;
-				}
+			if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 1 ) + " [" + RoundSigDigits( Numbers( 1 ), 2 ) + "] > " + cNumericFieldNames( 2 ) + " [" + RoundSigDigits( Numbers( 2 ), 2 ) + ']' );
+				ErrorsFound = true;
 			}
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
@@ -1983,7 +1992,48 @@ namespace CurveManager {
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
+				if ( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+			} 
+
+			// if user enters limits that exceed data range, warn that limits are based on table data
+			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
+				if ( PerfCurve( CurveNum ).Var1MinPresent ) {
+					if ( PerfCurve( CurveNum ).Var1Min < minval( TableData( TableNum ).X1 ) ) {
+						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( cNumericFieldNames( 1 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 1 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+					}
+				} else {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
+					if ( PerfCurve( CurveNum ).Var1Max > maxval( TableData( TableNum ).X1 ) ) {
+						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( cNumericFieldNames( 2 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 2 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+					}
+				} else {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
 			}
+
+			// if user does not enter limits, set to min/max in table
+			if( PerfCurve( CurveNum ).InterpolationType == LagrangeInterpolationLinearExtrapolation ) {
+				if( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+			}
+
 			// move table data to more compact array to allow interpolation using multivariable lookup table method
 			TableLookup( TableNum ).NumIndependentVars = 1;
 			TableLookup( TableNum ).NumX1Vars = size( PerfCurveTableData( TableNum ).X1 );
@@ -1992,6 +2042,396 @@ namespace CurveManager {
 			TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
 			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
 		}
+
+		// Loop over wind pressure coefficient tables and load data
+		if ( NumWPCValTab > 0 ) {
+			// Get the angle values
+			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
+			int numOfCPArray = GetNumObjectsFound(CurrentModuleObject);
+
+			if ( numOfCPArray != 1 ) {
+				ShowSevereError( "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject
+					+ " object per simulation is required when using the AirflowNetwork model." );
+				ErrorsFound = true;
+			} else if ( numOfCPArray == 1 ) {
+				GetObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+
+				std::string wpcName = Alphas( 1 ); // Name of CP array
+				int numWindDir = NumNumbers;
+				std::vector<Real64> windDirs( numWindDir );
+
+				Real64 dirMin = 0;
+				Real64 dirMax = 0;
+				for ( int j = 1; j <= NumNumbers; ++j ) { // Wind direction
+					windDirs[ j - 1 ] = Numbers( j );
+					dirMin = std::min( dirMin, Numbers( j ) );
+					dirMax = std::max( dirMax, Numbers( j ) );
+					if ( j > 1 ) {
+						if ( windDirs[ j - 2 ] >= windDirs[ j - 1 ]) {
+							ShowSevereError( "GetCurveInput: An " + CurrentModuleObject + " object " );
+							ShowContinueError( "has either the same values for two consecutive wind directions, or a lower wind direction value after a higher wind direction value." );
+							ShowContinueError( "Wind direction values must be entered in ascending order." );
+							ShowContinueError( cNumericFieldNames(j) + " = " + RoundSigDigits(windDirs[ j - 2 ], 2) + ' ' + cNumericFieldNames[ j + 1 ] + " = " + RoundSigDigits(windDirs[ j - 1 ], 2));
+							ErrorsFound = true;
+						}
+					}
+				}
+				// Check that the first table value is zero
+				if ( dirMin != 0.0 ) {
+					ShowSevereError( "GetCurveInput: An " + CurrentModuleObject + " object ");
+					ShowContinueError( "has a nonzero minimum value of " + RoundSigDigits(dirMin, 2) );
+					ShowContinueError( "Wind direction values must begin at zero.");
+					ErrorsFound = true;
+				}
+
+				// Now that we have the directions, we can read the tables themselves
+				CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
+				for ( int index = 1; index <= NumWPCValTab; ++index ) {
+					GetObjectItem(CurrentModuleObject, index, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+					++CurveNum;
+					++TableNum;
+					NumTableEntries = NumNumbers;
+					TableData( TableNum ).X1.allocate( NumTableEntries + 1 );
+					TableData( TableNum ).Y.allocate( NumTableEntries + 1 );
+					IsNotOK = false;
+					IsBlank = false;
+					VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					if (IsNotOK) {
+						ErrorsFound = true;
+						if (IsBlank) Alphas( 1 ) = "xxxxx";
+					}
+					// Need to verify that this name isn't used in Pressure Curves as well.
+					if ( NumPressureCurves > 0 ) {
+						CurveFound = FindItemInList( Alphas(1), PressureCurve );
+						if ( CurveFound != 0 ) {
+							ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate curve name." );
+							ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
+							ErrorsFound = true;
+						}
+					}
+
+					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
+					if ( !InputProcessor::SameString( Alphas(2), wpcName ) ) {
+						ShowSevereError( "GetCurveInput: Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) + " in " + CurrentModuleObject + " = " + Alphas( 1 ) );
+						ShowContinueError( "The valid name is " + wpcName );
+						ErrorsFound = true;
+					}
+
+					PerfCurve( CurveNum ).Name = Alphas( 1 );
+					PerfCurve( CurveNum ).ObjectType = CurveType_TableOneIV;
+					PerfCurve( CurveNum ).TableIndex = TableNum;
+					PerfCurve( CurveNum ).CurveType = Linear;
+					TableLookup( TableNum ).InterpolationOrder = 2;
+
+					PerfCurve( CurveNum ).InterpolationType = LinearInterpolationOfTable;
+
+					PerfCurve( CurveNum ).Var1Min = 0.0;
+					PerfCurve( CurveNum ).Var1MinPresent = true;
+					PerfCurve( CurveNum ).Var1Max = 360.0;
+					PerfCurve( CurveNum ).Var1MaxPresent = true;
+
+					TableData(TableNum).NormalPoint = 1.0;
+
+					PerfCurve( CurveNum ).CurveMin = -1.0;
+					PerfCurve( CurveNum ).CurveMinPresent = true;
+
+					PerfCurve( CurveNum ).CurveMax = 1.0;
+					PerfCurve( CurveNum ).CurveMaxPresent = true;
+
+					MaxTableNums = NumNumbers;
+					if ( NumNumbers != numWindDir ) {
+						ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( "The number of data entries must match the number of wind directions given in the wind pressure coefficient array. Number of data entries = " + RoundSigDigits( NumNumbers ) );
+						ErrorsFound = true;
+					}
+					else {
+						for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
+							TableData( TableNum ).X1( TableDataIndex ) = windDirs[ TableDataIndex - 1 ];
+							TableData( TableNum ).Y( TableDataIndex ) = Numbers( TableDataIndex );
+						}
+						TableData( TableNum ).X1( MaxTableNums + 1 ) = 360.0;
+						TableData( TableNum ).Y( MaxTableNums + 1 ) = Numbers( 1 );
+					}
+
+					// Convert raw table data to multidimensional array
+					// Find number of x variables
+					MaxTableNums += 1;
+					NumXVar = 1;
+					NextXVar = 1;
+					TempTableData = TableData;
+					while (NumXVar <= MaxTableNums) {
+
+						MinTableData = minval(TempTableData(TableNum).X1);
+						for (VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex) {
+							if (TempTableData(TableNum).X1(VarIndex) == MinTableData) {
+								TableData(TableNum).X1(NumXVar) = TempTableData(TableNum).X1(VarIndex);
+								TableData(TableNum).Y(NumXVar) = TempTableData(TableNum).Y(VarIndex);
+								TempTableData(TableNum).X1(VarIndex) = 999999.0;
+								++NumXVar;
+							}
+						}
+
+						NextXVar = NumXVar;
+
+					}
+
+					// Move table data to performance curve table data structure
+					PerfCurveTableData( TableNum ).X1.allocate( NumXVar - 1 );
+					PerfCurveTableData( TableNum ).Y.allocate( 1, NumXVar - 1 );
+					PerfCurveTableData( TableNum ).X1 = TableData( TableNum ).X1;
+					for ( VarIndex = 1; VarIndex <= NumXVar - 1; ++VarIndex ) {
+						PerfCurveTableData( TableNum ).Y( 1, VarIndex ) = TableData( TableNum ).Y( VarIndex );
+					}
+
+					// move table data to more compact array to allow interpolation using multivariable lookup table method
+					TableLookup( TableNum ).NumIndependentVars = 1;
+					TableLookup( TableNum ).NumX1Vars = size( PerfCurveTableData( TableNum ).X1 );
+					TableLookup( TableNum ).X1Var.allocate( TableLookup( TableNum ).NumX1Vars );
+					TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, size(PerfCurveTableData( TableNum ).Y ) );
+					TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
+					TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
+				}
+			}
+		}
+		/*
+		for (CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex) {
+			GetObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+			++CurveNum;
+			++TableNum;
+			NumTableEntries = (NumNumbers - 5) / 2;
+			TableData(TableNum).X1.allocate(NumTableEntries);
+			TableData(TableNum).Y.allocate(NumTableEntries);
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName(Alphas(1), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+			if (IsNotOK) {
+				ErrorsFound = true;
+				if (IsBlank) Alphas(1) = "xxxxx";
+			}
+			// Need to verify that this name isn't used in Pressure Curves as well.
+			if (NumPressureCurves > 0) {
+				CurveFound = FindItemInList(Alphas(1), PressureCurve);
+				if (CurveFound != 0) {
+					ShowSevereError("GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate curve name.");
+					ShowContinueError("...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves.");
+					ErrorsFound = true;
+				}
+			}
+			PerfCurve(CurveNum).Name = Alphas(1);
+			PerfCurve(CurveNum).ObjectType = CurveType_TableOneIV;
+			PerfCurve(CurveNum).TableIndex = TableNum;
+			{ auto const SELECT_CASE_var(Alphas(2));
+			if (SELECT_CASE_var == "LINEAR") {
+				PerfCurve(CurveNum).CurveType = Linear;
+				TableLookup(TableNum).InterpolationOrder = 2;
+			}
+			else if (SELECT_CASE_var == "QUADRATIC") {
+				PerfCurve(CurveNum).CurveType = Quadratic;
+				TableLookup(TableNum).InterpolationOrder = 3;
+			}
+			else if (SELECT_CASE_var == "CUBIC") {
+				PerfCurve(CurveNum).CurveType = Cubic;
+				TableLookup(TableNum).InterpolationOrder = 4;
+			}
+			else if (SELECT_CASE_var == "QUARTIC") {
+				PerfCurve(CurveNum).CurveType = Quartic;
+				TableLookup(TableNum).InterpolationOrder = 5;
+			}
+			else if (SELECT_CASE_var == "EXPONENT") {
+				PerfCurve(CurveNum).CurveType = Exponent;
+				TableLookup(TableNum).InterpolationOrder = 4;
+			}
+			else {
+				ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+				ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
+				ErrorsFound = true;
+			}}
+
+			{ auto const SELECT_CASE_var(Alphas(3));
+			if (SELECT_CASE_var == "LINEARINTERPOLATIONOFTABLE") {
+				PerfCurve(CurveNum).InterpolationType = LinearInterpolationOfTable;
+			}
+			else if (SELECT_CASE_var == "LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION") {
+				PerfCurve(CurveNum).InterpolationType = LagrangeInterpolationLinearExtrapolation;
+			}
+			else if (SELECT_CASE_var == "EVALUATECURVETOLIMITS") {
+				PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+			}
+			else {
+				ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+				ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
+				ErrorsFound = true;
+			}}
+
+			if (lNumericFieldBlanks(1)) {
+				PerfCurve(CurveNum).Var1Min = -99999999999.0;
+			}
+			else {
+				PerfCurve(CurveNum).Var1Min = Numbers(1);
+				PerfCurve(CurveNum).Var1MinPresent = true;
+			}
+			if (lNumericFieldBlanks(2)) {
+				PerfCurve(CurveNum).Var1Max = 99999999999.0;
+			}
+			else {
+				PerfCurve(CurveNum).Var1Max = Numbers(2);
+				PerfCurve(CurveNum).Var1MaxPresent = true;
+			}
+
+			if (Numbers(1) > Numbers(2)) { // error
+				ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+				ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(Numbers(1), 2) + "] > " + cNumericFieldNames(2) + " [" + RoundSigDigits(Numbers(2), 2) + ']');
+				ErrorsFound = true;
+			}
+			if (NumAlphas >= 4) {
+				if (!IsCurveInputTypeValid(Alphas(4))) {
+					ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+					ShowContinueError(cAlphaFieldNames(4) + " [" + Alphas(4) + "] is invalid");
+				}
+			}
+			if (NumAlphas >= 5) {
+				if (!IsCurveOutputTypeValid(Alphas(5))) {
+					ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+					ShowContinueError(cAlphaFieldNames(5) + " [" + Alphas(5) + "] is invlaid");
+				}
+			}
+
+			// read this value first to allow normalization of min/max table output fields
+			if (!lNumericFieldBlanks(5)) {
+				TableData(TableNum).NormalPoint = Numbers(5);
+				if (Numbers(5) == 0.0) {
+					ShowSevereError("GetTableInput: For " + CurrentModuleObject + ": " + Alphas(1));
+					ShowContinueError("..." + cNumericFieldNames(5) + " [" + RoundSigDigits(Numbers(5), 6) + "] is not a valid choice.");
+					ShowContinueError("...Setting Normalization Reference to 1 and the simulation continues.");
+					TableData(TableNum).NormalPoint = 1.0;
+				}
+			}
+			else {
+				TableData(TableNum).NormalPoint = 1.0;
+			}
+
+			if (!lNumericFieldBlanks(3)) {
+				PerfCurve(CurveNum).CurveMin = Numbers(3) / TableData(TableNum).NormalPoint;
+				PerfCurve(CurveNum).CurveMinPresent = true;
+			}
+			if (!lNumericFieldBlanks(4)) {
+				PerfCurve(CurveNum).CurveMax = Numbers(4) / TableData(TableNum).NormalPoint;
+				PerfCurve(CurveNum).CurveMaxPresent = true;
+			}
+
+			MaxTableNums = (NumNumbers - 5) / 2;
+			if (mod((NumNumbers - 5), 2) != 0) {
+				ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+				ShowContinueError("The number of data entries must be evenly divisable by 2. Number of data entries = " + RoundSigDigits(NumNumbers - 5));
+				ErrorsFound = true;
+			}
+			else {
+				for (TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex) {
+					TableData(TableNum).X1(TableDataIndex) = Numbers((TableDataIndex - 1) * 2 + 5 + 1);
+					TableData(TableNum).Y(TableDataIndex) = Numbers((TableDataIndex - 1) * 2 + 5 + 2) / TableData(TableNum).NormalPoint;
+				}
+			}
+
+			// convert raw table data to multidimensional array
+			// find number of x variables
+			NumXVar = 1;
+			NextXVar = 1;
+			TempTableData = TableData;
+			while (NumXVar <= MaxTableNums) {
+
+				MinTableData = minval(TempTableData(TableNum).X1);
+				for (VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex) {
+					if (TempTableData(TableNum).X1(VarIndex) == MinTableData) {
+						TableData(TableNum).X1(NumXVar) = TempTableData(TableNum).X1(VarIndex);
+						TableData(TableNum).Y(NumXVar) = TempTableData(TableNum).Y(VarIndex);
+						TempTableData(TableNum).X1(VarIndex) = 999999.0;
+						++NumXVar;
+					}
+				}
+
+				NextXVar = NumXVar;
+
+			}
+
+			// move table data to performance curve table data structure
+			PerfCurveTableData(TableNum).X1.allocate(NumXVar - 1);
+			PerfCurveTableData(TableNum).Y.allocate(1, NumXVar - 1);
+			PerfCurveTableData(TableNum).X1 = TableData(TableNum).X1;
+			for (VarIndex = 1; VarIndex <= NumXVar - 1; ++VarIndex) {
+				PerfCurveTableData(TableNum).Y(1, VarIndex) = TableData(TableNum).Y(VarIndex);
+			}
+
+			// create curve objects when regression analysis is required
+			if (PerfCurve(CurveNum).InterpolationType == EvaluateCurveToLimits) {
+				{ auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
+				if ((SELECT_CASE_var == Linear) || (SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var == Quartic) || (SELECT_CASE_var == Exponent)) {
+					TempArray1 = PerfCurveTableData(TableNum).X1;
+					TempArray2.allocate(size(PerfCurveTableData(TableNum).Y));
+					for (VarIndex = 1; VarIndex <= isize(PerfCurveTableData(TableNum).Y); ++VarIndex) {
+						TempArray2(VarIndex) = PerfCurveTableData(TableNum).Y(1, VarIndex);
+					}
+					SolveRegression(CurveNum, CurrentModuleObject, PerfCurve(CurveNum).Name, TempArray1, TempArray2);
+					TempArray1.deallocate();
+					TempArray2.deallocate();
+				}
+				else {
+					ShowWarningError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+					ShowContinueError("The requested regression analysis is not available at this time. Curve type = " + Alphas(2));
+					PerfCurve(CurveIndex).InterpolationType = LinearInterpolationOfTable;
+				}}
+				if (!PerfCurve(CurveNum).Var1MinPresent) {
+					PerfCurve(CurveNum).Var1Min = minval(TableData(TableNum).X1);
+				}
+				if (!PerfCurve(CurveNum).Var1MaxPresent) {
+					PerfCurve(CurveNum).Var1Max = maxval(TableData(TableNum).X1);
+				}
+			}
+
+			// if user enters limits that exceed data range, warn that limits are based on table data
+			if (PerfCurve(CurveNum).InterpolationType == LinearInterpolationOfTable) {
+				if (PerfCurve(CurveNum).Var1MinPresent) {
+					if (PerfCurve(CurveNum).Var1Min < minval(TableData(TableNum).X1)) {
+						ShowWarningError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+						ShowContinueError(cNumericFieldNames(1) + " exceeds the data range and will not be used.");
+						ShowContinueError(" Entered value = " + RoundSigDigits(Numbers(1), 6) + ", Minimum data range = " + RoundSigDigits(minval(TableData(TableNum).X1), 6));
+						PerfCurve(CurveNum).Var1Min = minval(TableData(TableNum).X1);
+					}
+				}
+				else {
+					PerfCurve(CurveNum).Var1Min = minval(TableData(TableNum).X1);
+				}
+				if (PerfCurve(CurveNum).Var1MaxPresent) {
+					if (PerfCurve(CurveNum).Var1Max > maxval(TableData(TableNum).X1)) {
+						ShowWarningError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+						ShowContinueError(cNumericFieldNames(2) + " exceeds the data range and will not be used.");
+						ShowContinueError(" Entered value = " + RoundSigDigits(Numbers(2), 6) + ", Maximum data range = " + RoundSigDigits(maxval(TableData(TableNum).X1), 6));
+						PerfCurve(CurveNum).Var1Max = maxval(TableData(TableNum).X1);
+					}
+				}
+				else {
+					PerfCurve(CurveNum).Var1Max = maxval(TableData(TableNum).X1);
+				}
+			}
+
+			// if user does not enter limits, set to min/max in table
+			if (PerfCurve(CurveNum).InterpolationType == LagrangeInterpolationLinearExtrapolation) {
+				if (!PerfCurve(CurveNum).Var1MinPresent) {
+					PerfCurve(CurveNum).Var1Min = minval(TableData(TableNum).X1);
+				}
+				if (!PerfCurve(CurveNum).Var1MaxPresent) {
+					PerfCurve(CurveNum).Var1Max = maxval(TableData(TableNum).X1);
+				}
+			}
+
+			// move table data to more compact array to allow interpolation using multivariable lookup table method
+			TableLookup(TableNum).NumIndependentVars = 1;
+			TableLookup(TableNum).NumX1Vars = size(PerfCurveTableData(TableNum).X1);
+			TableLookup(TableNum).X1Var.allocate(TableLookup(TableNum).NumX1Vars);
+			TableLookup(TableNum).TableLookupZData.allocate(1, 1, 1, 1, size(PerfCurveTableData(TableNum).Y));
+			TableLookup(TableNum).X1Var = PerfCurveTableData(TableNum).X1;
+			TableLookup(TableNum).TableLookupZData(1, 1, 1, 1, _) = PerfCurveTableData(TableNum).Y(1, _);
+		}
+		*/
 
 		// Loop over two variable tables and load data
 		CurrentModuleObject = "Table:TwoIndependentVariables";
@@ -2053,10 +2493,30 @@ namespace CurveManager {
 				ErrorsFound = true;
 			}}
 
-			PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
-			PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
-			PerfCurve( CurveNum ).Var2Min = Numbers( 3 );
-			PerfCurve( CurveNum ).Var2Max = Numbers( 4 );
+			if( lNumericFieldBlanks( 1 ) ) {
+				PerfCurve( CurveNum ).Var1Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
+				PerfCurve( CurveNum ).Var1MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 2 ) ) {
+				PerfCurve( CurveNum ).Var1Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
+				PerfCurve( CurveNum ).Var1MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 3 ) ) {
+				PerfCurve( CurveNum ).Var2Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Min = Numbers( 3 );
+				PerfCurve( CurveNum ).Var2MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 4 ) ) {
+				PerfCurve( CurveNum ).Var2Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Max = Numbers( 4 );
+				PerfCurve( CurveNum ).Var2MaxPresent = true;
+			}
 
 			if ( Numbers( 1 ) > Numbers( 2 ) ) { // error
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
@@ -2113,6 +2573,9 @@ namespace CurveManager {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
 				ErrorsFound = true;
+				TableData( TableNum ).X1 = 0.;
+				TableData( TableNum ).X2 = 0.;
+				TableData( TableNum ).Y = 0.;
 			} else {
 				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
 					TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
@@ -2229,6 +2692,77 @@ namespace CurveManager {
 					ShowContinueError( "The requested regression analysis is not available at this time. Curve type = " + Alphas( 2 ) );
 					PerfCurve( CurveIndex ).InterpolationType = LinearInterpolationOfTable;
 				}}
+				if ( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+				if ( !PerfCurve( CurveNum ).Var2MinPresent ) {
+					PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
+				}
+				if ( !PerfCurve( CurveNum ).Var2MaxPresent ) {
+					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
+				}
+			}
+
+			// if user enters limits that exceed data range, warn that limits are based on table data
+			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
+				if ( PerfCurve( CurveNum ).Var1MinPresent ) {
+					if ( PerfCurve( CurveNum ).Var1Min < minval( TableData( TableNum ).X1 ) ) {
+						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( cNumericFieldNames( 1 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 1 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+					}
+				} else {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
+					if ( PerfCurve( CurveNum ).Var1Max > maxval( TableData( TableNum ).X1 ) ) {
+						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( cNumericFieldNames( 2 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 2 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
+						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+					}
+				} else {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+				if ( PerfCurve( CurveNum ).Var2MinPresent ) {
+					if ( PerfCurve( CurveNum ).Var2Min < minval( TableData( TableNum ).X2 ) ) {
+						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( cNumericFieldNames( 3 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 3 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X2 ), 6 ) );
+						PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
+					}
+				} else {
+					PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
+				}
+				if ( PerfCurve( CurveNum ).Var2MaxPresent ) {
+					if ( PerfCurve( CurveNum ).Var2Max > maxval( TableData( TableNum ).X2 ) ) {
+						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+						ShowContinueError( cNumericFieldNames( 4 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 4 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X2 ), 6 ) );
+						PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
+					}
+				} else {
+					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
+				}
+			}
+			// if user does not enter limits, set to min/max in table
+			if( PerfCurve( CurveNum ).InterpolationType == LagrangeInterpolationLinearExtrapolation ) {
+				if( !PerfCurve( CurveNum ).Var1MinPresent ) {
+					PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
+				}
+				if( !PerfCurve( CurveNum ).Var1MaxPresent ) {
+					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
+				}
+				if( !PerfCurve( CurveNum ).Var2MinPresent ) {
+					PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
+				}
+				if( !PerfCurve( CurveNum ).Var2MaxPresent ) {
+					PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
+				}
 			}
 
 			// move table data to more compact array to allow interpolation using multivariable lookup table method
@@ -2330,16 +2864,66 @@ namespace CurveManager {
 			} else {
 				TableData( TableNum ).NormalPoint = 1.0;
 			}
-			PerfCurve( CurveNum ).Var1Min = Numbers( 3 );
-			PerfCurve( CurveNum ).Var1Max = Numbers( 4 );
-			PerfCurve( CurveNum ).Var2Min = Numbers( 5 );
-			PerfCurve( CurveNum ).Var2Max = Numbers( 6 );
-			PerfCurve( CurveNum ).Var3Min = Numbers( 7 );
-			PerfCurve( CurveNum ).Var3Max = Numbers( 8 );
-			PerfCurve( CurveNum ).Var4Min = Numbers( 9 );
-			PerfCurve( CurveNum ).Var4Max = Numbers( 10 );
-			PerfCurve( CurveNum ).Var5Min = Numbers( 11 );
-			PerfCurve( CurveNum ).Var5Max = Numbers( 12 );
+			if( lNumericFieldBlanks( 3 ) ) {
+				PerfCurve( CurveNum ).Var1Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Min = Numbers( 3 );
+				PerfCurve( CurveNum ).Var1MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 4 ) ) {
+				PerfCurve( CurveNum ).Var1Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var1Max = Numbers( 4 );
+				PerfCurve( CurveNum ).Var1MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 5 ) ) {
+				PerfCurve( CurveNum ).Var2Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Min = Numbers( 5 );
+				PerfCurve( CurveNum ).Var2MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 6 ) ) {
+				PerfCurve( CurveNum ).Var2Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var2Max = Numbers( 6 );
+				PerfCurve( CurveNum ).Var2MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 7 ) ) {
+				PerfCurve( CurveNum ).Var3Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var3Min = Numbers( 7 );
+				PerfCurve( CurveNum ).Var3MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 8 ) ) {
+				PerfCurve( CurveNum ).Var3Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var3Max = Numbers( 8 );
+				PerfCurve( CurveNum ).Var3MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 9 ) ) {
+				PerfCurve( CurveNum ).Var4Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var4Min = Numbers( 9 );
+				PerfCurve( CurveNum ).Var4MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 10 ) ) {
+				PerfCurve( CurveNum ).Var4Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var4Max = Numbers( 10 );
+				PerfCurve( CurveNum ).Var4MaxPresent = true;
+			}
+			if( lNumericFieldBlanks( 11 ) ) {
+				PerfCurve( CurveNum ).Var5Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var5Min = Numbers( 11 );
+				PerfCurve( CurveNum ).Var5MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 12 ) ) {
+				PerfCurve( CurveNum ).Var5Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var5Max = Numbers( 12 );
+				PerfCurve( CurveNum ).Var5MaxPresent = true;
+			}
 
 			if ( Numbers( 3 ) > Numbers( 4 ) ) { // error
 				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
@@ -2517,10 +3101,6 @@ namespace CurveManager {
 				}}
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination." );
 		}
 
 	}
@@ -4686,12 +5266,24 @@ Label999: ;
 		{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).InterpolationType );
 		if ( SELECT_CASE_var == LinearInterpolationOfTable ) {
 		} else if ( SELECT_CASE_var == EvaluateCurveToLimits ) {
-			MinX = min( MinX, PerfCurve( CurveNum ).Var1Min );
-			MaxX = max( MaxX, PerfCurve( CurveNum ).Var1Max );
-			MinX2 = min( MinX2, PerfCurve( CurveNum ).Var2Min );
-			MaxX2 = max( MaxX2, PerfCurve( CurveNum ).Var2Max );
-			MinY = min( MinY, PerfCurve( CurveNum ).CurveMin );
-			MaxY = max( MaxY, PerfCurve( CurveNum ).CurveMax );
+			if ( PerfCurve( CurveNum ).Var1MinPresent ) {
+				MinX = PerfCurve( CurveNum ).Var1Min;
+			}
+			if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
+				MaxX = PerfCurve( CurveNum ).Var1Max;
+			}
+			if( PerfCurve( CurveNum ).Var2MinPresent ) {
+				MinX2 = PerfCurve( CurveNum ).Var2Min;
+			}
+			if( PerfCurve( CurveNum ).Var2MaxPresent ) {
+				MaxX2 = PerfCurve( CurveNum ).Var2Max;
+			}
+			if( PerfCurve( CurveNum ).CurveMinPresent ) {
+				MinY = PerfCurve( CurveNum ).CurveMin;
+			}
+			if( PerfCurve( CurveNum ).CurveMaxPresent ) {
+				MaxY = PerfCurve( CurveNum ).CurveMax;
+			}
 		} else {
 		}}
 
@@ -4791,10 +5383,6 @@ Label999: ;
 		PerfCurve( CurveNum ).Var1Max = MaxX;
 		PerfCurve( CurveNum ).Var2Min = MinX2;
 		PerfCurve( CurveNum ).Var2Max = MaxX2;
-		PerfCurve( CurveNum ).CurveMin = MinY;
-		PerfCurve( CurveNum ).CurveMax = MaxY;
-		PerfCurve( CurveNum ).CurveMinPresent = true;
-		PerfCurve( CurveNum ).CurveMaxPresent = true;
 
 		A.deallocate();
 		Results.deallocate();

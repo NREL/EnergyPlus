@@ -37,7 +37,6 @@
 ! All solar and visible transmittance and reflectance values are spectral average values
 !
 !                    Name                                         Th   Ts   Rfs  Rbs  Tv   Rfv  Rbv Tir Ef  Eb Con
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   WindowMaterial:Glazing,

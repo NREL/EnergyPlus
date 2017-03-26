@@ -49,7 +49,6 @@
     0.7,                     !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     ,                        !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     ,                        !- Dehumidification Setpoint {percent}
     ,                        !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -128,7 +127,7 @@
 !
 !
 
-  VERSION,8.4;
+  VERSION,8.6;
 
   Building,
     Exercise 2A,             !- Name
@@ -149,9 +148,11 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    1,                       !- Temperature Capacity Multiplier
-    1,                       !- Humidity Capacity Multiplier
-    1,                       !- Carbon Dioxide Capacity Multiplier
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
+    1.0,                     !- Temperature Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    1.0,                     !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier
 
   SimulationControl,

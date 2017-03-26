@@ -164,25 +164,28 @@ q = \dot m{C_p}\left( {{T_i} - {T_o}} \right)
 
 Both of these equations have q and T\(_{o}\) as unknowns.~ However, since the setpoint temperature is the goal for T\(_{o}\), we can use this as an initial guess for T\(_{o}\).~ Below is an outline of the algorithm:
 
-n~Initialize T\(_{o}\) = T\(_{set}\)
+\begin{itemize}
+  \item
+    Initialize T\(_{o}\) = T\(_{set}\)
+  \item
+    Calculate LMTD*
+  \item
+    Calculate q* from charging equation for the current percent charged (We will assume that the EnergyPlus time step is sufficiently small so that we do not need to find the average percent charged for the time step. This was necessary when one hour time steps were used as in BLAST, but EnergyPlus generally uses relatively short time steps. Since there is already some iteration involved in the solution, we would like to avoid another layer of iteration if at all possible. One alternative that could be implemented would be to make a second pass with a closer average value based on what happens during the time step. This would effectively double the execution time for the model and would need to be justified before implementation.)
+  \item
+    Calculate T\(_{o,new}\) and compare it to T\(_{o}\)
+  \item
+    Use T\(_{o,new}\) to calculate a new LMTD* and iterate until T\(_{o}\) converges to some acceptable level
+\end{itemize}
 
-n~Calculate LMTD*
-
-n~Calculate q* from charging equation for the current percent charged (We will assume that the EnergyPlus time step is sufficiently small so that we do not need to find the average percent charged for the time step.~ This was necessary when one hour time steps were used as in BLAST, but EnergyPlus generally uses relatively short time steps.~ Since there is already some iteration involved in the solution, we would like to avoid another layer of iteration if at all possible.~ One alternative that could be implemented would be to make a second pass with a closer average value based on what happens during the time step.~ This would effectively double the execution time for the model and would need to be justified before implementation.)
-
-n~Calculate T\(_{o,new}\) and compare it to T\(_{o}\)
-
-n~Use T\(_{o,new}\) to calculate a new LMTD* and iterate until T\(_{o}\) converges to some acceptable level
-
-Charging would continue in subsequent time steps until the final state of the ice storage unit at the end of a particular time step is fully charged.~ If running a chiller would ``overcharge'' the tank, then the flow to the tank would be reduced (greater than zero bypass flow) while maintaining the same setpoint temperature coming out of the tank (though not necessarily out of the component).
+Charging would continue in subsequent time steps until the final state of the ice storage unit at the end of a particular time step is fully charged. If running a chiller would ``overcharge'' the tank, then the flow to the tank would be reduced (greater than zero bypass flow) while maintaining the same setpoint temperature coming out of the tank (though not necessarily out of the component).
 
 \subsubsection{Discharging Algorithm}\label{discharging-algorithm}
 
-During discharging, we cannot assume that all of the flow is sent through the ice storage unit and thus some of it may be bypassed around it locally.~ This ice storage model includes a built-in bypass leg to accommodate this without requiring the user to enter this additional information.~ This also allows the bypass leg/valve to be controlled by the ice storage unit.
+During discharging, we cannot assume that all of the flow is sent through the ice storage unit and thus some of it may be bypassed around it locally. This ice storage model includes a built-in bypass leg to accommodate this without requiring the user to enter this additional information. This also allows the bypass leg/valve to be controlled by the ice storage unit.
 
-While we cannot assume that all of the flow is sent through the ice storage unit, we can use that as an initial guess in order to determine the current performance of the ice storage system.~ Most of the discharging algorithm then becomes very similar to the charging process.
+While we cannot assume that all of the flow is sent through the ice storage unit, we can use that as an initial guess in order to determine the current performance of the ice storage system. Most of the discharging algorithm then becomes very similar to the charging process.
 
-In solving the performance of the ice storage unit, we have effectively two equations (one of which is non-linear) and two unknowns.~ The equations are:
+In solving the performance of the ice storage unit, we have effectively two equations (one of which is non-linear) and two unknowns. The equations are:
 
 \begin{equation}
 {q^*} = \left[ {C1 + C2\left( {{P_d}} \right) + C3{{\left( {{P_d}} \right)}^2}} \right] + \left[ {C4 + C5\left( {{P_d}} \right) + C6{{\left( {{P_d}} \right)}^2}} \right]\Delta T_{lm}^*
@@ -196,22 +199,29 @@ q = \dot m{C_p}\left( {{T_i} - {T_o}} \right)
 
 Both of these equations have q and T\(_{o}\) as unknowns.~ However, since the setpoint temperature is the goal for T\(_{o}\), we can use this as an initial guess for T\(_{o}\).~ Below is an outline of the algorithm:
 
-n~Initialize T\(_{o}\) = T\(_{set}\)
-
-n~Calculate LMTD*
-
-n~Calculate q* from charging equation for the current percent charged (we will assume that the EnergyPlus time step is sufficiently small so that we do not need to find the average percent charged for the time step; this was necessary when one hour time steps were used as in BLAST, but EnergyPlus generally uses relatively short time steps)
-
-n~Calculate T\(_{o,new}\) and compare it to T\(_{o}\)
-
-n~Use T\(_{o,new}\) to calculate a new LMTD* and iterate until T\(_{o}\) converges to some acceptable level
-
-n~Once T\(_{o}\) has converged, we need to compare this value again to T\(_{set}\).~ If T\(_{o}\) is greater than or equal to T\(_{set}\), then we either just met the load (equal) or can't quite meet it (greater than).~ In this case, we simply leave T\(_{o}\) as is because we cannot meet the setpoint temperature.
-
-n~If T\(_{o}\) is less than T\(_{set}\), then we have more capacity available than we need.~ In this case, we need to bypass some of the flow.~ Since the load on the ice storage device and the outlet temperature are not changing (we are just reducing the flow), we only need to split the flow and do not need to recalculate the action of the ice storage device.~ Some systems may be slightly dependent on the actual flow through the device itself.~ However, in an actual application, this only means that a slightly different amount will bypass the device.~ The overall energy impact will be the same and thus it is not necessary to be concerned about flow rate dependence.
+\begin{itemize}
+  \item
+    Initialize T\(_{o}\) = T\(_{set}\)
+  \item
+    Calculate LMTD*
+  \item
+    Calculate q* from charging equation for the current percent charged (we will assume that the EnergyPlus time step is sufficiently small so that we do not need to find the average percent charged for the time step; this was necessary when one hour time steps were used as in BLAST, but EnergyPlus generally uses relatively short time steps)
+  \item
+    Calculate T\(_{o,new}\) and compare it to T\(_{o}\)
+  \item
+    Use T\(_{o,new}\) to calculate a new LMTD* and iterate until T\(_{o}\) converges to some acceptable level
+  \item
+    Once T\(_{o}\) has converged, we need to compare this value again to T\(_{set}\).~ If T\(_{o}\) is greater than or equal to T\(_{set}\), then we either just met the load (equal) or can't quite meet it (greater than).~ In this case, we simply leave T\(_{o}\) as is because we cannot meet the setpoint temperature.
+  \item
+    If T\(_{o}\) is less than T\(_{set}\), then we have more capacity available than we need.~ In this case, we need to bypass some of the flow.~ Since the load on the ice storage device and the outlet temperature are not changing (we are just reducing the flow), we only need to split the flow and do not need to recalculate the action of the ice storage device.~ Some systems may be slightly dependent on the actual flow through the device itself.~ However, in an actual application, this only means that a slightly different amount will bypass the device.~ The overall energy impact will be the same and thus it is not necessary to be concerned about flow rate dependence.
+\end{itemize}
 
 Discharging would continue in subsequent time steps until the final state of the ice storage unit at the end of a particular time step is fully discharged.
 
 \subsubsection{References}\label{references-1-011}
 
 Strand, R.K. 1992. ``Indirect Ice Storage System Simulation,'' M.S. Thesis, Department of Mechanical and Industrial Engineering, University of Illinois at Urbana-Champaign.
+
+\subsection{Other Ice Thermal Storage Options}
+
+Thermal storage can also be modeled as integrated with a packaged air-conditioning unit. For this option, see Section \ref{packaged-thermal-storage-cooling-coil}.

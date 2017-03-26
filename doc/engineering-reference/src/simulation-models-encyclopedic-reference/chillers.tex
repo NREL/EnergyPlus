@@ -539,47 +539,47 @@ The chiller model uses user-supplied performance information at design condition
 
 The following nomenclature is used in the cooling equations:
 
-\emph{AvailCoolCap}~~~~~~~~~ = ~~ available full-load cooling capacity at current conditions {[}W{]}
+\emph{AvailCoolCap}~~~~~~~ = ~~ available full-load cooling capacity at current conditions {[}W{]}
 
-\emph{CEIR}~~~~~~~~~~~~~~~~~~~~~~~ = ~~ user input ``Electric Input to Cooling Output Ratio''
+\emph{CEIR}~~~~~~~~~~~~~~~ = ~~ user input ``Electric Input to Cooling Output Ratio''
 
-\emph{CEIRfPLR}~~~~~~~~~~~~~~~ = ~~ electric input to cooling output factor, equal to 1 at full load, user input ``Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name''
+\emph{CEIRfPLR}~~~~~~~~~~~ = ~~ electric input to cooling output factor, equal to 1 at full load, user input ``Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name''
 
-\emph{CEIRfT}~~~~~~~~~~~~~~~~~~~~ = ~~ electric input to cooling output factor, equal to 1 at design conditions, user input ``Electric Input to Cooling Output Ratio Function of Temperature Curve Name''
+\emph{CEIRfT}~~~~~~~~~~~~~ = ~~ electric input to cooling output factor, equal to 1 at design conditions, user input ``Electric Input to Cooling Output Ratio Function of Temperature Curve Name''
 
-\emph{CFIR}~~~~~~~~~~~~~~~~~~~~~~~ = ~~ user input ``Fuel Input to Cooling Output Ratio''
+\emph{CFIR}~~~~~~~~~~~~~~~ = ~~ user input ``Fuel Input to Cooling Output Ratio''
 
-\emph{CFIRfPLR}~~~~~~~~~~~~~~~ = ~~ fuel input to cooling output factor, equal to 1 at full load, user input ``Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name''
+\emph{CFIRfPLR}~~~~~~~~~~~ = ~~ fuel input to cooling output factor, equal to 1 at full load, user input ``Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name''
 
-\emph{CFIRfT}~~~~~~~~~~~~~~~~~~~~ = ~~ fuel input to cooling output factor, equal to 1 at design conditions, user input ``Fuel Input to Cooling Output Ratio Function of Temperature Curve Name''
+\emph{CFIRfT}~~~~~~~~~~~~~ = ~~ fuel input to cooling output factor, equal to 1 at design conditions, user input ``Fuel Input to Cooling Output Ratio Function of Temperature Curve Name''
 
-\emph{CondenserLoad~~~~~~~} = ~~ condenser heat rejection load {[}W{]}
+\emph{CondenserLoad} ~~~~~ = ~~ condenser heat rejection load {[}W{]}
 
-\emph{CoolCapfT}~~~~~~~~~~~~~~ = ~~ cooling capacity factor, equal to 1 at design conditions, user input ``Cooling Capacity Function of Temperature Curve Name''
+\emph{CoolCapfT}~~~~~~~~~~ = ~~ cooling capacity factor, equal to 1 at design conditions, user input ``Cooling Capacity Function of Temperature Curve Name''
 
 \emph{CoolElectricPower}~~ = ~~ cooling electricity input {[}W{]}
 
-\emph{CoolFuelInput}~~~~~~~~~ = ~~ cooling fuel input {[}W{]}
+\emph{CoolFuelInput}~~~~~~ = ~~ cooling fuel input {[}W{]}
 
-\emph{CoolingLoad}~~~~~~~~~~~ = ~~ current cooling load on the chiller {[}W{]}
+\emph{CoolingLoad}~~~~~~~~ = ~~ current cooling load on the chiller {[}W{]}
 
-\emph{CPLR}~~~~~~~~~~~~~~~~~~~~~~ = ~~ cooling part-load ratio = \emph{CoolingLoad} / \emph{AvailCoolCap}
+\emph{CPLR}~~~~~~~~~~~~~~~ = ~~ cooling part-load ratio = \emph{CoolingLoad} / \emph{AvailCoolCap}
 
-\emph{HeatingLoad}~~~~~~~~~~~ = ~~ current heating load on the chiller heater {[}W{]}
+\emph{HeatingLoad}~~~~~~~~ = ~~ current heating load on the chiller heater {[}W{]}
 
-\emph{HFIR}~~~~~~~~~~~~~~~~~~~~~~~ = ~~ user input ``Fuel Input to Heating Output Ratio''
+\emph{HFIR}~~~~~~~~~~~~~~~ = ~~ user input ``Fuel Input to Heating Output Ratio''
 
-\emph{HPLR}~~~~~~~~~~~~~~~~~~~~~~ = ~~ heating part-load ratio = \emph{HeatingLoad} / \emph{AvailHeatCap}
+\emph{HPLR}~~~~~~~~~~~~~~~ = ~~ heating part-load ratio = \emph{HeatingLoad} / \emph{AvailHeatCap}
 
-\emph{MinPLR~~~~~~~~~~~~~~~~~~~} = ~~ user input ``Minimum Part Load Ratio''
+\emph{MinPLR}~~~~~~~~~~~~~ = ~~ user input ``Minimum Part Load Ratio''
 
-\emph{NomCoolCap}~~~~~~~~~~ = ~~ user input ``Nominal Cooling Capacity'' {[}W{]}
+\emph{NomCoolCap}~~~~~~~~~ = ~~ user input ``Nominal Cooling Capacity'' {[}W{]}
 
-\emph{RunFrac}~~~~~~~~~~~~~~~~~~ = ~~ fraction of time step which the chiller is running
+\emph{RunFrac}~~~~~~~~~~~~ = ~~ fraction of time step which the chiller is running
 
-\emph{T\(_{cond}\)}~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ entering or leaving condenser fluid temperature {[}C{]}. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower) if the entering condenser fluid temperature option is used. For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively, if the entering condenser fluid temperature option is used.
+\emph{T\(_{cond}\)}~~~~~~~ = ~~ entering or leaving condenser fluid temperature {[}C{]}. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower) if the entering condenser fluid temperature option is used. For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively, if the entering condenser fluid temperature option is used.
 
-\emph{T\(_{cw,l}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~ = ~~ leaving chilled water temperature {[}C{]}
+\emph{T\(_{cw,l}\)}~~~~~~~ = ~~ leaving chilled water temperature {[}C{]}
 
 Five performance curves are used in the calculation of cooling capacity and efficiency:
 
@@ -657,37 +657,37 @@ CondenserLoad = CoolingLoad + {\raise0.7ex\hbox{{CoolFuelInput}} \!\mathord{\lef
 
 The following nomenclature is used in the heating equations:
 
-\emph{AvailHeatCap}~~~~~~~~~ = ~~ available full-load heating capacity at current conditions {[}W{]}
+\emph{AvailHeatCap}~~~~~~~ = ~~ available full-load heating capacity at current conditions {[}W{]}
 
-\emph{CPLRh}~~~~~~~~~~~~~~~~~~~~ = ~~ cooling part-load ratio for heating curve = \emph{CoolingLoad} / \emph{NomCoolCap}
+\emph{CPLRh}~~~~~~~~~~~~~~ = ~~ cooling part-load ratio for heating curve = \emph{CoolingLoad} / \emph{NomCoolCap}
 
 \emph{HeatCapfCPLR}~~~~~~~ = ~~ heating capacity factor as a function of cooling part load ratio, equal to 1 at zero cooling load, user input ``Heating Capacity Function of Cooling Capacity Curve Name''
 
-\emph{HeatCoolCapRatio~} = ~~ user input ``Heating to Cooling Capacity Ratio''
+\emph{HeatCoolCapRatio}~~~ = ~~ user input ``Heating to Cooling Capacity Ratio''
 
 \emph{HeatElectricPower}~~ = ~~ heating electricity input {[}W{]}
 
-\emph{HeatFuelInput}~~~~~~~~~ = ~~ heating fuel input {[}W{]}
+\emph{HeatFuelInput}~~~~~~ = ~~ heating fuel input {[}W{]}
 
-\emph{HeatingLoad}~~~~~~~~~~~ = ~~ current heating load on the chiller {[}W{]}
+\emph{HeatingLoad}~~~~~~~~ = ~~ current heating load on the chiller {[}W{]}
 
-\emph{HEIR}~~~~~~~~~~~~~~~~~~~~~~~ = ~~ user input ``Electric Input to Heating Output Ratio''
+\emph{HEIR}~~~~~~~~~~~~~~~ = ~~ user input ``Electric Input to Heating Output Ratio''
 
-\emph{HFIR}~~~~~~~~~~~~~~~~~~~~~~~ = ~~ user input ``Fuel Input to Heating Output Ratio''
+\emph{HFIR}~~~~~~~~~~~~~~~ = ~~ user input ``Fuel Input to Heating Output Ratio''
 
-\emph{HFIRfHPLR}~~~~~~~~~~~~ = ~~ fuel input to heating output factor, equal to 1 at full load, user input ``Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name''
+\emph{HFIRfHPLR}~~~~~~~~~~ = ~~ fuel input to heating output factor, equal to 1 at full load, user input ``Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name''
 
-\emph{HPLR}~~~~~~~~~~~~~~~~~~~~~~ = ~~ heating part-load ratio = \emph{HeatingLoad} / \emph{AvailHeatCap}
+\emph{HPLR}~~~~~~~~~~~~~~~ = ~~ heating part-load ratio = \emph{HeatingLoad} / \emph{AvailHeatCap}
 
-\emph{MinPLR~~~~~~~~~~~~~~~~~~~} = ~~ user input ``Minimum Part Load Ratio''
+\emph{MinPLR}~~~~~~~~~~~~~ = ~~ user input ``Minimum Part Load Ratio''
 
-\emph{NomCoolCap}~~~~~~~~~~ = ~~ user input ``Nominal Cooling Capacity'' {[}W{]}
+\emph{NomCoolCap}~~~~~~~~~ = ~~ user input ``Nominal Cooling Capacity'' {[}W{]}
 
-\emph{RunFrac}~~~~~~~~~~~~~~~~~~ = ~~ fraction of time step which the chiller is running
+\emph{RunFrac}~~~~~~~~~~~~ = ~~ fraction of time step which the chiller is running
 
-\emph{TotalElectricPower~} = ~~ total electricity input {[}W{]}
+\emph{TotalElectricPower}~ = ~~ total electricity input {[}W{]}
 
-\emph{TotalFuelInput~~~~~~~~} = ~~ total fuel input {[}W{]}
+\emph{TotalFuelInput}~~~~~ = ~~ total fuel input {[}W{]}
 
 Cooling is the primary purpose of the Direct Fired Absorption Chiller so that function is satisfied first and if energy is available for providing heating that is provided next.
 
@@ -1256,7 +1256,7 @@ The chiller model uses user-supplied performance information at reference condit
 
 3)~~~~Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
 
-·~~~~~~~~The cooling capacity function of temperature curve is a biquadratic performance curve with two independent variables: the leaving chilled water temperature and the entering condenser fluid temperature. The output of this curve is multiplied by the reference capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+The cooling capacity function of temperature curve is a biquadratic performance curve with two independent variables: the leaving chilled water temperature and the entering condenser fluid temperature. The output of this curve is multiplied by the reference capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 \(ChillerCapFTemp = a + b\left( {{T_{cw,l}}} \right) + c{\left( {{T_{cw,l}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,l}}} \right)\left( {{T_{cond,e}}} \right)\) where
 
@@ -1266,7 +1266,7 @@ The chiller model uses user-supplied performance information at reference condit
 
 \emph{T\(_{cond,e}\)}~~~~~~~~ = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
 
-·~~~~~~~~The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the entering condenser fluid temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
+The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the entering condenser fluid temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
 \begin{equation}
 ChillerEIRFTemp = a + b\left( {{T_{cw,l}}} \right) + c{\left( {{T_{cw,l}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,l}}} \right)\left( {{T_{cond,e}}} \right)
@@ -1280,12 +1280,12 @@ where
 
 \emph{T\(_{cond,e}\)} = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
-·~~~~~~~~The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
+The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller's available cooling capacity. The output of this curve \textit{ChillerEIRFPLR} is multiplied by the reference EIR (inverse of the reference COP), chiller capacity as a function of temperature curve \textit{ChillerCapFTemp} and the Energy Input to Cooling Output Ratio Function of Temperature Curve \textit{ChillerEIRFTemp} to give the normalized power input at the specific temperature and part-load ratio at which the chiller is operating. Normalized power input is the ratio of chiller power input at a given operating condition to the chiller power input at reference condition. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
 \begin{equation}
   \begin{array}{rl}
     ChillerEIRFPLR &= a + b\PB{PLR} + c\PB{PLR}^2\\
-                   &= \frac{P_{chiller}}{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)
+                   &= \frac{P_{chiller}}{{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}
   \end{array}
 \end{equation}
 

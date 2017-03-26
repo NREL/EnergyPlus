@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef HVACUnitarySystem_hh_INCLUDED
 #define HVACUnitarySystem_hh_INCLUDED
@@ -113,6 +101,7 @@ namespace HVACUnitarySystem {
 	// System Control Type
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
+	extern int const CCM_ASHRAE; // capacity control based on ASHRAE Standard 90.1
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -211,6 +200,10 @@ namespace HVACUnitarySystem {
 		int DehumidControlType_Num; // Set to Dehumid Control None, CoolReheat or MultiMode
 		int AirFlowControl; // UseCompressorOnFlow or UseCompressorOffFlow
 		int ControlType; // Setpoint or Load based control
+		bool validASHRAECoolCoil; // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
+		bool validASHRAEHeatCoil; // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
+		bool simASHRAEModel; // flag denoting that ASHRAE model should be used
+		int CapacityControlType; // operational system control
 		bool RequestAutoSize; // determines if inputs need autosizing
 		bool RunOnSensibleLoad; // logical determines if this system will run to
 		bool RunOnLatentLoad; // logical determines if this system will run to
@@ -264,6 +257,8 @@ namespace HVACUnitarySystem {
 		int HeatCoilCompNum; // Comp num of the heating coil in the plant loop
 		int HeatCoilFluidInletNode; // Heating coil fluid inlet node
 		Real64 MaxHeatCoilFluidFlow; // Maximum heating coil fluid flow for hot water or steam coil
+		Real64 CoolCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
+		Real64 HeatCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
 		Real64 HeatCompPartLoadRatio; // Unitary system compressor part load ratio in heating
 		// Supplemental heating coil specific data
 		std::string SuppHeatCoilName; // coil name (eliminate after blank is accepted in CALL)
@@ -283,6 +278,7 @@ namespace HVACUnitarySystem {
 		int SuppCoilBranchNum; // Branch of number of the supplemental coil in the plant loop
 		int SuppCoilCompNum; // Comp num of the supplemental coil in the plant loop
 		// fan specific data
+		std::string fanName; // TRANE
 		int FanType_Num; // Fan type num i.e. OnOff, ConstVol, VAV
 		int FanIndex; // index of fan of a particular type
 		Real64 ActualFanVolFlowRate; // Actual or design fan volume flow rate
@@ -384,6 +380,8 @@ namespace HVACUnitarySystem {
 		Real64 SensHeatEnergyRate; // Unitary System Sensible Heating Rate [W]
 		Real64 LatHeatEnergyRate; // Unitary System Latent Heating Rate [W]
 		Real64 TotalAuxElecPower; // Unitary System Ancillary Electric Power [W]
+		Real64 SensibleLoadPredicted; // Unitary System predicted sensible load [W]
+		Real64 MoistureLoadPredicted; // Unitary System predicted moisture load [W]
 		Real64 HeatingAuxElecConsumption; // Unitary System Heating Ancillary Electric Energy [J]
 		Real64 CoolingAuxElecConsumption; // Unitary System Cooling Ancillary Electric Energy [J]
 		Real64 HeatRecoveryRate; // Unitary System Heat Recovery Rate [W]
@@ -398,6 +396,8 @@ namespace HVACUnitarySystem {
 		Real64 SpeedRatio; // current compressor speed ratio (variable speed)
 		Real64 CycRatio; // cycling part load ratio (variable speed)
 		int TESOpMode; // operating mode of TES DX cooling coil
+		Real64 LowSpeedCoolFanRatio;
+		Real64 LowSpeedHeatFanRatio;
 		// Warning message variables
 		int HXAssistedSensPLRIter; // used in HX Assisted calculations
 		int HXAssistedSensPLRIterIndex; // used in HX Assisted calculations
@@ -470,6 +470,20 @@ namespace HVACUnitarySystem {
 		int iterationCounter; // track time step iterations
 		Array1D< int > iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
 
+		// connect ZoneHVAC to DOAS
+		bool ATMixerExists; // True if there is an ATMixer
+		std::string ATMixerName; // name of air terminal mixer
+		int ATMixerIndex; // index to the air terminal mixer
+		int ATMixerType; // 1 = inlet side mixer, 2 = supply side mixer
+		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
+		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
+		int ATMixerOutNode; // outlet air node number for the air terminal mixer
+
+		// Fault model of coil SAT sensor
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		
 		// Default Constructor
 		UnitarySystemData() :
 			UnitarySystemType_Num( 0 ),
@@ -491,6 +505,10 @@ namespace HVACUnitarySystem {
 			DehumidControlType_Num( 0 ),
 			AirFlowControl( 1 ),
 			ControlType( 0 ),
+			validASHRAECoolCoil( false ),
+			validASHRAEHeatCoil( false ),
+			simASHRAEModel( false ),
+			CapacityControlType( 0 ),
 			RequestAutoSize( false ),
 			RunOnSensibleLoad( true ),
 			RunOnLatentLoad( false ),
@@ -537,6 +555,8 @@ namespace HVACUnitarySystem {
 			HeatCoilCompNum( 0 ),
 			HeatCoilFluidInletNode( 0 ),
 			MaxHeatCoilFluidFlow( AutoSize ),
+			CoolCoilWaterFlowRatio( 0.0 ),
+			HeatCoilWaterFlowRatio( 0.0 ),
 			HeatCompPartLoadRatio( 0.0 ),
 			SuppHeatCoilType_Num( 0 ),
 			SuppHeatCoilIndex( 0 ),
@@ -652,6 +672,8 @@ namespace HVACUnitarySystem {
 			SpeedRatio( 0.0 ),
 			CycRatio( 0.0 ),
 			TESOpMode( 0 ),
+			LowSpeedCoolFanRatio( 0.0),
+			LowSpeedHeatFanRatio( 0.0 ),
 			HXAssistedSensPLRIter( 0 ),
 			HXAssistedSensPLRIterIndex( 0 ),
 			HXAssistedSensPLRFail( 0 ),
@@ -719,7 +741,16 @@ namespace HVACUnitarySystem {
 			FirstPass( true ),
 			SingleMode( 0 ),
 			iterationCounter( 0 ),
-			iterationMode( 0 )
+			iterationMode( 0 ),
+			ATMixerExists( false ),
+			ATMixerIndex( 0 ),
+			ATMixerType( 0 ),
+			ATMixerPriNode( 0 ),
+			ATMixerSecNode( 0 ),
+			ATMixerOutNode( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 			{}
 
 	};
@@ -860,6 +891,12 @@ namespace HVACUnitarySystem {
 		Optional_int CompOn = _
 	);
 
+	Real64
+	CalcUnitarySystemWaterFlowResidual(
+		Real64 const PartLoadRatio, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
 	void
 	SetSpeedVariables(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
@@ -890,6 +927,13 @@ namespace HVACUnitarySystem {
 	);
 
 	void
+	calculateCapacity(
+		int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
+		Real64 & SensOutput, // sensible output of AirloopHVAC:UnitarySystem
+		Real64 & LatOutput // latent output of AirloopHVAC:UnitarySystem
+	);
+
+	void
 	CalcUnitaryCoolingSystem(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		int const AirLoopNum, // index to air loop
@@ -898,7 +942,7 @@ namespace HVACUnitarySystem {
 		int const CompOn, // compressor control (0=off, 1=on)
 		Real64 const OnOffAirFlowRatio,
 		Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
-		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
+		bool const HXUnitOn // Flag to control HX for HXAssisted Cooling Coil
 	);
 
 	void

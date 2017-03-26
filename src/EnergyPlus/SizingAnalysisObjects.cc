@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <string>
@@ -73,6 +61,7 @@
 #include <General.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -90,34 +79,36 @@ namespace EnergyPlus {
 
 
 	ZoneTimestepObject::ZoneTimestepObject(
-		int kindSim,
-		int environmentNum,
-		int daySim,
-		int hourDay,
-		int stepEndMin,
-		Real64 timeStepDurat,
-		int numOfTimeStepsPerHour
+		int kindSim, // kind of simulation, e.g. ksDesignDay, ksHVACSizeDesignDay, usally DataGlobals::KindOfSim
+		int environmentNum, //index in Environment data structure, usually WeatherManager::Envrn
+		int daySim,  // days into simulation period, usually DataGlobals::DayOfSim
+		int hourDay,  // hour into day, 1-24, filled by DataGlobals::HourOfDay
+		int timeStep, // time steps into hour, filled by DataGlobals::TimeStep
+		Real64 timeStepDurat, //duration of timestep in fractional hours, usually OutputProcessor::TimeValue( ZoneIndex ).TimeStep
+		int numOfTimeStepsPerHour // timesteps in each hour, usually DataGlobals::NumOfTimeStepInHour
 	)
 		:	kindOfSim( kindSim ),
 			envrnNum( environmentNum ),
 			dayOfSim( daySim ),
 			hourOfDay( hourDay ),
-			stepEndMinute( stepEndMin ),
+
 			timeStepDuration( timeStepDurat )
 	{
 		Real64 const minutesPerHour( 60.0 );
 		int const hoursPerDay( 24 );
 
+		stepEndMinute = timeStepDuration * minutesPerHour + ( timeStep - 1 ) * timeStepDuration * minutesPerHour;
+
 		stepStartMinute = stepEndMinute - timeStepDuration * minutesPerHour;
+
 		if ( stepStartMinute < 0.0 ) {
-		// then TimeValue(1).CurMinute has not been updated
 			stepStartMinute = 0.0;
 			stepEndMinute = timeStepDuration * minutesPerHour;
 		}
 
-		ztStepsIntoPeriod = ((dayOfSim - 1) * (hoursPerDay * numOfTimeStepsPerHour) ) + //multiple days
-			((hourOfDay-1) * numOfTimeStepsPerHour ) + //so far this day's hours
-			round( (stepStartMinute / minutesPerHour)/(timeStepDuration) ); // into current hour
+		ztStepsIntoPeriod = ( ( dayOfSim - 1 ) * ( hoursPerDay * numOfTimeStepsPerHour ) ) + //multiple days
+			( ( hourOfDay - 1 ) * numOfTimeStepsPerHour ) + //so far this day's hours
+			round( ( stepStartMinute / minutesPerHour )/( timeStepDuration ) ); // into current hour
 
 		if ( ztStepsIntoPeriod < 0 ) ztStepsIntoPeriod = 0;
 
@@ -132,8 +123,10 @@ namespace EnergyPlus {
 	p_rVariable( rVariable )
 	{}
 
-	int SizingLog::GetZtStepIndex (
-		const ZoneTimestepObject tmpztStepStamp )
+	int
+	SizingLog::GetZtStepIndex (
+		const ZoneTimestepObject tmpztStepStamp
+	)
 	{
 
 		int vecIndex;
@@ -141,22 +134,23 @@ namespace EnergyPlus {
 		if ( tmpztStepStamp.ztStepsIntoPeriod > 0 ) { // discard any negative value for safety
 			vecIndex = envrnStartZtStepIndexMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ] + tmpztStepStamp.ztStepsIntoPeriod;
 		} else {
-			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ];
+			vecIndex = envrnStartZtStepIndexMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ];
 		}
 
 		// next for safety sake, constrain index to lie inside correct envronment
-		if ( vecIndex < envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ] ) {
-			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]; // first step in environment
+		if ( vecIndex < envrnStartZtStepIndexMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ] ) {
+			vecIndex = envrnStartZtStepIndexMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ]; // first step in environment
 		}
-		if (vecIndex > ( envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]
-				+ ztStepCountByEnvrnMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]) ) {
-			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]
-				+ ztStepCountByEnvrnMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]; // last step in environment
+		if (vecIndex > ( envrnStartZtStepIndexMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ]
+				+ ztStepCountByEnvrnMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ] ) ) {
+			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ]
+				+ ztStepCountByEnvrnMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ]; // last step in environment
 		}
 		return vecIndex;
 	}
 
-	void SizingLog::FillZoneStep(
+	void
+	SizingLog::FillZoneStep(
 		ZoneTimestepObject tmpztStepStamp )
 	{
 		int index =  GetZtStepIndex( tmpztStepStamp );
@@ -174,47 +168,37 @@ namespace EnergyPlus {
 
 	}
 
-	int SizingLog::GetSysStepZtStepIndex(
+	int
+	SizingLog::GetSysStepZtStepIndex(
 		ZoneTimestepObject tmpztStepStamp
 	)
 	{
 	// this method finds a zone timestep for the system timestep update to use
 	// system timesteps are substeps inside a zone timestep, but are updated
 	// before the zone step has been called.
-		int lastZnStepIndex =  GetZtStepIndex( tmpztStepStamp );
-		int znStepIndex = lastZnStepIndex + 1;
+	// the zone timestamp passed in is now accurate, not lagged, so this is simpler
 
-		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
-		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr) {
+		int znStepIndex = GetZtStepIndex( tmpztStepStamp );
 
-			//check if at the beginning of an environment
-			if ( itr->second == lastZnStepIndex ) { // don't advance yet
-				znStepIndex = lastZnStepIndex;
-			}
-			//check if at the end of an environment
-			if ( itr->second == znStepIndex ) { // don't kick over into the next environment
-				znStepIndex = lastZnStepIndex;
-			}
-		}
-
-		//last safety checks for range
+		//safety checks for range
 		if ( znStepIndex >= NumOfStepsInLogSet ) znStepIndex = NumOfStepsInLogSet - 1;
 		if ( znStepIndex < 0 ) znStepIndex = 0;
 
 		return znStepIndex;
 	}
 
-	void SizingLog::FillSysStep(
+	void
+	SizingLog::FillSysStep(
 		ZoneTimestepObject tmpztStepStamp ,
 		SystemTimestepObject tmpSysStepStamp
 	)
 	{
-		int lastZnStepIndex( 0 );
+
 		int ztIndex( 0 );
-		int oldNumSubSteps;
-		int newNumSubSteps;
+		int oldNumSubSteps( 0 );
+		int newNumSubSteps( 0 );
 		Real64 const MinutesPerHour( 60.0 );
-		Real64 ZoneStepStartMinutes;
+		Real64 ZoneStepStartMinutes( 0.0 );
 
 		ztIndex = GetSysStepZtStepIndex(tmpztStepStamp);
 
@@ -234,59 +218,54 @@ namespace EnergyPlus {
 		}
 
 
-			// figure out which index this substep needs to go into
-			// the zone step level data are not yet available for minute, but we can get the previous zone step data...
-		lastZnStepIndex = (ztIndex - 1);
-		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
-		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr) {
-			if ( itr->second == ztIndex ) { // don't drop back into the previous environment
-					lastZnStepIndex = ztIndex;
-			}
-		}
-
-		ZoneStepStartMinutes = ztStepObj[lastZnStepIndex].stepEndMinute;
-		if (ZoneStepStartMinutes < 0.0 ) ZoneStepStartMinutes = 0.0;
+		// figure out which index this substep needs to go into
+		ZoneStepStartMinutes = tmpztStepStamp.stepStartMinute;
 
 		tmpSysStepStamp.stStepsIntoZoneStep = round(
-			(( ( tmpSysStepStamp.CurMinuteStart - ZoneStepStartMinutes ) / MinutesPerHour)
-			/ tmpSysStepStamp.TimeStepDuration) );
+			( ( ( tmpSysStepStamp.CurMinuteStart - ZoneStepStartMinutes ) / MinutesPerHour )
+			/ tmpSysStepStamp.TimeStepDuration ) );
 
-		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ] = tmpSysStepStamp;
-		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ].LogDataValue = p_rVariable;
+		if ( ( tmpSysStepStamp.stStepsIntoZoneStep >= 0 ) && ( tmpSysStepStamp.stStepsIntoZoneStep < ztStepObj[ ztIndex ].numSubSteps ) ) {
+			ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ] = tmpSysStepStamp;
+			ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ].LogDataValue = p_rVariable;
+		} else {
+			ztStepObj[ ztIndex ].subSteps[ 0 ] = tmpSysStepStamp;
+			ztStepObj[ ztIndex ].subSteps[ 0 ].LogDataValue = p_rVariable;
+		}
+
 
 	}
 
-	void SizingLog::AverageSysTimeSteps()
+	void
+	SizingLog::AverageSysTimeSteps()
 	{
 		Real64 RunningSum;
 
-		for ( auto &Zt : ztStepObj ) {
-			if ( Zt.numSubSteps > 0) {
+		for ( auto &zt : ztStepObj ) {
+			if ( zt.numSubSteps > 0) {
 				RunningSum = 0.0;
-				for ( auto &SysT : Zt.subSteps ) {
+				for ( auto &SysT : zt.subSteps ) {
 					RunningSum += SysT.LogDataValue;
 				}
-				Zt.logDataValue = RunningSum / double( Zt.numSubSteps );
+				zt.logDataValue = RunningSum / double( zt.numSubSteps );
 			}
 		}
 	}
 
-	void SizingLog::ProcessRunningAverage ()
+	void
+	SizingLog::ProcessRunningAverage ()
 	{
 		Real64 RunningSum = 0.0;
 		Real64 divisor = double( timeStepsInAverage );
 
 		std::map< int, int >:: iterator end = ztStepCountByEnvrnMap.end();
-		for (std::map< int, int >:: iterator itr = ztStepCountByEnvrnMap.begin(); itr != end; ++itr) {
-//		for (int k = 0; k < NumOfEnvironmentsInLogSet; k++) { // outer loop over environments in log set
-
-//			for ( int i = 0; i < ztStepCountByEnvrn[ k ]; ++i ) { // next inner loop over zone timestep steps
+		for ( std::map< int, int >:: iterator itr = ztStepCountByEnvrnMap.begin(); itr != end; ++itr ) {
 			for ( int i = 0; i < itr->second; ++i ) { // next inner loop over zone timestep steps
 
 				if ( timeStepsInAverage > 0 ) {
 					RunningSum = 0.0;
 					for ( int j = 0; j < timeStepsInAverage; ++j ) { //
-						if ( (i - j) < 0) {
+						if ( ( i - j ) < 0) {
 							RunningSum += ztStepObj[ envrnStartZtStepIndexMap[ itr->first ] ].logDataValue; //just use first value to fill early steps
 						} else {
 							RunningSum += ztStepObj[ ( (i - j) + envrnStartZtStepIndexMap[ itr->first ] ) ].logDataValue;
@@ -298,27 +277,30 @@ namespace EnergyPlus {
 		}
 	}
 
-	ZoneTimestepObject SizingLog::GetLogVariableDataMax()
+	ZoneTimestepObject
+	SizingLog::GetLogVariableDataMax()
 	{
 		Real64 MaxVal;
 		ZoneTimestepObject tmpztStepStamp;
 		MaxVal = 0.0;
 
 		if ( ! ztStepObj.empty() ) {
-			tmpztStepStamp = ztStepObj[ 1 ];
+			tmpztStepStamp = ztStepObj[ 0 ];
 		}
 
-		for ( auto &Zt : ztStepObj ) {
-
-			if ( Zt.runningAvgDataValue > MaxVal) {
-				MaxVal = Zt.runningAvgDataValue;
-				tmpztStepStamp = Zt;
-				}
+		for ( auto &zt : ztStepObj ) {
+			if ( zt.envrnNum > 0 && zt.kindOfSim > 0 && zt.runningAvgDataValue > MaxVal ) {
+				MaxVal = zt.runningAvgDataValue;
+				tmpztStepStamp = zt;
+			} else if ( zt.envrnNum == 0 && zt.kindOfSim == 0 ) { // null timestamp, problem to fix
+				ShowWarningMessage("GetLogVariableDataMax: null timestamp in log" );
+			}
 		}
-	return tmpztStepStamp;
+		return tmpztStepStamp;
 	}
 
-	Real64 SizingLog::GetLogVariableDataAtTimestamp(
+	Real64
+	SizingLog::GetLogVariableDataAtTimestamp(
 		ZoneTimestepObject tmpztStepStamp
 	)
 	{
@@ -329,16 +311,18 @@ namespace EnergyPlus {
 		return val;
 	}
 
-	void SizingLog::ReInitLogForIteration()
+	void
+	SizingLog::ReInitLogForIteration()
 	{
 		ZoneTimestepObject tmpNullztStepObj;
 
-		for ( auto &Zt : ztStepObj ) {
-			Zt = tmpNullztStepObj;
+		for ( auto &zt : ztStepObj ) {
+			zt = tmpNullztStepObj;
 		}
 	}
 
-	void SizingLog::SetupNewEnvironment(
+	void
+	SizingLog::SetupNewEnvironment(
 		int const seedEnvrnNum,
 		int const newEnvrnNum
 	)
@@ -346,8 +330,8 @@ namespace EnergyPlus {
 		newEnvrnToSeedEnvrnMap[ newEnvrnNum ] = seedEnvrnNum;
 	}
 
-	int SizingLoggerFramework::SetupVariableSizingLog(
-//		int const SupplySideInletNodeNum  // change to pointer setup
+	int
+	SizingLoggerFramework::SetupVariableSizingLog(
 		Real64 & rVariable,
 		int stepsInAverage
 	)
@@ -409,78 +393,84 @@ namespace EnergyPlus {
 
 	}
 
-	void SizingLoggerFramework::SetupSizingLogsNewEnvironment ()
+	void
+	SizingLoggerFramework::SetupSizingLogsNewEnvironment ()
 	{
 		using namespace WeatherManager;
 
-		for ( auto & L : logObjs ) {
-			L.SetupNewEnvironment (Environment( Envrn ).SeedEnvrnNum, Envrn);
+		for ( auto & l : logObjs ) {
+			l.SetupNewEnvironment (Environment( Envrn ).SeedEnvrnNum, Envrn);
 		}
 
 	}
 
-	ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
+	ZoneTimestepObject
+	SizingLoggerFramework::PrepareZoneTimestepStamp()
 	{
 		//prepare current timing data once and then pass into fill routines
 		//function used by both zone and system frequency log updates
 
-		using DataGlobals::KindOfSim;
-		using DataGlobals::DayOfSim;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::NumOfTimeStepInHour;
-		using namespace WeatherManager;
-		using namespace OutputProcessor;
 		int const ZoneIndex ( 1 );
 
+		int locDayOfSim( 1 );
+
+		if ( DataGlobals::WarmupFlag ) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
+			locDayOfSim = 1;
+		} else {
+			locDayOfSim = DataGlobals::DayOfSim;
+		}
+
 		ZoneTimestepObject tmpztStepStamp( // call constructor
-			KindOfSim,
-			Envrn,
-			DayOfSim,
-			HourOfDay,
-			TimeValue( ZoneIndex ).CurMinute,
-			TimeValue( ZoneIndex ).TimeStep,
-			NumOfTimeStepInHour );
+			DataGlobals::KindOfSim,
+			WeatherManager::Envrn,
+			locDayOfSim,
+			DataGlobals::HourOfDay,
+			DataGlobals::TimeStep,
+			OutputProcessor::TimeValue( ZoneIndex ).TimeStep,
+			DataGlobals::NumOfTimeStepInHour );
 
 		return tmpztStepStamp;
 	}
 
-	void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
+	void
+	SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 	{
 		ZoneTimestepObject tmpztStepStamp;
 
 		tmpztStepStamp = PrepareZoneTimestepStamp();
 
-		for ( auto & L : logObjs ) {
-			L.FillZoneStep(tmpztStepStamp);
+		for ( auto & l : logObjs ) {
+			l.FillZoneStep(tmpztStepStamp);
 		}
 	}
 
-	void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
+	void
+	SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
 	{
 		int const SysIndex ( 2 );
 		Real64 const MinutesPerHour( 60.0 );
-		using namespace OutputProcessor;
 		ZoneTimestepObject tmpztStepStamp;
 		SystemTimestepObject tmpSysStepStamp;
 
 		tmpztStepStamp = PrepareZoneTimestepStamp();
 
 		//pepare system timestep stamp
-		tmpSysStepStamp.CurMinuteEnd = TimeValue( SysIndex ).CurMinute;
+		tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue( SysIndex ).CurMinute;
 		if ( tmpSysStepStamp.CurMinuteEnd == 0.0 ) { tmpSysStepStamp.CurMinuteEnd = MinutesPerHour; }
-		tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - TimeValue( SysIndex ).TimeStep * MinutesPerHour;
-		tmpSysStepStamp.TimeStepDuration = TimeValue( SysIndex ).TimeStep;
+		tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue( SysIndex ).TimeStep * MinutesPerHour;
+		tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue( SysIndex ).TimeStep;
 
-		for ( auto & L : logObjs ) {
-			L.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
+		for ( auto & l : logObjs ) {
+			l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
 		}
 
 	}
 
-	void SizingLoggerFramework::IncrementSizingPeriodSet()
+	void
+	SizingLoggerFramework::IncrementSizingPeriodSet()
 	{
-		for ( auto &L : this -> logObjs ) {
-			L.ReInitLogForIteration();
+		for ( auto &l : this -> logObjs ) {
+			l.ReInitLogForIteration();
 		}
 	}
 
@@ -504,13 +494,12 @@ namespace EnergyPlus {
 	}
 
 
-	void PlantCoinicidentAnalysis::ResolveDesignFlowRate(
+	void
+	PlantCoinicidentAnalysis::ResolveDesignFlowRate(
 		int const HVACSizingIterCount
 	)
 	{
 		using DataGlobals::OutputFileInits;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
 		using DataSizing::NoSizingFactorMode;
 		using DataSizing::GlobalHeatingSizingFactorMode;
@@ -539,7 +528,7 @@ namespace EnergyPlus {
 
 		// first make sure we have valid time stamps to work with
 		if ( CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )
-				|| CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {
+				&& CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {
 			// problem, don't have valid stamp, don't have any info to report either
 			nullStampProblem =  true;
 		} else {
@@ -548,17 +537,17 @@ namespace EnergyPlus {
 
 		previousVolDesignFlowRate = PlantSizData( plantSizingIndex ).DesVolFlowRate;
 
-		if (newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) {
+		if ( ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp ) && ( newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) ) { // issue 5665, was ||
 			newFoundMassFlowRate = newFoundMassFlowRateTimeStamp.runningAvgDataValue;
 		} else {
 			newFoundMassFlowRate = 0.0;
 		}
 
 		//step 3 calculate mdot from max load and delta T
-		if ( (NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0) &&
-			((specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT) > 0.0))  {
+		if ( ( ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) && ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) ) && 
+			( ( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT ) > 0.0 ) )  {
 				peakLoadCalculatedMassFlow = NewFoundMaxDemandTimeStamp.runningAvgDataValue /
-											(specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT);
+											( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT );
 		} else {
 			peakLoadCalculatedMassFlow = 0.0;
 		}
@@ -594,8 +583,8 @@ namespace EnergyPlus {
 		normalizedChange = 0.0;
 		if ( newVolDesignFlowRate > SmallWaterVolFlow && ! nullStampProblem ) {// do not use zero size or bad stamp data
 
-			normalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) / previousVolDesignFlowRate);
-			if (normalizedChange > significantNormalizedChange ) {
+			normalizedChange = std::abs( ( newVolDesignFlowRate - previousVolDesignFlowRate ) / previousVolDesignFlowRate );
+			if ( normalizedChange > significantNormalizedChange ) {
 				anotherIterationDesired = true;
 				setNewSizes = true;
 			} else {
@@ -612,7 +601,8 @@ namespace EnergyPlus {
 				PlantLoop( plantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
 			}
 			if ( PlantLoop( plantLoopIndex ).VolumeWasAutoSized ) {
-				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+				// Note this calculation also appears in PlantManager::SizePlantLoop and PlantManager::ResizePlantLoopLevelSizes
+				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * PlantLoop( plantLoopIndex ).CirculationTime * 60.0;
 				PlantLoop( plantLoopIndex ).Mass = PlantLoop( plantLoopIndex ).Volume* densityForSizing;
 			}
 
@@ -663,7 +653,7 @@ namespace EnergyPlus {
 		}
 
 		if ( ! nullStampProblem ) {
-			if ( ! changedByDemand ) {
+			if ( ! changedByDemand && ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )) { //Trane: bug fix #5665
 				if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
 				}
@@ -673,7 +663,7 @@ namespace EnergyPlus {
 					newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
 				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
-			} else {
+			} else if ( changedByDemand && ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {    //Trane: bug fix #5665
 				if ( NewFoundMaxDemandTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title );
 				}
@@ -687,7 +677,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	bool PlantCoinicidentAnalysis::CheckTimeStampForNull(
+	bool
+	PlantCoinicidentAnalysis::CheckTimeStampForNull(
 		ZoneTimestepObject testStamp
 	)
 	{

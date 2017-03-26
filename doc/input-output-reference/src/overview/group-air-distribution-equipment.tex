@@ -110,7 +110,7 @@ The valid reheat component objects currently available are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -186,15 +186,19 @@ The design maximum volume flow rate (m\(^{3}\)/sec) specified for VAV ADU.
 
 \paragraph{Field: Zone Minimum Air Flow Method}\label{field-zone-minimum-air-flow-method}
 
-This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.~ There are three choices for selecting how the minimum flow rate is specified:~ Constant, FixedFlowRate, and Scheduled.~ If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.~ If FixedFlowRate is entered, then the program will use the value entered in the field below called Fixed Minimum Air Flow Rate.If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name.
+This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.~ The minimum flow rate is modeled as a fraction of the maximum flow rate.~ There are three choices for selecting how the minimum flow rate is specified:~ Constant, FixedFlowRate, and Scheduled.~ If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.~ If FixedFlowRate is entered, then the program will use the value for minimum flow rate entered in the field below called Fixed Minimum Air Flow Rate.~ If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name.~ The default is Constant.
 
 \paragraph{Field: Constant Minimum Air Flow Fraction}\label{field-constant-minimum-air-flow-fraction}
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the previous field is set to Constant.~ If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal.~ This field is used if the previous field is set to Constant.~ If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
+
+This field is autosizable and defaulted to autosize. The values for autosizing are picked up from the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of .000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) is used.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the Zone Minimum Air Flow Method field is set to FixedFlowRate. If the Zone Minimum Air Flow Method field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. Only one of these two minimum air flow fields (i.e., this field and the previous field) should be used at any time. If this field and the previous field have values, the greater of the two is used for sizing.
+
+This field is autosizable and defaulted to autosize. The values for autosizing are picked up from the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of .000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) is used.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name}
 
@@ -210,7 +214,7 @@ The valid reheat component objects currently available are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -239,9 +243,9 @@ The coil is controlled by knowing the zone demand determined by the zone thermos
 
 \paragraph{Field: Damper Heating Action}\label{field-damper-heating-action}
 
-During heating operation, there are two control options for the damper controlling the air flow in the VAV terminal unit as the zone moves above or below the zone setpoint. With both control options, the damper is at the minimum air flow rate whenever the zone temperature is between the cooling and heating setpoints (deadband condition).
+During heating operation, there are three control options for the damper controlling the air flow in the VAV terminal unit as the zone moves above or below the zone setpoint. With all three control options, the damper is at the minimum air flow rate whenever the zone temperature is between the cooling and heating setpoints (deadband condition).
 
-With \textbf{Normal} (the default) action, the damper will remain at the minimum air flow rate during heating operation. As the heating load increases, the water flow rate in the reheat coil will be increased to maintain temperature in the zone until the maximum water flow rate is reached or the user-specified maximum reheat air temperature is reached.. ~This is sometimes called the single maximum control logic as illustrated below.
+With \textbf{Normal} action, the damper will remain at the minimum air flow rate during heating operation. As the heating load increases, the water flow rate in the reheat coil will be increased to maintain temperature in the zone until the maximum water flow rate is reached or the user-specified maximum reheat air temperature is reached. This is sometimes called the single maximum control logic as illustrated below.
 
 \begin{figure}[hbtp] % fig 102
 \centering
@@ -249,7 +253,7 @@ With \textbf{Normal} (the default) action, the damper will remain at the minimum
 \caption{The Single Maximum Control Logic \protect \label{fig:the-single-maximum-control-logic}}
 \end{figure}
 
-With \textbf{Reverse} action, as the heating load increases, the unit starts at minimum air flow and minimum hot water flow. The hot water flow is increased until it reaches maximum flow or the user-specified maximum reheat air temperature is reached, then the air damper starts to open to meet the load. This option is used if the minimum air flow rate is not adequate to serve the peak heating load. This is sometimes called the dual maximum control logic as illustrated in following figure. For heating coil types other than the hot-water coil, e.g.~electric, steam, and gas, the reverse action works the same as the normal action -- always keeping the air flow at the minimum during heating.
+With \textbf{Reverse} and \textbf{ReverseWithLimits} (the default) action, as the heating load increases, the unit starts at minimum air flow and minimum hot water flow. The hot water flow is increased until it reaches maximum flow or the user-specified maximum reheat air temperature is reached, then the air damper starts to open to meet the load. For \textbf{Reverse} the damper can open all the way. For \textbf{ReverseWithLimits}s the damper can only partially open to a maximum flow rate given by the following two fields. These options are used if the minimum air flow rate is not adequate to serve the peak heating load. This is sometimes called the dual maximum control logic as illustrated in following figure. For heating coil types other than the hot-water coil, e.g.~electric, steam, and gas, the reverse action works the same as the normal action -- always keeping the air flow at the minimum during heating.
 
 The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat objects with reverse acting dampers and hot-water coils.
 
@@ -261,21 +265,21 @@ The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat 
 
 \paragraph{Control Fields for Maximum Flow During Reheat:}\label{control-fields-for-maximum-flow-during-reheat}
 
-The following two fields are used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = Reverse. Maximum Flow per Zone Floor Area During Reheat and Maximum Flow Fraction During Reheat are two optional methods to calculate the maximum allowable air flow rate during reheat operation. If both are entered, the greater resulting flow rate is used. If Design Specification Outdoor Air Object Name is also specified, it may increase this limit to meet the outdoor air flow rate requirement. At no time will the maximum flow rate calculated here exceed the value for Maximum Air Flow Rate.
+The following two fields are used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits. Maximum Flow per Zone Floor Area During Reheat and Maximum Flow Fraction During Reheat are two optional methods to calculate the maximum allowable air flow rate during reheat operation. If both are entered, the greater resulting flow rate is used. If Design Specification Outdoor Air Object Name is also specified, it may increase this limit to meet the outdoor air flow rate requirement. At no time will the maximum flow rate calculated here exceed the value for Maximum Air Flow Rate.
 
-This limit is active only when the zone thermostat requests heating and the VAV box damper is reverse acting.
+This limit is active only when the zone thermostat requests heating and the VAV box damper is reverse acting (i.e., ReverseWithLimits).
 
 \paragraph{Field: Maximum Flow per Zone Floor Area During Reheat}\label{field-maximum-flow-per-zone-floor-area-during-reheat}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autocalculatable. If autocalculate is selected, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)). If this field and the following field are entered, the greater of the two inputs is used. If this field and the following field are left blank, the maximum flow will not be limited.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizable and its default is autosize. If autosize is selected or the field is blank, the value is filled from the similar inputs in Sizing:Zone. If there is no sizing calculation the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)). If this field and the following field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
 
 \paragraph{Field: Maximum Flow Fraction During Reheat}\label{field-maximum-flow-fraction-during-reheat}
 
-This fraction is multiplied by the Maximum Air Flow Rate to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autocalculatable. If autocalculate is selected, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)) multiplied by the zone floor area divided by the Maximum Air Flow Rate. If this field and the previous field are entered, the greater of the two inputs is used. If this field and the previous field are left blank, the maximum flow will not be limited.
+This fraction is multiplied by the Maximum Air Flow Rate to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizeable and is defaulted to autosize. If autosizeable is selected or the field is blank, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)) multiplied by the zone floor area divided by the Maximum Air Flow Rate. If this field and the previous field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
 
 \paragraph{Field: Maximum Reheat Air Temperature}\label{field-maximum-reheat-air-temperature-1}
 
-This field specifies a maximum supply air temperature (°C) leaving the reheat coil in a VAV terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic high.
+This field specifies a maximum supply air temperature (Â°C) leaving the reheat coil in a VAV terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic high.
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name}
 
@@ -285,7 +289,7 @@ An IDF example:
 
 \begin{lstlisting}
 
-AirTerminal:SingleDuct:VAV:Reheat,
+    AirTerminal:SingleDuct:VAV:Reheat,
       SPACE2-1 VAV Reheat,  !- Name of System
       ReheatCoilAvailSched,  !- Availability schedule for VAV System
       SPACE2-1 Zone Coil Air In Node,  !- Damper Air Outlet Node
@@ -301,10 +305,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
       0.0,  !- Min Reheat Water Flow {m3/s}
       SPACE2-1 In Node,  !- Unit Air Outlet Node
       0.001,  !- Convergence Tolerance
-  Reverse,  !- Damper Heating Action
-  ,         !- Maximum Flow per Zone Floor Area During Reheat
-  ,         !- Maximum Flow Fraction During Reheat
-  35.0,     !- Maximum Reheat Air Temperature {C}
+      ReverseWithLimits,  !- Damper Heating Action
+      ,         !- Maximum Flow per Zone Floor Area During Reheat
+      ,         !- Maximum Flow Fraction During Reheat
+      35.0,     !- Maximum Reheat Air Temperature {C}
       ;         !- Design Specification Outdoor Air Object Name
 
     DesignSpecification:OutdoorAir,
@@ -316,7 +320,6 @@ AirTerminal:SingleDuct:VAV:Reheat,
       ,                         !- Outdoor Air Flow Air Changes per Hour
       Min OARequirements Sched; !- Outdoor Air Flow Rate Fraction Schedule Name
 
-
     Schedule:Compact,
       Min OARequirements Sched,  !- Name
       Any Number,                !- Schedule Type Limits Name
@@ -325,9 +328,11 @@ AirTerminal:SingleDuct:VAV:Reheat,
       Until: 24:00,1.0,          !- Field 7
       For: AllOtherDays,         !- Field 9
       Until: 24:00,0.25;         !- Field 10
-  COIL:Heating:Gas,
+
+    COIL:Heating:Fuel,
       SPACE1-1 Zone Coil,  !- Coil Name
       ReheatCoilAvailSched,  !- Availability Schedule Name
+      NaturalGas,             !- Fuel Type
       0.8,  !- Gas Burner Efficiency of the Coil
       autosize,  !- Nominal Capacity of the Coil {W}
       SPACE1-1 Zone Coil Air In Node,  !- Coil_Air_Inlet_Node
@@ -345,11 +350,11 @@ AirTerminal:SingleDuct:VAV:Reheat,
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Zone Air Terminal VAV Damper Position {[]}}{Zone Air Terminal VAV Damper Position }}\label{zone-air-terminal-vav-damper-position}
+\paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position}
 
 This output is the variable air volume damper position required to meet the zone load. This is the average value over the frequency being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
 
-\paragraph{\texorpdfstring{Zone Air Terminal Minimum Air Flow Fraction {[]}}{Zone Air Terminal Minimum Air Flow Fraction }}\label{zone-air-terminal-minimum-air-flow-fraction}
+\paragraph{Zone Air Terminal Minimum Air Flow Fraction {[]}}\label{zone-air-terminal-minimum-air-flow-fraction}
 
 This output is the value for the minimum air flow fraction setting on a VAV terminal.~~ This is the average value over the frequency being reported.~ The minimum air flow fraction is defined as the lower limit on the terminal unit air mass flow rate divided by the terminal units maximum air mass flow rate.
 
@@ -397,7 +402,7 @@ The name of the HVAC system node that is the air outlet node of the unit. This s
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type}
 
-The type of fan in the terminal unit. At this time the only type of fan allowed is \emph{Fan:VariableVolume}.
+The type of fan in the terminal unit. At this time the only type of fan allowed is \emph{Fan:SystemModel} or \emph{Fan:VariableVolume}.
 
 \paragraph{Field: Fan Name}\label{field-fan-name}
 
@@ -413,7 +418,7 @@ The type of heating coil in the terminal unit. The valid choices are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -547,7 +552,7 @@ The valid reheat component objects currently available are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -609,7 +614,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
 
 HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
 
-\paragraph{\texorpdfstring{Zone Air Terminal VAV Damper Position {[]}}{Zone Air Terminal VAV Damper Position }}\label{zone-air-terminal-vav-damper-position-2}
+\paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-2}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
 
@@ -643,15 +648,19 @@ The design maximum volume flow rate (m\(^{3}\)/sec) specified for VAV ADU. This 
 
 \paragraph{Field: Zone Minimum Air Flow Method}\label{field-zone-minimum-air-flow-method-1}
 
-This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.~ The minimum flow rate is modeled as a fraction of the maximum flow rate.~ There are five choices:~ Constant, FixedFlowRate, Scheduled, Sum and Maximum.~ If Constant is entered, then the program will use the value for minimum flow fraction entered in the following field.~ If FixedFlowRate is entered, then the program will use the value for minimum flow rate entered in the field below called Fixed Minimum Air Flow Rate.If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name. Sum and Maximum are used to either provide the summation of all ``entered'' inputs or the maximum of all ``entered'' inputs.
+This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.~ The minimum flow rate is modeled as a fraction of the maximum flow rate.~ There are three choices for selecting how the minimum flow rate is specified:~ Constant, FixedFlowRate, and Scheduled.~ If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.~ If FixedFlowRate is entered, then the program will use the value for minimum flow rate entered in the field below called Fixed Minimum Air Flow Rate.~ If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name. The default is Constant.
 
 \paragraph{Field: Constant Minimum Air Flow Fraction}\label{field-constant-minimum-air-flow-fraction-1}
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant.
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant. 
+
+This field is autosizable and defaulted to autosize. The values for autosizing are picked up from the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of .000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) is used.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate-1}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to FixedFlowRate.
+
+This field is autosizable and defaulted to autosize. The values for autosizing are picked up from the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of .000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) is used.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name-1}
 
@@ -705,7 +714,7 @@ An IDF example:
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Zone Air Terminal VAV Damper Position {[]}}{Zone Air Terminal VAV Damper Position }}\label{zone-air-terminal-vav-damper-position-3}
+\paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-3}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
 
@@ -770,7 +779,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 
 HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
 
-\paragraph{\texorpdfstring{Zone Air Terminal VAV Damper Position {[]}}{Zone Air Terminal VAV Damper Position }}\label{zone-air-terminal-vav-damper-position-4}
+\paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-4}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
 
@@ -830,7 +839,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run according to the Availability Schedule specified in the fan object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-3}
 
@@ -842,7 +851,7 @@ The type of coil in the PIU. The valid choices are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -927,7 +936,7 @@ This field reports the dry air sensible heat extraction of the series PIU termin
 
 The parallel powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a variable total flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The secondary and primary air streams enter the unit in parallel. The fan sits in the secondary air stream and runs only when the primary air flow is below the Fan On Flow Fraction and the fan's availability schedule is on or it is activated by an availability manager. The primary air inlet contains a damper that can move from fully open (maximum primary air) to a minimum stop (minimum primary air).
 
-At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand.
+At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand. The Fan On Flow Fraction field controls the fan operation; see this field description for more details. 
 
 The EnergyPlus model of the parallel PIU terminal unit is composed of three components: a constant volume fan, a zone mixer, and a heating coil (hot water, electric, or gas).
 
@@ -961,7 +970,9 @@ The minimum volumetric air flow rate of primary air through the unit expressed a
 
 \paragraph{Field: Fan On Flow Fraction}\label{field-fan-on-flow-fraction}
 
-The fraction of the primary air flow at which fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off. Otherwise the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below), unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+If Fan On Flow Fraction is > 0, then this is the fraction of the primary air flow at which the fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off. Otherwise the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below), unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). The fan will operate whenever the availability status is CycleOn or CycleOnZoneFansOnly.
+
+If Fan On Flow Fraction = 0, then the fan is controlled based on the zone load requirement rather than primary air flow fraction. The fan will operate if there is a heating load or if reheat is required to maintain the zone at the thermostat heating setpoint. When the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below) is off, it may be overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run regardless of zone load.  If the status is CycleOn, then the fan will run only if there is a heating load or reheat is required.
 
 \paragraph{Field: Supply Air Inlet Node Name}\label{field-supply-air-inlet-node-name-1}
 
@@ -985,7 +996,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-2}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. When the primary air flow is below the Fan On Flow Fraction (above), the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. When the primary air flow is below the Fan On Flow Fraction (above), the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-4}
 
@@ -997,7 +1008,7 @@ The type of coil in the PIU. The valid choices are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -1590,11 +1601,11 @@ This is n2 in the above equations. The default is 0.84.
 
 This is n3 in the above equations. The default is 0.12.
 
-\paragraph{\texorpdfstring{Field: Model Parameter a\(_{0}\) (a)}{Field: Model Parameter a\_\{0\} (a)}}\label{field-model-parameter-aux5f0-a}
+\paragraph{Field: Model Parameter a\(_{0}\) (a)}\label{field-model-parameter-aux5f0-a}
 
 This is a\(_{0}\) in the above equations. It is the free area of the coil in plan view (for the air flow) per unit beam length. The units are square meters per meter. The default is 0.171.
 
-\paragraph{\texorpdfstring{Field: Model Parameter K\(_{1}\) (K1)}{Field: Model Parameter K\_\{1\} (K1)}}\label{field-model-parameter-kux5f1-k1}
+\paragraph{Field: Model Parameter K\(_{1}\) (K1)}\label{field-model-parameter-kux5f1-k1}
 
 This is K\(_{1}\) in the above equations. The default is 0.005.
 
@@ -1602,7 +1613,7 @@ This is K\(_{1}\) in the above equations. The default is 0.005.
 
 This is n in the above equations. The default is 0.4.
 
-\paragraph{\texorpdfstring{Field: Coefficient of Induction K\(_{in}\) (Kin)}{Field: Coefficient of Induction K\_\{in\} (Kin)}}\label{field-coefficient-of-induction-kux5fin-kin}
+\paragraph{Field: Coefficient of Induction K\(_{in}\) (Kin)}\label{field-coefficient-of-induction-kux5fin-kin}
 
 The coefficient of induction K\(_{in}\) in the above equations. The default is 2.0 for active beams and 0.0 for passive beams.
 
@@ -1687,106 +1698,90 @@ Heating by the supply air to the zone, exclusive of any cooling done by the beam
 
 The heat transfer energy for the chilled water serving the beams, in Joules.
 
-\subsection{AirTerminal:SingleDuct:InletSideMixer}\label{airterminalsingleductinletsidemixer}
+\subsection{AirTerminal:SingleDuct:Mixer}\label{airterminalsingleductmixer}
 
-The inlet side mixer air terminal unit provides a means of supplying central system air to the air inlet of a zone AC unit such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
+The air terminal mixer provides a means of supplying central system air either to air inlet or supply side of a ZoneHVAC equipment such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
 
-The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is recirculated air from the zone. The outlet air stream of the inlet side mixer is then the inlet to the zone AC unit.
+This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS air loop and recirculating (secondary air) and deliver it either to inlet or supply side of a local ZoneHVAC equipment. The terminal mixer can be connected either to the inlet or supply side of the local ZoneHVAC equipment and the connection type is specified in the input field \textit{Mixer Connection Type}. If the AirTerminal:SingleDuct:Mixer object is connected to the supply side, a mix of conditioned outdoor air from a central dedicated outdoor air system (DOAS) with conditioned recirculation air from the local ZoneHVAC equipment is supplied as a single stream to the conditioned zone at its inlet node. If the AirTerminal:SingleDuct:Mixer object is connected to the inlet side, a mix of outdoor air from the a central dedicated outdoor air system (DOAS) with un-conditioned recirculation air from a zone exhaust node is supplied to the ZoneHVAC equipment inlet node. The mixer model will sum the two air streams and average the air properties. The AirTerminal:SingleDuct:Mixer is used with the ZoneHVAC:FourPipeFanCoil, ZoneHVAC:WaterToAirHeatPump, ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:TerminalUnit:VariableRefrigerantFlow, ZoneHVAC:UnitVentilator, and AirLoopHVAC:UnitarySystem objects. The AirLoopHVAC:UnitarySystem object is used as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
 
 \begin{figure}[hbtp] % fig 108
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image275.png}
 \caption{Inlet Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:inlet-side-mixer-air-terminal-unit-with-fan}}
 \end{figure}
-
-\subsubsection{Inputs}\label{inputs-12-000}
-
-\paragraph{Field: Name}\label{field-name-12}
-
-A unique user assigned name for a particular inlet side mixer terminal unit. Any reference to this unit by another object will use this name.
-
-\paragraph{Field: ZoneHVAC Terminal Unit Object Type}\label{field-zonehvac-terminal-unit-object-type}
-
-The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
-
-\paragraph{Field: ZoneHVAC Terminal Unit Name}\label{field-zonehvac-terminal-unit-name}
-
-The name of the zone AC unit to which this terminal will be connected.
-
-\paragraph{Field: Terminal Unit Outlet Node Name}\label{field-terminal-unit-outlet-node-name}
-
-The name of the air outlet node of the inlet side mixer. This will be the inlet air node of the zone AC unit.
-
-\paragraph{Field: Terminal Unit Primary Air Inlet Node Name}\label{field-terminal-unit-primary-air-inlet-node-name}
-
-The name of the primary air inlet node of the inlet side mixer. This will be an outlet node of an AirLoopHVAC:ZoneSplitter, providing the connection to the DOAS system.
-
-\paragraph{Field: Terminal Unit Secondary Air Inlet Node Name}\label{field-terminal-unit-secondary-air-inlet-node-name}
-
-The name of the secondary air inlet node of the inlet side mixer. This will be an exhaust node of the zone that is being conditioned.
-
-An IDF example:
-
-\begin{lstlisting}
-
-AirTerminal:SingleDuct:InletSideMixer,
-      SPACE2-1 DOAS Air Terminal,  !- Name
-      ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-      SPACE2-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-      SPACE2-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-      SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-      SPACE2-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
-\end{lstlisting}
-
-\subsection{AirTerminal:SingleDuct:SupplySideMixer}\label{airterminalsingleductsupplysidemixer}
-
-The supply side mixer air terminal unit provides a means of supplying central system air to the air outlet of a zone AC unit such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
-
-The AirTerminal:SingleDuct:SupplySideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is outlet air from the zone AC unit. The outlet air stream from the supply side mixer is then the inlet to the conditioned zone.
-
 \begin{figure}[hbtp] % fig 109
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image276.png}
 \caption{Supply Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:supply-side-mixer-air-terminal-unit-with-fan}}
 \end{figure}
 
-\subsubsection{Inputs}\label{inputs-13-000}
 
-\paragraph{Field: Name}\label{field-name-13}
+\subsubsection{Inputs}\label{inputs-12-000}
 
-A unique user assigned name for a particular supply side mixer terminal unit. Any reference to this unit by another object will use this name.
+\paragraph{Field: Name}\label{field-name-12}
 
-\paragraph{Field: ZoneHVAC Terminal Unit Object Type}\label{field-zonehvac-terminal-unit-object-type-1}
+A unique user assigned name for a particular terminal mixer unit. Any reference to this unit by another object will use this name.
 
-The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
+\paragraph{Field: ZoneHVAC Unit Object Type}\label{field-zonehvac-unit-object-type}
 
-\paragraph{Field: ZoneHVAC Terminal Unit Name}\label{field-zonehvac-terminal-unit-name-1}
+The type of ZoneHVAC equipment to which this terminal mixer will be connected. This is a choice input field. 
+Valid ZoneHVAC choices are:
+\begin{itemize}
+\setlength{\parskip}{0pt}
+\setlength{\itemsep}{0pt plus 1pt}
+\item ZoneHVAC:FourPipeFanCoil
+\item ZoneHVAC:WaterToAirHeatPump
+\item ZoneHVAC:PackagedTerminalAirConditioner
+\item ZoneHVAC:PackagedTerminalHeatPump
+\item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+\item ZoneHVAC:UnitVentilator 
+\item AirLoopHVAC:UnitarySystem
+\end{itemize}
 
-The name of the zone AC unit to which this terminal will be connected.
+\paragraph{Field: ZoneHVAC Unit Object Name}\label{field-zonehvac-unit-object-name}
 
-\paragraph{Field: Terminal Unit Outlet Node Name}\label{field-terminal-unit-outlet-node-name-1}
+The name of ZoneHVAC equipment to which this mixer will be connected.
 
-The name of the air outlet node of the supply side mixer. This will be an inlet air node of the conditioned zone.
+\paragraph{Field: Mixer Outlet Node Name}\label{field-mixer-outlet-node-name}
 
-\paragraph{Field: Terminal Unit Primary Air Inlet Node Name}\label{field-terminal-unit-primary-air-inlet-node-name-1}
+The outlet air node name of the mixer. This will be an inlet air node name of the conditioned zone if the connection type specified in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be the inlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{InletSide}.
 
-The name of the primary air inlet node of the supply side mixer. This will be an outlet node of an AirLoopHVAC:ZoneSplitter, providing the connection to the DOAS system.
+\paragraph{Field: Mixer Primary Air Inlet Node Name}\label{field-mixer-primary-air-inlet-node-name}
 
-\paragraph{Field: Terminal Unit Secondary Air Inlet Node Name}\label{field-terminal-unit-secondary-air-inlet-node-name-1}
+The primary air (treated outdoor air) inlet node name of the mixer. This will be the outlet air node name of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum, providing the connection to the DOAS system.
 
-The name of the secondary air inlet node of the supply side mixer. This will be the outlet air node of the zone AC unit.
+\paragraph{Field: Mixer Secondary Air Inlet Node Name}\label{field-mixer-secondary-air-inlet-node-name}
 
-An IDF example:
+The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be an exhaust air node name of the conditioned zone if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{InletSide}.
+
+\paragraph{Field: Mixer Connection Type}\label{field-mixer-connection-type}
+
+This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{SupplySide}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{SupplySide}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\ 
+
+An IDF examples for InletSide and SupplySide connection type:
 
 \begin{lstlisting}
 
-AirTerminal:SingleDuct:SupplySideMixer,
-      SPACE1-1 DOAS Air Terminal,  !- Name
-      ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-      SPACE1-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-      SPACE1-1 Supply Inlet,   !- Terminal Unit Outlet Node Name
-      SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-      SPACE1-1 Fan Coil Outlet;!- Terminal Unit Secondary Air Inlet Node Name
+AirTerminal:SingleDuct:Mixer,
+      SPACE2-1 DOAS Air Terminal,  !- Name
+      ZoneHVAC:FourPipeFanCoil,    !- ZoneHVAC Unit Object Type
+      SPACE2-1 Fan Coil,           !- ZoneHVAC Unit Object Name
+      SPACE2-1 Fan Coil Inlet,     !- Mixer Outlet Node Name
+      SPACE2-1 ATM Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+      SPACE2-1 ATM Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+      InletSide;                   !- Mixer Connection Type   
+\end{lstlisting}
+
+\begin{lstlisting}
+
+AirTerminal:SingleDuct:Mixer,
+      SPACE1-1 DOAS Air Terminal, !- Name
+      ZoneHVAC:FourPipeFanCoil,   !- ZoneHVAC Unit Object Type
+      SPACE1-1 Fan Coil,          !- ZoneHVAC Unit Object Name
+      SPACE1-1 Supply Inlet,      !- Mixer Outlet Node Name
+      SPACE1-1 ATM Primary Inlet, !- Mixer Primary Air Inlet Node Name
+      SPACE1-1 Fan Coil Outlet,   !- Mixer Secondary Air Inlet Node Name
+      SupplySide;                 !- Mixer Connection Type
 \end{lstlisting}
 
 \subsection{AirTerminal:DualDuct:ConstantVolume}\label{airterminaldualductconstantvolume}
@@ -1932,11 +1927,11 @@ An IDF example:
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Zone Air Terminal Cold Supply Duct Damper Position {[]}}{Zone Air Terminal Cold Supply Duct Damper Position }}\label{zone-air-terminal-cold-supply-duct-damper-position-1}
+\paragraph{Zone Air Terminal Cold Supply Duct Damper Position {[]}}\label{zone-air-terminal-cold-supply-duct-damper-position-1}
 
 This output is the damper position of the cold air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit cold air mass flow rate divided by the terminal unit's maximum cold air mass flow rate.
 
-\paragraph{\texorpdfstring{Zone Air Terminal Hot Supply Duct Damper Position {[]}}{Zone Air Terminal Hot Supply Duct Damper Position }}\label{zone-air-terminal-hot-supply-duct-damper-position-1}
+\paragraph{Zone Air Terminal Hot Supply Duct Damper Position {[]}}\label{zone-air-terminal-hot-supply-duct-damper-position-1}
 
 This output is the damper position of the hot air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit hot air mass flow rate divided by the terminal unit's maximum hot air mass flow rate.
 
@@ -2022,14 +2017,14 @@ An example input object follows.
   Output:Variable,*,Zone Air Terminal Outdoor Air Fraction,hourly; !- HVAC Average {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Zone Air Terminal Outdoor Air Duct Damper Position {[]}}{Zone Air Terminal Outdoor Air Duct Damper Position }}\label{zone-air-terminal-outdoor-air-duct-damper-position}
+\paragraph{Zone Air Terminal Outdoor Air Duct Damper Position {[]}}\label{zone-air-terminal-outdoor-air-duct-damper-position}
 
 This output is the damper position of the outdoor air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit outdoor air mass flow rate divided by the terminal unit's maximum outdoor air mass flow rate.~ This output is dimensionless and ranges from 0.0 to 1.0.
 
-\paragraph{\texorpdfstring{Zone Air Terminal Recirculated Air Duct Damper Position {[]}}{Zone Air Terminal Recirculated Air Duct Damper Position }}\label{zone-air-terminal-recirculated-air-duct-damper-position}
+\paragraph{Zone Air Terminal Recirculated Air Duct Damper Position {[]}}\label{zone-air-terminal-recirculated-air-duct-damper-position}
 
 This output is the damper position of the recirculated cool air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit cool air mass flow rate divided by the terminal unit's maximum cool air mass flow rate.~ This output is dimensionless and ranges from 0.0 to 1.0.
 
-\paragraph{\texorpdfstring{Zone Air Terminal Outdoor Air Fraction {[]}}{Zone Air Terminal Outdoor Air Fraction }}\label{zone-air-terminal-outdoor-air-fraction}
+\paragraph{Zone Air Terminal Outdoor Air Fraction {[]}}\label{zone-air-terminal-outdoor-air-fraction}
 
 This output is the current fraction of outdoor air contained in the combined flow of aire entering the zone from the terminal unit. This is the average value over the frequency being reported. The outdoor air fraction is defined as the terminal unit outdoor air mass flow rate divided by the total air mass flow rate.~ This output is dimensionless and ranges from 0.0 to 1.0.

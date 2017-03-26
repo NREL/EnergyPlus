@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -83,6 +71,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
+#include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessor.hh>
@@ -123,16 +112,11 @@ namespace VentilatedSlab {
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
 	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
@@ -140,7 +124,6 @@ namespace VentilatedSlab {
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataHeatBalFanSys::QRadSysSource;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 
@@ -148,9 +131,6 @@ namespace VentilatedSlab {
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Module Object
 	std::string const cMO_VentilatedSlab( "ZoneHVAC:VentilatedSlab" );
@@ -847,6 +827,21 @@ namespace VentilatedSlab {
 			// Fan information:
 			VentSlab( Item ).FanName = cAlphaArgs( 25 );
 
+			if ( HVACFan::checkIfFanNameIsAFanSystem( VentSlab( Item ).FanName ) ) {
+				VentSlab( Item ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( VentSlab( Item ).FanName ) );
+				VentSlab( Item ).Fan_Index = HVACFan::getFanObjectVectorIndex( VentSlab( Item ).FanName );
+			} else {
+				bool isNotOkay( false );
+				ValidateComponent( "FAN:CONSTANTVOLUME", VentSlab( Item ).FanName, isNotOkay, "GetPIUs"  );
+				if ( isNotOkay ) {
+					ShowContinueError( "In " + CurrentModuleObject + " = " + VentSlab( Item ).Name );
+					ErrorsFound = true;
+				}
+				VentSlab( Item ).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+			}
+
+
 			if ( VentSlab( Item ).OAControlType == FixedOAControl ) {
 				VentSlab( Item ).OutAirVolFlow = VentSlab( Item ).MinOutAirVolFlow;
 				VentSlab( Item ).MaxOASchedName = VentSlab( Item ).MinOASchedName;
@@ -878,7 +873,7 @@ namespace VentilatedSlab {
 				//             \type choice
 				//             \key Coil:Heating:Water
 				//             \key Coil:Heating:Electric
-				//             \key Coil:Heating:Gas
+				//             \key Coil:Heating:Fuel
 				//             \key Coil:Heating:Steam
 				//        A28, \field Heating Coil Name
 				//             \type object-list
@@ -906,7 +901,7 @@ namespace VentilatedSlab {
 						}
 					} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 						VentSlab( Item ).HCoilType = Heating_ElectricCoilType;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+					} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 						VentSlab( Item ).HCoilType = Heating_GasCoilType;
 					} else {
 						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
@@ -1344,7 +1339,7 @@ namespace VentilatedSlab {
 			if ( VentSlab( Item ).HCoilPresent ) { // Only initialize these if a heating coil is actually present
 
 				if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && ! MyPlantScanFlag( Item ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 
 					VentSlab( Item ).MaxHotWaterFlow = rho * VentSlab( Item ).MaxVolHotWaterFlow;
 					VentSlab( Item ).MinHotWaterFlow = rho * VentSlab( Item ).MinVolHotWaterFlow;
@@ -1366,7 +1361,7 @@ namespace VentilatedSlab {
 			if ( VentSlab( Item ).CCoilPresent && ! MyPlantScanFlag( Item ) ) {
 				// Only initialize these if a cooling coil is actually present
 				if ( ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ) || ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
 					VentSlab( Item ).MaxColdWaterFlow = rho * VentSlab( Item ).MaxVolColdWaterFlow;
 					VentSlab( Item ).MinColdWaterFlow = rho * VentSlab( Item ).MinVolColdWaterFlow;
 					InitComponentNodes( VentSlab( Item ).MinColdWaterFlow, VentSlab( Item ).MaxColdWaterFlow, VentSlab( Item ).ColdControlNode, VentSlab( Item ).ColdCoilOutNodeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
@@ -1467,6 +1462,8 @@ namespace VentilatedSlab {
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
+		using WaterCoils::GetWaterCoilIndex;
+		using WaterCoils::WaterCoil;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -1542,7 +1539,13 @@ namespace VentilatedSlab {
 		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 CoolingAirVolFlowScalable; // cooling airvolume for rate determined using scalable sizing method
 		Real64 HeatingAirVolFlowScalable; // heating airvolume for rate determined using scalable sizing method
+		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
+		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+		int CoilNum; // index of water coil object
 
+		DoWaterCoilSizing = false;
+		WaterCoilSizDeltaT = 0.0;
+		CoilNum = 0;
 		PltSizCoolNum = 0;
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -1758,8 +1761,23 @@ namespace VentilatedSlab {
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						//END IF
-						if ( PltSizHeatNum > 0 ) {
+						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", VentSlab( Item ).HCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizHeatNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
+								ErrorsFound = true;
+							}
+						}
+						if ( DoWaterCoilSizing ) {
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = HeatingCapacitySizing;
 								if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
@@ -1790,6 +1808,7 @@ namespace VentilatedSlab {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1797,16 +1816,12 @@ namespace VentilatedSlab {
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
 								}
-								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+								MaxVolHotWaterFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
 							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
-							ErrorsFound = true;
 						}
 					}
 
@@ -1883,6 +1898,7 @@ namespace VentilatedSlab {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1895,8 +1911,8 @@ namespace VentilatedSlab {
 								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
 								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
-								rho = GetDensityGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName );
+								rho = GetDensityGlycol( fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName );
 								MaxVolHotSteamFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
 							} else {
 								MaxVolHotSteamFlowDes = 0.0;
@@ -1953,7 +1969,23 @@ namespace VentilatedSlab {
 				CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
 				if ( IsAutoSize ) {
 					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-					if ( PltSizCoolNum > 0 ) {
+					CoilNum = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
+					if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+						WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+						DoWaterCoilSizing = true;
+					} else {
+						if ( PltSizCoolNum > 0 ) {
+							WaterCoilSizDeltaT = PlantSizData( PltSizCoolNum ).DeltaT;
+							DoWaterCoilSizing = true;
+						} else {
+							DoWaterCoilSizing = false;
+							// If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
+							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
+							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
+							ErrorsFound = true;
+						}
+					}
+					if ( DoWaterCoilSizing ) {
 						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 							SizingMethod = CoolingCapacitySizing;
 							if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
@@ -1984,6 +2016,7 @@ namespace VentilatedSlab {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
@@ -1994,14 +2027,10 @@ namespace VentilatedSlab {
 							}
 							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
 							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-							MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+							MaxVolColdWaterFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 						} else {
 							MaxVolColdWaterFlowDes = 0.0;
 						}
-					} else {
-						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
-						ErrorsFound = true;
 					}
 				}
 				if ( IsAutoSize ) {
@@ -2120,7 +2149,6 @@ namespace VentilatedSlab {
 		using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
 		using SteamCoils::CheckSteamCoilSchedule;
 		using General::TrimSigDigits;
-		using Fans::SimulateFanComponents; // 12/18
 		using DataHeatBalSurface::TH;
 		using NodeInputManager::GetOnlySingleNode;
 
@@ -2194,7 +2222,7 @@ namespace VentilatedSlab {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else {
 			}}
 
@@ -2220,7 +2248,7 @@ namespace VentilatedSlab {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else {
 			}}
 
@@ -2244,7 +2272,6 @@ namespace VentilatedSlab {
 
 		// FLOW:
 
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -2551,7 +2578,13 @@ namespace VentilatedSlab {
 					}}
 
 					SimVentSlabOAMixer( Item );
-					SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+
+					if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+					} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+						Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					}
+
 					CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
 					QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
 
@@ -2777,7 +2810,11 @@ namespace VentilatedSlab {
 					HCoilOn = false;
 
 					SimVentSlabOAMixer( Item );
-					SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+						HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+					} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+						Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					}
 
 					CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
 					QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
@@ -2794,14 +2831,24 @@ namespace VentilatedSlab {
 
 		// Resimulate fans if AirMassFlow is zero and FanElecPower is > 0, indicating that load or condensation controls shut off the ventilated slab in CalcVentilatedSlabRadComps
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
-		if ( ( AirMassFlow <= 0.0 ) && ( FanElecPower > 0.0 ) ) {
+		Real64 locFanElecPower = 0.0;
+		if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( VentSlab( Item ).Fan_Index );
+		}
+		if ( ( AirMassFlow <= 0.0 ) && ( locFanElecPower > 0.0 ) ) {
 			Node( MixoutNode ).MassFlowRate = 0.0;
 			Node( MixoutNode ).MassFlowRateMaxAvail = 0.0;
 			Node( MixoutNode ).MassFlowRateMinAvail = 0.0;
 			Node( FanOutletNode ).MassFlowRate = 0.0;
 			Node( FanOutletNode ).MassFlowRateMaxAvail = 0.0;
 			Node( FanOutletNode ).MassFlowRateMinAvail = 0.0;
-			SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+			} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+				Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			}
 		}
 
 		CalcVentilatedSlabCoilOutput( Item, PowerMet, LatOutputProvided );
@@ -2838,7 +2885,6 @@ namespace VentilatedSlab {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -2873,7 +2919,11 @@ namespace VentilatedSlab {
 		// FLOW:
 
 		SimVentSlabOAMixer( Item );
-		SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+		} else if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
+			Fans::SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		}
 		if ( ( VentSlab( Item ).CCoilPresent ) && ( VentSlab( Item ).CCoilSchedValue >= 0.0 ) ) {
 			if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
 				SimHXAssistedCoolingCoil( VentSlab( Item ).CCoilName, FirstHVACIteration, On, 0.0, VentSlab( Item ).CCoil_Index, ContFanCycCoil );
@@ -2998,7 +3048,11 @@ namespace VentilatedSlab {
 		VentSlab( Item ).SensCoolCoilPower = std::abs( min( 0.0, QUnitOut ) );
 		VentSlab( Item ).TotCoolCoilPower = std::abs( min( 0.0, QTotUnitOut ) );
 		VentSlab( Item ).LateCoolCoilPower = VentSlab( Item ).TotCoolCoilPower - VentSlab( Item ).SensCoolCoilPower;
-		VentSlab( Item ).ElecFanPower = FanElecPower;
+		if ( VentSlab( Item ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			VentSlab( Item ).ElecFanPower = HVACFan::fanObjs[ VentSlab( Item ).Fan_Index ]->fanPower();
+		} else {
+			VentSlab( Item ).ElecFanPower = Fans::GetFanPower( VentSlab( Item ).Fan_Index );
+		}
 		VentSlab( Item ).AirMassFlowRate = AirMassFlow;
 
 		SpecHumOut = Node( OutletNode ).HumRat;
@@ -3039,7 +3093,7 @@ namespace VentilatedSlab {
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using General::RoundSigDigits;
-		using Fans::SimulateFanComponents;
+
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;

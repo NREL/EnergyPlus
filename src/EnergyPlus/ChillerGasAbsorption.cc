@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -121,11 +109,9 @@ namespace ChillerGasAbsorption {
 	//    Development of this module was funded by the Gas Research Institute.
 	//    (Please see copyright and disclaimer information at end of module)
 
-	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BigNumber;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -133,29 +119,31 @@ namespace ChillerGasAbsorption {
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
 	int NumGasAbsorbers( 0 ); // number of Absorption Chillers specified in input
-
-	// This type holds the output from the algorithm i.e., the Report Variables
 
 	Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
-	// Object Data
 	Array1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
 	Array1D< ReportVars > GasAbsorberReport;
 
-	// MODULE SUBROUTINES:
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		Real64 Sim_HeatCap( 0.0 ); // W - nominal heating capacity
+		bool Sim_GetInput( true ); // then TRUE, calls subroutine to read input file.
+		bool Get_ErrorsFound( false );
+		bool Init_MyOneTimeFlag( true );
+		Array1D_bool Init_MyEnvrnFlag;
+		Array1D_bool Init_MyPlantScanFlag;
+		Real64 Calc_oldCondSupplyTemp( 0.0 ); // save the last iteration value of leaving condenser water temperature
+	}
+
 
 	// Beginning of Absorption Chiller Module Driver Subroutines
 	//*************************************************************************
-
-	// Functions
 
 	void
 	SimGasAbsorber(
@@ -177,49 +165,23 @@ namespace ChillerGasAbsorption {
 		Real64 & TempEvapOutDesign
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   March 2001
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
-
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using CurveManager::CurveValue;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// used to determine if heating side or cooling
-		// side of chiller-heater is being called
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		static Real64 HeatCap( 0.0 ); // W - nominal heating capacity
-		static bool GetInput( true ); // then TRUE, calls subroutine to read input file.
 		int ChillNum; // Absorber number counter
 
 		//Get Absorber data from input file
-		if ( GetInput ) {
+		if ( Sim_GetInput ) {
 			GetGasAbsorberInput();
-			GetInput = false;
+			Sim_GetInput = false;
 		}
 
 		// Find the correct Equipment
@@ -255,12 +217,12 @@ namespace ChillerGasAbsorption {
 				MaxCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).MaxPartLoadRat;
 				OptCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).OptPartLoadRat;
 			} else if ( BranchInletNodeNum == GasAbsorber( ChillNum ).HeatReturnNodeNum ) { // Operate as heater
-				HeatCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).NomHeatCoolRatio;
-				MinCap = HeatCap * GasAbsorber( ChillNum ).MinPartLoadRat;
-				MaxCap = HeatCap * GasAbsorber( ChillNum ).MaxPartLoadRat;
-				OptCap = HeatCap * GasAbsorber( ChillNum ).OptPartLoadRat;
+				Sim_HeatCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).NomHeatCoolRatio;
+				MinCap = Sim_HeatCap * GasAbsorber( ChillNum ).MinPartLoadRat;
+				MaxCap = Sim_HeatCap * GasAbsorber( ChillNum ).MaxPartLoadRat;
+				OptCap = Sim_HeatCap * GasAbsorber( ChillNum ).OptPartLoadRat;
 			} else if ( BranchInletNodeNum == GasAbsorber( ChillNum ).CondReturnNodeNum ) { // called from condenser loop
-				HeatCap = 0.0;
+				Sim_HeatCap = 0.0;
 				MinCap = 0.0;
 				MaxCap = 0.0;
 				OptCap = 0.0;
@@ -299,8 +261,9 @@ namespace ChillerGasAbsorption {
 			CalcGasAbsorberHeaterModel( ChillNum, MyLoad, RunFlag );
 			UpdateGasAbsorberHeatRecords( MyLoad, RunFlag, ChillNum );
 		} else if ( BranchInletNodeNum == GasAbsorber( ChillNum ).CondReturnNodeNum ) { // called from condenser loop
-			UpdateChillerComponentCondenserSide( GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorberReport( ChillNum ).TowerLoad, GasAbsorberReport( ChillNum ).CondReturnTemp, GasAbsorberReport( ChillNum ).CondSupplyTemp, GasAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
-
+			if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ){
+				UpdateChillerComponentCondenserSide( GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorberReport( ChillNum ).TowerLoad, GasAbsorberReport( ChillNum ).CondReturnTemp, GasAbsorberReport( ChillNum ).CondSupplyTemp, GasAbsorberReport( ChillNum ).CondWaterFlowRate, FirstIteration );
+			}
 		} else { // Error, nodes do not match
 			ShowSevereError( "Invalid call to Gas Absorber Chiller " + AbsorberName );
 			ShowContinueError( "Node connections in branch are not consistent with object nodes." );
@@ -318,20 +281,11 @@ namespace ChillerGasAbsorption {
 	void
 	GetGasAbsorberInput()
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Jason Glazer
 		//       DATE WRITTEN:    March 2001
-
-		// PURPOSE OF THIS SUBROUTINE:
 		// This routine will get the input
 		// required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
 
-		// METHODOLOGY EMPLOYED:
-		// EnergyPlus input processor
-
-		// REFERENCES: na
-
-		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
@@ -344,15 +298,10 @@ namespace ChillerGasAbsorption {
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
 		using DataSizing::AutoSize;
 
-		// Locals
-		// PARAMETERS
-
-		//LOCAL VARIABLES
 		int AbsorberNum; // Absorber counter
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string ChillerName;
@@ -365,7 +314,7 @@ namespace ChillerGasAbsorption {
 
 		if ( NumGasAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
-			ErrorsFound = true;
+			Get_ErrorsFound = true;
 		}
 
 		if ( allocated( GasAbsorber ) ) return;
@@ -379,18 +328,18 @@ namespace ChillerGasAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
-				ErrorsFound = true;
+				Get_ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
-				ErrorsFound = true;
+				Get_ErrorsFound = true;
 			}
 			GasAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
 			ChillerName = cCurrentModuleObject + " Named " + GasAbsorber( AbsorberNum ).Name;
@@ -408,16 +357,16 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).ElecHeatRatio = rNumericArgs( 6 );
 
 			// Assign Node Numbers to specified nodes
-			GasAbsorber( AbsorberNum ).ChillReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			GasAbsorber( AbsorberNum ).ChillSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			GasAbsorber( AbsorberNum ).ChillReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			GasAbsorber( AbsorberNum ).ChillSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 			// Condenser node processing depends on condenser type, see below
-			GasAbsorber( AbsorberNum ).HeatReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
-			GasAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+			GasAbsorber( AbsorberNum ).HeatReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+			GasAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
-			if ( ErrorsFound ) {
+			if ( Get_ErrorsFound ) {
 				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ErrorsFound = false;
+				Get_ErrorsFound = false;
 			}
 
 			// Assign Part Load Ratios
@@ -444,16 +393,16 @@ namespace ChillerGasAbsorption {
 				GasAbsorber( AbsorberNum ).HeatVolFlowRateWasAutoSized = true;
 			}
 			// Assign Curve Numbers
-			GasAbsorber( AbsorberNum ).CoolCapFTCurve = GetCurveCheck( cAlphaArgs( 8 ), ErrorsFound, ChillerName );
-			GasAbsorber( AbsorberNum ).FuelCoolFTCurve = GetCurveCheck( cAlphaArgs( 9 ), ErrorsFound, ChillerName );
-			GasAbsorber( AbsorberNum ).FuelCoolFPLRCurve = GetCurveCheck( cAlphaArgs( 10 ), ErrorsFound, ChillerName );
-			GasAbsorber( AbsorberNum ).ElecCoolFTCurve = GetCurveCheck( cAlphaArgs( 11 ), ErrorsFound, ChillerName );
-			GasAbsorber( AbsorberNum ).ElecCoolFPLRCurve = GetCurveCheck( cAlphaArgs( 12 ), ErrorsFound, ChillerName );
-			GasAbsorber( AbsorberNum ).HeatCapFCoolCurve = GetCurveCheck( cAlphaArgs( 13 ), ErrorsFound, ChillerName );
-			GasAbsorber( AbsorberNum ).FuelHeatFHPLRCurve = GetCurveCheck( cAlphaArgs( 14 ), ErrorsFound, ChillerName );
-			if ( ErrorsFound ) {
+			GasAbsorber( AbsorberNum ).CoolCapFTCurve = GetCurveCheck( cAlphaArgs( 8 ), Get_ErrorsFound, ChillerName );
+			GasAbsorber( AbsorberNum ).FuelCoolFTCurve = GetCurveCheck( cAlphaArgs( 9 ), Get_ErrorsFound, ChillerName );
+			GasAbsorber( AbsorberNum ).FuelCoolFPLRCurve = GetCurveCheck( cAlphaArgs( 10 ), Get_ErrorsFound, ChillerName );
+			GasAbsorber( AbsorberNum ).ElecCoolFTCurve = GetCurveCheck( cAlphaArgs( 11 ), Get_ErrorsFound, ChillerName );
+			GasAbsorber( AbsorberNum ).ElecCoolFPLRCurve = GetCurveCheck( cAlphaArgs( 12 ), Get_ErrorsFound, ChillerName );
+			GasAbsorber( AbsorberNum ).HeatCapFCoolCurve = GetCurveCheck( cAlphaArgs( 13 ), Get_ErrorsFound, ChillerName );
+			GasAbsorber( AbsorberNum ).FuelHeatFHPLRCurve = GetCurveCheck( cAlphaArgs( 14 ), Get_ErrorsFound, ChillerName );
+			if ( Get_ErrorsFound ) {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ErrorsFound = false;
+				Get_ErrorsFound = false;
 			}
 			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = false;
@@ -465,7 +414,7 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\"" );
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
-			// Assign Other Paramters
+			// Assign Other Parameters
 			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
 			} else if ( SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
@@ -476,13 +425,24 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 16 ) + '=' + cAlphaArgs( 16 ) );
 				ShowContinueError( "resetting to WaterCooled, simulation continues" );
 			}
+			if ( !GasAbsorber( AbsorberNum ).isEnterCondensTemp && !GasAbsorber( AbsorberNum ).isWaterCooled ){
+				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
+				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+				ShowContinueError( "Invalid to have both LeavingCondenser and AirCooled.");
+				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
+			}
 			if ( GasAbsorber( AbsorberNum ).isWaterCooled ) {
-				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				if ( lAlphaFieldBlanks( 5 ) ){
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
+					ShowContinueError( "For WaterCooled chiller the condenser outlet node is required." );
+					Get_ErrorsFound = true;
+				}
+				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser Water Nodes" );
 			} else {
-				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
-				GasAbsorber( AbsorberNum ).CondSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+				GasAbsorber( AbsorberNum ).CondReturnNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 2, ObjectIsNotParent );
+				// Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
 				// Connection not required for air or evap cooled condenser so no call to TestCompSet here
 				CheckAndAddAirNodeNumber( GasAbsorber( AbsorberNum ).CondReturnNodeNum, Okay );
 				if ( ! Okay ) {
@@ -494,7 +454,7 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).SizFac = rNumericArgs( 17 );
 
 			//Fuel Type Case Statement
-			{ auto const SELECT_CASE_var( cAlphaArgs( 18 ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 17 ) );
 			if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
 				GasAbsorber( AbsorberNum ).FuelType = "Gas";
 
@@ -521,14 +481,14 @@ namespace ChillerGasAbsorption {
 
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
-				ShowContinueError( "Invalid " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 17 ) + '=' + cAlphaArgs( 17 ) );
 				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
-				ErrorsFound = true;
+				Get_ErrorsFound = true;
 			}}
 
 		}
 
-		if ( ErrorsFound ) {
+		if ( Get_ErrorsFound ) {
 			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
 		}
 
@@ -601,24 +561,14 @@ namespace ChillerGasAbsorption {
 		bool const EP_UNUSED( RunFlag ) // TRUE when chiller operating
 	)
 	{
-
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   June 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for initializations of direct fired absorption chiller
 		// components.
 
-		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
@@ -633,26 +583,8 @@ namespace ChillerGasAbsorption {
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using Psychrometrics::RhoH2O;
 
-		// na
+		std::string const RoutineName( "InitGasAbsorber" );
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// used to determine if heating side or cooling
-		// side of chiller-heater is being called
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "InitGasAbsorber" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-		static Array1D_bool MyEnvrnFlag;
-		static Array1D_bool MyPlantScanFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int HeatInletNode; // node number of hot water inlet node
@@ -662,15 +594,15 @@ namespace ChillerGasAbsorption {
 		Real64 mdot; // lcoal fluid mass flow rate
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
-			MyPlantScanFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag.dimension( NumGasAbsorbers, true );
-			MyOneTimeFlag = false;
-			MyPlantScanFlag = true;
+		if ( Init_MyOneTimeFlag ) {
+			Init_MyPlantScanFlag.allocate( NumGasAbsorbers );
+			Init_MyEnvrnFlag.dimension( NumGasAbsorbers, true );
+			Init_MyOneTimeFlag = false;
+			Init_MyPlantScanFlag = true;
 		}
 
 		// Init more variables
-		if ( MyPlantScanFlag( ChillNum ) ) {
+		if ( Init_MyPlantScanFlag( ChillNum ) ) {
 			// Locate the chillers on the plant loops for later usage
 			errFlag = false;
 			ScanPlantLoopsForObject( GasAbsorber( ChillNum ).Name, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CWLoopNum, GasAbsorber( ChillNum ).CWLoopSideNum, GasAbsorber( ChillNum ).CWBranchNum, GasAbsorber( ChillNum ).CWCompNum, GasAbsorber( ChillNum ).CHWLowLimitTemp, _, _, GasAbsorber( ChillNum ).ChillReturnNodeNum, _, errFlag );
@@ -752,7 +684,7 @@ namespace ChillerGasAbsorption {
 				Node( GasAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPoint = Node( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).TempSetPointNodeNum ).TempSetPoint;
 				Node( GasAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPointLo = Node( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).TempSetPointNodeNum ).TempSetPointLo;
 			}
-			MyPlantScanFlag( ChillNum ) = false;
+			Init_MyPlantScanFlag( ChillNum ) = false;
 		}
 
 		CondInletNode = GasAbsorber( ChillNum ).CondReturnNodeNum;
@@ -760,14 +692,14 @@ namespace ChillerGasAbsorption {
 		HeatInletNode = GasAbsorber( ChillNum ).HeatReturnNodeNum;
 		HeatOutletNode = GasAbsorber( ChillNum ).HeatSupplyNodeNum;
 
-		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+		if ( Init_MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
 			if ( GasAbsorber( ChillNum ).isWaterCooled ) {
 				// init max available condenser water flow rate
 				if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				} else {
-					rho = RhoH2O( InitConvTemp );
+					rho = RhoH2O( DataGlobals::InitConvTemp );
 
 				}
 
@@ -776,29 +708,29 @@ namespace ChillerGasAbsorption {
 			}
 
 			if ( GasAbsorber( ChillNum ).HWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
-				rho = RhoH2O( InitConvTemp );
+				rho = RhoH2O( DataGlobals::InitConvTemp );
 			}
 			GasAbsorber( ChillNum ).DesHeatMassFlowRate = rho * GasAbsorber( ChillNum ).HeatVolFlowRate;
 			//init available hot water flow rate
 			InitComponentNodes( 0.0, GasAbsorber( ChillNum ).DesHeatMassFlowRate, HeatInletNode, HeatOutletNode, GasAbsorber( ChillNum ).HWLoopNum, GasAbsorber( ChillNum ).HWLoopSideNum, GasAbsorber( ChillNum ).HWBranchNum, GasAbsorber( ChillNum ).HWCompNum );
 
 			if ( GasAbsorber( ChillNum ).CWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 			} else {
-				rho = RhoH2O( InitConvTemp );
+				rho = RhoH2O( DataGlobals::InitConvTemp );
 			}
 			GasAbsorber( ChillNum ).DesEvapMassFlowRate = rho * GasAbsorber( ChillNum ).EvapVolFlowRate;
 			//init available hot water flow rate
 			InitComponentNodes( 0.0, GasAbsorber( ChillNum ).DesEvapMassFlowRate, GasAbsorber( ChillNum ).ChillReturnNodeNum, GasAbsorber( ChillNum ).ChillSupplyNodeNum, GasAbsorber( ChillNum ).CWLoopNum, GasAbsorber( ChillNum ).CWLoopSideNum, GasAbsorber( ChillNum ).CWBranchNum, GasAbsorber( ChillNum ).CWCompNum );
 
-			MyEnvrnFlag( ChillNum ) = false;
+			Init_MyEnvrnFlag( ChillNum ) = false;
 
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( ChillNum ) = true;
+			Init_MyEnvrnFlag( ChillNum ) = true;
 		}
 
 		//this component model works off setpoints on the leaving node
@@ -813,7 +745,7 @@ namespace ChillerGasAbsorption {
 			Node( GasAbsorber( ChillNum ).HeatSupplyNodeNum ).TempSetPointLo = Node( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).TempSetPointNodeNum ).TempSetPointLo;
 		}
 
-		if ( ( GasAbsorber( ChillNum ).isWaterCooled ) && ( ( GasAbsorber( ChillNum ).InHeatingMode ) || ( GasAbsorber( ChillNum ).InCoolingMode ) ) && ( ! MyPlantScanFlag( ChillNum ) ) ) {
+		if ( ( GasAbsorber( ChillNum ).isWaterCooled ) && ( ( GasAbsorber( ChillNum ).InHeatingMode ) || ( GasAbsorber( ChillNum ).InCoolingMode ) ) && ( !Init_MyPlantScanFlag( ChillNum ) ) ) {
 			mdot = GasAbsorber( ChillNum ).DesCondMassFlowRate;
 			//DSU removed, this has to have been wrong (?)  Node(CondInletNode)%Temp  = GasAbsorber(ChillNum)%TempDesCondReturn
 
@@ -821,7 +753,9 @@ namespace ChillerGasAbsorption {
 
 		} else {
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+			if ( GasAbsorber( ChillNum ).CDLoopNum > 0 && GasAbsorber( ChillNum ).isWaterCooled){
+				SetComponentFlowRate( mdot, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+			}
 		}
 
 	}
@@ -829,14 +763,10 @@ namespace ChillerGasAbsorption {
 	void
 	SizeGasAbsorber( int const ChillNum )
 	{
-
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   June 2003
 		//       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for sizing direct fired gas absorption chiller components for which
 		// capacities and flow rates have not been specified in the input.
 
@@ -845,10 +775,6 @@ namespace ChillerGasAbsorption {
 		// the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		// is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -857,30 +783,16 @@ namespace ChillerGasAbsorption {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		//  USE BranchInputManager,  ONLY: MyPlantSizingIndex
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "SizeGasAbsorber" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string const RoutineName( "SizeGasAbsorber" );
 
 		int PltSizCoolNum; // Plant Sizing index for cooling loop
 		int PltSizHeatNum; // Plant Sizing index for heating loop
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 
 		bool ErrorsFound; // If errors detected in input
-		//  LOGICAL             :: LoopErrorsFound
 		std::string equipName;
 		Real64 Cp; // local fluid specific heat
 		Real64 rho; // local fluid density
@@ -912,8 +824,8 @@ namespace ChillerGasAbsorption {
 
 		if ( PltSizCoolNum > 0 ) {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate * GasAbsorber( ChillNum ).SizFac;
 				if ( ! GasAbsorber( ChillNum ).NomCoolingCapWasAutoSized ) tmpNomCap = GasAbsorber( ChillNum ).NomCoolingCap;
 			} else {
@@ -1178,13 +1090,9 @@ namespace ChillerGasAbsorption {
 		bool const EP_UNUSED( RunFlag ) // TRUE when Absorber operating
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   March 2001
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
 		// Simulate a direct fired (gas consuming) absorption chiller using
 		// curves and inputs similar to DOE-2.1e
 
@@ -1195,7 +1103,6 @@ namespace ChillerGasAbsorption {
 		// 1.  DOE-2.1e Supplement and source code
 		// 2.  CoolTools GasMod work
 
-		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataPlant::DeltaTempTol;
 		using DataPlant::PlantLoop;
@@ -1206,22 +1113,11 @@ namespace ChillerGasAbsorption {
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::SetComponentFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// FlowLock = 0  if mass flow rates may be changed by loop components
 		// FlowLock = 1  if mass flow rates may not be changed by loop components
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "CalcGasAbsorberChillerModel" );
+		std::string const RoutineName( "CalcGasAbsorberChillerModel" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// Local copies of GasAbsorberSpecs Type
 		// all variables that are local copies of data structure
 		// variables are prefaced with an "l" for local.
@@ -1282,7 +1178,6 @@ namespace ChillerGasAbsorption {
 
 		Real64 calcCondTemp; // the condenser temperature used for curve calculation
 		// either return or supply depending on user input
-		static Real64 oldCondSupplyTemp( 0.0 ); // save the last iteration value of leaving condenser water temperature
 		Real64 revisedEstimateAvailCap; // final estimate of available capacity if using leaving
 		// condenser water temperature
 		Real64 errorAvailCap; // error fraction on final estimate of AvailableCoolingCapacity
@@ -1343,8 +1238,10 @@ namespace ChillerGasAbsorption {
 
 		rhoCW = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		Cp_CW = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-		Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ){
+			rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+			Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+		}
 
 		//If no loop demand or Absorber OFF, return
 		// will need to modify when absorber can act as a boiler
@@ -1370,10 +1267,10 @@ namespace ChillerGasAbsorption {
 				if ( lIsEnterCondensTemp ) {
 					calcCondTemp = lCondReturnTemp;
 				} else {
-					if ( oldCondSupplyTemp == 0 ) {
-						oldCondSupplyTemp = lCondReturnTemp + 8.0; // if not previously estimated assume 8C greater than return
+					if ( Calc_oldCondSupplyTemp == 0 ) {
+						Calc_oldCondSupplyTemp = lCondReturnTemp + 8.0; // if not previously estimated assume 8C greater than return
 					}
-					calcCondTemp = oldCondSupplyTemp;
+					calcCondTemp = Calc_oldCondSupplyTemp;
 				}
 				//Set mass flow rates
 				lCondWaterMassFlowRate = GasAbsorber( ChillNum ).DesCondMassFlowRate;
@@ -1381,9 +1278,12 @@ namespace ChillerGasAbsorption {
 			} else {
 				// air cooled
 				Node( lCondReturnNodeNum ).Temp = Node( lCondReturnNodeNum ).OutAirDryBulb;
+				calcCondTemp = Node( lCondReturnNodeNum ).OutAirDryBulb;
 				lCondReturnTemp = Node( lCondReturnNodeNum ).Temp;
 				lCondWaterMassFlowRate = 0.0;
-				SetComponentFlowRate( lCondWaterMassFlowRate, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+				if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ) {
+					SetComponentFlowRate( lCondWaterMassFlowRate, GasAbsorber( ChillNum ).CondReturnNodeNum, GasAbsorber( ChillNum ).CondSupplyNodeNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum );
+				}
 			}
 
 			//Determine available cooling capacity using the setpoint temperature
@@ -1519,7 +1419,7 @@ namespace ChillerGasAbsorption {
 
 			// save the condenser water supply temperature for next iteration if that is used in lookup
 			// and if capacity is large enough error than report problem
-			oldCondSupplyTemp = lCondSupplyTemp;
+			Calc_oldCondSupplyTemp = lCondSupplyTemp;
 			if ( ! lIsEnterCondensTemp ) {
 				// calculate the fraction of the estimated error between the capacity based on the previous
 				// iteration's value of condenser supply temperature and the actual calculated condenser supply
@@ -1562,13 +1462,8 @@ namespace ChillerGasAbsorption {
 		bool const RunFlag // TRUE when Absorber operating
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer and Michael J. Witte
 		//       DATE WRITTEN   March 2001
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
 		// Simulate a direct fired (gas consuming) absorption chiller using
 		// curves and inputs similar to DOE-2.1e
 
@@ -1579,7 +1474,6 @@ namespace ChillerGasAbsorption {
 		// 1.  DOE-2.1e Supplement and source code
 		// 2.  CoolTools GasMod work
 
-		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1589,23 +1483,14 @@ namespace ChillerGasAbsorption {
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// FlowLock = 0  if mass flow rates may be changed by loop components
 		// FlowLock = 1  if mass flow rates may not be changed by loop components
 		// FlowLock = 2  if overloaded and mass flow rates has changed to a small amount and Tout drops
 		//                 below Setpoint
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "CalcGasAbsorberHeaterModel" );
+		std::string const RoutineName( "CalcGasAbsorberHeaterModel" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// Local copies of GasAbsorberSpecs Type
 		// all variables that are local copies of data structure
 		// variables are prefaced with an "l" for local.
@@ -1822,37 +1707,15 @@ namespace ChillerGasAbsorption {
 		int const ChillNum // Absorber number
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   March 2001
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// reporting
-
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
-		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int lChillReturnNodeNum; // Node number on the inlet side of the plant
 		int lChillSupplyNodeNum; // Node number on the outlet side of the plant
 		int lCondReturnNodeNum; // Node number on the inlet side of the condenser
 		int lCondSupplyNodeNum; // Node number on the outlet side of the condenser
-
-		// BEGIN ROUTINE
 
 		lChillReturnNodeNum = GasAbsorber( ChillNum ).ChillReturnNodeNum;
 		lChillSupplyNodeNum = GasAbsorber( ChillNum ).ChillSupplyNodeNum;
@@ -1863,8 +1726,9 @@ namespace ChillerGasAbsorption {
 			//set node temperatures
 
 			Node( lChillSupplyNodeNum ).Temp = Node( lChillReturnNodeNum ).Temp;
-			Node( lCondSupplyNodeNum ).Temp = Node( lCondReturnNodeNum ).Temp;
-
+			if ( GasAbsorber( ChillNum ).isWaterCooled ){
+				Node( lCondSupplyNodeNum ).Temp = Node( lCondReturnNodeNum ).Temp;
+			}
 			//set node flow rates
 			//Update Outlet Conditions so that same as Inlet, so component
 			//can be bypassed if necessary
@@ -1877,7 +1741,9 @@ namespace ChillerGasAbsorption {
 		} else {
 			//set node temperatures
 			Node( lChillSupplyNodeNum ).Temp = GasAbsorberReport( ChillNum ).ChillSupplyTemp;
-			Node( lCondSupplyNodeNum ).Temp = GasAbsorberReport( ChillNum ).CondSupplyTemp;
+			if ( GasAbsorber( ChillNum ).isWaterCooled ){
+				Node( lCondSupplyNodeNum ).Temp = GasAbsorberReport( ChillNum ).CondSupplyTemp;
+			}
 			//set node flow rates;  for these load based models
 			//assume that the sufficient evaporator flow rate available
 			//    Node(lChillReturnNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%ChillWaterFlowRate
@@ -1909,35 +1775,13 @@ namespace ChillerGasAbsorption {
 		int const ChillNum // Absorber number
 	)
 	{
-		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   March 2001
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// reporting
-
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
-		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int lHeatReturnNodeNum; // absorber steam inlet node number, water side
 		int lHeatSupplyNodeNum; // absorber steam outlet node number, water side
-
-		// BEGIN ROUTINE
 
 		lHeatReturnNodeNum = GasAbsorber( ChillNum ).HeatReturnNodeNum;
 		lHeatSupplyNodeNum = GasAbsorber( ChillNum ).HeatSupplyNodeNum;
@@ -1974,6 +1818,23 @@ namespace ChillerGasAbsorption {
 
 	// End of Record Keeping subroutines for the Absorption Chiller Module
 	// *****************************************************************************
+
+	void
+	clear_state()
+	{
+		NumGasAbsorbers = 0 ;
+		CheckEquipName.deallocate();
+		GasAbsorber.deallocate();
+		GasAbsorberReport.deallocate();
+		Sim_HeatCap = 0.0;
+		Sim_GetInput = true;
+		Get_ErrorsFound = false;
+		Init_MyOneTimeFlag = true;
+		Init_MyEnvrnFlag.deallocate();
+		Init_MyPlantScanFlag.deallocate();
+		Calc_oldCondSupplyTemp = 0.0;
+
+	}
 
 	//                                 COPYRIGHT NOTICE
 

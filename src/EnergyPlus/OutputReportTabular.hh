@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef OutputReportTabular_hh_INCLUDED
 #define OutputReportTabular_hh_INCLUDED
@@ -182,6 +170,10 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
+	extern bool displayLifeCycleCostReport;
+	extern bool displayTariffReport;
+	extern bool displayEconomicResultSummary;
+	extern bool displayEioSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -637,6 +629,9 @@ namespace OutputReportTabular {
 	void
 	InitializeTabularMonthly();
 
+	bool
+	isInvalidAggregationOrder();
+
 	void
 	GetInputTabularTimeBins();
 
@@ -651,7 +646,7 @@ namespace OutputReportTabular {
 
 
 	void
-	GetInputTabularPredefined();
+	GetInputOutputTableSummaryReports();
 
 	bool
 	isCompLoadRepReq();
@@ -770,6 +765,15 @@ namespace OutputReportTabular {
 	void
 	WriteSurfaceShadowing();
 
+	void
+	WriteEioTables();
+
+	int
+	unitsFromHeading( std::string & heading );
+
+	std::vector< std::string >
+	splitCommaString (std::string const & inputString );
+	
 	void
 	AddTOCZoneLoadComponentTable();
 
@@ -937,6 +941,12 @@ namespace OutputReportTabular {
 	std::string
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
 
+	bool
+	isNumber( std::string const & s );
+
+	int
+	digitsAferDecimal( std::string s );
+
 	void
 	AddTOCEntry(
 		std::string const & nameSection,
@@ -954,6 +964,13 @@ namespace OutputReportTabular {
 		std::string const & stringInWithSI,
 		int & unitConvIndex,
 		std::string & stringOutWithIP
+	);
+
+	void
+	LookupJtokWH(
+		std::string const & stringInWithJ,
+		int & unitConvIndex,
+		std::string & stringOutWithKWH
 	);
 
 	Real64

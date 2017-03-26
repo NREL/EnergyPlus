@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::SurfaceGeometry Unit Tests
 
@@ -757,5 +745,222 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 
 }
 
+TEST_F( EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisticZ )
+{
+	TotSurfaces = 10;
+	Surface.allocate( TotSurfaces );
 
+	Surface( 1 ).Class = SurfaceClass_Roof;
+	Surface( 1 ).GrossArea = 1000.;
+	Surface( 1 ).Sides = 4;
+	Surface( 1 ).Vertex.allocate( 4 );
 
+	Surface( 1 ).Vertex( 1 ).x = 2000.;
+	Surface( 1 ).Vertex( 1 ).y = -1000.;
+	Surface( 1 ).Vertex( 1 ).z = 10.;
+
+	Surface( 1 ).Vertex( 2 ).x = 1.;
+	Surface( 1 ).Vertex( 2 ).y = 0.;
+	Surface( 1 ).Vertex( 2 ).z = 10.;
+
+	Surface( 1 ).Vertex( 3 ).x = 2000.;
+	Surface( 1 ).Vertex( 3 ).y = 1000.;
+	Surface( 1 ).Vertex( 3 ).z = 10.;
+
+	Surface( 1 ).Vertex( 4 ).x = 0.;
+	Surface( 1 ).Vertex( 4 ).y = 0.;
+	Surface( 1 ).Vertex( 4 ).z = 10.;
+
+	CalcSurfaceCentroid();
+
+	EXPECT_EQ( Surface( 1 ).Centroid.x, 667. );
+	EXPECT_EQ( Surface( 1 ).Centroid.y, 0. );
+	EXPECT_EQ( Surface( 1 ).Centroid.z, 10. );
+
+}
+
+TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
+{
+
+	bool ErrorsFound( false );
+
+	std::string const idf_objects = delimited_string({
+		"Version,                                                        ",
+		"	8.6;                     !- Version Identifier               ",
+		"	                                                             ",
+		"FenestrationSurface:Detailed,                                   ",
+		"	Surface-1-Rectangle,     !- Name                             ",
+		"	Window,                  !- Surface Type                     ",
+		"	SINGLE PANE HW WINDOW,   !- Construction Name                ",
+		"	WallExample,             !- Building Surface Name            ",
+		"	,                        !- Outside Boundary Condition Object",
+		"	0.50000,                 !- View Factor to Ground            ",
+		"	,                        !- Shading Control Name             ",
+		"	,                        !- Frame and Divider Name           ",
+		"	1,                       !- Multiplier                       ",
+		"	4,                       !- Number of Vertices               ",
+		"	0.0, 11.4, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
+		"	0.0, 11.4, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
+		"	0.0, 3.8,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
+		"	0.0, 3.8,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",
+		"                                                                ",
+		"FenestrationSurface:Detailed,                                   ",
+		"	Surface-2-Trapzoid,      !- Name                             ",
+		"	Window,                  !- Surface Type                     ",
+		"	SINGLE PANE HW WINDOW,   !- Construction Name                ",
+		"	WallExample,             !- Building Surface Name            ",
+		"	,                        !- Outside Boundary Condition Object",
+		"	0.50000,                 !- View Factor to Ground            ",
+		"	,                        !- Shading Control Name             ",
+		"	,                        !- Frame and Divider Name           ",
+		"	1,                       !- Multiplier                       ",
+		"	4,                       !- Number of Vertices               ",
+		"	0.0, 11.2, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
+		"	0.0, 11.6, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
+		"	0.0, 3.6,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
+		"	0.0, 4.0,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",
+		"                                                                ",
+		"FenestrationSurface:Detailed,                                   ",
+		"	Surface-3-parallelogram, !- Name                             ",
+		"	Window,                  !- Surface Type                     ",
+		"	SINGLE PANE HW WINDOW,   !- Construction Name                ",
+		"	WallExample,             !- Building Surface Name            ",
+		"	,                        !- Outside Boundary Condition Object",
+		"	0.50000,                 !- View Factor to Ground            ",
+		"	,                        !- Shading Control Name             ",
+		"	,                        !- Frame and Divider Name           ",
+		"	1,                       !- Multiplier                       ",
+		"	4,                       !- Number of Vertices               ",
+		"	0.0, 11.4, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
+		"	0.0, 12.4, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
+		"	0.0, 4.8,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
+		"	0.0, 3.8,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",    
+		"                                                                ",
+		"BuildingSurface:Detailed,                                       ",
+		"	WallExample,   !- Name                                       ",
+		"	Wall,                    !- Surface Type                     ",
+		"	ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name     ",
+		"	ZoneExample,             !- Zone Name                        ",
+		"	Outdoors,                !- Outside Boundary Condition       ",
+		"	,                        !- Outside Boundary Condition Object",
+		"	NoSun,                   !- Sun Exposure                     ",
+		"	NoWind,                  !- Wind Exposure                    ",
+		"	,                        !- View Factor to Ground            ",
+		"	,                        !- Number of Vertices               ",
+		"	0.0, 15.2, 2.4,          !- X,Y,Z ==> Vertex 1 {m}           ",        
+		"	0.0, 15.2, 0.0,          !- X,Y,Z ==> Vertex 2 {m}           ",        
+		"	0.0, 0.0,  0.0,          !- X,Y,Z ==> Vertex 3 {m}           ",        
+		"	0.0, 0.0,  2.4;          !- X,Y,Z ==> Vertex 4 {m}           ",        
+		"	                                                             ",
+		"BuildingSurface:Detailed,                                       ",
+		"	FloorExample,            !- Name                             ",
+		"	Floor,                   !- Surface Type                     ",
+		"	ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name     ",
+		"	ZoneExample,             !- Zone Name                        ",
+		"	Outdoors,                !- Outside Boundary Condition       ",
+		"	,                        !- Outside Boundary Condition Object",
+		"	NoSun,                   !- Sun Exposure                     ",
+		"	NoWind,                  !- Wind Exposure                    ",
+		"	,                        !- View Factor to Ground            ",
+		"	,                        !- Number of Vertices               ",
+		"	0.0, 0.0,  0.0,          !- Vertex 1 X-coordinate {m}        ",
+		"	5.0, 15.2, 0.0,          !- Vertex 2 X-coordinate {m}        ",
+		"	0.0, 15.2, 0.0;          !- Vertex 3 X-coordinate {m}        ",
+		"                                                                ",
+		"Zone,                                                           ",
+		"	ZoneExample,             !- Name                             ",
+		"	0,                       !- Direction of Relative North {deg}",
+		"	0.0,                     !- X Origin {m}                     ",
+		"	0.0,                     !- Y Origin {m}                     ",
+		"	0.0,                     !- Z Origin {m}                     ",
+		"	,                        !- Type                             ",
+		"	,                        !- Multiplier                       ",
+		"	,                        !- Ceiling Height {m}               ",
+		"	,                        !- Volume {m3}                      ",
+		"	,                        !- Floor Area {m2}                  ",
+		"	,                        !- Zone Inside Convection Algorithm ",
+		"	,                        !- Zone Outside Convection Algorithm",
+		"	No;                      !- Part of Total Floor Area         ",
+		"                                                                ",
+		"Construction,                                                   ",
+		"	ExtSlabCarpet 4in ClimateZone 1-8,  !- Name                  ",
+		"	MAT-CC05 4 HW CONCRETE,  !- Outside Layer                    ",
+		"	CP02 CARPET PAD;         !- Layer 2                          ",
+		"                                                                ",
+		"Construction,                                                   ",
+		"	SINGLE PANE HW WINDOW,   !- Name                             ",
+		"	CLEAR 3MM;  !- Outside Layer                                 ",
+		"                                                                ",
+		"Material,                                                       ",
+		"	MAT-CC05 4 HW CONCRETE,  !- Name                             ",
+		"	Rough,                   !- Roughness                        ",
+		"	0.1016,                  !- Thickness {m}                    ",
+		"	1.311,                   !- Conductivity {W/m-K}             ",
+		"	2240,                    !- Density {kg/m3}                  ",
+		"	836.800000000001,        !- Specific Heat {J/kg-K}           ",
+		"	0.9,                     !- Thermal Absorptance              ",
+		"	0.85,                    !- Solar Absorptance                ",
+		"	0.85;                    !- Visible Absorptance              ",
+		"                                                                ",
+		"Material:NoMass,                                                ",
+		"	CP02 CARPET PAD,         !- Name                             ",
+		"	Smooth,                  !- Roughness                        ",
+		"	0.1,                     !- Thermal Resistance {m2-K/W}      ",
+		"	0.9,                     !- Thermal Absorptance              ",
+		"	0.8,                     !- Solar Absorptance                ",
+		"	0.8;                     !- Visible Absorptance              ",
+		"                                                                ",
+		"WindowMaterial:Glazing,                                                          ",
+		"	CLEAR 3MM,               !- Name                                              ",
+		"	SpectralAverage,         !- Optical Data Type                                 ",
+		"	,                        !- Window Glass Spectral Data Set Name               ",
+		"	0.003,                   !- Thickness {m}                                     ",
+		"	0.837,                   !- Solar Transmittance at Normal Incidence           ",
+		"	0.075,                   !- Front Side Solar Reflectance at Normal Incidence  ",
+		"	0.075,                   !- Back Side Solar Reflectance at Normal Incidence   ",
+		"	0.898,                   !- Visible Transmittance at Normal Incidence         ",
+		"	0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+		"	0.081,                   !- Back Side Visible Reflectance at Normal Incidence ",
+		"	0.0,                     !- Infrared Transmittance at Normal Incidence        ",
+		"	0.84,                    !- Front Side Infrared Hemispherical Emissivity      ",
+		"	0.84,                    !- Back Side Infrared Hemispherical Emissivity       ",
+		"	0.9;                     !- Conductivity {W/m-K}                              ",
+		});
+
+	// Prepare data for the test
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	GetMaterialData( ErrorsFound ); // read material data
+	EXPECT_FALSE( ErrorsFound ); 
+	GetConstructData( ErrorsFound ); // read construction data
+	EXPECT_FALSE( ErrorsFound ); 
+	GetZoneData( ErrorsFound ); // read zone data
+	EXPECT_FALSE( ErrorsFound ); 
+	GetProjectControlData( ErrorsFound ); // read project control data
+	EXPECT_FALSE( ErrorsFound ); 
+	CosZoneRelNorth.allocate( 1 );
+	SinZoneRelNorth.allocate( 1 );
+	CosZoneRelNorth( 1 ) = std::cos( -Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
+	SinZoneRelNorth( 1 ) = std::sin( -Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
+	CosBldgRelNorth = 1.0;
+	SinBldgRelNorth = 0.0;
+	GetSurfaceData( ErrorsFound ); // setup zone geometry and get zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	// Run the test
+	for( int SurfNum = 2; SurfNum < 5; SurfNum++ ){
+		MakeEquivalentRectangle( SurfNum, ErrorsFound );
+		EXPECT_FALSE( ErrorsFound ); // expect no errors
+	}
+
+	// Check the result
+	// (1) rectangle window
+	EXPECT_NEAR( 7.60, Surface( 2 ).Width, 0.01 );
+	EXPECT_NEAR( 1.20, Surface( 2 ).Height, 0.01 );
+	// (2) trapzoid window
+	EXPECT_NEAR( 7.80, Surface( 3 ).Width, 0.01 );
+	EXPECT_NEAR( 1.17, Surface( 3 ).Height, 0.01 );
+	// (3) parallelogram window
+	EXPECT_NEAR( 8.08, Surface( 4 ).Width, 0.01 );
+	EXPECT_NEAR( 1.13, Surface( 4 ).Height, 0.01 );
+
+}

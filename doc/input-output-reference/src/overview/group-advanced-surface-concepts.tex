@@ -197,7 +197,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \paragraph{Field: Construction Name}\label{field-construction-name}
 
-This field is the name of a Construction object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm slected in the previous field.
+This field is the name of a Construction object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm selected in the previous field.
 
 An example IDF object follows.
 
@@ -209,7 +209,7 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
       R13WALL;                     !- Construction Name
 \end{lstlisting}
 
-\subsection{SurfaceControl:MoveableInsulation}\label{surfacecontrolmoveableinsulation}
+\subsection{SurfaceControl:MovableInsulation}\label{surfacecontrolmovableinsulation}
 
 Movable insulation can be used/scheduled on any surface regular surface (such as a wall, floor, roof, etc.) but not on a subsurface (such as a window, use WindowProperty:ShadingControl instead). With movable insulation, no reference is made in the surface that is using the insulation -- rather the movable insulation statement references the surface to which it is applied.
 
@@ -229,7 +229,7 @@ This field refers the movable insulation back to a particular surface (ref: Buil
 
 \subsubsection{Field: Material Name}\label{field-material-name}
 
-This field refers to a material layer (e.g., Material, Material:NoMass, or WindowMaterial:Glazing; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.
+This field refers to a material layer (e.g., Material, Material:NoMass, or WindowMaterial:Glazing; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
 
 \subsubsection{Field: Schedule Name}\label{field-schedule-name}
 
@@ -363,7 +363,7 @@ SurfaceProperty:OtherSideCoefficients,
 \end{lstlisting}
 
 \begin{lstlisting}
-!  Example input for outside heat transfer coefficient of 1.23, using Tosdb
+!  Example input for outside heat transfer coefficient of 1.23, using Toadb
 SurfaceProperty:OtherSideCoefficients,
       OSCCoef:Zn005:Wall004,   !- Name
       1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
@@ -453,7 +453,631 @@ This is the effective temperature exposed to the other side of the surface for t
 
 \paragraph{Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-other-side-conditions-modeled-radiation-heat-transfer-coefficient-wm2-k}
 
-This is the effective (Iinearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
+This is the effective (Linearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
+
+\subsection{Foundation:Kiva}\label{foundationkiva}
+
+Foundation:Kiva objects describe boundary conditions for ground-coupled
+foundation surfaces. Surfaces with the ``Outside Boundary Condition''
+defined as ``Foundation'', may also refer to a Foundation:Kiva object in
+the ``Outside Boundary Condition Object'' field (if unspecified, a
+default Foundation:Kiva object will be created and applied).
+
+Limitations when using Foundation:Kiva objects include:
+
+\begin{itemize}
+\tightlist
+\item
+  Only floors and walls may use Foundation:Kiva objects as Outside
+  Boundary Conditions.
+\item
+  Exactly one floor surface must reference each Foundation:Kiva object.
+  However, multiple floors may exist in the same thermal zone so long as
+  they reference separate Foundation:Kiva objects.
+\item
+  All foundation wall surfaces must be quadrilateral.
+\end{itemize}
+
+The inputs from Foundation:Kiva objects are translated into Kiva's
+foundation heat transfer model. Kiva\textsuperscript{TM} generates a
+two-dimensional heat transfer calculation to represent heat flow between
+a zone and the adjacent ground. Foundation:Kiva surfaces do not use the
+same HeatBalanceAlgorithm (e.g., Conduction Transfer Functions) as the
+rest of the model.
+
+Foundation:Kiva objects are used to describe the two-dimensional
+features that cannot be captured by the typical one-dimensional
+constructions used in EnergyPlus. Figure \ref{fig:context} illustrates
+Kiva's two-dimensional context for a basement where the basement slab
+and wall both refer to ``Foundation'' as the Outside Boundary Condition,
+the ceiling of the basement and the exterior wall of the zone above the
+basement refer to ``Surface'' (or ``Zone'') and ``Outdoors'',
+respectively. Note: Not all of the foundation wall surface needs to be
+below grade (see the ``Wall Height Above Grade'' field for this object).
+Any part above grade is modeled in Kiva's two-dimensional heat transfer
+calculations. The non-foundation surfaces are shown in Figure
+\ref{fig:context} for context, but are not part of the Kiva model.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-otherside.png}
+\caption{Outside Boundary Conditions for surfaces within Kiva's
+Two-dimensional context. Only surfaces referencing ``Foundation'' are
+simulated in Kiva\label{fig:context}}
+\end{figure}
+
+This context allows for a finer description of the structural and
+insulation components of a foundation that impact heat transfer (Figure
+\ref{fig:el}).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-elements.png}
+\caption{Structural and insulation components of Foundation:Kiva
+objects\label{fig:el}}
+\end{figure}
+
+Foundation:Kiva objects define only the aspects of the foundation that
+are not already defined by the one-dimensional constructions of the
+respective surfaces. That is, the footing wall and slab constructions
+and their relative dimensions are inferred from the respective Surface
+objects (see Figure \ref{fig:surf}).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-surfaces.png}
+\caption{Two-dimensional interpretation of foundation surface
+data\label{fig:surf}}
+\end{figure}
+
+The depth of the foundation is defined by the hight of the wall surfaces
+that reference the Foundation:Kiva boundary condition object. For
+slab-on-grade foundations, a depth of zero is implied by having no
+associated wall surfaces. Figure \ref{fig:ws} shows a slab-on-grade
+foundation with whole slab insulation. Notice there are no walls
+referencing the ``Foundation'' Outside Boundary Condition. In this case,
+the under-slab insulation is modeled as part of the slab construction,
+while the edge/gap insulation is modeled using the interior vertical
+insulation fields of a Foundation:Kiva object. Note: Since there are no
+wall surfaces for slab foundations, the footing wall construction is
+defined within the Foundation:Kiva object (or defaulted to a 0.3m wide
+cast concrete wall).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-whole-slab.png}
+\caption{Two-dimensional interpretation of foundation surface
+data\label{fig:ws}}
+\end{figure}
+
+A walkout basement (with a variable grade along the sides; see Figure
+\ref{fig:wo-r}) must be modeled using discrete quadrilateral surfaces of
+stepped height for the walls as shown in Figure \ref{fig:wo-s}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-walkout-real.png}
+\caption{Example walkout basement\label{fig:wo-r}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-walkout-segs.png}
+\caption{Walkout basement wall and floor surfaces (in gray) all
+reference the same Foundation:Kiva object\label{fig:wo-s}}
+\end{figure}
+
+The width of the floor surface in the two-dimensional context is defined
+by the area and the exposed perimeter (see
+SurfaceProperty:ExposedFoundationPerimeter) of the floor surface object.
+Details on this calculation can be found in the Engineering Reference
+document.
+
+Other components of the two-dimensional context are defined by the
+Foundation:Kiva:Settings object and applied uniformly for all instances
+of Foundation:Kiva objects. These components include:
+
+\begin{itemize}
+\tightlist
+\item
+  Far-Field width
+\item
+  Deep Ground depth (and boundary type)
+\item
+  Soil and ground surface thermal properties
+\end{itemize}
+
+\subsubsection{Example IDF}\label{example-idf}
+
+\begin{verbatim}
+BuildingSurface:Detailed,
+  Slab Floor,         !- Name
+  Floor,              !- Surface Type
+  Slab Construction,  !- Construction Name
+  Living Room,        !- Zone Name
+  Foundation,         !- Outside Boundary Condition
+  Slab Details,       !- Outside Boundary Condition Object
+  No,                 !- Sun Exposure
+  No,                 !- Wind Exposure
+  0.0,                !- View Factor to Ground
+  4,                  !- Number of Vertices
+  0.0, 0.0, 0.0,      !- Vertex 1
+  0.0, 20.0, 0.0,     !- Vertex 2
+  20.0, 20.0, 0.0,    !- Vertex 3
+  20.0, 0.0, 0.0;     !- Vertex 4
+
+Foundation:Kiva,
+  Slab Details,              !- Name
+  XPS,                       !- Interior Horizontal Insulation Material Name
+  0.2,                       !- Interior Horizontal Insulation Depth
+  0.6,                       !- Interior Horizontal Insulation Width
+  XPS,                       !- Interior Vertical Insulation Material Name
+  0.2,                       !- Interior Vertical Insulation Depth
+  ,                          !- Exterior Horizontal Insulation Material Name
+  ,                          !- Exterior Horizontal Insulation Depth
+  ,                          !- Exterior Horizontal Insulation Width
+  ,                          !- Exterior Vertical Insulation Material Name
+  ,                          !- Exterior Vertical Insulation Depth
+  0.2,                       !- Wall Height Above Grade
+  0.3,                       !- Wall Depth Below Slab
+  Slab Footing Construction; !- Footing Wall Construction Name
+
+Material,
+  XPS,    !- Name
+  Rough,  !- Roughness
+  0.05,   !- Thickness
+  0.029,  !- Conductivity
+  28,     !- Density
+  1450,   !- Specific Heat
+  0.9,    !- Thermal Absorptance
+  0.7,    !- Solar Absorptance
+  0.7;    !- Visible Absorptance
+
+Material,
+  Concrete,  !- Name
+  Rough,     !- Roughness
+  0.3,       !- Thickness
+  1.95,      !- Conductivity
+  2400,      !- Density
+  900,       !- Specific Heat
+  0.9,       !- Thermal Absorptance
+  0.7,       !- Solar Absorptance
+  0.7;       !- Visible Absorptance
+
+Construction,
+  Slab Footing Construction, !- Name
+  Concrete;                  !- Outside Layer Name
+\end{verbatim}
+
+\subsubsection{Input Description}\label{input-description}
+
+\paragraph{Field: Name}\label{field-name}
+
+The unique identifier of the Foundation:Kiva object. Referenced by a the
+``Outside Boundary Condition Object'' field in a surface object.
+
+\paragraph{Field: Interior Horizontal Insulation Material
+Name}\label{field-interior-horizontal-insulation-material-name}
+
+A reference to a material object associated with the interior horizontal
+insulation. If left blank, no interior horizontal insulation will be
+used. Default: blank.
+
+The following two fields define the placement of this material within
+Kiva's two-dimensional context and are illustrated in Figure
+\ref{fig:ihi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-ihi.png}
+\caption{Placement of interior horizontal insulation\label{fig:ihi}}
+\end{figure}
+
+\paragraph{Field: Interior Horizontal Insulation
+Depth}\label{field-interior-horizontal-insulation-depth}
+
+Distance from the wall top to the top of interior horizontal insulation,
+in m. Required if Interior Horizontal Insulation Material Name is
+defined.
+
+\paragraph{Field: Interior Horizontal Insulation
+Width}\label{field-interior-horizontal-insulation-width}
+
+Extent of insulation as measured from the wall interior to the edge of
+interior horizontal insulation, in m. Required if Interior Horizontal
+Insulation Material Name is defined.
+
+\paragraph{Field: Interior Vertical Insulation Material
+Name}\label{field-interior-vertical-insulation-material-name}
+
+A reference to a material object associated with the interior vertical
+insulation. If left blank, no interior vertical insulation will be used.
+Default: blank.
+
+The following field defines the placement of this material within Kiva's
+two-dimensional context and are illustrated in Figure \ref{fig:ivi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-ivi.png}
+\caption{Placement of interior vertical insulation\label{fig:ivi}}
+\end{figure}
+
+\paragraph{Field: Interior Vertical Insulation
+Depth}\label{field-interior-vertical-insulation-depth}
+
+Extent of insulation as measured from the wall top to the bottom edge of
+the interior vertical insulation, in m. Required if Interior Vertical
+Insulation Material Name is defined.
+
+\paragraph{Field: Exterior Horizontal Insulation Material
+Name}\label{field-exterior-horizontal-insulation-material-name}
+
+A reference to a material object associated with the exterior horizontal
+insulation. If left blank, no exterior horizontal insulation will be
+used. Default: blank.
+
+The following two fields define the placement of this material within
+Kiva's two-dimensional context and are illustrated in Figure
+\ref{fig:ehi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-ehi.png}
+\caption{Placement of exterior horizontal insulation\label{fig:ehi}}
+\end{figure}
+
+\paragraph{Field: Exterior Horizontal Insulation
+Depth}\label{field-exterior-horizontal-insulation-depth}
+
+Distance from the wall top to the top of exterior horizontal insulation,
+in m. Required if Exterior Horizontal Insulation Material Name is
+defined.
+
+\paragraph{Field: Exterior Horizontal Insulation
+Width}\label{field-exterior-horizontal-insulation-width}
+
+Extent of insulation as measured from the wall exterior to the edge of
+exterior horizontal insulation, in m. Required if Exterior Horizontal
+Insulation Material Name is defined.
+
+\paragraph{Field: Exterior Vertical Insulation Material
+Name}\label{field-exterior-vertical-insulation-material-name}
+
+A reference to a material object associated with the exterior vertical
+insulation. If left blank, no exterior vertical insulation will be used.
+Default: blank
+
+The following field defines the placement of this material within Kiva's
+two-dimensional context and are illustrated in Figure \ref{fig:evi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-evi.png}
+\caption{Placement of exterior vertical insulation\label{fig:evi}}
+\end{figure}
+
+\paragraph{Field: Exterior Vertical Insulation
+Depth}\label{field-exterior-vertical-insulation-depth}
+
+Extent of insulation as measured from the wall top to the bottom edge of
+the exterior vertical insulation, in m. Required if Exterior Vertical
+Insulation Material Name is defined.
+
+\paragraph{Field: Wall Height Above
+Grade}\label{field-wall-height-above-grade}
+
+Distance from the exterior grade to the wall top, in m. Default: 0.2 m
+
+Figure \ref{fig:2d-w} illustrates the definition of both the ``Wall
+Height Above Grade'' and the following field, ``Wall Depth Below Slab''.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-wall.png}
+\caption{Definition of exterior grade and footing wall depth relative to
+the wall surface\label{fig:2d-w}}
+\end{figure}
+
+\paragraph{Field: Wall Depth Below
+Slab}\label{field-wall-depth-below-slab}
+
+Distance from the slab bottom to the bottom of the foundation wall, in
+m. Default: 0.0 m
+
+Extending the wall below the slab provides a coarse approximation of the
+foundation footing. Alternatively, one may use the the fields ``Footing
+Material Name'' and ``Footing Depth'' to explicitly model the footing.
+Note, that explicit modeling of the footing requires a higher spatial
+discretization and, therefore, longer computation times.
+
+\paragraph{Field: Footing Wall Construction
+Name}\label{field-footing-wall-construction-name}
+
+Defines the construction of the foundation footing wall for slab foundations where the foundation wall is not exposed
+to the zone (and has no zone surface to explicitly assign a
+construction).
+
+By default, this is the same construction as any associated below-grade
+wall surfaces, or a 0.3 m wide poured concrete wall (conductivity = 1.95
+W/m-K, density = 2240 kg/m3, specific heat = 900 J/kg-K).
+
+\paragraph{Field: Footing Material
+Name}\label{field-footing-material-name}
+
+A reference to a material object associated with the foundation footing
+(typically some form of concrete). The thickness of this material is
+used to determine the width of the footing. If left blank, no footing
+will be used. Default: blank
+
+The following field defines the placement of this material within Kiva's
+two-dimensional context and are illustrated in Figure \ref{fig:foot}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-footing.png}
+\caption{Placement of footing\label{fig:foot}}
+\end{figure}
+
+\paragraph{Field: Footing Depth}\label{field-footing-depth}
+
+Top-to-bottom dimension of the footing (not to be confused with its
+depth in the ground). The width of the footing is defined by the
+material's thickness. Default: 0.3 m.
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{} Material
+Name}\label{field-custom-block-x-material-name}
+
+A reference to a material object associated with a custom block in the
+two-dimensional foundation context. The thickness of this material
+determines the width of the block.
+
+Custom blocks can be used to represent solid materials in the
+two-dimensional context that are not otherwise covered by the fields
+above. Examples of this might include interior finishings and insulation
+(Figure \ref{fig:cw}) or backfill soil with different thermal properties
+(Figure \ref{fig:cf}).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-custom-ex-wall.png}
+\caption{Custom blocks representing interior batt insulation and dry
+wall\label{fig:cw}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-custom-ex-fill.png}
+\caption{Custom block representing exterior backfill\label{fig:cf}}
+\end{figure}
+
+If two or more custom blocks overlap, the final properties are
+determined by the higher block number (e.g., Custom Block 4 in the input
+object supersedes properties defined by Custom Block 2). All custom
+blocks properties are superseded by the elements shown in Figure
+\ref{fig:el}.
+
+The following fields defines the placement of this material within
+Kiva's two-dimensional context and are illustrated in Figure
+\ref{fig:custom}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-custom.png}
+\caption{Placement of a custom block\label{fig:custom}}
+\end{figure}
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{}
+Depth}\label{field-custom-block-x-depth}
+
+Top-to-bottom dimension of the block downward. The default is the depth
+from the wall top to the top of the slab to facilitate interior
+constructions. Default: Slab depth
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{} X
+Position}\label{field-custom-block-x-x-position}
+
+Position outward (+) or inward (-) relative to the foundation wall.
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{} Z
+Position}\label{field-custom-block-x-z-position}
+
+Position downward (+) relative to the foundation wall top. Default: Wall
+top
+
+\subsubsection{Output Description}\label{output-description}
+
+Output for surfaces with a Foundation boundary condition type will
+include all opaque surface output variables except:
+
+\begin{itemize}
+\tightlist
+\item
+  Surface Outside Face variables (since there is no ``Outside Face'')
+\item
+  Surface Heat Storage variables (since this definition depends on an
+  ``Outside Face'')
+\item
+  Surface Internal Source Location Temperature (Kiva doesn't handle
+  internal sources yet, but this is a possible future enhancement)
+\end{itemize}
+
+\subsection{Foundation:Kiva:Settings}\label{foundationkivasettings}
+
+This object defines settings applied across all Kiva foundation
+calculations. This object is not required. If it is not defined, all
+defaults will be applied.
+
+\subsubsection{Input Description}\label{input-description-1}
+
+\paragraph{Field: Soil Conductivity}\label{field-soil-conductivity}
+
+The thermal conductivity of the soil, in W/m-K. Default: 1.73 W/m-K.
+
+\paragraph{Field: Soil Density}\label{field-soil-density}
+
+The bulk density of the soil, in kg/m3. Default: 1842 kg/m3.
+
+\paragraph{Field: Soil Specific Heat}\label{field-soil-specific-heat}
+
+The specific heat of the soil, in J/kg-K. Default: 419 J/kg-K
+
+\paragraph{Field: Ground Solar
+Absorptivity}\label{field-ground-solar-absorptivity}
+
+Solar absorptivity of the exterior grade surface. Default: 0.9.
+
+\paragraph{Field: Ground Thermal
+Absorptivity}\label{field-ground-thermal-absorptivity}
+
+Long-wave absorptivity (emissivity) of the exterior grade surface.
+Default: 0.9.
+
+\paragraph{Field: Ground Surface
+Roughness}\label{field-ground-surface-roughness}
+
+The relief roughness of the exterior ground surface in m. Default: 0.03
+m.
+
+Estimates of surface roughnesses in m are shown below:
+
+\begin{longtable}[]{@{}lc@{}}
+\toprule
+Example Surface & Roughness {[}m{]}\tabularnewline
+\midrule
+\endhead
+Concrete & 0.002\tabularnewline
+Brick & 0.003\tabularnewline
+Soil & 0.005\tabularnewline
+Gravel & 0.012\tabularnewline
+Grass & 0.030\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Far-Field Width}\label{field-far-field-width}
+
+The distance from the wall interior to the zero horizontal heat flux
+(i.e., adiabatic) far-field boundary, in m. This distance represents
+either the distance halfway between this foundation and a similar
+foundation of a neighboring building, or a distance adequately far from
+the foundation such that it is isolated from the effects of the boundary
+(typically \textgreater{}= 40 m). Default: 40 m.
+
+\paragraph{Field: Deep-Ground Boundary
+Condition}\label{field-deep-ground-boundary-condition}
+
+Defines the type of boundary condition to apply at the Deep-Ground
+Depth. Options are:
+
+\begin{itemize}
+\tightlist
+\item
+  ZeroFlux
+\item
+  GroundWater
+\item
+  Autoselect
+\end{itemize}
+
+ZeroFlux applies a zero vertical heat flux (i.e.~adiabatic) boundary
+condition. GroundWater applies a constant temperature boundary
+condition, with a temperature equal to the average outdoor air dry-bulb
+temperature from the environment(s). Autoselect applies either boundary
+condition depending on the elevation of the building site (Williams and
+Williamson, 1989):
+
+\[d_{wt}=0.1022\cdot d_{elev}\]
+
+If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
+a ZeroFlux boundary is applied at 40 m.
+
+Default: Autoselect.
+
+\paragraph{Field: Deep-Ground Depth}\label{field-deep-ground-depth}
+
+The distance from the exterior grade to the deep ground boundary, in m.
+This distance represents either the distance to the ground water level,
+or a distance adequately far from the foundation such that it is
+isolated from the effects of the boundary (typically \textgreater{}= 40
+m). Default 40 m, or the distance determined by the ``Auto'' Deep-Ground
+Boundary Condition.
+
+\paragraph{Field: Minimum Cell
+Dimension}\label{field-minimum-cell-dimension}
+
+The minimum cell dimension, in m, used in the Kiva discretization.
+Default: 0.02 m.
+
+\paragraph{Field: Maximum Cell Growth
+Coefficient}\label{field-maximum-cell-growth-coefficient}
+
+The maximum ratio of growth between neighboring cells in the direction
+away from the near-field area of interest. Default: 1.50.
+
+\paragraph{Field: Simulation Timestep}\label{field-simulation-timestep}
+
+This field allows the user to choose whether to calculate foundation
+loads on the zone timestep or at hourly intervals. Hourly intervals will
+allow for less overall computation time, but with less accuracy. Choices
+are ``Hourly'' and ``Timestep''. Default: Hourly
+
+\subsection{ExposedFoundationPerimeter}\label{surfacepropertyexposedfoundationperimeter}
+
+This object (currently only used in conjunction with Foundation:Kiva
+boundary conditions) defines the perimeter of a foundation floor that is
+exposed to the exterior environment through the floor. The user may
+either define the total exposed perimeter, the fraction of the total
+perimeter that is exposed, or individually define which segments of the
+floor surface perimeter are exposed. This object is optional. By default
+it is assumed that the entire perimeter of each foundation is exposed.
+
+Figure \ref{fig:ex} illustrates how the exposed perimeter is determined
+from a floor plan of the foundation level.
+
+Some buildings may have neighboring zones with different foundation
+types. For example, a crawlspace next to a garage with a slab (Figure
+\ref{fig:ifw}). The foundation wall in this case is NOT considered part
+of either floor's exposed perimeter, and should not reference a
+Foundation boundary condition. Kiva does not calculate heat flow between
+two zones through ground. In this case, it is best to approximate
+interior foundation wall using an Adiabatic Outside Boundary Condition.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-exposed-perim.png}
+\caption{Exposed foundation perimeter\label{fig:ex}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-interior-fnd-wall.png}
+\caption{Interior foundation wall\label{fig:ifw}}
+\end{figure}
+
+\subsubsection{Input Description}\label{input-description-2}
+
+\paragraph{Field: Surface Name}\label{field-surface-name}
+
+Name of foundation floor surface.
+
+\paragraph{Field: Total Exposed
+Perimeter}\label{field-total-exposed-perimeter}
+
+Total perimeter that is is exposed in m.
+
+\paragraph{Field: Exposed Perimeter
+Fraction}\label{field-exposed-perimeter-fraction}
+
+Fraction of the total perimeter that is exposed. Default 1.0
+
+\paragraph{Field: Surface Segment \textless{}x\textgreater{}
+Exposed}\label{field-surface-segment-x-exposed}
+
+Surface Segment \textless{}x\textgreater{} is the perimeter between the
+\textless{}x\textgreater{}th and (\textless{}x\textgreater{}+1)th
+vertices. The default is ``Yes'', so users may elect to only enter
+``No'' for segments that are not exposed and leave the others blank.
+Default: Yes
 
 \subsection{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections}\label{surfaceconvectionalgorithminsideadaptivemodelselections}
 
@@ -777,11 +1401,11 @@ The key choice options include: BeausoleilMorrisonMixedAssistedWall, AlamdariHam
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-\paragraph{Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation Source}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-source}
+\paragraph{Field: Mixed Regime Buoyancy Opposing Flow on Walls Equation Source}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-source}
 
 The key choice options include: BeausoleilMorrisonMixedOpposingWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
 
-\paragraph{Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation User Curve Name}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-user-curve-name}
+\paragraph{Field: Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-user-curve-name}
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
@@ -877,7 +1501,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Natural Convection Unstable Horizontal Equation Source}\label{field-natural-convection-unstable-horizontal-equation-source}
 
-This is for just the natural convection portion of the total film coefficient. This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice optios include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
+This is for just the natural convection portion of the total film coefficient. This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
 
 \paragraph{Field: Natural Convection Unstable Horizontal Equation User Curve Name}\label{field-natural-convection-unstable-horizontal-equation-user-curve-name}
 
@@ -925,7 +1549,7 @@ Unique name of input object.
 
 \paragraph{Field: Wind Speed Type for Curve}\label{field-wind-speed-type-for-curve}
 
-This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field. There are for key choice options. ``WeatherFile'' directs using the unmodified value from the epw file or design weather data. ``HeightAdjust'' uses the value from the epw file modified for height above ground, as determined by the z cooridinate, using the site terrain and weather station information. ``ParallelComponent'' uses the value from the epw file modified to take just the velocity component that is parallel to the surface. ``ParallelComponentHeightAdjust'' uses the height adjusted wind velocity and then computes the parallel component.
+This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field. There are for key choice options. ``WeatherFile'' directs using the unmodified value from the epw file or design weather data. ``HeightAdjust'' uses the value from the epw file modified for height above ground, as determined by the z coordinate, using the site terrain and weather station information. ``ParallelComponent'' uses the value from the epw file modified to take just the velocity component that is parallel to the surface. ``ParallelComponentHeightAdjust'' uses the height adjusted wind velocity and then computes the parallel component.
 
 \paragraph{Field: Hf Function of Wind Speed Curve Name}\label{field-hf-function-of-wind-speed-curve-name}
 
@@ -971,43 +1595,61 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied. The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside, SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-\begin{longtable}[c]{@{}ll@{}}
-\toprule 
-Report Code & Related key and model \tabularnewline
+\begin{longtable}[c]{p{3.49in}p{2.5in}}
+\toprule
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+Value & Both \tabularnewline
+Schedule & Both \tabularnewline
+Simple & Inside \tabularnewline
+SimpleCombined & Outside \tabularnewline
+TARP & Both \tabularnewline
+DOE-2 & Outside \tabularnewline
+MoWitt & Outside \tabularnewline
+AdaptiveConvectionAlgorithm & Both \tabularnewline
+ASHRAEVerticalWall~~~ & Both \tabularnewline
+WaltonUnstableHorizontalOrTilt & Both \tabularnewline
+WaltonStableHorizontalOrTilt & Both \tabularnewline
+FisherPedersenCeilingDiffuserWalls & Inside \tabularnewline
+FisherPedersenCeilingDiffuserCeiling & Inside \tabularnewline
+FisherPedersenCeilingDiffuserFloor & Inside \tabularnewline
+AlamdariHammondStableHorizontal & Both \tabularnewline
+AlamdariHammondUnstableHorizontal & Both \tabularnewline
+AlamdariHammondVerticalWall & Both \tabularnewline
+KhalifaEq3WallAwayFromHeat & Inside \tabularnewline
+KhalifaEq4CeilingAwayFromHeat & Inside \tabularnewline
+KhalifaEq5WallNearHeat & Inside \tabularnewline
+KhalifaEq6NonHeatedWalls & Inside \tabularnewline
+KhalifaEq7Ceiling & Inside \tabularnewline
+AwbiHattonHeatedFloor & Inside \tabularnewline
+AwbiHattonHeatedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedAssistedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedOpposingWall & Inside \tabularnewline
+BeausoleilMorrisonMixedStableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedStableCeiling & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableCeiling & Inside \tabularnewline
+FohannoPolidoriVerticalWall~~~~~~ & Both \tabularnewline
+KaradagChilledCeiling & Inside \tabularnewline
+ISO15099Windows & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWindow & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWalls & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserFloor & Inside \tabularnewline
+SimpleCombined~~~~~ & Outside \tabularnewline
+NusseltJurges & Outside \tabularnewline
+McAdams & Outside \tabularnewline
+Mitchell & Outside \tabularnewline
+BlockenWindard & Outside \tabularnewline
+Emmel & Outside \tabularnewline
+ClearRoof & Outside \tabularnewline
+UserCurve & Both \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1029,7 +1671,7 @@ The complete IDD definition for the ConvectionCoefficients object follows:
 
 \paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name}
 
-If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
 
 In IDF usage:
 
@@ -1118,43 +1760,61 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.~ The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-\begin{longtable}[c]{@{}ll@{}}
-\toprule 
-Report Code & Related key and model \tabularnewline
+\begin{longtable}[c]{p{3.49in}p{2.5in}}
+\toprule
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+Value & Both \tabularnewline
+Schedule & Both \tabularnewline
+Simple & Inside \tabularnewline
+SimpleCombined & Outside \tabularnewline
+TARP & Both \tabularnewline
+DOE-2 & Outside \tabularnewline
+MoWitt & Outside \tabularnewline
+AdaptiveConvectionAlgorithm & Both \tabularnewline
+ASHRAEVerticalWall~~~ & Both \tabularnewline
+WaltonUnstableHorizontalOrTilt & Both \tabularnewline
+WaltonStableHorizontalOrTilt & Both \tabularnewline
+FisherPedersenCeilingDiffuserWalls & Inside \tabularnewline
+FisherPedersenCeilingDiffuserCeiling & Inside \tabularnewline
+FisherPedersenCeilingDiffuserFloor & Inside \tabularnewline
+AlamdariHammondStableHorizontal & Both \tabularnewline
+AlamdariHammondUnstableHorizontal & Both \tabularnewline
+AlamdariHammondVerticalWall & Both \tabularnewline
+KhalifaEq3WallAwayFromHeat & Inside \tabularnewline
+KhalifaEq4CeilingAwayFromHeat & Inside \tabularnewline
+KhalifaEq5WallNearHeat & Inside \tabularnewline
+KhalifaEq6NonHeatedWalls & Inside \tabularnewline
+KhalifaEq7Ceiling & Inside \tabularnewline
+AwbiHattonHeatedFloor & Inside \tabularnewline
+AwbiHattonHeatedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedAssistedWall & Inside \tabularnewline
+BeausoleilMorrisonMixedOpposingWall & Inside \tabularnewline
+BeausoleilMorrisonMixedStableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableFloor & Inside \tabularnewline
+BeausoleilMorrisonMixedStableCeiling & Inside \tabularnewline
+BeausoleilMorrisonMixedUnstableCeiling & Inside \tabularnewline
+FohannoPolidoriVerticalWall~~~~~~ & Both \tabularnewline
+KaradagChilledCeiling & Inside \tabularnewline
+ISO15099Windows & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWindow & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserWalls & Inside \tabularnewline
+GoldsteinNovoselacCeilingDiffuserFloor & Inside \tabularnewline
+SimpleCombined~~~~~ & Outside \tabularnewline
+NusseltJurges & Outside \tabularnewline
+McAdams & Outside \tabularnewline
+Mitchell & Outside \tabularnewline
+BlockenWindard & Outside \tabularnewline
+Emmel & Outside \tabularnewline
+ClearRoof & Outside \tabularnewline
+UserCurve & Both \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1174,7 +1834,7 @@ If the Convection type was ``Schedule'', then this field contains the name of a 
 
 \paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name-1}
 
-If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
 
 In IDF usage:
 
@@ -1188,7 +1848,7 @@ SurfaceProperty:ConvectionCoefficients:MultipleSurface,
 
 \subsection{Convection Coefficient Application Hierarchy}\label{convection-coefficient-application-hierarchy}
 
-Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilties in EnergyPlus. The objects that control how convection models are assigned to individual surfaces~ are:
+Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilities in EnergyPlus. The objects that control how convection models are assigned to individual surfaces~ are:
 
 \begin{itemize}
 \item
@@ -1210,13 +1870,13 @@ General to Specific, they are assigned in this order:
 % table 9
 \begin{longtable}[c]{p{2.96in}p{3.03in}}
 \caption{Convection Coefficient Assignment Hierarchy \label{table:convection-coefficient-assignment-hierarchy}} \tabularnewline
-\toprule 
+\toprule
 Objects/Description & Action \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Convection Coefficient Assignment Hierarchy} \tabularnewline
-\toprule 
+\toprule
 Objects/Description & Action \tabularnewline
 \midrule
 \endhead
@@ -1252,43 +1912,62 @@ When EnergyPlus is set to Display Advanced Variables (Output:Diagnostics, Displa
 
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the inside face.~ The algorithm examines probable flow regimes, heat flow directions, orientations, HVAC equipment connections, and current operating status to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
-\begin{longtable}[c]{@{}ll@{}}
-\toprule 
-Report Code & Related key and model \tabularnewline
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\toprule
+Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+1 & A1 Radiant Heated Floor or Chilled Ceiling & Vertical Wall & Any \tabularnewline
+2 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Stable \tabularnewline
+3 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Unstable \tabularnewline
+4 & A1 Radiant Heated Floor or Chilled Ceiling & Heated Floor & Unstable \tabularnewline
+5 & A1 Radiant Heated Floor or Chilled Ceiling & Chilled Ceiling & Unstable \tabularnewline
+6 & A1 Radiant Heated Floor or Chilled Ceiling & Tilted & Stable \tabularnewline
+7 & A1 Radiant Heated Floor or Chilled Ceiling & Tilted & Unstable \tabularnewline
+8 & A1 Radiant Heated Floor or Chilled Ceiling & Window & Any \tabularnewline
+9 & A2 Radiant Wall Heat & Non-heated Vertical Wall & Any \tabularnewline
+10 & A2 Radiant Wall Heat & Heated wall & Any \tabularnewline
+11 & A2 Radiant Wall Heat & Horizontal & Stable \tabularnewline
+12 & A2 Radiant Wall Heat & Horizontal & Unstable \tabularnewline
+13 & A2 Radiant Wall Heat & Tilted & Stable \tabularnewline
+14 & A2 Radiant Wall Heat & Tilted & Unstable \tabularnewline
+15 & A2 Radiant Wall Heat & Windows & Any \tabularnewline
+16 & A3 Simple Buoyancy & Vertical Walls & Any \tabularnewline
+17 & A3 Simple Buoyancy & Horizontal & Stable \tabularnewline
+18 & A3 Simple Buoyancy & Horizontal & Unstable \tabularnewline
+19 & A3 Simple Buoyancy & Tilted & Stable \tabularnewline
+20 & A3 Simple Buoyancy & Tilted & Unstable \tabularnewline
+21 & A3 Simple Buoyancy & Windows & Any \tabularnewline
+22 & B Convective Zone Heat & Vertical Walls & Any \tabularnewline
+23 & B Convective Zone Heat & Vertical Walls near heater & Any \tabularnewline
+24 & B Convective Zone Heat & Horizontal & Stable \tabularnewline
+25 & B Convective Zone Heat & Horizontal & Unstable \tabularnewline
+26 & B Convective Zone Heat & Tilted & Stable \tabularnewline
+27 & B Convective Zone Heat & Tilted & Unstable \tabularnewline
+28 & B Convective Zone Heat & Windows & Any \tabularnewline
+29 & C Central Air Diffuser & Walls & Any \tabularnewline
+30 & C Central Air Diffuser & Ceiling & Any \tabularnewline
+31 & C Central Air Diffuser & Floor & Any \tabularnewline
+32 & C Central Air Diffuser & Windows & Any \tabularnewline
+33 & D Zone Fan Unit & Walls & Any \tabularnewline
+34 & D Zone Fan Unit & Horizontal & Stable \tabularnewline
+35 & D Zone Fan Unit & Horizontal & Unstable \tabularnewline
+36 & D Zone Fan Unit & Tilted & Stable \tabularnewline
+37 & D Zone Fan Unit & Tilted & Unstable \tabularnewline
+38 & D Zone Fan Unit & Windows & Any \tabularnewline
+39 & E Mixed Forced and Buoyancy & Walls & Assisting \tabularnewline
+40 & E Mixed Forced and Buoyancy & Walls & Opposing \tabularnewline
+41 & E Mixed Forced and Buoyancy & Floor & Stable \tabularnewline
+42 & E Mixed Forced and Buoyancy & Floor & Unstable \tabularnewline
+43 & E Mixed Forced and Buoyancy & Ceiling & Stable \tabularnewline
+44 & E Mixed Forced and Buoyancy & Ceiling & Unstable \tabularnewline
+45 & E Mixed Forced and Buoyancy & Windows & Any \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1297,42 +1976,47 @@ Report Code & Related key and model \tabularnewline
 This variable reports the specific model equation used to calculate the inside face convection coefficient.~ This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.~ The following table lists the models associated with specific interger codes reported here.~ The models correspond to key words used in input objects.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+200 & UserValue~~~~ \tabularnewline
+201 & UserSchedule \tabularnewline
+202 & UserCurve~ \tabularnewline
+203 & ASHRAEVerticalWall~ \tabularnewline
+204 & WaltonUnstableHorizontalOrTilt \tabularnewline
+205 & WaltonStableHorizontalOrTilt~~ \tabularnewline
+206 & FisherPedersenCeilDiffuserFloor \tabularnewline
+207 & FisherPedersenCeilDiffuserCeiling \tabularnewline
+208 & FisherPedersenCeilDiffuserWalls~~~~~~~~ \tabularnewline
+209 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
+210 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
+211 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+212 & KhalifaEq3WallAwayFromHeat~~~~~~~~~~~~~ \tabularnewline
+213 & KhalifaEq4CeilingAwayFromHeat~~~~~~~~~~ \tabularnewline
+214 & KhalifaEq5WallNearHeat~~~~~~~~~~~~~~~~~ \tabularnewline
+215 & KhalifaEq6NonHeatedWalls~ \tabularnewline
+216 & KhalifaEq7Ceiling~ \tabularnewline
+217 & AwbiHattonHeatedFloor~~~~~~~~~~~~~~~~~~ \tabularnewline
+218 & AwbiHattonHeatedWall~~~~~~~~~~~~~~~~~~~ \tabularnewline
+219 & BeausoleilMorrisonMixedAssistingWall~~~ \tabularnewline
+220 & BeausoleilMorrisonMixedOppossingWall~~~ \tabularnewline
+221 & BeausoleilMorrisonMixedStableCeiling~~~ \tabularnewline
+222 & BeausoleilMorrisonMixedUnstableCeiling~ \tabularnewline
+223 & BeausoleilMorrisonMixedStableFloor~~~~~ \tabularnewline
+224 & BeausoleilMorrisonMixedUnstableFloor~~~ \tabularnewline
+225 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
+226 & KaradagChilledCeiling~~~~~~~~~~~~~~~~~~ \tabularnewline
+227 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
+228 & GoldsteinNovoselacCeilingDiffuserWindow \tabularnewline
+229 & GoldsteinNovoselacCeilingDiffuserWalls~ \tabularnewline
+230 & GoldsteinNovoselacCeilingDiffuserFloor \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1341,42 +2025,19 @@ Report Code & Related key and model \tabularnewline
 The inside face convection heat transfer calculations can be based on different reference air temperatures.~ This reference air temperature can vary during the simulation when the adaptive algorithm selects models that use different references.~ The following table lists the meaning of the integer codes.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Report Code & Reference Air Temperature Method \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Report Code & Reference Air Temperature Method \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+1 & Zone mean air temperature \tabularnewline
+2 & Surface adjacent air temperature \tabularnewline
+3 & Supply air temperature \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1385,42 +2046,20 @@ Report Code & Related key and model \tabularnewline
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the outside face.~ The algorithm examines the wind direction, heat flow directions and orientations to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Report Code & Surface Classification \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
-Report Code & Related key and model \tabularnewline
+\toprule
+Report Code & Surface Classification \tabularnewline
 \midrule
 \endhead
 
-300 & None~ \tabularnewline
-301 & UserValue \tabularnewline
-302 & UserSchedule \tabularnewline
-303 & UserCurve~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-304 & ASHRAESimpleCombined~~~~~~~~~~~~~~~~~~~ \tabularnewline
-305 & NaturalASHRAEVerticalWall~~~~~~~~~~~~~~ \tabularnewline
-306 & NaturalWaltonUnstableHorizontalOrTilt~~ \tabularnewline
-307 & NaturalWaltonStableHorizontalOrTilt~~~~ \tabularnewline
-308 & SparrowWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-309 & SparrowLeeward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-310 & MoWiTTWindward~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-311 & MoWiTTLeeward~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-312 & DOE2Windward~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-313 & DOE2Leeward~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-314 & NusseltJurges~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-315 & McAdams~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-316 & Mitchell~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-317 & ClearRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-318 & BlockenWindward~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-319 & EmmelVertical~~~~~~~~~~~~ ~~~~~~~~~~~~~~ \tabularnewline
-320 & EmmelRoof~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-321 & AlamdariHammondVerticalWall~~~~~~~~~~~~ \tabularnewline
-322 & FohannoPolidoriVerticalWall~~~~~~~~~~~~ \tabularnewline
-323 & ISO15099Windows~~~~~~~~~~~~~~~~~~~~~~~~ \tabularnewline
-324 & AlamdariHammondStableHorizontal~~~~~~~~ \tabularnewline
-325 & AlamdariHammondUnstableHorizontal~~~~~~ \tabularnewline
+101 & Vertical Wall, Windward \tabularnewline
+102 & Vertical Wall, Leeward \tabularnewline
+103 & Roof, stable heat flow direction \tabularnewline
+104 & Roof, unstable heat flow direction \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1431,12 +2070,12 @@ Report Code & Related key and model \tabularnewline
 These variables report the specific model equation used to calculate the outside face's convection coefficient.~ They can vary when using the adaptive convection algorithm and so the results of that selection algorithm are reported in these variables.~ The following table lists the models associated with specific integer codes that might be reported here.~ The models correspond to key words used in input objects.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endhead
@@ -1486,7 +2125,7 @@ Select `yes' to use the value supplied as the external vapor transfer coefficien
 
 \paragraph{Field: External Vapor Coefficient Value}\label{field-external-vapor-coefficient-value}
 
-HAMT will use this value to calculate the vapour transfer into and out off the external surface of this surface. Units are kg/Pa.s.m2.
+HAMT will use this value to calculate the vapor transfer into and out off the external surface of this surface. Units are kg/Pa.s.m2.
 
 \paragraph{Field: Constant Internal vapor Transfer Coefficient}\label{field-constant-internal-vapor-transfer-coefficient}
 
@@ -1514,7 +2153,7 @@ This object is used to model a multi-skin exterior heat transfer surface. This i
 
 The area and orientation are obtained from \textbf{BuildingSurface:Detailed} objects, which are referenced by name. This object can be used to model certain types of photovoltaic mounting configurations such as interlocking roof pavers. If the baffle covers only part of a surface, then that surface should be split into separate \textbf{BuildingSurface:Detailed} objects where one matches the size of the baffle. A single baffle can be associated with as many \textbf{BuildingSurface:Detailed} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The base heat transfer surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
-Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and bouancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
+Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and buoyancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
 
 \subsubsection{Inputs}\label{inputs-13}
 
@@ -1536,11 +2175,11 @@ This field is used to enter the thermal emissivity of the baffler. This surface 
 
 \paragraph{Field: Solar Absorptivity of Exterior Baffle}\label{field-solar-absorptivity-of-exterior-baffle}
 
-This field is used to enter the solar absorbtivity of the baffle. This surface property is for shortwave, solar radiation. The property is used for the front side of the baffle that faces the environment. Darker colors have a higher absorptivity. While black is the highest performance, other colors might be used to match the color scheme of the rest of the façade.
+This field is used to enter the solar absorptivity of the baffle. This surface property is for shortwave, solar radiation. The property is used for the front side of the baffle that faces the environment. Darker colors have a higher absorptivity. While black is the highest performance, other colors might be used to match the color scheme of the rest of the façade.
 
 \paragraph{Field: Height Scale for Buoyancy-Driven Ventilation}\label{field-height-scale-for-buoyancy-driven-ventilation}
 
-This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (\(\Delta {H_{NPL}}\) ) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
+This field is used to enter a nominal height scale (m) for prediction of ventilation induced by buoyancy. This value (\(\Delta {H_{NPL}}\) ) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
 
 \paragraph{Field: Effective Thickness of Cavity Behind Exterior Baffle}\label{field-effective-thickness-of-cavity-behind-exterior-baffle}
 

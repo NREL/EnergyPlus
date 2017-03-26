@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -679,7 +667,7 @@ namespace DaylightingManager {
 			// Skip zones that are not Daylighting:Detailed zones.
 			// TotalDaylRefPoints = 0 means zone has (1) no daylighting or
 			// (3) Daylighting:DElight
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
+			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 || ZoneDaylight( ZoneNum ).DaylightMethod != SplitFluxDaylighting ) continue;
 
 			// Skip zones with no exterior windows in the zone or in adjacent zone with which an interior window is shared
 			if ( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins == 0 ) continue;
@@ -696,7 +684,7 @@ namespace DaylightingManager {
 					// due to change in ground reflectance from month to month, or change in storm window status.
 					gio::write( OutputFileInits, Format_700 );
 					for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-						if ( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins == 0 ) continue;
+						if ( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins == 0 || ZoneDaylight( ZoneNum ).DaylightMethod != SplitFluxDaylighting ) continue;
 						for ( loop = 1; loop <= ZoneDaylight( ZoneNum ).NumOfDayltgExtWins; ++loop ) {
 							IWin = ZoneDaylight( ZoneNum ).DayltgExtWinSurfNums( loop );
 							// For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
@@ -2452,18 +2440,7 @@ namespace DaylightingManager {
 		Array1D< Vector > TmpGndPt( NBasis, Vector( 0.0, 0.0, 0.0 ) ); // Temporary ground intersection list
 		Array2D< Vector > TmpHitPt( TotSurfaces, NBasis, Vector( 0.0, 0.0, 0.0 ) ); // Temporary HitPt
 
-		// find if reference point belongs to light tube of outgoing bsdf direction.  This works for entire window and not window
-		// elements.
-		// initialization for each reference point
-		//do iRefPoint = 1, NRefPt
-		//if (CalledFrom == CalledForRefPoint) then
-		//  RefPoint = ZoneDaylight(ZoneNum)%DaylRefPtAbsCoord(iRefPoint, 1:3)
-		//else
-		//  RefPoint = IllumMapCalc(MapNum)%MapRefPtAbsCoord(irefPoint, 1:3)
-		//end if
-
 		CFSRefPointPosFactor( RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW );
-		//end do
 
 		curWinEl = 0;
 		// loop through window elements. This will calculate sky, ground and reflection bins for each window element
@@ -2476,15 +2453,7 @@ namespace DaylightingManager {
 				Centroid = W2 + ( double( IX ) - 0.5 ) * W23 * DWX + ( double( IY ) - 0.5 ) * W21 * DWY;
 				RWin = Centroid;
 
-				//do iRefPoint = 1, NRefPt
-				//if (CalledFrom == CalledForRefPoint) then
-				//  RefPoint = ZoneDaylight(ZoneNum)%DaylRefPtAbsCoord(iRefPoint, 1:3)
-				//else
-				//  RefPoint = IllumMapCalc(MapNum)%MapRefPtAbsCoord(iRefPoint, 1:3)
-				//end if
-
 				CFSRefPointSolidAngle( RefPoint, RWin, WNorm, StateRefPoint, DaylghtGeomDescr, iWin, CurFenState, NTrnBasis, curWinEl, WinElArea );
-				//end do
 
 				NSky = 0;
 				NGnd = 0;
@@ -4071,7 +4040,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TotDaylightingDetailed; // Total Daylighting:Detailed inputs
+		int TotDaylightingControls; // Total Daylighting:Controls inputs (splitflux or delight type)
 		int IntWin; // Interior window surface index
 		bool ErrorsFound; // Error flag
 		int SurfNum; // Surface counter (loop)
@@ -4080,7 +4049,6 @@ namespace DaylightingManager {
 		int SurfNumAdj; // Surface Number for adjacent surface
 		int ZoneNumAdj; // Zone Number for adjacent zone
 		// RJH DElight Modification Begin - local variable declarations
-		int TotDaylightingDElight; // Total Daylighting:DElight inputs
 		Real64 dLatitude; // double for argument passing
 		int iErrorFlag; // Error Flag for warning/errors returned from DElight
 		int iDElightErrorFile; // Unit number for reading DElight Error File
@@ -4098,9 +4066,12 @@ namespace DaylightingManager {
 
 		ErrorsFound = false;
 		cCurrentModuleObject = "Daylighting:Controls";
-		TotDaylightingDetailed = GetNumObjectsFound( cCurrentModuleObject );
-		if ( TotDaylightingDetailed > 0 ) {
-			GetDaylightingParametersDetaild( TotDaylightingDetailed, ErrorsFound );
+		TotDaylightingControls = GetNumObjectsFound( cCurrentModuleObject );
+		if ( TotDaylightingControls > 0 ) {
+			GetInputDayliteRefPt( ErrorsFound );
+			GetDaylightingControls(TotDaylightingControls, ErrorsFound);
+			GeometryTransformForDaylighting(  );
+			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
 			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
 			DayltgSetupAdjZoneListsAndPointers();
@@ -4121,6 +4092,10 @@ namespace DaylightingManager {
 					SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt = 0.0;
 					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt = 0.0;
+					SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep.allocate( MaxRefPoints );
+					SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep = 0.0;
+					SurfaceWindow( SurfNum ).LumWinFromRefPtRep.allocate( MaxRefPoints );
+					SurfaceWindow( SurfNum ).LumWinFromRefPtRep = 0.0;
 					SurfaceWindow( SurfNum ).SurfDayLightInit = true;
 				}
 			} else {
@@ -4139,6 +4114,10 @@ namespace DaylightingManager {
 							SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt = 0.0;
 							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt = 0.0;
+							SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep.allocate( MaxRefPoints );
+							SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep = 0.0;
+							SurfaceWindow( SurfNum ).LumWinFromRefPtRep.allocate( MaxRefPoints );
+							SurfaceWindow( SurfNum ).LumWinFromRefPtRep = 0.0;
 							SurfaceWindow( SurfNum ).SurfDayLightInit = true;
 						}
 					}
@@ -4209,8 +4188,7 @@ namespace DaylightingManager {
 		}
 
 		// RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
-		TotDaylightingDElight = GetNumObjectsFound( "Daylighting:DELight:Controls" );
-		if ( TotDaylightingDElight > 0 ) {
+		if ( doesDayLightingUseDElight() ) {
 			dLatitude = Latitude;
 			DisplayString( "Calculating DElight Daylighting Factors" );
 			DElightInputGenerator();
@@ -4269,7 +4247,6 @@ namespace DaylightingManager {
 				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
-			SetupDElightOutput4EPlus();
 		}
 		// RJH DElight Modification End - Calls to DElight preprocessing subroutines
 
@@ -4290,39 +4267,533 @@ namespace DaylightingManager {
 	}
 
 	void
-	GetDaylightingParametersDetaild(
-		int const TotDaylightingDetailed, // Total "simple" daylighting inputs
+	GetInputIlluminanceMap(
 		bool & ErrorsFound
 	)
 	{
+		// Perform the GetInput function for the Output:IlluminanceMap
+		// Glazer - June 2016 (moved from GetDaylightingControls)
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+		using General::TrimSigDigits;
+		using General::RoundSigDigits;
+		using DataStringGlobals::CharSpace;
+		using DataStringGlobals::CharComma;
+		using DataStringGlobals::CharTab;
 
-		// SUBROUTINE INFORMATION:
+		static gio::Fmt fmtA("(A)");
+
+		Array1D_int ZoneMapCount;
+		int MapNum;
+		int IOStat;
+		int NumAlpha;
+		int NumNumber;
+		int MapStyleIn;
+		int AddMapPoints;
+		int Loop1;
+		int RefPt;
+		int X;
+		int Y;
+		Real64 CosBldgRelNorth; // Cosine of Building rotation
+		Real64 SinBldgRelNorth; // Sine of Building rotation
+		Real64 CosZoneRelNorth; // Cosine of Zone rotation
+		Real64 SinZoneRelNorth; // Sine of Zone rotation
+		static Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only (relative north)
+		static Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only (relative north)
+		Real64 Xb; // temp var for transformation calc
+		Real64 Yb; // temp var for transformation calc
+		Real64 Xo;
+		Real64 XnoRot;
+		Real64 Xtrans;
+		Real64 Yo;
+		Real64 YnoRot;
+		Real64 Ytrans;
+		bool doTransform;
+		Real64 OldAspectRatio;
+		Real64 NewAspectRatio;
+		Array1D_bool ZoneMsgDone;
+
+		CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
+		SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
+		// these are only for Building Rotation for Appendix G when using world coordinate system
+		CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DegToRadians);
+		SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DegToRadians);
+
+		doTransform = false;
+		OldAspectRatio = 1.0;
+		NewAspectRatio = 1.0;
+
+		CheckForGeometricTransform(doTransform, OldAspectRatio, NewAspectRatio);
+
+		cCurrentModuleObject = "Output:IlluminanceMap";
+		TotIllumMaps = GetNumObjectsFound(cCurrentModuleObject);
+
+		IllumMap.allocate(TotIllumMaps);
+		IllumMapCalc.allocate(TotIllumMaps);
+		ZoneMapCount.dimension(NumOfZones, 0);
+
+		if (TotIllumMaps > 0) {
+			for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+				GetObjectItem(cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+				IllumMap(MapNum).Name = cAlphaArgs(1);
+				IllumMap(MapNum).Zone = FindItemInList(cAlphaArgs(2), Zone);
+
+				if (IllumMap(MapNum).Zone == 0) {
+					ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+					ErrorsFound = true;
+				}
+
+				IllumMapCalc(MapNum).Zone = IllumMap(MapNum).Zone;
+				if (IllumMap(MapNum).Zone != 0) {
+					++ZoneMapCount(IllumMap(MapNum).Zone);
+				}
+				IllumMap(MapNum).Z = rNumericArgs(1);
+
+				IllumMap(MapNum).Xmin = rNumericArgs(2);
+				IllumMap(MapNum).Xmax = rNumericArgs(3);
+				if (rNumericArgs(2) > rNumericArgs(3)) {
+					ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+					ShowContinueError("..." + cNumericFieldNames(2) + '[' + RoundSigDigits(rNumericArgs(2), 2) + "] must be <= " + cNumericFieldNames(3) + '[' + RoundSigDigits(rNumericArgs(3), 2) + "].");
+					ErrorsFound = true;
+				}
+				IllumMap(MapNum).Xnum = rNumericArgs(4);
+				if (IllumMap(MapNum).Xnum != 1) {
+					IllumMap(MapNum).Xinc = (IllumMap(MapNum).Xmax - IllumMap(MapNum).Xmin) / (IllumMap(MapNum).Xnum - 1);
+				}
+				else {
+					IllumMap(MapNum).Xinc = 0.0;
+				}
+
+				IllumMap(MapNum).Ymin = rNumericArgs(5);
+				IllumMap(MapNum).Ymax = rNumericArgs(6);
+				if (rNumericArgs(5) > rNumericArgs(6)) {
+					ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+					ShowContinueError("..." + cNumericFieldNames(5) + '[' + RoundSigDigits(rNumericArgs(5), 2) + "] must be <= " + cNumericFieldNames(6) + '[' + RoundSigDigits(rNumericArgs(6), 2) + "].");
+					ErrorsFound = true;
+				}
+				IllumMap(MapNum).Ynum = rNumericArgs(7);
+				if (IllumMap(MapNum).Ynum != 1) {
+					IllumMap(MapNum).Yinc = (IllumMap(MapNum).Ymax - IllumMap(MapNum).Ymin) / (IllumMap(MapNum).Ynum - 1);
+				}
+				else {
+					IllumMap(MapNum).Yinc = 0.0;
+				}
+				if (IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum > MaxMapRefPoints) {
+					ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", too many map points specified.");
+					ShowContinueError("..." + cNumericFieldNames(4) + '[' + RoundSigDigits(IllumMap(MapNum).Xnum) + "] * " + cNumericFieldNames(7) + '[' + RoundSigDigits(IllumMap(MapNum).Ynum) + "].= [" + RoundSigDigits(IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum) + "] must be <= [" + RoundSigDigits(MaxMapRefPoints) + "].");
+					ErrorsFound = true;
+				}
+			} // MapNum
+			cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
+			MapStyleIn = GetNumObjectsFound(cCurrentModuleObject);
+
+			if (MapStyleIn == 0) {
+				cAlphaArgs(1) = "COMMA";
+				MapColSep = CharComma; //comma
+			}
+			else if (MapStyleIn == 1) {
+				GetObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+				if (cAlphaArgs(1) == "COMMA") {
+					MapColSep = CharComma; //comma
+				}
+				else if (cAlphaArgs(1) == "TAB") {
+					MapColSep = CharTab; //tab
+				}
+				else if (cAlphaArgs(1) == "FIXED" || cAlphaArgs(1) == "SPACE") {
+					MapColSep = CharSpace; // space
+				}
+				else {
+					MapColSep = CharComma; //comma
+					ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\", Commas will be used to separate fields.");
+					cAlphaArgs(1) = "COMMA";
+				}
+			}
+			gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
+			ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
+			cAlphaArgs(1).erase(1);
+			cAlphaArgs(1) += cAlphaArgs(2).substr(1);
+			gio::write(OutputFileInits, "('Daylighting:Illuminance Maps,',A,',',A)") << TrimSigDigits(TotIllumMaps) << cAlphaArgs(1);
+		}
+		for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
+			ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
+			ZoneDaylight(Loop1).ZoneToMap = 0;
+			ZoneDaylight(Loop1).MapCount = 0;
+		}
+
+		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+			if (IllumMap(MapNum).Zone == 0) continue;
+			++ZoneDaylight(IllumMap(MapNum).Zone).MapCount;
+			ZoneDaylight(IllumMap(MapNum).Zone).ZoneToMap(ZoneDaylight(IllumMap(MapNum).Zone).MapCount) = MapNum;
+		}
+
+		ZoneMapCount.deallocate();
+
+		// Check for illuminance maps associated with this zone
+		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+			if (IllumMap(MapNum).Zone > 0) {
+				auto & zone(Zone(IllumMap(MapNum).Zone));
+				// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
+				CosZoneRelNorth = std::cos(-zone.RelNorth * DegToRadians);
+				SinZoneRelNorth = std::sin(-zone.RelNorth * DegToRadians);
+				if (IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum > 0) {
+					// Add additional daylighting reference points for map
+					AddMapPoints = IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum;
+					IllumMapCalc(MapNum).TotalMapRefPoints = AddMapPoints;
+					IllumMapCalc(MapNum).MapRefPtAbsCoord.allocate(3, AddMapPoints);
+					IllumMapCalc(MapNum).MapRefPtAbsCoord = 0.0;
+					IllumMapCalc(MapNum).MapRefPtInBounds.allocate(AddMapPoints);
+					IllumMapCalc(MapNum).MapRefPtInBounds = true;
+					IllumMapCalc(MapNum).DaylIllumAtMapPt.allocate(AddMapPoints);
+					IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;
+					IllumMapCalc(MapNum).GlareIndexAtMapPt.allocate(AddMapPoints);
+					IllumMapCalc(MapNum).GlareIndexAtMapPt = 0.0;
+					IllumMapCalc(MapNum).DaylIllumAtMapPtHr.allocate(AddMapPoints);
+					IllumMapCalc(MapNum).DaylIllumAtMapPtHr = 0.0;
+					IllumMapCalc(MapNum).GlareIndexAtMapPtHr.allocate(AddMapPoints);
+					IllumMapCalc(MapNum).GlareIndexAtMapPtHr = 0.0;
+
+					if (AddMapPoints > MaxMapRefPoints) {
+						ShowSevereError("GetDaylighting Parameters: Total Map Reference points entered is greater than maximum allowed.");
+						ShowContinueError("Occurs in Zone=" + zone.Name);
+						ShowContinueError("Maximum reference points allowed=" + TrimSigDigits(MaxMapRefPoints) + ", entered amount (when error first occurred)=" + TrimSigDigits(AddMapPoints));
+						ErrorsFound = true;
+						break;
+					}
+					RefPt = 1;
+					// Calc cos and sin of Zone Relative North values for later use in transforming Map Point coordinates
+					//CosZoneRelNorth = std::cos( -zone.RelNorth * DegToRadians ); //Tuned These should not be changing
+					//SinZoneRelNorth = std::sin( -zone.RelNorth * DegToRadians );
+					if (IllumMap(MapNum).Xnum != 1) {
+						IllumMap(MapNum).Xinc = (IllumMap(MapNum).Xmax - IllumMap(MapNum).Xmin) / (IllumMap(MapNum).Xnum - 1);
+					}
+					else {
+						IllumMap(MapNum).Xinc = 0.0;
+					}
+					if (IllumMap(MapNum).Ynum != 1) {
+						IllumMap(MapNum).Yinc = (IllumMap(MapNum).Ymax - IllumMap(MapNum).Ymin) / (IllumMap(MapNum).Ynum - 1);
+					}
+					else {
+						IllumMap(MapNum).Yinc = 0.0;
+					}
+
+					// Map points and increments are stored in AbsCoord and then that is operated on if relative coords entered.
+					for (Y = 1; Y <= IllumMap(MapNum).Ynum; ++Y) {
+						for (X = 1; X <= IllumMap(MapNum).Xnum; ++X) {
+							IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) = IllumMap(MapNum).Xmin + (X - 1) * IllumMap(MapNum).Xinc;
+							IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) = IllumMap(MapNum).Ymin + (Y - 1) * IllumMap(MapNum).Yinc;
+							IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) = IllumMap(MapNum).Z;
+							++RefPt;
+						}
+					}
+					RefPt = 1;
+					for (Y = 1; Y <= IllumMap(MapNum).Ynum; ++Y) {
+						for (X = 1; X <= IllumMap(MapNum).Xnum; ++X) {
+							if (!DaylRefWorldCoordSystem) {
+								Xb = IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) * CosZoneRelNorth - IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) * SinZoneRelNorth + zone.OriginX;
+								Yb = IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) * SinZoneRelNorth + IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) * CosZoneRelNorth + zone.OriginY;
+								IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+								IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+								IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) += zone.OriginZ;
+								if (doTransform) {
+									Xo = IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt); // world coordinates.... shifted by relative north angle...
+									Yo = IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt);
+									// next derotate the building
+									XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
+									YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
+									// translate
+									Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
+									Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+									// rerotate
+									IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+
+									IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+								}
+							}
+							else {
+								Xb = IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt);
+								Yb = IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt);
+								IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
+								IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
+							}
+							if (RefPt == 1) {
+								IllumMap(MapNum).Xmin = IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt);
+								IllumMap(MapNum).Ymin = IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt);
+								IllumMap(MapNum).Xmax = IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt);
+								IllumMap(MapNum).Ymax = IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt);
+								IllumMap(MapNum).Z = IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt);
+							}
+							IllumMap(MapNum).Xmin = min(IllumMap(MapNum).Xmin, IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt));
+							IllumMap(MapNum).Ymin = min(IllumMap(MapNum).Ymin, IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
+							IllumMap(MapNum).Xmax = max(IllumMap(MapNum).Xmax, IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt));
+							IllumMap(MapNum).Ymax = max(IllumMap(MapNum).Ymax, IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
+							if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) < zone.MinimumX && (zone.MinimumX - IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt)) > 0.001) || (IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) > zone.MaximumX && (IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) - zone.MaximumX) > 0.001) || (IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) < zone.MinimumY && (zone.MinimumY - IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt)) > 0.001) || (IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) > zone.MaximumY && (IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) - zone.MaximumY) > 0.001) || (IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ && (zone.MinimumZ - IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt)) > 0.001) || (IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) > zone.MaximumZ && (IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) - zone.MaximumZ) > 0.001)) {
+								IllumMapCalc(MapNum).MapRefPtInBounds(RefPt) = false;
+							}
+							// Test extremes of Map Points against Zone Min/Max
+							if (RefPt == 1 || RefPt == IllumMapCalc(MapNum).TotalMapRefPoints) {
+								if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) < zone.MinimumX || IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) > zone.MaximumX) && !IllumMapCalc(MapNum).MapRefPtInBounds(RefPt)) {
+									ShowWarningError("GetInputIlluminanceMap: Reference Map point #[" + RoundSigDigits(RefPt) + "], X Value outside Zone Min/Max X, Zone=" + zone.Name);
+									ShowContinueError("...X Reference Point= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 2) + ", Zone Minimum X= " + RoundSigDigits(zone.MinimumX, 2) + ", Zone Maximum X= " + RoundSigDigits(zone.MaximumX, 2));
+									if (IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) < zone.MinimumX) {
+										ShowContinueError("...X Reference Distance Outside MinimumX= " + RoundSigDigits(zone.MinimumX - IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 4) + " m.");
+									}
+									else {
+										ShowContinueError("...X Reference Distance Outside MaximumX= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) - zone.MaximumX, 4) + " m.");
+									}
+								}
+								if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) < zone.MinimumY || IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) > zone.MaximumY) && !IllumMapCalc(MapNum).MapRefPtInBounds(RefPt)) {
+									ShowWarningError("GetInputIlluminanceMap: Reference Map point #[" + RoundSigDigits(RefPt) + "], Y Value outside Zone Min/Max Y, Zone=" + zone.Name);
+									ShowContinueError("...Y Reference Point= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 2) + ", Zone Minimum Y= " + RoundSigDigits(zone.MinimumY, 2) + ", Zone Maximum Y= " + RoundSigDigits(zone.MaximumY, 2));
+									if (IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) < zone.MinimumY) {
+										ShowContinueError("...Y Reference Distance Outside MinimumY= " + RoundSigDigits(zone.MinimumY - IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 4) + " m.");
+									}
+									else {
+										ShowContinueError("...Y Reference Distance Outside MaximumY= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) - zone.MaximumY, 4) + " m.");
+									}
+								}
+								if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ || IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) > zone.MaximumZ) && !IllumMapCalc(MapNum).MapRefPtInBounds(RefPt)) {
+									ShowWarningError("GetInputIlluminanceMap: Reference Map point #[" + RoundSigDigits(RefPt) + "], Z Value outside Zone Min/Max Z, Zone=" + zone.Name);
+									ShowContinueError("...Z Reference Point= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt), 2) + ", Zone Minimum Z= " + RoundSigDigits(zone.MinimumZ, 2) + ", Zone Maximum Z= " + RoundSigDigits(zone.MaximumZ, 2));
+									if (IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ) {
+										ShowContinueError("...Z Reference Distance Outside MinimumZ= " + RoundSigDigits(zone.MinimumZ - IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt), 4) + " m.");
+									}
+									else {
+										ShowContinueError("...Z Reference Distance Outside MaximumZ= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) - zone.MaximumZ, 4) + " m.");
+									}
+								}
+							}
+							++RefPt;
+						} // X
+					} // Y
+
+				}
+			}
+		} // MapNum
+		ZoneMsgDone.dimension(NumOfZones, false);
+		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+			if (IllumMap(MapNum).Zone == 0) continue;
+			if (ZoneDaylight(IllumMap(MapNum).Zone).DaylightMethod != SplitFluxDaylighting && !ZoneMsgDone(IllumMap(MapNum).Zone)) {
+				ShowSevereError("Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + Zone(IllumMap(MapNum).Zone).Name);
+				ErrorsFound = true;
+			}
+		}
+		ZoneMsgDone.deallocate();
+
+		if (TotIllumMaps > 0) {
+			gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
+		}
+		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+			gio::write(OutputFileInits, "('Daylighting:Illuminance Maps:Detail',11(',',A))") << IllumMap(MapNum).Name << Zone(IllumMap(MapNum).Zone).Name << RoundSigDigits(IllumMap(MapNum).Xmin, 2) << RoundSigDigits(IllumMap(MapNum).Xmax, 2) << RoundSigDigits(IllumMap(MapNum).Xinc, 2) << RoundSigDigits(IllumMap(MapNum).Xnum) << RoundSigDigits(IllumMap(MapNum).Ymin, 2) << RoundSigDigits(IllumMap(MapNum).Ymax, 2) << RoundSigDigits(IllumMap(MapNum).Yinc, 2) << RoundSigDigits(IllumMap(MapNum).Ynum) << RoundSigDigits(IllumMap(MapNum).Z, 2);
+		}
+
+		if (ErrorsFound) return;
+	}
+
+	void
+	GetDaylightingControls(
+		int const TotDaylightingControls, // Total daylighting inputs
+		bool & ErrorsFound
+	)
+	{
 		//       AUTHOR         Fred Winkelmann
 		//       DATE WRITTEN   March 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Obtain the user input data for Daylighting:Detailed objects in the input file.
-		// For detailed daylighting, a calculation of interior daylight illuminance is done at one
-		//    or two reference points; the illuminance level, setpoint and type of control
-		//    system determines lighting power reduction.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// none
-
-		// Using/Aliasing
+		//       MODIFIED       Glazer - July 2016 - Move geometry transformation portion, rearrange input, allow more than three reference points
+		// Obtain the user input data for Daylighting:Controls object in the input file.
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using InputProcessor::FindItemInList;
-		using DataStringGlobals::CharSpace;
-		using DataStringGlobals::CharComma;
-		using DataStringGlobals::CharTab;
+		using InputProcessor::SameString;
+		using General::RoundSigDigits;
+
+		int IOStat;
+		int NumAlpha;
+		int NumNumber;
+		int iDaylCntrl;
+		int refPtNum;
+		int SurfLoop;
+		int ZoneFound;
+
+		cCurrentModuleObject = "Daylighting:Controls";
+		for ( iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl ) {
+			cAlphaArgs = "";
+			rNumericArgs = 0.0;
+			GetObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			ZoneFound = FindItemInList( cAlphaArgs( 2 ), Zone );
+			if ( ZoneFound == 0 ) {
+				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+				ErrorsFound = true;
+				continue;
+			}
+			auto & zone_daylight( ZoneDaylight( ZoneFound ) );
+			zone_daylight.Name = cAlphaArgs( 1 );  // Field: Name
+			zone_daylight.ZoneName = cAlphaArgs( 2 );  // Field: Zone Name
+
+			if ( SameString( cAlphaArgs( 3 ), "SPLITFLUX" )){  // Field: Daylighting Method
+				zone_daylight.DaylightMethod = SplitFluxDaylighting;
+			} else if ( SameString( cAlphaArgs( 3 ), "DELIGHT" )) {
+				zone_daylight.DaylightMethod = DElightDaylighting;
+			} else if ( lAlphaFieldBlanks( 3 ) ) {
+				zone_daylight.DaylightMethod = SplitFluxDaylighting;
+			} else {
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + ", occurs in " + cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
+				ShowContinueError( "SplitFlux assumed, and the simulation continues." );
+			}
+
+			if ( !lAlphaFieldBlanks( 4 ) ) {  // Field: Availability Schedule Name
+				zone_daylight.AvailSchedNum = GetScheduleIndex( cAlphaArgs( 4 ) );
+				if ( zone_daylight.AvailSchedNum == 0 ) {
+					ShowWarningError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + ", occurs in " + cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
+					ShowContinueError( "Schedule was not found so controls will always be available, and the simulation continues." );
+					zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
+				}
+			} else {
+				zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
+			}
+
+			if ( SameString( cAlphaArgs( 5 ), "CONTINUOUS" ) ){  // Field: Lighting Control Type
+				zone_daylight.LightControlType = Continuous;
+			} else if ( SameString( cAlphaArgs( 5 ), "STEPPED" ) ) {
+				zone_daylight.LightControlType = Stepped;
+			} else if ( SameString( cAlphaArgs( 5 ), "CONTINUOUSOFF" ) ) {
+				zone_daylight.LightControlType = ContinuousOff;
+			} else if ( lAlphaFieldBlanks( 5 ) ) {
+				zone_daylight.LightControlType = Continuous;
+			} else {
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) + ", occurs in " + cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
+				ShowContinueError( "Continuous assumed, and the simulation continues." );
+			}
+
+			zone_daylight.MinPowerFraction = rNumericArgs( 1 );  // Field: Minimum Input Power Fraction for Continuous Dimming Control
+			zone_daylight.MinLightFraction = rNumericArgs( 2 );  // Field: Minimum Light Output Fraction for Continuous Dimming Control
+			zone_daylight.LightControlSteps = rNumericArgs( 3 ); // Field: Number of Stepped Control Steps
+			zone_daylight.LightControlProbability = rNumericArgs( 4 ); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
+
+			if ( !lAlphaFieldBlanks( 6 )){ // Field: Glare Calculation Daylighting Reference Point Name
+				zone_daylight.glareRefPtNumber = FindItemInList( cAlphaArgs( 6 ), DaylRefPt, &RefPointData::Name );  // Field: Glare Calculation Daylighting Reference Point Name
+				if ( zone_daylight.glareRefPtNumber == 0 ) {
+					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" for object named: " + cAlphaArgs( 1 ) );
+					ErrorsFound = true;
+					continue;
+				}
+			} else if (zone_daylight.DaylightMethod == SplitFluxDaylighting) {
+				ShowWarningError( "No " + cAlphaFieldNames( 6 ) + " provided for object named: " + cAlphaArgs( 1 ) );
+				ShowContinueError( "No glare calculation performed, and the simulation continues." );
+			}
+
+			if ( !lNumericFieldBlanks( 5 ) ){
+				zone_daylight.ViewAzimuthForGlare = rNumericArgs( 5 ); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+			} else{
+				zone_daylight.ViewAzimuthForGlare = 0.;
+			}
+
+			zone_daylight.MaxGlareallowed = rNumericArgs( 6 ); // Field: Maximum Allowable Discomfort Glare Index
+			zone_daylight.DElightGriddingResolution = rNumericArgs( 7 ); // Field: DElight Gridding Resolution
+
+			int curTotalDaylRefPts = NumAlpha - 6; // first six alpha fields are not part of extensible group
+			zone_daylight.TotalDaylRefPoints = curTotalDaylRefPts;
+			if ( ( NumNumber - 7 ) / 2 != zone_daylight.TotalDaylRefPoints ){
+				ShowSevereError( cCurrentModuleObject + "The number of extensible numeric fields and alpha fields is inconsistent for: " + cAlphaArgs( 1 ) );
+				ShowContinueError( "For each field: " + cAlphaFieldNames( NumAlpha ) + " there needs to be the following fields: Fraction Controlled by Reference Point and Illuminance Setpoint at Reference Point" );
+				ErrorsFound = true;
+			}
+			zone_daylight.DaylRefPtNum.allocate( curTotalDaylRefPts );
+			zone_daylight.DaylRefPtNum = 0;
+			zone_daylight.FracZoneDaylit.allocate( curTotalDaylRefPts );
+			zone_daylight.FracZoneDaylit = 0.0;
+			zone_daylight.IllumSetPoint.allocate( curTotalDaylRefPts );
+			zone_daylight.IllumSetPoint = 0.0;
+			zone_daylight.DaylIllumAtRefPt.allocate( curTotalDaylRefPts );
+			zone_daylight.DaylIllumAtRefPt = 0.0;
+			zone_daylight.GlareIndexAtRefPt.allocate( curTotalDaylRefPts );
+			zone_daylight.GlareIndexAtRefPt = 0.0;
+
+			zone_daylight.DaylRefPtAbsCoord.allocate( 3, curTotalDaylRefPts );
+			zone_daylight.DaylRefPtAbsCoord = 0.0;
+			zone_daylight.DaylRefPtInBounds.allocate( curTotalDaylRefPts );
+			zone_daylight.DaylRefPtInBounds = true;
+			zone_daylight.RefPtPowerReductionFactor.allocate( curTotalDaylRefPts );
+			zone_daylight.RefPtPowerReductionFactor = 1.0;
+			zone_daylight.BacLum.allocate( curTotalDaylRefPts );
+			zone_daylight.BacLum = 0.0;
+
+			zone_daylight.TimeExceedingGlareIndexSPAtRefPt.allocate( curTotalDaylRefPts );
+			zone_daylight.TimeExceedingGlareIndexSPAtRefPt = 0.0;
+
+			zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate( curTotalDaylRefPts );
+			zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
+
+			int countRefPts = 0;
+			for ( refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum ){
+				zone_daylight.DaylRefPtNum(refPtNum) = FindItemInList( cAlphaArgs( 6 + refPtNum ), DaylRefPt, &RefPointData::Name );  // Field: Daylighting Reference Point Name
+				if ( zone_daylight.DaylRefPtNum( refPtNum ) == 0 ) {
+					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 + refPtNum ) + "=\"" + cAlphaArgs( 6 + refPtNum ) + "\" for object named: " + cAlphaArgs(1));
+					ErrorsFound = true;
+					continue;
+				} else {
+					++countRefPts;
+				}
+				zone_daylight.FracZoneDaylit( refPtNum ) = rNumericArgs( 6 + refPtNum * 2 ); // Field: Fraction Controlled by Reference Point
+				zone_daylight.IllumSetPoint( refPtNum ) = rNumericArgs( 7 + refPtNum * 2 ); // Field: Illuminance Setpoint at Reference Point
+
+				if ( zone_daylight.DaylightMethod == SplitFluxDaylighting ){
+					SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", zone_daylight.DaylIllumAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
+					SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Daylight Illuminance Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
+					SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index []", zone_daylight.GlareIndexAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
+					SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingGlareIndexSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
+				}
+			}
+			// Register Error if 0 DElight RefPts have been input for valid DElight object
+			if ( countRefPts < 1 ) {
+				ShowSevereError( "No Reference Points input for " + cCurrentModuleObject + " zone =" + zone_daylight.ZoneName );
+				ErrorsFound = true;
+			}
+
+
+			if ( sum( zone_daylight.FracZoneDaylit ) < 1.0 ) {
+				ShowWarningError( "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0." );
+				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", only " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone is controlled." );
+			}
+			if ( sum( zone_daylight.FracZoneDaylit ) > 1.0 ) {
+				ShowSevereError( "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0." );
+				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", trying to control " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone." );
+				ErrorsFound = true;
+			}
+			if ( zone_daylight.LightControlType == Stepped && zone_daylight.LightControlSteps <= 0 ) {
+				ShowWarningError( "GetDaylightingControls: For Stepped Control, the number of steps must be > 0" );
+				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", will use 1" );
+				zone_daylight.LightControlSteps = 1;
+			}
+			SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
+		}
+
+		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
+			if ( Surface( SurfLoop ).Class == SurfaceClass_Window && Surface( SurfLoop ).ExtSolar ) {
+				int zoneOfSurf = Surface( SurfLoop ).Zone;
+				if ( ZoneDaylight( zoneOfSurf ).TotalDaylRefPoints > 0 && !Zone( zoneOfSurf ).HasInterZoneWindow && ZoneDaylight( zoneOfSurf ).DaylightMethod == SplitFluxDaylighting ){
+					SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep.allocate( ZoneDaylight( zoneOfSurf ).TotalDaylRefPoints );
+					SurfaceWindow( SurfLoop ).LumWinFromRefPtRep.allocate( ZoneDaylight( zoneOfSurf ).TotalDaylRefPoints );
+					for ( refPtNum = 1; refPtNum <= ZoneDaylight( zoneOfSurf ).TotalDaylRefPoints; ++refPtNum ) {
+						SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
+						SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + " View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
+					}
+				}
+			}
+		}
+	}
+
+	void
+	GeometryTransformForDaylighting(
+	)
+	{
+		//       AUTHOR         Fred Winkelmann
+		//       DATE WRITTEN   March 2002
+		//       MODIFIED       Glazer - July 2016 - separated this from GetInput function
+		// For splitflux daylighting, transform the geometry
+
 		using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
 		using InternalHeatGains::GetDesignLightingLevelForZone;
 		using General::TrimSigDigits;
@@ -4330,36 +4801,16 @@ namespace DaylightingManager {
 		using namespace OutputReportPredefined;
 		using ScheduleManager::GetScheduleIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
 
-		// INTERFACE BLOCK SPECIFICATIONS: na
-		// DERIVED TYPE DEFINITIONS: na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int IOStat;
-		int Loop1;
-		int MapStyleIn;
-		int NumAlpha;
-		int NumNumber;
-		int ZoneNum;
-		int MapNum;
-		int RefPt;
-		int X;
-		int Y;
-		int SurfLoop;
-		int AddMapPoints;
-		int ZoneFound;
+		int refPtNum;
 		std::string refName;
 		Real64 CosBldgRelNorth; // Cosine of Building rotation
 		Real64 SinBldgRelNorth; // Sine of Building rotation
 		Real64 CosZoneRelNorth; // Cosine of Zone rotation
 		Real64 SinZoneRelNorth; // Sine of Zone rotation
-		static Real64 CosBldgRotAppGonly( 0.0 ); // Cosine of the building rotation for appendix G only (relative north)
-		static Real64 SinBldgRotAppGonly( 0.0 ); // Sine of the building rotation for appendix G only (relative north)
+		Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only (relative north)
+		Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only (relative north)
 		Real64 Xb; // temp var for transformation calc
 		Real64 Yb; // temp var for transformation calc
 		Real64 Xo;
@@ -4372,10 +4823,6 @@ namespace DaylightingManager {
 		Real64 OldAspectRatio;
 		Real64 NewAspectRatio;
 		Real64 rLightLevel;
-		Array1D_bool ZoneMsgDone;
-		Array1D_int ZoneMapCount;
-
-		// FLOW:
 
 		// Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
 		CosBldgRelNorth = std::cos( -( BuildingAzimuth + BuildingRotationAppendixG ) * DegToRadians );
@@ -4389,524 +4836,148 @@ namespace DaylightingManager {
 		NewAspectRatio = 1.0;
 
 		CheckForGeometricTransform( doTransform, OldAspectRatio, NewAspectRatio );
+		int zoneIndex = 0;
+		for (auto & daylCntrl : ZoneDaylight) {
+			zoneIndex++;
+			if ( daylCntrl.TotalDaylRefPoints > 0 ){
+				auto & zone( Zone(zoneIndex) );
 
-		// Get and initialize illuminance map objects
-		cCurrentModuleObject = "Output:IlluminanceMap";
-		TotIllumMaps = GetNumObjectsFound( cCurrentModuleObject );
+				// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
+				CosZoneRelNorth = std::cos( -zone.RelNorth * DegToRadians );
+				SinZoneRelNorth = std::sin( -zone.RelNorth * DegToRadians );
 
-		IllumMap.allocate( TotIllumMaps );
-		IllumMapCalc.allocate( TotIllumMaps );
-		ZoneMapCount.dimension( NumOfZones, 0 );
+				rLightLevel = GetDesignLightingLevelForZone( zoneIndex );
+				CheckLightsReplaceableMinMaxForZone( zoneIndex );
 
-		if ( TotIllumMaps > 0 ) {
-			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-				GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
-				IllumMap( MapNum ).Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
-
-				if ( IllumMap( MapNum ).Zone == 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-					ErrorsFound = true;
-				}
-
-				IllumMapCalc( MapNum ).Zone = IllumMap( MapNum ).Zone;
-				if ( IllumMap( MapNum ).Zone != 0 ) {
-					++ZoneMapCount( IllumMap( MapNum ).Zone );
-				}
-				IllumMap( MapNum ).Z = rNumericArgs( 1 );
-
-				IllumMap( MapNum ).Xmin = rNumericArgs( 2 );
-				IllumMap( MapNum ).Xmax = rNumericArgs( 3 );
-				if ( rNumericArgs( 2 ) > rNumericArgs( 3 ) ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
-					ShowContinueError( "..." + cNumericFieldNames( 2 ) + '[' + RoundSigDigits( rNumericArgs( 2 ), 2 ) + "] must be <= " + cNumericFieldNames( 3 ) + '[' + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "]." );
-					ErrorsFound = true;
-				}
-				IllumMap( MapNum ).Xnum = rNumericArgs( 4 );
-				if ( IllumMap( MapNum ).Xnum != 1 ) {
-					IllumMap( MapNum ).Xinc = ( IllumMap( MapNum ).Xmax - IllumMap( MapNum ).Xmin ) / ( IllumMap( MapNum ).Xnum - 1 );
-				} else {
-					IllumMap( MapNum ).Xinc = 0.0;
-				}
-
-				IllumMap( MapNum ).Ymin = rNumericArgs( 5 );
-				IllumMap( MapNum ).Ymax = rNumericArgs( 6 );
-				if ( rNumericArgs( 5 ) > rNumericArgs( 6 ) ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
-					ShowContinueError( "..." + cNumericFieldNames( 5 ) + '[' + RoundSigDigits( rNumericArgs( 5 ), 2 ) + "] must be <= " + cNumericFieldNames( 6 ) + '[' + RoundSigDigits( rNumericArgs( 6 ), 2 ) + "]." );
-					ErrorsFound = true;
-				}
-				IllumMap( MapNum ).Ynum = rNumericArgs( 7 );
-				if ( IllumMap( MapNum ).Ynum != 1 ) {
-					IllumMap( MapNum ).Yinc = ( IllumMap( MapNum ).Ymax - IllumMap( MapNum ).Ymin ) / ( IllumMap( MapNum ).Ynum - 1 );
-				} else {
-					IllumMap( MapNum ).Yinc = 0.0;
-				}
-				if ( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum > MaxMapRefPoints ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", too many map points specified." );
-					ShowContinueError( "..." + cNumericFieldNames( 4 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Xnum ) + "] * " + cNumericFieldNames( 7 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Ynum ) + "].= [" + RoundSigDigits( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum ) + "] must be <= [" + RoundSigDigits( MaxMapRefPoints ) + "]." );
-					ErrorsFound = true;
-				}
-			} // MapNum
-
-			cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-			MapStyleIn = GetNumObjectsFound( cCurrentModuleObject );
-
-			if ( MapStyleIn == 0 ) {
-				cAlphaArgs( 1 ) = "COMMA";
-				MapColSep = CharComma; //comma
-			} else if ( MapStyleIn == 1 ) {
-				GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ) == "COMMA" ) {
-					MapColSep = CharComma; //comma
-				} else if ( cAlphaArgs( 1 ) == "TAB" ) {
-					MapColSep = CharTab; //tab
-				} else if ( cAlphaArgs( 1 ) == "FIXED" || cAlphaArgs( 1 ) == "SPACE" ) {
-					MapColSep = CharSpace; // space
-				} else {
-					MapColSep = CharComma; //comma
-					ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\", Commas will be used to separate fields." );
-					cAlphaArgs( 1 ) = "COMMA";
-				}
-			}
-			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
-			ConvertCaseToLower( cAlphaArgs( 1 ), cAlphaArgs( 2 ) );
-			cAlphaArgs( 1 ).erase( 1 );
-			cAlphaArgs( 1 ) += cAlphaArgs( 2 ).substr( 1 );
-			gio::write( OutputFileInits, "('Daylighting:Illuminance Maps,',A,',',A)" ) << TrimSigDigits( TotIllumMaps ) << cAlphaArgs( 1 );
-
-		}
-
-		for ( Loop1 = 1; Loop1 <= NumOfZones; ++Loop1 ) {
-			ZoneDaylight( Loop1 ).ZoneToMap.allocate( ZoneMapCount( Loop1 ) );
-			ZoneDaylight( Loop1 ).ZoneToMap = 0;
-			ZoneDaylight( Loop1 ).MapCount = 0;
-		}
-
-		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-			if ( IllumMap( MapNum ).Zone == 0 ) continue;
-			++ZoneDaylight( IllumMap( MapNum ).Zone ).MapCount;
-			ZoneDaylight( IllumMap( MapNum ).Zone ).ZoneToMap( ZoneDaylight( IllumMap( MapNum ).Zone ).MapCount ) = MapNum;
-		}
-
-		ZoneMapCount.deallocate();
-
-		cCurrentModuleObject = "Daylighting:Controls";
-		for ( Loop1 = 1; Loop1 <= TotDaylightingDetailed; ++Loop1 ) {
-			cAlphaArgs = "";
-			rNumericArgs = 0.0;
-			GetObjectItem( cCurrentModuleObject, Loop1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// First is Zone Name
-			ZoneFound = FindItemInList( cAlphaArgs( 1 ), Zone );
-			if ( ZoneFound == 0 ) {
-				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
-				ErrorsFound = true;
-				continue;
-			}
-			auto & zone( Zone( ZoneFound ) );
-			auto & zone_daylight( ZoneDaylight( ZoneFound ) );
-
-			// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-			CosZoneRelNorth = std::cos( -zone.RelNorth * DegToRadians );
-			SinZoneRelNorth = std::sin( -zone.RelNorth * DegToRadians );
-
-			if ( zone_daylight.DaylightType != NoDaylighting ) {
-				ShowSevereError( cCurrentModuleObject + ": Attempted to apply Detailed Daylighting to a Zone with Previous Daylighting" );
-				ShowContinueError( "Error discovered for Zone=" + cAlphaArgs( 1 ) );
-				ShowContinueError( "Previously applied Daylighting Type=" + DaylightTypes( zone_daylight.DaylightType ) );
-				ErrorsFound = true;
-				continue;
-			}
-			zone_daylight.DaylightType = DetailedDaylighting;
-			zone_daylight.TotalDaylRefPoints = rNumericArgs( 1 );
-
-			rLightLevel = GetDesignLightingLevelForZone( ZoneFound );
-			CheckLightsReplaceableMinMaxForZone( ZoneFound );
-
-			zone_daylight.DaylRefPtAbsCoord.allocate( 3, MaxRefPoints );
-			zone_daylight.DaylRefPtAbsCoord = 0.0;
-			zone_daylight.DaylRefPtInBounds.allocate( MaxRefPoints );
-			zone_daylight.DaylRefPtInBounds = true;
-			zone_daylight.FracZoneDaylit.allocate( MaxRefPoints );
-			zone_daylight.FracZoneDaylit = 0.0;
-			zone_daylight.IllumSetPoint.allocate( MaxRefPoints );
-			zone_daylight.IllumSetPoint = 0.0;
-			zone_daylight.RefPtPowerReductionFactor.allocate( MaxRefPoints );
-			zone_daylight.RefPtPowerReductionFactor = 1.0;
-			zone_daylight.DaylIllumAtRefPt.allocate( MaxRefPoints );
-			zone_daylight.DaylIllumAtRefPt = 0.0;
-			zone_daylight.GlareIndexAtRefPt.allocate( MaxRefPoints );
-			zone_daylight.GlareIndexAtRefPt = 0.0;
-			zone_daylight.BacLum.allocate( MaxRefPoints );
-			zone_daylight.BacLum = 0.0;
-
-			//added TH 12/2/2008
-			zone_daylight.TimeExceedingGlareIndexSPAtRefPt.allocate( MaxRefPoints );
-			zone_daylight.TimeExceedingGlareIndexSPAtRefPt = 0.0;
-
-			//added TH 7/6/2009
-			zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate( MaxRefPoints );
-			zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
-
-			if ( zone_daylight.TotalDaylRefPoints >= 1 ) {
-				if ( DaylRefWorldCoordSystem ) {
-					//transform only by appendix G rotation
-					zone_daylight.DaylRefPtAbsCoord( 1, 1 ) = rNumericArgs( 2 ) * CosBldgRotAppGonly - rNumericArgs( 3 ) * SinBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = rNumericArgs( 2 ) * SinBldgRotAppGonly + rNumericArgs( 3 ) * CosBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 3, 1 ) = rNumericArgs( 4 );
-				} else {
-					//Transform reference point coordinates into building coordinate system
-					Xb = rNumericArgs( 2 ) * CosZoneRelNorth - rNumericArgs( 3 ) * SinZoneRelNorth + zone.OriginX;
-					Yb = rNumericArgs( 2 ) * SinZoneRelNorth + rNumericArgs( 3 ) * CosZoneRelNorth + zone.OriginY;
-					//Transform into World Coordinate System
-					zone_daylight.DaylRefPtAbsCoord( 1, 1 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 3, 1 ) = rNumericArgs( 4 ) + zone.OriginZ;
-					if ( doTransform ) {
-						Xo = zone_daylight.DaylRefPtAbsCoord( 1, 1 ); // world coordinates.... shifted by relative north angle...
-						Yo = zone_daylight.DaylRefPtAbsCoord( 2, 1 );
-						// next derotate the building
-						XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-						YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
-						// translate
-						Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
-						Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
-						// rerotate
-						zone_daylight.DaylRefPtAbsCoord( 1, 1 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-
-						zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
-					}
-				}
-				zone_daylight.FracZoneDaylit( 1 ) = rNumericArgs( 8 );
-				zone_daylight.IllumSetPoint( 1 ) = rNumericArgs( 10 );
-			}
-			if ( zone_daylight.TotalDaylRefPoints >= 2 ) {
-				if ( DaylRefWorldCoordSystem ) {
-					//transform only by appendix G rotation
-					zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = rNumericArgs( 5 ) * CosBldgRotAppGonly - rNumericArgs( 6 ) * SinBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 2, 2 ) = rNumericArgs( 5 ) * SinBldgRotAppGonly + rNumericArgs( 6 ) * CosBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 3, 2 ) = rNumericArgs( 7 );
-				} else {
-					//Transform reference point coordinates into building coordinate system
-					Xb = rNumericArgs( 5 ) * CosZoneRelNorth - rNumericArgs( 6 ) * SinZoneRelNorth + zone.OriginX;
-					Yb = rNumericArgs( 5 ) * SinZoneRelNorth + rNumericArgs( 6 ) * CosZoneRelNorth + zone.OriginY;
-					//Transform into World Coordinate System
-					zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 2, 2 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 3, 2 ) = rNumericArgs( 7 ) + zone.OriginZ;
-					if ( doTransform ) {
-						Xo = zone_daylight.DaylRefPtAbsCoord( 1, 2 ); // world coordinates.... shifted by relative north angle...
-						Yo = zone_daylight.DaylRefPtAbsCoord( 2, 2 );
-						// next derotate the building
-						XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-						YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
-						// translate
-						Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
-						Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
-						// rerotate
-						zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-
-						zone_daylight.DaylRefPtAbsCoord( 2, 2 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
-					}
-				}
-				zone_daylight.FracZoneDaylit( 2 ) = rNumericArgs( 9 );
-				zone_daylight.IllumSetPoint( 2 ) = rNumericArgs( 11 );
-			}
-			for ( RefPt = 1; RefPt <= zone_daylight.TotalDaylRefPoints; ++RefPt ) {
-				if ( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) < zone.MinimumX || zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) > zone.MaximumX ) {
-					zone_daylight.DaylRefPtInBounds( RefPt ) = false;
-					ShowWarningError( "GetDetailedDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name );
-					ShowContinueError( "...X Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
-					if ( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) < zone.MinimumX ) {
-						ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - zone_daylight.DaylRefPtAbsCoord( 1, RefPt ), 4 ) + " m." );
+				for ( refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum ){
+					auto & curRefPt( DaylRefPt( daylCntrl.DaylRefPtNum( refPtNum ) ) ); // get the active daylighting:referencepoint
+					curRefPt.indexToFracAndIllum = refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
+					if ( DaylRefWorldCoordSystem ) {
+						//transform only by appendix G rotation
+						daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
+						daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
+						daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) = curRefPt.z;
 					} else {
-						ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) - zone.MaximumX, 4 ) + " m." );
-					}
-				}
-				if ( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) < zone.MinimumY || zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) > zone.MaximumY ) {
-					zone_daylight.DaylRefPtInBounds( RefPt ) = false;
-					ShowWarningError( "GetDetailedDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
-					ShowContinueError( "...Y Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
-					if ( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) < zone.MinimumY ) {
-						ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - zone_daylight.DaylRefPtAbsCoord( 2, RefPt ), 4 ) + " m." );
-					} else {
-						ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) - zone.MaximumY, 4 ) + " m." );
-					}
-				}
-				if ( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ || zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) > zone.MaximumZ ) {
-					zone_daylight.DaylRefPtInBounds( RefPt ) = false;
-					ShowWarningError( "GetDetailedDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
-					ShowContinueError( "...Z Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
-					if ( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ ) {
-						ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - zone_daylight.DaylRefPtAbsCoord( 3, RefPt ), 4 ) + " m." );
-					} else {
-						ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) - zone.MaximumZ, 4 ) + " m." );
-					}
-				}
-			} // RefPt
-			if ( sum( zone_daylight.FracZoneDaylit ) < 1.0 ) {
-				ShowWarningError( "GetDetailedDaylighting: Fraction of Zone controlled by the Daylighting reference points is < 1.0." );
-				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 1 ) + "\", only " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone is controlled." );
-			}
-			if ( sum( zone_daylight.FracZoneDaylit ) > 1.0 ) {
-				ShowSevereError( "GetDetailedDaylighting: Fraction of Zone controlled by the Daylighting reference points is > 1.0." );
-				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 1 ) + "\", trying to control " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone." );
-				ErrorsFound = true;
-			}
-			zone_daylight.LightControlType = rNumericArgs( 12 ); // Relies on IDD limits for verification
-			zone_daylight.ViewAzimuthForGlare = rNumericArgs( 13 );
-			zone_daylight.MaxGlareallowed = rNumericArgs( 14 );
-			zone_daylight.MinPowerFraction = rNumericArgs( 15 );
-			zone_daylight.MinLightFraction = rNumericArgs( 16 );
-			zone_daylight.LightControlSteps = rNumericArgs( 17 );
-			if ( zone_daylight.LightControlType == 2 && zone_daylight.LightControlSteps <= 0 ) {
-				ShowWarningError( "GetDetailedDaylighting: For Stepped Control, the number of steps must be > 0" );
-				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 1 ) + "\", will use 1" );
-				zone_daylight.LightControlSteps = 1;
-			}
-			zone_daylight.LightControlProbability = rNumericArgs( 18 );
-
-			if ( ! lAlphaFieldBlanks( 2 ) ) {
-				zone_daylight.AvailSchedNum = GetScheduleIndex( cAlphaArgs( 2 ) );
-				if ( zone_daylight.AvailSchedNum == 0 ) {
-					ShowWarningError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) + ", occurs in " + cCurrentModuleObject + "object for " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) );
-					ShowContinueError( "Schedule was not found so controls will always be available, and the simulation continues." );
-					zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
-				}
-			} else {
-				zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
-			}
-
-			if ( zone_daylight.TotalDaylRefPoints >= 1 ) {
-				refName = cAlphaArgs( 1 ) + " - REF 1";
-				PreDefTableEntry( pdchDyLtZone, refName, cAlphaArgs( 1 ) );
-				PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
-				// (1=continuous, 2=stepped, 3=continuous/off)
-				{ auto const SELECT_CASE_var( zone_daylight.LightControlType );
-				if ( SELECT_CASE_var == 1 ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous" );
-				} else if ( SELECT_CASE_var == 2 ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Stepped" );
-				} else if ( SELECT_CASE_var == 3 ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous/Off" );
-				}}
-				PreDefTableEntry( pdchDyLtFrac, refName, zone_daylight.FracZoneDaylit( 1 ) );
-				PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );
-				PreDefTableEntry( pdchDyLtWCtrl, refName, rLightLevel * zone_daylight.FracZoneDaylit( 1 ) );
-			}
-			if ( zone_daylight.TotalDaylRefPoints >= 2 ) {
-				refName = cAlphaArgs( 1 ) + " - REF 2";
-				PreDefTableEntry( pdchDyLtZone, refName, cAlphaArgs( 1 ) );
-				PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
-				// (1=continuous, 2=stepped, 3=continuous/off)
-				{ auto const SELECT_CASE_var( zone_daylight.LightControlType );
-				if ( SELECT_CASE_var == 1 ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous" );
-				} else if ( SELECT_CASE_var == 2 ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Stepped" );
-				} else if ( SELECT_CASE_var == 3 ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous/Off" );
-				}}
-				PreDefTableEntry( pdchDyLtFrac, refName, zone_daylight.FracZoneDaylit( 2 ) );
-				PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );
-				PreDefTableEntry( pdchDyLtWCtrl, refName, rLightLevel * zone_daylight.FracZoneDaylit( 2 ) );
-			}
-
-			// Check for illuminance maps associated with this zone
-			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-				if ( IllumMap( MapNum ).Zone == ZoneFound ) {
-					if ( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum > 0 ) {
-						// Add additional daylighting reference points for map
-						AddMapPoints = IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum;
-						IllumMapCalc( MapNum ).TotalMapRefPoints = AddMapPoints;
-						IllumMapCalc( MapNum ).MapRefPtAbsCoord.allocate( 3, AddMapPoints );
-						IllumMapCalc( MapNum ).MapRefPtAbsCoord = 0.0;
-						IllumMapCalc( MapNum ).MapRefPtInBounds.allocate( AddMapPoints );
-						IllumMapCalc( MapNum ).MapRefPtInBounds = true;
-						IllumMapCalc( MapNum ).DaylIllumAtMapPt.allocate( AddMapPoints );
-						IllumMapCalc( MapNum ).DaylIllumAtMapPt = 0.0;
-						IllumMapCalc( MapNum ).GlareIndexAtMapPt.allocate( AddMapPoints );
-						IllumMapCalc( MapNum ).GlareIndexAtMapPt = 0.0;
-						IllumMapCalc( MapNum ).DaylIllumAtMapPtHr.allocate( AddMapPoints );
-						IllumMapCalc( MapNum ).DaylIllumAtMapPtHr = 0.0;
-						IllumMapCalc( MapNum ).GlareIndexAtMapPtHr.allocate( AddMapPoints );
-						IllumMapCalc( MapNum ).GlareIndexAtMapPtHr = 0.0;
-
-						if ( AddMapPoints > MaxMapRefPoints ) {
-							ShowSevereError( "GetDaylighting Parameters: Total Map Reference points entered is greater than maximum allowed." );
-							ShowContinueError( "Occurs in Zone=" + zone.Name );
-							ShowContinueError( "Maximum reference points allowed=" + TrimSigDigits( MaxMapRefPoints ) + ", entered amount (when error first occurred)=" + TrimSigDigits( AddMapPoints ) );
-							ErrorsFound = true;
-							break;
+						//Transform reference point coordinates into building coordinate system
+						Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y  * SinZoneRelNorth + zone.OriginX;
+						Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y  * CosZoneRelNorth + zone.OriginY;
+						//Transform into World Coordinate System
+						daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+						daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+						daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) = curRefPt.z + zone.OriginZ;
+						if ( doTransform ) {
+							Xo = daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ); // world coordinates.... shifted by relative north angle...
+							Yo = daylCntrl.DaylRefPtAbsCoord( 2, refPtNum );
+							// next derotate the building
+							XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
+							YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
+							// translate
+							Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
+							Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
+							// rerotate
+							daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+							daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
 						}
-						RefPt = 1;
-						// Calc cos and sin of Zone Relative North values for later use in transforming Map Point coordinates
-						//CosZoneRelNorth = std::cos( -zone.RelNorth * DegToRadians ); //Tuned These should not be changing
-						//SinZoneRelNorth = std::sin( -zone.RelNorth * DegToRadians );
-						if ( IllumMap( MapNum ).Xnum != 1 ) {
-							IllumMap( MapNum ).Xinc = ( IllumMap( MapNum ).Xmax - IllumMap( MapNum ).Xmin ) / ( IllumMap( MapNum ).Xnum - 1 );
+					}
+					refName = curRefPt.Name;
+					PreDefTableEntry(pdchDyLtZone, refName, daylCntrl.ZoneName);
+					PreDefTableEntry(pdchDyLtCtrlName, refName, daylCntrl.Name );
+					if (daylCntrl.DaylightMethod == SplitFluxDaylighting ){
+						PreDefTableEntry (pdchDyLtKind, refName, "SplitFlux");
+					} else {
+						PreDefTableEntry (pdchDyLtKind, refName, "DElight");
+					}
+					// (1=continuous, 2=stepped, 3=continuous/off)
+					if ( daylCntrl.LightControlType == Continuous ) {
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous" );
+					} else if ( daylCntrl.LightControlType == Stepped ) {
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Stepped" );
+					} else if ( daylCntrl.LightControlType == ContinuousOff ) {
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous/Off" );
+					}
+					PreDefTableEntry( pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit( refPtNum ) );
+					PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );
+					PreDefTableEntry( pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit( refPtNum ) );
+
+					if ( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) > zone.MaximumX ) {
+						daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
+						ShowWarningError( "GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name );
+						ShowContinueError( "...X Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
+						if ( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) < zone.MinimumX ) {
+							ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ), 4 ) + " m." );
 						} else {
-							IllumMap( MapNum ).Xinc = 0.0;
+							ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) - zone.MaximumX, 4 ) + " m." );
 						}
-						if ( IllumMap( MapNum ).Ynum != 1 ) {
-							IllumMap( MapNum ).Yinc = ( IllumMap( MapNum ).Ymax - IllumMap( MapNum ).Ymin ) / ( IllumMap( MapNum ).Ynum - 1 );
+					}
+					if ( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) > zone.MaximumY ) {
+						daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
+						ShowWarningError( "GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
+						ShowContinueError( "...Y Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
+						if ( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) < zone.MinimumY ) {
+							ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ), 4 ) + " m." );
 						} else {
-							IllumMap( MapNum ).Yinc = 0.0;
+							ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) - zone.MaximumY, 4 ) + " m." );
 						}
-
-						// Map points and increments are stored in AbsCoord and then that is operated on if relative coords entered.
-						for ( Y = 1; Y <= IllumMap( MapNum ).Ynum; ++Y ) {
-							for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
-								IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = IllumMap( MapNum ).Xmin + ( X - 1 ) * IllumMap( MapNum ).Xinc;
-								IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = IllumMap( MapNum ).Ymin + ( Y - 1 ) * IllumMap( MapNum ).Yinc;
-								IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) = IllumMap( MapNum ).Z;
-								++RefPt;
-							}
+					}
+					if ( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) > zone.MaximumZ ) {
+						daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
+						ShowWarningError( "GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
+						ShowContinueError( "...Z Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
+						if ( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) < zone.MinimumZ ) {
+							ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ), 4 ) + " m." );
+						} else {
+							ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) - zone.MaximumZ, 4 ) + " m." );
 						}
-						RefPt = 1;
-						for ( Y = 1; Y <= IllumMap( MapNum ).Ynum; ++Y ) {
-							for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
-								if ( ! DaylRefWorldCoordSystem ) {
-									Xb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) * CosZoneRelNorth - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) * SinZoneRelNorth + zone.OriginX;
-									Yb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) * SinZoneRelNorth + IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) * CosZoneRelNorth + zone.OriginY;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) += zone.OriginZ;
-									if ( doTransform ) {
-										Xo = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ); // world coordinates.... shifted by relative north angle...
-										Yo = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
-										// next derotate the building
-										XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-										YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
-										// translate
-										Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
-										Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
-										// rerotate
-										IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-
-										IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
-									}
-								} else {
-									Xb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt );
-									Yb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
-								}
-								if ( RefPt == 1 ) {
-									IllumMap( MapNum ).Xmin = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt );
-									IllumMap( MapNum ).Ymin = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
-									IllumMap( MapNum ).Xmax = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt );
-									IllumMap( MapNum ).Ymax = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
-									IllumMap( MapNum ).Z = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt );
-								}
-								IllumMap( MapNum ).Xmin = min( IllumMap( MapNum ).Xmin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) );
-								IllumMap( MapNum ).Ymin = min( IllumMap( MapNum ).Ymin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) );
-								IllumMap( MapNum ).Xmax = max( IllumMap( MapNum ).Xmax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) );
-								IllumMap( MapNum ).Ymax = max( IllumMap( MapNum ).Ymax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) );
-								if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) < zone.MinimumX && ( zone.MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) > zone.MaximumX && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) - zone.MaximumX ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) < zone.MinimumY && ( zone.MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) > zone.MaximumY && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) - zone.MaximumY ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ && ( zone.MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) > zone.MaximumZ && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) - zone.MaximumZ ) > 0.001 ) ) {
-									IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) = false;
-								}
-								// Test extremes of Map Points against Zone Min/Max
-								if ( RefPt == 1 || RefPt == IllumMapCalc( MapNum ).TotalMapRefPoints ) {
-									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) < zone.MinimumX || IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) > zone.MaximumX ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
-										ShowWarningError( "GetDetailedDaylighting: Reference Map point #[" + RoundSigDigits( RefPt ) + "], X Value outside Zone Min/Max X, Zone=" + zone.Name );
-										ShowContinueError( "...X Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
-										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) < zone.MinimumX ) {
-											ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ), 4 ) + " m." );
-										} else {
-											ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) - zone.MaximumX, 4 ) + " m." );
-										}
-									}
-									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) < zone.MinimumY || IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) > zone.MaximumY ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
-										ShowWarningError( "GetDetailedDaylighting: Reference Map point #[" + RoundSigDigits( RefPt ) + "], Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
-										ShowContinueError( "...Y Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
-										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) < zone.MinimumY ) {
-											ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ), 4 ) + " m." );
-										} else {
-											ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) - zone.MaximumY, 4 ) + " m." );
-										}
-									}
-									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ || IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) > zone.MaximumZ ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
-										ShowWarningError( "GetDetailedDaylighting: Reference Map point #[" + RoundSigDigits( RefPt ) + "], Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
-										ShowContinueError( "...Z Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
-										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ ) {
-											ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ), 4 ) + " m." );
-										} else {
-											ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) - zone.MaximumZ, 4 ) + " m." );
-										}
-									}
-								}
-								++RefPt;
-							} // X
-						} // Y
-
 					}
-				}
-			} // MapNum
-
-		}
-
-		ZoneMsgDone.dimension( NumOfZones, false );
-		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-			if ( IllumMap( MapNum ).Zone == 0 ) continue;
-			if ( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylightType != DetailedDaylighting && ! ZoneMsgDone( IllumMap( MapNum ).Zone ) ) {
-				ShowSevereError( "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + Zone( IllumMap( MapNum ).Zone ).Name );
-				ErrorsFound = true;
+				} // refPtNum
 			}
 		}
-		ZoneMsgDone.deallocate();
-
-		if ( TotIllumMaps > 0 ) {
-			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
-		}
-		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-			gio::write( OutputFileInits, "('Daylighting:Illuminance Maps:Detail',11(',',A))" ) << IllumMap( MapNum ).Name << Zone( IllumMap( MapNum ).Zone ).Name << RoundSigDigits( IllumMap( MapNum ).Xmin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xmax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xnum ) << RoundSigDigits( IllumMap( MapNum ).Ymin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ymax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Yinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ynum ) << RoundSigDigits( IllumMap( MapNum ).Z, 2 );
-		}
-
-		if ( ErrorsFound ) return;
-
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
-
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 0 ) {
-				SetupOutputVariable( "Daylighting Reference Point 1 Illuminance [lux]", ZoneDaylight( ZoneNum ).DaylIllumAtRefPt( 1 ), "Zone", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Daylighting Reference Point 1 Glare Index []", ZoneDaylight( ZoneNum ).GlareIndexAtRefPt( 1 ), "Zone", "Average", Zone( ZoneNum ).Name );
-
-				//added TH 12/2/2008 to calculate the time exceeding the glare index setpoint
-				SetupOutputVariable( "Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time [hr]", ZoneDaylight( ZoneNum ).TimeExceedingGlareIndexSPAtRefPt( 1 ), "Zone", "Sum", Zone( ZoneNum ).Name );
-
-				//added TH 7/6/2009 to calculate the time exceeding the illuminance setpoint
-				SetupOutputVariable( "Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time [hr]", ZoneDaylight( ZoneNum ).TimeExceedingDaylightIlluminanceSPAtRefPt( 1 ), "Zone", "Sum", Zone( ZoneNum ).Name );
-			}
-
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) {
-				SetupOutputVariable( "Daylighting Reference Point 2 Illuminance [lux]", ZoneDaylight( ZoneNum ).DaylIllumAtRefPt( 2 ), "Zone", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Daylighting Reference Point 2 Glare Index []", ZoneDaylight( ZoneNum ).GlareIndexAtRefPt( 2 ), "Zone", "Average", Zone( ZoneNum ).Name );
-
-				//added TH 12/2/2008 to calculate the time exceeding the glare index setpoint
-				SetupOutputVariable( "Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time [hr]", ZoneDaylight( ZoneNum ).TimeExceedingGlareIndexSPAtRefPt( 2 ), "Zone", "Sum", Zone( ZoneNum ).Name );
-
-				//added TH 7/6/2009 to calculate the time exceeding the illuminance setpoint
-				SetupOutputVariable( "Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time [hr]", ZoneDaylight( ZoneNum ).TimeExceedingDaylightIlluminanceSPAtRefPt( 2 ), "Zone", "Sum", Zone( ZoneNum ).Name );
-			}
-			SetupOutputVariable( "Daylighting Lighting Power Multiplier []", ZoneDaylight( ZoneNum ).ZonePowerReductionFactor, "Zone", "Average", Zone( ZoneNum ).Name );
-		}
-
-		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
-			if ( Surface( SurfLoop ).Class == SurfaceClass_Window && Surface( SurfLoop ).ExtSolar ) {
-				if ( ZoneDaylight( Surface( SurfLoop ).Zone ).TotalDaylRefPoints > 0 && ! Zone( Surface( SurfLoop ).Zone ).HasInterZoneWindow ) {
-					SetupOutputVariable( "Daylighting Window Reference Point 1 Illuminance [lux]", SurfaceWindow( SurfLoop ).IllumFromWinAtRefPt1Rep, "Zone", "Average", Surface( SurfLoop ).Name );
-					SetupOutputVariable( "Daylighting Window Reference Point 1 View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPt1Rep, "Zone", "Average", Surface( SurfLoop ).Name );
-					if ( ZoneDaylight( Surface( SurfLoop ).Zone ).TotalDaylRefPoints > 1 ) {
-						SetupOutputVariable( "Daylighting Window Reference Point 2 Illuminance [lux]", SurfaceWindow( SurfLoop ).IllumFromWinAtRefPt2Rep, "Zone", "Average", Surface( SurfLoop ).Name );
-						SetupOutputVariable( "Daylighting Window Reference Point 2 View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPt2Rep, "Zone", "Average", Surface( SurfLoop ).Name );
-					}
-				}
-			}
-		}
-
 	}
+
+	void
+	GetInputDayliteRefPt(
+		bool & ErrorsFound
+	){
+		// Perform GetInput function for the Daylighting:ReferencePoint object
+		// Glazer - July 2016
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+
+		int RefPtNum = 0;
+		int IOStat;
+		int NumAlpha;
+		int NumNumber;
+
+		cCurrentModuleObject = "Daylighting:ReferencePoint";
+		TotRefPoints = GetNumObjectsFound( cCurrentModuleObject );
+		DaylRefPt.allocate( TotRefPoints );
+		for ( auto & pt : DaylRefPt ){
+			GetObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			pt.Name = cAlphaArgs( 1 );
+			pt.ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			if ( pt.ZoneNum == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+				ErrorsFound = true;
+			}
+			pt.x = rNumericArgs( 1 );
+			pt.y = rNumericArgs( 2 );
+			pt.z = rNumericArgs( 3 );
+		}
+	}
+
+	bool
+	doesDayLightingUseDElight()
+	{
+		for ( auto & znDayl : ZoneDaylight ){
+			if ( znDayl.DaylightMethod == DElightDaylighting ){
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	void
 	CheckTDDsAndLightShelvesInDaylitZones()
@@ -4967,9 +5038,9 @@ namespace DaylightingManager {
 		for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
 			SurfNum = TDDPipe( PipeNum ).Diffuser;
 			if ( SurfNum > 0 ) {
-				if ( ZoneDaylight( Surface( SurfNum ).Zone ).DaylightType == NoDaylighting ) {
+				if ( ZoneDaylight( Surface( SurfNum ).Zone ).DaylightMethod == NoDaylighting ) {
 					ShowSevereError( "DaylightingDevice:Tubular = " + TDDPipe( PipeNum ).Name + ":  is not connected to a Zone that has Daylighting.  " );
-					ShowContinueError( "Add Daylighting:Controls (or Daylighting:DELight:Controls) to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
+					ShowContinueError( "Add Daylighting:Controls to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
 					ShowContinueError( "A sufficient control is provided on the .dbg file." );
 					ErrorsFound = true;
 					if ( CheckTDDZone( Surface( SurfNum ).Zone ) ) {
@@ -5016,15 +5087,6 @@ namespace DaylightingManager {
 
 		for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
 			SurfNum = Shelf( ShelfNum ).Window;
-			//    IF (SurfNum > 0) THEN
-			//      IF (ZoneDaylight(Surface(SurfNum)%zone)%DaylightType == NoDaylighting) THEN
-			//        CALL ShowSevereError('DaylightingDevice:Shelf = '//TRIM(Shelf(ShelfNum)%Name)// &
-			//            ':  is not connected to a Zone that has Daylighting.  ')
-			//        CALL ShowContinueError('Add Daylighting:Controls (or Daylighting:DELight:Controls) ' //&
-			//            'to Zone named:  '//TRIM(Zone(Surface(SurfNum)%zone)%name) )
-			//          ErrorsFound = .TRUE.
-			//      ENDIF
-			//    ELSE ! SurfNum == 0
 			if ( SurfNum == 0 ) {
 				// should not come here (would have already been caught in shelf get input), but is an error
 				ShowSevereError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  window not found " );
@@ -5800,6 +5862,8 @@ namespace DaylightingManager {
 
 		static bool blnCycle( false );
 
+		if ( ZoneDaylight( ZoneNum ).DaylightMethod != SplitFluxDaylighting ) return;
+
 		// Three arrays to save original clear and dark (fully switched) states'
 		//  zone/window daylighting properties.
 		if ( firstTime ) {
@@ -5918,9 +5982,6 @@ namespace DaylightingManager {
 
 								// We add the contribution from the solar disk if slats do not block beam solar
 								// TH CR 8010. DaylIllFacSunDisk needs to be interpolated!
-								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) DFSUHR(2) = DFSUHR(2) + &
-								//            VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,IL,2,HourOfDay) + &
-								//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 							}
 
@@ -5930,10 +5991,6 @@ namespace DaylightingManager {
 								BFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// TH CR 8010. DaylBackFacSunDisk needs to be interpolated!
-								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) THEN
-								//  BFSUHR(2) = BFSUHR(2) + &
-								//            VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylBackFacSunDisk(loop,IL,2,HourOfDay) + &
-								//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylBackFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
 									BFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 								}
@@ -5945,10 +6002,6 @@ namespace DaylightingManager {
 								SFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// TH CR 8010. DaylSourceFacSunDisk needs to be interpolated!
-								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) THEN
-								//  SFSUHR(2) = SFSUHR(2) + &
-								//           VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylSourceFacSunDisk(loop,IL,2,HourOfDay) + &
-								//           WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylSourceFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
 									SFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 								}
@@ -6154,7 +6207,6 @@ namespace DaylightingManager {
 				// Check if window is eligible for glare control
 				// TH 1/21/2010. Switchable glazings already in partially switched state
 				//  should be allowed to further dim to control glare
-				//IF (SurfaceWindow(IWin)%ShadingFlag < 10) CYCLE
 				if ( SurfaceWindow( IWin ).ShadingFlag < 10 && SurfaceWindow( IWin ).ShadingFlag != SwitchableGlazing ) continue;
 
 				ICtrl = Surface( IWin ).WindowShadingControlPtr;
@@ -6388,17 +6440,6 @@ namespace DaylightingManager {
 							// it is in shaded state and glare is ok - job is done, exit the window loop - IWin
 							break;
 						}
-						//   ELSE
-						//     ! glare still high at either ref pt. go to next window
-						//     !  clean up for switchable glazings
-						//     IF (SurfaceWindow(IWin)%ShadingFlag == SwitchableGlazing) THEN
-						//       ! Already in fully dark state
-						//       DO IL = 1,NREFPT
-						//         ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) = tmpSourceLumFromWinAtRefPt(IL,2,loop)
-						//         ZoneDaylight(ZoneNum)%IllumFromWinAtRefPt(IL,2,loop) = tmpIllumFromWinAtRefPt(IL,2,loop)
-						//         ZoneDaylight(ZoneNum)%BackLumFromWinAtRefPt(IL,2,loop) = tmpBackLumFromWinAtRefPt(IL,2,loop)
-						//       END DO
-						//     ENDIF
 					}
 
 				} // End of check if window glare control is active
@@ -6439,11 +6480,11 @@ namespace DaylightingManager {
 				IWin = ZoneDaylight( ZoneNum ).DayltgExtWinSurfNums( loop );
 				IS = 1;
 				if ( SurfaceWindow( IWin ).ShadingFlag > 0 || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
-				SurfaceWindow( IWin ).IllumFromWinAtRefPt1Rep = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, 1 );
-				SurfaceWindow( IWin ).LumWinFromRefPt1Rep = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, 1 );
-				if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) {
-					SurfaceWindow( IWin ).IllumFromWinAtRefPt2Rep = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, 2 );
-					SurfaceWindow( IWin ).LumWinFromRefPt2Rep = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, 2 );
+				if ( ZoneDaylight( ZoneNum ).DaylightMethod == SplitFluxDaylighting ){
+					for ( int refPtNum = 1; refPtNum <= ZoneDaylight( ZoneNum ).TotalDaylRefPoints; ++refPtNum ){
+						SurfaceWindow( IWin ).IllumFromWinAtRefPtRep( refPtNum ) = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, refPtNum );
+						SurfaceWindow( IWin ).LumWinFromRefPtRep( refPtNum ) = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, refPtNum );
+					}
 				}
 			}
 		}
@@ -6591,6 +6632,8 @@ namespace DaylightingManager {
 		bool ScheduledAvailable;
 
 		// FLOW:
+
+		if ( ZoneDaylight( ZoneNum ).DaylightMethod != SplitFluxDaylighting ) return;
 
 		TotReduction = 0.0;
 		//  ScheduledAvailable = .TRUE.
@@ -8117,10 +8160,6 @@ namespace DaylightingManager {
 			WinLumSU += dirTrans * ElementLuminanceSun( iIncElem );
 
 			// For sun disk need to go throug outgoing directions and see which directions actually contain reference point
-			//if ((PosFac /= 0.0d0).and.(dOmega > 1e-6)) then
-			//WinLumSUdisk = WinLumSUdisk + dirTrans * ElementLuminanceSunDisk(iIncElem) * 14700.0d0 * sqrt(0.000068d0*PosFac) / &
-			//  (dOmega**0.8d0)
-			//end if
 		}
 
 		if ( zProjection > 0.0 ) {
@@ -8781,8 +8820,6 @@ namespace DaylightingManager {
 		for ( ILM = 1; ILM <= ZoneDaylight( ZoneNum ).MapCount; ++ILM ) {
 
 			MapNum = ZoneDaylight( ZoneNum ).ZoneToMap( ILM );
-			//    IllumMapCalc(MapNum)%DaylIllumAtMapPt  = 0.0
-			//    IllumMapCalc(MapNum)%GlareIndexAtMapPt = 0.0
 			NREFPT = IllumMapCalc( MapNum ).TotalMapRefPoints;
 
 			daylight_illum = 0.0;
@@ -8894,9 +8931,6 @@ namespace DaylightingManager {
 
 									// We add the contribution from the solar disk if slats do not block beam solar
 									// TH CR 8010, DaylIllFacSunDisk needs to be interpolated
-									//IF(.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) DFSUHR(2) = DFSUHR(2) + &
-									//  VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,ILB,2,HourOfDay) + &
-									//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,ILB,2,PreviousHour))
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
 										DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 									}
@@ -9749,13 +9783,13 @@ Label903: ;
 
 		gio::write( OutputFileInits, Format_700 );
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
+			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting ) continue;
 			gio::write( OutputFileInits, Format_701 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).TotalExtWindows ) << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins - ZoneDaylight( ZoneNum ).TotalExtWindows );
 		}
 
 		gio::write( OutputFileInits, Format_702 );
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
+			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
 			gio::write( OutputFileInits, Format_703 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones );
 			for ( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
 				gio::write( OutputFileInits, fmtCommaA ) << Zone( ZoneDaylight( ZoneNum ).AdjIntWinZoneNums( loop ) ).Name;

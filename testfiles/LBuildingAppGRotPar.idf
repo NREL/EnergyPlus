@@ -60,7 +60,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.6;
 
   Building,
     LBuildingAppGPar,        !- Name
@@ -2325,7 +2325,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2404,7 +2403,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2483,7 +2481,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2562,7 +2559,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2641,7 +2637,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2720,7 +2715,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2799,7 +2793,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
@@ -2878,7 +2871,6 @@
     0.70,                    !- Sensible Heat Recovery Effectiveness
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60.0,                    !- Dehumidification Setpoint {percent}
     None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
