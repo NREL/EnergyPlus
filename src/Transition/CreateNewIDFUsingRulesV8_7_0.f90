@@ -367,6 +367,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('COIL:COOLING:DX:MULTISPEED', 'COIL:HEATING:DX:MULTISPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
+                 OutArgs=InArgs
                  IF (SameString(InArgs(16), '')) THEN
                    OutArgs(16) = 'NaturalGas'
                  ELSEIF (SameString(InArgs(16), 'PropaneGas')) THEN
@@ -377,25 +378,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ObjectName='CoolingTower:SingleSpeed'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs(1:12)=InArgs(1:12)  ! No change
-                 OutArgs(13:16)=''           ! Added 4 New Input Fields, Set
-                 OutArgs(17:CurArgs+4)=InArgs(13:CurArgs)  !
+                 OutArgs(1:16)=InArgs(1:16)  ! No change
+                 OutArgs(17:20)=''           ! Added 4 New Input Fields, Set
+                 OutArgs(21:CurArgs+4)=InArgs(17:CurArgs)  !
                  CurArgs = CurArgs + 4
 
              CASE('COOLINGTOWER:TWOSPEED')
                  ObjectName='CoolingTower:TwoSpeed'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs(1:20)=InArgs(1:20)  ! No change
-                 OutArgs(21:24)=''           ! Added 4 New Input Fields, Set
-                 OutArgs(25:CurArgs+4)=InArgs(21:CurArgs)  !
+                 OutArgs(1:24)=InArgs(1:24)  ! No change
+                 OutArgs(25:28)=''           ! Added 4 New Input Fields, Set
+                 OutArgs(29:CurArgs+4)=InArgs(25:CurArgs)  !
              CASE('COOLINGTOWER:VARIABLESPEED:MERKEL')
                  ObjectName='CoolingTower:VariableSpeed:Merkel'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs(1:16)=InArgs(1:16)  ! No change
-                 OutArgs(17:20)=''           ! Added 4 New Input Fields, Set
-                 OutArgs(21:CurArgs+4)=InArgs(17:CurArgs)  !
+                 OutArgs(1:24)=InArgs(1:24)  ! No change
+                 OutArgs(25:28)=''           ! Added 4 New Input Fields, Set
+                 OutArgs(29:CurArgs+4)=InArgs(25:CurArgs)  !
                  CurArgs = CurArgs + 4
 
              CASE('AIRFLOWNETWORK:SIMULATIONCONTROL')

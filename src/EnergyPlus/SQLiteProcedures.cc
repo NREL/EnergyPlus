@@ -347,6 +347,14 @@ void SQLite::sqliteCommit()
 	}
 }
 
+bool SQLite::sqliteWithinTransaction()
+{
+	if ( m_writeOutputToSQLite ) {
+		return SQLiteProcedures::sqliteWithinTransaction();
+	}
+	return false;
+}
+
 void SQLite::sqliteWriteMessage(const std::string & message)
 {
 	if ( m_writeOutputToSQLite ) {
@@ -2812,6 +2820,11 @@ int SQLiteProcedures::sqliteStepCommand(sqlite3_stmt * stmt)
 int SQLiteProcedures::sqliteResetCommand(sqlite3_stmt * stmt)
 {
 	return sqlite3_reset(stmt);
+}
+
+bool SQLiteProcedures::sqliteWithinTransaction()
+{
+	return ( sqlite3_get_autocommit(m_connection) == 0 );
 }
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
