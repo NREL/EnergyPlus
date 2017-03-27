@@ -11866,6 +11866,12 @@ namespace OutputReportTabular {
 
 		// AirLoopComponentLoadSummary
 		if ( displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
+			Array1D_int zoneToAirLoopCool;
+			zoneToAirLoopCool.dimension( NumOfZones );
+			zoneToAirLoopCool = 0;
+			Array1D_int zoneToAirLoopHeat;
+			zoneToAirLoopHeat.dimension( NumOfZones );
+			zoneToAirLoopHeat = 0;
 			// set the peak day and time for each zone used by the airloops
 			for ( int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop ) {
 				coolDesSelected = SysSizPeakDDNum( iAirLoop ).TotCoolPeakDD;
@@ -11873,6 +11879,7 @@ namespace OutputReportTabular {
 				int NumZonesCooled = AirToZoneNodeInfo( iAirLoop ).NumZonesCooled;
 				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
 					int CtrlZoneNum = AirToZoneNodeInfo( iAirLoop ).CoolCtrlZoneNums( ZonesCooledNum );
+					zoneToAirLoopCool( CtrlZoneNum ) = iAirLoop;
 					AirLoopZonesCoolCompLoadTables( CtrlZoneNum ).desDayNum = coolDesSelected;
 					AirLoopZonesCoolCompLoadTables( CtrlZoneNum ).timeStepMax = timeCoolMax;
 				}
@@ -11881,8 +11888,32 @@ namespace OutputReportTabular {
 				int NumZonesHeated = AirToZoneNodeInfo( iAirLoop ).NumZonesHeated;
 				for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over cooled zones
 					int CtrlZoneNum = AirToZoneNodeInfo( iAirLoop ).HeatCtrlZoneNums( ZonesHeatedNum );
+					zoneToAirLoopHeat( CtrlZoneNum ) = iAirLoop;
 					AirLoopZonesHeatCompLoadTables( CtrlZoneNum ).desDayNum = heatDesSelected;
 					AirLoopZonesHeatCompLoadTables( CtrlZoneNum ).timeStepMax = timeHeatMax;
+				}
+			}
+			// if the zones are not assoicated with an airloop, use ZoneEquipConfig to associate the the airloop
+			for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
+				if ( zoneToAirLoopCool( iZone ) == 0 ) {
+					if ( ZoneEquipConfig( iZone ).IsControlled ) {
+						int airLoopNum = ZoneEquipConfig(iZone).AirLoopNum;
+						zoneToAirLoopCool( iZone ) = airLoopNum;
+						coolDesSelected = SysSizPeakDDNum( airLoopNum ).TotCoolPeakDD;
+						timeCoolMax = SysSizPeakDDNum( airLoopNum ).TimeStepAtTotCoolPk( coolDesSelected );
+						AirLoopZonesCoolCompLoadTables( iZone ).desDayNum = coolDesSelected;
+						AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax = timeCoolMax;
+					}
+				}
+				if ( zoneToAirLoopHeat( iZone ) == 0 ) {
+					if ( ZoneEquipConfig( iZone ).IsControlled ) {
+						int airLoopNum = ZoneEquipConfig( iZone ).AirLoopNum;
+						zoneToAirLoopHeat( iZone ) = airLoopNum;
+						heatDesSelected = SysSizPeakDDNum( airLoopNum ).HeatPeakDD;
+						timeHeatMax = SysSizPeakDDNum( airLoopNum ).TimeStepAtHeatPk( heatDesSelected );
+						AirLoopZonesHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
+						AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax = timeHeatMax;
+					}
 				}
 			}
 			// now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute them for specific design day and time of max
@@ -11910,20 +11941,19 @@ namespace OutputReportTabular {
 				}
 			}
 			// combine the zones for each air loop
+
 			for ( int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop ) {
-				int NumZonesCooled = AirToZoneNodeInfo( iAirLoop ).NumZonesCooled;
-				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
-					int CtrlZoneNum = AirToZoneNodeInfo( iAirLoop ).CoolCtrlZoneNums( ZonesCooledNum );
-					mult = Zone( CtrlZoneNum ).Multiplier * Zone( CtrlZoneNum ).ListMultiplier;
-					if ( mult == 0.0 ) mult = 1.0;
-					CombineLoadCompResults( AirLoopCoolCompLoadTables( iAirLoop ), AirLoopZonesCoolCompLoadTables( CtrlZoneNum ), mult);
-				}
-				int NumZonesHeated = AirToZoneNodeInfo( iAirLoop ).NumZonesHeated;
-				for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over cooled zones
-					int CtrlZoneNum = AirToZoneNodeInfo( iAirLoop ).HeatCtrlZoneNums( ZonesHeatedNum );
-					mult = Zone( CtrlZoneNum ).Multiplier * Zone( CtrlZoneNum ).ListMultiplier;
-					if ( mult == 0.0 ) mult = 1.0;
-					CombineLoadCompResults( AirLoopHeatCompLoadTables( iAirLoop ), AirLoopZonesHeatCompLoadTables( CtrlZoneNum ), mult );
+				for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
+					if ( zoneToAirLoopCool( iZone ) == iAirLoop) {
+						mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
+						if ( mult == 0.0 ) mult = 1.0;
+						CombineLoadCompResults( AirLoopCoolCompLoadTables( iAirLoop ), AirLoopZonesCoolCompLoadTables( iZone ), mult );
+					}
+					if ( zoneToAirLoopHeat( iZone ) == iAirLoop ) {
+						mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
+						if ( mult == 0.0 ) mult = 1.0;
+						CombineLoadCompResults( AirLoopHeatCompLoadTables( iAirLoop ), AirLoopZonesHeatCompLoadTables( iZone ), mult );
+					}
 				}
 
 				AddTotalRowsForLoadSummary( AirLoopCoolCompLoadTables( iAirLoop ) );
@@ -11942,14 +11972,17 @@ namespace OutputReportTabular {
 
 		//FacilityComponentLoadSummary
 		if ( displayFacilityComponentLoadSummary ) {
+
+			coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
+			timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
+
+			heatDesSelected = CalcFinalFacilitySizing.HeatDDNum;
+			timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
+
 			for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 				if ( !ZoneEquipConfig( iZone ).IsControlled ) continue;
-				coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
-				timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
-
 				mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
 				if ( mult == 0.0 ) mult = 1.0;
-
 				if ( displayZoneComponentLoadSummary && ( timeCoolMax == ZoneCoolCompLoadTables( iZone ).desDayNum ) && ( timeCoolMax == ZoneCoolCompLoadTables( iZone ).timeStepMax ) ) {
 					FacilityZonesCoolCompLoadTables( iZone ) = ZoneCoolCompLoadTables( iZone );
 				} else if ( displayAirLoopComponentLoadSummary && ( timeCoolMax == AirLoopZonesCoolCompLoadTables( iZone ).desDayNum ) && ( timeCoolMax == AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax ) ) {
@@ -11958,11 +11991,11 @@ namespace OutputReportTabular {
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesCoolCompLoadTables( iZone ).cells, FacilityZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputePeakConditions( FacilityZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
-					CombineLoadCompResults( FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables( iZone ), mult );
 				}
+				FacilityZonesCoolCompLoadTables( iZone ).timeStepMax = timeCoolMax;
+				FacilityZonesCoolCompLoadTables( iZone ).desDayNum = coolDesSelected;
+				CombineLoadCompResults( FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables( iZone ), mult );
 
-				heatDesSelected = CalcFinalFacilitySizing.HeatDDNum;
-				timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
 				if ( displayZoneComponentLoadSummary && ( timeHeatMax == ZoneHeatCompLoadTables( iZone ).desDayNum ) && ( timeHeatMax == ZoneHeatCompLoadTables( iZone ).timeStepMax ) ) {
 					FacilityZonesHeatCompLoadTables( iZone ) = ZoneHeatCompLoadTables( iZone );
 				} else if ( displayAirLoopComponentLoadSummary && ( timeHeatMax == AirLoopZonesHeatCompLoadTables( iZone ).desDayNum ) && ( timeHeatMax == AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax ) ) {
@@ -11971,8 +12004,10 @@ namespace OutputReportTabular {
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesHeatCompLoadTables( iZone ).cells, FacilityZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputePeakConditions( FacilityZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
-					CombineLoadCompResults( FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables( iZone ), mult );
 				}
+				FacilityZonesHeatCompLoadTables( iZone ).timeStepMax = timeHeatMax;
+				FacilityZonesHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
+				CombineLoadCompResults( FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables( iZone ), mult );
 			}
 
 			AddTotalRowsForLoadSummary( FacilityCoolCompLoadTables );
@@ -12558,11 +12593,11 @@ namespace OutputReportTabular {
 			reportName = "Zone Component Load Summary";
 			zoneAirLoopFacilityName = Zone( zoneOrAirLoopIndex ).Name;
 			writeOutput = true;
-		} else if ( kind == zoneOuput && displayAirLoopComponentLoadSummary ) {
+		} else if ( kind == airLoopOutput && displayAirLoopComponentLoadSummary ) {
 			reportName = "AirLoop Component Load Summary";
 			zoneAirLoopFacilityName = DataSizing::FinalSysSizing( zoneOrAirLoopIndex ).AirPriLoopName;
 			writeOutput = true;
-		} else if ( kind == zoneOuput && displayFacilityComponentLoadSummary ) {
+		} else if ( kind == facilityOutput && displayFacilityComponentLoadSummary ) {
 			reportName = "Facility Component Load Summary";
 			zoneAirLoopFacilityName = "Facility";
 			writeOutput = true;

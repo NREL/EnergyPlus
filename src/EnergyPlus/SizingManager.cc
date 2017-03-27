@@ -3588,26 +3588,26 @@ namespace SizingManager {
 
 		} else if ( CallIndicator == EndZoneSizingCalc ) {
 			for ( int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum ) {
-				if ( CalcFacilitySizing( CurOverallSimDay ).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad ) {
-					CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing( CurOverallSimDay ).DesCoolLoad;
-					CalcFinalFacilitySizing.TimeStepNumAtCoolMax = CalcFacilitySizing( CurOverallSimDay ).TimeStepNumAtCoolMax;
-					CalcFinalFacilitySizing.CoolDDNum = CalcFacilitySizing( CurOverallSimDay ).CoolDDNum;
+				if ( CalcFacilitySizing( DDNum ).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad ) {
+					CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing( DDNum ).DesCoolLoad;
+					CalcFinalFacilitySizing.TimeStepNumAtCoolMax = CalcFacilitySizing( DDNum ).TimeStepNumAtCoolMax;
+					CalcFinalFacilitySizing.CoolDDNum = CalcFacilitySizing( DDNum ).CoolDDNum;
 					for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-						CalcFinalFacilitySizing.CoolOutHumRatSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).CoolOutHumRatSeq( TimeStepIndex );
-						CalcFinalFacilitySizing.CoolOutTempSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).CoolOutTempSeq( TimeStepIndex );
-						CalcFinalFacilitySizing.CoolZoneTempSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).CoolZoneTempSeq( TimeStepIndex );
-						CalcFinalFacilitySizing.DOASHeatAddSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).DOASHeatAddSeq( TimeStepIndex );
-						CalcFinalFacilitySizing.DOASLatAddSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).DOASLatAddSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.CoolOutHumRatSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).CoolOutHumRatSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.CoolOutTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).CoolOutTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.CoolZoneTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).CoolZoneTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.DOASHeatAddSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).DOASHeatAddSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.DOASLatAddSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).DOASLatAddSeq( TimeStepIndex );
 					}
 				}
-				if ( CalcFacilitySizing( CurOverallSimDay ).DesHeatLoad > CalcFinalFacilitySizing.DesHeatLoad ) {
-					CalcFinalFacilitySizing.DesHeatLoad = CalcFacilitySizing( CurOverallSimDay ).DesHeatLoad;
-					CalcFinalFacilitySizing.TimeStepNumAtHeatMax = CalcFacilitySizing( CurOverallSimDay ).TimeStepNumAtHeatMax;
-					CalcFinalFacilitySizing.HeatDDNum = CalcFacilitySizing( CurOverallSimDay ).HeatDDNum;
+				if ( CalcFacilitySizing( DDNum ).DesHeatLoad > CalcFinalFacilitySizing.DesHeatLoad ) {
+					CalcFinalFacilitySizing.DesHeatLoad = CalcFacilitySizing( DDNum ).DesHeatLoad;
+					CalcFinalFacilitySizing.TimeStepNumAtHeatMax = CalcFacilitySizing( DDNum ).TimeStepNumAtHeatMax;
+					CalcFinalFacilitySizing.HeatDDNum = CalcFacilitySizing( DDNum ).HeatDDNum;
 					for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-						CalcFinalFacilitySizing.HeatOutHumRatSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).HeatOutHumRatSeq( TimeStepIndex );
-						CalcFinalFacilitySizing.HeatOutTempSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).HeatOutTempSeq( TimeStepIndex );
-						CalcFinalFacilitySizing.HeatZoneTempSeq( TimeStepIndex ) = CalcFacilitySizing( CurOverallSimDay ).HeatZoneTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.HeatOutHumRatSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).HeatOutHumRatSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.HeatOutTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).HeatOutTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.HeatZoneTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).HeatZoneTempSeq( TimeStepIndex );
 					}
 				}
 			}
