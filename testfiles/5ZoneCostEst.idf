@@ -37,7 +37,7 @@
 !
 ! WeatherFilename=USA_IL_Chicago-OHare_TMY2.epw
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,4;
 
