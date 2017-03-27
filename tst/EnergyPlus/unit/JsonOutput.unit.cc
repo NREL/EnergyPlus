@@ -52,12 +52,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
 //Fixture
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::ResultsFramework;
+using namespace EnergyPlus::SimulationManager;
 
 namespace EnergyPlus {
 
@@ -144,7 +146,207 @@ namespace EnergyPlus {
 	};
 
 	TEST_F( EnergyPlusFixture , JsonOutput_Variable) {
-		OutputSchema->
+//		std::string const idf_objects = delimited_string({
+//				                                                 "Version,8.6;",
+//				                                                 "SimulationControl,",
+//				                                                 "No,                      !- Do Zone Sizing Calculation",
+//				                                                 "No,                      !- Do System Sizing Calculation",
+//				                                                 "No,                      !- Do Plant Sizing Calculation",
+//				                                                 "No,                      !- Run Simulation for Sizing Periods",
+//				                                                 "Yes;                     !- Run Simulation for Weather File Run Periods",
+//				                                                 "Building,",
+//				                                                 "None,                    !- Name",
+//				                                                 "0,                       !- North Axis {deg}",
+//				                                                 " Suburbs,                 !- Terrain",
+//				                                                 "0.04,                    !- Loads Convergence Tolerance Value",
+//				                                                 "0.4,                     !- Temperature Convergence Tolerance Value {deltaC}",
+//				                                                 "MinimalShadowing,        !- Solar Distribution",
+//				                                                 "50,                      !- Maximum Number of Warmup Days",
+//				                                                 "6;                       !- Minimum Number of Warmup Days",
+//
+//				                                                 "SurfaceConvectionAlgorithm:Inside,TARP;",
+//
+//				                                                 "Refrigeration:Case,",
+//				                                                 "FishDisplayCase,         !- Name",
+//				                                                 "CaseCleanedOnMonday,     !- Availability Schedule Name",
+//				                                                 "SalesFloor,              !- Zone Name",
+//				                                                 "23.88,                   !- Rated Ambient Temperature {C}",
+//				                                                 "55.0,                    !- Rated Ambient Relative Humidity {percent}",
+//				                                                 "288.4,                   !- Rated Total Cooling Capacity per Unit Length {W/m}",
+//				                                                 "0.1,                     !- Rated Latent Heat Ratio",
+//				                                                 "0.85,                    !- Rated Runtime Fraction",
+//				                                                 "15.0,                    !- Case Length {m}",
+//				                                                 "1.1,                     !- Case Operating Temperature {C}",
+//				                                                 "RelativeHumidityMethod,  !- Latent Case Credit Curve Type",
+//				                                                 "RHCubic_LatentEnergyMult,!- Latent Case Credit Curve Name",
+//				                                                 "0.0,                     !- Standard Case Fan Power per Unit Length {W/m}",
+//				                                                 "0.0,                     !- Operating Case Fan Power per Unit Length {W/m}",
+//				                                                 "41.56,                   !- Standard Case Lighting Power per Unit Length {W/m}",
+//				                                                 ",                        !- Installed Case Lighting Power per Unit Length {W/m}",
+//				                                                 "CaseLightingSched,       !- Case Lighting Schedule Name",
+//				                                                 "0.9,                     !- Fraction of Lighting Energy to Case",
+//				                                                 "0.0,                     !- Case Anti-Sweat Heater Power per Unit Length {W/m}",
+//				                                                 ",                        !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}",
+//				                                                 "None,                    !- Anti-Sweat Heater Control Type",
+//				                                                 "0.0,                     !- Humidity at Zero Anti-Sweat Heater Energy {percent}",
+//				                                                 "0.0,                     !- Case Height {m}",
+//				                                                 "0.2,                     !- Fraction of Anti-Sweat Heater Energy to Case",
+//				                                                 "0.0,                     !- Case Defrost Power per Unit Length {W/m}",
+//				                                                 "OffCycle,                !- Case Defrost Type",
+//				                                                 "CaseDefrostSched,        !- Case Defrost Schedule Name",
+//				                                                 "CaseDripDownSched,       !- Case Defrost Drip-Down Schedule Name",
+//				                                                 ",                        !- Defrost Energy Correction Curve Type",
+//				                                                 ",                        !- Defrost Energy Correction Curve Name",
+//				                                                 "0.05,                    !- Under Case HVAC Return Air Fraction",
+//				                                                 "CaseStockingSched;       !- Refrigerated Case Restocking Schedule Name",
+//
+//				                                                 "Schedule:Compact,",
+//				                                                 "CaseCleanedOnMonday,     !- Name",
+//				                                                 "AnyNumber,               !- Schedule Type Limits Name",
+//				                                                 "Through: 12/31,          !- Field 1",
+//				                                                 "For: Monday,             !- Field 2",
+//				                                                 "Until: 5:00,1.0,         !- Field 3",
+//				                                                 "Until: 7:00,0.0,         !- Field 5",
+//				                                                 "Until: 24:00,1.0,        !- Field 7",
+//				                                                 "For: AllOtherDays,       !- Field 9",
+//				                                                 "Until: 24:00,1.0;        !- Field 10",
+//
+//				                                                 "Zone,",
+//				                                                 "SalesFloor,              !- Name",
+//				                                                 "0,                       !- Direction of Relative North {deg}",
+//				                                                 "0,                       !- X Origin {m}",
+//				                                                 "0,                       !- Y Origin {m}",
+//				                                                 "0,                       !- Z Origin {m}",
+//				                                                 "1,                       !- Type",
+//				                                                 "1,                       !- Multiplier",
+//				                                                 "4.266992,                !- Ceiling Height {m}",
+//				                                                 "autocalculate,           !- Volume {m3}",
+//				                                                 "autocalculate,           !- Floor Area {m2}",
+//				                                                 "TARP;                    !- Zone Inside Convection Algori",
+//
+//				                                                 "Curve:Cubic,",
+//				                                                 "RHCubic_LatentEnergyMult,!- Name",
+//				                                                 "-0.4641,                 !- Coefficient1 Constant",
+//				                                                 "0.0268,                  !- Coefficient2 x",
+//				                                                 "0.0,                     !- Coefficient3 x**2",
+//				                                                 "0.0,                     !- Coefficient4 x**3",
+//				                                                 "17.32,                   !- Minimum Value of x",
+//				                                                 "80.0;                    !- Maximum Value o",
+//
+//				                                                 "Schedule:Compact,",
+//				                                                 "CaseLightingSched,       !- Name",
+//				                                                 "ON/OFF,                  !- Schedule Type Limits Name",
+//				                                                 "Through: 12/31,          !- Field 1",
+//				                                                 "For: AllDays,            !- Field 2",
+//				                                                 "Until: 6:00,0.0,         !- Field 3",
+//				                                                 "Until: 21:00,1.0,        !- Field 5",
+//				                                                 "Until: 24:00,0.0;        !- Fie",
+//
+//				                                                 "Schedule:Compact,",
+//				                                                 "CaseDefrostSched,        !- Name",
+//				                                                 "ON/OFF,                  !- Schedule Type Limits Name",
+//				                                                 "Through: 12/31,          !- Field 1",
+//				                                                 "For:AllDays,             !- Field 2",
+//				                                                 "Interpolate:Yes,         !- Field 3",
+//				                                                 "Until: 4:00,0,           !- Field 4",
+//				                                                 "Until: 4:17,1,           !- Field 6",
+//				                                                 "Until: 14:00,0,          !- Field 8",
+//				                                                 "Until: 14:17,1,          !- Field 10",
+//				                                                 "Until: 24:00,0;          !- Field 12",
+//				                                                 "Schedule:Compact,",
+//				                                                 "CaseDripDownSched,       !- Name",
+//				                                                 "ON/OFF,                  !- Schedule Type Limits Name",
+//				                                                 "Through: 12/31,          !- Field 1",
+//				                                                 "For:AllDays,             !- Field 2",
+//				                                                 "Interpolate:Yes,         !- Field 3",
+//				                                                 "Until: 4:00,0,           !- Field 4",
+//				                                                 "Until: 4:22,1,           !- Field 6",
+//				                                                 "Until: 14:00,0,          !- Field 8",
+//				                                                 "Until: 14:22,1,          !- Field 10",
+//				                                                 "Until: 24:00,0;          !- Field 12",
+//				                                                 "Schedule:Compact,",
+//				                                                 "CaseStockingSched,       !- Name",
+//				                                                 "AnyNumber,               !- Schedule Type Limits Name",
+//				                                                 "Through: 12/31,          !- Field 1",
+//				                                                 "For: AllDays,            !- Field 2",
+//				                                                 "Until: 13:00,0.0,        !- Field 3",
+//				                                                 "Until: 14:00,50.0,       !- Field 5",
+//				                                                 "Until: 15:00,35.0,       !- Field 7",
+//				                                                 "Until: 24:00,0.0;        !- Field 9",
+//
+//				                                                 "ScheduleTypeLimits,",
+//				                                                 "On/Off,                  !- Name",
+//				                                                 "0,                       !- Lower Limit Value",
+//				                                                 "1,                       !- Upper Limit Value",
+//				                                                 "DISCRETE;                !- Numeric ",
+//
+//				                                                 "Output:VariableDictionary,Regular;",
+//				                                                 "Output:Surfaces:List,detailswithvertices;",
+//				                                                 "Output:Surfaces:Drawing,DXF;",
+//				                                                 "Output:Schedules,timestep;",
+//				                                                 "Output:Constructions,Constructions;",
+//				                                                 "Output:Table:SummaryReports,",
+//				                                                 "AllSummary;              !- Report 1 Name",
+//				                                                 "Output:Table:Monthly,",
+//				                                                 "Building Loads - Cooling,!- Name",
+//				                                                 "2,                       !- Digits After Decimal",
+//				                                                 "Zone Air System Sensible Cooling Energy,  !- Variable or Meter 1 Name",
+//				                                                 "SumOrAverage,            !- Aggregation Type for Variable or Meter 1",
+//				                                                 "Zone Air System Sensible Cooling Rate,  !- Variable or Meter 2 Name",
+//				                                                 "Maximum,                 !- Aggregation Type for Variable or Meter 2",
+//				                                                 "Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name",
+//				                                                 "ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3",
+//				                                                 "Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 4 Name",
+//				                                                 "ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4",
+//				                                                 "Zone Total Internal Latent Gain Energy,  !- Variable or Meter 5 Name",
+//				                                                 "SumOrAverage,            !- Aggregation Type for Variable or Meter 5",
+//				                                                 "Zone Total Internal Latent Gain Energy,  !- Variable or Meter 6 Name",
+//				                                                 "Maximum,                 !- Aggregation Type for Variable or Meter 6",
+//				                                                 "Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 7 Name",
+//				                                                 "ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7",
+//				                                                 "Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 8 Name",
+//				                                                 "ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 8",
+//				                                                 "Output:Table:Monthly,",
+//				                                                 "Building Loads - Heating,!- Name",
+//				                                                 "2,                       !- Digits After Decimal",
+//				                                                 "Zone Air System Sensible Heating Energy,  !- Variable or Meter 1 Name",
+//				                                                 "SumOrAverage,            !- Aggregation Type for Variable or Meter 1",
+//				                                                 "Zone Air System Sensible Heating Rate,  !- Variable or Meter 2 Name",
+//				                                                 "Maximum,                 !- Aggregation Type for Variable or Meter 2",
+//				                                                 "Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name",
+//				                                                 "eWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3",
+//				                                                 "Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,timestep;",
+//				                                                 "Output:Variable,Outside Air Inlet Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,Relief Air Outlet Node,System Node Mass Flow Rate,timestep;",
+//				                                                 "Output:Variable,Relief Air Outlet Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,Outdoor Air Mixer Inlet Node,System Node Mass Flow Rate,timestep;",
+//				                                                 "Output:Variable,Outdoor Air Mixer Inlet Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,Mixed Air Node,System Node Mass Flow Rate,timestep;",
+//				                                                 "Output:Variable,Mixed Air Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,Heating Coil Air Inlet Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,DX Cooling Coil Air Inlet Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,Air Loop Outlet Node,System Node Temperature,timestep;",
+//				                                                 "Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;",
+//				                                                 "Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;",
+//				                                                 "Output:Variable,*,Refrigeration Case Evaporator Sensible Cooling Rate,timestep;",
+//				                                                 "Output:Variable,*,Refrigeration Case Evaporator Latent Cooling Rate,timestep;",
+//				                                                 "Output:Variable,*,Zone Air System Sensible Cooling Energy,timeste",
+//
+//				                                                 "Refrigeration:CaseAndWalkInList,",
+//				                                                 " MedTempCaseList,         !- Name",
+//				                                                 "FishDisplayCase,         !- Case or WalkIn 1 Name",
+//
+//				                                                 "Output:JSON,",
+//				                                                 "TimeSeriesAndTabular;",
+//
+//		                                                 });
+//
+//		ASSERT_TRUE( process_idf( idf_objects ) );
+//		OutputSchema->setupOutputOptions();
+//
+//		ManageSimulation();
+//
+//		compare_json_stream( "" );
 	};
 
 }
