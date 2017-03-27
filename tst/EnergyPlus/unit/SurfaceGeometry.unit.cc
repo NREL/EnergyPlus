@@ -1169,4 +1169,46 @@ TEST( SurfaceGeometryUnitTests, isPointOnLineBetweenPoints )
 
 }
 
+TEST( SurfaceGeometryUnitTests, findIndexOfVertex )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, findIndexOfVertex" );
 
+	DataVectorTypes::Vector a;
+	std::vector<DataVectorTypes::Vector> list;
+
+	a.x = 0.;
+	a.y = 0.;
+	a.z = 0.;
+
+	EXPECT_EQ( -1, findIndexOfVertex( a, list ) ); //not found
+
+	list.emplace_back( a );
+
+	EXPECT_EQ( 0, findIndexOfVertex( a, list ) );
+
+	list.emplace_back( DataVectorTypes::Vector( 3., 2., 4. ) );
+	list.emplace_back( DataVectorTypes::Vector( 4., 3., 5. ) );
+	list.emplace_back( DataVectorTypes::Vector( 8., 1., 2. ) );
+	list.emplace_back( DataVectorTypes::Vector( 4., 7., 3. ) );
+
+	EXPECT_EQ( 0, findIndexOfVertex( a, list ) );
+
+	a.x = 4.;
+	a.y = 3.;
+	a.z = 5.;
+
+	EXPECT_EQ( 2, findIndexOfVertex( a, list ) );
+
+	a.x = 4.01;
+	a.y = 7.01;
+	a.z = 3.01;
+
+	EXPECT_EQ( 4, findIndexOfVertex( a, list ) );
+
+	a.x = 4.03;
+	a.y = 7.03;
+	a.z = 3.03;
+
+	EXPECT_EQ( -1, findIndexOfVertex( a, list ) ); //not found
+
+}
