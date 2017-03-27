@@ -336,7 +336,7 @@ namespace ConductionTransferFunctionCalc {
 
 			AdjacentResLayerNum = 0; // Zero this out for each construct
 
-			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
+			if ( !Construct( ConstrNum ).IsUsedCTF ) continue;
 
 			// Initialize construct parameters
 
@@ -381,6 +381,9 @@ namespace ConductionTransferFunctionCalc {
 									ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 								}
 								Material( CurrentLayer ).WarnedForHighDiffusivity = true;
+							}
+							if ( Material( CurrentLayer ).Thickness > 3.0 ) {
+								ShowWarningError( "InitConductionTransferFunctions: Found Material that is possibly too thick for Conduction Transfer Function calculation, material name = " + Material( CurrentLayer ).Name );
 							}
 						}
 					}
@@ -2181,7 +2184,7 @@ namespace ConductionTransferFunctionCalc {
 
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
-				if ( Construct( ThisNum ).TypeIsWindow ) continue;
+				if ( !Construct( ThisNum ).IsUsedCTF ) continue;
 
 				gio::write( OutputFileInits, Format_700 ) << Construct( ThisNum ).Name << ThisNum << Construct( ThisNum ).TotLayers << Construct( ThisNum ).NumCTFTerms << Construct( ThisNum ).CTFTimeStep << Construct( ThisNum ).UValue << Construct( ThisNum ).OutsideAbsorpThermal << Construct( ThisNum ).InsideAbsorpThermal << Construct( ThisNum ).OutsideAbsorpSolar << Construct( ThisNum ).InsideAbsorpSolar << DisplayMaterialRoughness( Construct( ThisNum ).OutsideRoughness );
 

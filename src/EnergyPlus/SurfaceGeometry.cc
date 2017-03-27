@@ -6385,6 +6385,10 @@ namespace SurfaceGeometry {
 				Surface( Item ).HeatTransferAlgorithm = HeatTransferModel_TDD;
 			}
 
+			if (Surface( Item ).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+				Construct( Surface( Item ).Construction ).IsUsedCTF = true;
+			}
+
 		}
 
 	}
