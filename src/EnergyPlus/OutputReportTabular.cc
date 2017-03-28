@@ -394,11 +394,6 @@ namespace OutputReportTabular {
 	int DesignDayCount( 0 );
 
 	//arrays related to pulse and load component reporting
-	Array2D< Real64 > tableBodyNums;
-	Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
-	Array1D< Real64 > AvgData; // sequence data after averaging
-	Array1D< Real64 > totalColumn;
-	Array1D< Real64 > grandTotalRow;
 	Array2D< Real64 > radiantPulseUsed;
 	Array2D_int radiantPulseTimestep;
 	Array2D< Real64 > radiantPulseReceived;
@@ -651,9 +646,6 @@ namespace OutputReportTabular {
 		sourceFactorOtherFuel2 = 0.0;
 		DesignDayName.deallocate();
 		DesignDayCount = 0;
-		tableBodyNums.deallocate();
-		totalColumn.deallocate();
-		grandTotalRow.deallocate();
 		radiantPulseUsed.deallocate();
 		radiantPulseTimestep.deallocate();
 		radiantPulseReceived.deallocate();
@@ -11672,7 +11664,6 @@ namespace OutputReportTabular {
 
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::CalcFinalZoneSizing;
-		using DataSizing::CalcZoneSizing;
 		using DataSizing::SysSizPeakDDNum;
 		using DataSizing::CalcFinalFacilitySizing;
 		using DataGlobals::NumOfTimeStepInHour;
@@ -12076,10 +12067,15 @@ namespace OutputReportTabular {
 		Array1D< Real64 > lightLWRadIntoSurf;
 
 		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		peopleRadIntoSurf = 0.;
 		equipRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		equipRadIntoSurf = 0.;
 		hvacLossRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		hvacLossRadIntoSurf = 0.;
 		powerGenRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		powerGenRadIntoSurf = 0.;
 		lightLWRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		lightLWRadIntoSurf = 0.;
 
 		if ( desDaySelected != 0 ) {
 
@@ -12178,6 +12174,7 @@ namespace OutputReportTabular {
 		using DataSizing::NumTimeStepsInAvg;
 		Array1D< Real64 > AvgData; // sequence data after averaging
 		AvgData.allocate( numTimeSteps );
+		AvgData = 0.;
 		MovingAvg( dataSeq * 1.0, numTimeSteps, NumTimeStepsInAvg, AvgData );
 		return AvgData( maxTimeStep );
 	}
@@ -12231,7 +12228,9 @@ namespace OutputReportTabular {
 		resultCells = 0.;
 		resCellsUsd = false;
 		delayOpaque.allocate( rGrdTot );
+		delayOpaque = 0.;
 		AvgData.allocate( NumOfTimeStepInDay );
+		AvgData = 0.;
 
 		if ( desDaySelected != 0 && timeOfMax != 0 ) {
 

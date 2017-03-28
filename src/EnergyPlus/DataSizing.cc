@@ -293,9 +293,9 @@ namespace DataSizing {
 	Array1D< OARequirementsData > OARequirements;
 	Array1D< ZoneAirDistributionData > ZoneAirDistribution;
 	Array1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
-	Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
+	Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design)
 	Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
-	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
+	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data)
 	Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
 	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
 	Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
