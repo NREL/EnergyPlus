@@ -615,6 +615,37 @@ namespace OutputReportTabular {
 
 	};
 
+	struct ZompComponentAreasType
+	{
+		// members
+		Real64 floor;
+		Real64 roof;
+		Real64 ceiling;
+		Real64 extWall;
+		Real64 intZoneWall;
+		Real64 grndCntWall;
+		Real64 extFloor;
+		Real64 intZoneFloor;
+		Real64 grndCntFloor;
+		Real64 fenestration;
+		Real64 door;
+
+		// default constructor
+		ZompComponentAreasType() :
+			floor( 0. ),
+			roof( 0. ),
+			ceiling( 0. ),
+			extWall( 0. ),
+			intZoneWall( 0. ),
+			grndCntWall( 0. ),
+			extFloor( 0. ),
+			intZoneFloor( 0. ),
+			grndCntFloor( 0. ),
+			fenestration( 0. ),
+			door( 0. )
+		{}
+	};
+
 	// Object Data
 	extern Array1D< OutputTableBinnedType > OutputTableBinned;
 	extern Array2D< BinResultsType > BinResults; // table number, number of intervals
@@ -879,6 +910,18 @@ namespace OutputReportTabular {
 	);
 
 	void
+	GetZoneComponentAreas(
+		Array1D< ZompComponentAreasType > & areas
+	);
+
+	void
+	AddAreaColumnForZone(
+		int const & zoneNum,
+		Array1D< ZompComponentAreasType > const & compAreas,
+		CompLoadTablesType & compLoadTotal
+	);
+
+	void
 	CombineLoadCompResults(
 		CompLoadTablesType & compLoadTotal,
 		CompLoadTablesType const & compLoadPartial,
@@ -889,7 +932,6 @@ namespace OutputReportTabular {
 	AddTotalRowsForLoadSummary(
 		CompLoadTablesType & compLoadTotal
 	);
-
 
 	void
 	ComputePeakDifference(
