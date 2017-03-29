@@ -382,11 +382,12 @@ namespace ConductionTransferFunctionCalc {
 								}
 								Material( CurrentLayer ).WarnedForHighDiffusivity = true;
 							}
-							if ( Material( CurrentLayer ).Thickness > 3.0 ) {
-								ShowWarningError( "InitConductionTransferFunctions: Found Material that is possibly too thick for Conduction Transfer Function calculation, material name = " + Material( CurrentLayer ).Name );
-							}
 						}
 					}
+				}
+				if ( Material( CurrentLayer ).Thickness > 3.0 ) {
+					ShowWarningError( "InitConductionTransferFunctions: Found Material that is possibly too thick for CTF calculation" );
+					ShowContinueError("material name = " + Material( CurrentLayer ).Name);
 				}
 
 				if ( rk( Layer ) <= PhysPropLimit ) { // Thermal conductivity too small,
