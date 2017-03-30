@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -77,6 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -739,8 +728,6 @@ namespace Boilers {
 				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;
-
 			} else {
 				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 
@@ -792,7 +779,6 @@ namespace Boilers {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpBoilerVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * Boiler( BoilerNum ).SizFac;
-				if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
 			} else {
 				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = 0.0;
 			}
@@ -867,8 +853,9 @@ namespace Boilers {
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   April 1999
 		//       MODIFIED       Taecheol Kim,May 2000
-		//                      R. Raustad - FSEC, June 2008: added boiler efficiency curve object
-		//                      B. Griffith - NREL, Aug 2011: added switch for temperature to use in curve
+		//                      Jun. 2008, R. Raustad, FSEC. Added boiler efficiency curve object
+		//                      Aug. 2011, B. Griffith, NREL. Added switch for temperature to use in curve
+		//                      Nov. 2016, R. Zhang, LBNL. Applied the boiler fouling fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -883,16 +870,18 @@ namespace Boilers {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
-
-		using FluidProperties::GetSpecificHeatGlycol;
-		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using CurveManager::CurveValue;
-		using General::TrimSigDigits;
-		using PlantUtilities::SetComponentFlowRate;
+		using DataBranchAirLoopPlant::ControlType_SeriesActive;
+		using DataGlobals::BeginEnvrnFlag;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
+		using FaultsManager::FaultsBoilerFouling;
+		using FluidProperties::GetSpecificHeatGlycol;
+		using General::TrimSigDigits;
+		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -947,7 +936,22 @@ namespace Boilers {
 			if ( EquipFlowCtrl == ControlType_SeriesActive ) BoilerMassFlowRate = Node( BoilerInletNode ).MassFlowRate;
 			return;
 		}
-
+		
+		//If there is a fault of boiler fouling (zrp_Nov2016)
+		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = Boiler( BoilerNum ).FaultyBoilerFoulingIndex;
+			Real64 NomCap_ff = BoilerNomCap;
+			Real64 BoilerEff_ff = BoilerEff;
+			
+			//calculate the Faulty Boiler Fouling Factor using fault information
+			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the boiler nominal capacity at faulty cases
+			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
+			BoilerEff = BoilerEff_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
+			
+		}
+ 
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 

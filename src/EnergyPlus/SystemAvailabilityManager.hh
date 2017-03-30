@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef SystemAvailabilityManager_hh_INCLUDED
 #define SystemAvailabilityManager_hh_INCLUDED
@@ -96,6 +84,9 @@ namespace SystemAvailabilityManager {
 	extern int const HybridVentMode_Enth; // Enthalpy control
 	extern int const HybridVentMode_DewPoint; // Dew point control
 	extern int const HybridVentMode_OA; // Outdoor air control
+	extern int const HybridVentMode_OperT80; // Operative temperature control with 80% acceptability limits
+	extern int const HybridVentMode_OperT90; // Operative temperature control with 90% acceptability limits
+	extern int const HybridVentMode_CO2; // CO2 control
 
 	extern int const HybridVentCtrl_NoAction; // No hybrid ventilation control
 	extern int const HybridVentCtrl_Open; // Open windows or doors
@@ -468,6 +459,14 @@ namespace SystemAvailabilityManager {
 		// manager is connected to air loop
 		bool SimHybridVentSysAvailMgr; // Set to false when a zone has two hybrid ventilation
 		// managers, one with air loop and one without
+		Real64 OperativeTemp; // Zone air operative temperature [C]
+		Real64 CO2; // Zone air CO2 [ppm]
+		Real64 MinOperTime; // Minimum HVAC Operation Time [minutes]
+		Real64 MinVentTime; // Minimum Ventilation Time [minutes]
+		Real64 TimeOperDuration; // Time duration with continuous HVAC operation [minutes]
+		Real64 TimeVentDuration; // Time duration with continuous ventilation [minutes]
+		Real64 minAdaTem; // minimum adaptive temperature for adaptive temperature control [C]
+		Real64 maxAdaTem; // maximum adaptive temperature for adaptive temperature control [C]
 
 		// Default Constructor
 		DefineHybridVentSysAvailManager() :
@@ -500,7 +499,15 @@ namespace SystemAvailabilityManager {
 			VentilationPtr( 0 ),
 			AvailStatus( 0 ),
 			HybridVentMgrConnectedToAirLoop( true ),
-			SimHybridVentSysAvailMgr( false )
+			SimHybridVentSysAvailMgr( false ),
+			OperativeTemp( 0.0 ),
+			CO2( 0.0 ),
+			MinOperTime( 0.0 ),
+			MinVentTime( 0.0 ),
+			TimeOperDuration( 0.0 ),
+			TimeVentDuration( 0.0 ),
+			minAdaTem( 0.0 ), 
+			maxAdaTem( 0.0 ) 
 		{}
 
 	};

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef AirflowNetworkBalanceManager_hh_INCLUDED
 #define AirflowNetworkBalanceManager_hh_INCLUDED
@@ -108,14 +96,12 @@ namespace AirflowNetworkBalanceManager {
 	extern int AirflowNetworkNumOfSurCracks;
 	extern int AirflowNetworkNumOfSurELA;
 	extern int AirflowNetworkNumOfExtNode;
-	extern int AirflowNetworkNumOfCPArray;
-	extern int AirflowNetworkNumOfCPValue;
 	extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-	extern int AirflowNetworkNumofWindDir;
 	extern int DisSysNumOfNodes;
 	extern int DisSysNumOfLeaks;
 	extern int DisSysNumOfELRs;
 	extern int DisSysNumOfDucts;
+	extern int DysSysNumOfDuctViewFactors;
 	extern int DisSysNumOfDampers;
 	extern int DisSysNumOfCVFs;
 	extern int DisSysNumOfDetFans;
@@ -212,11 +198,64 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
-	CalcWindPressure(
-		int const CPVNum, // CP Value number
-		Real64 const Vref, // Velocity at reference height
-		Real64 const Height // Node height for outdoor temperature calculation
+	airThermConductivity(
+		Real64 T // Temperature in Celsius
 	);
+
+	Real64
+	airDynamicVisc(
+		Real64 T  // Temperature in Celsius
+	);
+
+	Real64
+	airKinematicVisc(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	airThermalDiffusivity(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	airPrandtl(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	CalcDuctInsideConvResist(
+		Real64 const Tair, // Average air temperature
+		Real64 const mdot, // Mass flow rate
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hIn // User defined convection coefficient
+	);
+
+	Real64
+	CalcDuctOutsideConvResist(
+		Real64 const Ts, // Surface temperature
+		Real64 const Tamb, // Free air temperature
+		Real64 const Wamb, // Free air humidity ratio
+		Real64 const Pamb, // Free air barometric pressure
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const ZoneNum, // Zone number
+		Real64 const hOut // User defined convection coefficient
+	);
+
+	Real64
+    CalcWindPressure(
+        int const curve, // Curve index, change this to pointer after curve refactor
+        Real64 const Vref, // Velocity at reference height
+        Real64 const height, // Node height for outdoor temperature calculation
+        Real64 const azimuth, // Azimuthal angle of surface
+        bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+        bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
+    );
 
 	void
 	CalcAirflowNetworkHeatBalance();
@@ -255,7 +294,7 @@ namespace AirflowNetworkBalanceManager {
 	HybridVentilationControl();
 
 	void
-	CalcSingleSidedCps();
+	CalcSingleSidedCps(std::vector< std::vector< Real64 > > &valsByFacade, int numWindDirs = 36);
 
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number

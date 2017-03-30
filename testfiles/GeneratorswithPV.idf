@@ -21,7 +21,7 @@
 ! Note, this file was completely changed from Ver. 1.1.1 to 1.2 to add tests for different PV generators
 ! note  this file was changed for Ver. 1.2.2 to add new strategies for ventilated mounting configurations
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,4;
 
@@ -624,11 +624,11 @@
     Simple Electric Load Center,  !- Name
     PV list,                 !- Generator List Name
     Baseload,                !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     DirectCurrentWithInverter,  !- Electrical Buss Type
-    Simple Ideal Inverter;   !- Inverter Object Name
+    Simple Ideal Inverter;   !- Inverter Name
 
   ElectricLoadCenter:Inverter:Simple,
     Simple Ideal Inverter,   !- Name

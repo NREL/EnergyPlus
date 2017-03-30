@@ -16,7 +16,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with DistrictHeating and Pressure drop components and a pump pressure curve.
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -215,9 +215,9 @@
     Pump,                    !- Name
     Supply Inlet Node,       !- Inlet Node Name
     Supply Pump-Heating Node,!- Outlet Node Name
-    0.01,                    !- Rated Flow Rate {m3/s}
-    55400.0,                 !- Rated Pump Head {Pa}
-    800.0,                   !- Rated Power Consumption {W}
+    0.01,                    !- Design Flow Rate {m3/s}
+    55400.0,                 !- Design Pump Head {Pa}
+    800.0,                   !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type

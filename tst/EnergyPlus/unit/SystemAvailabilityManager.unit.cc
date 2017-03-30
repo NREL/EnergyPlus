@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #include <fstream>
 
@@ -66,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -77,6 +66,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
 
 using namespace EnergyPlus;
 
@@ -347,5 +337,146 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance )
 	DataHeatBalFanSys::ZoneThermostatSetPointHi.deallocate();
 	DataHeatBalFanSys::ZoneThermostatSetPointLo.deallocate();
 	ZoneNumList.deallocate();
+
+}
+
+TEST_F( EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control )
+{
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData.allocate( 1 );
+	DataHVACGlobals::HybridVentSysAvailVentCtrl.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr.allocate( 1 );
+	DataHeatBalance::Zone.allocate( 1 );
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	DataHeatBalance::MRT.allocate( 1 );
+	DataContaminantBalance::ZoneAirCO2.allocate( 1 );
+	DataContaminantBalance::ZoneCO2SetPoint.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr.allocate( 1 );
+	SystemAvailabilityManager::SchedSysAvailMgrData.allocate( 1 );
+	ScheduleManager::Schedule.allocate( 1 );
+	DataHVACGlobals::ZoneComp.allocate( DataZoneEquipment::NumValidSysAvailZoneComponents );
+	DataHeatBalFanSys::TempControlType.allocate( 1 );
+	DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate( 1 );
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).Name = "HybridControl";
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).ActualZoneNum = 1;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).AirLoopNum = 1;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).ControlModeSchedPtr = 1;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).UseRainIndicator = false;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MaxWindSpeed = 40.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MinOutdoorTemp = 15.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MaxOutdoorTemp = 35.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MinOutdoorEnth = 20000.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MaxOutdoorEnth = 30000.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MinOutdoorDewPoint = 15.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MaxOutdoorDewPoint = 35.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MinOASched = 2;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MinOperTime = 10.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).MinVentTime = 10.0;
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeVentDuration = 0.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeOperDuration = 0.0;
+
+	DataHeatBalance::Zone( 1 ).OutDryBulbTemp = 20.0;
+	DataHeatBalance::Zone( 1 ).WindSpeed = 5.0;
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).ControlMode = 5; // 80% acceptance
+	ThermalComfort::runningAverageASH = 20.0;
+	DataHeatBalFanSys::MAT( 1 ) = 23.0;
+	DataHeatBalance::MRT( 1 ) = 27.0;
+
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 1, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // Vent open
+
+	DataHeatBalFanSys::MAT( 1 ) = 26.0;
+	DataHeatBalance::MRT( 1 ) = 30.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 2, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // System operation
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).ControlMode = 6; // 90% acceptance
+	DataHeatBalFanSys::MAT( 1 ) = 23.0;
+	DataHeatBalance::MRT( 1 ) = 27.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 1, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // Vent open
+
+	DataHeatBalFanSys::MAT( 1 ) = 26.0;
+	DataHeatBalance::MRT( 1 ) = 30.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 2, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // System operation
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).ControlMode = 7; // CO2 control with an AirLoop
+	DataContaminantBalance::ZoneAirCO2( 1 ) = 900.0;
+	DataContaminantBalance::ZoneCO2SetPoint( 1 ) = 800.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).HybridVentMgrConnectedToAirLoop = true;
+	DataAirLoop::PriAirSysAvailMgr( 1 ).NumAvailManagers = 1;
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerType.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerName.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerNum.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailStatus = 1;
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerType( 1 ) = 1; // Scheduled
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerName( 1 ) = "Avail 1";
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerNum( 1 ) = 1;
+	SystemAvailabilityManager::SchedSysAvailMgrData( 1 ).SchedPtr = 1;
+	ScheduleManager::Schedule( 1 ).CurrentValue = 1;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 2, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // System operation
+	ScheduleManager::Schedule( 1 ).CurrentValue = 0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 1, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // Vent open
+
+	DataContaminantBalance::ZoneAirCO2( 1 ) = 500.0;
+	DataContaminantBalance::ZoneCO2SetPoint( 1 ) = 800.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 0, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // No action
+
+	DataHVACGlobals::ZoneComp( 1 ).TotalNumComp = 1; //  CO2 control with zone equipment
+	DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs.allocate( 1 );
+	DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).AvailStatus = 2;
+	DataContaminantBalance::ZoneAirCO2( 1 ) = 900.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).HybridVentMgrConnectedToAirLoop = false;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).SimHybridVentSysAvailMgr = true;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 2, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // System operation
+	DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).AvailStatus = 1;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 1, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // Vent open
+
+	// time duration test
+	DataHeatBalance::Zone( 1 ).OutDryBulbTemp = 40.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).ControlMode = 1; // Temperature control
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl = 1; // Open
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeOperDuration = 5.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 1, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // No change
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeOperDuration = 11.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 2, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // Can change
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl = 2; // close
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeOperDuration = 0.0;
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeVentDuration = 5.0;
+	DataHeatBalance::Zone( 1 ).OutDryBulbTemp = 20.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 2, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // No change
+	SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).TimeVentDuration = 11.0;
+	DataHeatBalFanSys::TempControlType( 1 ) = 1;
+	DataHeatBalFanSys::TempZoneThermostatSetPoint( 1 ) = 25.0;
+	SystemAvailabilityManager::CalcHybridVentSysAvailMgr( 1, 1 );
+	EXPECT_EQ( 1, SystemAvailabilityManager::HybridVentSysAvailMgrData( 1 ).VentilationCtrl ); // Can change
+
+	SystemAvailabilityManager::HybridVentSysAvailMgrData.deallocate( );
+	DataHVACGlobals::HybridVentSysAvailVentCtrl.deallocate( );
+	DataAirLoop::PriAirSysAvailMgr.deallocate( );
+	DataHeatBalance::Zone.deallocate( );
+	DataHeatBalFanSys::MAT.deallocate( );
+	DataHeatBalance::MRT.deallocate( );
+	DataContaminantBalance::ZoneAirCO2.deallocate( );
+	DataContaminantBalance::ZoneCO2SetPoint.deallocate( );
+	DataAirLoop::PriAirSysAvailMgr.deallocate( );
+	SystemAvailabilityManager::SchedSysAvailMgrData.deallocate( );
+	ScheduleManager::Schedule.deallocate( );
+	DataHVACGlobals::ZoneComp.deallocate( ); 
+	DataHeatBalFanSys::TempControlType.deallocate( );
+	DataHeatBalFanSys::TempZoneThermostatSetPoint.deallocate( );
 
 }

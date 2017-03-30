@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::DXCoils unit tests
 // DX heating coil defrost capacity with electric resistance
@@ -95,13 +83,16 @@ namespace EnergyPlus {
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
+		using Psychrometrics::PsyWFnTdbH;
+		using Psychrometrics::PsyTdbFnHW;
+		using Psychrometrics::PsyTsatFnHPb;
+		using Psychrometrics::PsyRhFnTdbWPb;
 		//	int NumDXCoils( 0 ); // Total number of DX coils
 		//	Array1D< DXCoilData > DXCoil;
 		int DXCoilNum;
 		int CurveNum;
 
 		NumDXCoils = 2;
-		DXCoilNum = 2;
 		DXCoil.allocate( NumDXCoils );
 		DXCoil( 1 ).DXCoilType_Num = CoilDX_MultiSpeedCooling;
 		DXCoil( 1 ).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -120,31 +111,39 @@ namespace EnergyPlus {
 		DXCoil( 1 ).NumOfSpeeds = 2;
 		DXCoil( 2 ).NumOfSpeeds = 2;
 
-		DXCoil( DXCoilNum ).MSRatedTotCap.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSRatedSHR.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSRatedCOP.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSRatedAirVolFlowRate.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSRatedAirMassFlowRate.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSCCapFTemp.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSCCapFFlow.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSEIRFTemp.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSEIRFFlow.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSWasteHeat.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSEvapCondEffect.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSEvapCondAirFlow.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSRatedCBF.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSWasteHeatFrac.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSPLFFPLR.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSTwet_Rated.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSGamma_Rated.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSMaxONOFFCyclesperHour.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSLatentCapacityTimeConstant.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
-		DXCoil( DXCoilNum ).MSFanPowerPerEvapAirFlowRate.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+		for (DXCoilNum = 1; DXCoilNum <= 2; ++DXCoilNum) {
+			DXCoil(DXCoilNum).MSRatedTotCap.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSRatedSHR.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSRatedCOP.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSRatedAirVolFlowRate.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSRatedAirMassFlowRate.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSCCapFTemp.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSCCapFFlow.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSEIRFTemp.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSEIRFFlow.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSWasteHeat.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSEvapCondEffect.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSEvapCondAirFlow.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSRatedCBF.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSWasteHeatFrac.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSPLFFPLR.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSTwet_Rated.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSGamma_Rated.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSMaxONOFFCyclesperHour.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSLatentCapacityTimeConstant.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+			DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+		}
 
 		DXCoil( 1 ).MSRatedTotCap( 1 ) = 4455.507579219055;
 		DXCoil( 1 ).MSRatedTotCap( 2 ) = 6188.507579219055;
+		DXCoil( 1 ).MSCCapFFlow = 1;
+		DXCoil( 1 ).MSCCapFTemp = 3;
+		DXCoil( 1 ).MSEIRFFlow = 1;
+		DXCoil( 1 ).MSEIRFTemp = 3;
+		DXCoil( 1 ).MSPLFFPLR = 2;
 
+		DXCoilNum = 2;
 		DXCoil( DXCoilNum ).MSRatedTotCap( 1 ) = 4455.507579219055;
 		DXCoil( DXCoilNum ).MSRatedTotCap( 2 ) = 6188.204971137576;
 		DXCoil( DXCoilNum ).MSRatedCOP( 1 ) = 4.03;
@@ -221,7 +220,54 @@ namespace EnergyPlus {
 		// 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number",
 		// 	" DX Heating Coil Standard Rating Information, , DX Heating coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
+		// set up coil operating conditions (replicates first occurance of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
+		OutDryBulbTemp = 16.1;
+		OutHumRat = 0.0114507065;
+		OutBaroPress = 98200.0;
+		DataEnvironment::StdRhoAir = 1.2;
+		MSHPMassFlowRateLow = 0.2339 * DataEnvironment::StdRhoAir;
+		MSHPMassFlowRateHigh = 0.2924 * DataEnvironment::StdRhoAir;
+
+		int CoilIndex = 1;
+		DataHeatBalance::HeatReclaimDXCoil.allocate( 2 );
+		DXCoil( CoilIndex ).InletAirMassFlowRate = MSHPMassFlowRateLow;
+		DXCoil( CoilIndex ).MSRatedAirMassFlowRate( 1 ) = MSHPMassFlowRateLow;
+		DXCoil( CoilIndex ).MSRatedAirMassFlowRate( 2 ) = MSHPMassFlowRateHigh;
+		DXCoil( CoilIndex ).InletAirTemp = 16.1; // 97% RH - inlet is right up against the saturation curve
+		DXCoil( CoilIndex ).InletAirEnthalpy = 45158.16;
+		DXCoil( CoilIndex ).InletAirHumRat = 0.01145065;
+		DXCoil( CoilIndex ).MSRatedCBF( 1 ) = 0.0107723;
+		DXCoil( CoilIndex ).MSRatedCBF( 2 ) = 0.0107723;
+		DXCoil( CoilIndex ).SchedPtr = 1;
+		Schedule.allocate( 1 );
+		Schedule( 1 ).CurrentValue = 1.0;
+		DXCoilOutletTemp.allocate( 1 );
+		DXCoilOutletHumRat.allocate( 1 );
+		DXCoilPartLoadRatio.allocate( 1 );
+		DXCoilFanOpMode.allocate( 1 );
+
+
+		Real64 SpeedRatio = 0.0;
+		Real64 CycRatio = 1.0;
+		int SpeedNum = 2;
+		int FanOpMode = 1;
+		int CompOp = 1;
+		int SingleMode = 0;
+		CalcMultiSpeedDXCoilCooling( CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode );
+		
+		Real64 TdbAtOutlet = PsyTdbFnHW( DXCoil( CoilIndex ).OutletAirEnthalpy, DXCoil( CoilIndex ).OutletAirHumRat );
+		Real64 tSatAtOutlet = PsyTsatFnHPb( DXCoil( CoilIndex ).OutletAirEnthalpy, OutBaroPress);
+		Real64 rhAtOutlet = PsyRhFnTdbWPb(DXCoil( CoilIndex ).OutletAirTemp, DXCoil( CoilIndex ).OutletAirHumRat, OutBaroPress);
+
+		// air outlet condition is right next to the saturation curve
+		EXPECT_DOUBLE_EQ( TdbAtOutlet, tSatAtOutlet ); // Tdb higher than TSat by 1.8E-15 C
+		EXPECT_GT( TdbAtOutlet, tSatAtOutlet ); // Tdb higher than TSat by 1.8E-15 C
+		EXPECT_NEAR( 1.0, rhAtOutlet, 0.00001 ); // 99.9995% RH (i.e., it's not 100% as PsyRhFnTdbWPb would have reported previously)
+		EXPECT_LT( rhAtOutlet, 1.0 ); // just to the right of saturation curve
+		EXPECT_FALSE( has_cerr_output() ); // old warning no longer reported
+
 	}
+
 	TEST_F( EnergyPlusFixture, DXCoils_Test2 ) {
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
@@ -892,8 +938,8 @@ namespace EnergyPlus {
 		using DataEnvironment::StdPressureSeaLevel;
 		const std::string CoilType( "Coil:WaterHeating:AirToWaterHeatPump:Wrapped" );
 		const std::string CoilName( "The Coil" );
-		const Real64 InletDBTemp( 19.722222222222221 );
-		const Real64 InletWBTemp( 13.078173565729553 );
+		Real64 InletDBTemp( 19.722222222222221 );
+		Real64 InletWBTemp( 13.078173565729553 );
 		Real64 InletAirHumRat;
 		const Real64 TotalCap( 1303.5987246916557 );
 		const Real64 AirVolFlowRate( 0.085422486640000003 );
@@ -909,6 +955,18 @@ namespace EnergyPlus {
 		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
+
+		// push inlet condition towards saturation curve to test CBF calculation robustness
+		InletWBTemp = 19.7; // 19.72 DB / 19.7 WB
+		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
+		EXPECT_NEAR( CBF_calculated, 0.00021141, 0.0000001 );
+
+		InletDBTemp = 13.1; // colder and much less likely inlet air temperature
+		InletWBTemp = 13.08; // 13.1 DB / 13.08 WB - hard to find ADP (needed mod to CalcCBF function)
+		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
+		EXPECT_NEAR( CBF_calculated, 0.0001531, 0.0000001 );
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
@@ -1425,7 +1483,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
 
-		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // run right at the saturation curve
+		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // simulate outlet condition right at the saturation curve
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HVACControllers Unit Tests
 
@@ -217,6 +205,94 @@ namespace EnergyPlus {
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType );
 
+	}
+
+	TEST_F( EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest ) {
+		std::string const idf_objects = delimited_string( {
+		"  Version,8.6;",
+
+		"  Coil:Cooling:Water,",
+		"    Main Cooling Coil 1,     !- Name",
+		"    CoolingCoilAvailSched,   !- Availability Schedule Name",
+		"    autosize,                !- Design Water Flow Rate {m3/s}",
+		"    autosize,                !- Design Air Flow Rate {m3/s}",
+		"    autosize,                !- Design Inlet Water Temperature {C}",
+		"    autosize,                !- Design Inlet Air Temperature {C}",
+		"    autosize,                !- Design Outlet Air Temperature {C}",
+		"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+		"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+		"    CCoil Water Inlet Node,  !- Water Inlet Node Name",
+		"    CCoil Water Outlet Node, !- Water Outlet Node Name",
+		"    Mixed Air Node 1,        !- Air Inlet Node Name",
+		"    CCoil Air Outlet Node,   !- Air Outlet Node Name",
+		"    SimpleAnalysis,          !- Type of Analysis",
+		"    CrossFlow;               !- Heat Exchanger Configuration",
+
+		"  Schedule:Compact,",
+		"   CoolingCoilAvailSched,	  !- Name",
+		"	Fraction,			      !- Schedule Type Limits Name",
+		"	Through: 12/31,		      !- Field 1",
+		"	For: AllDays,		      !- Field 2",
+		"	Until: 24:00, 1.0;        !- Field 3",
+
+		"  Controller:WaterCoil,",
+		"    Cooling Coil Contoller,  !- Name",
+		"    HumidityRatio,           !- Control Variable",
+		"    Reverse,                 !- Action",
+		"    FLOW,                    !- Actuator Variable",
+		"    CCoil Air Outlet Node,   !- Sensor Node Name",
+		"    CCoil Water Inlet Node,  !- Actuator Node Name",
+		"    autosize,                !- Controller Convergence Tolerance {deltaC}",
+		"    autosize,                !- Maximum Actuated Flow {m3/s}",
+		"    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+		"  SetpointManager:Scheduled,",
+		"    CCoil Temp Setpoint Mgr, !- Name",
+		"    Temperature,             !- Control Variable",
+		"    Always 16,               !- Schedule Name",
+		"    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
+
+		"  Schedule:Compact,",
+		"    Always 16,               !- Name",
+		"    Temperature,             !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,16;         !- Field 3",
+
+		"  SetpointManager:Scheduled,",
+		"    CCoil Hum Setpoint Mgr,  !- Name",
+		"    MaximumHumidityRatio,    !- Control Variable",
+		"    HumSetPt,                !- Schedule Name",
+		"    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
+
+		"  Schedule:Compact,",
+		"    HumSetPt,                !- Name",
+		"    AnyNumber,               !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00, 0.009;     !- Field 3",
+
+		"  AirLoopHVAC:ControllerList,",
+		"	CW Coil Controller,       !- Name",
+		"	Controller:WaterCoil,     !- Controller 1 Object Type",
+		"	Cooling Coil Contoller;   !- Controller 1 Name",
+		});
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetSetPointManagerInputs();
+		// There are two setpoint managers and are schedule type 	
+		ASSERT_EQ( 2, NumSchSetPtMgrs ); // 2 schedule set point managers
+		ASSERT_EQ( 2, NumAllSetPtMgrs );  // 2 all set point managers
+		// check specified control variable types 	
+		ASSERT_EQ( iTemperature, AllSetPtMgr( 1 ).CtrlTypeMode ); // is "Temperature"
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 2 ).CtrlTypeMode ); // is "MaximumHumidityRatio"
+
+		GetControllerInput();
+		// check ControllerProps control variable is set to "MaximumHumidityRatio"
+		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType ); // MaximumHumidityRatio
+			
 	}
 
 }
