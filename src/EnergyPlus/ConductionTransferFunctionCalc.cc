@@ -583,6 +583,12 @@ namespace ConductionTransferFunctionCalc {
 
 						} // ... end of layers loop.
 
+						// If the reverse construction isn't used by any surfaces then the CTFs
+						// still need to be defined.
+						if ( RevConst && !Construct( Constr ).IsUsedCTF ) {
+							RevConst = false;
+						}
+
 						if ( RevConst ) { // Curent construction is a reverse of
 							// construction Constr.  Thus, CTFs do not need to be re-
 							// calculated.  Copy CTF info for construction Constr to
