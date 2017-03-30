@@ -75,7 +75,6 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
-#include <SurfaceGroundHeatExchanger.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 #include <WeatherManager.hh>
@@ -6391,14 +6390,6 @@ namespace SurfaceGeometry {
 			}
 
 		}
-
-		// Get Surface Ground Heat Exchanger input (may use CTF constructions)
-		if ( SurfaceGroundHeatExchanger::GetInputFlag ) {
-			SurfaceGroundHeatExchanger::GetSurfaceGroundHeatExchanger();
-			SurfaceGroundHeatExchanger::GetInputFlag = false;
-		}
-
-
 	}
 
 	void

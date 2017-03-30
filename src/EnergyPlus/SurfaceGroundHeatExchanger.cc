@@ -302,8 +302,6 @@ namespace loc {
 				ErrorsFound = true;
 			}
 
-			Construct( SurfaceGHE( Item ).ConstructionNum ).IsUsedCTF = true;
-
 			// Error checking for surfaces, zones, and construction information
 			if ( ! Construct( SurfaceGHE( Item ).ConstructionNum ).SourceSinkPresent ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
