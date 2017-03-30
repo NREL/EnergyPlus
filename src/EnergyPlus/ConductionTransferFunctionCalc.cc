@@ -336,7 +336,9 @@ namespace ConductionTransferFunctionCalc {
 
 			AdjacentResLayerNum = 0; // Zero this out for each construct
 
-			if ( !Construct( ConstrNum ).IsUsedCTF ) continue;
+			if ( !Construct( ConstrNum ).IsUsedCTF ) {
+				continue;
+			}
 
 			// Initialize construct parameters
 

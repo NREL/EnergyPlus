@@ -6381,11 +6381,11 @@ namespace SurfaceGeometry {
 			if ( Surface( Item ).Class == SurfaceClass_Detached_B || Surface( Item ).Class == SurfaceClass_Detached_F || Surface( Item ).Class == SurfaceClass_Shading || Surface( Item ).Class == SurfaceClass_Overhang || Surface( Item ).Class == SurfaceClass_Fin ) {
 				Surface( Item ).HeatTransferAlgorithm = HeatTransferModel_None;
 			}
-			if ( Surface( Item ).Class == SurfaceClass_TDD_Diffuser ) {
+			if ( Surface( Item ).Class == SurfaceClass_TDD_Diffuser || Surface( Item ).Class == SurfaceClass_TDD_Dome ) {
 				Surface( Item ).HeatTransferAlgorithm = HeatTransferModel_TDD;
 			}
 
-			if (Surface( Item ).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+			if ( Surface( Item ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( Item ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 				Construct( Surface( Item ).Construction ).IsUsedCTF = true;
 			}
 
