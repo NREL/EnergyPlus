@@ -129,7 +129,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name

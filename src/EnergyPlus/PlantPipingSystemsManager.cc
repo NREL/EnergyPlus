@@ -3670,8 +3670,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		std::ofstream static file("grid.csv", std::ostream::out);
-
 		int TotNumCells = 0;
 		int NumCutawayBasementCells = 0;
 		int NumInsulationCells = 0;
@@ -3781,39 +3779,32 @@ namespace PlantPipingSystemsManager {
 								if ( CellYIndex <= this->y_max_index && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
 									cellType = CellType::VertInsulation;
 									++NumInsulationCells;
-									file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 								}
 							} else if ( CellYIndex == this->y_max_index ) {
 								cellType = CellType::GroundSurface;
 								++NumGroundSurfaceCells;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 							}
 						} else if ( CellZIndex == MinZIndex  &&  CellXIndex >= MinXIndex ) { // X side interface
 							if ( this->VertInsPresentFlag ) { // Check if vertical insulation present
 								if ( CellYIndex <= this->y_max_index && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
 									cellType = CellType::VertInsulation;
 									++NumInsulationCells;
-									file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 								}
 							} else if ( CellYIndex == this->y_max_index ) {
 								cellType = CellType::GroundSurface;
 								++NumGroundSurfaceCells;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 							}
 						} else if ( CellYIndex == y_max_index ) {
 							if ( CellXIndex <= MinXIndex || CellZIndex <= MinZIndex ) { // Ground surface
 								cellType = CellType::GroundSurface;
 								++NumGroundSurfaceCells;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 							} else if ( CellXIndex >= MinXIndex || CellZIndex >= MinZIndex ) { // Zone-ground interface
 								cellType = CellType::ZoneGroundInterface;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 							}
 						}
 
 						if ( CellYIndex == 0 || CellXIndex == 0 || CellZIndex == 0 ) { // Farfield boundary
 							cellType = CellType::FarfieldBoundary;
-							file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						}
 
 						// Assign different cells between in-grade and on-grade cases
@@ -3823,15 +3814,12 @@ namespace PlantPipingSystemsManager {
 							if ( CellZIndex > MinZIndex && CellXIndex > MinXIndex ) { // Cells inside bounds of slab
 								if ( CellYIndex >= YIndex && CellYIndex < y_max_index ) { // Slab cells
 									cellType = CellType::Slab;
-									file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 								} else if ( CellYIndex == ( YIndex - 1 ) ) {
 									if ( this->HorizInsPresentFlag && this->FullHorizInsPresent ) { // Full under-slab insulation
 										cellType = CellType::HorizInsulation;
-										file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 									} else if ( this->HorizInsPresentFlag && !this->FullHorizInsPresent ) { // Perimeter only under-slab insulation
 										if ( CellZIndex < InsulationZIndex || CellXIndex < InsulationXIndex ) {
 											cellType = CellType::HorizInsulation;
-											file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 										}
 									}
 								}
@@ -3847,27 +3835,22 @@ namespace PlantPipingSystemsManager {
 						// Set the appropriate cell type
 						if ( CellYIndex == 0 ) { // Farfield cells
 							cellType = CellType::FarfieldBoundary;
-							file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						} else if ( CellXIndex > XWallIndex && CellZIndex > ZWallIndex ) { // Basement cutaway
 							if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) { // General basement cells
 								cellType = CellType::BasementCutaway;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 								// Not counting basement cutaway cells.
 							} else if ( CellYIndex == YFloorIndex ) { //Basement Floor cells
 								cellType = CellType::BasementFloor;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 							} else if ( CellYIndex == YIndex ) {
 								// Check if horizontal insulation present
 								if ( this->HorizInsPresentFlag ) {
 									if ( this->FullHorizInsPresent ) { // Entire underfloor insulated
 										cellType = CellType::HorizInsulation;
 										++NumInsulationCells;
-										file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 									} else { //Perimeter insulation
 										if ( CellXIndex < InsulationXIndex || CellZIndex < InsulationZIndex ) {
 											cellType = CellType::HorizInsulation;
 											++NumInsulationCells;
-											file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 										}
 									}
 								}
@@ -3875,7 +3858,6 @@ namespace PlantPipingSystemsManager {
 						} else if ( ( CellXIndex == XWallIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == ZWallIndex && CellXIndex > XWallIndex ) ) { // Basement Walls
 							if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) {
 								cellType = CellType::BasementWall;
-								file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 							}
 						} else if ( ( CellXIndex == MinXIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == MinZIndex && CellXIndex > XWallIndex ) ) { // Insulation cells
 							if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) {
@@ -3885,13 +3867,11 @@ namespace PlantPipingSystemsManager {
 										if ( CellYIndex <= this->y_max_index && CellYIndex > InsulationYIndex ) {
 											cellType = CellType::VertInsulation;
 											++NumInsulationCells;
-											file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 										}
 									} else { //Vertical insulation extends to depth of basement floor
 										if ( CellYIndex <= this->y_max_index && CellYIndex > YFloorIndex ) {
 											cellType = CellType::VertInsulation;
 											++NumInsulationCells;
-											file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 										}
 									}
 								}
@@ -3899,42 +3879,31 @@ namespace PlantPipingSystemsManager {
 						} else if ( CellYIndex == this->y_max_index ) { // Surface cells
 							cellType = CellType::GroundSurface;
 							++NumGroundSurfaceCells;
-							file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						} else if ( CellYIndex == 0 || CellXIndex == 0 || CellZIndex == 0 ) { // Farfield boundary
 							cellType = CellType::FarfieldBoundary;
-							file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						}
 					} else if ( CellXIndex == MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex ) {
 						cellType = CellType::BasementCorner;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 					} else if ( CellXIndex == MaxBasementXNodeIndex && CellYIndex > MinBasementYNodeIndex ) {
 						cellType = CellType::BasementWall;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 					} else if ( CellXIndex < MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex ) {
 						cellType = CellType::BasementFloor;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 					} else if ( CellXIndex < MaxBasementXNodeIndex && CellYIndex > MinBasementYNodeIndex ) {
 						cellType = CellType::BasementCutaway;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						//Not counting basement cutaway cells
 					} else if ( CellYIndex == Y_end ) {
 						cellType = CellType::GroundSurface;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						++NumGroundSurfaceCells;
 					} else if ( CellXIndex == 0 ) {
 						if ( this->HasBasement && Y > 0 ) {
 							cellType = UnderBasementBoundary; //'this must come after the basement cutaway ELSEIF branch
-							file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						} else {
 							cellType = CellType::FarfieldBoundary;
-							file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						}
 					} else if ( CellXIndex == X_end || CellYIndex == 0 ) {
 						cellType = CellType::FarfieldBoundary;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 					} else if ( CellZIndex == 0 || CellZIndex == Z_end ) {
 						cellType = ZWallCellType;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 					}
 
 					//'check to see if this is a pipe node...
@@ -3975,7 +3944,6 @@ namespace PlantPipingSystemsManager {
 						break;
 					case CellType::Unknown:
 						cellType = CellType::GeneralField;
-						file << static_cast < int > ( cellType ) << "," << X << "," << Y << "," << Z << "," << CellXMaxValue - CellXMinValue << "," << CellYMaxValue - CellYMinValue << "," << CellZMaxValue - CellZMinValue << "\n";
 						// don't break; fallthrough
 					default:
 						++TotNumCells;
@@ -4012,8 +3980,6 @@ namespace PlantPipingSystemsManager {
 				} //'z
 			} //'y
 		} //'x
-
-		file << std::endl;
 
 		this->NumDomainCells = TotNumCells;
 		this->NumGroundSurfCells = NumGroundSurfaceCells;

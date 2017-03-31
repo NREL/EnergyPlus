@@ -16,6 +16,7 @@ set( test_src
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BoilerHotWater.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
@@ -107,6 +108,7 @@ set( test_src
   PlantPipingSystemsManager.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
+  PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc
