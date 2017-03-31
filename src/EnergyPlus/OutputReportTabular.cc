@@ -11770,6 +11770,8 @@ namespace OutputReportTabular {
 				e.cells = 0.;
 				e.cellUsed.allocate( cPerArea, rGrdTot );
 				e.cellUsed = false;
+				e.zoneIndices.allocate( NumOfZones ); // only need to allocate this for the AirLoop 
+				e.zoneIndices = 0;
 			}
 			AirLoopCoolCompLoadTables.allocate( NumPrimaryAirSys );
 			for ( auto & e : AirLoopCoolCompLoadTables ) {
@@ -11777,6 +11779,8 @@ namespace OutputReportTabular {
 				e.cells = 0.;
 				e.cellUsed.allocate( cPerArea, rGrdTot );
 				e.cellUsed = false;
+				e.zoneIndices.allocate( NumOfZones ); // only need to allocate this for the AirLoop 
+				e.zoneIndices = 0;
 			}
 			AirLoopZonesHeatCompLoadTables.allocate( NumOfZones );
 			for ( auto & e : AirLoopZonesHeatCompLoadTables ) {
@@ -11894,7 +11898,7 @@ namespace OutputReportTabular {
 					AirLoopZonesHeatCompLoadTables( CtrlZoneNum ).timeStepMax = timeHeatMax;
 				}
 			}
-			// if the zones are not assoicated with an airloop, use ZoneEquipConfig to associate the the airloop
+			// if the zones are not associated with an airloop, use ZoneEquipConfig to associate the the airloop
 			for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 				if ( zoneToAirLoopCool( iZone ) == 0 ) {
 					if ( ZoneEquipConfig( iZone ).IsControlled ) {
@@ -11964,6 +11968,9 @@ namespace OutputReportTabular {
 
 				ComputePeakDifference( AirLoopCoolCompLoadTables( iAirLoop ) );
 				ComputePeakDifference( AirLoopHeatCompLoadTables( iAirLoop ) );
+
+				CreateListOfZonesForAirLoop( AirLoopCoolCompLoadTables( iAirLoop ), zoneToAirLoopCool, iAirLoop );
+				CreateListOfZonesForAirLoop( AirLoopHeatCompLoadTables( iAirLoop ), zoneToAirLoopHeat, iAirLoop );
 
 				LoadSummaryUnitConversion( AirLoopCoolCompLoadTables( iAirLoop ) );
 				LoadSummaryUnitConversion( AirLoopHeatCompLoadTables( iAirLoop ) );
@@ -12721,6 +12728,24 @@ namespace OutputReportTabular {
 		}
 	}
 
+	// make a list of the zones for the airloop component loads report 
+	void
+	CreateListOfZonesForAirLoop(
+		CompLoadTablesType  & compLoad,
+		Array1D_int const & zoneToAirLoop,
+		int const & curAirLoop 
+	)
+	{
+		int counter = 0;
+		for ( int zi = 1; zi <= NumOfZones; ++zi ) {
+			if ( zoneToAirLoop( zi ) == curAirLoop ) {
+				++counter;
+				compLoad.zoneIndices(counter) = zi;
+			}
+		}
+	}
+
+
 	// provide output from the load component summary tables
 	void
 	OutputCompLoadSummary(
@@ -12759,6 +12784,8 @@ namespace OutputReportTabular {
 			WriteReportHeaders( reportName, zoneAirLoopFacilityName, isAverage );
 			std::string peakLoadCompName;
 			std::string peakCondName;
+			std::string zonesIncludedName;
+			std::string engineeringCheckName;
 			for ( int coolHeat = 1; coolHeat <= 2; ++coolHeat ) {
 				tableBody.allocate( cPerArea, rGrdTot );
 				tableBody = "";
@@ -12766,10 +12793,14 @@ namespace OutputReportTabular {
 					curCompLoad = compLoadCool;
 					peakLoadCompName = "Estimated Cooling Peak Load Components";
 					peakCondName = "Cooling Peak Conditions";
+					zonesIncludedName = "Zones Included for Cooling";
+					engineeringCheckName = "Engineering Checks for Cooling";
 				} else {
 					curCompLoad = compLoadHeat;
 					peakLoadCompName = "Estimated Heating Peak Load Components";
 					peakCondName = "Heating Peak Conditions";
+					zonesIncludedName = "Zones Included for Heating";
+					engineeringCheckName = "Engineering Checks for Heating";
 				}
 				// move number array into string array
 				for ( int c = 1; c <= cPerArea; ++c ) {
@@ -12843,12 +12874,12 @@ namespace OutputReportTabular {
 
 				//---- Peak Conditions
 
-				rowHead.allocate( 10 );
+				rowHead.allocate( 20 );
 				columnHead.allocate( 1 );
 				columnWidth.allocate( 1 );
 				columnWidth = 14; //array assignment - same for all columns
 
-				tableBody.allocate( 1, 10 );
+				tableBody.allocate( 1, 20 );
 				tableBody = "";
 
 				columnHead( 1 ) = "Value";
@@ -12858,22 +12889,46 @@ namespace OutputReportTabular {
 					rowHead( 3 ) = "Outside  Wet Bulb Temperature [C]";
 					rowHead( 4 ) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
 					rowHead( 5 ) = "Zone Dry Bulb Temperature [C]";
-					rowHead( 6 ) = "Zone Relative Humdity [%]";
+					rowHead( 6 ) = "Zone Relative Humidity [%]";
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
-					rowHead( 8 ) = "Peak Design Sensible Load [W]";
-					rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [W]";
-					rowHead( 10 ) = "Difference [W]";
+
+					rowHead( 8 ) = "Terminal Supply Temperature [C]";
+					rowHead( 9 ) = "Supply Air Temperature [C]";
+					rowHead( 10 ) = "Mixed Air Temperature [C]";
+					rowHead( 11 ) = "Terminal Air Flow [m3/s]";
+					rowHead( 12 ) = "Main Fan Air Flow [m3/s]";
+					rowHead( 13 ) = "Outside Air Flow [m3/s]";
+					rowHead( 14 ) = "Infiltration Air Flow [m3/s]";
+					rowHead( 15 ) = "Exhaust Air Flow [m3/s]";
+					rowHead( 16 ) = "Design Peak Load  [W]";
+					rowHead( 17 ) = "Difference Between Design and Peak Load [W]";
+
+					rowHead( 18 ) = "Peak Design Sensible Load [W]";
+					rowHead( 19 ) = "Estimated Instant + Delayed Sensible Load [W]";
+					rowHead( 20 ) = "Difference Between Peak and Estimated Sensible Load [W]";
 				} else {
 					rowHead( 1 ) = "Time of Peak Load";
 					rowHead( 2 ) = "Outside  Dry Bulb Temperature [F]";
 					rowHead( 3 ) = "Outside  Wet Bulb Temperature [F]";
 					rowHead( 4 ) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
 					rowHead( 5 ) = "Zone Dry Bulb Temperature [F]";
-					rowHead( 6 ) = "Zone Relative Humdity [%]";
+					rowHead( 6 ) = "Zone Relative Humidity [%]";
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
-					rowHead( 8 ) = "Peak Design Sensible Load [Btu/h]";
-					rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
-					rowHead( 10 ) = "Difference [Btu/h]";
+
+					rowHead( 8 ) = "Terminal Supply Temperature [F]";
+					rowHead( 9 ) = "Supply Air Temperature [F]";
+					rowHead( 10 ) = "Mixed Air Temperature [F]";
+					rowHead( 11 ) = "Terminal Air Flow [ft3/min]";
+					rowHead( 12 ) = "Main Fan Air Flow [ft3/min]";
+					rowHead( 13 ) = "Outside Air Flow [ft3/min]";
+					rowHead( 14 ) = "Infiltration Air Flow [ft3/min]";
+					rowHead( 15 ) = "Exhaust Air Flow [ft3/min]";
+					rowHead( 16 ) = "Design Peak Load  [Btu/h]";
+					rowHead( 17 ) = "Difference Between Design and Peak Load [Btu/h]";
+
+					rowHead( 18 ) = "Peak Design Sensible Load [Btu/h]";
+					rowHead( 19 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
+					rowHead( 20 ) = "Difference Between Peak and Estimated Sensible Load [Btu/h]";
 				}
 
 				if ( curCompLoad.timeStepMax != 0 ) {
@@ -12885,14 +12940,104 @@ namespace OutputReportTabular {
 					tableBody( 1, 6 ) = RealToStr( 100 * curCompLoad.zoneRelHum, 2 ); // Zone Relative Humdity
 					tableBody( 1, 7 ) = RealToStr( curCompLoad.zoneHumRatio, 5 ); //Zone Humidity Ratio at Peak
 				}
-				tableBody( 1, 8 ) = RealToStr( curCompLoad.peakDesSensLoad, 2 ); //Peak Design Sensible Load
-				tableBody( 1, 9 ) = RealToStr( curCompLoad.estInstDelSensLoad, 2 ); //Estimated Instant + Delayed Sensible Load
-				tableBody( 1, 10 ) = RealToStr( curCompLoad.diffPeakEst, 2 ); //Difference
+				tableBody( 1, 8 ) = RealToStr( curCompLoad.termSupTemp, 2 );  // terminal supply temperature
+				tableBody( 1, 9 ) = RealToStr( curCompLoad.supAirTemp, 2 );  // supply air temperature
+				tableBody( 1, 10 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature
+				tableBody( 1, 11 ) = RealToStr( curCompLoad.termAirFlow, 2 );  // terminal air flow
+				tableBody( 1, 12 ) = RealToStr( curCompLoad.mainFanAirFlow, 2 );  // main fan air flow
+				tableBody( 1, 13 ) = RealToStr( curCompLoad.outsideAirFlow, 2 );  // outside air flow
+				tableBody( 1, 14 ) = RealToStr( curCompLoad.infilAirFlow, 2 );  // infiltration air flow
+				tableBody( 1, 15 ) = RealToStr( curCompLoad.exhaustAirFlow, 2 );  // exhaust air flow
+				tableBody( 1, 16 ) = RealToStr( curCompLoad.designPeakLoad, 2 );  // design peak load
+				tableBody( 1, 17 ) = RealToStr( curCompLoad.diffDesignPeak, 2 );  // difference between Design and Peak Load
+				tableBody( 1, 18 ) = RealToStr( curCompLoad.peakDesSensLoad, 2 ); //Peak Design Sensible Load
+				tableBody( 1, 19 ) = RealToStr( curCompLoad.estInstDelSensLoad, 2 ); //Estimated Instant + Delayed Sensible Load
+				tableBody( 1, 20 ) = RealToStr( curCompLoad.diffPeakEst, 2 ); //Difference
 
 				WriteSubtitle( peakCondName );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName );
+				}
+
+				//---- Engineering Checks
+
+				rowHead.allocate( 8 );
+				columnHead.allocate( 1 );
+				columnWidth.allocate( 1 );
+				columnWidth = 14; //array assignment - same for all columns
+
+				tableBody.allocate( 1, 8 );
+				tableBody = "";
+
+				columnHead( 1 ) = "Value";
+				if ( unitsStyle != unitsStyleInchPound ) {
+					rowHead( 1 ) = "Outside Air (%)";
+					rowHead( 2 ) = "Airflow per Floor Area [m3/s-m2]";
+					rowHead( 3 ) = "Airflow per Total Capacity [m3/s-W]";
+					rowHead( 4 ) = "Floor Area per Total Capcity [m2/W]";
+					rowHead( 5 ) = "Total Capacity per Floor Area [W/m2]";
+					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]";
+					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]";
+					rowHead( 8 ) = "Number of People";
+				} else {
+					rowHead( 1 ) = "Outside Air (%)";
+					rowHead( 2 ) = "Airflow per Floor Area [ft3/min-ft2]";
+					rowHead( 3 ) = "Airflow per Total Capacity [ft3-h/min-Btu]";
+					rowHead( 4 ) = "Floor Area per Total Capcity [ft2-h/Btu]";
+					rowHead( 5 ) = "Total Capacity per Floor Area [Btu/h-ft2]";
+					rowHead( 6 ) = "Chiller Pump Power per Flow [Btu-min/h-ft3]";
+					rowHead( 7 ) = "Condenser Pump Power per Flow [Btu-min/h-ft3]";
+					rowHead( 8 ) = "Number of People";
+				}
+
+				tableBody( 1, 1 ) = RealToStr( curCompLoad.outsideAirRatio, 2 );  // outside Air
+				tableBody( 1, 2 ) = RealToStr( curCompLoad.airflowPerFlrArea, 2 );  // airflow per floor area
+				tableBody( 1, 3 ) = RealToStr( curCompLoad.airflowPerTotCap, 2 );  // airflow per total capacity
+				tableBody( 1, 4 ) = RealToStr( curCompLoad.areaPerTotCap, 2 );  // area per total capacity
+				tableBody( 1, 5 ) = RealToStr( curCompLoad.totCapPerArea, 2 );  // total capacity per area
+				tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 5 );  // chiller pump power per flow
+				tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 5 );  // condenser pump power per flow
+				tableBody( 1, 8 ) = RealToStr( curCompLoad.numPeople, 1 );  // number of people
+
+
+				WriteSubtitle( engineeringCheckName );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName );
+				}
+
+				// write the list of zone for the AirLoop level report
+				if ( kind == airLoopOutput && curCompLoad.zoneIndices.allocated()) {
+					int maxRow = 0;
+					for ( int zi = 1; zi <= curCompLoad.zoneIndices.size(); ++zi ) {
+						if ( curCompLoad.zoneIndices( zi ) > 0 ) {
+							maxRow = zi;
+						}
+					}
+
+					rowHead.allocate( maxRow );
+					columnHead.allocate( 1 );
+					columnWidth.allocate( 1 );
+					columnWidth = 14; //array assignment - same for all columns
+					tableBody.allocate( 1, maxRow );
+					tableBody = "";
+
+					columnHead( 1 ) = "Zone Name";
+					for ( int zi = 1; zi <= maxRow; ++zi ) {
+						rowHead(zi) = std::to_string(zi);
+						if ( curCompLoad.zoneIndices( zi ) > 0 ) {
+							tableBody( 1, zi ) = Zone( curCompLoad.zoneIndices( zi ) ).Name;
+						}
+					}
+
+					WriteSubtitle( zonesIncludedName );
+					WriteTable( tableBody, rowHead, columnHead, columnWidth );
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName );
+					}
+
+
 				}
 			}
 		}

@@ -595,9 +595,31 @@ namespace OutputReportTabular {
 		Real64 zoneDryBulb;   // zone dry bulb temperature at peak
 		Real64 zoneRelHum;   // zone relative humidity at peak
 		Real64 zoneHumRatio;  // zone humidity ratio at peak
+
+		Real64 termSupTemp;  // terminal supply temperature
+		Real64 supAirTemp;  // supply air temperature
+		Real64 mixAirTemp;  // mixed air temperature
+		Real64 termAirFlow;  // terminal air flow
+		Real64 mainFanAirFlow;  // main fan air flow
+		Real64 outsideAirFlow;  // outside air flow
+		Real64 infilAirFlow;  // infiltration air flow
+		Real64 exhaustAirFlow;  // exhaust air flow
+		Real64 designPeakLoad;  // design peak load
+		Real64 diffDesignPeak;  // difference between Design and Peak Load
+
 		Real64 peakDesSensLoad; // peak design sensible load
 		Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
 		Real64 diffPeakEst; // difference between the peak design sensible load and the estimated instant plus delayed sensible load
+		Array1D_int zoneIndices; // the zone numbers covered by the report
+
+		Real64 outsideAirRatio;  // outside Air
+		Real64 airflowPerFlrArea;  // airflow per floor area
+		Real64 airflowPerTotCap;  // airflow per total capacity
+		Real64 areaPerTotCap;  // area per total capacity
+		Real64 totCapPerArea;  // total capacity per area
+		Real64 chlPumpPerFlow;  // chiller pump power per flow
+		Real64 cndPumpPerFlow;  // condenser pump power per flow
+		Real64 numPeople;  // number of people
 
 		// default constructor
 		CompLoadTablesType() :
@@ -608,9 +630,28 @@ namespace OutputReportTabular {
 			outsideHumRatio( 0. ),
 			zoneDryBulb( 0. ),
 			zoneRelHum( 0. ),
+			termSupTemp( 0.),
+			supAirTemp( 0. ),
+			mixAirTemp( 0. ),
+			termAirFlow( 0. ),
+			mainFanAirFlow( 0. ),
+			outsideAirFlow( 0. ),
+			infilAirFlow( 0. ),
+			exhaustAirFlow( 0. ),
+			designPeakLoad( 0. ),
+			diffDesignPeak( 0. ),
 			peakDesSensLoad( 0. ),
 			estInstDelSensLoad( 0. ),
-			diffPeakEst( 0. )
+			diffPeakEst( 0. ),
+			outsideAirRatio( 0.),
+			airflowPerFlrArea( 0. ),
+			airflowPerTotCap( 0. ),
+			areaPerTotCap( 0. ),
+			totCapPerArea( 0. ),
+			chlPumpPerFlow( 0. ),
+			cndPumpPerFlow( 0. ),
+			numPeople( 0. )
+
 		{}
 
 	};
@@ -942,6 +983,13 @@ namespace OutputReportTabular {
 	LoadSummaryUnitConversion(
 		CompLoadTablesType & compLoadTotal
     );
+
+	void
+	CreateListOfZonesForAirLoop(
+		CompLoadTablesType  & compLoad,
+		Array1D_int const & zoneToAirLoop,
+		int const & curAirLoop
+	);
 
 	void
 	OutputCompLoadSummary(
