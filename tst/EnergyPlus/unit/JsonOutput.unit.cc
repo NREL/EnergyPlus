@@ -184,7 +184,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( expectedObject, var->getJSON() );
 	};
 
-	TEST_F( EnergyPlusFixture , JsonOutput_DataFrameInfo) {
+	TEST_F( EnergyPlusFixture , JsonOutput_DataFrameInfo1) {
 
 		json OutputVars;
 		int indexType = 1;
@@ -220,4 +220,97 @@ namespace EnergyPlus {
 		EXPECT_EQ( expectedObject.dump(), OutputVars.dump());
 
 	};
+
+	TEST_F( EnergyPlusFixture , JsonOutput_DataFrameInfo2) {
+
+		json OutputData;
+		int indexType = 1;
+		int reportId = 1;
+
+		Variable *var0 = new Variable("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
+		var0->setUUID("b78f1461-c383-2b7c-4e6c-8ad163036bc7");
+		OutputSchema->RITimestepTSData.addVariable(var0);
+		OutputSchema->RITimestepTSData.newRow(2,25,14,40); //month,day,hour,minute
+		OutputSchema->RITimestepTSData.newRow(2,25,14,45); //month,day,hour,minute
+
+		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 1.0);
+		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 2.0);
+
+		reportId++;
+		Variable *var1 = new Variable("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
+		var1->setUUID("d83f492c-bc10-9d87-4456-846a10607b79");
+		OutputSchema->RITimestepTSData.addVariable(var1);
+		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
+		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
+
+		OutputSchema->RITimestepTSData.setUUID("b78f1461-c383-2b7c-4e6c-8ad163036bc7");
+
+		OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
+
+		json expectedObject = R"( {
+				"Timestep": {
+					"Cols":[
+						{
+							"UUID" : "d83f492c-bc10-9d87-4456-846a10607b79",
+							"Units" : "kgWater/kgDryAir",
+							"Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
+						},
+						{
+							"UUID" : "b78f1461-c383-2b7c-4e6c-8ad163036bc7",
+							"Units" : "C",
+							"Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+						}
+					],
+					"ReportFrequency" : "Timestep",
+					"Rows":[
+						{ "2/25 14:40:00" : [3,1] },
+						{ "2/25 14:45:00" : [4,2] }
+					],
+					"UUID":"b78f1461-c383-2b7c-4e6c-8ad163036bc7"
+				}
+		} )"_json;
+
+		EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+
+		// If add one more, it also should go to the top of json cols array
+		reportId++;
+		Variable *var2 = new Variable("SALESFLOOR OUTLET NODE:System Node Temperature", 0, indexType, reportId, "C");
+		var2->setUUID("fcbad2f4-7342-17a4-429e-8f9de01bb10f");
+		OutputSchema->RITimestepTSData.addVariable(var2);
+		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
+		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);
+		OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
+
+		expectedObject = R"( {
+				"Timestep": {
+					"Cols":[
+						{
+			                "UUID": "fcbad2f4-7342-17a4-429e-8f9de01bb10f",
+			                "Units": "C",
+							"Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
+			            },
+						{
+							"UUID" : "d83f492c-bc10-9d87-4456-846a10607b79",
+							"Units" : "kgWater/kgDryAir",
+							"Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
+						},
+						{
+							"UUID" : "b78f1461-c383-2b7c-4e6c-8ad163036bc7",
+							"Units" : "C",
+							"Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+						}
+					],
+					"ReportFrequency" : "Timestep",
+					"Rows":[
+						{ "2/25 14:40:00" : [5,3,1] },
+						{ "2/25 14:45:00" : [6,4,2] }
+					],
+					"UUID":"b78f1461-c383-2b7c-4e6c-8ad163036bc7"
+				}
+		} )"_json;
+
+		EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+	};
 }
+
+
