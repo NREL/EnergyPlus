@@ -1410,6 +1410,9 @@ namespace HeatBalFiniteDiffManager {
 					auto const & matFD_TempEnth( matFD.TempEnth );
 					assert( matFD_TempEnth.u2() >= 3 );
 					auto const lTE( matFD_TempEnth.index( 2, 1 ) );
+					if ( mat.phaseChange ) {
+						Cp = mat.phaseChange.getCurrentSpecificHeat();
+					}
 					if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
 						// Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
 						EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
