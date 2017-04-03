@@ -2,6 +2,7 @@
 * See the LICENSE file for additional terms and conditions. */
 
 #include "Foundation.hpp"
+#include "Errors.hpp"
 
 namespace Kiva {
 
@@ -245,10 +246,10 @@ void Foundation::createMeshData()
     double bXmax = std::max(bX1,bX2);
 
     if (bZmin < zMin) {
-      // Error input block below deep ground
+      showMessage(MSG_ERR, "'Material Block' cannot be below the deep ground boundary.");
     }
     if (bZmax > zMax) {
-      // Error input block above wall
+      showMessage(MSG_ERR, "'Material Block' cannot be above the wall top.");
     }
 
     if (isEqual(bZmax,zMax)) {
@@ -282,10 +283,10 @@ void Foundation::createMeshData()
     MultiPolygon diff;
     boost::geometry::difference(intBound,intBoxes,diff);
     if (diff.size() > 1) {
-      // Error cannot have holes
+      showMessage(MSG_ERR, "'Material Blocks' cannot create an enclosure.");
     }
     if (diff[0].inners().size() > 1) {
-      // Error cannot have islands
+      showMessage(MSG_ERR, "'Material Blocks' must touch an existing boundary.");
     }
 
     int numTops = 0;
@@ -423,7 +424,7 @@ void Foundation::createMeshData()
     }
 
     if (numTops > 1) {
-      // Error blocks must be along wall or slab
+      showMessage(MSG_ERR, "'Material Blocks' must touch the slab, wall, or grade boundary.");
     }
   } else {
     // Add surface for perimeter for slabs (zSlab == zMax) if necessary
@@ -452,10 +453,10 @@ void Foundation::createMeshData()
     MultiPolygon diff;
     boost::geometry::difference(extBound,extBoxes,diff);
     if (diff.size() > 1) {
-      // Error cannot have holes
+      showMessage(MSG_ERR, "'Material Blocks' cannot create an enclosure.");
     }
     if (diff[0].inners().size() > 1) {
-      // Error cannot have islands
+      showMessage(MSG_ERR, "'Material Blocks' must touch an existing boundary.");
     }
 
     int numTops = 0;
@@ -561,7 +562,7 @@ void Foundation::createMeshData()
     }
 
     if (numTops > 1) {
-      // Error blocks must be along wall or slab
+      showMessage(MSG_ERR, "'Material Blocks' must touch the slab, wall, or grade boundary.");
     }
   }
 
@@ -2800,7 +2801,7 @@ void Foundation::createMeshData()
     yMaxExteriorRange.type = RangeType::MAX_EXTERIOR;
     yRanges.ranges.push_back(yMaxExteriorRange);
 #else
-    std::cerr << "This version of Kiva cannot calculate 3D heat transfer.";//TODO: Error function
+    showMessage(MSG_ERR, "This version of Kiva cannot calculate 3D heat transfer.");
 #endif
   }
 
