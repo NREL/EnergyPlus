@@ -11843,6 +11843,7 @@ namespace OutputReportTabular {
 					ComputeTableBodyUsingMovingAvg( ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputePeakConditions( ZoneCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
 
+
 					heatDesSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
 					ZoneHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
 					timeHeatMax = CalcFinalZoneSizing( iZone ).TimeStepNumAtHeatMax;
@@ -12410,8 +12411,11 @@ namespace OutputReportTabular {
 		using DataSizing::CoolPeakDateHrMin;
 		using DataSizing::HeatPeakDateHrMin;
 		using DataSizing::CalcFinalZoneSizing;
+		using DataSizing::SupplyAirTemperature;
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using Psychrometrics::PsyRhFnTdbWPb;
+		using DataHeatBalance::People;
+		using DataHeatBalance::TotPeople;
 
 		if ( timeOfMax != 0 ) {
 
@@ -12447,6 +12451,15 @@ namespace OutputReportTabular {
 				//Peak Design Sensible Load
 				compLoad.peakDesSensLoad =  CalcFinalZoneSizing( zoneIndex ).DesCoolLoad / mult ; //change sign
 
+				// Supply air temperature
+				if ( CalcFinalZoneSizing( zoneIndex ).ZnCoolDgnSAMethod == SupplyAirTemperature ) {
+					compLoad.supAirTemp = CalcFinalZoneSizing( zoneIndex ).CoolDesTemp;
+				} else {
+					Real64 DeltaTemp = -std::abs( CalcFinalZoneSizing( zoneIndex ).CoolDesTempDiff );
+					compLoad.supAirTemp = DeltaTemp + CalcFinalZoneSizing( zoneIndex ).ZoneTempAtCoolPeak;
+				}
+
+
 			} else {
 				//Time of Peak Load
 				compLoad.peakDateHrMin = HeatPeakDateHrMin( zoneIndex );
@@ -12475,7 +12488,26 @@ namespace OutputReportTabular {
 
 				//Peak Design Sensible Load
 				compLoad.peakDesSensLoad = -CalcFinalZoneSizing( zoneIndex ).DesHeatLoad / mult; //change sign
+
+    			// Supply air temperature
+				if ( CalcFinalZoneSizing( zoneIndex ).ZnHeatDgnSAMethod == SupplyAirTemperature ) {
+					compLoad.supAirTemp = CalcFinalZoneSizing( zoneIndex ).HeatDesTemp;
+				} else {
+					Real64 DeltaTemp = -std::abs( CalcFinalZoneSizing( zoneIndex ).HeatDesTempDiff );
+					compLoad.supAirTemp = DeltaTemp + CalcFinalZoneSizing( zoneIndex ).ZoneTempAtHeatPeak;
+				}
 			}
+
+
+			// Number of people
+			Real64 totNumPeople = 0.;
+			for ( int iPeople = 1; iPeople <= TotPeople; ++iPeople ) {
+				if ( zoneIndex == People( iPeople ).ZonePtr ) {
+					totNumPeople += People( iPeople ).NumberOfPeople;
+				}
+			}
+			compLoad.numPeople = totNumPeople;
+
 		}
 	}
 
@@ -12630,6 +12662,9 @@ namespace OutputReportTabular {
 		compLoadTotal.peakDesSensLoad += compLoadPartial.peakDesSensLoad * multiplier;
 		compLoadTotal.estInstDelSensLoad += compLoadPartial.estInstDelSensLoad * multiplier;
 		compLoadTotal.diffPeakEst +=compLoadPartial.diffPeakEst * multiplier;
+
+		// sum the engineering checks
+		compLoadTotal.numPeople += compLoadPartial.numPeople * multiplier;
 	}
 
 	// create the total row and total columns for the load summary tables
@@ -12702,6 +12737,9 @@ namespace OutputReportTabular {
 			Real64 powerConversion = getSpecificUnitMultiplier( "W", "Btu/h" ); 
 			Real64 areaConversion = getSpecificUnitMultiplier("m2", "ft2");
 			Real64 powerPerAreaConversion = getSpecificUnitMultiplier("W/m2", "Btu/h-ft2");
+			Real64 airFlowConversion = getSpecificUnitMultiplier( "m3/s", "ft3/min" );
+			Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier( "m3/s-m2", "ft3/min-ft2" );
+			Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier( "W-s/m3", "W-min/gal" );
 			for ( int row = 1; row <= rGrdTot; ++row ) {
 				for ( int col = 1; col <= cTotal; ++col ) {
 					if ( compLoadTotal.cellUsed( col, row ) ) {
@@ -12723,8 +12761,32 @@ namespace OutputReportTabular {
 			compLoadTotal.outsideWebBulb = ConvertIP( tempConvIndx, compLoadTotal.outsideWebBulb );
 			compLoadTotal.zoneDryBulb = ConvertIP( tempConvIndx, compLoadTotal.zoneDryBulb );
 			compLoadTotal.peakDesSensLoad *= powerConversion;
+
+			compLoadTotal.termSupTemp = ConvertIP( tempConvIndx, compLoadTotal.termSupTemp );
+			compLoadTotal.supAirTemp = ConvertIP( tempConvIndx, compLoadTotal.supAirTemp );
+			compLoadTotal.mixAirTemp = ConvertIP( tempConvIndx, compLoadTotal.mixAirTemp );
+			compLoadTotal.termAirFlow *= airFlowConversion;
+			compLoadTotal.mainFanAirFlow *= airFlowConversion;
+			compLoadTotal.outsideAirFlow *= airFlowConversion;
+			compLoadTotal.infilAirFlow *= airFlowConversion;
+			compLoadTotal.exhaustAirFlow *= airFlowConversion;
+			compLoadTotal.designPeakLoad *= powerConversion;
+			compLoadTotal.diffDesignPeak *= powerConversion;
+
 			compLoadTotal.estInstDelSensLoad *= powerConversion;
 			compLoadTotal.diffPeakEst *= powerConversion;
+
+			compLoadTotal.airflowPerFlrArea *= airFlowPerAreaConversion;
+			if ( powerConversion != 0. ) {
+				compLoadTotal.airflowPerTotCap = compLoadTotal.airflowPerTotCap * airFlowPerAreaConversion / powerConversion;
+				compLoadTotal.areaPerTotCap = compLoadTotal.areaPerTotCap * areaConversion / powerConversion;
+			}
+			if ( areaConversion != 0. ) {
+				compLoadTotal.totCapPerArea = compLoadTotal.areaPerTotCap * powerConversion / areaConversion;
+			}
+			compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
+			compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion; 
+
 		}
 	}
 
@@ -12986,8 +13048,8 @@ namespace OutputReportTabular {
 					rowHead( 3 ) = "Airflow per Total Capacity [ft3-h/min-Btu]";
 					rowHead( 4 ) = "Floor Area per Total Capcity [ft2-h/Btu]";
 					rowHead( 5 ) = "Total Capacity per Floor Area [Btu/h-ft2]";
-					rowHead( 6 ) = "Chiller Pump Power per Flow [Btu-min/h-ft3]";
-					rowHead( 7 ) = "Condenser Pump Power per Flow [Btu-min/h-ft3]";
+					rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
+					rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
 					rowHead( 8 ) = "Number of People";
 				}
 
