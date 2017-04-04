@@ -1147,6 +1147,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 					}
+					bCheckForZero = false;
 				} else if (SizingType == WaterHeatingCoilUASizing) {
 					if ( DataCapacityUsedForSizing > 0.0 ) {
 						Par( 1 ) = DataCapacityUsedForSizing;
@@ -1950,6 +1951,7 @@ namespace ReportSizingManager {
 						}
 					}
 					AutosizeDes *= StdRhoAir;
+					bCheckForZero = false;
 				} else if (SizingType == WaterHeatingCoilUASizing) {
 					if ( DataCapacityUsedForSizing >= SmallLoad ) {
 						Par( 1 ) = DataCapacityUsedForSizing;
