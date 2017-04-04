@@ -12574,6 +12574,33 @@ namespace OutputReportTabular {
 		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
 
+
+		// Outside air flow
+		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
+
+		// outside air %
+		if ( compLoad.mainFanAirFlow != 0. ) {
+			compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
+		}
+
+		Real64 sumArea = compLoad.cells( cArea, rPeople );
+		if ( sumArea != 0. ) {
+			// airflow per floor area
+			compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / sumArea;
+
+			// capacity per floor area
+			compLoad.totCapPerArea = compLoad.designPeakLoad / sumArea;
+		}
+		if ( compLoad.designPeakLoad != 0. ) {
+			// airflow per capacity
+			compLoad.airflowPerTotCap = compLoad.mainFanAirFlow / compLoad.designPeakLoad;
+
+			// floor area per capacity
+			compLoad.areaPerTotCap = sumArea / compLoad.designPeakLoad;
+		}
+
+
+
 	}
 
 
