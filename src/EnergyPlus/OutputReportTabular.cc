@@ -13072,7 +13072,7 @@ namespace OutputReportTabular {
 				// write the list of zone for the AirLoop level report
 				if ( kind == airLoopOutput && curCompLoad.zoneIndices.allocated()) {
 					int maxRow = 0;
-					for ( int zi = 1; zi <= curCompLoad.zoneIndices.size(); ++zi ) {
+					for ( size_t zi = 1; zi <= curCompLoad.zoneIndices.size(); ++zi ) {
 						if ( curCompLoad.zoneIndices( zi ) > 0 ) {
 							maxRow = zi;
 						}
