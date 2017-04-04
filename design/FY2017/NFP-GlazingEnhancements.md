@@ -20,8 +20,11 @@
 ================
 
 **Lixing Gu**
+
 **Florida Solar Energy Center**
 
+ - Third revision on Mar. 16, 2017
+ - Add design document
  - Second revision on Feb. 15, 2017
  - Revised NFP based on discussion in the the first conference call on 2/14/17
  - First revision on Feb. 3, 2017
@@ -299,19 +302,23 @@ The calculation procedure is expanded based on the Spectral choice defined in th
 
 1. Read input objects
 
-Read inputs from Table:TwoIndependentVariables objects when the choice of SpectralAndIncidentAngle is entered.
+Read inputs from Table:TwoIndependentVariables objects when the choice of SpectralAndIncidentAngle is entered in the WindowMaterial:Glazing object.
 
-2. Integrate system properties with respect to wavelength for each angle of incidence
+2. Convert table data into a WCE structure
 
-For a particular angle of incidence, calculates system properties for a glass layer for each wavelength in the solar spectrum in a new function in WCE called by the WindowManager module using given solar spectral irradiance. In other words, the approach treats each property as SpectralAverage defined in the WindowMaterial:Glazing to provide equivalent property for each incident angle. Therefore, after calculation, each property is not a function of wavelength.
+The table data will be converted into a new class of CSingleAnugularMeasures, which contains spectral sample data based on each incident angle. The whole set of data, including all incident angles and associated spectral data, will be under a new class of CAngularMeasurements. The detailed structure will be shown in the Data Structure section in the Design Document.
 
-The next step will generate an angular array with size of all incident angles from all layers in a construction. In other words, a common size array will contain all input incident angles from all layers. If an angle from other layers is not available in this layer, the properties will be linearly interpolated from this particular angle.  
+It should be noted that the previous step was to integrate system properties with respect to wavelength for each angle of incidence. This step changes slightly. The integration will be performed inside WCE. There are two main reasons. The first reason is that there are many optical properties are presented at different wavelength ranges, such as entire solar ranges, visible and different colors. If integration occurs in the beginning, further process may not be performed based on wavelenght ranges. The second main reason is that the existing internal structure of WCE requires to read data with different wavelengths. In order to match existing structure, we will process integration internally, so that the proposed procedure will be consistent with existing structure and a lot of existing functions will be utilized effectively.
 
-The difference is that the SpectralAverage provide a constant value for each incident angle, while the SpectralAndIncidentAngle after solar spectral integration is a function of incident angle.  
+3. Create a new set of spectral data at a given incident angle
 
-3. Interpolate angular properties
+If a given incident angle is not listed in incident angle values, linear interpolation will be performed between two nearest angles given in the material properties to generate a new spectral data set.
 
-A new function, corresponding to the SpectralAndIncidentAngle choice, and similar to a WCE function of getPropertyAtAngle, will be generated in WCE called from the SolarShading module. Instead of calculating angular properties, the properties will be linearly interpolated between two nearest angles given in the material properties.   
+4. Generate a new derived class of material to handle new spectral data
+
+A new derived class of CMaterial as CMaterialMeasured will be created to handle optical properties for each layer.
+
+5. The optical properties from linear interpolation will be fed to classes of Single or Multiple layer windows for further processing in the existing structure.
 
 ## Testing/Validation/Data Sources ##
 
@@ -345,11 +352,7 @@ If Optical Data Type = SpectralAverage, the values you enter for solar transmitt
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of  solar and visible transmittance and reflectance in the fields below should be blank.
 
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, then, in the next 3 fields, you must enter the name of a spectral and angle data set defined with the WindowGlassSpectralAndAngleData object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.</span>
-
-<span style="color:red;">Alternative approach
-
-<span style="color:red;">If Optical Data Type = SpectralAndAngle, then, in the next 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.</span>
+<span style="color:red;">If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.</span>
 
 If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object must be used to define the window construction layers. The Construction:ComplexFenestrationState object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
@@ -1135,3 +1138,319 @@ A transition of Table:TwoIndependentVariables is needed because an additional fi
 
 insert text
 
+## Design Document ##
+
+I have got extensive help from Simon, LBNL, to develop this design document. Sincere thanks is expressed here.
+
+This section describes code changes and additions in EnergyPlus in HeatBalanceManager, CurveManager, DataHeatBalance, WindowManagerExteriorData, WindowManagerExteriorOptical, and WCE. The WCE contains 3 main projects: SPectralAveraging, SingleLayerOptics, and MultipleLayerOptics.
+
+
+### DataHeatBalance ###
+
+Four variables are added in the struct MaterialProperties: 
+
+	bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered chcoice
+	int GlassSpecAngTransDataPtr; // Number of transmittance data set as a function of spectral and angle associated with a window glass material
+	int GlassSpecAngFRefleDataPtr; // Number of front reflectance data set as a function of spectral and angle associated with a window glass material
+	int GlassSpecAngBRefleDataPtr; // Number of back reflectance data set as a function of spectral and angle associated with a window glass material
+
+The additions are mainly used to catch the changes in revised idd object: WindowMaterial:Glazing.
+
+### HeatBalanceManager ###
+
+A section of the GetMaterialData function in the HeatBalanceManager module will be revised to accommodate the idd changes. The changes also cover to get the table curve numbers for 3 optical properties.  
+
+### CurveManager ###
+
+The changes of this module include new and revised functions.
+
+#### New functions ###
+
+Four new functions will be created:
+
+##### GetCurveInterpolationTypeNum ###
+
+	int
+	GetCurveInterpolationTypeNum( int const CurveIndex ); // index of curve in curve array
+
+		return TableInterpolationTypeNum;
+
+This function is called by GetMaterialData function in the HeatBalanceManager module and will return table types to ensure optical properties curve type are Table:TwoIndependentVariables only.   
+
+##### ReadTableDataFromFile ###
+
+	void
+	ReadTableDataFromFile(
+		int const CurveNum,
+		std::string & CurrentModuleObject,
+		std::string & FileName,
+		bool IndVarSwitch,
+		int & lineNum,
+		bool & ErrorsFound
+	);
+
+This function allows user inputs of optical properties are from an external file. This is a new functionality of the Table:TwoIndependentVariables object, to provide a flexible way for users to input optical property data, either from an external file or from idf input file.
+
+##### splitString ###
+ 
+	std::vector <std::string> splitString( const std::string &string, char delimiter );
+
+This new function is adopted from OpenStudio to split data from a string.
+
+##### SetSameIndeVariableValues ####
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	);
+
+This new function is to get common wavelengths and incident angles from 3 optical data sets to represent transmittance, front reflectance and back reflectance. The common wavelengths and incident angles include all values from 3 datasets, unless differences are less than 1e-6. It is possible to allow users to input difference values of wavelengths and incident angles for each property. Due to requirements of WCE, the same discrete values of wavelengths and incident angles are needed for WCE to read and process. Any missing values of optical properties will be linearly interpolated among two nearest points based on common wavelengths and incident angles.   
+
+#### Revised functions ####
+
+Two existing functions will be revised to accommodate the changes of the Table:TwoIndependentVariables object.
+
+##### GetCurveInputData
+
+A section to read inputs of the Table:TwoIndependentVariables object will be revised to read new fields and allow inputs from data files.
+
+##### IsCurveInputTypeValid
+
+Two more valid input types will be allowed in the function: WAVELENGTH and ANGLE.
+
+### WindowManagerExteriorData ###
+
+This module has a new function only.
+
+#### New function ###
+
+##### getSpectralSample
+
+	shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample(  const int i, const int t_TransTablePtr, const int t_FRefleTablePtr, const int t_BRefleTablePtr ) {}
+
+This new function will read optical data from Table:TwoIndependentVariables and assign to a data structure as CAngularMeasurements::CAngularMeasurements (discuss in WCE). This function is called by CWCESpecularMaterialsFactory::init() in the WindowManagerExteriorOptical module.
+
+### WindowManagerExteriorOptical ###
+
+This module revises an existing function.
+
+#### Revised function ####
+
+##### CWCESpecularMaterialsFactory::init()
+
+This function will be modified to to allow the third glass type as SpectralAndAngle.
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCESpecularMaterialsFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : CWCEMaterialFactory( t_Material, t_Range ) {
+      
+    }
+
+    void CWCESpecularMaterialsFactory::init() {
+		int i = 0;
+		int numOfIn;
+
+	  shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+      shared_ptr< CSpectralSampleData > aSampleData = nullptr;
+	  std::vector< std::shared_ptr< CSingleAngularMeasurement > > m_Measurements;
+	  if (m_MaterialProperties->GlassSpectralDataPtr > 0) {
+		  aSampleData = CWCESpecturmProperties::getSpectralSample( m_MaterialProperties->GlassSpectralDataPtr );
+	  } else if ( m_MaterialProperties->GlassSpectralAndAngle ) {
+		  numOfIn = TableLookup( PerfCurve( m_MaterialProperties->GlassSpecAngTransDataPtr ).TableIndex ).NumX1Vars;
+		  for ( auto i = 1; i <= numOfIn; ++i ) {
+			  auto TransTableData = TableData( PerfCurve( m_MaterialProperties->GlassSpecAngTransDataPtr ).TableIndex );
+			  for ( auto i = 0; i < numOfIn; ++i ) {
+				  double ia = TableLookup( PerfCurve( m_MaterialProperties->GlassSpecAngTransDataPtr ).TableIndex ).X1Var( i );
+				  aSampleData = CWCESpecturmProperties::getSpectralSample( i, m_MaterialProperties->GlassSpecAngTransDataPtr, m_MaterialProperties->GlassSpecAngFRefleDataPtr, m_MaterialProperties->GlassSpecAngBRefleDataPtr );
+				  shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
+				  shared_ptr< CSingleAngularMeasurement > aAngular = make_shared< CSingleAngularMeasurement >( aSample, ia );
+				  m_Measurements.push_back( aAngular );
+			  }
+		  }
+      } else {
+        aSampleData = CWCESpecturmProperties::getSpectralSample( *m_MaterialProperties );
+      }
+      
+      shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
+
+      MaterialType aType = MaterialType::Monolithic;
+      CWavelengthRange aRange = CWavelengthRange( m_Range );
+      double lowLambda = aRange.minLambda();
+      double highLambda = aRange.maxLambda();
+
+      if( m_Range == WavelengthRange::Visible ) {
+        shared_ptr< CSeries > aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse();
+		if ( !m_MaterialProperties->GlassSpectralAndAngle ) {
+			aSample->setDetectorData( aPhotopicResponse );
+		} else {
+			for ( auto i = 0; i < numOfIn; ++i ) {
+				m_Measurements[ i ]->getData( )->setDetectorData( aPhotopicResponse );
+			}
+		}
+      }
+
+      double thickness = m_MaterialProperties->Thickness;
+	  if ( !m_MaterialProperties->GlassSpectralAndAngle ) {
+		  m_Material = make_shared< CMaterialSample >( aSample, thickness, aType, lowLambda, highLambda );
+	  } else {
+		  shared_ptr< CAngularMeasurements > angularMeasurement = make_shared< CAngularMeasurements >( m_Measurements );
+		  m_Material = make_shared< CMaterialMeasured >( angularMeasurement, thickness, aType, lowLambda, highLambda );
+	  }
+    }
+
+### Window Calculation Engine
+
+The engine revisions include data structure and new classes.
+
+#### Data structure
+
+##### Solar data: Wavelength (micron), Cpetral Irradiance (W/m2) 
+
+    shared_ptr< CSeries >  aSolarRadiation = make_shared< CSeries >();
+
+    // Full ASTM E891-87 Table 1
+    aSolarRadiation->addProperty( 0.3000, 0.0 );
+    aSolarRadiation->addProperty( 0.3050, 3.4 );
+    aSolarRadiation->addProperty( 0.3100, 15.6 );
+
+##### Optical properties at each given incident angle
+
+Existing Data format: Wavelength (microns), Transmittance, Front Reflectance, Back Reflectance
+
+    shared_ptr< CSpectralSampleData > aMeasurements40 = make_shared< CSpectralSampleData >();
+    // incident angle = 40
+
+    aMeasurements40->addRecord( 0.290, 0.10, 0.1, 0.1 );
+    aMeasurements40->addRecord( 0.295, 0.15, 0.099, 0.099 );
+    aMeasurements40->addRecord( 0.300, 0.20, 0.098, 0.098 );
+
+##### Spectral Data
+
+The existing data structure includes optical properties and solar radiation at each given incident angle
+
+    shared_ptr< CSpectralSample > aSample40 = make_shared< CSpectralSample >( aMeasurements40, aSolarRadiation );
+
+##### Spectral data with a corresponding incident angle angle
+
+New data format: Spectral Data, Incident angle
+
+    shared_ptr< CSingleAngularMeasurement > aAngular40 = make_shared< CSingleAngularMeasurement >( aSample40, 40 );
+
+##### Spectral and angular data with common wavelength
+
+New data format: Spectral and angular data, Common Wavelength
+
+    m_Measurements = make_shared< CAngularMeasurements >( aAngular40, commonWavelengths );
+
+
+#### New classes under SpectralAveraging namespace
+
+##### CSingleAngularMeasurement
+
+This class processes optical data sets based on each incident angle. 
+
+	class CSingleAngularMeasurement {
+	public:
+		CSingleAngularMeasurement( const std::shared_ptr< CSpectralSample > t_Data, const double t_Angle );
+Constructor with arguments of Spectral Data and Incident Angle 
+
+		double getAngle( ) const;
+		std::shared_ptr< CSpectralSample > getData( ) const;
+        std::shared_ptr< std::vector< double > > getWavelengthsFromSample() const;
+		std::shared_ptr< CSpectralSample > Interpolate( const double t_Angle, const std::shared_ptr< CSpectralSample > t_Data1, const double t_Angle1, const std::shared_ptr< CSpectralSample > t_Data2, const double t_Angle2 ) const;
+Interpolate optical properties linearly between two spectral data sets with two nearest angles based on a given incident angle.
+ 
+		void interpolate( const std::vector< double >& t_Wavelengths );
+
+Interpolate optical properties within a single spectral data linearly based on common wavelengths.
+  
+	private:
+		std::shared_ptr< CSpectralSample > m_Data;
+		double m_Angle;
+	};
+
+##### CAngularMeasurements
+
+This class handles all Spectral and angular data with common wavelength. 
+
+	class CAngularMeasurements {
+	public:
+		// You want to provide different measurement and also you want to provide common wavelengths (set of points for interpolation)
+		CAngularMeasurements( std::shared_ptr< CSingleAngularMeasurement > t_SingleMeasurement, const std::shared_ptr<
+			std::vector< double > > t_CommonWavelengths );
+
+Constructor with arguments of Combined Spectral Data and Angle, and Common Wavelengths 
+
+		// then you add function that will accept measurements at different angles
+		void addMeasurement( std::shared_ptr< CSingleAngularMeasurement > t_SingleMeasurement );
+		// Now insert very important function here
+
+Add new data set at difference angles by linear interpolation if the given incident angle is not available in existing data sets.
+
+		std::shared_ptr< CSingleAngularMeasurement > getMeasurements( const double t_Angle );
+		// Note that previous function (getMeasurements) needs to do interpolation if user asks for t_Angle that does not exist.So this is where you want to do your interpolation
+			// work
+		virtual void setSourceData( std::shared_ptr< FenestrationCommon::CSeries > t_SourceData );
+
+A virtual function to set solar source data to spectral data for each angle. 
+
+Retrieve data set at a given incident angle.
+
+	private:
+		// Do not forget storage for it
+		std::shared_ptr< CSingleAngularMeasurement > m_SingleMeasurement;
+		std::vector< std::shared_ptr< CSingleAngularMeasurement > > m_Measurements;
+		std::shared_ptr< std::vector< double > > m_CommonWavelengths;
+		std::shared_ptr< CSingleAngularMeasurement > m_Angle;
+
+	}; 
+
+#### new classes under SingleLayerOptics namespace
+
+##### class CMaterialMeasured
+
+	class CMaterialMeasured : public CMaterial {
+
+  	public:
+	  CMaterialMeasured( const std::shared_ptr< SpectralAveraging::CAngularMeasurements >& t_Measurements,
+		  const double minLambda, const double maxLambda );
+
+	  CMaterialMeasured( const std::shared_ptr< SpectralAveraging::CAngularMeasurements >& t_Measurements,
+		  const FenestrationCommon::WavelengthRange t_Range );
+
+Two constructors. The differences are that the first one requires two additional arguments of minimum and maximum wavelength for solar spectrum, and the other requires an additional argument of wavelength range. 
+
+	  virtual void setSourceData( std::shared_ptr< FenestrationCommon::CSeries > t_SourceData );
+
+	  // In this case sample property is taken. Standard spectral data file contains T, Rf, Rb that is 
+	  // measured at certain wavelengths.
+	  double getPropertyAtAngle( const FenestrationCommon::Property t_Property,
+		  const FenestrationCommon::Side t_Side, const double t_Angle ) const;
+
+This function gets a single optical property for entire wavelength range at a given angle, side and property type. 
+ 
+	  double getProperty( const FenestrationCommon::Property t_Property, const FenestrationCommon::Side t_Side ) const;
+
+This function gets a single optical property for entire wavelength range at a normal angle (0), side and property type. 
+
+	  // Get properties at each wavelength and at given incident angle
+	  std::shared_ptr< std::vector< double > >
+		  getBandPropertiesAtAngle( const FenestrationCommon::Property t_Property,
+			  const FenestrationCommon::Side t_Side, const double t_Angle ) const;
+
+This function gets a single optical property at each wavelength at a given angle, side and property type. 
+
+	  std::shared_ptr< std::vector< double > >
+		  getBandProperties( const FenestrationCommon::Property t_Property, const FenestrationCommon::Side t_Side ) const;
+
+This function gets a single optical property at each wavelength at a normal angle (0 degree), side and property type. 
+
+  	private:
+	  std::shared_ptr< std::vector< double > > calculateBandWavelengths( );
+	  std::shared_ptr< SpectralAveraging::CAngularMeasurements > m_AngularMeasurements;
+
+  };
