@@ -11841,7 +11841,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					ComputePeakConditions( ZoneCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
 
 
 					heatDesSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
@@ -11851,7 +11851,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( ZoneHeatCompLoadTables( iZone ).cells, ZoneHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					ComputePeakConditions( ZoneHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( ZoneHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
 
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, ZoneCoolCompLoadTables( iZone ) );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, ZoneHeatCompLoadTables( iZone ) );
@@ -11933,7 +11933,7 @@ namespace OutputReportTabular {
 					
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( AirLoopZonesCoolCompLoadTables( iZone ).cells, AirLoopZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					ComputePeakConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables( iZone ) );
 				}
 				if ( displayZoneComponentLoadSummary && ( AirLoopZonesHeatCompLoadTables( iZone ).desDayNum == ZoneHeatCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax == ZoneHeatCompLoadTables( iZone ).timeStepMax ) ) {
@@ -11944,7 +11944,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( AirLoopZonesHeatCompLoadTables( iZone ).cells, AirLoopZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					ComputePeakConditions( AirLoopZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( AirLoopZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables( iZone ) );
 				}
 			}
@@ -11963,6 +11963,9 @@ namespace OutputReportTabular {
 						CombineLoadCompResults( AirLoopHeatCompLoadTables( iAirLoop ), AirLoopZonesHeatCompLoadTables( iZone ), mult );
 					}
 				}
+
+				CollectPeakAirLoopConditions( AirLoopCoolCompLoadTables( iAirLoop ), iAirLoop, true );
+				CollectPeakAirLoopConditions( AirLoopHeatCompLoadTables( iAirLoop ), iAirLoop, false );
 
 				AddTotalRowsForLoadSummary( AirLoopCoolCompLoadTables( iAirLoop ) );
 				AddTotalRowsForLoadSummary( AirLoopHeatCompLoadTables( iAirLoop ) );
@@ -12001,7 +12004,7 @@ namespace OutputReportTabular {
 				} else {
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesCoolCompLoadTables( iZone ).cells, FacilityZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					ComputePeakConditions( FacilityZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( FacilityZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables( iZone ) );
 				}
 				FacilityZonesCoolCompLoadTables( iZone ).timeStepMax = timeCoolMax;
@@ -12015,7 +12018,7 @@ namespace OutputReportTabular {
 				} else {
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesHeatCompLoadTables( iZone ).cells, FacilityZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					ComputePeakConditions( FacilityZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( FacilityZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables( iZone ) );
 				}
 				FacilityZonesHeatCompLoadTables( iZone ).timeStepMax = timeHeatMax;
@@ -12401,7 +12404,7 @@ namespace OutputReportTabular {
 
 	// for the load summary report add values the peak conditions subtable
 	void
-	ComputePeakConditions( 
+	CollectPeakZoneConditions( 
 		CompLoadTablesType & compLoad,
 		int const & timeOfMax,
 		int const & zoneIndex,
@@ -12510,6 +12513,29 @@ namespace OutputReportTabular {
 
 		}
 	}
+
+	// for the load summary report add airloop related values the peak conditions subtable
+	void
+	CollectPeakAirLoopConditions(
+		CompLoadTablesType & compLoad,
+		int const & airLoopIndex,
+		bool const & isCooling
+	) 
+	{
+		using DataSizing::FinalSysSizing;
+
+		if ( isCooling ) {
+			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
+			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
+		} else {
+			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
+			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
+		}
+		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
+		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
+
+	}
+
 
 	// gather the areas used in the load component tabels
 	void
@@ -12762,14 +12788,10 @@ namespace OutputReportTabular {
 			compLoadTotal.zoneDryBulb = ConvertIP( tempConvIndx, compLoadTotal.zoneDryBulb );
 			compLoadTotal.peakDesSensLoad *= powerConversion;
 
-			compLoadTotal.termSupTemp = ConvertIP( tempConvIndx, compLoadTotal.termSupTemp );
 			compLoadTotal.supAirTemp = ConvertIP( tempConvIndx, compLoadTotal.supAirTemp );
 			compLoadTotal.mixAirTemp = ConvertIP( tempConvIndx, compLoadTotal.mixAirTemp );
-			compLoadTotal.termAirFlow *= airFlowConversion;
 			compLoadTotal.mainFanAirFlow *= airFlowConversion;
 			compLoadTotal.outsideAirFlow *= airFlowConversion;
-			compLoadTotal.infilAirFlow *= airFlowConversion;
-			compLoadTotal.exhaustAirFlow *= airFlowConversion;
 			compLoadTotal.designPeakLoad *= powerConversion;
 			compLoadTotal.diffDesignPeak *= powerConversion;
 
@@ -12936,12 +12958,12 @@ namespace OutputReportTabular {
 
 				//---- Peak Conditions
 
-				rowHead.allocate( 20 );
+				rowHead.allocate( 16 );
 				columnHead.allocate( 1 );
 				columnWidth.allocate( 1 );
 				columnWidth = 14; //array assignment - same for all columns
 
-				tableBody.allocate( 1, 20 );
+				tableBody.allocate( 1, 16);
 				tableBody = "";
 
 				columnHead( 1 ) = "Value";
@@ -12954,20 +12976,16 @@ namespace OutputReportTabular {
 					rowHead( 6 ) = "Zone Relative Humidity [%]";
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
 
-					rowHead( 8 ) = "Terminal Supply Temperature [C]";
-					rowHead( 9 ) = "Supply Air Temperature [C]";
-					rowHead( 10 ) = "Mixed Air Temperature [C]";
-					rowHead( 11 ) = "Terminal Air Flow [m3/s]";
-					rowHead( 12 ) = "Main Fan Air Flow [m3/s]";
-					rowHead( 13 ) = "Outside Air Flow [m3/s]";
-					rowHead( 14 ) = "Infiltration Air Flow [m3/s]";
-					rowHead( 15 ) = "Exhaust Air Flow [m3/s]";
-					rowHead( 16 ) = "Design Peak Load  [W]";
-					rowHead( 17 ) = "Difference Between Design and Peak Load [W]";
+					rowHead( 8 ) = "Supply Air Temperature [C]";
+					rowHead( 9 ) = "Mixed Air Temperature [C]";
+					rowHead( 10 ) = "Main Fan Air Flow [m3/s]";
+					rowHead( 11 ) = "Outside Air Flow [m3/s]";
+					rowHead( 12 ) = "Design Peak Load  [W]";
+					rowHead( 13 ) = "Difference Between Design and Peak Load [W]";
 
-					rowHead( 18 ) = "Peak Design Sensible Load [W]";
-					rowHead( 19 ) = "Estimated Instant + Delayed Sensible Load [W]";
-					rowHead( 20 ) = "Difference Between Peak and Estimated Sensible Load [W]";
+					rowHead( 14 ) = "Peak Design Sensible Load [W]";
+					rowHead( 15 ) = "Estimated Instant + Delayed Sensible Load [W]";
+					rowHead( 16 ) = "Difference Between Peak and Estimated Sensible Load [W]";
 				} else {
 					rowHead( 1 ) = "Time of Peak Load";
 					rowHead( 2 ) = "Outside  Dry Bulb Temperature [F]";
@@ -12977,20 +12995,16 @@ namespace OutputReportTabular {
 					rowHead( 6 ) = "Zone Relative Humidity [%]";
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
 
-					rowHead( 8 ) = "Terminal Supply Temperature [F]";
-					rowHead( 9 ) = "Supply Air Temperature [F]";
-					rowHead( 10 ) = "Mixed Air Temperature [F]";
-					rowHead( 11 ) = "Terminal Air Flow [ft3/min]";
-					rowHead( 12 ) = "Main Fan Air Flow [ft3/min]";
-					rowHead( 13 ) = "Outside Air Flow [ft3/min]";
-					rowHead( 14 ) = "Infiltration Air Flow [ft3/min]";
-					rowHead( 15 ) = "Exhaust Air Flow [ft3/min]";
-					rowHead( 16 ) = "Design Peak Load  [Btu/h]";
-					rowHead( 17 ) = "Difference Between Design and Peak Load [Btu/h]";
+					rowHead( 8 ) = "Supply Air Temperature [F]";
+					rowHead( 9 ) = "Mixed Air Temperature [F]";
+					rowHead( 10 ) = "Main Fan Air Flow [ft3/min]";
+					rowHead( 11 ) = "Outside Air Flow [ft3/min]";
+					rowHead( 12 ) = "Design Peak Load  [Btu/h]";
+					rowHead( 13 ) = "Difference Between Design and Peak Load [Btu/h]";
 
-					rowHead( 18 ) = "Peak Design Sensible Load [Btu/h]";
-					rowHead( 19 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
-					rowHead( 20 ) = "Difference Between Peak and Estimated Sensible Load [Btu/h]";
+					rowHead( 14 ) = "Peak Design Sensible Load [Btu/h]";
+					rowHead( 15 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
+					rowHead( 16 ) = "Difference Between Peak and Estimated Sensible Load [Btu/h]";
 				}
 
 				if ( curCompLoad.timeStepMax != 0 ) {
@@ -13002,19 +13016,15 @@ namespace OutputReportTabular {
 					tableBody( 1, 6 ) = RealToStr( 100 * curCompLoad.zoneRelHum, 2 ); // Zone Relative Humdity
 					tableBody( 1, 7 ) = RealToStr( curCompLoad.zoneHumRatio, 5 ); //Zone Humidity Ratio at Peak
 				}
-				tableBody( 1, 8 ) = RealToStr( curCompLoad.termSupTemp, 2 );  // terminal supply temperature
-				tableBody( 1, 9 ) = RealToStr( curCompLoad.supAirTemp, 2 );  // supply air temperature
-				tableBody( 1, 10 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature
-				tableBody( 1, 11 ) = RealToStr( curCompLoad.termAirFlow, 2 );  // terminal air flow
-				tableBody( 1, 12 ) = RealToStr( curCompLoad.mainFanAirFlow, 2 );  // main fan air flow
-				tableBody( 1, 13 ) = RealToStr( curCompLoad.outsideAirFlow, 2 );  // outside air flow
-				tableBody( 1, 14 ) = RealToStr( curCompLoad.infilAirFlow, 2 );  // infiltration air flow
-				tableBody( 1, 15 ) = RealToStr( curCompLoad.exhaustAirFlow, 2 );  // exhaust air flow
-				tableBody( 1, 16 ) = RealToStr( curCompLoad.designPeakLoad, 2 );  // design peak load
-				tableBody( 1, 17 ) = RealToStr( curCompLoad.diffDesignPeak, 2 );  // difference between Design and Peak Load
-				tableBody( 1, 18 ) = RealToStr( curCompLoad.peakDesSensLoad, 2 ); //Peak Design Sensible Load
-				tableBody( 1, 19 ) = RealToStr( curCompLoad.estInstDelSensLoad, 2 ); //Estimated Instant + Delayed Sensible Load
-				tableBody( 1, 20 ) = RealToStr( curCompLoad.diffPeakEst, 2 ); //Difference
+				tableBody( 1, 8 ) = RealToStr( curCompLoad.supAirTemp, 2 );  // supply air temperature
+				tableBody( 1, 9 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature
+				tableBody( 1, 10 ) = RealToStr( curCompLoad.mainFanAirFlow, 2 );  // main fan air flow
+				tableBody( 1, 11 ) = RealToStr( curCompLoad.outsideAirFlow, 2 );  // outside air flow
+				tableBody( 1, 12 ) = RealToStr( curCompLoad.designPeakLoad, 2 );  // design peak load
+				tableBody( 1, 13 ) = RealToStr( curCompLoad.diffDesignPeak, 2 );  // difference between Design and Peak Load
+				tableBody( 1, 14 ) = RealToStr( curCompLoad.peakDesSensLoad, 2 ); //Peak Design Sensible Load
+				tableBody( 1, 15 ) = RealToStr( curCompLoad.estInstDelSensLoad, 2 ); //Estimated Instant + Delayed Sensible Load
+				tableBody( 1, 16 ) = RealToStr( curCompLoad.diffPeakEst, 2 ); //Difference
 
 				WriteSubtitle( peakCondName );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );

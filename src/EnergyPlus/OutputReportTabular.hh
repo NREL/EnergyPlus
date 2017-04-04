@@ -596,14 +596,10 @@ namespace OutputReportTabular {
 		Real64 zoneRelHum;   // zone relative humidity at peak
 		Real64 zoneHumRatio;  // zone humidity ratio at peak
 
-		Real64 termSupTemp;  // terminal supply temperature
 		Real64 supAirTemp;  // supply air temperature
 		Real64 mixAirTemp;  // mixed air temperature
-		Real64 termAirFlow;  // terminal air flow
 		Real64 mainFanAirFlow;  // main fan air flow
 		Real64 outsideAirFlow;  // outside air flow
-		Real64 infilAirFlow;  // infiltration air flow
-		Real64 exhaustAirFlow;  // exhaust air flow
 		Real64 designPeakLoad;  // design peak load
 		Real64 diffDesignPeak;  // difference between Design and Peak Load
 
@@ -630,14 +626,10 @@ namespace OutputReportTabular {
 			outsideHumRatio( 0. ),
 			zoneDryBulb( 0. ),
 			zoneRelHum( 0. ),
-			termSupTemp( 0.),
 			supAirTemp( 0. ),
 			mixAirTemp( 0. ),
-			termAirFlow( 0. ),
 			mainFanAirFlow( 0. ),
 			outsideAirFlow( 0. ),
-			infilAirFlow( 0. ),
-			exhaustAirFlow( 0. ),
 			designPeakLoad( 0. ),
 			diffDesignPeak( 0. ),
 			peakDesSensLoad( 0. ),
@@ -943,10 +935,17 @@ namespace OutputReportTabular {
 	);
 
 	void
-	ComputePeakConditions(
+	CollectPeakZoneConditions(
 		CompLoadTablesType & compLoad,
 		int const & timeOfMax,
 		int const & zoneIndex,
+		bool const & isCooling
+	);
+
+	void
+	CollectPeakAirLoopConditions(
+		CompLoadTablesType & compLoad,
+		int const & airLoopIndex,
 		bool const & isCooling
 	);
 
