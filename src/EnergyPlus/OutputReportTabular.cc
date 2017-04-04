@@ -12414,6 +12414,7 @@ namespace OutputReportTabular {
 		using DataSizing::CoolPeakDateHrMin;
 		using DataSizing::HeatPeakDateHrMin;
 		using DataSizing::CalcFinalZoneSizing;
+		using DataSizing::FinalZoneSizing;
 		using DataSizing::SupplyAirTemperature;
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using Psychrometrics::PsyRhFnTdbWPb;
@@ -12454,6 +12455,9 @@ namespace OutputReportTabular {
 				//Peak Design Sensible Load
 				compLoad.peakDesSensLoad =  CalcFinalZoneSizing( zoneIndex ).DesCoolLoad / mult ; //change sign
 
+				//Design Peak Load
+				compLoad.designPeakLoad = FinalZoneSizing(zoneIndex).DesCoolLoad/mult;
+
 				// Supply air temperature
 				if ( CalcFinalZoneSizing( zoneIndex ).ZnCoolDgnSAMethod == SupplyAirTemperature ) {
 					compLoad.supAirTemp = CalcFinalZoneSizing( zoneIndex ).CoolDesTemp;
@@ -12461,6 +12465,9 @@ namespace OutputReportTabular {
 					Real64 DeltaTemp = -std::abs( CalcFinalZoneSizing( zoneIndex ).CoolDesTempDiff );
 					compLoad.supAirTemp = DeltaTemp + CalcFinalZoneSizing( zoneIndex ).ZoneTempAtCoolPeak;
 				}
+
+				// Main fan air flow
+				compLoad.mainFanAirFlow = CalcFinalZoneSizing( zoneIndex ).DesCoolVolFlow;
 
 
 			} else {
@@ -12492,6 +12499,9 @@ namespace OutputReportTabular {
 				//Peak Design Sensible Load
 				compLoad.peakDesSensLoad = -CalcFinalZoneSizing( zoneIndex ).DesHeatLoad / mult; //change sign
 
+				//Design Peak Load
+				compLoad.designPeakLoad = -FinalZoneSizing( zoneIndex ).DesHeatLoad / mult;
+
     			// Supply air temperature
 				if ( CalcFinalZoneSizing( zoneIndex ).ZnHeatDgnSAMethod == SupplyAirTemperature ) {
 					compLoad.supAirTemp = CalcFinalZoneSizing( zoneIndex ).HeatDesTemp;
@@ -12499,6 +12509,33 @@ namespace OutputReportTabular {
 					Real64 DeltaTemp = -std::abs( CalcFinalZoneSizing( zoneIndex ).HeatDesTempDiff );
 					compLoad.supAirTemp = DeltaTemp + CalcFinalZoneSizing( zoneIndex ).ZoneTempAtHeatPeak;
 				}
+
+				// Main fan air flow
+				compLoad.mainFanAirFlow = CalcFinalZoneSizing( zoneIndex ).DesHeatVolFlow;
+
+			}
+
+			// Outside air flow
+			compLoad.outsideAirFlow = CalcFinalZoneSizing( zoneIndex ).MinOA;
+
+			// outside air %
+			if ( compLoad.mainFanAirFlow != 0. ) {
+				compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
+			}
+
+			if ( Zone( zoneIndex ).FloorArea != 0. ) {
+				// airflow per floor area
+				compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / Zone( zoneIndex ).FloorArea;
+
+				// capacity per floor area
+				compLoad.totCapPerArea = compLoad.designPeakLoad / Zone( zoneIndex ).FloorArea;
+			}
+			if ( compLoad.designPeakLoad != 0. ) {
+				// airflow per capacity
+				compLoad.airflowPerTotCap = compLoad.mainFanAirFlow / compLoad.designPeakLoad;
+
+				// floor area per capacity
+				compLoad.areaPerTotCap = Zone( zoneIndex ).FloorArea / compLoad.designPeakLoad;
 			}
 
 
@@ -12527,9 +12564,12 @@ namespace OutputReportTabular {
 		if ( isCooling ) {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
+			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).SensCoolCap;
+
 		} else {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
+			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).HeatCap;
 		}
 		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
@@ -12685,6 +12725,8 @@ namespace OutputReportTabular {
 		compLoadTotal.zoneHumRatio = compLoadPartial.zoneHumRatio;
 
 		// sum the peak related values  
+		compLoadTotal.designPeakLoad += compLoadPartial.designPeakLoad * multiplier;
+		compLoadTotal.diffDesignPeak += compLoadPartial.diffDesignPeak * multiplier;
 		compLoadTotal.peakDesSensLoad += compLoadPartial.peakDesSensLoad * multiplier;
 		compLoadTotal.estInstDelSensLoad += compLoadPartial.estInstDelSensLoad * multiplier;
 		compLoadTotal.diffPeakEst +=compLoadPartial.diffPeakEst * multiplier;
@@ -12748,6 +12790,9 @@ namespace OutputReportTabular {
 
 		//Difference
 		compLoad.diffPeakEst = compLoad.peakDesSensLoad - compLoad.estInstDelSensLoad;
+
+		//Peak Design Diff
+		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
 
 	}
 
@@ -13047,7 +13092,7 @@ namespace OutputReportTabular {
 					rowHead( 1 ) = "Outside Air (%)";
 					rowHead( 2 ) = "Airflow per Floor Area [m3/s-m2]";
 					rowHead( 3 ) = "Airflow per Total Capacity [m3/s-W]";
-					rowHead( 4 ) = "Floor Area per Total Capcity [m2/W]";
+					rowHead( 4 ) = "Floor Area per Total Capacity [m2/W]";
 					rowHead( 5 ) = "Total Capacity per Floor Area [W/m2]";
 					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]";
 					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]";
@@ -13056,20 +13101,20 @@ namespace OutputReportTabular {
 					rowHead( 1 ) = "Outside Air (%)";
 					rowHead( 2 ) = "Airflow per Floor Area [ft3/min-ft2]";
 					rowHead( 3 ) = "Airflow per Total Capacity [ft3-h/min-Btu]";
-					rowHead( 4 ) = "Floor Area per Total Capcity [ft2-h/Btu]";
+					rowHead( 4 ) = "Floor Area per Total Capacity [ft2-h/Btu]";
 					rowHead( 5 ) = "Total Capacity per Floor Area [Btu/h-ft2]";
 					rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
 					rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
 					rowHead( 8 ) = "Number of People";
 				}
 
-				tableBody( 1, 1 ) = RealToStr( curCompLoad.outsideAirRatio, 2 );  // outside Air
-				tableBody( 1, 2 ) = RealToStr( curCompLoad.airflowPerFlrArea, 2 );  // airflow per floor area
-				tableBody( 1, 3 ) = RealToStr( curCompLoad.airflowPerTotCap, 2 );  // airflow per total capacity
-				tableBody( 1, 4 ) = RealToStr( curCompLoad.areaPerTotCap, 2 );  // area per total capacity
-				tableBody( 1, 5 ) = RealToStr( curCompLoad.totCapPerArea, 2 );  // total capacity per area
-				tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 5 );  // chiller pump power per flow
-				tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 5 );  // condenser pump power per flow
+				tableBody( 1, 1 ) = RealToStr( curCompLoad.outsideAirRatio, 4 );  // outside Air
+				tableBody( 1, 2 ) = RealToStr( curCompLoad.airflowPerFlrArea, 4 );  // airflow per floor area
+				tableBody( 1, 3 ) = RealToStr( curCompLoad.airflowPerTotCap, 4 );  // airflow per total capacity
+				tableBody( 1, 4 ) = RealToStr( curCompLoad.areaPerTotCap, 4 );  // area per total capacity
+				tableBody( 1, 5 ) = RealToStr( curCompLoad.totCapPerArea, 4);  // total capacity per area
+				tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per flow
+				tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump power per flow
 				tableBody( 1, 8 ) = RealToStr( curCompLoad.numPeople, 1 );  // number of people
 
 
