@@ -5287,7 +5287,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			if ( SumSysMCp > 0.0 ) { // protect div by zero
 				RefAirTemp( SurfNum ) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
 			} else {
-				RefAirTemp( SurfNum ) = NodeTemp;
+				RefAirTemp( SurfNum ) = MAT( ZoneNum );
 			}
 			TempEffBulkAir( SurfNum ) = RefAirTemp( SurfNum ); // for reporting surf adjacent air temp
 		} else {

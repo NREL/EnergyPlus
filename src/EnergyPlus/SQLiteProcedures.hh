@@ -87,6 +87,7 @@ protected:
 	bool sqliteStepValidity( int const rc );
 	int sqliteStepCommand(sqlite3_stmt * stmt);
 	int sqliteResetCommand(sqlite3_stmt * stmt);
+	bool sqliteWithinTransaction();
 	// int sqliteClearBindings(sqlite3_stmt * stmt);
 	// int sqliteFinalizeCommand(sqlite3_stmt * stmt);
 
@@ -137,6 +138,9 @@ public:
 
 	// Commit a transaction
 	void sqliteCommit();
+
+	// Within a current transaction
+	bool sqliteWithinTransaction();
 
 	void createSQLiteReportDictionaryRecord(
 		int const reportVariableReportID,

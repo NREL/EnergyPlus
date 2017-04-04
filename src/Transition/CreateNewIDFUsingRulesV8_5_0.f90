@@ -816,13 +816,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:15)=InArgs(1:15)   ! No change at all
                 OutArgs(16:16)=InArgs(17:17) ! Moved up
-                CurArgs = CurArgs - 1
+                CurArgs = MAX(CurArgs - 1, 13)
               CASE('AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT')
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:16)=InArgs(1:16)   ! No change at all
                 OutArgs(17:17)=InArgs(18:18) ! Moved up
-                CurArgs = CurArgs - 1
+                CurArgs = MAX(CurArgs - 1, 14)
               CASE('AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT')
                 ! Removed Input Field !- Hot Water or Steam Inlet Node Name
                 nodiff=.false.

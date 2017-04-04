@@ -922,6 +922,7 @@ namespace HeatBalFiniteDiffManager {
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 							}
 							Material( CurrentLayer ).WarnedForHighDiffusivity = true;
+							ShowFatalError( "Material conductivity problem causes program termination - check material properties and thicknesses" );
 						}
 					}
 
