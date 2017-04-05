@@ -747,16 +747,12 @@ namespace OutputReportTabular {
 		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
 			OutputReportTabularAnnual::GetInputTabularAnnual();
-			OutputReportTabularAnnual::checkAggregationOrderForAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
 			GetInputOutputTableSummaryReports();
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
-			if ( isInvalidAggregationOrder( ) ) {
-				ShowFatalError( "OutputReportTabular: Invalid aggregations detected, no simulation performed." );
-			}
-			GetInputFuelAndPollutionFactors( );
+			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCLoadComponentTableSummaries();
 			UpdateTabularReportsGetInput = false;
@@ -1461,53 +1457,6 @@ namespace OutputReportTabular {
 		//DEALLOCATE(NamesOfKeys)
 		//DEALLOCATE(IndexesForKeyVar)
 		//#endif
-	}
-
-	bool
-	isInvalidAggregationOrder( )
-	{
-		bool foundError = false;
-		if ( !DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
-			return foundError;
-		}
-		for ( int iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
-			bool foundMinOrMax = false;
-			bool foundHourAgg = false;
-			bool missingMaxOrMinError = false;
-			bool missingHourAggError = false;
-			for ( int jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
-				int curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
-				// test if the aggregation types are in the correct order
-				for ( int kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
-					int curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
-					int curAggType = MonthlyColumns( curCol ).aggType;
-					if ( ( curAggType == aggTypeMaximum ) || ( curAggType == aggTypeMinimum ) ) {
-						foundMinOrMax = true;
-					} else if ( ( curAggType == aggTypeHoursNonZero ) || ( curAggType == aggTypeHoursZero ) ||
-						( curAggType == aggTypeHoursPositive ) || ( curAggType == aggTypeHoursNonPositive ) ||
-								( curAggType == aggTypeHoursNegative ) || ( curAggType == aggTypeHoursNonNegative ) ) {
-						foundHourAgg = true;
-					} else if ( curAggType == aggTypeValueWhenMaxMin ) {
-						if ( !foundMinOrMax ) {
-							missingMaxOrMinError = true;
-						}
-					} else if ( ( curAggType == aggTypeSumOrAverageHoursShown ) || ( curAggType == aggTypeMaximumDuringHoursShown ) || ( curAggType == aggTypeMinimumDuringHoursShown ) ) {
-						if ( !foundHourAgg ) {
-							missingHourAggError = true;
-						}
-					}
-				}
-			}
-			if ( missingMaxOrMinError ) {
-				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
-				foundError = true;
-			}
-			if ( missingHourAggError ) {
-				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
-				foundError = true;
-			}
-		}	
-		return foundError;
 	}
 
 	void
