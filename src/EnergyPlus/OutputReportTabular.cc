@@ -13068,7 +13068,7 @@ namespace OutputReportTabular {
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
 
 					rowHead( 8 ) = "Supply Air Temperature [C]";
-					rowHead( 9 ) = "Mixed Air Temperature [C]";
+					rowHead( 9 ) = "Mixed Air Temperature [C]";  
 					rowHead( 10 ) = "Main Fan Air Flow [m3/s]";
 					rowHead( 11 ) = "Outside Air Flow [m3/s]";
 					rowHead( 12 ) = "Peak Sensible Load with Sizing Factor [W]";
@@ -13108,7 +13108,9 @@ namespace OutputReportTabular {
 					tableBody( 1, 7 ) = RealToStr( curCompLoad.zoneHumRatio, 5 ); //Zone Humidity Ratio at Peak
 				}
 				tableBody( 1, 8 ) = RealToStr( curCompLoad.supAirTemp, 2 );  // supply air temperature
-				tableBody( 1, 9 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature
+				if ( kind == airLoopOutput ) {
+					tableBody( 1, 9 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature - not for zone or facility
+				}
 				tableBody( 1, 10 ) = RealToStr( curCompLoad.mainFanAirFlow, 2 );  // main fan air flow
 				tableBody( 1, 11 ) = RealToStr( curCompLoad.outsideAirFlow, 2 );  // outside air flow
 				tableBody( 1, 12 ) = RealToStr( curCompLoad.designPeakLoad, 2 );  // design peak load
@@ -13140,8 +13142,8 @@ namespace OutputReportTabular {
 					rowHead( 3 ) = "Airflow per Total Capacity [m3/s-W]";
 					rowHead( 4 ) = "Floor Area per Total Capacity [m2/W]";
 					rowHead( 5 ) = "Total Capacity per Floor Area [W/m2]";
-					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]";
-					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]";
+					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
+					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
 					rowHead( 8 ) = "Number of People";
 				} else {
 					rowHead( 1 ) = "Outside Air (%)";
@@ -13159,8 +13161,10 @@ namespace OutputReportTabular {
 				tableBody( 1, 3 ) = RealToStr( curCompLoad.airflowPerTotCap, 4 );  // airflow per total capacity
 				tableBody( 1, 4 ) = RealToStr( curCompLoad.areaPerTotCap, 4 );  // area per total capacity
 				tableBody( 1, 5 ) = RealToStr( curCompLoad.totCapPerArea, 4);  // total capacity per area
-				tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per flow
-				tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump power per flow
+				if ( kind == facilityOutput ) {
+					tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per flow
+					tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump power per flow
+				}
 				tableBody( 1, 8 ) = RealToStr( curCompLoad.numPeople, 1 );  // number of people
 
 
