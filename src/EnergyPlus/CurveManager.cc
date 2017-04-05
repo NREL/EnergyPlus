@@ -460,7 +460,7 @@ namespace CurveManager {
 		int NumTables; // Total tables in the input file
 		int CurveIndex; // do loop index
 		int CurveNum; // current curve number
-		Array1D_string Alphas( 13 ); // Alpha items for object
+		Array1D_string Alphas( 14 ); // Alpha items for object
 		Array1D< Real64 > Numbers( 10000 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -3376,7 +3376,7 @@ namespace CurveManager {
 			gio::rewind( FileNum );
 
 			{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars; ReadStat = flags.ios(); }
-			if ( NumIVars > 5 || NumIVars < 1 ) {
+			if ( NumIVars > 6 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
 				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
@@ -3412,8 +3412,8 @@ namespace CurveManager {
 				gio::write( OutputFileInits, Format_130 );
 				gio::write( OutputFileInits, Format_150 ) << CurrentModuleObject << Alphas( 1 );
 			}
-			NumIVars = Numbers( 15 );
-			if ( NumIVars > 5 || NumIVars < 1 ) {
+			NumIVars = Numbers( 16 );
+			if ( NumIVars > 6 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables." );
 				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
