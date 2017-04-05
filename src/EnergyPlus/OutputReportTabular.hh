@@ -609,6 +609,7 @@ namespace OutputReportTabular {
 		Array1D_int zoneIndices; // the zone numbers covered by the report
 
 		Real64 outsideAirRatio;  // outside Air
+		Real64 floorArea; // floor area
 		Real64 airflowPerFlrArea;  // airflow per floor area
 		Real64 airflowPerTotCap;  // airflow per total capacity
 		Real64 areaPerTotCap;  // area per total capacity
@@ -636,6 +637,7 @@ namespace OutputReportTabular {
 			estInstDelSensLoad( 0. ),
 			diffPeakEst( 0. ),
 			outsideAirRatio( 0.),
+			floorArea( 0. ),
 			airflowPerFlrArea( 0. ),
 			airflowPerTotCap( 0. ),
 			areaPerTotCap( 0. ),
@@ -948,6 +950,12 @@ namespace OutputReportTabular {
 		int const & airLoopIndex,
 		bool const & isCooling
 	);
+
+	void
+	ComputeEngineeringChecks(
+		CompLoadTablesType & compLoad
+	);
+
 
 	void
 	GetZoneComponentAreas(

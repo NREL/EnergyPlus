@@ -11967,6 +11967,9 @@ namespace OutputReportTabular {
 				CollectPeakAirLoopConditions( AirLoopCoolCompLoadTables( iAirLoop ), iAirLoop, true );
 				CollectPeakAirLoopConditions( AirLoopHeatCompLoadTables( iAirLoop ), iAirLoop, false );
 
+				ComputeEngineeringChecks( AirLoopCoolCompLoadTables( iAirLoop ) );
+				ComputeEngineeringChecks( AirLoopHeatCompLoadTables( iAirLoop ) );
+
 				AddTotalRowsForLoadSummary( AirLoopCoolCompLoadTables( iAirLoop ) );
 				AddTotalRowsForLoadSummary( AirLoopHeatCompLoadTables( iAirLoop ) );
 
@@ -12025,6 +12028,9 @@ namespace OutputReportTabular {
 				FacilityZonesHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
 				CombineLoadCompResults( FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables( iZone ), mult );
 			}
+
+			ComputeEngineeringChecks( FacilityCoolCompLoadTables );
+			ComputeEngineeringChecks( FacilityHeatCompLoadTables );
 
 			AddTotalRowsForLoadSummary( FacilityCoolCompLoadTables );
 			AddTotalRowsForLoadSummary( FacilityHeatCompLoadTables );
@@ -12523,12 +12529,14 @@ namespace OutputReportTabular {
 				compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
 			}
 
-			if ( Zone( zoneIndex ).FloorArea != 0. ) {
+			compLoad.floorArea = Zone( zoneIndex ).FloorArea;
+
+			if ( compLoad.floorArea != 0. ) {
 				// airflow per floor area
-				compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / Zone( zoneIndex ).FloorArea;
+				compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / compLoad.floorArea;
 
 				// capacity per floor area
-				compLoad.totCapPerArea = compLoad.designPeakLoad / Zone( zoneIndex ).FloorArea;
+				compLoad.totCapPerArea = compLoad.designPeakLoad / compLoad.floorArea;
 			}
 			if ( compLoad.designPeakLoad != 0. ) {
 				// airflow per capacity
@@ -12560,17 +12568,22 @@ namespace OutputReportTabular {
 	) 
 	{
 		using DataSizing::FinalSysSizing;
+		using DataSizing::CalcSysSizing;
 
 		if ( isCooling ) {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
 			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).SensCoolCap;
+			compLoad.peakDesSensLoad = CalcSysSizing( airLoopIndex ).SensCoolCap;
 
 		} else {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
-			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).HeatCap;
+			compLoad.designPeakLoad = -FinalSysSizing( airLoopIndex ).HeatCap;
+			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).SensCoolCap;
 		}
+		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
+
 		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
 
@@ -12578,29 +12591,32 @@ namespace OutputReportTabular {
 		// Outside air flow
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
 
+	}
+
+	void 
+	ComputeEngineeringChecks(
+		CompLoadTablesType & compLoad
+	)
+	{
 		// outside air %
 		if ( compLoad.mainFanAirFlow != 0. ) {
 			compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
 		}
 
-		Real64 sumArea = compLoad.cells( cArea, rPeople );
-		if ( sumArea != 0. ) {
+		if ( compLoad.floorArea != 0. ) {
 			// airflow per floor area
-			compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / sumArea;
+			compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / compLoad.floorArea;
 
 			// capacity per floor area
-			compLoad.totCapPerArea = compLoad.designPeakLoad / sumArea;
+			compLoad.totCapPerArea = compLoad.designPeakLoad / compLoad.floorArea;
 		}
 		if ( compLoad.designPeakLoad != 0. ) {
 			// airflow per capacity
 			compLoad.airflowPerTotCap = compLoad.mainFanAirFlow / compLoad.designPeakLoad;
 
 			// floor area per capacity
-			compLoad.areaPerTotCap = sumArea / compLoad.designPeakLoad;
+			compLoad.areaPerTotCap = compLoad.floorArea / compLoad.designPeakLoad;
 		}
-
-
-
 	}
 
 
@@ -12757,9 +12773,12 @@ namespace OutputReportTabular {
 		compLoadTotal.peakDesSensLoad += compLoadPartial.peakDesSensLoad * multiplier;
 		compLoadTotal.estInstDelSensLoad += compLoadPartial.estInstDelSensLoad * multiplier;
 		compLoadTotal.diffPeakEst +=compLoadPartial.diffPeakEst * multiplier;
+		compLoadTotal.mainFanAirFlow += compLoadPartial.mainFanAirFlow * multiplier;
+		compLoadTotal.outsideAirFlow += compLoadPartial.outsideAirFlow * multiplier;
 
 		// sum the engineering checks
 		compLoadTotal.numPeople += compLoadPartial.numPeople * multiplier;
+		compLoadTotal.floorArea += compLoadPartial.floorArea * multiplier;
 	}
 
 	// create the total row and total columns for the load summary tables
@@ -13052,10 +13071,10 @@ namespace OutputReportTabular {
 					rowHead( 9 ) = "Mixed Air Temperature [C]";
 					rowHead( 10 ) = "Main Fan Air Flow [m3/s]";
 					rowHead( 11 ) = "Outside Air Flow [m3/s]";
-					rowHead( 12 ) = "Design Peak Load  [W]";
-					rowHead( 13 ) = "Difference Between Design and Peak Load [W]";
+					rowHead( 12 ) = "Peak Sensible Load with Sizing Factor [W]";
+					rowHead( 13 ) = "Difference Due to Sizing Factor [W]";
 
-					rowHead( 14 ) = "Peak Design Sensible Load [W]";
+					rowHead( 14 ) = "Peak Sensible Load [W]";
 					rowHead( 15 ) = "Estimated Instant + Delayed Sensible Load [W]";
 					rowHead( 16 ) = "Difference Between Peak and Estimated Sensible Load [W]";
 				} else {
@@ -13071,10 +13090,10 @@ namespace OutputReportTabular {
 					rowHead( 9 ) = "Mixed Air Temperature [F]";
 					rowHead( 10 ) = "Main Fan Air Flow [ft3/min]";
 					rowHead( 11 ) = "Outside Air Flow [ft3/min]";
-					rowHead( 12 ) = "Design Peak Load  [Btu/h]";
-					rowHead( 13 ) = "Difference Between Design and Peak Load [Btu/h]";
+					rowHead( 12 ) = "Peak Sensible Load with Sizing Factor [Btu/h]";
+					rowHead( 13 ) = "Difference Due to Sizing Factor [Btu/h]";
 
-					rowHead( 14 ) = "Peak Design Sensible Load [Btu/h]";
+					rowHead( 14 ) = "Peak Sensible Load  [Btu/h]";
 					rowHead( 15 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
 					rowHead( 16 ) = "Difference Between Peak and Estimated Sensible Load [Btu/h]";
 				}
