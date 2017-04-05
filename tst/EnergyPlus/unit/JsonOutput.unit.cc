@@ -311,6 +311,140 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 	};
+
+	TEST_F( EnergyPlusFixture , JsonOutput_TableInfo) {
+
+		Array1D_string rowLabels( 2 );
+		rowLabels( 1 ) = "ZONE1DIRECTAIR";
+		rowLabels( 2 ) = "ZONE2DIRECTAIR";
+
+
+		Array1D_string columnLabels(1);
+		columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
+
+		Array2D_string tableBody;
+		tableBody.allocate( columnLabels.size1(), rowLabels.size1() );
+		tableBody = ""; //set entire table to blank as default
+
+		tableBody(1,1) =  "5.22";
+		tableBody(1,2) =  "0.275000";
+
+		Table *tbl = new Table(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+		tbl->setUUID("e13b6158-7e17-b1e8-43d0-89f365b8d506");
+
+		json result = tbl->getJSON();
+		json expectedResult = R"( {
+				"Cols": [
+                        "User-Specified Maximum Air Flow Rate [m3/s]"
+                    ],
+                "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+                "Rows": {
+                "ZONE1DIRECTAIR": [
+                       "5.22"
+                    ],
+                    "ZONE2DIRECTAIR": [
+                       "0.275000"
+                    ]
+                },
+                "TableName": "AirTerminal:SingleDuct:Uncontrolled",
+                "UUID": "e13b6158-7e17-b1e8-43d0-89f365b8d506"
+		} )"_json;
+
+		EXPECT_EQ(result.dump(), expectedResult.dump());
+	};
+
+	TEST_F( EnergyPlusFixture , JsonOutput_ReportInfo) {
+
+		Array1D_string rowLabels( 2 );
+		rowLabels( 1 ) = "ZONE1DIRECTAIR";
+		rowLabels( 2 ) = "ZONE2DIRECTAIR";
+
+
+		Array1D_string columnLabels(1);
+		columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
+
+		Array2D_string tableBody;
+		tableBody.allocate( columnLabels.size1(), rowLabels.size1() );
+
+		tableBody(1,1) =  "5.22";
+		tableBody(1,2) =  "0.275000";
+
+		Table *tbl = new Table(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+		tbl->setUUID("e13b6158-7e17-b1e8-43d0-89f365b8d506");
+
+		rowLabels.deallocate();
+		columnLabels.deallocate();
+		tableBody.deallocate();
+
+		rowLabels.allocate(1);
+		columnLabels.allocate(3);
+		tableBody.allocate( columnLabels.size1(), rowLabels.size1() );
+
+		rowLabels( 1 ) = "FURNACE ACDXCOIL 1";
+
+		columnLabels(1) = "User-Specified rated_air_flow_rate [m3/s]";
+		columnLabels(2) = "User-Specified gross_rated_total_cooling_capacity [W]";
+		columnLabels(3) = "User-Specified gross_rated_sensible_heat_ratio";
+
+
+		tableBody(1,1) =  "5.50";
+		tableBody(2,1) =  "100000.00";
+		tableBody(3,1) =  "100000.00";
+
+		Table *tbl2 = new Table(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+		tbl2->setUUID("758b1c73-dacd-3148-4edc-8dd7d4d51557");
+
+		Report *report = new Report();
+		report->setUUID("dbdd85a9-d01f-3b04-47bf-848215a28ea5");
+		report->Tables.push_back(tbl);
+		report->Tables.push_back(tbl2);
+		report->ReportName = "Component Sizing Summary";
+		report->ReportForString = "Entire Facility";
+
+		json result = report->getJSON();
+		json expectedResult = R"( {
+				"For": "Entire Facility",
+            "ReportName": "Component Sizing Summary",
+            "Tables": [
+                {
+                    "Cols": [
+                        "User-Specified Maximum Air Flow Rate [m3/s]"
+                    ],
+                    "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+                    "Rows": {
+                        "ZONE1DIRECTAIR": [
+                            "5.22"
+                        ],
+                        "ZONE2DIRECTAIR": [
+                            "0.275000"
+                        ]
+                    },
+                    "TableName": "AirTerminal:SingleDuct:Uncontrolled",
+                    "UUID": "e13b6158-7e17-b1e8-43d0-89f365b8d506"
+                },
+                {
+                    "Cols": [
+                        "User-Specified rated_air_flow_rate [m3/s]",
+                        "User-Specified gross_rated_total_cooling_capacity [W]",
+                        "User-Specified gross_rated_sensible_heat_ratio"
+                    ],
+                    "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+                    "Rows": {
+                        "FURNACE ACDXCOIL 1": [
+                            "5.50",
+                            "100000.00",
+                            "100000.00"
+                        ]
+                    },
+                    "TableName": "Coil:Cooling:DX:SingleSpeed",
+                    "UUID": "758b1c73-dacd-3148-4edc-8dd7d4d51557"
+                }
+			],
+            "UUID": "dbdd85a9-d01f-3b04-47bf-848215a28ea5"
+		} )"_json;
+
+		EXPECT_EQ(result.dump(), expectedResult.dump());
+	};
 }
 
 
