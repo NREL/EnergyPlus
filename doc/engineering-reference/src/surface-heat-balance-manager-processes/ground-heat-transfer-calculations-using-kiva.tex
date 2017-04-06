@@ -1,6 +1,4 @@
-\section{Engineering Reference: Ground Heat Transfer Calculations
-using
-Foundation:Kiva}\label{ground-heat-transfer-calculations-using-foundationkiva}
+\section{Ground Heat Transfer Calculations using Foundation:Kiva}
 
 Kiva\textsuperscript{TM} is an open source foundation heat transfer
 calculation tool developed by Big Ladder Software.
@@ -13,7 +11,7 @@ quickly (on the order of 5 seconds) without any noticeable loss of
 accuracy relative to a mesh-independent, fully three-dimensional
 simulation.
 
-\subsection{Approach}\label{approach}
+\subsection{Approach}
 
 Within EnergyPlus, Kiva is used to perform two-dimensional finite
 difference heat transfer calculations. Each foundation is represented by
@@ -44,7 +42,7 @@ HeatBalanceAlgorithm (e.g., Conduction Transfer Functions) as the rest
 of the model.
 
 \subsection{Two-dimensional
-Approximation}\label{two-dimensional-approximation}
+Approximation}
 
 The two-dimensional approximation method employed by Kiva relies on
 knowing the footprint shape, area, and exposed perimeter of each
@@ -75,7 +73,7 @@ heat transfer without performing three-dimensional calculations. Because
 the two-dimensional context is symmetric, the domain can be divided in
 half to further reduce the number of calculations.
 
-\subsection{Numerical Calculations}\label{numerical-calculations}
+\subsection{Numerical Calculations}
 
 Kiva automatically discretizes the two-dimensional domain into
 rectangular cells. The size of each cell is defined by the
@@ -106,7 +104,7 @@ Alternating Direction Implicit (ADI) finite difference time stepping
 scheme. This scheme provides relatively fast calculations with stable
 results as demonstrated by Kruis and Krarti (2015).
 
-\subsection{Boundary Conditions}\label{boundary-conditions}
+\subsection{Boundary Conditions}
 
 \begin{figure}
 \centering
@@ -162,7 +160,7 @@ undisturbed ground temperature profile.
   exterior
 \end{itemize}
 
-\subsection{Multiple Kiva Instances}\label{multiple-kiva-instances}
+\subsection{Multiple Kiva Instances}
 
 In some cases, a single Foundation boundary condition might require
 multiple Kiva instances:
@@ -251,7 +249,7 @@ The weighted average temperature for the floor surface is:
 Foundation:Kiva object, or be combined into a single equivalent
 construction.
 
-\subsection{Core Zone Slabs}\label{core-zone-slabs}
+\subsection{Core Zone Slabs}
 
 Because core zones have no exposed perimeter, they are assumed to
 exchange heat only with the deep ground boundary condition. This is
@@ -272,7 +270,7 @@ surface.
 \caption{Core zone one-dimensional context\label{fig:cz-1}}
 \end{figure}
 
-\subsection{Warm-Up}\label{warm-up}
+\subsection{Warm-Up}
 
 The traditional ``warm-up'' period in EnergyPlus (of repeating a single
 day) presents several challenges for foundation heat transfer
@@ -293,12 +291,12 @@ Instead, Kiva instances are initialized independently from the rest of the simul
 
 The initialization of the ground relies on assumptions of indoor air temperatures (as they are not yet calculated by EnergyPlus). When a thermostat is assigned to a zone with Kiva foundation surfaces, the assumed temperature is equal to the setpoint (or a weighted average of heating and cooling setpoints depending on outdoor temperature). For zones without thermostats, a constant 22 \textsuperscript{o}C indoor temperature is assumed.
 
-\subsection{Validation}\label{validation}
+\subsection{Validation}
 
 Kiva has been tested against the BESTEST Ground coupled cases with
 accuracy within 3\% of the reference solutions (Kruis and Krarti, 2015).
 
-\subsection{References}\label{references}
+\subsection{References}
 
 {[}1{]} N. Kruis and M. Krarti, ``Kiva\textsuperscript{TM}: A Numerical
 Framework for Improving Foundation Heat Transfer Calculations,'' Journal
