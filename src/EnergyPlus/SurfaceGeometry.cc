@@ -6287,11 +6287,11 @@ namespace SurfaceGeometry {
 		//For evaporative cooling surfaces_Rongpeng Zhang, Apr. 2017
 		cCurrentModuleObject = "SurfaceProperty:EvaporativeCoolingSurface";
 		int CountEvapCoolingSurf = GetNumObjectsFound( cCurrentModuleObject );
-		auto const Surface_Name1( Surface.Name() ); // Member array
 		for ( Item = 1; Item <= CountEvapCoolingSurf; ++Item ) {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundSingleSurf = false;
-			Found = FindItemInList( cAlphaArgs( 1 ), Surface_Name1, TotSurfaces );
+
+			Found = FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
 
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
