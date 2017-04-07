@@ -5879,6 +5879,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -5886,6 +5888,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     2,                       !- Number of Values for Independent Variable X1
@@ -6429,6 +6432,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     2.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -6436,6 +6441,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     2,                       !- Number of Values for Independent Variable X1
@@ -7453,6 +7459,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7460,6 +7468,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7550,6 +7559,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     1.7,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7557,6 +7568,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7622,6 +7634,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.7,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7629,6 +7643,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7706,6 +7721,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.8,                     !- Minimum Table Output
     1.27,                    !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7713,6 +7730,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7790,6 +7808,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.6,                     !- Minimum Table Output
     1.6,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7797,6 +7817,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7887,6 +7908,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7894,6 +7917,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -8072,6 +8096,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -8079,6 +8105,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -8144,6 +8171,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -8151,6 +8180,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1

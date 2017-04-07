@@ -3479,7 +3479,7 @@ namespace CurveManager {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
 						TableLookup( TableNum ).X1Var( I ) = Numbers( BaseOffset + NumIVars + I );
 					}
-                    std::vector< Real64 > x1values( TableLookup( TableNum ).X1Var.begin(), TableLookup( TableNum ).X1Var.end() );
+					std::vector< Real64 > x1values( TableLookup( TableNum ).X1Var.begin(), TableLookup( TableNum ).X1Var.end() );
 
 					if ( EchoTableDataToEio ) {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
@@ -3749,9 +3749,9 @@ namespace CurveManager {
 										break;
 									}
 								}
-                                TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX6Vars, TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+								TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX6Vars, TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 							} else {
-                                TableLookup( TableNum ).TableLookupZData.allocate( 1, TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+								TableLookup( TableNum ).TableLookupZData.allocate( 1, TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 							}
 						} else {
 							TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
@@ -4945,52 +4945,52 @@ Label999: ;
 			VALSV4.deallocate();
 			VALSV5.deallocate();
 		} else if ( SELECT_CASE_var == 6 ) {
-            NX = TableLookup( TableIndex ).NumX1Vars;
-            NY = TableLookup( TableIndex ).NumX2Vars;
-            NV3 = TableLookup( TableIndex ).NumX3Vars;
-            NV4 = TableLookup( TableIndex ).NumX4Vars;
-            NV5 = TableLookup( TableIndex ).NumX5Vars;
-            NV6 = TableLookup( TableIndex ).NumX6Vars;
-            NUMPT = TableLookup( TableIndex ).InterpolationOrder;
-            VALSX.allocate( NX );
-            VALSX = TableLookup( TableIndex ).X1Var;
-            VALSY.allocate( NY );
-            VALSY = TableLookup( TableIndex ).X2Var;
-            VALSV3.allocate( NV3 );
-            VALSV3 = TableLookup( TableIndex ).X3Var;
-            VALSV4.allocate( NV4 );
-            VALSV4 = TableLookup( TableIndex ).X4Var;
-            VALSV5.allocate( NV5 );
-            VALSV5 = TableLookup( TableIndex ).X5Var;
-            VALSV6.allocate( NV6 );
-            VALSV6 = TableLookup( TableIndex ).X6Var;
-            // perform 2-D interpolation of 6D array at V1, V2, and store in 4D array
-            FOURDVALS.allocate( NV6, NV5, NV4, NV3 );
-            for ( IV6 = 1; IV6 <= NV6; ++IV6 ) {
-                for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
-                    for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
-                        for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-                            FOURDVALS( IV6, IV5, IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( IV6, IV5, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
-                        }
-                    }
-                }
-            }
-            // perform 2-D interpolation of 4D array at V3, V4, and store in 2D array
-            TWODVALS.allocate( NV6, NV5 );
-            for ( IV6 = 1; IV6 <= NV6; ++IV6 ) {
-                for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
-                    TWODVALS( IV6, IV5 ) = DLAG( V3, V4, VALSV3, VALSV4, FOURDVALS( IV6, IV5, _, _ ), NV3, NV4, NUMPT, IEXTV3, IEXTV4 );
-                }
-            }
-            // perform 2-D interpolation of 2D array to find final value
-            TableValue = DLAG( V5, V6, VALSV5, VALSV6, TWODVALS, NV5, NV6, NUMPT, IEXTV5, IEXTV6 );
-            TWODVALS.deallocate();
-            FOURDVALS.deallocate();
-            VALSX.deallocate();
-            VALSY.deallocate();
-            VALSV3.deallocate();
-            VALSV4.deallocate();
-            VALSV5.deallocate();
+			NX = TableLookup( TableIndex ).NumX1Vars;
+			NY = TableLookup( TableIndex ).NumX2Vars;
+			NV3 = TableLookup( TableIndex ).NumX3Vars;
+			NV4 = TableLookup( TableIndex ).NumX4Vars;
+			NV5 = TableLookup( TableIndex ).NumX5Vars;
+			NV6 = TableLookup( TableIndex ).NumX6Vars;
+			NUMPT = TableLookup( TableIndex ).InterpolationOrder;
+			VALSX.allocate( NX );
+			VALSX = TableLookup( TableIndex ).X1Var;
+			VALSY.allocate( NY );
+			VALSY = TableLookup( TableIndex ).X2Var;
+			VALSV3.allocate( NV3 );
+			VALSV3 = TableLookup( TableIndex ).X3Var;
+			VALSV4.allocate( NV4 );
+			VALSV4 = TableLookup( TableIndex ).X4Var;
+			VALSV5.allocate( NV5 );
+			VALSV5 = TableLookup( TableIndex ).X5Var;
+			VALSV6.allocate( NV6 );
+			VALSV6 = TableLookup( TableIndex ).X6Var;
+			// perform 2-D interpolation of 6D array at V1, V2, and store in 4D array
+			FOURDVALS.allocate( NV6, NV5, NV4, NV3 );
+			for ( IV6 = 1; IV6 <= NV6; ++IV6 ) {
+				for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
+					for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
+						for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
+							FOURDVALS( IV6, IV5, IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( IV6, IV5, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+						}
+					}
+				}
+			}
+			// perform 2-D interpolation of 4D array at V3, V4, and store in 2D array
+			TWODVALS.allocate( NV6, NV5 );
+			for ( IV6 = 1; IV6 <= NV6; ++IV6 ) {
+				for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
+					TWODVALS( IV6, IV5 ) = DLAG( V3, V4, VALSV3, VALSV4, FOURDVALS( IV6, IV5, _, _ ), NV3, NV4, NUMPT, IEXTV3, IEXTV4 );
+				}
+			}
+			// perform 2-D interpolation of 2D array to find final value
+			TableValue = DLAG( V5, V6, VALSV5, VALSV6, TWODVALS, NV5, NV6, NUMPT, IEXTV5, IEXTV6 );
+			TWODVALS.deallocate();
+			FOURDVALS.deallocate();
+			VALSX.deallocate();
+			VALSY.deallocate();
+			VALSV3.deallocate();
+			VALSV4.deallocate();
+			VALSV5.deallocate();
 		} else {
 			TableValue = 0.0;
 			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
