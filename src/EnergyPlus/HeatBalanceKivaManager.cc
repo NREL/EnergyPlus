@@ -49,6 +49,8 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
+// Kiva Headers
+#include <libkiva/Errors.hpp>
 #ifdef GROUND_PLOT
 #include <libgroundplot/GroundPlot.hpp>
 #endif
@@ -59,20 +61,40 @@
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHVACGlobals.hh>
 #include <DataGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <DataVectorTypes.hh>
+#include <DataZoneControls.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
+#include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
+#include <ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
+
+void kivaErrorCallback(
+	const int messageType,
+	const std::string message,
+	void*
+)
+{
+	if ( messageType == Kiva::MSG_INFO ) {
+		ShowMessage( "Kiva: " + message );
+	} else if ( messageType == Kiva::MSG_WARN ) {
+		ShowWarningError( "Kiva: " + message );
+	} else /* if (messageType == Kiva::MSG_ERR) */ {
+		ShowSevereError( "Kiva: " + message );
+		ShowFatalError( "Kiva: Errors discovered, program terminates." );
+	}
+}
 
 KivaInstanceMap::KivaInstanceMap(
 	Kiva::Foundation& foundation,
@@ -88,22 +110,221 @@ KivaInstanceMap::KivaInstanceMap(
 	floorSurface(floorSurface),
 	wallSurfaces(wallSurfaces),
 	zoneNum(zoneNum),
+	zoneControlType(KIVAZONE_UNCONTROLLED),
+	zoneControlNum(0),
 	weightedPerimeter(weightedPerimeter),
 	constructionNum(constructionNum)
-{}
-
-void KivaInstanceMap::initGround()
 {
-	// TODO Future accelerated initialization
-	// Figure out what times (and corresponding weather data) to read
-	// timestep = 168 hours
-	// number of timesteps = 12
 
+	for (int i = 1; i <= DataZoneControls::NumTempControlledZones; ++i) {
+		if ( DataZoneControls::TempControlledZone(i).ActualZoneNum == zoneNum)  {
+			zoneControlType = KIVAZONE_TEMPCONTROL;
+			zoneControlNum = i;
+			break;
+		}
+	}
+	for (int i = 1; i <= DataZoneControls::NumComfortControlledZones; ++i) {
+		if ( DataZoneControls::ComfortControlledZone(i).ActualZoneNum == zoneNum)  {
+			zoneControlType = KIVAZONE_COMFORTCONTROL;
+			zoneControlNum = i;
+			break;
+		}
+	}
+	for (size_t i = 1; i <= DataZoneControls::StageControlledZone.size(); ++i) {
+		if ( DataZoneControls::StageControlledZone(i).ActualZoneNum == zoneNum)  {
+			zoneControlType = KIVAZONE_STAGEDCONTROL;
+			zoneControlNum = i;
+			break;
+		}
+	}
+
+}
+
+void KivaInstanceMap::initGround(const KivaWeatherData& kivaWeather)
+{
+
+	// Determine accelerated intervals
+	int numAccelaratedTimesteps = 3;
+	int acceleratedTimestep = 30; // days
+	int accDate = DataEnvironment::DayOfYear - 1 - acceleratedTimestep * ( numAccelaratedTimesteps + 1 ); // date time = last timestep from the day before
+	while (accDate < 0) {
+		accDate = accDate + 365 + WeatherManager::LeapYearAdd;
+	}
+
+	// Use simple radiative model for initialization
+	ground.foundation.slab.emissivity = DataHeatBalance::Construct( DataSurfaces::Surface(floorSurface).Construction ).InsideAbsorpThermal;
+	if (constructionNum > 0) {
+		ground.foundation.wall.interiorEmissivity = DataHeatBalance::Construct( constructionNum ).InsideAbsorpThermal;
+	} else {
+		ground.foundation.wall.interiorEmissivity = 0.9;
+	}
+
+	// Initialize with steady state before accelerated timestepping
 	ground.foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
-	setBoundaryConditions();
+	setInitialBoundaryConditions( kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour );
 	ground.calculate( bcs );
+	accDate += acceleratedTimestep;
+	while (accDate > 365 + WeatherManager::LeapYearAdd) {
+		accDate = accDate - (365 + WeatherManager::LeapYearAdd);
+	}
+
+	// Accelerated timestepping
+	ground.foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
+	for (int i = 0; i < numAccelaratedTimesteps; ++i) {
+		setInitialBoundaryConditions( kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour );
+		ground.calculate( bcs, acceleratedTimestep * 24 * 60 * 60 );
+		accDate += acceleratedTimestep;
+		while (accDate > 365 + WeatherManager::LeapYearAdd) {
+			accDate = accDate - (365 + WeatherManager::LeapYearAdd);
+		}
+	}
+
+
 	ground.calculateSurfaceAverages();
 	ground.foundation.numericalScheme = Kiva::Foundation::NS_ADI;
+
+	// Reset emissivity to use EnergyPlus's IR model
+	ground.foundation.slab.emissivity = 0.0;
+	ground.foundation.wall.interiorEmissivity = 0.0;
+
+}
+
+void KivaInstanceMap::setInitialBoundaryConditions(
+	const KivaWeatherData& kivaWeather,
+	const int date,
+	const int hour,
+	const int timestep
+) {
+
+	unsigned index, indexPrev;
+	unsigned dataSize = kivaWeather.windSpeed.size();
+	Real64 weightNow;
+
+	if ( kivaWeather.intervalsPerHour == 1 ) {
+		index = (date - 1)*24 + (hour - 1);
+		weightNow = min( 1.0, ( double( timestep ) / double( DataGlobals::NumOfTimeStepInHour ) ) );
+	} else {
+		index = (date - 1)*24*DataGlobals::NumOfTimeStepInHour + (hour - 1)*DataGlobals::NumOfTimeStepInHour + (timestep - 1);
+		weightNow = 1.0; // weather data interval must be the same as the timestep interval (i.e., no interpolation)
+	}
+	if ( index == 0) {
+		indexPrev = dataSize - 1;
+	} else {
+		indexPrev = index - 1;
+	}
+
+	bcs.outdoorTemp = kivaWeather.dryBulb[index]*weightNow + kivaWeather.dryBulb[indexPrev]*(1.0 - weightNow) + DataGlobals::KelvinConv;
+
+	bcs.localWindSpeed = (kivaWeather.windSpeed[index]*weightNow + kivaWeather.windSpeed[indexPrev]*(1.0 - weightNow)) * DataEnvironment::WeatherFileWindModCoeff * std::pow( ground.foundation.surfaceRoughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp );
+	bcs.skyEmissivity = kivaWeather.skyEmissivity[index]*weightNow + kivaWeather.skyEmissivity[indexPrev]*(1.0 - weightNow);
+	bcs.solarAzimuth = 3.14;
+	bcs.solarAltitude = 0.0;
+	bcs.directNormalFlux = 0.0;
+	bcs.diffuseHorizontalFlux = 0.0;
+	bcs.slabAbsRadiation = 0.0;
+	bcs.wallAbsRadiation = 0.0;
+
+
+	// Estimate indoor temperature
+	const Real64 standardTemp = 22; // degC
+	Real64 assumedFloatingTemp = standardTemp; //*0.90 + kivaWeather.dryBulb[index]*0.10; // degC (somewhat arbitrary assumption--not knowing anything else about the building at this point)
+
+	switch (zoneControlType) {
+		case KIVAZONE_UNCONTROLLED: {
+			bcs.indoorTemp = assumedFloatingTemp + DataGlobals::KelvinConv;
+			break;
+		}
+		case KIVAZONE_TEMPCONTROL: {
+
+			int controlTypeSchId = DataZoneControls::TempControlledZone( zoneControlNum ).CTSchedIndex;
+			int controlType = ScheduleManager::LookUpScheduleValue(controlTypeSchId, hour, timestep);
+
+			if (controlType == 0) { // Uncontrolled
+
+				bcs.indoorTemp = assumedFloatingTemp + DataGlobals::KelvinConv;
+
+			} else if (controlType == DataHVACGlobals::SingleHeatingSetPoint) {
+
+				int schNameId = DataZoneControls::TempControlledZone( zoneControlNum ).SchIndx_SingleHeatSetPoint;
+				int schTypeId = DataZoneControls::TempControlledZone( zoneControlNum ).ControlTypeSchIndx(schNameId);
+				int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeating( schTypeId ).TempSchedIndex;
+				Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
+				bcs.indoorTemp = setpoint + DataGlobals::KelvinConv;
+
+			} else if (controlType == DataHVACGlobals::SingleCoolingSetPoint) {
+
+				int schNameId = DataZoneControls::TempControlledZone( zoneControlNum ).SchIndx_SingleCoolSetPoint;
+				int schTypeId = DataZoneControls::TempControlledZone( zoneControlNum ).ControlTypeSchIndx(schNameId);
+				int spSchId = ZoneTempPredictorCorrector::SetPointSingleCooling( schTypeId ).TempSchedIndex;
+				Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
+				bcs.indoorTemp = setpoint + DataGlobals::KelvinConv;
+
+			} else if (controlType == DataHVACGlobals::SingleHeatCoolSetPoint) {
+
+				int schNameId = DataZoneControls::TempControlledZone( zoneControlNum ).SchIndx_SingleHeatCoolSetPoint;
+				int schTypeId = DataZoneControls::TempControlledZone( zoneControlNum ).ControlTypeSchIndx(schNameId);
+				int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeatCool( schTypeId ).TempSchedIndex;
+				Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
+				bcs.indoorTemp = setpoint + DataGlobals::KelvinConv;
+
+			} else if (controlType == DataHVACGlobals::DualSetPointWithDeadBand) {
+
+				int schNameId = DataZoneControls::TempControlledZone( zoneControlNum ).SchIndx_DualSetPointWDeadBand;
+				int schTypeId = DataZoneControls::TempControlledZone( zoneControlNum ).ControlTypeSchIndx(schNameId);
+				int heatSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool( schTypeId ).HeatTempSchedIndex;
+				int coolSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool( schTypeId ).CoolTempSchedIndex;
+				Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
+				Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
+				const Real64 heatBalanceTemp = 10.0; // (assumed) degC
+				const Real64 coolBalanceTemp = 15.0; // (assumed) degC
+
+				if ( bcs.outdoorTemp < heatBalanceTemp ) {
+					bcs.indoorTemp = heatSetpoint + DataGlobals::KelvinConv;
+				} else if ( bcs.outdoorTemp > coolBalanceTemp ) {
+					bcs.indoorTemp = coolSetpoint + DataGlobals::KelvinConv;
+				} else {
+					Real64 weight = ( coolBalanceTemp - bcs.outdoorTemp ) / ( coolBalanceTemp - heatBalanceTemp );
+					bcs.indoorTemp = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobals::KelvinConv;
+				}
+
+			} else {
+
+				ShowSevereError( "Illegal control type for Zone=" + DataHeatBalance::Zone( zoneNum ).Name + ", Found value=" + General::TrimSigDigits( controlType ) + ", in Schedule=" + DataZoneControls::TempControlledZone( zoneControlNum ).ControlTypeSchedName );
+
+			}
+			break;
+		}
+		case KIVAZONE_COMFORTCONTROL: {
+
+			bcs.indoorTemp = standardTemp + DataGlobals::KelvinConv;
+			break;
+
+		}
+		case KIVAZONE_STAGEDCONTROL: {
+
+			int heatSpSchId = DataZoneControls::StageControlledZone( zoneControlNum ).HSBchedIndex;
+			int coolSpSchId = DataZoneControls::StageControlledZone( zoneControlNum ).CSBchedIndex;
+			Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
+			Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
+			const Real64 heatBalanceTemp = 10.0; // (assumed) degC
+			const Real64 coolBalanceTemp = 15.0; // (assumed) degC
+			if ( bcs.outdoorTemp < heatBalanceTemp ) {
+				bcs.indoorTemp = heatSetpoint + DataGlobals::KelvinConv;
+			} else if ( bcs.outdoorTemp > coolBalanceTemp ) {
+				bcs.indoorTemp = coolSetpoint + DataGlobals::KelvinConv;
+			} else {
+				Real64 weight = ( coolBalanceTemp - bcs.outdoorTemp ) / ( coolBalanceTemp - heatBalanceTemp );
+				bcs.indoorTemp = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobals::KelvinConv;
+			}
+			break;
+
+		}
+		default: {
+			// error?
+			bcs.indoorTemp = assumedFloatingTemp + DataGlobals::KelvinConv;
+			break;
+		}
+	}
 }
 
 void KivaInstanceMap::setBoundaryConditions()
@@ -242,7 +463,7 @@ void KivaManager::readWeatherData()
 			if ( flags.end() )
 				ShowFatalError( "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ) );
 		}
-		/* Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
+		// Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
 		int endcol = len( Line );
 		if ( endcol > 0 ) {
 			if ( int( Line[ endcol - 1 ] ) == DataSystemVariables::iUnicode_end ) {
@@ -293,13 +514,14 @@ void KivaManager::readWeatherData()
 				if ( SELECT_CASE_var1 == 1 ) {
 					 int NumDataPeriods = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 					 NumHdArgs += 4 * NumDataPeriods;
+					 // TODO: Error if more than one period? Less than full year?
 				} else if ( SELECT_CASE_var1 == 2 ) {
-					int NumIntervalsPerHour = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					kivaWeather.intervalsPerHour = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 				}}
 				Line.erase( 0, Pos + 1 );
 				++Count;
 			}
-		}}*/
+		}}
 		++HdLine;
 		if ( HdLine == 9 ) StillLooking = false;
 	}
@@ -350,6 +572,17 @@ void KivaManager::readWeatherData()
 			break;
 		}
 		WeatherManager::InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
+
+		kivaWeather.dryBulb.push_back(DryBulb);
+		kivaWeather.windSpeed.push_back(WindSpeed);
+
+		Real64 OSky = OpaqueSkyCover;
+		Real64 TDewK = min( DryBulb, DewPoint ) + DataGlobals::KelvinConv;
+		Real64 ESky = ( 0.787 + 0.764 * std::log( TDewK / DataGlobals::KelvinConv ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
+
+		kivaWeather.skyEmissivity.push_back(ESky);
+
+
 		++count;
 		totalDB += DryBulb;
 
@@ -363,7 +596,13 @@ void KivaManager::readWeatherData()
 
 bool KivaManager::setupKivaInstances()
 {
+	Kiva::setMessageCallback(kivaErrorCallback, NULL);
 	bool ErrorsFound = false;
+
+	if ( DataZoneControls::GetZoneAirStatsInputFlag ) {
+		ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+		DataZoneControls::GetZoneAirStatsInputFlag = false;
+	}
 
 	readWeatherData();
 
@@ -610,7 +849,7 @@ bool KivaManager::setupKivaInstances()
 					fnd.slab.layers.push_back( tempLayer );
 				}
 
-				fnd.slab.emissivity = 0.0; // Long wave included in rad BC. Materials(Constructs( surface.Construction ).LayerPoint(Constructs( surface.Construction ).TotLayers)).AbsorpThermal;
+				fnd.slab.emissivity = 0.0; // Long wave included in rad BC. Constructs( surface.Construction ).InsideAbsorpThermal;
 
 				fnd.foundationDepth = wallHeight;
 
@@ -780,9 +1019,10 @@ void KivaManager::initKivaInstances()
 
 	// initialize temperatures at the beginning of run environment
 	if ( DataGlobals::BeginEnvrnFlag ) {
+
 		for ( auto& kv : kivaInstances ) {
 			// Start with steady-state solution
-			kv.initGround();
+			kv.initGround(kivaWeather);
 		}
 	}
 }

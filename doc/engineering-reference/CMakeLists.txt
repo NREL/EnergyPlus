@@ -85,6 +85,8 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/demand-limiting.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes/airflownetwork-model.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes/room-air-models.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/alternative-modeling-processes/hybrid-model.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/engineering-reference-encyclopedia.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference/air-system-distribution-terminals.tex
@@ -519,6 +521,13 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image8006.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image8007.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/image8008.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-chart1.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-chart2.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure1.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure3.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure4.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure5.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure6.png
 )
 
 SET( SOURCE_FILENAME "engineering-reference" )

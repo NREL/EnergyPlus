@@ -9,6 +9,7 @@
 #include "Functions.hpp"
 
 #include <fstream>
+#include <memory>
 #include <numeric>
 
 namespace Kiva {
@@ -47,11 +48,9 @@ public:
   };
   CellType cellType;
 
-  //size_t blockNumber;
-  Block block;
+  Block* blockPtr;
 
-  //size_t surfaceNumber;
-  Surface surface;
+  Surface* surfacePtr;
 };
 
 class Domain
