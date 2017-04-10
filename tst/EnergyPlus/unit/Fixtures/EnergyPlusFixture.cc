@@ -171,6 +171,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -447,6 +448,8 @@ namespace EnergyPlus {
 		ZoneEquipmentManager::clear_state();
 		ZonePlenum::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
+		ResultsFramework::clear_state();
+
 	}
 
 	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {

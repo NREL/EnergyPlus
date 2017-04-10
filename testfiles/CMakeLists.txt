@@ -415,6 +415,7 @@ ADD_SIMULATION_TEST(IDF_FILE StormWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.
 ADD_SIMULATION_TEST(IDF_FILE StripMallZoneEvapCooler.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE StripMallZoneEvapCoolerAutosized.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SuperMarketDetailed_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SuperMarket.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SuperMarket_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SuperMarket_DetailedEvapCondenser.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SuperMarket_DetailedWaterCondenser.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

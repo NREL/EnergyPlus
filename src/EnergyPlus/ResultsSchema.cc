@@ -991,6 +991,28 @@ namespace EnergyPlus {
 				DataGlobals::json_stream = nullptr;
 			}
 		}
+
+		void clear_state(){
+			OutputSchema->DYMeters.setRDataFrameEnabled(false);
+			OutputSchema->DYMeters.setRVariablesScanned(false);
+			OutputSchema->DYMeters.setIVariablesScanned(false);
+			OutputSchema->DYMeters.setIDataFrameEnabled(false);
+
+			OutputSchema->TSMeters.setRVariablesScanned(false);
+			OutputSchema->TSMeters.setRDataFrameEnabled(false);
+			OutputSchema->TSMeters.setIDataFrameEnabled(false);
+			OutputSchema->TSMeters.setIVariablesScanned(false);
+
+			OutputSchema->HRMeters.setRVariablesScanned(false);
+			OutputSchema->HRMeters.setRDataFrameEnabled(false);
+			OutputSchema->HRMeters.setIDataFrameEnabled(false);
+			OutputSchema->HRMeters.setIVariablesScanned(false);
+
+			OutputSchema->MNMeters.setRVariablesScanned(false);
+			OutputSchema->MNMeters.setRDataFrameEnabled(false);
+			OutputSchema->MNMeters.setIDataFrameEnabled(false);
+			OutputSchema->MNMeters.setIVariablesScanned(false);
+		}
 	} // ResultsFramework
 
 } // EnergyPlus

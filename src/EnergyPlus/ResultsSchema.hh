@@ -237,6 +237,7 @@ namespace EnergyPlus {
 
 		extern std::unique_ptr<ResultsSchema> OutputSchema;
 
+		void clear_state();
 	} // ResultsFramework
 
 } // EnergyPlus
