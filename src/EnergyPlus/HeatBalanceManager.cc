@@ -503,8 +503,8 @@ namespace HeatBalanceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NumConstrObjects( 5 );
-		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
+		int const NumConstrObjects( 6 );
+		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular", "EnergyManagementSystem:ConstructionIndexVariable" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -530,13 +530,18 @@ namespace HeatBalanceManager {
 			NumObjects = GetNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
 				GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
-				if ( ONum != 5 ) {
-					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
-				} else {
+				if ( ONum == 5 ) {
 					CNum = FindItemInList( cAlphaArgs( 4 ), Construct );
+				} else {
+					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;
+				if ( ONum == 4 || ONum == 6 ) {
+					// GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
+					// Include all EMS constructions since they can potentially be used by a CTF surface
+					Construct( CNum ).IsUsedCTF = true;
+				}
 			}
 		}
 		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
