@@ -92,9 +92,9 @@ public: // Methods
 		Optional_bool_const zoneCompTurnFansOn = _, // Turn fans ON signal from ZoneHVAC component
 		Optional_bool_const zoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
 		Optional< Real64 const > pressureRise = _, // Pressure difference to use for DeltaPress
-		Optional< Real64 const > flowRatio1 = _, // Flow ratio in operating mode 1
+		Optional< Real64 const > massFlowRate1 = _, // Mass flow rate in operating mode 1 [kg/s]
 		Optional< Real64 const > runTimeFraction1 = _, // Run time fraction in operating mode 1
-		Optional< Real64 const > flowRatio2= _, // Flow ratio in operating mode 2
+		Optional< Real64 const > massFlowRate2 = _, // Mass flow rate in operating mode 2 [kg/s]
 		Optional< Real64 const > runTimeFraction2 = _, // Run time fraction in operating mode 2
 		Optional< Real64 const > pressureRise2 = _ // Pressure difference to use for operating mode 2
 		);
