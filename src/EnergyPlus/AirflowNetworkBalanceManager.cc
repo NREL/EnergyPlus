@@ -97,8 +97,6 @@
 #include <UtilityRoutines.hh>
 #include <ZoneDehumidifier.hh>
 
-#include <fstream>
-
 namespace EnergyPlus {
 
 namespace AirflowNetworkBalanceManager {
@@ -5510,9 +5508,6 @@ namespace AirflowNetworkBalanceManager {
 		using DataHeatBalSurface::TH;
 		using DataHeatBalFanSys::QRadSurfAFNDuct;
 
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5549,10 +5544,9 @@ namespace AirflowNetworkBalanceManager {
 		bool found;
 		bool OANode;
 
-		std::ofstream static file("AFN_debug.csv", std::ofstream::out);
-
 		MA = 0.0;
 		MV = 0.0;
+
 		for ( i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			CompNum = AirflowNetworkLinkageData( i ).CompNum;
 			CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
@@ -5704,14 +5698,9 @@ namespace AirflowNetworkBalanceManager {
 						Real64 ZoneSurfaceArea = Surface( SurfNum ).Area;
 						QRadSurfAFNDuct( SurfNum ) += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad * TimeStepSys * SecInHour / ZoneSurfaceArea; // Energy to each surface per unit area [J/m2]
 						VFObj.QRad += VFObj.LinkageSurfaceData( j ).SurfaceRadLoad; // Total radiant load from all surfaces for this system timestep [W]
-
-						if ( !WarmupFlag ) {
-							file << HourOfDay << "," << TimeStep << "," << ZoneSurfNum << "," << VFObj.LinkageSurfaceData( j ).SurfaceRadLoad << "," << TSurfj << "," << TDuctSurf << "," << Tsurr << "," << VFObj.LinkageSurfaceData( j ).SurfaceResistanceFactor << std::endl;
-						}
 					}
 
 					VFObj.QConv = hOut * DuctSurfArea * ( TDuctSurf - Tamb );
-
 					UThermal = ( VFObj.QRad + VFObj.QConv ) / ( DuctSurfArea * abs( Tsurr - Tin ) );
 
 				}
