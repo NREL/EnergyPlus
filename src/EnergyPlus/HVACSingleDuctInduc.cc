@@ -766,7 +766,7 @@ namespace HVACSingleDuctInduc {
 								// the design heating coil load is the zone load minus whatever the central system does. Note that
 								// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak > 0.0 ) {
-									DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
 								}
@@ -838,7 +838,7 @@ namespace HVACSingleDuctInduc {
 								// the design cooling coil load is the zone load minus whatever the central system does. Note that
 								// DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak > 0.0 ) {
-									DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 								}

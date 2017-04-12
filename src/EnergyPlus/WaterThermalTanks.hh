@@ -109,6 +109,7 @@ namespace WaterThermalTanks {
 	extern int const COIL_DX_MULTISPEED; // reclaim heating source is DX multispeed coil
 	extern int const COIL_DX_MULTIMODE; // reclaim heating source is DX multimode coil
 	extern int const CONDENSER_REFRIGERATION; // reclaim heating source is detailed refrigeration system condenser
+	extern int const COIL_DX_VARIABLE_COOLING; // reclaim heating source is Variable Speed DX cooling coil
 
 	extern int const UseSide; // Indicates Use side of water heater
 	extern int const SourceSide; // Indicates Source side of water heater

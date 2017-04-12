@@ -608,8 +608,6 @@ namespace RoomAirModelAirflowNetwork {
 		// Using/Aliasing
 		using DataHVACGlobals::UseZoneTimeStepHistory;
 		using DataHVACGlobals::TimeStepSys;
-		using DataHeatBalFanSys::ZoneVolCapMultpSens;
-		using DataHeatBalFanSys::ZoneVolCapMultpMoist;
 		using DataGlobals::SecInHour;
 		using Psychrometrics::PsyHgAirFnWTdb;
 		using DataHeatBalFanSys::ZoneAirHumRat;
@@ -664,7 +662,7 @@ namespace RoomAirModelAirflowNetwork {
 		// solve for node drybulb temperature
 		TempDepCoef = ThisRAFNNode.SumHA + ThisRAFNNode.SumLinkMCp + ThisRAFNNode.SumSysMCp;
 		TempIndCoef = ThisRAFNNode.SumIntSensibleGain + ThisRAFNNode.SumHATsurf - ThisRAFNNode.SumHATref + ThisRAFNNode.SumLinkMCpT + ThisRAFNNode.SumSysMCpT + ThisRAFNNode.NonAirSystemResponse + ThisRAFNNode.SysDepZoneLoadsLagged;
-		AirCap = ThisRAFNNode.AirVolume * ZoneVolCapMultpSens * ThisRAFNNode.RhoAir * ThisRAFNNode.CpAir / ( TimeStepSys*SecInHour );
+		AirCap = ThisRAFNNode.AirVolume * Zone( ZoneNum ).ZoneVolCapMultpSens * ThisRAFNNode.RhoAir * ThisRAFNNode.CpAir / ( TimeStepSys*SecInHour );
 
 		if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 			if ( TempDepCoef == 0.0 ) { // B=0
@@ -685,7 +683,7 @@ namespace RoomAirModelAirflowNetwork {
 		H2OHtOfVap = PsyHgAirFnWTdb( ThisRAFNNode.HumRat, ThisRAFNNode.AirTemp );
 		A = ThisRAFNNode.SumLinkM + ThisRAFNNode.SumHmARa + ThisRAFNNode.SumSysM;
 		B = ( ThisRAFNNode.SumIntLatentGain / H2OHtOfVap ) + ThisRAFNNode.SumSysMW + ThisRAFNNode.SumLinkMW + ThisRAFNNode.SumHmARaW;
-		C = ThisRAFNNode.RhoAir * ThisRAFNNode.AirVolume * ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
+		C = ThisRAFNNode.RhoAir * ThisRAFNNode.AirVolume * Zone( ZoneNum ).ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
 
 		// Exact solution
 		if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {

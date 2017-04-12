@@ -85,6 +85,7 @@
 #include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MatrixDataManager.hh>
@@ -1275,6 +1276,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::ScanForReports;
+		using General::TrimSigDigits;
 
 		// if this has a size, then input has already been gotten
 		if ( UniqueMaterialNames.size() ) {
@@ -3103,6 +3105,16 @@ namespace HeatBalanceManager {
 				ErrorsFound = true;
 			}
 
+			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
+				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
+			}
+
 		}
 
 		// Thermochromic glazing group
@@ -4100,6 +4112,7 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using DataDaylighting::ZoneDaylight;
+		using HybridModel::FlagHybridModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4210,6 +4223,11 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+
+		if ( FlagHybridModel ){
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		}
+
 	}
 
 	// End of Get Input subroutines for the HB Module

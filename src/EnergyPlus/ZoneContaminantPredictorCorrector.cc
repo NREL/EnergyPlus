@@ -1564,7 +1564,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of CO2 Load means that
@@ -1646,7 +1646,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds; 
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of GC Load means that
@@ -2139,7 +2139,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
 						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
 				}
 			} else if ( ZoneMassFlowRate <= 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {
@@ -2150,7 +2150,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 				}
 			}
 
@@ -2200,7 +2200,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
 						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 				}
 			} else if ( ZoneMassFlowRate <= 0.0 ) {
 				if ( Contaminant.GenericContamSimulation ) {
@@ -2211,7 +2211,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 				}
 			}
 

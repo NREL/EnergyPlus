@@ -2598,6 +2598,7 @@ namespace ZoneEquipmentManager {
 				z.CoolDDNum = c.CoolDDNum;
 
 				z.DesHeatLoad = c.DesHeatLoad;
+				z.NonAirSysDesHeatLoad = c.DesHeatLoad;
 				z.DesHeatMassFlow = c.DesHeatMassFlow;
 				z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
 				z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
@@ -2606,10 +2607,12 @@ namespace ZoneEquipmentManager {
 				z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
 				z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
 				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.NonAirSysDesHeatVolFlow = c.DesHeatVolFlow;
 				z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
 				z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
 
 				z.DesCoolLoad = c.DesCoolLoad;
+				z.NonAirSysDesCoolLoad = c.DesCoolLoad;
 				z.DesCoolMassFlow = c.DesCoolMassFlow;
 				z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
 				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
@@ -2618,6 +2621,7 @@ namespace ZoneEquipmentManager {
 				z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
 				z.TimeStepNumAtCoolMax = c.TimeStepNumAtCoolMax;
 				z.DesCoolVolFlow = c.DesCoolVolFlow;
+				z.NonAirSysDesCoolVolFlow = c.DesCoolVolFlow;
 				z.DesCoolCoilInTemp = c.DesCoolCoilInTemp;
 				z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
 			}
@@ -2665,8 +2669,10 @@ namespace ZoneEquipmentManager {
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				// Now take into account the user specified sizing factor and user specified cooling design air flow
-				// rate
+				// update non air system design load and air flow to include the sizing factor
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesCoolLoad *= FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesCoolVolFlow *= FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor; // NonAirSysDesCoolVolFlow not currently used
+				// Now take into account the user specified sizing factor and user specified cooling design air flow rate
 				TotCoolSizMult = 0.0;
 				// Calculate a sizing factor from the user specified cooling design air flow rate
 				if ( FinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow > 0.0 && FinalZoneSizing( CtrlZoneNum ).CoolAirDesMethod == InpDesAirFlow && FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
@@ -2771,7 +2777,13 @@ namespace ZoneEquipmentManager {
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepAtPeakF );
+						// issue 6006, heating coils sizing to 0 when no heating load in zone
+						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.empty() ) {
+							ShowSevereError( RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
+						} else {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.end() );
+						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
@@ -2779,13 +2791,17 @@ namespace ZoneEquipmentManager {
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolDesHumRat;
 						}
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRat = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 					}
 				}
-				// Now take into account the user specified sizing factor or user specified heating design air flow
-				// rate (which overrides the sizing factor)
+				// update non air system design load and air flow to include the sizing factor
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatLoad *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).NonAirSysDesHeatVolFlow *= FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
+				// Now take into account the user specified sizing factor or user specified heating design air flow rate (which overrides the sizing factor)
 				TotHeatSizMult = 0.0;
 				// Calculate a sizing factor from the user specified heating design air flow rate
 				if ( FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow > 0.0 && FinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod == InpDesAirFlow && FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
@@ -2891,13 +2907,21 @@ namespace ZoneEquipmentManager {
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepAtPeakF );
+						// issue 6006, heating coils sizing to 0 when no heating load in zone
+						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.empty() ) {
+							ShowSevereError( RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
+						} else {
+							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = *std::max_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.end() );
+						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, RoutineName ) );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatDesHumRat;
 						}
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
+						CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRat = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
@@ -2983,7 +3007,6 @@ namespace ZoneEquipmentManager {
 		using CoolingPanelSimple::SimCoolingPanel;
 		using SplitterComponent::SimAirLoopSplitter;
 		using FanCoilUnits::SimFanCoilUnit;
-		using Fans::SimulateFanComponents;
 		using WindowAC::SimWindowAC;
 		using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
 		using ZoneDehumidifier::SimZoneDehumidifier;
@@ -3298,7 +3321,7 @@ namespace ZoneEquipmentManager {
 						TurnFansOff = true;
 					}
 
-					SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					Fans::SimulateFanComponents( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;
@@ -4504,7 +4527,6 @@ namespace ZoneEquipmentManager {
 		VentMCP = 0.0;
 		MDotCPOA = 0.0;
 		MDotOA = 0.0;
-
 		MCPThermChim = 0.0;
 		ThermChimAMFL = 0.0;
 		MCPTThermChim = 0.0;
@@ -5208,7 +5230,6 @@ namespace ZoneEquipmentManager {
 				OAMFL( NZ ) += MCpI_temp / CpAir;
 				MCPTI( NZ ) += MCpI_temp * TempExt;
 			}
-
 		}
 
 		// Add infiltration rate enhanced by the existence of thermal chimney

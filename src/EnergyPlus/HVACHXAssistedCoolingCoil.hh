@@ -109,6 +109,7 @@ namespace HVACHXAssistedCoolingCoil {
 		int CoolingCoilType_Num; // Numeric Equivalent for cooling coil
 		std::string CoolingCoilName; // Cooling coil name
 		int CoolingCoilIndex;
+		int DXCoilNumOfSpeeds; // number of speed levels for variable speed DX coil
 		std::string HeatExchangerType; // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
 		// HeatExchanger:AirToAir:SensibleAndLatent or
 		// HeatExchanger:Desiccant:BalancedFlow
@@ -127,6 +128,7 @@ namespace HVACHXAssistedCoolingCoil {
 			HXAssistedCoilType_Num( 0 ),
 			CoolingCoilType_Num( 0 ),
 			CoolingCoilIndex( 0 ),
+			DXCoilNumOfSpeeds( 0 ),
 			HeatExchangerType_Num( 0 ),
 			HeatExchangerIndex( 0 ),
 			HXAssistedCoilInletNodeNum( 0 ),

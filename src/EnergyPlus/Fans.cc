@@ -845,8 +845,9 @@ namespace Fans {
 			// Setup Report variables for the Fans  CurrentModuleObject='Fans'
 			SetupOutputVariable( "Fan Electric Power [W]", Fan( FanNum ).FanPower, "System", "Average", Fan( FanNum ).FanName );
 			SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", Fan( FanNum ).DeltaTemp, "System", "Average", Fan( FanNum ).FanName );
+			SetupOutputVariable( "Fan Heat Gain to Air [W]", Fan( FanNum ).PowerLossToAir, "System", "Average", Fan( FanNum ).FanName );
 			SetupOutputVariable( "Fan Electric Energy [J]", Fan( FanNum ).FanEnergy, "System", "Sum", Fan( FanNum ).FanName, _, "Electric", "Fans", Fan( FanNum ).EndUseSubcategoryName, "System" );
-
+			SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", Fan( FanNum ).OutletAirMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 			if ( ( Fan( FanNum ).FanType_Num == FanType_ZoneExhaust ) && ( Fan( FanNum ).BalancedFractSchedNum > 0 ) ) {
 				SetupOutputVariable( "Fan Unbalanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).UnbalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 				SetupOutputVariable( "Fan Balanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).BalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
@@ -990,6 +991,7 @@ namespace Fans {
 			//Initialize all report variables to a known state at beginning of simulation
 			Fan( FanNum ).FanPower = 0.0;
 			Fan( FanNum ).DeltaTemp = 0.0;
+			Fan( FanNum ).PowerLossToAir = 0.0;
 			Fan( FanNum ).FanEnergy = 0.0;
 
 			MyEnvrnFlag( FanNum ) = false;
@@ -1435,7 +1437,7 @@ namespace Fans {
 		//unused0909      REAL(r64) Tin         ! [C]
 		//unused0909      REAL(r64) Win
 		Real64 FanShaftPower; // power delivered to fan shaft
-		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
+
 		int NVPerfNum;
 
 		NVPerfNum = Fan( FanNum ).NVPerfNum;
@@ -1491,8 +1493,8 @@ namespace Fans {
 			//Fan is operating
 			Fan( FanNum ).FanPower = MassFlow * DeltaPress / ( FanEff * RhoAir ); // total fan power
 			FanShaftPower = MotEff * Fan( FanNum ).FanPower; // power delivered to shaft
-			PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * MotInAirFrac;
-			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + PowerLossToAir / MassFlow;
+			Fan( FanNum ).PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * MotInAirFrac;
+			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + Fan( FanNum ).PowerLossToAir / MassFlow;
 			// This fan does not change the moisture or Mass Flow across the component
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirMassFlowRate = MassFlow;
@@ -1502,7 +1504,7 @@ namespace Fans {
 			//Fan is off and not operating no power consumed and mass flow rate.
 			Fan( FanNum ).FanPower = 0.0;
 			FanShaftPower = 0.0;
-			PowerLossToAir = 0.0;
+			Fan( FanNum ).PowerLossToAir = 0.0;
 			Fan( FanNum ).OutletAirMassFlowRate = 0.0;
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy;
@@ -1576,7 +1578,6 @@ namespace Fans {
 		static Real64 FlowFracForPower( 0.0 ); // Variable Volume Fan Flow Fraction for power calcs[-]
 		static Real64 FlowFracActual( 0.0 ); // actual VAV fan flow fraction
 		Real64 FanShaftPower; // power delivered to fan shaft
-		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
 		int NVPerfNum;
 
 		// added to address the fan heat issue during low air flow conditions
@@ -1619,7 +1620,7 @@ namespace Fans {
 
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( ! Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
 
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
 
@@ -1668,8 +1669,8 @@ namespace Fans {
 			Fan( FanNum ).FanPower = PartLoadFrac * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir ); // total fan power (PH 7/13/03)
 
 			FanShaftPower = MotEff * Fan( FanNum ).FanPower; // power delivered to shaft
-			PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * MotInAirFrac;
-			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + PowerLossToAir / MassFlow;
+			Fan( FanNum ).PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * MotInAirFrac;
+			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + Fan( FanNum ).PowerLossToAir / MassFlow;
 			// This fan does not change the moisture or Mass Flow across the component
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirMassFlowRate = MassFlow;
@@ -1695,8 +1696,8 @@ namespace Fans {
 					Fan( FanNum ).FanPower = FlowFracActual * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
 				}
 				FanShaftPower = MotEff * Fan( FanNum ).FanPower; // power delivered to shaft
-				PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * MotInAirFrac;
-				Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + PowerLossToAir / MassFlow;
+				Fan( FanNum ).PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * MotInAirFrac;
+				Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + Fan( FanNum ).PowerLossToAir / MassFlow;
 				// This fan does not change the moisture or Mass Flow across the component
 				Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 				Fan( FanNum ).OutletAirMassFlowRate = MassFlow;
@@ -1707,7 +1708,7 @@ namespace Fans {
 			//Fan is off and not operating no power consumed and mass flow rate.
 			Fan( FanNum ).FanPower = 0.0;
 			FanShaftPower = 0.0;
-			PowerLossToAir = 0.0;
+			Fan( FanNum ).PowerLossToAir = 0.0;
 			Fan( FanNum ).OutletAirMassFlowRate = 0.0;
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy;
@@ -1776,7 +1777,6 @@ namespace Fans {
 		Real64 PartLoadRatio; // Ratio of actual mass flow rate to max mass flow rate
 		Real64 FlowFrac; // Actual Fan Flow Fraction = actual mass flow rate / max air mass flow rate
 		Real64 FanShaftPower; // power delivered to fan shaft
-		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
 		Real64 SpeedRaisedToPower; // Result of the speed ratio raised to the power of n (Curve object)
 		Real64 EffRatioAtSpeedRatio; // Efficeincy ratio at current speed ratio (Curve object)
 		static int ErrCount( 0 );
@@ -1893,8 +1893,8 @@ namespace Fans {
 			//   requesting the fan to operate in cycling fan/cycling coil mode
 			OnOffFanPartLoadFraction = 1.0; // reset to 1 in case other on/off fan is called without a part load curve
 			FanShaftPower = Fan( FanNum ).MotEff * Fan( FanNum ).FanPower; // power delivered to shaft
-			PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * Fan( FanNum ).MotInAirFrac;
-			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + PowerLossToAir / MassFlow;
+			Fan( FanNum ).PowerLossToAir = FanShaftPower + ( Fan( FanNum ).FanPower - FanShaftPower ) * Fan( FanNum ).MotInAirFrac;
+			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + Fan( FanNum ).PowerLossToAir / MassFlow;
 			// This fan does not change the moisture or Mass Flow across the component
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirMassFlowRate = MassFlow;
@@ -1904,7 +1904,7 @@ namespace Fans {
 			// Fan is off and not operating no power consumed and mass flow rate.
 			Fan( FanNum ).FanPower = 0.0;
 			FanShaftPower = 0.0;
-			PowerLossToAir = 0.0;
+			Fan( FanNum ).PowerLossToAir = 0.0;
 			Fan( FanNum ).OutletAirMassFlowRate = 0.0;
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy;
@@ -1958,7 +1958,6 @@ namespace Fans {
 		Real64 FanEff;
 		Real64 MassFlow; // [kg/sec]
 		Real64 Tin; // [C]
-		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
 		bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
 
 		DeltaPress = Fan( FanNum ).DeltaPress;
@@ -2015,8 +2014,8 @@ namespace Fans {
 		if ( FanIsRunning ) {
 			//Fan is operating
 			Fan( FanNum ).FanPower = MassFlow * DeltaPress / ( FanEff * RhoAir ); // total fan power
-			PowerLossToAir = Fan( FanNum ).FanPower;
-			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + PowerLossToAir / MassFlow;
+			Fan( FanNum ).PowerLossToAir = Fan( FanNum ).FanPower;
+			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + Fan( FanNum ).PowerLossToAir / MassFlow;
 			// This fan does not change the moisture or Mass Flow across the component
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirMassFlowRate = MassFlow;
@@ -2025,7 +2024,7 @@ namespace Fans {
 		} else {
 			//Fan is off and not operating no power consumed and mass flow rate.
 			Fan( FanNum ).FanPower = 0.0;
-			PowerLossToAir = 0.0;
+			Fan( FanNum ).PowerLossToAir = 0.0;
 			Fan( FanNum ).OutletAirMassFlowRate = 0.0;
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy;
@@ -2136,7 +2135,6 @@ namespace Fans {
 		Real64 MotorPLEff; // Motor normalized (part-load) efficiency [-]
 		static Real64 VFDSpdRatio( 0.0 ); // Ratio of motor speed to motor max speed [-]
 		static Real64 VFDOutPwrRatio( 0.0 ); // Ratio of VFD output power to max VFD output power [-]
-		Real64 PowerLossToAir; // Energy input to air stream (W)
 		Real64 FanEnthalpyChange; // Air enthalpy change due to fan, belt, and motor losses [kJ/kg]
 
 		// Get inputs for night ventilation option
@@ -2273,8 +2271,8 @@ namespace Fans {
 
 			// Calculate air enthalpy and temperature rise from power entering air stream from fan wheel, belt, and motor
 			// Assumes MotInAirFrac applies to belt and motor but NOT to VFD
-			PowerLossToAir = Fan( FanNum ).FanShaftPower + ( Fan( FanNum ).MotorInputPower - Fan( FanNum ).FanShaftPower ) * Fan( FanNum ).MotInAirFrac; //[W]
-			FanEnthalpyChange = PowerLossToAir / MassFlow; //[kJ/kg]
+			Fan( FanNum ).PowerLossToAir = Fan( FanNum ).FanShaftPower + ( Fan( FanNum ).MotorInputPower - Fan( FanNum ).FanShaftPower ) * Fan( FanNum ).MotInAirFrac; //[W]
+			FanEnthalpyChange = Fan( FanNum ).PowerLossToAir / MassFlow; //[kJ/kg]
 			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy + FanEnthalpyChange; //[kJ/kg]
 
 			// This fan does not change the moisture or mass flow across the component
@@ -2305,7 +2303,7 @@ namespace Fans {
 			//Fan is OFF and not operating -- no power consumed and zero mass flow rate
 			Fan( FanNum ).FanPower = 0.0;
 			Fan( FanNum ).FanShaftPower = 0.0;
-			PowerLossToAir = 0.0;
+			Fan( FanNum ).PowerLossToAir = 0.0;
 			Fan( FanNum ).OutletAirMassFlowRate = 0.0;
 			Fan( FanNum ).OutletAirHumRat = Fan( FanNum ).InletAirHumRat;
 			Fan( FanNum ).OutletAirEnthalpy = Fan( FanNum ).InletAirEnthalpy;
@@ -2446,7 +2444,6 @@ namespace Fans {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::FanElecPower;
 		using DataAirLoop::LoopOnOffFanRTF;
 		using DataGlobals::SecInHour;
 
@@ -2467,7 +2464,6 @@ namespace Fans {
 
 		Fan( FanNum ).FanEnergy = Fan( FanNum ).FanPower * TimeStepSys * SecInHour;
 		Fan( FanNum ).DeltaTemp = Fan( FanNum ).OutletAirTemp - Fan( FanNum ).InletAirTemp;
-		FanElecPower = Fan( FanNum ).FanPower;
 
 		if ( Fan( FanNum ).FanType_Num == FanType_SimpleOnOff ) {
 			LoopOnOffFanRTF = Fan( FanNum ).FanRuntimeFraction;
@@ -2566,11 +2562,8 @@ namespace Fans {
 
 	}
 
-	void
-	GetFanPower(
-		int const FanIndex,
-		Real64 & FanPower
-	)
+	Real64
+	GetFanPower( int const FanIndex )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2607,9 +2600,9 @@ namespace Fans {
 		// na
 
 		if ( FanIndex == 0 ) {
-			FanPower = 0.0;
+			return 0.0;
 		} else {
-			FanPower = Fan( FanIndex ).FanPower;
+			return Fan( FanIndex ).FanPower;
 		}
 
 	}

@@ -64,6 +64,7 @@
 #include <DataSizing.hh>
 #include <DataSystemVariables.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -894,9 +895,9 @@ namespace HVACControllers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   July 1998
-		//       MODIFIED       Shirey/Raustad (FSEC), Jan 2004
-		//       MODIFIED       Dimitri Curtil (LBNL), Feb 2006
-		//                      - Moved first call convergence test code to ResetController()
+		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC), 
+		//       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
+		//                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -909,19 +910,23 @@ namespace HVACControllers {
 		// na
 
 		// Using/Aliasing
-		using Psychrometrics::PsyTdpFnWPb;
-		using FluidProperties::GetDensityGlycol;
 		using DataEnvironment::OutBaroPress;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::DoSetPointTest;
+		using DataPlant::PlantLoop;
+		using DataPlant::ScanPlantLoopsForNodeNum;
 		using RootFinder::SetupRootFinder;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using EMSManager::iHumidityRatioSetPoint;
 		using EMSManager::iHumidityRatioMaxSetPoint;
 		using EMSManager::iMassFlowRateSetPoint;
-		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForNodeNum;
+		using FaultsManager::FaultsCoilSATSensor;
+		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetActuatedBranchFlowRate;
+		using Psychrometrics::PsyTdpFnWPb;
 		using SetPointManager::GetHumidityRatioVariableType;
 		using SetPointManager::iCtrlVarType_HumRat;
 		using SetPointManager::iCtrlVarType_MaxHumRat;
@@ -1157,6 +1162,15 @@ namespace HVACControllers {
 			if ( ! ControllerProps( ControlNum ).IsSetPointDefinedFlag ) {
 				ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
+				
+				//If there is a fault of water coil SAT sensor (zrp_Jul2016)
+				if( ControllerProps( ControlNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+					//calculate the sensor offset using fault information
+					int FaultIndex = ControllerProps( ControlNum ).FaultyCoilSATIndex;
+					ControllerProps( ControlNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+					//update the SetPointValue
+					ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint - ControllerProps( ControlNum ).FaultyCoilSATOffset;
+				}
 			}
 
 		} else if ( SELECT_CASE_var == iTemperatureAndHumidityRatio ) { // 'TemperatureAndHumidityRatio'

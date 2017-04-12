@@ -2492,6 +2492,202 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( SQLiteFixture, OutputProcessor_setupOutputVariable_star )
+		{
+			std::string const idf_objects = delimited_string({
+				"Output:Variable,*,Boiler Gas Rate,runperiod;"
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			GetReportVariableInput();
+			Real64 fuel_used = 999;
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
+			sqlite_test = std::move( EnergyPlus::sqlite );
+
+			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+			std::vector< std::vector<std::string> > reportDataDictionary({
+				{ "1", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W" },
+				{ "2", "0", "Avg", "System", "Zone", "Boiler2", "Boiler Gas Rate", "Run Period", "", "W" },
+				{ "3", "0", "Avg", "System", "Zone", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W" },
+			});
+
+			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+
+
+			compare_eso_stream( delimited_string( {
+				"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"2,11,Boiler2,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"3,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"
+			} ) );
+
+		}
+
+		TEST_F( SQLiteFixture, OutputProcessor_setupOutputVariable_regex )
+		{
+			std::string const idf_objects = delimited_string({
+				"Output:Variable,Boiler[13],Boiler Gas Rate,runperiod;"
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			GetReportVariableInput();
+			Real64 fuel_used = 999;
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
+			sqlite_test = std::move( EnergyPlus::sqlite );
+
+			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+			std::vector< std::vector<std::string> > reportDataDictionary({
+				{ "1", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W" },
+				{ "2", "0", "Avg", "System", "Zone", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W" },
+			});
+
+			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+
+
+			compare_eso_stream( delimited_string( {
+				"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"2,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"
+			} ) );
+
+		}
+
+		TEST_F( SQLiteFixture, OutputProcessor_setupOutputVariable_regex_2 )
+		{
+			std::string const idf_objects = delimited_string({
+				"Output:Variable,Boiler.*,Boiler Gas Rate,runperiod;"
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			GetReportVariableInput();
+			Real64 fuel_used = 999;
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
+			sqlite_test = std::move( EnergyPlus::sqlite );
+
+			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+			std::vector< std::vector<std::string> > reportDataDictionary({
+				{ "1", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W" },
+				{ "2", "0", "Avg", "System", "Zone", "Boiler2", "Boiler Gas Rate", "Run Period", "", "W" },
+				{ "3", "0", "Avg", "System", "Zone", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W" },
+			});
+
+			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+
+
+			compare_eso_stream( delimited_string( {
+				"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"2,11,Boiler2,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"3,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"
+			} ) );
+
+		}
+
+		TEST_F( SQLiteFixture, OutputProcessor_setupOutputVariable_regex_3 ) {
+			std::string const idf_objects = delimited_string( {
+				"Output:Variable,Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"
+			} );
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			GetReportVariableInput();
+			Real64 vol_flow = 999;
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall002" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall003" );
+			sqlite_test = std::move( EnergyPlus::sqlite );
+
+			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
+
+			std::vector< std::vector< std::string > > reportDataDictionary( {
+				{ "1", "0", "Avg", "System", "Zone", "Zn003:Wall001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+				{ "2", "0", "Avg", "System", "Zone", "Zn003:Wall002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+				{ "3", "0", "Avg", "System", "Zone", "Zn003:Wall002:Win001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+				{ "4", "0", "Avg", "System", "Zone", "Zn003:Wall003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+			} );
+
+			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+			auto reportDataResults = queryResult( "SELECT * FROM ReportData;", "ReportData" );
+			auto reportExtendedDataResults = queryResult( "SELECT * FROM ReportExtendedData;", "ReportExtendedData" );
+
+
+			compare_eso_stream( delimited_string( {
+				"1,1,Zn003:Wall001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+				"2,1,Zn003:Wall002,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+				"3,1,Zn003:Wall002:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+				"4,1,Zn003:Wall003,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+			} ) );
+
+		}
+
+		TEST_F( SQLiteFixture, OutputProcessor_setupOutputVariable_regex_4 ) {
+			// case-insensitive comparison
+			std::string const idf_objects = delimited_string( {
+				"Output:Variable,(?i)Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"
+			} );
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			GetReportVariableInput();
+			Real64 vol_flow = 999;
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL002" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL003" );
+			sqlite_test = std::move( EnergyPlus::sqlite );
+
+			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
+
+			std::vector< std::vector< std::string > > reportDataDictionary( {
+				{ "1", "0", "Avg", "System", "Zone", "ZN003:WALL001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+				{ "2", "0", "Avg", "System", "Zone", "ZN003:WALL002", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+				{ "3", "0", "Avg", "System", "Zone", "ZN003:WALL002:WIN001", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+				{ "4", "0", "Avg", "System", "Zone", "ZN003:WALL003", "AFN Linkage Node 1 to Node 2 Volume Flow Rate", "Zone Timestep", "", "m3/s" },
+			} );
+
+			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+			auto reportDataResults = queryResult( "SELECT * FROM ReportData;", "ReportData" );
+			auto reportExtendedDataResults = queryResult( "SELECT * FROM ReportExtendedData;", "ReportExtendedData" );
+
+
+			compare_eso_stream( delimited_string( {
+				"1,1,ZN003:WALL001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+				"2,1,ZN003:WALL002,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+				"3,1,ZN003:WALL002:WIN001,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+				"4,1,ZN003:WALL003,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s] !TimeStep",
+			} ) );
+
+		}
+
 		TEST_F( SQLiteFixture, OutputProcessor_checkReportVariable )
 		{
 			std::string const idf_objects = delimited_string({

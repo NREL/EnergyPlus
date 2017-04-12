@@ -171,9 +171,15 @@ namespace DataStringGlobals {
 	std::string outputMtrCsvFileName("eplusmtr.csv");
 	std::string outputRvauditFileName("eplusout.rvaudit");
 
+<<<<<<< HEAD
 	std::string inputFileNameOnly;
 	std::string inputDirPathName;
 	std::string outputDirPathName;
+=======
+	std::string idfFileNameOnly;
+	std::string idfDirPathName;
+	std::string outDirPathName;
+>>>>>>> NREL/develop
 	std::string exeDirectory;
 
 	std::string ProgramPath; // Path for Program from INI file

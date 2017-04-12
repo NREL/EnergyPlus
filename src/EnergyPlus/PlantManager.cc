@@ -451,7 +451,12 @@ namespace PlantManager {
 			if ( this_loop.Volume == AutoCalculate ) {
 				this_loop.VolumeWasAutoSized = true;
 			}
-
+			// circulation time used to autocalculate loop volume
+			if ( lNumericFieldBlanks( 6 ) ) {
+				this_loop.CirculationTime = 2.0 ; // default
+			} else {
+				this_loop.CirculationTime = Num( 6 );
+			}
 
 			// Load the Loop Inlet and Outlet Nodes and Connection Info (Alpha(7-10) are related to the supply side)
 			this_supply_side.NodeNameIn = Alpha( 6 );
@@ -3220,8 +3225,9 @@ namespace PlantManager {
 
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
-			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::ResizePlantLoopLevelSizes and SizingAnalysisObjects::ResolveDesignFlowRate
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if (PlantFinalSizesOkayToReport) {
 				if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 					// condenser loop vs plant loop breakout needed.
@@ -3369,8 +3375,9 @@ namespace PlantManager {
 
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
-			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZoneSec / 0.8;
+			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::SizePlantLoop and SizingAnalysisObjects::ResolveDesignFlowRate
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 				// condenser loop vs plant loop breakout needed.
 				ReportSizingOutput( "PlantLoop", PlantLoop( LoopNum ).Name, "Plant Loop Volume [m3]", PlantLoop( LoopNum ).Volume );
@@ -4300,6 +4307,10 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgSlinky ) { //            = 91
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 

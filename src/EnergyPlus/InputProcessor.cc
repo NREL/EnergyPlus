@@ -2381,8 +2381,16 @@ namespace EnergyPlus {
 		static std::string const EMSOutputVariable( "EnergyManagementSystem:OutputVariable" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+<<<<<<< HEAD
 		std::string extension_key;
 		OutputVariablesForSimulation.allocate( 10000 );
+=======
+		int CurrentRecord;
+		int Loop;
+		int Loop1;
+
+		OutputVariablesForSimulation.reserve( 1024 );
+>>>>>>> NREL/develop
 		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
@@ -2540,10 +2548,13 @@ namespace EnergyPlus {
 			}
 		}
 
+<<<<<<< HEAD
 		if ( NumConsideredOutputVariables > 0 ) {
 			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
 			MaxConsideredOutputVariables = NumConsideredOutputVariables;
 		}
+=======
+>>>>>>> NREL/develop
 	}
 
 	void
@@ -2920,11 +2931,17 @@ namespace EnergyPlus {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
+<<<<<<< HEAD
+=======
+		//       MODIFIED       March 2017
+		//       RE-ENGINEERED  na
+>>>>>>> NREL/develop
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adds a new record (if necessary) to the Output Variable
 		// reporting structure.  DataOutputs, OutputVariablesForSimulation
 
+<<<<<<< HEAD
 		// METHODOLOGY EMPLOYED:
 		// OutputVariablesForSimulation is a linked list structure for later
 		// semi-easy perusal.
@@ -2935,6 +2952,9 @@ namespace EnergyPlus {
 		int CurNum;
 		int NextNum;
 		bool FoundOne;
+=======
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+>>>>>>> NREL/develop
 		std::string::size_type vnameLen; // if < length, there were units on the line/name
 
 		std::string::size_type const rbpos = index( VariableName, '[' );
@@ -2943,16 +2963,9 @@ namespace EnergyPlus {
 		} else {
 			vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
 		}
-
-		FoundOne = false;
 		std::string const VarName( VariableName.substr( 0, vnameLen ) );
-		for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
-			if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
-				FoundOne = true;
-				break;
-			}
-		}
 
+<<<<<<< HEAD
 		if ( !FoundOne ) {
 			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
 				ReAllocateAndPreserveOutputVariablesForSimulation();
@@ -2962,34 +2975,18 @@ namespace EnergyPlus {
 			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
 			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
 			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
+=======
+		auto const found = DataOutputs::OutputVariablesForSimulation.find( VarName );
+		if ( found == DataOutputs::OutputVariablesForSimulation.end() ) {
+			std::unordered_map< std::string, DataOutputs::OutputReportingVariables > data;
+			data.reserve( 32 );
+			data.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
+			DataOutputs::OutputVariablesForSimulation.emplace( VarName, std::move( data ) );
+>>>>>>> NREL/develop
 		} else {
-			if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
-				NextNum = CurNum;
-				if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-					while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-						CurNum = NextNum;
-						NextNum = OutputVariablesForSimulation( NextNum ).Next;
-					}
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
-					OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
-				} else {
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
-					OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
-				}
-			}
+			found->second.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
 		}
+<<<<<<< HEAD
 	}
 
 	void
@@ -3008,6 +3005,9 @@ namespace EnergyPlus {
 
 		// up allocation by OutputVarAllocInc
 		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
+=======
+		DataOutputs::NumConsideredOutputVariables++;
+>>>>>>> NREL/develop
 	}
 
 //void

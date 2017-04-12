@@ -47,6 +47,10 @@
 #ifndef FanCoilUnits_hh_INCLUDED
 #define FanCoilUnits_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+#include <string>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -54,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -209,7 +214,7 @@ namespace FanCoilUnits {
 		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
 		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
 		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
-		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
+		Real64 QUnitOutNoHC; // unit output with coils off [W]
 		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
 		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
 		int LimitErrCountH; // count of SolveRegulaFalsi limit errors

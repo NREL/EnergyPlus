@@ -882,6 +882,7 @@ namespace EnergyPlus {
 		AddRecordToOutputVariableStructure(
 		std::string const & KeyValue,
 		std::string const & VariableName
+<<<<<<< HEAD
 		);
 
 		static
@@ -903,5 +904,32 @@ namespace EnergyPlus {
 
 	}; // InputProcessor
 }
+=======
+	);
+
+	void
+	DumpCurrentLineBuffer(
+		int const StartLine,
+		std::string const & cStartLine,
+		std::string const & cStartName,
+		int const CurLine,
+		int const NumConxLines,
+		Array1S_string const LineBuf,
+		int const CurQPtr
+	);
+
+	void
+	ShowAuditErrorMessage(
+		std::string const & Severity, // if blank, does not add to sum
+		std::string const & ErrorMessage
+	);
+
+	std::string
+	IPTrimSigDigits( int const IntegerValue );
+
+} // InputProcessor
+
+} // EnergyPlus
+>>>>>>> NREL/develop
 
 #endif
