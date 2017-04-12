@@ -747,16 +747,12 @@ namespace OutputReportTabular {
 		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
 			OutputReportTabularAnnual::GetInputTabularAnnual();
-			OutputReportTabularAnnual::checkAggregationOrderForAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
 			GetInputOutputTableSummaryReports();
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
-			if ( isInvalidAggregationOrder( ) ) {
-				ShowFatalError( "OutputReportTabular: Invalid aggregations detected, no simulation performed." );
-			}
-			GetInputFuelAndPollutionFactors( );
+			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCLoadComponentTableSummaries();
 			UpdateTabularReportsGetInput = false;
@@ -1461,53 +1457,6 @@ namespace OutputReportTabular {
 		//DEALLOCATE(NamesOfKeys)
 		//DEALLOCATE(IndexesForKeyVar)
 		//#endif
-	}
-
-	bool
-	isInvalidAggregationOrder( )
-	{
-		bool foundError = false;
-		if ( !DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
-			return foundError;
-		}
-		for ( int iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
-			bool foundMinOrMax = false;
-			bool foundHourAgg = false;
-			bool missingMaxOrMinError = false;
-			bool missingHourAggError = false;
-			for ( int jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
-				int curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
-				// test if the aggregation types are in the correct order
-				for ( int kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
-					int curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
-					int curAggType = MonthlyColumns( curCol ).aggType;
-					if ( ( curAggType == aggTypeMaximum ) || ( curAggType == aggTypeMinimum ) ) {
-						foundMinOrMax = true;
-					} else if ( ( curAggType == aggTypeHoursNonZero ) || ( curAggType == aggTypeHoursZero ) ||
-						( curAggType == aggTypeHoursPositive ) || ( curAggType == aggTypeHoursNonPositive ) ||
-								( curAggType == aggTypeHoursNegative ) || ( curAggType == aggTypeHoursNonNegative ) ) {
-						foundHourAgg = true;
-					} else if ( curAggType == aggTypeValueWhenMaxMin ) {
-						if ( !foundMinOrMax ) {
-							missingMaxOrMinError = true;
-						}
-					} else if ( ( curAggType == aggTypeSumOrAverageHoursShown ) || ( curAggType == aggTypeMaximumDuringHoursShown ) || ( curAggType == aggTypeMinimumDuringHoursShown ) ) {
-						if ( !foundHourAgg ) {
-							missingHourAggError = true;
-						}
-					}
-				}
-			}
-			if ( missingMaxOrMinError ) {
-				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
-				foundError = true;
-			}
-			if ( missingHourAggError ) {
-				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
-				foundError = true;
-			}
-		}	
-		return foundError;
 	}
 
 	void
@@ -11967,6 +11916,9 @@ namespace OutputReportTabular {
 				CollectPeakAirLoopConditions( AirLoopCoolCompLoadTables( iAirLoop ), iAirLoop, true );
 				CollectPeakAirLoopConditions( AirLoopHeatCompLoadTables( iAirLoop ), iAirLoop, false );
 
+				ComputeEngineeringChecks( AirLoopCoolCompLoadTables( iAirLoop ) );
+				ComputeEngineeringChecks( AirLoopHeatCompLoadTables( iAirLoop ) );
+
 				AddTotalRowsForLoadSummary( AirLoopCoolCompLoadTables( iAirLoop ) );
 				AddTotalRowsForLoadSummary( AirLoopHeatCompLoadTables( iAirLoop ) );
 
@@ -12025,6 +11977,9 @@ namespace OutputReportTabular {
 				FacilityZonesHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
 				CombineLoadCompResults( FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables( iZone ), mult );
 			}
+
+			ComputeEngineeringChecks( FacilityCoolCompLoadTables );
+			ComputeEngineeringChecks( FacilityHeatCompLoadTables );
 
 			AddTotalRowsForLoadSummary( FacilityCoolCompLoadTables );
 			AddTotalRowsForLoadSummary( FacilityHeatCompLoadTables );
@@ -12177,6 +12132,9 @@ namespace OutputReportTabular {
 				// also remove the net radiant component on the instanteous conduction for fenestration
 				feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
 			} // for kTimeStep
+
+			decayCurve.deallocate();
+
 		} // if desDaySelected != 0
 
 		peopleRadIntoSurf.deallocate( );
@@ -12523,12 +12481,14 @@ namespace OutputReportTabular {
 				compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
 			}
 
-			if ( Zone( zoneIndex ).FloorArea != 0. ) {
+			compLoad.floorArea = Zone( zoneIndex ).FloorArea;
+
+			if ( compLoad.floorArea != 0. ) {
 				// airflow per floor area
-				compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / Zone( zoneIndex ).FloorArea;
+				compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / compLoad.floorArea;
 
 				// capacity per floor area
-				compLoad.totCapPerArea = compLoad.designPeakLoad / Zone( zoneIndex ).FloorArea;
+				compLoad.totCapPerArea = compLoad.designPeakLoad / compLoad.floorArea;
 			}
 			if ( compLoad.designPeakLoad != 0. ) {
 				// airflow per capacity
@@ -12560,17 +12520,22 @@ namespace OutputReportTabular {
 	) 
 	{
 		using DataSizing::FinalSysSizing;
+		using DataSizing::CalcSysSizing;
 
 		if ( isCooling ) {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
 			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).SensCoolCap;
+			compLoad.peakDesSensLoad = CalcSysSizing( airLoopIndex ).SensCoolCap;
 
 		} else {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
-			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).HeatCap;
+			compLoad.designPeakLoad = -FinalSysSizing( airLoopIndex ).HeatCap;
+			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).SensCoolCap;
 		}
+		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
+
 		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
 
@@ -12578,29 +12543,32 @@ namespace OutputReportTabular {
 		// Outside air flow
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
 
+	}
+
+	void 
+	ComputeEngineeringChecks(
+		CompLoadTablesType & compLoad
+	)
+	{
 		// outside air %
 		if ( compLoad.mainFanAirFlow != 0. ) {
 			compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
 		}
 
-		Real64 sumArea = compLoad.cells( cArea, rPeople );
-		if ( sumArea != 0. ) {
+		if ( compLoad.floorArea != 0. ) {
 			// airflow per floor area
-			compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / sumArea;
+			compLoad.airflowPerFlrArea = compLoad.mainFanAirFlow / compLoad.floorArea;
 
 			// capacity per floor area
-			compLoad.totCapPerArea = compLoad.designPeakLoad / sumArea;
+			compLoad.totCapPerArea = compLoad.designPeakLoad / compLoad.floorArea;
 		}
 		if ( compLoad.designPeakLoad != 0. ) {
 			// airflow per capacity
 			compLoad.airflowPerTotCap = compLoad.mainFanAirFlow / compLoad.designPeakLoad;
 
 			// floor area per capacity
-			compLoad.areaPerTotCap = sumArea / compLoad.designPeakLoad;
+			compLoad.areaPerTotCap = compLoad.floorArea / compLoad.designPeakLoad;
 		}
-
-
-
 	}
 
 
@@ -12757,9 +12725,12 @@ namespace OutputReportTabular {
 		compLoadTotal.peakDesSensLoad += compLoadPartial.peakDesSensLoad * multiplier;
 		compLoadTotal.estInstDelSensLoad += compLoadPartial.estInstDelSensLoad * multiplier;
 		compLoadTotal.diffPeakEst +=compLoadPartial.diffPeakEst * multiplier;
+		compLoadTotal.mainFanAirFlow += compLoadPartial.mainFanAirFlow * multiplier;
+		compLoadTotal.outsideAirFlow += compLoadPartial.outsideAirFlow * multiplier;
 
 		// sum the engineering checks
 		compLoadTotal.numPeople += compLoadPartial.numPeople * multiplier;
+		compLoadTotal.floorArea += compLoadPartial.floorArea * multiplier;
 	}
 
 	// create the total row and total columns for the load summary tables
@@ -13049,13 +13020,13 @@ namespace OutputReportTabular {
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
 
 					rowHead( 8 ) = "Supply Air Temperature [C]";
-					rowHead( 9 ) = "Mixed Air Temperature [C]";
+					rowHead( 9 ) = "Mixed Air Temperature [C]";  
 					rowHead( 10 ) = "Main Fan Air Flow [m3/s]";
 					rowHead( 11 ) = "Outside Air Flow [m3/s]";
-					rowHead( 12 ) = "Design Peak Load  [W]";
-					rowHead( 13 ) = "Difference Between Design and Peak Load [W]";
+					rowHead( 12 ) = "Peak Sensible Load with Sizing Factor [W]";
+					rowHead( 13 ) = "Difference Due to Sizing Factor [W]";
 
-					rowHead( 14 ) = "Peak Design Sensible Load [W]";
+					rowHead( 14 ) = "Peak Sensible Load [W]";
 					rowHead( 15 ) = "Estimated Instant + Delayed Sensible Load [W]";
 					rowHead( 16 ) = "Difference Between Peak and Estimated Sensible Load [W]";
 				} else {
@@ -13071,10 +13042,10 @@ namespace OutputReportTabular {
 					rowHead( 9 ) = "Mixed Air Temperature [F]";
 					rowHead( 10 ) = "Main Fan Air Flow [ft3/min]";
 					rowHead( 11 ) = "Outside Air Flow [ft3/min]";
-					rowHead( 12 ) = "Design Peak Load  [Btu/h]";
-					rowHead( 13 ) = "Difference Between Design and Peak Load [Btu/h]";
+					rowHead( 12 ) = "Peak Sensible Load with Sizing Factor [Btu/h]";
+					rowHead( 13 ) = "Difference Due to Sizing Factor [Btu/h]";
 
-					rowHead( 14 ) = "Peak Design Sensible Load [Btu/h]";
+					rowHead( 14 ) = "Peak Sensible Load  [Btu/h]";
 					rowHead( 15 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
 					rowHead( 16 ) = "Difference Between Peak and Estimated Sensible Load [Btu/h]";
 				}
@@ -13089,7 +13060,9 @@ namespace OutputReportTabular {
 					tableBody( 1, 7 ) = RealToStr( curCompLoad.zoneHumRatio, 5 ); //Zone Humidity Ratio at Peak
 				}
 				tableBody( 1, 8 ) = RealToStr( curCompLoad.supAirTemp, 2 );  // supply air temperature
-				tableBody( 1, 9 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature
+				if ( kind == airLoopOutput ) {
+					tableBody( 1, 9 ) = RealToStr( curCompLoad.mixAirTemp, 2 );  // mixed air temperature - not for zone or facility
+				}
 				tableBody( 1, 10 ) = RealToStr( curCompLoad.mainFanAirFlow, 2 );  // main fan air flow
 				tableBody( 1, 11 ) = RealToStr( curCompLoad.outsideAirFlow, 2 );  // outside air flow
 				tableBody( 1, 12 ) = RealToStr( curCompLoad.designPeakLoad, 2 );  // design peak load
@@ -13106,12 +13079,12 @@ namespace OutputReportTabular {
 
 				//---- Engineering Checks
 
-				rowHead.allocate( 8 );
+				rowHead.allocate( 6 );
 				columnHead.allocate( 1 );
 				columnWidth.allocate( 1 );
 				columnWidth = 14; //array assignment - same for all columns
 
-				tableBody.allocate( 1, 8 );
+				tableBody.allocate( 1, 6 );
 				tableBody = "";
 
 				columnHead( 1 ) = "Value";
@@ -13121,18 +13094,18 @@ namespace OutputReportTabular {
 					rowHead( 3 ) = "Airflow per Total Capacity [m3/s-W]";
 					rowHead( 4 ) = "Floor Area per Total Capacity [m2/W]";
 					rowHead( 5 ) = "Total Capacity per Floor Area [W/m2]";
-					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]";
-					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]";
-					rowHead( 8 ) = "Number of People";
+//					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
+//					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
+					rowHead( 6 ) = "Number of People";
 				} else {
 					rowHead( 1 ) = "Outside Air (%)";
 					rowHead( 2 ) = "Airflow per Floor Area [ft3/min-ft2]";
 					rowHead( 3 ) = "Airflow per Total Capacity [ft3-h/min-Btu]";
 					rowHead( 4 ) = "Floor Area per Total Capacity [ft2-h/Btu]";
 					rowHead( 5 ) = "Total Capacity per Floor Area [Btu/h-ft2]";
-					rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
-					rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
-					rowHead( 8 ) = "Number of People";
+//					rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
+//					rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
+					rowHead( 6 ) = "Number of People";
 				}
 
 				tableBody( 1, 1 ) = RealToStr( curCompLoad.outsideAirRatio, 4 );  // outside Air
@@ -13140,9 +13113,11 @@ namespace OutputReportTabular {
 				tableBody( 1, 3 ) = RealToStr( curCompLoad.airflowPerTotCap, 4 );  // airflow per total capacity
 				tableBody( 1, 4 ) = RealToStr( curCompLoad.areaPerTotCap, 4 );  // area per total capacity
 				tableBody( 1, 5 ) = RealToStr( curCompLoad.totCapPerArea, 4);  // total capacity per area
-				tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per flow
-				tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump power per flow
-				tableBody( 1, 8 ) = RealToStr( curCompLoad.numPeople, 1 );  // number of people
+//				if ( kind == facilityOutput ) {
+//					tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per flow
+//					tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump power per flow
+//				}
+				tableBody( 1, 6 ) = RealToStr( curCompLoad.numPeople, 1 );  // number of people
 
 
 				WriteSubtitle( engineeringCheckName );

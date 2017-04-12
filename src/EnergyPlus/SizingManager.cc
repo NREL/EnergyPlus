@@ -735,7 +735,7 @@ namespace SizingManager {
 					coolCap = FinalSysSizing( AirLoopNum ).TotCoolCap;
 				}
 				if ( coolPeakDD > 0 ) {
-					ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap,                              CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate,                                SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( coolPeakDD ));
+					ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap, CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate, SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( coolPeakDD ));
 				} else {
 					ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap, CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate, 0 );
 				}
