@@ -473,7 +473,6 @@ namespace CurveManager {
 
 		// Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-<<<<<<< HEAD
 		NumBiQuad = InputProcessor::GetNumObjectsFound( "Curve:Biquadratic" );
 		NumCubic = InputProcessor::GetNumObjectsFound( "Curve:Cubic" );
 		NumQuartic = InputProcessor::GetNumObjectsFound( "Curve:Quartic" );
@@ -496,33 +495,8 @@ namespace CurveManager {
 		NumChillerPartLoadWithLift = InputProcessor::GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
 
 		NumOneVarTab = InputProcessor::GetNumObjectsFound( "Table:OneIndependentVariable" );
+		NumWPCValTab = InputProcessor::GetNumObjectsFound( "AirflowNetwork:MultiZone:WindPressureCoefficientValues" );
 		NumTwoVarTab = InputProcessor::GetNumObjectsFound( "Table:TwoIndependentVariables" );
-=======
-		NumBiQuad = GetNumObjectsFound( "Curve:Biquadratic" );
-		NumCubic = GetNumObjectsFound( "Curve:Cubic" );
-		NumQuartic = GetNumObjectsFound( "Curve:Quartic" );
-		NumQuad = GetNumObjectsFound( "Curve:Quadratic" );
-		NumQLinear = GetNumObjectsFound( "Curve:QuadLinear" );
-		NumQuadLinear = GetNumObjectsFound( "Curve:QuadraticLinear" );
-		NumCubicLinear = GetNumObjectsFound( "Curve:CubicLinear" );
-		NumLinear = GetNumObjectsFound( "Curve:Linear" );
-		NumBicubic = GetNumObjectsFound( "Curve:Bicubic" );
-		NumTriQuad = GetNumObjectsFound( "Curve:Triquadratic" );
-		NumExponent = GetNumObjectsFound( "Curve:Exponent" );
-		NumMultVarLookup = GetNumObjectsFound( "Table:MultiVariableLookup" );
-		NumFanPressRise = GetNumObjectsFound( "Curve:FanPressureRise" ); //cpw22Aug2010
-		NumExpSkewNorm = GetNumObjectsFound( "Curve:ExponentialSkewNormal" ); //cpw22Aug2010
-		NumSigmoid = GetNumObjectsFound( "Curve:Sigmoid" ); //cpw22Aug2010
-		NumRectHyper1 = GetNumObjectsFound( "Curve:RectangularHyperbola1" ); //cpw22Aug2010
-		NumRectHyper2 = GetNumObjectsFound( "Curve:RectangularHyperbola2" ); //cpw22Aug2010
-		NumExpDecay = GetNumObjectsFound( "Curve:ExponentialDecay" ); //cpw22Aug2010
-		NumDoubleExpDecay = GetNumObjectsFound( "Curve:DoubleExponentialDecay" ); //ykt July 2011
-		NumChillerPartLoadWithLift = GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
-
-		NumOneVarTab = GetNumObjectsFound( "Table:OneIndependentVariable" );
-		NumWPCValTab = GetNumObjectsFound( "AirflowNetwork:MultiZone:WindPressureCoefficientValues" );
-		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
->>>>>>> NREL/develop
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
 					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
@@ -540,7 +514,7 @@ namespace CurveManager {
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
 		if (NumWPCValTab > 0) {
-			GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
+			InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
@@ -1754,14 +1728,14 @@ namespace CurveManager {
 		if ( NumWPCValTab > 0 ) {
 			// Get the angle values
 			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-			int numOfCPArray = GetNumObjectsFound(CurrentModuleObject);
+			int numOfCPArray = InputProcessor::GetNumObjectsFound(CurrentModuleObject);
 
 			if ( numOfCPArray != 1 ) {
 				ShowSevereError( "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject
 					+ " object per simulation is required when using the AirflowNetwork model." );
 				ErrorsFound = true;
 			} else if ( numOfCPArray == 1 ) {
-				GetObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+				InputProcessor::GetObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
 
 				std::string wpcName = Alphas( 1 ); // Name of CP array
 				int numWindDir = NumNumbers;
@@ -1794,28 +1768,13 @@ namespace CurveManager {
 				// Now that we have the directions, we can read the tables themselves
 				CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
 				for ( int index = 1; index <= NumWPCValTab; ++index ) {
-					GetObjectItem(CurrentModuleObject, index, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+					InputProcessor::GetObjectItem(CurrentModuleObject, index, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
 					++CurveNum;
 					++TableNum;
 					NumTableEntries = NumNumbers;
 					TableData( TableNum ).X1.allocate( NumTableEntries + 1 );
 					TableData( TableNum ).Y.allocate( NumTableEntries + 1 );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if (IsNotOK) {
-						ErrorsFound = true;
-						if (IsBlank) Alphas( 1 ) = "xxxxx";
-					}
-					// Need to verify that this name isn't used in Pressure Curves as well.
-					if ( NumPressureCurves > 0 ) {
-						CurveFound = FindItemInList( Alphas(1), PressureCurve );
-						if ( CurveFound != 0 ) {
-							ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate curve name." );
-							ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
-							ErrorsFound = true;
-						}
-					}
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
 					if ( !InputProcessor::SameString( Alphas(2), wpcName ) ) {
@@ -1902,7 +1861,7 @@ namespace CurveManager {
 		}
 		/*
 		for (CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex) {
-			GetObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+			InputProcessor::GetObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = (NumNumbers - 5) / 2;
@@ -1917,7 +1876,7 @@ namespace CurveManager {
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if (NumPressureCurves > 0) {
-				CurveFound = FindItemInList(Alphas(1), PressureCurve);
+				CurveFound = InputProcessor::FindItemInList(Alphas(1), PressureCurve);
 				if (CurveFound != 0) {
 					ShowSevereError("GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate curve name.");
 					ShowContinueError("...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves.");

@@ -118,66 +118,15 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_ZoneCoupled_Basement( "Site:GroundDomain:Basement" );
 
 	// MODULE VARIABLE DECLARATIONS:
-<<<<<<< HEAD
-	Array1D_int NeighborFieldCells;
-	Array1D_int NeighborBoundaryCells;
-	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE:
-	// ************************************* !
-	// Driver/Manager Routines               !
-	// ************************************* !
-	//   Public Entry Point                  !
-	//   Other Management                    !
-	//   Management/Input workers
-	// ************************************* !
-	// ************************************* !
-
-	// ******************************************** !
-	// Utility Routines                             !
-	// ******************************************** !
-	//   Useful numeric routines                    !
-	//   Extensions for data classes                !
-	//   Convergence checks                         !
-	//   Array shifting                             !
-	//   Error checking                             !
-	//   Other utilities                            !
-	//   Cartesian cell property routines           !
-	//   Class "constructors"                       !
-	// ******************************************** !
-	// ******************************************** !
-
-	// ***************************************** !
-	// Simulation Algorithms                     !
-	// ***************************************** !
-	//   Mesh Development routines               !
-	//   Simulation algorithms                   !
-	// ***************************************** !
-	// ***************************************** !
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	// Functions
-
-	void
-	clear_state() {
-		GroundDomainUniqueNames.clear();
-	}
-
-	void
-	CheckIfAnySlabs()
-=======
 	Array1D< Direction > NeighborFieldCells( 6 );
 	Array1D< Direction > NeighborBoundaryCells( 6 );
 	Array1D< FullDomainStructureInfo > PipingSystemDomains;
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
+	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
 
 	void
 	clear_state()
->>>>>>> NREL/develop
 	{
 		PipingSystemDomains.deallocate();
 		PipingSystemCircuits.deallocate();
@@ -194,30 +143,8 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   May 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-<<<<<<< HEAD
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// Using/Aliasing
-		using namespace DataIPShortCuts;
-		using DataGlobals::AnySlabsInModel;
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int numSlabsCheck;
-
-		numSlabsCheck = InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Slab );
-
-		if ( numSlabsCheck > 0 ) {
-			AnySlabsInModel = true;
-		} else {
-			AnySlabsInModel = false;
-		}
-
-=======
 		int numSlabsCheck( InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Slab ) );
 		DataGlobals::AnySlabsInModel = ( numSlabsCheck > 0 );
->>>>>>> NREL/develop
 	}
 
 	void
@@ -228,23 +155,8 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   May 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-<<<<<<< HEAD
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// Using/Aliasing
-		using namespace DataIPShortCuts;
-		using DataGlobals::AnyBasementsInModel;
-
-		int const numBasementsCheck( InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
-
-		AnyBasementsInModel = ( numBasementsCheck > 0 );
-
-=======
 		int const numBasementsCheck( InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
 		DataGlobals::AnyBasementsInModel = ( numBasementsCheck > 0 );
->>>>>>> NREL/develop
 	}
 
 	void
@@ -262,12 +174,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
@@ -553,12 +459,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
@@ -715,12 +615,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
@@ -765,12 +659,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
@@ -991,12 +879,6 @@ namespace PlantPipingSystemsManager {
 			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accommodate ground coupled calculations
 			//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-			// PURPOSE OF THIS SUBROUTINE:
-			// <description>
-
-=======
->>>>>>> NREL/develop
 			// Using/Aliasing
 			using namespace DataIPShortCuts;
 			using DataSurfaces::OSCM;
@@ -1341,12 +1223,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       Summer 2014  Sushobhit Acharya to accommodate basement calculations
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
@@ -1678,12 +1554,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace DataLoopNode;
@@ -1784,12 +1654,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 
@@ -1849,12 +1713,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace DataLoopNode;
@@ -2102,18 +1960,7 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PipeCircuitCounter;
-		int SegmentCtr;
-
-		for ( SegmentCtr = 1; SegmentCtr <= TotalNumSegments; ++SegmentCtr ) {
-=======
 		for ( int SegmentCtr = 1; SegmentCtr <= TotalNumSegments; ++SegmentCtr ) {
->>>>>>> NREL/develop
 
 			if ( ! PipingSystemSegments( SegmentCtr ).IsActuallyPartOfAHorizontalTrench ) {
 
@@ -2164,14 +2011,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-=======
->>>>>>> NREL/develop
 		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
 			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
@@ -2328,12 +2167,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		ShowSevereError( RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry + "\", Condition: " + Condition );
 		ErrorsFound = true;
 
@@ -5092,39 +4925,6 @@ namespace PlantPipingSystemsManager {
 	)
 	{
 
-<<<<<<< HEAD
-			// FUNCTION INFORMATION:
-			//       AUTHOR         Edwin Lee
-			//       DATE WRITTEN   Summer 2011
-			//       MODIFIED       na
-			//       RE-ENGINEERED  na
-
-			// PURPOSE OF THIS FUNCTION:
-			// <description>
-
-			// Return value
-			Real64 RetVal;
-
-			// FUNCTION LOCAL VARIABLE DECLARATIONS:
-			Real64 Numerator;
-			Real64 Denominator;
-			Real64 Beta;
-			Real64 Resistance;
-			Real64 NeighborTemp;
-			Real64 HeatFlux;
-			int DirectionCounter;
-			int CurDirection; // From Enum: Direction
-
-			// Initialize
-			Numerator = 0.0;
-			Denominator = 0.0;
-			Resistance = 0.0;
-			Beta = cell.MyBase.Beta;
-
-			// add effect from previous time step
-			Numerator += cell.MyBase.Temperature_PrevTimeStep;
-			++Denominator;
-=======
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   Summer 2011
@@ -5139,7 +4939,6 @@ namespace PlantPipingSystemsManager {
 		Real64 Resistance = 0.0;
 		Real64 AdiabaticMultiplier = 1.0;
 		Real64 Beta = cell.Beta;
->>>>>>> NREL/develop
 
 		// add effect from previous time step
 		Numerator += cell.Temperature_PrevTimeStep;
@@ -5497,12 +5296,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-<<<<<<< HEAD
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-=======
->>>>>>> NREL/develop
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CircuitCrossTemp;
 

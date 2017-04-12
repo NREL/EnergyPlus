@@ -847,12 +847,9 @@ namespace Boilers {
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
-<<<<<<< HEAD
-=======
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using FaultsManager::FaultsBoilerFouling;
->>>>>>> NREL/develop
 		using FluidProperties::GetSpecificHeatGlycol;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
@@ -910,22 +907,22 @@ namespace Boilers {
 			if ( EquipFlowCtrl == ControlType_SeriesActive ) BoilerMassFlowRate = Node( BoilerInletNode ).MassFlowRate;
 			return;
 		}
-		
+
 		//If there is a fault of boiler fouling (zrp_Nov2016)
 		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = Boiler( BoilerNum ).FaultyBoilerFoulingIndex;
 			Real64 NomCap_ff = BoilerNomCap;
 			Real64 BoilerEff_ff = BoilerEff;
-			
+
 			//calculate the Faulty Boiler Fouling Factor using fault information
 			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the boiler nominal capacity at faulty cases
 			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
 			BoilerEff = BoilerEff_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
-			
+
 		}
- 
+
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 

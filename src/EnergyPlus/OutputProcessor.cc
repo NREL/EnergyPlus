@@ -645,14 +645,9 @@ namespace OutputProcessor {
 		bool Dup;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
-<<<<<<< HEAD
-			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).Key, KeyedValue ) ) continue;
-=======
 			if ( ReqRepVars( Loop ).Key.empty() ) continue;
-			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
+			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
 			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
->>>>>>> NREL/develop
 
 			//   A match.  Make sure doesn't duplicate
 

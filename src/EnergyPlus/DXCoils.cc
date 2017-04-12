@@ -3726,11 +3726,7 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeElectricity;
 			} else if ( InputProcessor::SameString( Alphas( 12 ), "NaturalGas" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeNaturalGas;
-<<<<<<< HEAD
-			} else if ( InputProcessor::SameString( Alphas( 12 ), "PropaneGas" ) ) {
-=======
-			} else if ( SameString( Alphas( 12 ), "Propane" ) ) {
->>>>>>> NREL/develop
+			} else if ( InputProcessor::SameString( Alphas( 12 ), "Propane" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypePropaneGas;
 			} else if ( InputProcessor::SameString( Alphas( 12 ), "Diesel" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeDiesel;
@@ -4218,11 +4214,7 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeElectricity;
 			} else if ( InputProcessor::SameString( Alphas( 9 ), "NaturalGas" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeNaturalGas;
-<<<<<<< HEAD
-			} else if ( InputProcessor::SameString( Alphas( 9 ), "PropaneGas" ) ) {
-=======
-			} else if ( SameString( Alphas( 9 ), "Propane" ) ) {
->>>>>>> NREL/develop
+			} else if ( InputProcessor::SameString( Alphas( 9 ), "Propane" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypePropaneGas;
 			} else if ( InputProcessor::SameString( Alphas( 9 ), "Diesel" ) ) {
 				DXCoil( DXCoilNum ).FuelType = FuelTypeDiesel;
@@ -7172,7 +7164,7 @@ namespace DXCoils {
 		} else {
 			locFanElecPower = Fans::GetFanPower( Coil.SupplyFanIndex );
 		}
-		
+
 		// calculate evaporator total cooling capacity
 		if ( HPRTF > 0.0 ) {
 			if ( Coil.FanPowerIncludedInCOP ) {
@@ -12070,7 +12062,7 @@ Label50: ;
 				}
 
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-				
+
 
 				NetCoolingCapRated = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 			}
@@ -12369,11 +12361,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using DataAirSystems::PrimaryAirSystem;
-<<<<<<< HEAD
-		using Fans::GetFanIndex;
-=======
-
->>>>>>> NREL/develop
 		using DataHVACGlobals::NumPrimaryAirSys;
 
 		int const DXSystem( 14 ); // must match SimAirServingZones.cc (not public)
@@ -12671,13 +12658,8 @@ Label50: ;
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
-<<<<<<< HEAD
-		} else if ( InputProcessor::SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
+		} else if ( InputProcessor::SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) || InputProcessor::SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
 			WhichCoil = InputProcessor::FindItem( CoilName, DXCoil );
-=======
-		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) || SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).MSRatedTotCap( DXCoil( WhichCoil ).NumOfSpeeds );
 			}
@@ -15176,13 +15158,7 @@ Label50: ;
 
 		if ( OperationMode == FlagCoolMode ) {
 		//Cooling: OperationMode 0
-<<<<<<< HEAD
-
-			if( present( BF ) ) {
-=======
-			
 			if ( present( BF ) ) {
->>>>>>> NREL/develop
 				BF_real = BF;
 			} else {
 				BF_real = BFC_rate;

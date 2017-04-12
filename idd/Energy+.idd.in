@@ -3375,11 +3375,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A6 , \field DayType List 3
        \type choice
-<<<<<<< HEAD
-       \Key AllDays
-=======
        \key AllDays
->>>>>>> NREL/develop
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3400,11 +3396,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A8 , \field DayType List 4
        \type choice
-<<<<<<< HEAD
-       \Key AllDays
-=======
        \key AllDays
->>>>>>> NREL/develop
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3425,11 +3417,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A10, \field DayType List 5
        \type choice
-<<<<<<< HEAD
-       \Key AllDays
-=======
        \key AllDays
->>>>>>> NREL/develop
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -34455,7 +34443,7 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \required-field
         \type choice
         \key Fan:SystemModel
-        \key Fan:ComponentModel        
+        \key Fan:ComponentModel
         \key Fan:ConstantVolume
         \key Fan:OnOff
         \key Fan:VariableVolume
@@ -41369,10 +41357,6 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:DualDuct:VAV
        \key AirTerminal:SingleDuct:ConstantVolume:Reheat
        \key AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
-<<<<<<< HEAD
-       \key AirTerminal:SingleDuct:Mixer
-=======
->>>>>>> NREL/develop
        \key AirTerminal:SingleDuct:VAV:Reheat
        \key AirTerminal:SingleDuct:VAV:NoReheat
        \key AirTerminal:SingleDuct:SeriesPIU:Reheat
@@ -42183,15 +42167,11 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
-<<<<<<< HEAD
-  A33, \field Zone Equipment 16 Name
-=======
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
   A33, \field Zone Equipment 16 Name
        \type object-list
        \object-list ZoneEquipmentNames
->>>>>>> NREL/develop
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
        \minimum 1
@@ -42235,11 +42215,8 @@ ZoneHVAC:EquipmentList,
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
        \key WaterHeater:HeatPump:WrappedCondenser
-<<<<<<< HEAD
-=======
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
->>>>>>> NREL/develop
   A35, \field Zone Equipment 17 Name
        \type object-list
        \object-list ZoneEquipmentNames
@@ -42401,7 +42378,7 @@ Fan:SystemModel,
        \type real
        \units W
        \autosizable
-       \note Fan power consumption at maximum air flow rate.  
+       \note Fan power consumption at maximum air flow rate.
        \note If autosized the method used to scale power is chosen in the following field
   A6 , \field Design Power Sizing Method
        \type choice
@@ -42444,7 +42421,7 @@ Fan:SystemModel,
         \note optional, if used fan motor heat losses that not added to air stream are transferred to zone as internal gains
         \type object-list
         \object-list ZoneNames
-  N12, \field Motor Loss Radiative Fraction 
+  N12, \field Motor Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
         \note the split between convection and radiation for the fan motor's skin losses
         \type real

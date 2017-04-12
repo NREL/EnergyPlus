@@ -61,15 +61,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/DataIPShortCuts.hh>
-=======
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
->>>>>>> NREL/develop
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

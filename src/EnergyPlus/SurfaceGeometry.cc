@@ -2837,17 +2837,13 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					}
 
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
-					Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
-=======
-				} else if ( SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
 
 					if ( !WeatherManager::WeatherFileExists ){
 						ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file");
-				    ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+						ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
 						ErrorsFound = true;
-				  }
+					}
 
 					// Find foundation object, if blank use default
 					if ( lAlphaFieldBlanks(ArgPointer + 1) ) {
@@ -2876,9 +2872,8 @@ namespace SurfaceGeometry {
 					}
 					SurfaceTmp( SurfNum ).ExtBoundCond = KivaFoundation;
 
-				} else if ( SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
-					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
->>>>>>> NREL/develop
+				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
+					Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1 ) + "\"." );
 						ErrorsFound = true;
@@ -5565,10 +5560,6 @@ namespace SurfaceGeometry {
 	void
 	ExposedFoundationPerimeter::getData( bool& ErrorsFound ) {
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using DataSurfaces::Surface;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
@@ -5578,13 +5569,13 @@ namespace SurfaceGeometry {
 		int NumNumbers;
 
 		std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
-		int numObjects = GetNumObjectsFound( cCurrentModuleObject );
+		int numObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int obj = 1; obj <= numObjects; ++obj ) {
 			int alpF = 1;
 			int numF = 1;
-			GetObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			int Found = FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			int Found = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface" );
 				ErrorsFound = true;
@@ -5622,9 +5613,9 @@ namespace SurfaceGeometry {
 					ErrorsFound = true;
 				}
 				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if ( lAlphaFieldBlanks( alpF ) || SameString(cAlphaArgs( alpF ), "YES") ) {
+					if ( lAlphaFieldBlanks( alpF ) || InputProcessor::SameString(cAlphaArgs( alpF ), "YES") ) {
 						data.isExposedPerimeter.push_back(true);
-					} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
+					} else if ( InputProcessor::SameString(cAlphaArgs( alpF ), "NO") ) {
 						data.isExposedPerimeter.push_back(false);
 					} else {
 						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
@@ -7309,11 +7300,6 @@ namespace SurfaceGeometry {
 	GetFoundationData( bool & ErrorsFound )
 	{
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 
 		int NumAlphas;
 		int NumProps;
@@ -7321,7 +7307,7 @@ namespace SurfaceGeometry {
 
 		// Read Kiva Settings
 		cCurrentModuleObject = "Foundation:Kiva:Settings";
-		int TotKivaStgs = GetNumObjectsFound( cCurrentModuleObject );
+		int TotKivaStgs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotKivaStgs > 1 ) {
 			ErrorsFound = true;
@@ -7329,7 +7315,7 @@ namespace SurfaceGeometry {
 		}
 
 		if ( TotKivaStgs == 1) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			int numF = 1;
 			int alpF = 1;
@@ -7343,9 +7329,9 @@ namespace SurfaceGeometry {
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.farFieldWidth = rNumericArgs( numF );} numF++;
 
 			if ( !lAlphaFieldBlanks( alpF ) ) {
-				if (SameString(cAlphaArgs( alpF ), "ZeroFlux")) {
+				if (InputProcessor::SameString(cAlphaArgs( alpF ), "ZeroFlux")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
-				} else if (SameString(cAlphaArgs( alpF ), "GroundWater")) {
+				} else if (InputProcessor::SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
 				} else /* if (SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
@@ -7357,7 +7343,7 @@ namespace SurfaceGeometry {
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.maxGrowthCoeff = rNumericArgs( numF );} numF++;
 
 			if ( !lAlphaFieldBlanks( alpF ) ) {
-				if (SameString(cAlphaArgs( alpF ), "Hourly")) {
+				if (InputProcessor::SameString(cAlphaArgs( alpF ), "Hourly")) {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
 				} else /* if (SameString(cAlphaArgs( alpF ), "Timestep")) */ {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
@@ -7370,7 +7356,7 @@ namespace SurfaceGeometry {
 
 		// Read Foundation objects
 		cCurrentModuleObject = "Foundation:Kiva";
-		int TotKivaFnds = GetNumObjectsFound( cCurrentModuleObject );
+		int TotKivaFnds = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		if (TotKivaFnds > 0) {
 			kivaManager.defineDefaultFoundation();
@@ -7380,18 +7366,17 @@ namespace SurfaceGeometry {
 			fndNames( 1 ) = "<Default Foundation>";
 
 			for (int Loop = 1; Loop <= TotKivaFnds; ++Loop ) {
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				int numF = 1;
 				int alpF = 1;
 
 				bool ErrorInName = false;
-				bool IsBlank = false;
 
 				HeatBalanceKivaManager::FoundationKiva fndInput;
 
 				fndInput.name = cAlphaArgs( alpF ); alpF++;
-				VerifyName( fndInput.name, fndNames, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				InputProcessor::IsNameEmpty( fndInput.name, cCurrentModuleObject, ErrorInName );
 				if ( ErrorInName ) {
 					ErrorsFound = true;
 					continue;
@@ -7405,7 +7390,7 @@ namespace SurfaceGeometry {
 
 				// Interior horizontal insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7449,7 +7434,7 @@ namespace SurfaceGeometry {
 
 				// Interior vertical insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7485,7 +7470,7 @@ namespace SurfaceGeometry {
 
 				// Exterior horizontal insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7529,7 +7514,7 @@ namespace SurfaceGeometry {
 
 				// Exterior vertical insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7569,7 +7554,7 @@ namespace SurfaceGeometry {
 				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.depthBelowSlab = rNumericArgs( numF );} numF++;
 
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					fndInput.wallConstructionIndex = FindItemInList( cAlphaArgs( alpF ), Construct );
+					fndInput.wallConstructionIndex = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Construct );
 					if ( fndInput.wallConstructionIndex == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching construction for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing construction = " + cAlphaArgs( alpF ) );
@@ -7589,7 +7574,7 @@ namespace SurfaceGeometry {
 
 				// Footing
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7633,7 +7618,7 @@ namespace SurfaceGeometry {
 					for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
 						Kiva::InputBlock block;
 						if ( !lAlphaFieldBlanks( alpF ) ) {
-							int index = FindItemInList( cAlphaArgs( alpF ), Material );
+							int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
 							if ( index == 0 ) {
 								ErrorsFound = true;
 								ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );

@@ -791,7 +791,7 @@ namespace HVACDXSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   Feb. 2001
-		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC
 		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
 		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
 		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Cooling:DX:VariableSpeed, capable of both sensible and latent cooling
@@ -811,11 +811,7 @@ namespace HVACDXSystem {
 		using DataGlobals::WarmupFlag;
 		using DataEnvironment::OutBaroPress;
 		using DataHVACGlobals::TempControlTol;
-<<<<<<< HEAD
-=======
 		using FaultsManager::FaultsCoilSATSensor;
-		using InputProcessor::FindItemInList;
->>>>>>> NREL/develop
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;
@@ -921,7 +917,7 @@ namespace HVACDXSystem {
 			//update the DesOutTemp
 			DesOutTemp -= DXCoolingSystem( DXSystemNum ).FaultyCoilSATOffset;
 		}
-		
+
 		// If DXCoolingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXCoolingSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
@@ -1958,7 +1954,7 @@ namespace HVACDXSystem {
 				}}
 			} // End of cooling load type (sensible or latent) if block
 		} // End of If DXCoolingSystem is scheduled on and there is flow
-		
+
 		//Set the final results
 		DXCoolingSystem( DXSystemNum ).PartLoadFrac = PartLoadFrac;
 		DXCoolingSystem( DXSystemNum ).SpeedRatio = SpeedRatio;

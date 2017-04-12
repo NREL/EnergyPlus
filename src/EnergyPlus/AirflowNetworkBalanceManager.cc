@@ -627,14 +627,10 @@ namespace AirflowNetworkBalanceManager {
 		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-<<<<<<< HEAD
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
-=======
-		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers );
+		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
->>>>>>> NREL/develop
+		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Coil", TotalArgs, NumAlphas, NumNumbers );
@@ -931,13 +927,8 @@ namespace AirflowNetworkBalanceManager {
 				ErrorsFound = true;
 				SimObjectError = true;
 			} else {
-<<<<<<< HEAD
 				if ( ! ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) || InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
-=======
-				if ( ! ( SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) || SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) + " is invalid." );
->>>>>>> NREL/develop
 					ShowContinueError( "Valid choices are ExternalNode or OpeningHeight. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 					ErrorsFound = true;
 					SimObjectError = true;
@@ -955,15 +946,9 @@ namespace AirflowNetworkBalanceManager {
 				//        CALL ShowWarningError('GetAirflowNetworkInput: AirflowNetwork Wind Pressure Coefficient Type '// &
 				//             '= SURFACE-AVERAGE CALCULATION.'// &
 				//             ' CP ARRAY NAME was entered but will not be used. The simulation continues...')
-<<<<<<< HEAD
-			}
-			if ( ! ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " is invalid." );
-=======
 			//}
-			if ( ! ( SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
+			if ( ! ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
->>>>>>> NREL/develop
 				ShowContinueError( "Valid choices are LowRise or HighRise. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 				ErrorsFound = true;
 				SimObjectError = true;
@@ -975,13 +960,8 @@ namespace AirflowNetworkBalanceManager {
 			SimObjectError = true;
 		}
 
-<<<<<<< HEAD
-		AirflowNetworkSimu.InitType = Alphas( 7 );
-		if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
-=======
 		AirflowNetworkSimu.InitType = Alphas( 6 );
-		if ( SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
->>>>>>> NREL/develop
+		if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
 			AirflowNetworkSimu.InitFlag = 0;
 		} else if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "ZeroNodePressures" ) ) {
 			AirflowNetworkSimu.InitFlag = 1;
@@ -996,11 +976,7 @@ namespace AirflowNetworkBalanceManager {
 			SimObjectError = true;
 		}
 
-<<<<<<< HEAD
-		if ( !lAlphaBlanks( 8 ) && InputProcessor::SameString( Alphas( 8 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
-=======
-		if ( !lAlphaBlanks( 7 ) && SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
->>>>>>> NREL/develop
+		if ( !lAlphaBlanks( 7 ) && InputProcessor::SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
 
 		if ( SimObjectError ) {
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
@@ -1206,13 +1182,8 @@ namespace AirflowNetworkBalanceManager {
 					InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ); // Name of external node
-<<<<<<< HEAD
-					MultizoneExternalNodeData( i ).Height = Numbers( 1 ); // Nodal height
-					if ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
-=======
 					MultizoneExternalNodeData( i ).height = Numbers( 1 ); // Nodal height
-					if ( SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
->>>>>>> NREL/develop
+					if ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + " object =" + Alphas( 1 ) + ". The input of " + cNumericFields( 1 ) + " is required, but a blank is found." );
 						ShowContinueError( "The default value is assigned as " + RoundSigDigits( Numbers( 1 ), 1 ) );
 					}
@@ -1224,17 +1195,17 @@ namespace AirflowNetworkBalanceManager {
 						ErrorsFound = true;
 					}
 					if ( NumAlphas >= 3 && !lAlphaBlanks( 3 ) ) { // Symmetric curve
-						if ( SameString( Alphas( 3 ), "Yes" ) ) {
+						if ( InputProcessor::SameString( Alphas( 3 ), "Yes" ) ) {
 							MultizoneExternalNodeData( i ).symmetricCurve = true;
-						} else if ( !SameString(Alphas( 3 ), "No" ) ) {
+						} else if ( !InputProcessor::SameString(Alphas( 3 ), "No" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 							ShowContinueError( "The default value is assigned as No." );
 						}
 					}
 					if ( NumAlphas == 4 && !lAlphaBlanks( 4 ) ) { // Relative or absolute wind angle
-						if ( SameString( Alphas( 4 ), "Relative" ) ) {
+						if ( InputProcessor::SameString( Alphas( 4 ), "Relative" ) ) {
 							MultizoneExternalNodeData( i ).useRelativeAngle = true;
-						} else if ( !SameString(Alphas( 4 ), "Absolute" ) ) {
+						} else if ( !InputProcessor::SameString(Alphas( 4 ), "Absolute" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
 							ShowContinueError( "The default value is assigned as Absolute." );
 						}
@@ -2158,96 +2129,6 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-<<<<<<< HEAD
-		// *** Read AirflowNetwork CP Array
-		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
-			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-			AirflowNetworkNumOfCPArray = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-
-			if ( AirflowNetworkNumOfCPArray != 1 ) {
-				ShowSevereError( RoutineName + "Currently only one (\"1\") " + CurrentModuleObject + " object per simulation allowed when using the AirflowNetwork model." );
-				ErrorsFound = true;
-			}
-
-			if ( AirflowNetworkNumOfCPArray > 0 && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
-				MultizoneCPArrayData.allocate( AirflowNetworkNumOfCPArray );
-				for ( i = 1; i <= AirflowNetworkNumOfCPArray; ++i ) {
-
-					InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-					MultizoneCPArrayData( i ).Name = Alphas( 1 ); // Name of CP array
-					MultizoneCPArrayData( i ).NumWindDir = NumNumbers;
-
-					MultizoneCPArrayData( i ).WindDir.allocate( NumNumbers );
-					for ( j = 1; j <= NumNumbers; ++j ) { // Wind direction
-						MultizoneCPArrayData( i ).WindDir( j ) = Numbers( j );
-						if ( j > 1 ) {
-							if ( MultizoneCPArrayData( i ).WindDir( j - 1 ) >= MultizoneCPArrayData( i ).WindDir( j ) ) {
-								ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object " );
-								ShowContinueError( "has either the same values for two consecutive wind directions, or a lower wind direction value after a higher wind direction value." );
-								ShowContinueError( "Wind direction values must be entered in ascending order." );
-								ShowContinueError( cNumericFields( j ) + " = " + RoundSigDigits( MultizoneCPArrayData( i ).WindDir( j - 1 ), 2 ) + ' ' + cNumericFields( j + 1 ) + " = " + RoundSigDigits( MultizoneCPArrayData( i ).WindDir( j ), 2 ) );
-								ErrorsFound = true;
-							}
-						}
-					}
-				}
-			} else {
-				if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Wind coefficient == Surface-Average does not need inputs of CP Array
-					ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required." );
-					ShowContinueError( "..but not found with Wind Pressure Coefficient Type = INPUT" );
-					ErrorsFound = true;
-				}
-			}
-		}
-
-		// Get the number of wind directions
-		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
-			AirflowNetworkSimu.NWind = NumNumbers;
-		} else {
-			//    AirflowNetworkSimu%NWind = 4
-		}
-
-		// Read AirflowNetwork CP Value
-		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
-			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
-			AirflowNetworkNumOfCPValue = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-			if ( AirflowNetworkNumOfCPValue > 0 && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
-				MultizoneCPValueData.allocate( AirflowNetworkNumOfCPValue );
-
-				for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-					InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
-					MultizoneCPValueData( i ).Name = Alphas( 1 ); // Name of CP value
-					MultizoneCPValueData( i ).CPArrayName = Alphas( 2 ); // CP array Name
-					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
-					if ( ! InputProcessor::SameString( Alphas( 2 ), MultizoneCPArrayData( 1 ).Name ) ) {
-						ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " in " + CurrentModuleObject + " = " + Alphas( 1 ) );
-						ShowContinueError( "The valid name is " + MultizoneCPArrayData( 1 ).Name );
-						ErrorsFound = true;
-					}
-					MultizoneCPValueData( i ).CPValue.allocate( NumNumbers );
-					if ( NumNumbers < AirflowNetworkSimu.NWind ) {
-						ShowSevereError( RoutineName + "The number of WPC Values (" + RoundSigDigits( NumNumbers ) + ") in the " + CurrentModuleObject + " object " );
-						ShowContinueError( Alphas( 1 ) + " with " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " is less than the number of Wind Directions (" + RoundSigDigits( MultizoneCPArrayData( 1 ).NumWindDir ) + ") defined in the " );
-						ShowContinueError( CurrentModuleObject + " object." );
-						ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
-					}
-					for ( j = 1; j <= NumNumbers; ++j ) { // CP Value
-						MultizoneCPValueData( i ).CPValue( j ) = Numbers( j );
-					}
-				}
-
-			} else {
-				if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Wind coefficient == Surface-Average does not need inputs of CP Array
-					ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required and not found with Wind Pressure Coefficient Type = INPUT" );
-					ErrorsFound = true;
-				}
-			}
-		}
-
-=======
->>>>>>> NREL/develop
 		// Calculate CP values
 		if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 			CalcWindPressureCoeffs();
@@ -2283,13 +2164,8 @@ namespace AirflowNetworkBalanceManager {
 			for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
 					if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( j ).SurfNum ).ExtWind ) ) {
-<<<<<<< HEAD
 						if ( InputProcessor::SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
-							MultizoneExternalNodeData( i ).Height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
-=======
-						if ( SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
 							MultizoneExternalNodeData( i ).height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
->>>>>>> NREL/develop
 							break;
 						}
 					}
@@ -2301,7 +2177,7 @@ namespace AirflowNetworkBalanceManager {
 		for (i = 1; i <= AirflowNetworkNumOfExtNode; ++i) {
 			for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
 				if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment || (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt && Surface(MultizoneSurfaceData(j).SurfNum).ExtWind)) {
-					if (SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
+					if (InputProcessor::SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
 						MultizoneExternalNodeData(i).azimuth = Surface(MultizoneSurfaceData(j).SurfNum).Azimuth;
 						break;
 					}
@@ -2439,27 +2315,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Validate CP Value number
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) { // Surface-Average does not need inputs of external nodes
-<<<<<<< HEAD
-			// Ensure no duplicated external names in CP Value
-			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
-			for ( j = 1; j <= AirflowNetworkNumOfExtNode; ++j ) {
-				found = false;
-				for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
-					if ( InputProcessor::SameString( MultizoneExternalNodeData( j ).WPCName, MultizoneCPValueData( i ).Name ) ) {
-						MultizoneExternalNodeData( j ).CPVNum = i;
-						break;
-					}
-				}
-				if ( MultizoneExternalNodeData( j ).CPVNum == 0 ) {
-					ShowSevereError( RoutineName + "AirflowNetwork:MultiZone:ExternalNode: Wind Pressure Coefficient Values Object Name is not found in " + MultizoneExternalNodeData( j ).Name );
-					ShowContinueError( "Please ensure there is a WindPressureCoefficientValues name defined as " + MultizoneExternalNodeData( j ).WPCName + " in " + CurrentModuleObject );
-					ErrorsFound = true;
-				}
-			}
-			// Ensure different CPVNum is used to avoid a single side boundary condition
-=======
 			// Ensure different curve is used to avoid a single side boundary condition
->>>>>>> NREL/develop
 			found = false;
 			bool differentAngle = false;
 			for ( j = 2; j <= AirflowNetworkNumOfExtNode; ++j ) {
@@ -2526,13 +2382,8 @@ namespace AirflowNetworkBalanceManager {
 
 		// check model compatibility
 		if ( IntraZoneNumOfNodes > 0 ) {
-<<<<<<< HEAD
 			if ( !InputProcessor::SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " model requies Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
-=======
-			if ( !SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
->>>>>>> NREL/develop
 				ErrorsFound = true;
 				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );
 			}
@@ -2828,18 +2679,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork distribution system component: DuctViewFactors
 		CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
-		DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfDuctViewFactors = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfDuctViewFactors > 0 ) {
 			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
 			for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
-				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
 
@@ -2880,7 +2725,7 @@ namespace AirflowNetworkBalanceManager {
 				for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
 				{
 					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceName = Alphas( surfNum + 1 ); // Surface name
-					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
+					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum = InputProcessor::FindItemInList( Alphas( surfNum + 1 ), Surface );
 
 					if ( this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum == 0 ) {
 						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
@@ -3146,19 +2991,8 @@ namespace AirflowNetworkBalanceManager {
 		if ( NumOfPressureControllers > 0 ) {
 			PressureControllerData.allocate( NumOfPressureControllers );
 			for ( i = 1; i <= NumOfPressureControllers; ++i ) {
-<<<<<<< HEAD
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
-=======
-				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), PressureControllerData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
->>>>>>> NREL/develop
 				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name
 				PressureControllerData( i ).ZoneName = Alphas( 2 ); // Zone name
 				PressureControllerData( i ).ZoneNum = InputProcessor::FindItemInList( Alphas( 2 ), Zone );
@@ -5075,13 +4909,9 @@ namespace AirflowNetworkBalanceManager {
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-<<<<<<< HEAD
-				if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) SideRatio = 1.0 / SideRatio;
-=======
-				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+				if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
 					SideRatio = 1.0 / SideRatio;
 				}
->>>>>>> NREL/develop
 				SideRatioFac = std::log( SideRatio );
 				std::vector< Real64 > vals( 13 );
 				for ( WindDirNum = 1; WindDirNum <= 12; ++WindDirNum ) {
@@ -5102,11 +4932,7 @@ namespace AirflowNetworkBalanceManager {
 
 					// Wind-pressure coefficients for vertical facades, high-rise building
 
-<<<<<<< HEAD
-					if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
-=======
-					else if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
->>>>>>> NREL/develop
+					else if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
 						SR = min( max( SideRatio, 0.25 ), 4.0 );
 						if ( SR >= 0.25 && SR < 1.0 ) {
 							ISR = 1;
@@ -5120,11 +4946,7 @@ namespace AirflowNetworkBalanceManager {
 
 					// Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
 
-<<<<<<< HEAD
-					if ( ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
-=======
-					else if ( ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
->>>>>>> NREL/develop
+					else if ( ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
 						SR = min( max( SideRatio, 0.25 ), 1.0 );
 						if ( SR >= 0.25 && SR < 0.5 ) {
 							ISR = 1;
@@ -5157,13 +4979,9 @@ namespace AirflowNetworkBalanceManager {
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-<<<<<<< HEAD
-				if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) SideRatio = 1.0 / SideRatio;
-=======
-				if ( SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+				if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
 					SideRatio = 1.0 / SideRatio;
 				}
->>>>>>> NREL/develop
 				SideRatioFac = std::log( SideRatio );
 				for ( WindDirNum = 1; WindDirNum <= 36; ++WindDirNum ) {
 					WindAng = ( WindDirNum - 1 ) * 10.0;

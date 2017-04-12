@@ -2381,16 +2381,8 @@ namespace EnergyPlus {
 		static std::string const EMSOutputVariable( "EnergyManagementSystem:OutputVariable" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-<<<<<<< HEAD
 		std::string extension_key;
-		OutputVariablesForSimulation.allocate( 10000 );
-=======
-		int CurrentRecord;
-		int Loop;
-		int Loop1;
-
 		OutputVariablesForSimulation.reserve( 1024 );
->>>>>>> NREL/develop
 		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
@@ -2548,13 +2540,6 @@ namespace EnergyPlus {
 			}
 		}
 
-<<<<<<< HEAD
-		if ( NumConsideredOutputVariables > 0 ) {
-			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
-			MaxConsideredOutputVariables = NumConsideredOutputVariables;
-		}
-=======
->>>>>>> NREL/develop
 	}
 
 	void
@@ -2931,30 +2916,14 @@ namespace EnergyPlus {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-<<<<<<< HEAD
-=======
 		//       MODIFIED       March 2017
 		//       RE-ENGINEERED  na
->>>>>>> NREL/develop
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adds a new record (if necessary) to the Output Variable
 		// reporting structure.  DataOutputs, OutputVariablesForSimulation
 
-<<<<<<< HEAD
-		// METHODOLOGY EMPLOYED:
-		// OutputVariablesForSimulation is a linked list structure for later
-		// semi-easy perusal.
-
-		// Using/Aliasing
-		using namespace DataOutputs;
-
-		int CurNum;
-		int NextNum;
-		bool FoundOne;
-=======
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
->>>>>>> NREL/develop
 		std::string::size_type vnameLen; // if < length, there were units on the line/name
 
 		std::string::size_type const rbpos = index( VariableName, '[' );
@@ -2965,49 +2934,16 @@ namespace EnergyPlus {
 		}
 		std::string const VarName( VariableName.substr( 0, vnameLen ) );
 
-<<<<<<< HEAD
-		if ( !FoundOne ) {
-			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-				ReAllocateAndPreserveOutputVariablesForSimulation();
-			}
-			++NumConsideredOutputVariables;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
-=======
 		auto const found = DataOutputs::OutputVariablesForSimulation.find( VarName );
 		if ( found == DataOutputs::OutputVariablesForSimulation.end() ) {
 			std::unordered_map< std::string, DataOutputs::OutputReportingVariables > data;
 			data.reserve( 32 );
 			data.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
 			DataOutputs::OutputVariablesForSimulation.emplace( VarName, std::move( data ) );
->>>>>>> NREL/develop
 		} else {
 			found->second.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
 		}
-<<<<<<< HEAD
-	}
-
-	void
-	InputProcessor::ReAllocateAndPreserveOutputVariablesForSimulation() {
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   April 2011
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
-		// the data that is already in the structure.
-
-		using namespace DataOutputs;
-
-		int const OutputVarAllocInc( 500 );
-
-		// up allocation by OutputVarAllocInc
-		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
-=======
 		DataOutputs::NumConsideredOutputVariables++;
->>>>>>> NREL/develop
 	}
 
 //void

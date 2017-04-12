@@ -812,17 +812,10 @@ namespace NodeInputManager {
 		int NumAlphas;
 		int NumNums;
 
-<<<<<<< HEAD
-		if ( firstTime ) {
-			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-			NodeNums.dimension( NumParams, 0 );
-			firstTime = false;
-=======
 		if ( GetOnlySingleNodeFirstTime ) {
-			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 			GetOnlySingleNodeNodeNums.dimension( NumParams, 0 );
 			GetOnlySingleNodeFirstTime = false;
->>>>>>> NREL/develop
 		}
 
 		FluidType = NodeFluidType;

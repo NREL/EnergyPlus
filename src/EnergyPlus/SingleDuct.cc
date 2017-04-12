@@ -1232,16 +1232,10 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).FanType = Alphas( 5 );
-<<<<<<< HEAD
 			if ( InputProcessor::SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
-				Sys( SysNum ).Fan_Num = FanType_VS;
-=======
-			if ( SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
 				Sys( SysNum ).Fan_Num = DataHVACGlobals::FanType_SimpleVAV;
-			} else if ( SameString( Sys( SysNum ).FanType, "Fan:SystemModel" ) ) {
+			} else if ( InputProcessor::SameString( Sys( SysNum ).FanType, "Fan:SystemModel" ) ) {
 				Sys( SysNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
-
->>>>>>> NREL/develop
 			} else if ( Sys( SysNum ).FanType != "" ) {
 				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).FanType + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );

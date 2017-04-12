@@ -1931,19 +1931,12 @@ namespace OutputReportTabular {
 				} else if ( InputProcessor::SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
-<<<<<<< HEAD
 				} else if ( InputProcessor::SameString( AlphArray( iReport ), "EIO" ) ) {
+					WriteTabularFiles = true;
 					displayEioSummary = true;
 					nameFound = true;
 				} else if ( InputProcessor::SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
-=======
-				} else if ( SameString( AlphArray( iReport ), "EIO" ) ) {
 					WriteTabularFiles = true;
-					displayEioSummary = true;
-					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
-					WriteTabularFiles = true;
->>>>>>> NREL/develop
 					displayEioSummary = true;
 					nameFound = true;
 				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummary" ) ) {
@@ -9366,7 +9359,7 @@ namespace OutputReportTabular {
 		using ExteriorEnergyUse::NumExteriorLights;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
-		using namespace DataGlobals; 
+		using namespace DataGlobals;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9895,7 +9888,7 @@ namespace OutputReportTabular {
 					}
 					tableBody( 2, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
 				}
-				
+
 				WriteSubtitle( "Hybrid Model: Internal Thermal Mass" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {

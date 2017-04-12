@@ -64,7 +64,7 @@ namespace EnergyPlus {
 namespace HybridModel {
 
 	// MODULE INFORMATION:
-	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL 
+	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL
 	//       DATE WRITTEN   Oct 2015
 
 	// PURPOSE OF THIS MODULE:
@@ -80,10 +80,9 @@ namespace HybridModel {
 	using namespace DataHeatBalance;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRoomAirModel;
-	using namespace InputProcessor;
 	using DataGlobals::ScheduleAlwaysOn;
 	using General::CheckCreatedZoneItemName;
-	
+
 	bool FlagHybridModel( false ); // True if hybrid model is activated
 	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
 	std::string CurrentModuleObject; // to assist in getting input
@@ -114,31 +113,31 @@ namespace HybridModel {
 		Array1D_string cAlphaFieldNames( 10 );
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
-		int HybridModelStartMonth( 0 ); // Hybrid model start month 
-		int HybridModelStartDate( 0 ); // Hybrid model start date of month 
-		int HybridModelEndMonth( 0 ); // Hybrid model end month 
-		int HybridModelEndDate( 0 ); // Hybrid model end date of month 
+		int HybridModelStartMonth( 0 ); // Hybrid model start month
+		int HybridModelStartDate( 0 ); // Hybrid model start date of month
+		int HybridModelEndMonth( 0 ); // Hybrid model end month
+		int HybridModelEndDate( 0 ); // Hybrid model end date of month
 		int HMStartDay( 0 );
 		int HMEndDay( 0 );
 
 		// Read hybrid model input
 		CurrentModuleObject = "HybridModel:Zone";
-		NumOfHybridModelZones = GetNumObjectsFound( CurrentModuleObject );
+		NumOfHybridModelZones = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		HybridModelZone.allocate( NumOfZones );
 
 		if ( NumOfHybridModelZones > 0 ) {
 
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
-				GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				
+				InputProcessor::GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 				ZoneListPtr = 0;
-				ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
-				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+				ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 				if ( ZonePtr > 0 ) {
 					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
-					HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "Yes" );
-					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "Yes" );
+					HybridModelZone( ZonePtr ).InternalThermalMassCalc = InputProcessor::SameString( cAlphaArgs( 3 ), "Yes" );
+					HybridModelZone( ZonePtr ).InfiltrationCalc = InputProcessor::SameString( cAlphaArgs( 4 ), "Yes" );
 
 					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
 					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc && HybridModelZone( ZonePtr ).InfiltrationCalc ){

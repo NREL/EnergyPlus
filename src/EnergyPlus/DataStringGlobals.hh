@@ -115,15 +115,12 @@ namespace DataStringGlobals {
 	extern std::string outputRvauditFileName;
 
 	extern std::string weatherFileNameOnly;
-<<<<<<< HEAD
-	extern std::string inputDirPathName;
-	extern std::string outputDirPathName;
-	extern std::string inputFileNameOnly;
-=======
 	extern std::string idfDirPathName;
 	extern std::string outDirPathName;
 	extern std::string idfFileNameOnly;
->>>>>>> NREL/develop
+	extern std::string inputDirPathName;
+	extern std::string outputDirPathName;
+	extern std::string inputFileNameOnly;
 	extern std::string exeDirectory;
 
 	// MODULE PARAMETER DEFINITIONS:

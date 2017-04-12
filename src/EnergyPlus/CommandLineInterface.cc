@@ -284,7 +284,7 @@ ProcessArgs(int argc, const char * argv[])
 		makeDirectory(outDirPathName);
 	}
 
-	outputDirPathName = dirPathName;
+	outputDirPathName = outDirPathName;
 
 	// File naming scheme
 	std::string outputFilePrefix;

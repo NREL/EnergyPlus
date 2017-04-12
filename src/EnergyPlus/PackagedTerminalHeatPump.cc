@@ -793,7 +793,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).FanName = Alphas( 8 );
 
 
-			if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 				PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 				PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
@@ -1247,13 +1247,8 @@ namespace PackagedTerminalHeatPump {
 			//   Initialize last mode of compressor operation
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
-=======
-			if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
-				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
->>>>>>> NREL/develop
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
@@ -1487,7 +1482,7 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "In " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 				ErrorsFound = true;
 			}
-			if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 				PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 				PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
@@ -1882,13 +1877,8 @@ namespace PackagedTerminalHeatPump {
 			//   Initialize last mode of compressor operation
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
-=======
-			if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
-				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
->>>>>>> NREL/develop
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
@@ -2057,7 +2047,7 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			} else {
 
-				if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 					PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 					PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
@@ -3154,7 +3144,7 @@ namespace PackagedTerminalHeatPump {
 					GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, PTUnit( PTUnitNum ).ActualFanVolFlowRate );
 				}
 
-				
+
 			}
 		}
 
@@ -3206,7 +3196,7 @@ namespace PackagedTerminalHeatPump {
 				} else {
 					GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, PTUnit( PTUnitNum ).FanVolFlow );
 				}
-				
+
 				if ( PTUnit( PTUnitNum ).FanVolFlow != AutoSize ) {
 					//     Check fan versus system supply air flow rates
 					if ( PTUnit( PTUnitNum ).FanVolFlow + 1e-10 < PTUnit( PTUnitNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) ) {
@@ -4525,7 +4515,7 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
-			
+
 		}
 
 		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {

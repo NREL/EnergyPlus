@@ -1066,17 +1066,6 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( 4420.0, QUnitOut, 5.0 );
 
-<<<<<<< HEAD
-		DataGlobals::DoingSizing = false;
-		PlantLoop.deallocate();
-		ZoneSysEnergyDemand.deallocate();
-		FanCoil.deallocate();
-		Node.deallocate();
-		WaterCoil.deallocate();
-		ZoneEquipConfig.deallocate();
-		Zone.deallocate();
-		CoilNames.clear();
-=======
 		// Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
 		QZnReq = 80.0;
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 80.00;
@@ -1110,7 +1099,6 @@ namespace EnergyPlus {
 		// water flow rate had to increase to get to 80 W since coil off capacity was much different at -1752 W
 		EXPECT_NEAR( 0.000219, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
 
->>>>>>> NREL/develop
 	}
 	TEST_F( EnergyPlusFixture, ElectricCoilFanCoilHeatingTest ) {
 

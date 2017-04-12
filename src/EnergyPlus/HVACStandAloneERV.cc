@@ -674,24 +674,13 @@ namespace HVACStandAloneERV {
 				ErrorsFound = true;
 			}
 			// Verify supply air fan name in Stand Alone ERV object matches name of valid fan object
-<<<<<<< HEAD
-			if ( InputProcessor::GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " supply fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
-				ErrorsFound = true;
-			}
-
-			// Verify exhaust air fan name in Stand Alone ERV object matches name of valid fan object
-			if ( InputProcessor::GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
-				ErrorsFound = true;
-=======
 			if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				if ( GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
+				if ( InputProcessor::GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " supply fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
 					ErrorsFound = true;
 				}
 			} else {
-				if ( GetObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
+				if ( InputProcessor::GetObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " supply fan type Fan:SystemModel not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
 					ErrorsFound = true;
 				}
@@ -699,16 +688,15 @@ namespace HVACStandAloneERV {
 
 			// Verify exhaust air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				if ( GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
+				if ( InputProcessor::GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
 					ErrorsFound = true;
 				}
 			} else {
-				if ( GetObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
+				if ( InputProcessor::GetObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:SystemModel not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
 					ErrorsFound = true;
 				}
->>>>>>> NREL/develop
 			}
 
 		}
@@ -1350,12 +1338,6 @@ namespace HVACStandAloneERV {
 		// simulate the fan to size using the flow rate specified above
 		// (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;)
 		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
-<<<<<<< HEAD
-			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
-		}
-		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
-			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
-=======
 			if ( ! ( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject ) ) {
 				SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
 			} else {
@@ -1368,7 +1350,6 @@ namespace HVACStandAloneERV {
 			} else {
 				HVACFan::fanObjs[ StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex ]->simulate( _,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 			}
->>>>>>> NREL/develop
 		}
 
 		// now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs

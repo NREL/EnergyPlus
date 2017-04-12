@@ -391,7 +391,7 @@ namespace HVACHXAssistedCoolingCoil {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+			} else if ( InputProcessor::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
@@ -468,7 +468,7 @@ namespace HVACHXAssistedCoolingCoil {
 					ErrorsFound = true;
 				}
 
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+			} else if ( InputProcessor::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
@@ -688,8 +688,8 @@ namespace HVACHXAssistedCoolingCoil {
 			DXCoilFullLoadOutAirTemp( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 			DXCoilFullLoadOutAirHumRat( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 		} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
-			// 
-		
+			//
+
 		}
 
 	}

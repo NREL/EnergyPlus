@@ -536,7 +536,7 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith (derived from ControlDXSystem by Richard Liesen)
 		//       DATE WRITTEN   Jan 2012
-		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC
 		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
 		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
 		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Heating:DX:VariableSpeed
@@ -555,15 +555,11 @@ namespace HVACDXHeatPumpSystem {
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
-<<<<<<< HEAD
-=======
 		using DXCoils::SimDXCoil;
 		using DXCoils::DXCoilOutletTemp;
 		using FaultsManager::FaultsCoilSATSensor;
 		using General::SolveRegulaFalsi;
 		using General::RoundSigDigits;
-		using InputProcessor::FindItemInList;
->>>>>>> NREL/develop
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -640,7 +636,7 @@ namespace HVACDXHeatPumpSystem {
 			//update the DesOutTemp
 			DesOutTemp -= DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATOffset;
 		}
-		
+
 		// If DXHeatingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXHeatPumpSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 

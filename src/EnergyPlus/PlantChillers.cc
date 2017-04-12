@@ -982,12 +982,8 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum ) {
-<<<<<<< HEAD
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
-=======
-			GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
->>>>>>> NREL/develop
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -1195,7 +1191,7 @@ namespace PlantChillers {
 
 			EngineDrivenChiller( ChillerNum ).FuelHeatingValue = rNumericArgs( 25 );
 
-			// add support of autosize to this. 
+			// add support of autosize to this.
 
 			EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 26 );
 			if ( EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 || EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate ==  DataSizing::AutoSize ) {
@@ -1429,12 +1425,8 @@ namespace PlantChillers {
 		GTChillerReport.allocate( NumGTChillers );
 
 		for ( ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum ) {
-<<<<<<< HEAD
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
-=======
-			GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
->>>>>>> NREL/develop
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -3515,7 +3507,7 @@ namespace PlantChillers {
 			RegisterPlantCompDesignFlow( EngineDrivenChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 		}
 
-		// autosize support for heat recovery flow rate. 
+		// autosize support for heat recovery flow rate.
 		if ( EngineDrivenChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * EngineDrivenChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
@@ -3801,7 +3793,7 @@ namespace PlantChillers {
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
 		if ( GTChiller( ChillNum ).Base.CondenserType == WaterCooled ) RegisterPlantCompDesignFlow( GTChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 
-		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP ); 
+		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP );
 		if ( PlantFirstSizesOkayToFinalize ) {
 			if ( GTChiller( ChillNum ).GTEngineCapacityWasAutoSized ) {
 				GTChiller( ChillNum ).GTEngineCapacity = GTEngineCapacityDes;
@@ -3832,7 +3824,7 @@ namespace PlantChillers {
 			}
 		}
 
-		// autosize support for heat recovery flow rate. 
+		// autosize support for heat recovery flow rate.
 		if ( GTChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = GTChiller( ChillNum ).Base.CondVolFlowRate * GTChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
@@ -4348,16 +4340,16 @@ namespace PlantChillers {
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 RatedCOP_ff = RatedCOP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
 			RatedCOP = RatedCOP_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
-		
+
 		// initialize outlet air humidity ratio of air or evap cooled chillers
 		CondOutletHumRat = Node( CondInletNode ).HumRat;
 
@@ -4406,15 +4398,15 @@ namespace PlantChillers {
 		if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( ElectricChiller( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset ));
 			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
-		
+
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
 
@@ -4618,7 +4610,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -5007,20 +4999,20 @@ namespace PlantChillers {
 		LoopNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopSideNum;
 		EvapMassFlowRateMax = EngineDrivenChiller( ChillerNum ).Base.EvapMassFlowRateMax;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			COP = COP_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
 
 		//*********************************
@@ -5029,13 +5021,13 @@ namespace PlantChillers {
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( EngineDrivenChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		//Calculate chiller performance from this set of performance equations.
@@ -5143,7 +5135,7 @@ namespace PlantChillers {
 				// ChillerPartLoadRatio = PartLoadRat;
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
-			
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5221,7 +5213,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -5659,20 +5651,20 @@ namespace PlantChillers {
 		EvapMassFlowRateMax = GTChiller( ChillerNum ).Base.EvapMassFlowRateMax;
 		LoopNum = GTChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = GTChiller( ChillerNum ).Base.CWLoopSideNum;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
-			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;			
+			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			COP = COP_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
 
 		//*********************************
@@ -5681,13 +5673,13 @@ namespace PlantChillers {
 		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( GTChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
 			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		//Calculate chiller performance from this set of performance equations.
@@ -5793,7 +5785,7 @@ namespace PlantChillers {
 				// ChillerPartLoadRatio = PartLoadRat;
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
-			
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5865,7 +5857,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -6142,7 +6134,7 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen 
+		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen
 		//                      Feb. 2010, Chandan Sharma, FSEC. Added basin heater
 		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
 		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
@@ -6223,16 +6215,16 @@ namespace PlantChillers {
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
-			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor; 
-			
+			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+
 		}
-		
+
 		//set module level chiller inlet and temperature variables
 		LoopNum = ConstCOPChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ConstCOPChiller( ChillNum ).Base.CWLoopSideNum;
@@ -6255,15 +6247,15 @@ namespace PlantChillers {
 		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOutSetPoint
 			TempEvapOutSetPoint = min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset );
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOutSetPoint;
-			
+
 		}
-		
+
 		EvapDeltaTemp = std::abs( Node( EvapInletNode ).Temp - TempEvapOutSetPoint );
 		EvapInletTemp = Node( EvapInletNode ).Temp;
 
@@ -6498,7 +6490,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

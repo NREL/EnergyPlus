@@ -137,11 +137,8 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
-=======
 #include <EnergyPlus/HVACFan.hh>
->>>>>>> NREL/develop
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -377,11 +374,8 @@ namespace EnergyPlus {
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
 		HVACDXSystem::clear_state();
-<<<<<<< HEAD
 		HVACHXAssistedCoolingCoil::clear_state();
-=======
 		HVACFan::clearHVACFanObjects();
->>>>>>> NREL/develop
 		HVACManager::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
@@ -588,123 +582,7 @@ namespace EnergyPlus {
 									{"minimum_number_of_warmup_days", 6}
 							}
 					}
-<<<<<<< HEAD
 			};
-=======
-					if ( found_building && found_global_geo ) break;
-				}
-			}
-		}
-		std::string idf = parser.encode( parsed_idf );
-		if ( ! found_building ) {
-			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
-		}
-		if ( ! found_global_geo ) {
-			idf += "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;" + DataStringGlobals::NL;
-		}
-
-		auto errors_found = false;
-
-		if ( use_idd_cache ) {
-			use_cached_idd();
-		} else {
-			auto const idd = "";
-			process_idd( idd, errors_found );
-		}
-
-		if ( errors_found ) {
-			if ( use_assertions ) {
-				compare_eso_stream( "" );
-				compare_eio_stream( "" );
-				compare_mtr_stream( "" );
-				compare_echo_stream( "" );
-				compare_err_stream( "" );
-				compare_cout_stream( "" );
-				compare_cerr_stream( "" );
-			}
-			return errors_found;
-		}
-
-		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
-		NumLines = 0;
-		InitSecretObjects();
-		ProcessInputDataFile( *idf_stream );
-
-		ListOfSections.allocate( NumSectionDefs );
-		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
-
-		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		DataIPShortCuts::lAlphaFieldBlanks.dimension( MaxAlphaIDFDefArgsFound, false );
-		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		DataIPShortCuts::rNumericArgs.dimension( MaxNumericIDFDefArgsFound, 0.0 );
-		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
-
-		IDFRecordsGotten.dimension( NumIDFRecords, false );
-
-		int count_err = 0;
-		std::string error_string;
-		for ( int loop = 1; loop <= NumIDFSections; ++loop ) {
-			if ( SectionsOnFile( loop ).LastRecord != 0 ) continue;
-			if ( equali( SectionsOnFile( loop ).Name, "REPORT VARIABLE DICTIONARY" ) ) continue;
-			if ( count_err == 0 ) {
-				error_string += " Potential errors in IDF processing:" + DataStringGlobals::NL;
-			}
-			++count_err;
-			int which = SectionsOnFile( loop ).FirstRecord;
-			if ( which > 0 ) {
-				int num_1 = 0;
-				if ( DataSystemVariables::SortedIDD ) {
-					num_1 = FindItemInSortedList( IDFRecords( which ).Name, ListOfObjects, NumObjectDefs );
-					if ( num_1 != 0 ) num_1 = iListOfObjects( num_1 );
-				} else {
-					num_1 = FindItemInList( IDFRecords( which ).Name, ListOfObjects, NumObjectDefs );
-				}
-				if ( ObjectDef( num_1 ).NameAlpha1 && IDFRecords( which ).NumAlphas > 0 ) {
-					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
-									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
-									"], Object Type Preceding=" + IDFRecords( which ).Name + ", Object Name=" + IDFRecords( which ).Alphas( 1 ) + DataStringGlobals::NL;
-				} else {
-					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
-									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
-									"], Object Type Preceding=" + IDFRecords( which ).Name + ", Name field not recorded for Object." + DataStringGlobals::NL;
-				}
-			} else {
-				error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
-								", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
-								"], No prior Objects." + DataStringGlobals::NL;
-			}
-		}
-		if ( use_assertions ) EXPECT_EQ( 0, count_err ) << error_string;
-
-		if ( NumIDFRecords == 0 ) {
-			if ( use_assertions ) EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
-			++NumMiscErrorsFound;
-			errors_found = true;
-		}
-
-		for ( auto const obj_def : ObjectDef ) {
-			if ( ! obj_def.RequiredObject ) continue;
-			if ( obj_def.NumFound > 0 ) continue;
-			if ( use_assertions ) EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
-			++NumMiscErrorsFound;
-			errors_found = true;
-		}
-
-		if ( TotalAuditErrors > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
-			errors_found = true;
-		}
-
-		if ( NumOutOfRangeErrorsFound > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
-			errors_found = true;
-		}
-
-		if ( NumBlankReqFieldFound > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
-			errors_found = true;
->>>>>>> NREL/develop
 		}
 		if (InputProcessor::jdf.find("GlobalGeometryRules") == InputProcessor::jdf.end()) {
 			InputProcessor::jdf["GlobalGeometryRules"] = {
@@ -721,22 +599,10 @@ namespace EnergyPlus {
 			};
 		}
 
-<<<<<<< HEAD
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
 		int MaxNumeric = 0;
 		InputProcessor::GetMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
-=======
-		if ( use_assertions ) {
-			compare_eso_stream( "" );
-			compare_eio_stream( "" );
-			compare_mtr_stream( "" );
-			compare_echo_stream( "" );
-			compare_err_stream( "" );
-			compare_cout_stream( "" );
-			compare_cerr_stream( "" );
-		}
->>>>>>> NREL/develop
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlpha );
 		DataIPShortCuts::cAlphaArgs.allocate( MaxAlpha );

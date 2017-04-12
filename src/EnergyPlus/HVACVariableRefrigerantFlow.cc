@@ -3000,7 +3000,7 @@ namespace HVACVariableRefrigerantFlow {
 			//Get fan data
 			FanType = cAlphaArgs( 7 );
 			FanName = cAlphaArgs( 8 );
-			if ( SameString( FanType, "Fan:SystemModel" ) ) {
+			if ( InputProcessor::SameString( FanType, "Fan:SystemModel" ) ) {
 				if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
 					ErrorsFound = true;
 				} else {
@@ -3016,11 +3016,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			// Check the type of the fan is correct
-<<<<<<< HEAD
-			if ( ! InputProcessor::SameString( cFanTypes( FanType_Num ), FanType ) ) {
-=======
-			if ( ! SameString( cFanTypes( VRFTU( VRFTUNum ).fanType_Num ), FanType ) ) {
->>>>>>> NREL/develop
+			if ( ! InputProcessor::SameString( cFanTypes( VRFTU( VRFTUNum ).fanType_Num ), FanType ) ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
 				ShowContinueError( "Fan type specified = " + cAlphaArgs( 7 ) );
 				ShowContinueError( "Based on the fan name the type of fan actually used = " + cFanTypes( VRFTU( VRFTUNum ).fanType_Num ) );
@@ -4171,7 +4167,7 @@ namespace HVACVariableRefrigerantFlow {
 					} else {
 						GetFanVolFlow( VRFTU( VRFTUNum ).FanIndex, VRFTU( VRFTUNum ).ActualFanVolFlowRate );
 					}
-					
+
 				}
 			}
 		} // IF(MyVRFFlag(VRFTUNum))THEN
@@ -6241,7 +6237,7 @@ namespace HVACVariableRefrigerantFlow {
 				} else {
 					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				}
-				
+
 			} else {
 				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
@@ -7491,12 +7487,6 @@ namespace HVACVariableRefrigerantFlow {
 		using namespace DataZoneEnergyDemands;
 		using DataEnvironment::OutBaroPress;
 		using DXCoils::DXCoil;
-<<<<<<< HEAD
-		using Fans::Fan;
-		using Fans::SimulateFanComponents;
-=======
-		using InputProcessor::FindItemInList;
->>>>>>> NREL/develop
 		using MixedAir::SimOAMixer;
 		using MixedAir::OAMixer;
 		using HVACVariableRefrigerantFlow::VRF;

@@ -458,7 +458,7 @@ namespace WindowAC {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( InputProcessor::SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
 					WindAC( WindACNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( WindAC( WindACNum ).FanName ) ); // call constructor
 					WindAC( WindACNum ).FanIndex = HVACFan::getFanObjectVectorIndex( WindAC( WindACNum ).FanName );
@@ -508,11 +508,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).DXCoilName = Alphas( 10 );
 
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
-=======
-			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 				WindAC( WindACNum ).DXCoilType = Alphas( 9 );
 				CoilNodeErrFlag = false;
 				if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
@@ -521,7 +517,7 @@ namespace WindowAC {
 				} else if ( InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingHXAssisted;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
-				} else if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
+				} else if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
 					WindAC( WindACNum ).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 					WindAC( WindACNum ).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
 					WindAC( WindACNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( WindAC( WindACNum ).DXCoilName, ErrorsFound );
@@ -1344,7 +1340,7 @@ namespace WindowAC {
 			Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 
 			VariableSpeedCoils::SimVariableSpeedCoils( WindAC( WindACNum ).DXCoilName, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadFrac, WindAC( WindACNum ).DXCoilNumOfSpeeds, 1.0, QZnReq, QLatReq, OnOffAirFlowRatio );
-		
+
 		} else {
 			SimDXCoil( WindAC( WindACNum ).DXCoilName, On, FirstHVACIteration, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, PartLoadFrac );
 		}

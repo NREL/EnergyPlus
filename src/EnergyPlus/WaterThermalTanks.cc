@@ -1294,10 +1294,7 @@ namespace WaterThermalTanks {
 							ShowContinueError( "...occurs in " + cCurrentModuleObject + '=' + WaterHeaterDesuperheater( DesuperheaterNum ).Name );
 							ErrorsFound = true;
 						}
-<<<<<<< HEAD
-					} else if ( ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:CompressorRack" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
-=======
-					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceType = cAlphaArgs( 9 );
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceName = cAlphaArgs( 10 );
 						errFlag = false;
@@ -1306,8 +1303,7 @@ namespace WaterThermalTanks {
 							ShowContinueError( "...occurs in " + cCurrentModuleObject + '=' + WaterHeaterDesuperheater( DesuperheaterNum ).Name );
 							ErrorsFound = true;
 						}
-					} else if ( ( SameString( cAlphaArgs( 9 ), "Refrigeration:CompressorRack" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
->>>>>>> NREL/develop
+					} else if ( ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:CompressorRack" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceType = cAlphaArgs( 9 );
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceName = cAlphaArgs( 10 );
 					} else {
@@ -1383,10 +1379,10 @@ namespace WaterThermalTanks {
 							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
 							ErrorsFound = true;
 						}
-					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
 						for ( DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum ) {
-							if ( !SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
+							if ( !InputProcessor::SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 							if ( allocated(  DataHeatBalance::HeatReclaimVS_DXCoil ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
@@ -1868,7 +1864,7 @@ namespace WaterThermalTanks {
 						ShowContinueError( "...occurs in " + cCurrentModuleObject + ", unit=\"" + HPWH.Name + "\"." );
 						ErrorsFound = true;
 					} else {
-						if ( SameString(  HPWH.FanType, "Fan:SystemModel" ) ) {
+						if ( InputProcessor::SameString(  HPWH.FanType, "Fan:SystemModel" ) ) {
 							HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 							HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( HPWH.FanName ) ); // call constructor
 							HPWH.FanNum = HVACFan::getFanObjectVectorIndex( HPWH.FanName );
@@ -1881,7 +1877,7 @@ namespace WaterThermalTanks {
 						}
 
 					}
-					// issue #5630, set fan info in coils. 
+					// issue #5630, set fan info in coils.
 					if ( bIsVScoil == true ) {
 						VariableSpeedCoils::setVarSpeedHPWHFanTypeNum( HPWH.DXCoilNum, HPWH.FanType_Num );
 						VariableSpeedCoils::setVarSpeedHPWHFanIndex( HPWH.DXCoilNum, HPWH.FanNum );
@@ -1897,11 +1893,7 @@ namespace WaterThermalTanks {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified." );
 						ShowContinueError( " The fan object (" + HPWH.FanName + ") type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater." );
 						ErrorsFound = true;
-<<<<<<< HEAD
-					} else if ( !InputProcessor::SameString( HPWH.FanType, "Fan:OnOff" ) ) {
-=======
-					} else if ( !SameString( HPWH.FanType, "Fan:OnOff" ) && !SameString( HPWH.FanType, "Fan:SystemModel" ) ) {
->>>>>>> NREL/develop
+					} else if ( !InputProcessor::SameString( HPWH.FanType, "Fan:OnOff" ) && !InputProcessor::SameString( HPWH.FanType, "Fan:SystemModel" ) ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified." );
 						ShowContinueError(" The " + cCurrentModuleObject + " must specify that the fan object");
 						ShowContinueError(" is of type FanSystemModel or Fan:OnOff in addition to the fan actually being of that type and defined elsewhere.");
@@ -5622,9 +5614,9 @@ namespace WaterThermalTanks {
 				} else if ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ) {
 					GetFanVolFlow( HPWaterHeater( HPNum ).FanNum, FanVolFlow );
 				}
-				
+
 				if ( FanVolFlow  < HPWaterHeater( HPNum ).HPWHAirVolFlowRate( HPWaterHeater( HPNum ).NumofSpeed ) ) { // but this is the not the scaled mas flow
-				//if ( FanVolFlow  < HPWaterHeater( HPNum ).HPWHAirVolFlowRate( HPWaterHeater( HPNum ).NumofSpeed ) ) { 
+				//if ( FanVolFlow  < HPWaterHeater( HPNum ).HPWHAirVolFlowRate( HPWaterHeater( HPNum ).NumofSpeed ) ) {
 
 					ShowWarningError( "InitWaterThermalTank: -air flow rate = " + TrimSigDigits(FanVolFlow, 7) +
 						" in fan object " " is less than the MSHP system air flow rate" " when waterheating is required("
@@ -8718,7 +8710,7 @@ namespace WaterThermalTanks {
 		Node( FanInNode ).MassFlowRateMaxAvail = MdotAir;
 		Node( FanInNode ).MassFlowRateMax = MdotAir;
 		if ( ! ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) ) {
-			Fans::Fan( HPWaterHeater( HPNum ).FanNum ).MassFlowRateMaxAvail = MdotAir; 
+			Fans::Fan( HPWaterHeater( HPNum ).FanNum ).MassFlowRateMaxAvail = MdotAir;
 		} // system fan will use the inlet node max avail.
 
 		MdotAirSav = MdotAir;

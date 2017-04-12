@@ -4346,24 +4346,7 @@ namespace SystemAvailabilityManager {
 		using DataZoneEquipment::NumValidSysAvailZoneComponents;
 		using DataHeatBalance::TotVentilation;
 		using DataHeatBalance::Ventilation;
-<<<<<<< HEAD
-=======
-		using InputProcessor::FindItemInList;
 		using DataHeatBalance::AdaptiveComfortRequested_ASH55;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// NA
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
->>>>>>> NREL/develop
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // One time flag

@@ -670,13 +670,8 @@ namespace InternalHeatGains {
 
 							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
-<<<<<<< HEAD
 								People( Loop ).SurfacePtr = InputProcessor::FindItemInList( AlphaName( 8 ), Surface );
-								if ( People( Loop ).SurfacePtr == 0 ) {
-=======
-								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface );
 								if ( People( Loop ).SurfacePtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
->>>>>>> NREL/develop
 									if ( Item1 == 1 ) {
 										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) + " invalid Surface Name=" + AlphaName( 8 ) );
 										ErrorsFound = true;
