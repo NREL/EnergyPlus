@@ -3562,17 +3562,16 @@ namespace SizingManager {
 			CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepInDay ) = sumCoolLoad;
 			CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepInDay ) = sumHeatLoad;
 
-			CalcFacilitySizing( CurOverallSimDay ).CoolZoneTempSeq( TimeStepInDay ) = wghtdCoolZoneTemp / sumCoolLoad;
-			CalcFacilitySizing( CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) = wghtdHeatZoneTemp  / sumHeatLoad;
-
-			CalcFacilitySizing( CurOverallSimDay ).CoolOutHumRatSeq( TimeStepInDay ) = wghtdCoolHumRat / sumCoolLoad;
-			CalcFacilitySizing( CurOverallSimDay ).HeatOutHumRatSeq( TimeStepInDay ) = wghtdHeatHumRat / sumHeatLoad;
-
-			CalcFacilitySizing( CurOverallSimDay ).CoolOutTempSeq( TimeStepInDay ) = DataEnvironment::OutDryBulbTemp;
-			CalcFacilitySizing( CurOverallSimDay ).HeatOutTempSeq( TimeStepInDay ) = DataEnvironment::OutDryBulbTemp;
-
-			CalcFacilitySizing( CurOverallSimDay ).DOASHeatAddSeq( TimeStepInDay ) = wghtdCoolDOASHeatAdd / sumCoolLoad;
-			CalcFacilitySizing( CurOverallSimDay ).DOASLatAddSeq( TimeStepInDay ) = wghtdCoolDOASLatAdd / sumHeatLoad;
+			if ( sumCoolLoad != 0. ) {
+				CalcFacilitySizing( CurOverallSimDay ).CoolZoneTempSeq( TimeStepInDay ) = wghtdCoolZoneTemp / sumCoolLoad;
+				CalcFacilitySizing( CurOverallSimDay ).CoolOutHumRatSeq( TimeStepInDay ) = wghtdCoolHumRat / sumCoolLoad;
+				CalcFacilitySizing( CurOverallSimDay ).DOASHeatAddSeq( TimeStepInDay ) = wghtdCoolDOASHeatAdd / sumCoolLoad;
+				CalcFacilitySizing( CurOverallSimDay ).DOASLatAddSeq( TimeStepInDay ) = wghtdCoolDOASLatAdd / sumCoolLoad;
+			}
+			if ( sumHeatLoad != 0. ) {
+				CalcFacilitySizing( CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) = wghtdHeatZoneTemp / sumHeatLoad;
+				CalcFacilitySizing( CurOverallSimDay ).HeatOutHumRatSeq( TimeStepInDay ) = wghtdHeatHumRat / sumHeatLoad;
+			}
 
 		} else if ( CallIndicator == EndDay ) {
 			for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
