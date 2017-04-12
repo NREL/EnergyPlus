@@ -5438,7 +5438,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( ZoneNum > 0 ) {
 				Real64 ACH = GetZoneInfilAirChangeRate( ZoneNum ); // Zone air change rate [1/hr]
 				Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
-				V = pow( Vol, 1/3 ) * ACH / 3600; // Average air speed in zone [m/s]
+				V = pow( Vol, 0.333 ) * ACH / 3600; // Average air speed in zone [m/s]
 			} else {
 				V = WindSpeed;
 			}
