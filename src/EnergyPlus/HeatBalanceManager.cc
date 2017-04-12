@@ -540,7 +540,9 @@ namespace HeatBalanceManager {
 				if ( ONum == 4 || ONum == 6 ) {
 					// GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
 					// Include all EMS constructions since they can potentially be used by a CTF surface
-					Construct( CNum ).IsUsedCTF = true;
+					if ( !Construct( CNum ).TypeIsWindow ) {
+						Construct( CNum ).IsUsedCTF = true;
+					}
 				}
 			}
 		}
