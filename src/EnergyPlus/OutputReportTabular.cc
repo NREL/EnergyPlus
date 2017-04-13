@@ -12532,15 +12532,11 @@ namespace OutputReportTabular {
 			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
 			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
 			compLoad.designPeakLoad = -FinalSysSizing( airLoopIndex ).HeatCap;
-			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).SensCoolCap;
+			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).HeatCap;
 		}
 		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
 
 		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
-		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
-
-
-		// Outside air flow
 		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
 
 	}
