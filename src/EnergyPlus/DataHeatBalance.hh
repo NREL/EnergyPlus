@@ -787,7 +787,7 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
-		std::shared_ptr< PhaseChangeModel > phaseChange = nullptr;
+		PhaseChangeModel * phaseChange = nullptr;
 		Real64 tk1; // Temperature coefficient for thermal conductivity
 		Array2D< Real64 > TempEnth; //  (25, 2) = -100 Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
 		                             //  TempEnth(1,2) = First Enthalpy, TempEnth(2,1) = second  Temp, etc.
@@ -813,20 +813,20 @@ namespace DataHeatBalance {
 		                             //  TempEnthFreezing(1,1)= first Temp, TempEnthFreezing(1,2) = First Enthalpy,
 									 //  TempEnthFreezing(2,1) = second Temp, etc.
 
-		Real64 DeltaH;        // Latent Heat of PCM
-		Real64 CpSolid;       // Specific Heat of PCM in Solid State {kJ/kg-K}
-		Real64 CpLiquid;      // Specific Heat of PCM in Liquid State {kJ/kg-K}
-		Real64 Tm;            // Melting Temperature of PCM {C}
-		Real64 Tf;            // Freezing Temperature of PCM {C}
-		Real64 Tau1;          // Width of Melting Zone ( tau1 = Tm - T1){C}
-		Real64 Tau2;          // Width of Melting Zone ( tau2 = T2 - Tm){C}
-		Real64 Tau1Prime;     // Width of Freezing Zone ( tau1' = Tf - T1){C}
-		Real64 Tau2Prime;     // Width of Melting Zone ( tau2' = T2 - Tf){C}
-
-		Real64 TempLowPCM   =0.0;		//lowest temperature at which phase change starts (melting)
-		Real64 TempHighPCM  =0.0;		//highest temperature at which phase change is complete to liquified state
-		Real64 TempLowPCF   =0.0;		//lowest temperature at which phase change starts (Freezing)
-		Real64 TempHighPCF  =0.0;		//highest temperature at which phase change is complete to crystallization state.
+//		Real64 DeltaH;        // Latent Heat of PCM
+//		Real64 CpSolid;       // Specific Heat of PCM in Solid State {kJ/kg-K}
+//		Real64 CpLiquid;      // Specific Heat of PCM in Liquid State {kJ/kg-K}
+//		Real64 Tm;            // Melting Temperature of PCM {C}
+//		Real64 Tf;            // Freezing Temperature of PCM {C}
+//		Real64 Tau1;          // Width of Melting Zone ( tau1 = Tm - T1){C}
+//		Real64 Tau2;          // Width of Melting Zone ( tau2 = T2 - Tm){C}
+//		Real64 Tau1Prime;     // Width of Freezing Zone ( tau1' = Tf - T1){C}
+//		Real64 Tau2Prime;     // Width of Melting Zone ( tau2' = T2 - Tf){C}
+//
+//		Real64 TempLowPCM   =0.0;		//lowest temperature at which phase change starts (melting)
+//		Real64 TempHighPCM  =0.0;		//highest temperature at which phase change is complete to liquified state
+//		Real64 TempLowPCF   =0.0;		//lowest temperature at which phase change starts (Freezing)
+//		Real64 TempHighPCF  =0.0;		//highest temperature at which phase change is complete to crystallization state.
 
 		// Default Constructor
 		MaterialProperties() :

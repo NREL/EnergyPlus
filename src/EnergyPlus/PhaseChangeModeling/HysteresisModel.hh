@@ -44,10 +44,10 @@ namespace HysteresisPhaseChange {
 		Real64 deltaTempFreezingLow;
 
 		// history and state terms
-		Real64 phaseChangeDeltaT;
-		int phaseChangeStateOld;
-		int phaseChangeState;
-		int phaseChangeTransition;
+		Real64 phaseChangeDeltaT = 0;
+		int phaseChangeStateOld = 0;
+		int phaseChangeState = 0;
+		int phaseChangeTransition = 0;
 		Real64 enthOld;
 		Real64 enthNew;
 		Real64 TDT;
@@ -57,12 +57,12 @@ namespace HysteresisPhaseChange {
 		Real64 CpOld;
 
 		// terms to map up to the input parameters
-		Real64 tau1;
-		Real64 tau2;
-		Real64 deltaHF;
-		Real64 tau1Prime;
-		Real64 tau2Prime;
-		Real64 deltaHS;
+		//Real64 tau1;
+		//Real64 tau2;
+		//Real64 deltaHF;
+		//Real64 tau1Prime;
+		//Real64 tau2Prime;
+		//Real64 deltaHS;
 
 		// unknown
 		Real64 specHeatTransition;
@@ -77,9 +77,9 @@ namespace HysteresisPhaseChange {
 		PhaseChangeModel *
 		factory( const std::string objectName );
 
-		Real64 getEnthalpy(Real64, Real64);
+		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2, Real64 deltaH, Real64 CpSolid, Real64 CpLiquid );
 
-		Real64 getCurrentSpecificHeat() override;
+		Real64 getCurrentSpecificHeat( Real64, Real64 ) override;
 	
 	};
 
