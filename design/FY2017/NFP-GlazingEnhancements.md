@@ -1150,9 +1150,9 @@ This section describes code changes and additions in EnergyPlus in HeatBalanceMa
 Four variables are added in the struct MaterialProperties: 
 
 	bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered chcoice
-	int GlassSpecAngTransDataPtr; // Number of transmittance data set as a function of spectral and angle associated with a window glass material
-	int GlassSpecAngFRefleDataPtr; // Number of front reflectance data set as a function of spectral and angle associated with a window glass material
-	int GlassSpecAngBRefleDataPtr; // Number of back reflectance data set as a function of spectral and angle associated with a window glass material
+	int GlassSpecAngTransDataPtr; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
+	int GlassSpecAngFRefleDataPtr; // Data set index of front reflectance as a function of spectral and angle associated with a window glass material 
+	int GlassSpecAngBRefleDataPtr; // Data set index of back reflectance as a function of spectral and angle associated with a window glass material 
 
 The additions are mainly used to catch the changes in revised idd object: WindowMaterial:Glazing.
 
@@ -1166,16 +1166,16 @@ The changes of this module include new and revised functions.
 
 #### New functions ###
 
-Four new functions will be created:
+Three new functions will be created:
 
-##### GetCurveInterpolationTypeNum ###
+##### GetCurveInterpolationMethodNum ###
 
 	int
 	GetCurveInterpolationTypeNum( int const CurveIndex ); // index of curve in curve array
 
 		return TableInterpolationTypeNum;
 
-This function is called by GetMaterialData function in the HeatBalanceManager module and will return table types to ensure optical properties curve type are Table:TwoIndependentVariables only.   
+This function is called by GetMaterialData function in the HeatBalanceManager module and will return interpolation method to ensure the method should LinearInterpolationOfTable defined in the Interpolation Method field of the Table:TwoIndependentVariables object.   
 
 ##### ReadTableDataFromFile ###
 
@@ -1191,11 +1191,7 @@ This function is called by GetMaterialData function in the HeatBalanceManager mo
 
 This function allows user inputs of optical properties are from an external file. This is a new functionality of the Table:TwoIndependentVariables object, to provide a flexible way for users to input optical property data, either from an external file or from idf input file.
 
-##### splitString ###
- 
-	std::vector <std::string> splitString( const std::string &string, char delimiter );
 
-This new function is adopted from OpenStudio to split data from a string.
 
 ##### SetSameIndeVariableValues ####
 
@@ -1206,7 +1202,16 @@ This new function is adopted from OpenStudio to split data from a string.
 		int const BRefleCurveIndex
 	);
 
-This new function is to get common wavelengths and incident angles from 3 optical data sets to represent transmittance, front reflectance and back reflectance. The common wavelengths and incident angles include all values from 3 datasets, unless differences are less than 1e-6. It is possible to allow users to input difference values of wavelengths and incident angles for each property. Due to requirements of WCE, the same discrete values of wavelengths and incident angles are needed for WCE to read and process. Any missing values of optical properties will be linearly interpolated among two nearest points based on common wavelengths and incident angles.   
+This new function is to get common wavelengths and incident angles from 3 optical data sets to represent transmittance, front reflectance and back reflectance. The common wavelengths and incident angles include all values from 3 datasets, unless differences are less than 1e-6. It is possible to allow users to input difference values of wavelengths and incident angles for each property. Due to requirements of WCE, the same discrete values of wavelengths and incident angles are needed for WCE to read and process. Any missing values of optical properties will be linearly interpolated among two nearest points based on common wavelengths and incident angles. 
+  
+### General ###
+
+A new function will be created to split data from a string. The function is adopted from OpenStudio.
+
+##### splitString ###
+ 
+	std::vector <std::string> splitString( const std::string &string, char delimiter );
+
 
 #### Revised functions ####
 
