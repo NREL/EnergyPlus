@@ -83,6 +83,7 @@
 #include <ElectricBaseboardRadiator.hh>
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
+#include <HybridEvaporativeCooler.hh>
 #include <FanCoilUnits.hh>
 #include <Fans.hh>
 #include <General.hh>
@@ -3034,6 +3035,7 @@ namespace ZoneEquipmentManager {
 		using SystemAvailabilityManager::GetZoneEqAvailabilityManager;
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
+		using HybridEvaporativeCooler::SimZoneHybridEvaporativeCooler;
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;
@@ -3360,7 +3362,12 @@ namespace ZoneEquipmentManager {
 				} else if ( SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num ) {
 					SimZoneEvaporativeCoolerUnit( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
-				} else {
+				}
+				else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
+					SimZoneHybridEvaporativeCooler(PrioritySimOrder(EquipTypeNum).EquipName, ActualZoneNum, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+
+				}
+				else {
 
 				}}
 
