@@ -1171,9 +1171,9 @@ Three new functions will be created:
 ##### GetCurveInterpolationMethodNum ###
 
 	int
-	GetCurveInterpolationTypeNum( int const CurveIndex ); // index of curve in curve array
+	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
 
-		return TableInterpolationTypeNum;
+		return TableInterpolationMethodNum;
 
 This function is called by GetMaterialData function in the HeatBalanceManager module and will return interpolation method to ensure the method should LinearInterpolationOfTable defined in the Interpolation Method field of the Table:TwoIndependentVariables object.   
 
