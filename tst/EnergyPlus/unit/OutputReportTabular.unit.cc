@@ -6080,3 +6080,26 @@ TEST( OutputReportTabularTest, CollectPeakAirLoopConditions_test )
 	EXPECT_EQ( compLoad.diffDesignPeak, -100. );
 
 }
+
+TEST( OutputReportTabularTest, ComputeEngineeringChecks_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ComputeEngineeringChecks_test" );
+
+	CompLoadTablesType compLoad;
+
+	compLoad.outsideAirFlow = 0.12;
+	compLoad.mainFanAirFlow = 0.50;
+	compLoad.floorArea = 13.;
+	compLoad.designPeakLoad = 800;
+
+	ComputeEngineeringChecks( compLoad );
+
+	EXPECT_EQ( compLoad.outsideAirRatio, 0.12/0.50 );
+	EXPECT_EQ( compLoad.airflowPerFlrArea, 0.50/13. );
+	EXPECT_EQ( compLoad.totCapPerArea, 800./13. );
+	EXPECT_EQ( compLoad.airflowPerTotCap, 0.50/800. );
+	EXPECT_EQ( compLoad.areaPerTotCap, 13./800. );
+
+}
+
+
