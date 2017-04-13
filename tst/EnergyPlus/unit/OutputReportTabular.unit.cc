@@ -67,6 +67,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -5971,5 +5972,60 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	EXPECT_EQ( "      500.00", tabularData[88][10] ); // above ground gross floor area
 	EXPECT_EQ( "      100.00", tabularData[98][10] ); // window glass area
 	EXPECT_EQ( "      114.72", tabularData[103][10] ); // window opening area
+
+}
+
+TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakZoneConditions" );
+
+	Psychrometrics::InitializePsychRoutines();
+
+	CompLoadTablesType compLoad;
+	int timeOfMax = 10;
+	int zoneIndex = 1;
+	bool isCooling = true;
+
+	Zone.allocate( 1 );
+	Zone( 1 ).Multiplier = 1;
+	Zone( 1 ).ListMultiplier = 1;
+	Zone( 1 ).FloorArea = 12.;
+
+	CoolPeakDateHrMin.allocate( 1 );
+	CoolPeakDateHrMin( 1 ) = "06/30 13:15:00";
+
+	CalcFinalZoneSizing.allocate( 1 );
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq( 10 ) = 38.;
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq( 10 ) = 0.01459;
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq( 10 ) = 24.;
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq( 10 ) = 0.00979;
+	CalcFinalZoneSizing( 1 ).DesCoolLoad = 500.;
+	CalcFinalZoneSizing( 1 ).ZnCoolDgnSAMethod = SupplyAirTemperature;
+	CalcFinalZoneSizing( 1 ).CoolDesTemp = 13.;
+	CalcFinalZoneSizing( 1 ).DesCoolVolFlow = 3.3;
+
+	FinalZoneSizing.allocate( 1 );
+	FinalZoneSizing( 1 ).DesCoolLoad = 600.;
+
+	CollectPeakZoneConditions( compLoad, timeOfMax, zoneIndex, isCooling );
+
+	EXPECT_EQ( compLoad.peakDateHrMin, "06/30 13:15:00" );
+	EXPECT_EQ( compLoad.outsideDryBulb, 38. );
+	EXPECT_EQ( compLoad.outsideHumRatio, 0.01459 );
+	EXPECT_EQ( compLoad.zoneDryBulb, 24. );
+	EXPECT_EQ( compLoad.zoneHumRatio, 0.00979 );
+	EXPECT_EQ( compLoad.peakDesSensLoad, 500. );
+	EXPECT_EQ( compLoad.designPeakLoad, 600. );
+	EXPECT_EQ( compLoad.supAirTemp, 13. );
+	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
+	EXPECT_NEAR( compLoad.airflowPerFlrArea, 3.3 / 12., 0.0001 );
+	EXPECT_NEAR( compLoad.totCapPerArea, 600. / 12., 0.0001 );
+	EXPECT_NEAR( compLoad.airflowPerTotCap, 3.3 / 600., 0.0001 );
+	EXPECT_NEAR( compLoad.areaPerTotCap, 12. / 600., 0.0001 );
+
 
 }
