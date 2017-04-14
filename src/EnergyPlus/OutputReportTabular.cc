@@ -12843,7 +12843,7 @@ namespace OutputReportTabular {
 				compLoadTotal.areaPerTotCap = compLoadTotal.areaPerTotCap * areaConversion / powerConversion;
 			}
 			if ( areaConversion != 0. ) {
-				compLoadTotal.totCapPerArea = compLoadTotal.areaPerTotCap * powerConversion / areaConversion;
+				compLoadTotal.totCapPerArea = compLoadTotal.totCapPerArea * powerConversion / areaConversion;
 			}
 			compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
 			compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion; 
