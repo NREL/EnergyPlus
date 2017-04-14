@@ -6102,4 +6102,111 @@ TEST( OutputReportTabularTest, ComputeEngineeringChecks_test )
 
 }
 
+TEST( OutputReportTabularTest, GetZoneComponentAreas_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetZoneComponentAreas_test" );
+
+	Array1D< ZompComponentAreasType > areas;
+	areas.allocate(1);
+
+	Zone.allocate( 1 );
+	NumOfZones = 1;
+	Zone( 1 ).FloorArea = 12.;
+
+	Surface.allocate(13);
+
+	Surface( 1 ).GrossArea = 5.;  //extWall
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 1 ).Zone = 1;
+	Surface( 1 ).HeatTransSurf = true;
+
+	Surface( 2 ).GrossArea = 6.; //grdCntWall
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).ExtBoundCond = GroundFCfactorMethod;
+	Surface( 2 ).Zone = 1;
+	Surface( 2 ).HeatTransSurf = true;
+
+	Surface( 3 ).GrossArea = 7.; //intZoneWall
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).ExtBoundCond = 2;
+	Surface( 3 ).Zone = 1;
+	Surface( 3 ).HeatTransSurf = true;
+
+	Surface( 4 ).GrossArea = 8.; //roof
+	Surface( 4 ).Class = SurfaceClass_Roof;
+	Surface( 4 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 4 ).Zone = 1;
+	Surface( 4 ).HeatTransSurf = true;
+
+	Surface( 5 ).GrossArea = 9.; //ceiling
+	Surface( 5 ).Class = SurfaceClass_Roof;
+	Surface( 5 ).ExtBoundCond = 5;
+	Surface( 5 ).Zone = 1;
+	Surface( 5 ).HeatTransSurf = true;
+
+	Surface( 6 ).GrossArea = 10.; //extFloor
+	Surface( 6 ).Class = SurfaceClass_Floor;
+	Surface( 6 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 6 ).Zone = 1;
+	Surface( 6 ).HeatTransSurf = true;
+
+	Surface( 7 ).GrossArea = 11.; //grndCntFloor
+	Surface( 7 ).Class = SurfaceClass_Floor;
+	Surface( 7 ).ExtBoundCond = Ground;
+	Surface( 7 ).Zone = 1;
+	Surface( 7 ).HeatTransSurf = true;
+
+	Surface( 8 ).GrossArea = 12.; //intZoneFloor
+	Surface( 8 ).Class = SurfaceClass_Floor;
+	Surface( 8 ).ExtBoundCond = 3;
+	Surface( 8 ).Zone = 1;
+	Surface( 8 ).HeatTransSurf = true;
+
+	Surface( 9 ).GrossArea = 13.; //fenestration
+	Surface( 9 ).Class = SurfaceClass_Window;
+	Surface( 9 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 9 ).Zone = 1;
+	Surface( 9 ).HeatTransSurf = true;
+
+	Surface( 10 ).GrossArea = 14.; //door
+	Surface( 10 ).Class = SurfaceClass_Door;
+	Surface( 10 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 10 ).Zone = 1;
+	Surface( 10 ).HeatTransSurf = true;
+
+	Surface( 11 ).GrossArea = 15.; //door (again)
+	Surface( 11 ).Class = SurfaceClass_GlassDoor;
+	Surface( 11 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 11 ).Zone = 1;
+	Surface( 11 ).HeatTransSurf = true;
+
+	Surface( 12 ).GrossArea = 16.; //fenestration (again)
+	Surface( 12 ).Class = SurfaceClass_TDD_Dome;
+	Surface( 12 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 12 ).Zone = 1;
+	Surface( 12 ).HeatTransSurf = true;
+
+	Surface( 13 ).GrossArea = 17.; //grndCntFloor (again)
+	Surface( 13 ).Class = SurfaceClass_Floor;
+	Surface( 13 ).ExtBoundCond = KivaFoundation;
+	Surface( 13 ).Zone = 1;
+	Surface( 13 ).HeatTransSurf = true;
+
+	GetZoneComponentAreas( areas );
+
+	EXPECT_EQ( 12., areas( 1 ).floor );
+	EXPECT_EQ( 8., areas( 1 ).roof );
+	EXPECT_EQ( 9., areas( 1 ).ceiling );
+	EXPECT_EQ( 5., areas( 1 ).extWall );
+	EXPECT_EQ( 7., areas( 1 ).intZoneWall );
+	EXPECT_EQ( 6., areas( 1 ).grndCntWall );
+	EXPECT_EQ( 10., areas( 1 ).extFloor );
+	EXPECT_EQ( 12., areas( 1 ).intZoneFloor );
+	EXPECT_EQ( 28., areas( 1 ).grndCntFloor );
+	EXPECT_EQ( 29., areas( 1 ).fenestration );
+	EXPECT_EQ( 29., areas( 1 ).door );
+
+}
+
 

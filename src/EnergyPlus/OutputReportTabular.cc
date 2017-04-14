@@ -12608,9 +12608,9 @@ namespace OutputReportTabular {
 				} else {
 					areas( curZoneIndex ).intZoneFloor += curSurface.GrossArea;
 				}
-			} else if ( curSurface.Class == SurfaceClass_Window || curSurface.Class == SurfaceClass_TDD_Dome || curSurface.Class == SurfaceClass_GlassDoor ) {
+			} else if ( curSurface.Class == SurfaceClass_Window || curSurface.Class == SurfaceClass_TDD_Dome  ) {
 				areas( curZoneIndex ).fenestration += curSurface.GrossArea;
-			} else if ( curSurface.Class == SurfaceClass_Door || curSurface.Class == SurfaceClass_TDD_Dome ) {
+			} else if ( curSurface.Class == SurfaceClass_Door || curSurface.Class == SurfaceClass_GlassDoor ) {
 				areas( curZoneIndex ).door += curSurface.GrossArea;
 			}
 		}
