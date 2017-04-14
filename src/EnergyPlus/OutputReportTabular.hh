@@ -108,6 +108,42 @@ namespace OutputReportTabular {
 	extern int const stepTypeZone;
 	extern int const stepTypeHVAC;
 
+	extern int const cSensInst;
+	extern int const cSensDelay;
+	extern int const cSensRA;
+	extern int const cLatent;
+	extern int const cTotal;
+	extern int const cPerc;
+	extern int const cArea;
+	extern int const cPerArea;
+
+	extern int const rPeople;
+	extern int const rLights;
+	extern int const rEquip;
+	extern int const rRefrig;
+	extern int const rWaterUse;
+	extern int const rHvacLoss;
+	extern int const rPowerGen;
+	extern int const rDOAS;
+	extern int const rInfil;
+	extern int const rZoneVent;
+	extern int const rIntZonMix;
+	extern int const rRoof;
+	extern int const rIntZonCeil;
+	extern int const rOtherRoof;
+	extern int const rExtWall;
+	extern int const rIntZonWall;
+	extern int const rGrdWall;
+	extern int const rOtherWall;
+	extern int const rExtFlr;
+	extern int const rIntZonFlr;
+	extern int const rGrdFlr;
+	extern int const rOtherFlr;
+	extern int const rFeneCond;
+	extern int const rFeneSolr;
+	extern int const rOpqDoor;
+	extern int const rGrdTot;
+
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
 	extern int const numResourceTypes;

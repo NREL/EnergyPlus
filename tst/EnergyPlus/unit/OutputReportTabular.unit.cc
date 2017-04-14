@@ -6243,3 +6243,37 @@ TEST( OutputReportTabularTest, CombineLoadCompResults_test )
 
 }
 
+TEST( OutputReportTabularTest, AddTotalRowsForLoadSummary_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, AddTotalRowsForLoadSummary_test" );
+
+	CompLoadTablesType compLoad;
+	compLoad.cells.allocate( cPerArea, rGrdTot );
+	compLoad.cells = 0.;
+	compLoad.cellUsed.allocate( cPerArea, rGrdTot );
+	compLoad.cellUsed = true;
+
+	compLoad.cells( cSensInst, rLights ) = 3.;
+	compLoad.cells( cSensInst, rRefrig ) = 4.;
+	compLoad.cells( cLatent, rLights ) = 10.;
+	compLoad.cells( cLatent, rRefrig ) = 20.;
+
+	compLoad.cells( cArea, rLights ) = 5.;
+	compLoad.cells( cArea, rRefrig ) = 5.;
+
+	AddTotalRowsForLoadSummary( compLoad );
+
+	EXPECT_EQ( 3. + 4., compLoad.cells( cSensInst, rGrdTot ) );
+	EXPECT_EQ( 10 + 20., compLoad.cells( cLatent, rGrdTot ) );
+	EXPECT_EQ( 3. + 10., compLoad.cells( cTotal, rLights ) );
+	EXPECT_EQ( 4 + 20., compLoad.cells( cTotal, rRefrig ) );
+
+	EXPECT_EQ( 37., compLoad.cells( cTotal, rGrdTot ) );
+
+	EXPECT_EQ( 100. * 13. / 37., compLoad.cells( cPerc, rLights ) );
+	EXPECT_EQ( 100. * 24. / 37., compLoad.cells( cPerc, rRefrig ) );
+
+	EXPECT_EQ( 13. / 5., compLoad.cells( cPerArea, rLights ) );
+	EXPECT_EQ( 24. / 5., compLoad.cells( cPerArea, rRefrig ) );
+
+}
