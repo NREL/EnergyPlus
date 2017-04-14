@@ -6209,4 +6209,37 @@ TEST( OutputReportTabularTest, GetZoneComponentAreas_test )
 
 }
 
+TEST( OutputReportTabularTest, CombineLoadCompResults_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CombineLoadCompResults_test" );
+
+	CompLoadTablesType compLoadTotal;
+	compLoadTotal.cells.allocate( 10, 30 );
+	compLoadTotal.cells = 0.;
+	compLoadTotal.cellUsed.allocate( 10, 30 );
+	compLoadTotal.cellUsed = false;
+
+	CompLoadTablesType compLoadPartial;
+	compLoadPartial.cells.allocate( 10, 30 );
+	compLoadPartial.cells = 0.;
+	compLoadPartial.cellUsed.allocate( 10, 30 );
+	compLoadPartial.cellUsed = false;
+
+	Real64 multiplier = 3.;
+
+	compLoadPartial.cells( 1, 1) = 1.1;
+	compLoadPartial.cells( 4, 25 ) = 1.2;
+	compLoadPartial.cellUsed( 3, 17 ) = true;
+	compLoadPartial.outsideWebBulb = 17.;
+	compLoadPartial.diffDesignPeak = 11.;
+
+	CombineLoadCompResults( compLoadTotal, compLoadPartial, multiplier );
+
+	EXPECT_EQ( 1.1 * 3., compLoadTotal.cells( 1, 1 ) );
+	EXPECT_EQ( 1.2 * 3., compLoadTotal.cells( 4, 25 ) );
+	EXPECT_EQ( true, compLoadTotal.cellUsed( 3, 17 ) );
+	EXPECT_EQ( 17., compLoadTotal.outsideWebBulb );
+	EXPECT_EQ( 33., compLoadTotal.diffDesignPeak );
+
+}
 
