@@ -6320,3 +6320,61 @@ TEST( OutputReportTabularTest, LoadSummaryUnitConversion_test )
 }
 
 
+TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CreateListOfZonesForAirLoop_test" );
+
+	CompLoadTablesType compLoad;
+	Array1D_int zoneToAirLoop;
+
+	NumOfZones = 15;
+	compLoad.zoneIndices.allocate( NumOfZones );
+	compLoad.zoneIndices = 0;
+
+	zoneToAirLoop.allocate( NumOfZones );
+	zoneToAirLoop( 1 ) = 3;
+	zoneToAirLoop( 2 ) = 2;
+	zoneToAirLoop( 3 ) = 1;
+	zoneToAirLoop( 4 ) = 1;
+	zoneToAirLoop( 5 ) = 2;
+	zoneToAirLoop( 6 ) = 3;
+	zoneToAirLoop( 7 ) = 1;
+	zoneToAirLoop( 8 ) = 1;
+	zoneToAirLoop( 9 ) = 2;
+	zoneToAirLoop( 10 ) = 2;
+	zoneToAirLoop( 11 ) = 1;
+	zoneToAirLoop( 12 ) = 1;
+	zoneToAirLoop( 13 ) = 3;
+	zoneToAirLoop( 14 ) = 3;
+	zoneToAirLoop( 15 ) = 1;
+
+	CreateListOfZonesForAirLoop( compLoad, zoneToAirLoop, 1 );
+	EXPECT_EQ( 3, compLoad.zoneIndices( 1 ) );
+	EXPECT_EQ( 4, compLoad.zoneIndices( 2 ) );
+	EXPECT_EQ( 7, compLoad.zoneIndices( 3 ) );
+	EXPECT_EQ( 8, compLoad.zoneIndices( 4 ) );
+	EXPECT_EQ( 11, compLoad.zoneIndices( 5 ) );
+	EXPECT_EQ( 12, compLoad.zoneIndices( 6 ) );
+	EXPECT_EQ( 15, compLoad.zoneIndices( 7 ) );
+	EXPECT_EQ( 0, compLoad.zoneIndices( 8 ) );
+
+	compLoad.zoneIndices = 0;
+	CreateListOfZonesForAirLoop( compLoad, zoneToAirLoop, 2 );
+	EXPECT_EQ( 2, compLoad.zoneIndices( 1 ) );
+	EXPECT_EQ( 5, compLoad.zoneIndices( 2 ) );
+	EXPECT_EQ( 9, compLoad.zoneIndices( 3 ) );
+	EXPECT_EQ( 10, compLoad.zoneIndices( 4 ) );
+	EXPECT_EQ( 0, compLoad.zoneIndices( 5 ) );
+
+	compLoad.zoneIndices = 0;
+	CreateListOfZonesForAirLoop( compLoad, zoneToAirLoop, 3 );
+	EXPECT_EQ( 1, compLoad.zoneIndices( 1 ) );
+	EXPECT_EQ( 6, compLoad.zoneIndices( 2 ) );
+	EXPECT_EQ( 13, compLoad.zoneIndices( 3 ) );
+	EXPECT_EQ( 14, compLoad.zoneIndices( 4 ) );
+	EXPECT_EQ( 0, compLoad.zoneIndices( 5 ) );
+
+}
+
+
+
