@@ -69,6 +69,15 @@ namespace DataStringGlobals {
 	extern std::string outputErrFileName;
 	extern std::string outputEsoFileName;
 	extern std::string outputJsonFileName;
+
+	extern std::string outputTSHvacJsonFileName;
+	extern std::string outputTSZoneJsonFileName;
+	extern std::string outputTSJsonFileName;
+	extern std::string outputMNJsonFileName;
+	extern std::string outputDYJsonFileName;
+	extern std::string outputHRJsonFileName;
+	extern std::string outputSMJsonFileName;
+
 	extern std::string outputMtdFileName;
 	extern std::string outputMddFileName;
 	extern std::string outputMtrFileName;

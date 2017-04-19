@@ -1306,6 +1306,88 @@ namespace SimulationManager {
 			}
 			json_stream = gio::out_stream( OutputFileJson );
 		}
+
+		if (OutputSchema->timeSeriesEnabled()){
+			// Output detailed Zone time series file
+			if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled())
+			{
+				OutputFileTSZoneJson = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileTSZoneJson, DataStringGlobals::outputTSZoneJsonFileName, flags); write_stat = flags.ios(); }
+				if (write_stat != 0) {
+					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputTSZoneJsonFileName+ " for output (write).");
+				}
+				json_TSstream_Zone = gio::out_stream( OutputFileTSZoneJson );
+			}
+
+			// Output detailed HVAC time series file
+			if (OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled())
+			{
+				OutputFileTSHVACJson = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileTSHVACJson, DataStringGlobals::outputTSHvacJsonFileName, flags); write_stat = flags.ios(); }
+				if (write_stat != 0) {
+					ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputTSHvacJsonFileName+ " for output (write).");
+				}
+				json_TSstream_HVAC = gio::out_stream( OutputFileTSHVACJson );
+			}
+
+			// Output timestep time series file
+			if (OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled())
+			{
+				OutputFileTSJson = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileTSJson, DataStringGlobals::outputTSJsonFileName, flags); write_stat = flags.ios(); }
+				if (write_stat != 0) {
+					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputTSJsonFileName+ " for output (write).");
+				}
+				json_TSstream = gio::out_stream( OutputFileTSJson );
+			}
+
+			// Output hourly time series file
+			if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled())
+			{
+				OutputFileHRJson = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileHRJson, DataStringGlobals::outputHRJsonFileName, flags); write_stat = flags.ios(); }
+				if (write_stat != 0) {
+					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputHRJsonFileName+ " for output (write).");
+				}
+				json_HRstream = gio::out_stream( OutputFileHRJson );
+			}
+
+			// Output daily time series file
+			if (OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled())
+				if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled())
+				{
+					OutputFileDYJson = GetNewUnitNumber();
+					{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileDYJson, DataStringGlobals::outputDYJsonFileName, flags); write_stat = flags.ios(); }
+					if (write_stat != 0) {
+						ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputDYJsonFileName+ " for output (write).");
+					}
+					json_DYstream = gio::out_stream( OutputFileDYJson );
+				}
+
+			// Output monthly time series file
+			if (OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled())
+				if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled())
+				{
+					OutputFileMNJson = GetNewUnitNumber();
+					{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileMNJson, DataStringGlobals::outputMNJsonFileName, flags); write_stat = flags.ios(); }
+					if (write_stat != 0) {
+						ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputMNJsonFileName+ " for output (write).");
+					}
+					json_MNstream = gio::out_stream( OutputFileMNJson );
+				}
+
+			// Output run period time series file
+			if (OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled())
+				if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled())
+				{
+					OutputFileSMJson = GetNewUnitNumber();
+					{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileSMJson, DataStringGlobals::outputSMJsonFileName, flags); write_stat = flags.ios(); }
+					if (write_stat != 0) {
+						ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputSMJsonFileName+ " for output (write).");
+					}
+					json_SMstream = gio::out_stream( OutputFileSMJson );
+				}
+		}
 	}
 
 	void

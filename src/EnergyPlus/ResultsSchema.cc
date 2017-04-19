@@ -26,6 +26,7 @@
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <DataGlobals.hh>
+#include "DataStringGlobals.hh"
 
 namespace EnergyPlus {
 
@@ -400,28 +401,23 @@ namespace EnergyPlus {
 		}
 
 		void DataFrame::writeReport() {
-			//std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout_" + ReportFrequency + ".json";
+			std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout_" + ReportFrequency + ".json";
 			//std::string jsonfilename =  "eplusout_" + ReportFrequency + ".json";
-			//std::ofstream jsonfile(jsonfilename);
+			std::ofstream jsonfile(jsonfilename);
 			
 			json root;
 			
-//			if (jsonfile.is_open())
-//			{
-//				root = getJSON();
-//				jsonfile << std::setw(4) << root << std::endl;
-//				jsonfile.close();
-//			}
+			if (jsonfile.is_open())
+			{
+				root = getJSON();
+				jsonfile << std::setw(4) << root << std::endl;
+				jsonfile.close();
+			}
 //
 //			if (DataGlobals::json_stream){
 //				root = getJSON();
 //				*(DataGlobals::json_stream) << std::setw(4) << root << std::endl;
 //			}
-
-			// does this need to go to error?
-			//else
-			//	ShowWarningError("Unable to open file for time-series output.");
-			//cJSON_Delete(_root);
 		}
 
 
@@ -1012,6 +1008,11 @@ namespace EnergyPlus {
 			OutputSchema->MNMeters.setRDataFrameEnabled(false);
 			OutputSchema->MNMeters.setIDataFrameEnabled(false);
 			OutputSchema->MNMeters.setIVariablesScanned(false);
+
+			OutputSchema->SMMeters.setRVariablesScanned(false);
+			OutputSchema->SMMeters.setRDataFrameEnabled(false);
+			OutputSchema->SMMeters.setIDataFrameEnabled(false);
+			OutputSchema->SMMeters.setIVariablesScanned(false);
 		}
 	} // ResultsFramework
 

@@ -166,6 +166,13 @@ namespace DataGlobals {
 	extern int OutputFileStandard; // Unit number for the standard output file (hourly data only)
 	extern std::ostream * eso_stream; // Internal stream used for eso output (used for performance)
 	extern std::ostream * json_stream; // Internal stream used for json output (used for performance)
+	extern std::ostream * json_TSstream_Zone;
+	extern std::ostream * json_TSstream_HVAC;
+	extern std::ostream * json_TSstream;
+	extern std::ostream * json_HRstream;
+	extern std::ostream * json_MNstream;
+	extern std::ostream * json_DYstream;
+	extern std::ostream * json_SMstream;
 	extern int OutputStandardError; // Unit number for the standard error output file
 	extern std::ostream * err_stream; // Internal stream used for err output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
@@ -175,6 +182,13 @@ namespace DataGlobals {
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
 	extern int OutputFileJson; // Unit number for Schema output
+	extern int OutputFileTSZoneJson;
+	extern int OutputFileTSHVACJson;
+	extern int OutputFileTSJson;
+	extern int OutputFileHRJson;
+	extern int OutputFileDYJson;
+	extern int OutputFileMNJson;
+	extern int OutputFileSMJson;
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
