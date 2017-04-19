@@ -1,24 +1,26 @@
 \section{Hybrid Model}\label{hybrid-model}
 
-\subsection{Overview}\label{overview-004}
+\subsection{Overview}
 
 Nomenclature\\
-$Q_{int}$	Internal heat gain\\
-$h_s$	Convective heat transfer coefficient\\
-$A_s$	Zone surface area\\
-$T_s$	Zone surface temperature\\
-$T_z$	Zone air temperature\\
-$T_{iz}$	Interzone air temperature\\
-$T_o$	Outdoor air temperature\\
-$T_{sup}$	Air system supply air temperature\\
-$q_{inf}$	Infiltration air flow rate\\
-$m ̇_i$z	Interzone air mass flow rate\\
-$m ̇_{sys}$	Air system mass flow rate\\
-$V$	Zone volume\\
-$ρ_{air}$	Air density\\
-$C_z$	Heat capacity of zone air and internal thermal mass\\
-$C_p$	Zone air specific heat\\
-$C_T$	Heat capacity multiplier\\
+\begin{tabular}{ll}
+$Q_{int}$ & Internal heat gain\\
+$h_s$ & Convective heat transfer coefficient\\
+$A_s$ & Zone surface area\\
+$T_s$ & Zone surface temperature\\
+$T_z$ & Zone air temperature\\
+$T_{iz}$ & Interzone air temperature\\
+$T_o$ & Outdoor air temperature\\
+$T_{sup}$ & Air system supply air temperature\\
+$q_{inf}$ & Infiltration air flow rate\\
+$\dot{m}_i$z & Interzone air mass flow rate\\
+$\dot{m}_{sys}$ & Air system mass flow rate\\
+$V$ & Zone volume\\
+$\rho_{air}$ & Air density\\
+$C_z$ & Heat capacity of zone air and internal thermal mass\\
+$C_p$ & Zone air specific heat\\
+$C_T$ & Heat capacity multiplier\\
+\end{tabular}
 
 The hybrid modeling combines forward and inverse physics-based modeling taking advantage of measured zone air temperature data to perform targeted calibration on specific inputs. The hybrid modeling approach aims to enhance the current energy retrofit practices not only offering more user-friendly energy modeling environments but also providing more accurate estimates of energy savings at the same time. The hybrid model avoids input parameters that are hard to measure and replace them to easily measurable data, which integrates physics-based and data-driven modeling methods. Parameters such as interior thermal mass and air infiltration rates are required in physics-based models, and they have significant impacts as they are driving factors for the dynamic performance of buildings. An accurate estimate of interior thermal mass has been a difficult problem because the building usually has various amounts of furniture and changeable partitions. The air infiltration rate changes in time and dynamically interacts with indoor and outdoor climatic conditions. However the accurate estimation of the data is almost impossible to collect without a fan pressurized test, which can not be easily done by typical energy modelers (Gowri et al. 2009). The hybrid model introduces an approach that represents the interior thermal mass in EnergyPlus, one with traditional interior mass object and the other with capacitance multiplier approach. Also the approach presents fundamentals of the infiltration modeling in energy simulation and provides mathematical derivation of the hybrid model. 
 
@@ -51,10 +53,10 @@ The hybrid model algorithms are built upon the physics-based zone heat balance e
 EnergyPlus provides algorithms to solve the zone air energy balance equation that uses the analytical solution to calculate the derivative term respect to time. The basis for the zone air system integration is to formulate energy balances for the zone air as shown in following equations and solve the resulting ordinary differential equations. 
 
 \begin{equation}
-C_z \frac {dT_z} {dt} = ∑Q_i +∑[h_i A_i (T_{si} - T_z)] + ∑[ṁ_i C_p (T_{zi}-T_z)] + ṁ_{inf} C_p (T_o - T_z) + Q_{sys}
+C_z \frac {dT_z} {dt} = \Sigma Q_i +\Sigma[h_i A_i (T_{si} - T_z)] + \Sigma [\dot{m}_i C_p (T_{zi}-T_z)] + \dot{m}_{inf} C_p (T_o - T_z) + Q_{sys}
 \end{equation}
 \begin{equation}
-C_z = V ρ_{air} C_p C_T
+C_z = V \rho_{air} C_p C_T
 \end{equation}
 
 The sum of zone loads and the provided air system energy equals the change in energy stored in the zone. Typically the zone capacitance, $C_z$ includes the zone air only when formulating energy balances for the zone air. The internal thermal mass, including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The infiltration airflow rate, $q_inf$ changes for different conditions depending on outdoor temperature, wind speed, and HVAC system operations. The energy provided from systems to the zone is represented as $Q_{sys}$.
@@ -91,25 +93,27 @@ The use of the internal mass multiplier, the zone temperature capacitance multip
 The interior thermal mass including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The interior thermal mass is assumed to be in equilibrium with the zone air. The interior mass in the current EnergyPlus model uses a capacitance multiplier, $C_T$ indicating the capacitance as part of the air in the volume of the specified zone. The default value is given as 1.0 corresponding to the total capacitance for the zone’s volume of air at current zone conditions. The hybrid model to derive internal thermal mass uses the capacitance multiplier that indicates the capacitance added to the zone air. The added internal thermal mass capacitance will be represented in the multiplier, which the value would be greater than 1.0. The formulation starts with the heat balance on the zone air. The following equation calculates the time-series zone air temperature, $T_z$ reformulating the above equation using the analytical solution method.
 
 \begin{equation}
-T_z^t = [T_z^{t-δt} - \frac {∑Q_i + ∑(h_i A_i T_{si}) + ∑(ṁ_i C_p T_{zi}) +ṁ_{inf} C_p T_o + ṁ_{sys} C_pT_{sup}^t} {∑(h_i A_i)  + ∑(ṁ_i C_p) + ṁ_{inf} C_p + ṁ_sys C_p}]  \\ \times e^{ - \frac {∑(h_i A_i) + ∑(ṁ_i C_p ṁ_{inf} C_p)+ ṁ_{sys} C_p} {C_z^t } δt} \\ + \frac {∑Q_i +∑(h_i A_i T_{si}) + ∑(ṁ_i C_p T_{zi}) + ṁ_{inf} C_p T_o + ṁ_{sys} C_p T_{sup}^t} {∑(h_i A_i) +∑(ṁ_i C_p)  + ṁ_{inf} C_p + ṁ_{sys} C_p }
+\begin{aligned}
+T_z^t = &\left[T_z^{t-\delta t} - \frac {\Sigma Q_i + \Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) +\dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_pT_{sup}^t} {\Sigma (h_i A_i)  + \Sigma(\dot{m}_i C_p) + \dot{m}_{inf} C_p + \dot{m}_sys C_p}\right]\\ &\times e^{ - \frac {\Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p \dot{m}_{inf} C_p)+ \dot{m}_{sys} C_p} {C_z^t } \delta t} \\ &+ \frac {\Sigma Q_i +\Sigma(h_i A_i T_{si}) + \Sigma(\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t} {\Sigma(h_i A_i) +\Sigma(\dot{m}_i C_p)  + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p }
+\end{aligned}
 \end{equation}
 
-The hybrid modeling approach derives the internal mass by solving the heat capacity of zone air and internal thermal mass, $C_z$. The equation below shows the inverse heat balance algorithm that replacing the zone air temperature, $T_z$ with the measured zone air temperature. The current timestep measured temperature, $T_z^t$  and the previous timestep measured temperature, $T_z^{t-δt}$ are given from inputs, them the zone air heat capacity, $C_z^t$ for each timestep is expressed as following. 
+The hybrid modeling approach derives the internal mass by solving the heat capacity of zone air and internal thermal mass, $C_z$. The equation below shows the inverse heat balance algorithm that replacing the zone air temperature, $T_z$ with the measured zone air temperature. The current timestep measured temperature, $T_z^t$  and the previous timestep measured temperature, $T_z^{t-\delta t}$ are given from inputs, them the zone air heat capacity, $C_z^t$ for each timestep is expressed as following. 
 
 \begin{equation}
-C_z^t = - \frac {[∑(h_i A_i) + ∑(ṁ_i C_p ṁ_{inf} C_p) + ṁ_{sys} C_p ] δt}{ ln⁡ \left[ \frac { T_z^t - \frac { ∑Q_i +∑(h_i A_i T_{si}) + ∑(ṁ_i C_p T_{zi}) + ṁ_{inf} C_p T_o + ṁ_{sys} C_p T_{sup}^t} {∑(h_i A_i)  + ∑(ṁ_i C_p)  + ṁ_{inf} C_p + ṁ_{sys} C_p}} {T_z^{t-δt} - \frac {∑Q_i +∑(h_i A_i T_si)  + ∑(ṁ_i C_p T_zi) + ṁ_{inf} C_p T_o + ṁ_{sys} C_p T_{sup}^t} {∑(h_i A_i) + ∑(ṁ_i C_p)  + ṁ_{inf} C_p + ṁ_{sys} C_p}} \right]}
+C_z^t = - \frac {[\Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p \dot{m}_{inf} C_p) + \dot{m}_{sys} C_p ] \delta t}{ ln⁡ \left[ \frac { T_z^t - \frac { \Sigma Q_i +\Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t} {\Sigma (h_i A_i)  + \Sigma (\dot{m}_i C_p)  + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}} {T_z^{t-\delta t} - \frac {\Sigma Q_i +\Sigma (h_i A_i T_si)  + \Sigma (\dot{m}_i C_p T_zi) + \dot{m}_{inf} C_p T_o + \dot{m}_{sys} C_p T_{sup}^t} {\Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p)  + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}} \right]}
 \end{equation}
 
-There are different conditions in deriving the interior thermal mass depending on the air system operation. The initial process assumes that calculation is conducted when HVAC systems are off. If HVAC systems are turned off during unoccupied hours, the zone heat capacity can be determined without additional inputs of the supply air temperature for the above condition. The condition when the air system is off, $Q_{sys}=0$, this induces $T_{sup}^t=T_z^t$.  Zone air capacitance with internal mass, $C_z$  remains constant, not changing with the given time series. When the air system is operating, $Q_{sys}$ is not zero. This requires input values of the supply air temperature as denoted as $T_{sup}^t$ and supply air volume. These are additional inputs when estimating interior thermal mass under the condition when HVAC system is operating. When the air system is operating, $C_z \frac {dT_z} {dt}$ becomes zero or almost zero. The zone temperature is maintained at the set-point temperature, thus the temperature difference between $T_z^t$  and $T_z^{t-δt}$ is zero. For those hours zone temperatures are maintained at the set-point temperature, the interior thermal mass, $C_z^t$ is not calculated. 
+There are different conditions in deriving the interior thermal mass depending on the air system operation. The initial process assumes that calculation is conducted when HVAC systems are off. If HVAC systems are turned off during unoccupied hours, the zone heat capacity can be determined without additional inputs of the supply air temperature for the above condition. The condition when the air system is off, $Q_{sys}=0$, this induces $T_{sup}^t=T_z^t$.  Zone air capacitance with internal mass, $C_z$  remains constant, not changing with the given time series. When the air system is operating, $Q_{sys}$ is not zero. This requires input values of the supply air temperature as denoted as $T_{sup}^t$ and supply air volume. These are additional inputs when estimating interior thermal mass under the condition when HVAC system is operating. When the air system is operating, $C_z \frac {dT_z} {dt}$ becomes zero or almost zero. The zone temperature is maintained at the set-point temperature, thus the temperature difference between $T_z^t$  and $T_z^{t-\delta t}$ is zero. For those hours zone temperatures are maintained at the set-point temperature, the interior thermal mass, $C_z^t$ is not calculated. 
 
 Zone air heat capacity needs to be derived from the stabilized internal zone air temperature data that fully captures the stored heat in the air and internal thermal mass. It is recommended the measured zone temperature needs to be at least one week of data for more reliable result. Zone heat capacity is an important component for buildings as it stabilizes interior temperatures, thus at least one week of the measured interior temperature can capture the stored heat in the interior thermal mass. The temperature capacity multiplier i.e., internal mass multiplier, $C_T^t$ is calculated for each time step using the equation below.
 
 
 \begin{equation}
-C_T^t = \frac{C_z^t} {Vρ_{air} C_p}
+C_T^t = \frac{C_z^t} {V\rho_{air} C_p}
 \end{equation}
 
-The default value is 1.0. Ideally the zone heat capacity shall remain constant for the same condition of the interior environment in the zone heat balance equation. An underlying assumption is that the zone heat capacity is treated as constant for the equilibrium of the inversed heat balance model. However the measured temperatures are not the same as the simulated zone air temperatures which is the result of the energy simulation in Equation (3). This causes the internal mass multiplier, $C_T^t$, the result from the inverse model is not constant during the course of the simulation period. The hybrid model will determine a time span when $|T_z^t ┤-├ T_z^{t-δt} ┤|>0.05°C$ that $C_z^t$ remains more constant. Internal mass multiplier calculations are only done when the zone air temperature difference between timesteps meets the condition. This filter is needed for more reliable inverse calculation to avoid the anomaly conditions due to the use of the inverse model.  
+The default value is 1.0. Ideally the zone heat capacity shall remain constant for the same condition of the interior environment in the zone heat balance equation. An underlying assumption is that the zone heat capacity is treated as constant for the equilibrium of the inversed heat balance model. However the measured temperatures are not the same as the simulated zone air temperatures which is the result of the energy simulation in Equation (3). This causes the internal mass multiplier, $C_T^t$, the result from the inverse model is not constant during the course of the simulation period. The hybrid model will determine a time span when $|T_z^t ┤-├ T_z^{t-\delta t} ┤|>0.05°C$ that $C_z^t$ remains more constant. Internal mass multiplier calculations are only done when the zone air temperature difference between timesteps meets the condition. This filter is needed for more reliable inverse calculation to avoid the anomaly conditions due to the use of the inverse model.  
 
 \subsection{Infiltration hybrid modeling method}\label{Infiltration hybrid modeling method}
 
@@ -120,43 +124,36 @@ Infiltration is an uncontrolled outside air into a building depending on the air
 The infiltration modeling is relatively simplified in the energy simulation because of the lack of knowledge about the sizes and distribution of cracks in the building envelope, the permeability of the envelope, the air flow to the building, and the pressure distribution in and around the building. EnergyPlus allows a simple approach to model the infiltration for users. This requires to define a design flow rate and coefficients for temperature and wind velocity using the ZoneInfiltration:DesignFlowRate object. EnergyPlus calculates airflow rates by adjusting for the indoor-outdoor temperature differences and the outdoor wind speed using the following equation.
 
 \begin{equation}
-Infiltration = Infiltration_{design} F_{schedule} [A+B|T_z −T_o|+C (WindSpeed)+D(Windspeed^2 )]
+\begin{aligned}
+\text{Infiltration} = \text{Infiltration}_\text{design} F_\text{schedule} \left[A+B|T_z -T_o|&+C (\text{WindSpeed})\\
+&+D(\text{WindSpeed}^2 )\right]
+\end{aligned}
 \end{equation}
-$Where:$
+Where $A$ is the constant term coefficient, $B$ is the temperature term coefficient, $C$ is the velocity term coefficient, $D$ is the velocity squared coefficient, and $F_\text{schedule}$ is a user-defined schedule value between 0 and 1.
 
-$A$ = Constant term coefficient
-
-$B$ = Temperature term coefficient
-
-$C$ = Velocity term coefficient
-
-$D$ = Velocity squared coefficient
-
-$F_schedule$ = a user-defined schedule value between 0 and 1
-
-The simplified infiltration model using a constant infiltration flow rate is designed to capture the average effect over the year and in different locations. The simple infiltration approach has an empirical correlation that modifies the infiltration as a function of wind speed and temperature difference across the envelope. The difficulty in using this approach the determination of valid coefficients for each building type in each location. These coefficients vary and provide very different results that cause great uncertainty. This is not easy to identify correct ones for typical modeling practices. The current EnergyPlus simplified infiltration modeling method uses a fixed infiltration rate that can represent the average impact over a year. This may not be realistic for accurate energy modeling when capturing hourly dynamics. More complicated flow network simulations are necessary for detailed modeling. Other infiltration related EnergyPlus models that add details and complexities are the “Effective Leakage Area” model (Jokisalo et al. 2009) using the ZoneInfiltration:EffectiveLeakageArea object  and “Flow Coefficient” model (Walker \& Wilson 1998), using the ZoneInfiltration:FlowCoefficient object.
+The simplified infiltration model using a constant infiltration flow rate is designed to capture the average effect over the year and in different locations. The simple infiltration approach has an empirical correlation that modifies the infiltration as a function of wind speed and temperature difference across the envelope. The difficulty in using this approach the determination of valid coefficients for each building type in each location. These coefficients vary and provide very different results that cause great uncertainty. This is not easy to identify correct ones for typical modeling practices. The current EnergyPlus simplified infiltration modeling method uses a fixed infiltration rate that can represent the average impact over a year. This may not be realistic for accurate energy modeling when capturing hourly dynamics. More complicated flow network simulations are necessary for detailed modeling. Other infiltration related EnergyPlus models that add details and complexities are the ``Effective Leakage Area'' model (Jokisalo et al. 2009) using the ZoneInfiltration:EffectiveLeakageArea object  and ``Flow Coefficient'' model (Walker \& Wilson 1998), using the ZoneInfiltration:FlowCoefficient object.
 
 \subsubsection{Infiltration inverse modeling}\label{Infiltration inverse modeling}
 
-It is not easy to estimate as the infiltration is caused by various sources of unknown leakages. The development of the hybrid model fills the gap when estimating the infiltration that reflects all complexities of design flow rate, coefficients, and climate conditions by only requiring easily attainable zone air temperature data to derive zone. The development of the infiltration hybrid modeling algorithm is consistent with the EnergyPlus source code. The approach derives the infiltration mass flow rate, $m ̇_{inf}$ by reformulating the zone air heat balance algorithm. The 3rd order backward difference method is used for the inverse model development for the infiltration hybrid modeling. The inverse model using the analytical solution cannot be realized in a mathematical form. The time-series zone air temperature, $T_z$ using the 3rd order method is shown in the following equation.
+It is not easy to estimate as the infiltration is caused by various sources of unknown leakages. The development of the hybrid model fills the gap when estimating the infiltration that reflects all complexities of design flow rate, coefficients, and climate conditions by only requiring easily attainable zone air temperature data to derive zone. The development of the infiltration hybrid modeling algorithm is consistent with the EnergyPlus source code. The approach derives the infiltration mass flow rate, $\dot{m}_{inf}$ by reformulating the zone air heat balance algorithm. The 3rd order backward difference method is used for the inverse model development for the infiltration hybrid modeling. The inverse model using the analytical solution cannot be realized in a mathematical form. The time-series zone air temperature, $T_z$ using the 3rd order method is shown in the following equation.
 
 \begin{equation}
-T_z^t = \\ \frac {∑Q_i +∑(h_i A_i T_{si}) + ∑(m ̇_i C_p T_{zi}) + ṁ_{inf} C_p T_o + ṁ_{sys} C_p T_{sup}^t - \frac {C_z} {δt}(-3T_z^{t-δt} + \frac {3} {2} T_z^{t-2δt} - \frac {1} {3} T_z^{t-3δt})} { \frac {11} {6} \frac {C_z} {δt} + ∑(h_i A_i)  + ∑(ṁ_i C_p) + ṁ_{inf} C_p + ṁ_{sys} C_p}
+T_z^t = \\ \frac {\left(\begin{aligned}\Sigma Q_i &+ \Sigma(h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{inf} C_p T_o\\ &+ \dot{m}_{sys} C_p T_{sup}^t - \frac{C_z}{\delta t}\left(-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t}\right)\end{aligned}\right)} { \frac {11}{6} \frac {C_z} {\delta t} + \Sigma (h_i A_i)  + \Sigma (\dot{m}_i C_p) + \dot{m}_{inf} C_p + \dot{m}_{sys} C_p}
 \end{equation}
 
 The equation below shows the inverse algorithm for infiltration hybrid modeling method to derive the zone infiltration mass flow rate using the measured zone air temperature.
 
 \begin{equation}
-ṁ_{inf} C_p = \frac {∑Q_i + ∑(h_i A_i T_{si}) + ∑(ṁ_i C_p T_{zi}) + ṁ_{sys} C_p T_{sup}^t - \frac {C_z} {δt} (-3T_z^{t-δt} + \frac {3} {2} T_z^{t-2δt} - \frac {1} {3} T_z^{t-3δt}) - T_z^t [ \frac {11} {6} \frac {C_z} {δt} + ∑(h_i A_i) + ∑(ṁ_i C_p) + ṁ_{sys} C_p]} {T_z^t - T_o}
+\dot{m}_{inf} C_p = \frac {\left(\begin{aligned}\Sigma Q_i &+ \Sigma (h_i A_i T_{si}) + \Sigma (\dot{m}_i C_p T_{zi}) + \dot{m}_{sys} C_p T_{sup}^t\\ &- \frac {C_z} {\delta t} \left(-3T_z^{t-\delta t} + \frac {3} {2} T_z^{t-2\delta t} - \frac {1} {3} T_z^{t-3\delta t}\right)\\ &- T_z^t \left[ \frac {11} {6} \frac {C_z} {\delta t} + \Sigma (h_i A_i) + \Sigma (\dot{m}_i C_p) + \dot{m}_{sys} C_p\right]\end{aligned}\right)} {T_z^t - T_o}
 \end{equation}
 
 The infiltration air flow rate, $q_{inf}$ is then calculated from the derived infiltration mass flow rate from the following equation.
 
 \begin{equation}
-q_{inf}= \frac {ṁ_{inf} C_p} {ρ_{air} C_p}
+q_{inf}= \frac {\dot{m}_{inf} C_p} {ρ_{air} C_p}
 \end{equation}
 
-For the infiltration mode of the hybrid model simulation, the calculation is only done when the zone air temperature difference between the current and previous timestep is less than 0.1°C and the zone air and outdoor air temperature difference is greater than 5 °C as depicted $|T_z^t ┤-├ T_o^t ┤|>5.0 °C$ and $|T_z^t ┤-├ T_z^{t-δt} ┤|<0.1°C$
+For the infiltration mode of the hybrid model simulation, the calculation is only done when the zone air temperature difference between the current and previous timestep is less than 0.1°C and the zone air and outdoor air temperature difference is greater than 5 °C as depicted $|T_z^t ┤-├ T_o^t ┤|>5.0 °C$ and $|T_z^t ┤-├ T_z^{t-\delta t} ┤|<0.1°C$
 
 \subsection{References}\label{references}
 

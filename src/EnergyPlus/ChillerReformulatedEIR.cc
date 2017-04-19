@@ -1006,7 +1006,10 @@ namespace ChillerReformulatedEIR {
 		tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
 		tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
-		PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+
+		if ( ElecReformEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
+			PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+		}
 
 		// find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).PlantSizNum;
@@ -1014,8 +1017,6 @@ namespace ChillerReformulatedEIR {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * ElecReformEIRChiller( EIRChillNum ).SizFac;
-				if ( ! ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
-
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = 0.0;
 
@@ -1077,13 +1078,9 @@ namespace ChillerReformulatedEIR {
 					SizingCondOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut;
 				}
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 				RefCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, SizingEvapOutletTemp, SizingCondOutletTemp );
 				tmpNomCap = ( Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate ) / RefCapFT;
-				if ( ! ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
-
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = 0.0;
 
@@ -1134,10 +1131,8 @@ namespace ChillerReformulatedEIR {
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-				if ( ! ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
 				//IF (PlantFirstSizesOkayToFinalize) ElecReformEIRChiller(EIRChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = 0.0;
