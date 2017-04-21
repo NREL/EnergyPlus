@@ -401,26 +401,31 @@ namespace EnergyPlus {
 		}
 
 		void DataFrame::writeReport() {
-			std::string jsonfilename =  DataStringGlobals::outputDirPathName + "eplusout_" + ReportFrequency + ".json";
-			//std::string jsonfilename =  "eplusout_" + ReportFrequency + ".json";
-			std::ofstream jsonfile(jsonfilename);
 			
-			json root;
-			
-			if (jsonfile.is_open())
-			{
-				root = getJSON();
-				jsonfile << std::setw(4) << root << std::endl;
-				jsonfile.close();
+			json root = getJSON();
+			std::cout << ReportFrequency <<std::endl;
+			if (DataGlobals::json_TSstream_HVAC && ReportFrequency == "Detailed-HVAC"){
+				*(DataGlobals::json_TSstream_HVAC) << std::setw(4) << root << std::endl;
+
+			}else if(DataGlobals::json_TSstream_Zone && ReportFrequency == "Detailed-Zone"){
+				*(DataGlobals::json_TSstream_Zone) << std::setw(4) << root << std::endl;
+
+			}else if(DataGlobals::json_TSstream && ReportFrequency == "Timestep"){
+				*(DataGlobals::json_TSstream) << std::setw(4) << root << std::endl;
+
+			}else if(DataGlobals::json_DYstream && ReportFrequency == "Daily"){
+				*(DataGlobals::json_DYstream) << std::setw(4) << root << std::endl;
+
+			}else if(DataGlobals::json_HRstream && ReportFrequency == "Hourly"){
+				*(DataGlobals::json_HRstream) << std::setw(4) << root << std::endl;
+
+			}else if(DataGlobals::json_MNstream && ReportFrequency == "Monthly"){
+				*(DataGlobals::json_MNstream) << std::setw(4) << root << std::endl;
+
+			}else if(DataGlobals::json_SMstream && ReportFrequency == "RunPeriod"){
+				*(DataGlobals::json_SMstream) << std::setw(4) << root << std::endl;
 			}
-//
-//			if (DataGlobals::json_stream){
-//				root = getJSON();
-//				*(DataGlobals::json_stream) << std::setw(4) << root << std::endl;
-//			}
 		}
-
-
 		// class Table
 
 		Table::Table(Array2D_string const & body,

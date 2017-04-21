@@ -370,6 +370,15 @@ ProcessArgs(int argc, const char * argv[])
 	outputErrFileName = outputFilePrefix + normalSuffix + ".err";
 	outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
 	outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
+
+	outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
+	outputTSHvacJsonFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.json";
+	outputTSJsonFileName = outputFilePrefix + normalSuffix + "_timestep.json";
+	outputMNJsonFileName = outputFilePrefix + normalSuffix + "_monthly.json";
+	outputDYJsonFileName = outputFilePrefix + normalSuffix + "_daily.json";
+	outputHRJsonFileName = outputFilePrefix + normalSuffix + "_hourly.json";
+	outputSMJsonFileName = outputFilePrefix +normalSuffix + "_runperiod.json";
+
 	outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
 	outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
 	outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";

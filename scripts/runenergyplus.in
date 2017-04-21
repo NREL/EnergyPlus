@@ -264,13 +264,13 @@ rm -f  eplusout.svg
 rm -f  eplusout.shd
 rm -f  eplusout.wrl
 rm -f  eplusout.json
-rm -f  eplusout_Detailed-Zone.json"
-rm -f  eplusout_Detailed-HVAC.json"
-rm -f  eplusout_Timestep.json"
-rm -f  eplusout_Hourly.json"
-rm -f  eplusout_Daily.json"
-rm -f  eplusout_Monthly.json"
-rm -f  eplusout_RunPeriod.json"
+rm -f  eplusout_detailed_zone.json"
+rm -f  eplusout_detailed_HVAC.json"
+rm -f  eplusout_timestep.json"
+rm -f  eplusout_hourly.json"
+rm -f  eplusout_daily.json"
+rm -f  eplusout_monthly.json"
+rm -f  eplusout_runperiod.json"
 rm -f  eplusoutscreen.csv
 rm -f  eplusout.delightin
 rm -f  eplusout.delightout
@@ -337,13 +337,13 @@ rm -f "${OUT_P}/${ARG1}.svg"
 rm -f "${OUT_P}/${ARG1}.shd"
 rm -f "${OUT_P}/${ARG1}.wrl"
 rm -f "${OUT_P}/${ARG1}.json"
-rm -f "${OUT_P}/${ARG1}_Detailed-Zone.json"
-rm -f "${OUT_P}/${ARG1}_Detailed-HVAC.json"
-rm -f "${OUT_P}/${ARG1}_Timestep.json"
-rm -f "${OUT_P}/${ARG1}_Hourly.json"
-rm -f "${OUT_P}/${ARG1}_Daily.json"
-rm -f "${OUT_P}/${ARG1}_Monthly.json"
-rm -f "${OUT_P}/${ARG1}_RunPeriod.json"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.json"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.json"
+rm -f "${OUT_P}/${ARG1}_timestep.json"
+rm -f "${OUT_P}/${ARG1}_hourly.json"
+rm -f "${OUT_P}/${ARG1}_daily.json"
+rm -f "${OUT_P}/${ARG1}_monthly.json"
+rm -f "${OUT_P}/${ARG1}_runperiod.json"
 rm -f "${OUT_P}/${ARG1}Screen.csv"
 rm -f "${OUT_P}/${ARG1}SPARK.log"
 rm -f "${OUT_P}/${ARG1}.expidf"
@@ -658,25 +658,25 @@ if [ -f eplusout.json ]; then
   mv eplusout.json "${OUT_P}/${ARG1}.json"
 fi
 if [ -f eplusout_Detailed-Zone.json ]; then
-  mv eplusout_Detailed-Zone.json "${OUT_P}/${ARG1}_Detailed-Zone.json"
+  mv eplusout_Detailed-Zone.json "${OUT_P}/${ARG1}_detailed_zone.json"
 fi
 if [ -f eplusout_Detailed-HVAC.json ]; then
-  mv eplusout_Detailed-HVAC.json "${OUT_P}/${ARG1}_Detailed-HVAC.json"
+  mv eplusout_Detailed-HVAC.json "${OUT_P}/${ARG1}_detailed_HVAC.json"
 fi
 if [ -f eplusout_Timestep.json ]; then
-  mv eplusout_Timestep.json "${OUT_P}/${ARG1}_Timestep.json"
+  mv eplusout_Timestep.json "${OUT_P}/${ARG1}_timestep.json"
 fi
 if [ -f eplusout_Hourly.json ]; then
-  mv eplusout_Hourly.json "${OUT_P}/${ARG1}_Hourly.json"
+  mv eplusout_Hourly.json "${OUT_P}/${ARG1}_hourly.json"
 fi
 if [ -f eplusout_Daily.json ]; then
-  mv eplusout_Daily.json "${OUT_P}/${ARG1}_Daily.json"
+  mv eplusout_Daily.json "${OUT_P}/${ARG1}_daily.json"
 fi
 if [ -f eplusout_Monthly.json ]; then
-  mv eplusout_Monthly.json "${OUT_P}/${ARG1}_Monthly.json"
+  mv eplusout_Monthly.json "${OUT_P}/${ARG1}_monthly.json"
 fi
 if [ -f eplusout_RunPeriod.json ]; then
-  mv eplusout_RunPeriod.json "${OUT_P}/${ARG1}_RunPeriod.json"
+  mv eplusout_RunPeriod.json "${OUT_P}/${ARG1}_runperiod.json"
 fi
 if [ -f eplusmtr.csv ]; then
   mv eplusmtr.csv "${OUT_P}/${ARG1}Meter.csv"

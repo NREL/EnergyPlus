@@ -126,13 +126,13 @@ namespace DataStringGlobals {
 	std::string outputErrFileName("eplusout.err");
 	std::string outputEsoFileName("eplusout.eso");
 	std::string outputJsonFileName("eplusout.json");
-	std::string outputTSHvacJsonFileName("eplusout_timestep_HVAC.json");
-	std::string outputTSZoneJsonFileName("eplusout_timestep_Zone.json");
+	std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
+	std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
 	std::string outputTSJsonFileName("eplusout_timestep.json");
 	std::string outputMNJsonFileName("eplusout_monthly.json");
 	std::string outputDYJsonFileName("eplusout_daily.json");
 	std::string outputHRJsonFileName("eplusout_hourly.json");
-	std::string outputSMJsonFileName("eplusout_runtime.json");
+	std::string outputSMJsonFileName("eplusout_runperiod.json");
 	std::string outputMtdFileName("eplusout.mtd");
 	std::string outputMddFileName("eplusout.mdd");
 	std::string outputMtrFileName("eplusout.mtr");
