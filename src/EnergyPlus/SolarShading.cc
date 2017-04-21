@@ -107,7 +107,7 @@
 #include <WindowManager.hh>
 #include <WindowManagerExteriorData.hh>
 #include <EquivalentBSDFLayer.hpp>
-#include <MultiBSDFLayer.hpp>
+#include <MultiPaneBSDF.hpp>
 #include <FenestrationCommon.hpp>
 #include <WindowComplexManager.hh>
 #include <BSDFDirections.hpp>
@@ -5677,7 +5677,7 @@ namespace SolarShading {
 						TBmBmEQL = max( 0.0, ( TBmBmEQL - TBmDiffEQL ) );
           } else if( inExtWindowModel->isExternalLibraryModel() ) {
             int nLayers = Construct( ConstrNum ).TotSolidLayers;
-            std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
+            std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > aEqLayer =
               CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
             std::pair< double, double > Angles = getSunBSDFCoordinates( SurfNum, BSDFHemisphere::Incoming );
@@ -5891,7 +5891,7 @@ namespace SolarShading {
 					DSZone( ZoneNum ) += DSZoneWin;
 					DGZone( ZoneNum ) += DGZoneWin;
         } else if( inExtWindowModel->isExternalLibraryModel() ) {
-          std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
+          std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > aEqLayer =
             CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
           CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
@@ -5938,7 +5938,7 @@ namespace SolarShading {
 						TBmBm = TBmBmEQL;
 						TBmDif = TBmDiffEQL;
           } else if ( inExtWindowModel->isExternalLibraryModel() ) {
-            std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
+            std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > aEqLayer =
               CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
             std::pair< double, double > Angles = getSunBSDFCoordinates( SurfNum, BSDFHemisphere::Incoming );
@@ -5968,7 +5968,7 @@ namespace SolarShading {
             //Note: this is not quite the same as the effective transmittance for total of sky and ground radiation
             TDifBare = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDiffTrans;
           } else if( inExtWindowModel->isExternalLibraryModel() ) {
-            std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
+            std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > aEqLayer =
               CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
             CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );

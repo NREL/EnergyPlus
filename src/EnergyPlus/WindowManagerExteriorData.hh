@@ -94,7 +94,7 @@ namespace SingleLayerOptics {
 
 namespace MultiLayerOptics {
 
-  class CMultiBSDFLayer;
+  class CMultiPaneBSDF;
 
 }
 
@@ -142,7 +142,7 @@ namespace EnergyPlus {
       void pushBSDFLayer( const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum,
         const std::shared_ptr< SingleLayerOptics::CBSDFLayer >& t_Layer );
 
-      std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > getEquivalentLayer( 
+      std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > getEquivalentLayer(
         const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum );
 
     private:
@@ -154,7 +154,7 @@ namespace EnergyPlus {
 
       // Need separate layer properties for Solar and Visible range
       std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< Layers_Map > > m_Layers;
-      std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > > m_Equivalent;
+      std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > > m_Equivalent;
       
     };
 
