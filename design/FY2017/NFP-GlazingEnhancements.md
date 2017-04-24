@@ -23,6 +23,8 @@
 
 **Florida Solar Energy Center**
 
+ - Fourth revision on April 17, 2017
+ - Report test results based on the third revision and propose additional effort to implement this new feature in existing E+ (based on Winkelmann approach)
  - Third revision on Mar. 16, 2017
  - Add design document
  - Second revision on Feb. 15, 2017
@@ -149,15 +151,15 @@ I think there may be 3 options.
 The data format is not nice. If there are 3 independent variables, it specify values of independent variables one-by-one, then specify values of dependent variable. Therefore, data are not easily readable. 
 
     1,                       !- Number of Independent Variables
-   4,                       !- Number of Values for Independent Variable X1
-    0.0,                     !- Field 1 Determined by the Number of Independent Variables
-    0.5,                     !- Field 2 Determined by the Number of Independent Variables
-    1.0,                     !- Field 3 Determined by the Number of Independent Variables
-    1.5,                     !- <none>
-    1.1552,                  !- <none>
-    1.0712,                  !- <none>
-    1.0,                     !- <none>
-0.9416;                  !- <none>
+	 4,                       !- Number of Values for Independent Variable X1
+     0.0,                     !- Field 1 Determined by the Number of Independent Variables
+     0.5,                     !- Field 2 Determined by the Number of Independent Variables
+     1.0,                     !- Field 3 Determined by the Number of Independent Variables
+     1.5,                     !- <none>
+     1.1552,                  !- <none>
+     1.0712,                  !- <none>
+     1.0,                     !- <none>
+     0.9416;                  !- <none>
 
 Rich and I had discussion. He suggested to use the proposed format (below).
 
@@ -264,11 +266,97 @@ A new data object may be similar to Schedule:File. The format may be similar. Ho
 
 I will write an item in the enhancement list. 
 
+###Third revision
+
+The third revision is to add design document based on existing WCE. 
+
+### WCE Implementation 
+
+After implementation of the proposed WCE addition based on design document, unit tests and whole building simulations are performed to ensure the code performs as expected.   
+
+#### Unit tests
+
+The unit tests were uploaded in the Lixing_Branch in https://github.com/LBNL-ETA/Windows-CalcEngine. 
+
+1. Sample_AngularMeasurementsTest1
+
+This unit test under SpectralAveraging_tests tests common wavelength operation when different optical property data sets have different values of wavelengths, and liner interpolation of optical properties when optical properties specified at certain incident angles are not given in the optical datasets.
+
+Common wavelength operation is to create a new array of wavelength, containing all wavelength values from different datasets. In other words, wavelength values in different datasets are a subset of the new array. Then all datasets will be re-organized based on the wavelength values of the new array. New optical properties with new wavelength values (none exist in the original dataset) will be linearly interpolated.  
+  
+2. TestSpecularAngularLayerProperty_102
+
+This unit test under SingleLayerOptics_tests tests optical properties integrated from a whole range of solar spectrum in a single layer at different incident angles. If a given angle matches one of dataset angles, optical properties are provided directly from the dataset. Otherwise, optical properties are linearly interpolated. In addition, results are compared based on each wavelength to ensure linear interpolation is performed correctly at each wavelength. 
+   
+3. EquivalentSpecularAngularLayer_102_103
+
+This unit test under MultiLayerOptics_tests tests optical properties integrated from a whole range of solar spectrum in multiple layers at different angles. There are two layers in a window construction. The Optical Data Type is Spectral in the first layer, and SpectralAndAngle in the second layer with 4 incident angles at 0, 10, 40 and 90, respectively. If a given angle matches one of dataset angles, optical properties are provided directly from the dataset. Otherwise, optical properties are provided based on linear interpolation. Tested angles are 0, 10, 25, and 90. Output variables are optical properties of transmittance, reflectance and absorptance based on a whole range of sun spectrum. Summation testing is also performed to ensure a sum of transmittance, reflectance and absorptance is equal to 1.  
+
+#### Whole building test
+
+An example input file of AirflowNetwork_MultiZone_SmallOffice were revised as a whole building test file.
+
+**Test cases**
+
+1. Single layer with Optical Data Type = SpectralAndIncidentAngle in the WindowMaterial:Glazing object
+
+2. Multiple layers with a layer at Optical Data Type = SpectralAndIncidentAngle, and the other layer at Optical Data Type = Spectral in the WindowMaterial:Glazing object.
+
+  Construction,
+    ELECTRO-CON-LIGHT,       !- Name
+    ELECTRO GLASS LIGHT STATE,  !- Outside Layer as SpectralAndAngle
+    WinAirGap,               !- Layer 2
+    SPECTRAL GLASS INNER PANE;  !- Layer as Spectral
+
+  Construction,
+    ELECTRO-CON-DARK,        !- Name
+    ELECTRO GLASS LIGHT STATE,  !- Outside Layer as SpectralAndAngle
+    WinAirGap,               !- Layer 2
+    SPECTRAL GLASS INNER PANE;  !- Layer as Spectral
+
+This test case has two sub test cases by switching outside and inside layers.
+
+#### Note ####
+
+WCE is able to perform BSDF simulations only. The Winkelmann approach is not available.
+
+###Fourth revision
+
+This revision is to add the new functionality based on the Winkelmann approach.
+
+#### Test results
+
+If BSDFBasis::Small is used in CWCEBSDFLayerFactory::init(), the execution speed is compatible with existing one as Winkelmann approach. However, optical properties are calculated at every 3 or 4 hours.
+
+It should be pointed out that four choices are available:
+
+  	enum class BSDFBasis { Small, Quarter, Half, Full };
+
+The current setting in the #2520943-WindowsCalc-Engine_Intergration branch in https://github.com/NREL/EnergyPlus is **BSDFBasis::Small**.
+
+If BSDFBasis::Full is used in CWCEBSDFLayerFactory::init(), the execution speed is expected to be very slow, so that it is not practical to use this setup to perform simple straight forward simulations.
+
+It should be pointed out that WCE version available in EnergyPlus branch is not updated to the latest version in https://github.com/LBNL-ETA/Windows-CalcEngine during the fourth revision writing. Tests failed with BSDFBasis::Full for simple testing.
+
+LBNL just updated WCE branch today (4/21/17). I am going to test it to see what happens.
+
+Based on current status mentioned above, WCE version may not be ready for AGC Glass to use right now. Adding this feature in the existing EnergyPlus based on the Winkelmann approach becomes necessary.   
+
+#### Major changes
+
+An empirical function of TransAndReflAtPhi in the WindowManager module is used to calculate transmittance and reflectance at an arbitrary angle of incidence based on given transmittance and reflectance at zero incidence angle for a single glazing layer. The existing code calculates optical properties at each 10 degree interval by calling this function, so that the number of incident angles is 10.
+
+If SpectralAndAngle is entered, optical properties at different incident angles are either given or linearly interpolated. The empirical function will be by-passed. Since the number of incident angles are user input, it is assumed that the maximum number of incident angles = 20. All array sizes associated with incident angles in the WindowManager module are revised based on the max number.
+
+The major revision to accommodate the new feature is a function of InitGlassOpticalCalculations() in the WindowManager module.
+
+The code changes will be composed of 3 sections. The first section is data input, which is commonly required by both WCE and existing one (Winkelmann approach). The second section is used in WCE only. The third section will be used by existing one only based on Winkelmann approach.  
+
 ## Overview ##
 
 Window glazing properties of transmittance, front reflectance, and back reflectance are a function of wavelength and incident angel. EnergyPlus allow users to only specify the spectral dependency and not the angular one. The optical properties are calculated based on an incident angle with hard code. The WindowMaterial:Glazing object has a field of Optical Data Type to allow users to select a choice of Spectral and enter Window Glass Spectral Data Set Name as a data set to input glazing data under the MaterialProperty:GlazingSpectralData object. The AGC Glass Europe found the glazing properties are not only a function of wavelength, as well as a function of incident angle, as shown in the above figure. These properties can be measured from testing. It is possible that these optical properties may not be covered by existing hard code as a function of incident angle. Therefore, the existing input structure can not simulate real performance using measured optical properties. A new functionality was proposed to enhance glazing properties as a function of both wavelength and incident angle. The added new functionality will improve window heat transfer calculations with more accurate prediction. 
 
-The code modification will be based on Window Calculation Engine (WCE) submitted by LBNL. 
+The code modifications will be based on Window Calculation Engine (WCE) submitted by LBNL and Winkelmann approach in the existing structure (proposed in the fourth revision). 
 
 ## Approach ##
 
@@ -298,6 +386,8 @@ The existing object does not read data from an external file. An additional effo
 
 ### Calculation procedure ###
 
+#### WCE based
+
 The calculation procedure is expanded based on the Spectral choice defined in the  WindowMaterial:Glazing object. The main difference is that the Spectral choice calculates the optical properties at a given incident angle using empirical functions (getPropertyAtAngle), while the new choice of SpectralAndIncidentAngle will calculate the optical properties at a given incident angle via linear interpolation from given inputs.
 
 1. Read input objects
@@ -319,6 +409,10 @@ If a given incident angle is not listed in incident angle values, linear interpo
 A new derived class of CMaterial as CMaterialMeasured will be created to handle optical properties for each layer.
 
 5. The optical properties from linear interpolation will be fed to classes of Single or Multiple layer windows for further processing in the existing structure.
+
+#### Winkelmann approach based
+
+When revision is based on the Winkelmann approach, the function of  InitGlassOpticalCalculations() in the WindowManager module will be revised only.
 
 ## Testing/Validation/Data Sources ##
 
@@ -1144,8 +1238,10 @@ I have got extensive help from Simon, LBNL, to develop this design document. Sin
 
 This section describes code changes and additions in EnergyPlus in HeatBalanceManager, CurveManager, DataHeatBalance, WindowManagerExteriorData, WindowManagerExteriorOptical, and WCE. The WCE contains 3 main projects: SPectralAveraging, SingleLayerOptics, and MultipleLayerOptics.
 
+The code changes will be composed of 3 sections. The first section is data input and commonly required by both WCE and existing one. The second section is used in WCE only. The third section will be used by existing one only. 
 
-### DataHeatBalance ###
+
+### DataHeatBalance (Common) ###
 
 Four variables are added in the struct MaterialProperties: 
 
@@ -1156,11 +1252,11 @@ Four variables are added in the struct MaterialProperties:
 
 The additions are mainly used to catch the changes in revised idd object: WindowMaterial:Glazing.
 
-### HeatBalanceManager ###
+### HeatBalanceManager (Common) ###
 
 A section of the GetMaterialData function in the HeatBalanceManager module will be revised to accommodate the idd changes. The changes also cover to get the table curve numbers for 3 optical properties.  
 
-### CurveManager ###
+### CurveManager (Common) ###
 
 The changes of this module include new and revised functions.
 
@@ -1168,7 +1264,7 @@ The changes of this module include new and revised functions.
 
 Three new functions will be created:
 
-##### GetCurveInterpolationMethodNum ###
+###### GetCurveInterpolationMethodNum ###
 
 	int
 	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
@@ -1177,7 +1273,7 @@ Three new functions will be created:
 
 This function is called by GetMaterialData function in the HeatBalanceManager module and will return interpolation method to ensure the method should LinearInterpolationOfTable defined in the Interpolation Method field of the Table:TwoIndependentVariables object.   
 
-##### ReadTableDataFromFile ###
+##### ReadTableDataFromFile (Common) ###
 
 	void
 	ReadTableDataFromFile(
@@ -1191,9 +1287,7 @@ This function is called by GetMaterialData function in the HeatBalanceManager mo
 
 This function allows user inputs of optical properties are from an external file. This is a new functionality of the Table:TwoIndependentVariables object, to provide a flexible way for users to input optical property data, either from an external file or from idf input file.
 
-
-
-##### SetSameIndeVariableValues ####
+##### SetSameIndeVariableValues (Common) ####
 
 	void
 	SetSameIndeVariableValues(
@@ -1202,8 +1296,8 @@ This function allows user inputs of optical properties are from an external file
 		int const BRefleCurveIndex
 	);
 
-This new function is to get common wavelengths and incident angles from 3 optical data sets to represent transmittance, front reflectance and back reflectance. The common wavelengths and incident angles include all values from 3 datasets, unless differences are less than 1e-6. It is possible to allow users to input difference values of wavelengths and incident angles for each property. Due to requirements of WCE, the same discrete values of wavelengths and incident angles are needed for WCE to read and process. Any missing values of optical properties will be linearly interpolated among two nearest points based on common wavelengths and incident angles. 
-  
+This new function is to get common wavelengths and incident angles from 3 optical data sets to represent transmittance, front reflectance and back reflectance. The common wavelengths and incident angles include all values from 3 datasets, unless differences are less than 1e-6. It is possible to allow users to input difference values of wavelengths and incident angles for each property. Due to requirements of WCE, the same discrete values of wavelengths and incident angles are needed for WCE to read and process. Any missing values of optical properties will be linearly interpolated among two nearest points based on common wavelengths and incident angles.   
+
 ### General ###
 
 A new function will be created to split data from a string. The function is adopted from OpenStudio.
@@ -1212,38 +1306,37 @@ A new function will be created to split data from a string. The function is adop
  
 	std::vector <std::string> splitString( const std::string &string, char delimiter );
 
-
 #### Revised functions ####
 
 Two existing functions will be revised to accommodate the changes of the Table:TwoIndependentVariables object.
 
-##### GetCurveInputData
+##### GetCurveInputData (Common)
 
 A section to read inputs of the Table:TwoIndependentVariables object will be revised to read new fields and allow inputs from data files.
 
-##### IsCurveInputTypeValid
+##### IsCurveInputTypeValid (Common)
 
 Two more valid input types will be allowed in the function: WAVELENGTH and ANGLE.
 
-### WindowManagerExteriorData ###
+### WindowManagerExteriorData (WCE) ###
 
 This module has a new function only.
 
 #### New function ###
 
-##### getSpectralSample
+##### getSpectralSample (WCE) 
 
 	shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample(  const int i, const int t_TransTablePtr, const int t_FRefleTablePtr, const int t_BRefleTablePtr ) {}
 
 This new function will read optical data from Table:TwoIndependentVariables and assign to a data structure as CAngularMeasurements::CAngularMeasurements (discuss in WCE). This function is called by CWCESpecularMaterialsFactory::init() in the WindowManagerExteriorOptical module.
 
-### WindowManagerExteriorOptical ###
+### WindowManagerExteriorOptical (WCE)###
 
 This module revises an existing function.
 
 #### Revised function ####
 
-##### CWCESpecularMaterialsFactory::init()
+##### CWCESpecularMaterialsFactory::init() (WCE)
 
 This function will be modified to to allow the third glass type as SpectralAndAngle.
 
@@ -1354,7 +1447,7 @@ New data format: Spectral and angular data, Common Wavelength
 
 #### New classes under SpectralAveraging namespace
 
-##### CSingleAngularMeasurement
+##### CSingleAngularMeasurement (WCE)
 
 This class processes optical data sets based on each incident angle. 
 
@@ -1378,7 +1471,7 @@ Interpolate optical properties within a single spectral data linearly based on c
 		double m_Angle;
 	};
 
-##### CAngularMeasurements
+##### CAngularMeasurements (WCE)
 
 This class handles all Spectral and angular data with common wavelength. 
 
@@ -1416,7 +1509,7 @@ Retrieve data set at a given incident angle.
 
 #### new classes under SingleLayerOptics namespace
 
-##### class CMaterialMeasured
+##### class CMaterialMeasured (WCE)
 
 	class CMaterialMeasured : public CMaterial {
 
@@ -1459,3 +1552,9 @@ This function gets a single optical property at each wavelength at a normal angl
 	  std::shared_ptr< SpectralAveraging::CAngularMeasurements > m_AngularMeasurements;
 
   };
+
+### InitGlassOpticalCalculations (Winkelmann)
+
+The code will be modified by replacing a fixed number of incident angles at 10 by the total number of incident angle from input datasets.
+
+The common incident angle operation, similar to common wavelength operation, will be performed in multiple layers to ensure all layers in the same construction will have the same values of incident angles. 
