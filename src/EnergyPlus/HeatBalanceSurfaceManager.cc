@@ -3820,6 +3820,12 @@ namespace HeatBalanceSurfaceManager {
 							EMSConstructActuatorChecked( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = true;
 							EMSConstructActuatorIsOkay( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = false;
 
+						} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_Kiva ) { // don't allow
+							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with Foundation Outside Boundary Condition." );
+							ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
+							EMSConstructActuatorChecked( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = true;
+							EMSConstructActuatorIsOkay( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = false;
+
 						}
 
 					} else {
