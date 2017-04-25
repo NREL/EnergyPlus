@@ -411,11 +411,11 @@ See Figure~\ref{fig:modulation-of-venting-area-according-to} or Figure~\ref{fig:
 
 \subsubsection{Field: Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor}\label{field-indoor-and-outdoor-temperature-difference-lower-limit-for-maximum-venting-open-factor}
 
-See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than 100˚C, with the default being 0˚C. The value for this field must be less than the value specified for the following field.
+See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than \SI{100}{\celsius}, with the default being \SI{0}{\celsius}. The value for this field must be less than the value specified for the following field.
 
 \subsubsection{Field: Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor}\label{field-indoor-and-outdoor-temperature-difference-upper-limit-for-minimun-venting-open-factor}
 
-See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than 0˚C, with the default being 100˚C. The value for this field must be greater than the value specified for the previous field..
+See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than \SI{0}{\celsius}, with the default being \SI{100}{\celsius}. The value for this field must be greater than the value specified for the previous field..
 
 \subsubsection{Field: Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor}\label{field-indoor-and-outdoor-enthalpy-difference-lower-limit-for-maximum-venting-open-factor}
 
@@ -436,6 +436,37 @@ Using Venting Availability Schedule allows you to turn off venting at certain ti
 If used with Ventilation Control Mode = Constant, the ventilation rate is constant only when this schedule allows venting; otherwise the ventilation rate is set to zero.
 
 If Ventilation Control Mode = NoVent, this schedule has no effect.
+
+\subsubsection{Field: Single Sided Wind Pressure Coefficient Algorithm}
+
+Specifies the type of single sided wind pressure coefficient algorithm to be used for
+the zone. This field is optional and is only used if Wind Pressure Coefficient Type is
+set to SurfaceAverageCalculation. The default is Standard and the two valid choices are:
+
+\textbf{Standard}: A single wind pressure coefficient is applied to all openings in the
+zone, as calculated using SurfaceAverageCalculation.
+
+\textbf{Advanced}: EnergyPlus calculates modified wind pressure coefficients for the two
+openings in the zone. This model is only valid for zones with two openings, both of which
+are on a single fa\c{c}ade (i.e. are coplanar). For zones with more than two openings,
+consider combining the openings into two. The modified wind pressure coefficients account
+for wind direction and turbulence effects on single sided ventilation rates. See the
+Engineering Reference for a detailed description of the Advanced algorithm. When the
+Advanced algorithm is selected, the difference between the two modified wind pressure
+coefficients are output to the .eio file.
+ 
+\subsubsection{Field: Fa\c{c}ade Width}
+This is the whole building width along the direction of the facade of this zone, or
+$W_F$ in Figure \ref{fig:single-sided-footprint}. This field is used in the Single
+Sided Wind Pressure Coefficient Algorithm. This field is optional and is only used if
+the Single Sided Wind Pressure Coefficient Algorithm is set to Advanced. The value must
+be greater than 0.0 m, with the default being 10 m.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/single-sided-footprint.png}
+\caption{Footprint of a rectangular building showing $W_F$, the ``Fa\c{c}ade Width'', used by the Single Sided Wind Pressure Coefficient Algorithm. \protect \label{fig:single-sided-footprint}}
+\end{figure}
 
 \subsubsection{Field: Occupant Ventilation Control Name}\label{field-occupant-ventilation-control-name}
 
