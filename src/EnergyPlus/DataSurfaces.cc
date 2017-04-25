@@ -826,7 +826,7 @@ namespace DataSurfaces {
       // PURPOSE OF THIS SUBROUTINE:
       // Return total short wave incident to the surface
       
-      return QRadSWOutIncident( t_SurfNum ) + QS( Zone );
+      return QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
     }
 
     int SurfaceData::getTotLayers() const {

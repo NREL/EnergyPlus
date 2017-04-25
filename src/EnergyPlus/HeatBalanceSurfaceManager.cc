@@ -2378,14 +2378,14 @@ namespace HeatBalanceSurfaceManager {
                   QRadSWwinAbsTotEnergy( SurfNum ) = QRadSWwinAbsTot( SurfNum ) * TimeStepZoneSec;
                 // Need to do it this way for now beaucse of scheduled surface gains. They do work only with
                 // BSDF windows and overwriting absorbtances will work only for ordinary windows
-                } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
-                  SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
-                  inExtWindowModel->isExternalLibraryModel() ) {
-                  TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
-                  for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
-                    QRadSWwinAbs( Lay, SurfNum ) = AWinSurf( Lay, SurfNum ) * 
-                      ( QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
-                  }
+                // } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
+                //   SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
+                //   inExtWindowModel->isExternalLibraryModel() ) {
+                //   TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
+                //   for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
+                //     QRadSWwinAbs( Lay, SurfNum ) = AWinSurf( Lay, SurfNum ) * 
+                //       ( QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
+                //   }
 								} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 									TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
 									CurrentState = SurfaceWindow( SurfNum ).ComplexFen.CurrentState;

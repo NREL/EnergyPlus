@@ -5622,8 +5622,7 @@ namespace SolarShading {
 							ExtBeamAbsByShadFac( SurfNum ) = AbsShade * CosInc * SunLitFract * InOutProjSLFracMult + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * AbsShadeDiff;
 						} // End of check if between-glass blind
 
-					} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel &&
-            !inExtWindowModel->isExternalLibraryModel() ) {
+					} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 
 						FenSolAbsPtr = WindowScheduledSolarAbs( SurfNum, ConstrNum );
 
@@ -5675,24 +5674,24 @@ namespace SolarShading {
 						TBmDiffEQL = max( 0.0, AbsSolBeamEQL( 2, CFS( EQLNum ).NL + 1 ) );
 						// Beam-beam transmittance: difference between beam-total and beam-diffuse transmittance
 						TBmBmEQL = max( 0.0, ( TBmBmEQL - TBmDiffEQL ) );
-          } else if( inExtWindowModel->isExternalLibraryModel() ) {
-            int nLayers = Construct( ConstrNum ).TotSolidLayers;
-            std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > aEqLayer =
-              CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
-
-            std::pair< double, double > Angles = getSunBSDFCoordinates( SurfNum, BSDFHemisphere::Incoming );
-            CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
-            double minLambda = aRange.minLambda();
-            double maxLambda = aRange.maxLambda();
-            for( int aLay = 1; aLay <= nLayers; ++aLay ) {
-              AWinSurf( aLay, SurfNum ) = aEqLayer->Abs( minLambda, maxLambda, Side::Front, aLay, Angles.first, Angles.second ) * 
-                SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
-              double WinDiffFront = aEqLayer->AbsDiff( minLambda, maxLambda, Side::Front, aLay ) * 
-                SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing;
-              double WinDiffBack = aEqLayer->AbsDiff( minLambda, maxLambda, Side::Front, aLay ) * 
-                SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing;
-              AWinSurf( aLay, SurfNum ) += WinDiffFront + WinDiffBack;
-            }
+          // } else if( inExtWindowModel->isExternalLibraryModel() ) {
+          //   int nLayers = Construct( ConstrNum ).TotSolidLayers;
+          //   std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > aEqLayer =
+          //     CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
+          // 
+          //   std::pair< double, double > Angles = getSunBSDFCoordinates( SurfNum, BSDFHemisphere::Incoming );
+          //   CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
+          //   double minLambda = aRange.minLambda();
+          //   double maxLambda = aRange.maxLambda();
+          //   for( int aLay = 1; aLay <= nLayers; ++aLay ) {
+          //     AWinSurf( aLay, SurfNum ) = aEqLayer->Abs( minLambda, maxLambda, Side::Front, aLay, Angles.first, Angles.second ) * 
+          //       SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+          //     double WinDiffFront = aEqLayer->AbsDiff( minLambda, maxLambda, Side::Front, aLay ) * 
+          //       SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing;
+          //     double WinDiffBack = aEqLayer->AbsDiff( minLambda, maxLambda, Side::Front, aLay ) * 
+          //       SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing;
+          //     AWinSurf( aLay, SurfNum ) += WinDiffFront + WinDiffBack;
+          //   }
           }
 
 				} // End of SunlitFrac check
@@ -5753,8 +5752,7 @@ namespace SolarShading {
 						DGZoneWin = 0.0;
 					}
 
-				} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel &&
-          !inExtWindowModel->isExternalLibraryModel() ) { // complex fenestration
+				} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) { // complex fenestration
 					FenSolAbsPtr = WindowScheduledSolarAbs( SurfNum, ConstrNum );
 					if ( FenSolAbsPtr == 0 ) {
 						//Sky Diffuse transmitted by Complex Fen
@@ -6629,7 +6627,8 @@ namespace SolarShading {
 								BmIncInsSurfAmountRep( BackSurfNum ) += BOverlap;
 								BmIncInsSurfAmountRepEnergy( BackSurfNum ) = BmIncInsSurfAmountRep( BackSurfNum ) * TimeStepZoneSec;
 							} // End of loop over back surfaces
-						} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
+						} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ||
+              inExtWindowModel->isExternalLibraryModel() ) {
 							// For complex window calculation goes over outgoing basis directions
 							// for current state
 							CurCplxFenState = SurfaceWindow( SurfNum ).ComplexFen.CurrentState;
@@ -6671,6 +6670,7 @@ namespace SolarShading {
 								for ( CurTrnDir = 1; CurTrnDir <= ComplexWind( SurfNum ).Geom( CurCplxFenState ).Trn.NBasis; ++CurTrnDir ) {
 									CurLambda = ComplexWind( SurfNum ).Geom( CurCplxFenState ).Trn.Lamda( CurTrnDir );
 									DirTrans = Construct( IConst ).BSDFInput.SolFrtTrans( IBm, CurTrnDir );
+
 									// Now calculate effect of this direction on all back surfaces
 									for ( IBack = 1; IBack <= NBkSurf; ++IBack ) {
 										CFDirBoverlap( IBack, CurTrnDir ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).AOverlap( IBack, CurTrnDir ) * DirTrans * CurLambda * CosInc;
