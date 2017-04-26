@@ -354,8 +354,6 @@ namespace EnergyPlus {
 
 		json DataFrame::getVariablesJSON() {
 			json arr = json::array();
-
-			//for (int i = 0; i < variables().size(); i++);
 			for (auto it = variableMap.begin(); it != variableMap.end(); ++it)
 				arr.push_back(it->second->getJSON());
 			return arr;
@@ -479,6 +477,7 @@ namespace EnergyPlus {
 					{ "Cols", cols },
 					{ "Rows", rows }
 			};
+
 			if (!FootnoteText.empty())
 				root["Footnote"] =  FootnoteText;
 			return root;
@@ -982,13 +981,10 @@ namespace EnergyPlus {
 			root [ "OutputVariables" ] = outputVars;
             root [ "MeterVariables" ] = meterVars;
 			root [ "MeterData" ] = meterData;
-
-			// reports
 			root[ "TabularReports" ] = TabularReportsCollection.getJSON();
 
 			if(DataGlobals::json_stream){
 				*(DataGlobals::json_stream) << std::setw(4) << root << std::endl;
-				//gio::close(DataGlobals::OutputFileJson);
 				DataGlobals::json_stream = nullptr;
 			}
 		}
