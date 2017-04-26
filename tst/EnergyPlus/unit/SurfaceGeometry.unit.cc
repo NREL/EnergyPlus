@@ -1212,3 +1212,75 @@ TEST( SurfaceGeometryUnitTests, findIndexOfVertex )
 	EXPECT_EQ( -1, findIndexOfVertex( a, list ) ); //not found
 
 }
+
+TEST( SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test" );
+
+	DataVectorTypes::Polyhedron zonePoly;
+	Real64 azimuth;
+	std::vector<int> results;
+
+	Surface.allocate( 9 );
+	Surface( 1 ).Azimuth = 0;
+	Surface( 2 ).Azimuth = 30.;
+	Surface( 3 ).Azimuth = 30.;
+	Surface( 4 ).Azimuth = 30.;
+	Surface( 5 ).Azimuth = 45.;
+	Surface( 6 ).Azimuth = 45.;
+	Surface( 7 ).Azimuth = 72.;
+	Surface( 8 ).Azimuth = 72.5;
+	Surface( 9 ).Azimuth = 73.;
+
+	zonePoly.NumSurfaceFaces = 9;
+	zonePoly.SurfaceFace.allocate( 9 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
+	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
+	zonePoly.SurfaceFace( 5 ).SurfNum = 5;
+	zonePoly.SurfaceFace( 6 ).SurfNum = 6;
+	zonePoly.SurfaceFace( 7 ).SurfNum = 7;
+	zonePoly.SurfaceFace( 8 ).SurfNum = 8;
+	zonePoly.SurfaceFace( 9 ).SurfNum = 9;
+
+	results = listOfFacesFacingAzimuth(zonePoly, 90.);
+	EXPECT_EQ( 0, results.size());
+
+	results = listOfFacesFacingAzimuth( zonePoly, 0. );
+	EXPECT_EQ( 1, results.size() );
+	EXPECT_EQ( 1, results.at( 0 ) );
+
+	results = listOfFacesFacingAzimuth( zonePoly, 30. );
+	EXPECT_EQ( 3, results.size() );
+	EXPECT_EQ( 2, results.at( 0 ) );
+	EXPECT_EQ( 3, results.at( 1 ) );
+	EXPECT_EQ( 4, results.at( 2 ) );
+
+	results = listOfFacesFacingAzimuth( zonePoly, 45. );
+	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( 5, results.at( 0 ) );
+	EXPECT_EQ( 6, results.at( 1 ) );
+
+	results = listOfFacesFacingAzimuth( zonePoly, 71.9 );
+	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( 7, results.at( 0 ) );
+	EXPECT_EQ( 8, results.at( 1 ) );
+
+	results = listOfFacesFacingAzimuth( zonePoly, 72.0 );
+	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( 7, results.at( 0 ) );
+	EXPECT_EQ( 8, results.at( 1 ) );
+
+	results = listOfFacesFacingAzimuth( zonePoly, 72.1 );
+	EXPECT_EQ( 3, results.size() );
+	EXPECT_EQ( 7, results.at( 0 ) );
+	EXPECT_EQ( 8, results.at( 1 ) );
+	EXPECT_EQ( 9, results.at( 2 ) );
+
+	results = listOfFacesFacingAzimuth( zonePoly, 73.0 );
+	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( 8, results.at( 0 ) );
+	EXPECT_EQ( 9, results.at( 1 ) );
+}
+
