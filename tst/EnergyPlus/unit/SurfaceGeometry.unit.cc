@@ -1414,4 +1414,81 @@ TEST( SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test )
 }
 
 
+TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, areWallHeightSame_test" );
 
+	DataVectorTypes::Polyhedron zonePoly;
+	Real64 azimuth;
+	std::vector<int> results;
+
+	Surface.allocate( 3 );
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).Class = SurfaceClass_Wall;
+
+	zonePoly.NumSurfaceFaces = 3;
+	zonePoly.SurfaceFace.allocate( 3 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 1 ).NSides  = 4;
+	zonePoly.SurfaceFace( 1 ).FacePoints.allocate( 4 );
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).z = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).z = 10.;
+
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 2 ).NSides = 4;
+	zonePoly.SurfaceFace( 2 ).FacePoints.allocate( 4 );
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).z = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).z = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 10.;
+
+	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
+	zonePoly.SurfaceFace( 3 ).NSides = 4;
+	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = 0.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).z = 10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 0.;
+
+	EXPECT_EQ(true, areWallHeightSame(zonePoly));
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 9.;
+	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 11.;
+	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 10.02;
+	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 10.03;
+	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = -10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = -0.5;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).z = -0.5;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).z = -10.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).z = -0.5;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = -10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).z = -0.5;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = -10.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = -0.5;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = -10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).z = -10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = -0.5;
+
+	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = -0.6;
+	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = -0.4;
+	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
+
+}
