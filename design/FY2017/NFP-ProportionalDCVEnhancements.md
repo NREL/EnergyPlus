@@ -23,9 +23,12 @@ Proportional Demand Control Ventilation (DCV) Enhancements
 
 ### Florida Solar Energy Center
 
+ - The first revision
+ - 4/24/17
+ - Added E-mail communications and change a new field name from "Base Ventilation Flow Rate" to "Proportional Control Minimum Outdoor Air Flow Rate" in the DesignSpecification:OutdoorAir object.
  - The original version
  - 4/3/17
- - Revision Date
+
  
 
 ## Justification for New Feature ##
@@ -52,7 +55,100 @@ The second request is to use the setpoint schedule value as C_{s - design}, in a
 
 ## E-mail and  Conference Call Conclusions ##
 
-None
+
+-----Original Message-----
+From: Michael J Witte [mailto:mjwitte@gard.com] 
+Sent: Friday, April 21, 2017 3:02 PM
+To: Lixing Gu <gu@fsec.ucf.edu>
+Cc: 'Wu, Tiejun UTC CCS' <Tiejun.Wu@utc.com>
+Subject: Re: [energyplusdevteam] NFP to enhance Proportional Demand Control Ventilation (DCV)
+
+I see.  I'm ok then with the new schedule in the contaminant controller.
+
+Mike
+
+
+
+On 4/21/2017 1:58 PM, Lixing Gu wrote:
+> Mike:
+>
+> Thanks for providing valuable comments to me.
+>
+> Carbon Dioxide Setpoint Schedule Name
+>
+> Carrier proposed to use the setpoint as C_design. The current program has its own way to calculate C_design. In order to trigger E+ to use the setpoint as C_design, I need an input to tell me. A new field is an input trigger. I talked to Tiejun before and he agreed with me.
+>
+> However, I may not use the new field, if the new choice of ProportionalControlBasedOnDesignOARate is used to set up 3 values:
+>
+> V_ot_min, V_ot_design and C_design.
+>
+> Since V_ot calculation and C_design are from 2 enhancement items, I assume V_ot and C_design can be independent.
+>
+> I am open to anyway.
+>
+> Thanks.
+>
+> Gu
+>
+> -----Original Message-----
+> From: Michael J Witte [mailto:mjwitte@gard.com]
+> Sent: Friday, April 21, 2017 12:05 PM
+> To: Lixing Gu <gu@fsec.ucf.edu>
+> Cc: Wu, Tiejun UTC CCS <Tiejun.Wu@utc.com>
+> Subject: Re: [energyplusdevteam] NFP to enhance Proportional Demand 
+> Control Ventilation (DCV)
+>
+> Gu:
+>
+> I'll review.
+>
+> For the first part "Proportional DCV with user specified design zone ventilation flow rate and base ventilation flow rate" we need to be careful about the use of "Outdoor Air Schedule Name".  The way it is currently describe is that it multiplies the result of any OA calculation method, so the use of the "Base Ventilation Air Flow Rate"
+> field should not be dependent on this schedule.
+>
+> Rather, the specs for "Base Ventilation Flow Rate" (actually, I'd suggest a more explicit name, see below) should be completely independent of what's input for the OA Schedule.
+>
+> I could see a group of fields for this, but maybe this is overkill:
+>
+> "Proportional Control Minimum Outdoor Air Flow Rate Input Method"
+> (FractionOfDesignFlowRate, SpecifiedFlowRate)
+>
+> "Proportional Control Minimum Outdoor Air Fraction" (used when 
+> FractionOfDesignFlowRate is specified above)
+>
+> "Proportional Control Minimum Outdoor Air Flow Rate" (used when 
+> SpecifiedFlowRate is specified above)
+>
+> "Proportional Control Minimum Outdoor Air Flow Rate Schedule" (applied 
+> to the flow rate specified above)
+>
+> Tiejun:  Comments?  If this it too flexible, then we could stick with one field for "Proportional Control Minimum Outdoor Air Flow Rate"  Or we could even make it more flexible and replicate all of the design OA flow rate fields (method, flow/person, flow/area, flow, and schedule).
+>
+>
+> And back to Gu:
+>
+> For the second part, why did you propose adding a new schedule for Max
+> CO2 rather than use the existing input for "Carbon Dioxide Setpoint Schedule Name"?
+>
+> Mike
+>
+>
+>
+> On 4/19/2017 8:26 AM, Lixing Gu wrote:
+>> Team:
+>>
+>> An NFP to enhance Proportional Demand Control Ventilation (DCV) is available on github.
+>>
+>> https://github.com/NREL/EnergyPlus/blob/ProportionalDCVEnhancements/d
+>> e sign/FY2017/NFP-ProportionalDCVEnhancements.md
+>>
+>> Comments are welcome via e-mail or github.  Please let me know if you wish to be a reviewer for this task.
+>>
+>> Thanks.
+>>
+>> Gu
+>>
+>>
+
 
 ## Overview ##
 
@@ -81,9 +177,9 @@ V_(ot-min)=  (DesignOAFlowRate * OAFlowRateFractionScheduleValue)/E
 
 The DesignOAFlowRate can be calculated with whatever inputs user specified in the “DesignSpecification:OutdoorAir” object.
 
-Another approach to #2 is to let user specify a base ventilation flow rate in unit of m^3/s. Which requires to add an input field named “BaseVentilationAirFlowRate (m^3/s)”  to object “DesignSpecification:OutdoorAir”.
+Another approach to #2 is to let user specify a base ventilation flow rate in unit of m^3/s. Which requires to add an input field named “Proportional Control Minimum Outdoor Air Flow Rate (m^3/s)”  to object “DesignSpecification:OutdoorAir”.
 
-If a user does not specify “OutdoorAirFlowRateFractionSchedule” and “BaseVentilationAirFlowRate (m^3/s)” , and has zero values for fields “Outdoor Air Flow per Person” and “Outdoor Air Flow per Floor Area”, then throw an error.
+If a user does not specify “OutdoorAirFlowRateFractionSchedule” and “Proportional Control Minimum Outdoor Air Flow Rate (m^3/s)” , and has zero values for fields “Outdoor Air Flow per Person” and “Outdoor Air Flow per Floor Area”, then throw an error.
 
 ### New choice of design zone CO2 concentration
 
@@ -243,8 +339,8 @@ This field is the name of schedule that defines how outdoor air requirements cha
 
 If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
 
- 	N5; \field Base Ventilation Air Flow Rate
-\paragraph{Field: Base Ventilation Air Flow Rate}\label{field-base-ventilation-air-flow-rate}
+ 	N5; \field Proportional Control Minimum Outdoor Air Flow Rate
+\paragraph{Field: Proportional Control Minimum Outdoor Air Flow Rate }\label{field-base-ventilation-air-flow-rate}
 
 <span style="color:red;"> This field specifies the value of the minimum outdoor air flow rate used in the proportional demand controlled ventilation (DCV) control. This input is only used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation, and the value of above schedule is zero.
 
@@ -584,7 +680,7 @@ This section has three revised objects: ZoneControl:ContaminantController, Contr
       \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
       \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
 
-<span style="color:red;">  	N5; \field Base Ventilation Air Flow Rate
+<span style="color:red;">  	N5; \field Proportional Control Minimum Outdoor Air Flow Rate 
 
       \units m3/s
       \type real
@@ -715,3 +811,157 @@ Enhancement items from Carrier
 1. [4-ModifyProportionalDCVFeatures-1-Carrier.docx] (https://energyplus.uservoice.com/forums/258860-energyplus/suggestions/14747307-proportional-dcv-with-user-specified-design-zone-v)
 2. [5-ModifyProportionalDCVFeatures-2-Carrier.docx] (https://energyplus.uservoice.com/forums/258860-energyplus/suggestions/14747292-proportional-dcv-with-user-specified-target-co2-co) 
 
+## Design Document
+
+The new feature does not create any new modules. Instead, it modifies 6 modules listed below
+
+MixedAir
+DataSizing
+SizingManager
+DataContaminantBalance
+DataHeatBalance
+ZoneContaminantPredictorCorrector
+
+### DataSizng
+
+#### New global variable
+
+A new variable to define a new choice of Outdoor Air Method as ProportionalControlBasedOnDesignOARate
+
+	extern int const SOAM_ProportionalControlDesOARate; // Calculate the system level outdoor air flow rates based on design OA rate
+
+#### New variables in Struct OARequirementsData
+
+The struct OARequirementsData represents an object of DesignSpecification:OutdoorAir. A new variable is added as OAPropCtlMinRate to represent the field input of Proportional Control Minimum Outdoor Air Flow Rate.
+
+	struct OARequirementsData
+	{
+		// Members
+		std::string Name;
+		int OAFlowMethod; // - Method for OA flow calculation
+		//- (Flow/Person, Flow/Zone, Flow/Area, FlowACH, Sum, Maximum)
+		Real64 OAFlowPerPerson; // - OA requirement per person
+		Real64 OAFlowPerArea; // - OA requirement per zone area
+		Real64 OAFlowPerZone; // - OA requirement per zone
+		Real64 OAFlowACH; // - OA requirement per zone per hour
+		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
+
+<span style="color:red;">Real64 OAPropCtlMinRate; // - Based OA flow rate </span>
+
+### SizingManager
+
+The ProcessInputOARequirements function in the SizingManager module reads inputs of DesignSpecification:OutdoorAir. A new section will be added to read the new field of A new field of Proportional Control Minimum Outdoor Air Flow Rate. 
+
+		if ( NumNumbers > 4 ) {
+			OARequirements( OAIndex ).OAPropCtlMinRate = Numbers( 5 );
+		}
+
+### DataContaminantBalance
+
+Two new variables will be added in the struct ZoneContControls to represent the ZoneControl:ContaminantController object to accommodate a new input filed of Maximum Carbon Dioxide Concentration Schedule Name.  
+
+		std::string ZoneMaxCO2SchedName; // Name of the schedule which determines maximum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for this schedule
+
+### DataHeatBalance
+
+A new variable will be added as ZoneMaxCO2SchedIndex in the struct ZoneData to represent the Zone object. The variable is used to store an index of ZoneMaxCO2SchedIndex in the ZoneContControls. 
+
+		int ZoneMaxCO2SchedIndex; // Index for the schedule the schedule which determines maximum CO2 concentration
+
+### ZoneContaminantPredictorCorrector
+
+A new section of the function GetZoneContaminanSetPoints will be created to read a new field of Maximum Carbon Dioxide Concentration Schedule Name.
+
+		if ( NumAlphas > 5 ) {
+			ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedName = cAlphaArgs( 6 );
+			ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
+			if ( ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex > 0 ) {
+				// Check validity of control types.
+				ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0 );
+				if ( !ValidScheduleType ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"" );
+					ShowContinueError( "..contains values outside of range [0,2000 ppm]." );
+					ErrorsFound = true;
+				}
+				else {
+					Zone( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum ).ZoneMaxCO2SchedIndex = ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex;
+				}
+			}
+		}
+
+### MixedAir
+
+#### Add new variables in the struct VentilationMechanicalProps to represent  the Controller:MechanicalVentilation object
+
+The first two variables are used in reccursive warnings when maximum OA rate is less than minimum OA rate. The min value will be reset to the max value. Simulation still continues.
+
+The last variable stores the value of the Proportional Control Minimum Outdoor Air Flow Rate field at each zone.
+
+		int OAMaxMinLimitErrorCount; // Counter when max OA < min OA for SOAM_ProportionalControlDesOARate
+		int OAMaxMinLimitErrorIndex; // Index for max OA < min OA recurring error message for SOAM_ProportionalControlDesOARate
+		Array1D< Real64 > OAPropCtlMinRate; // Outdoor design OA flow rate from DesignSpecification:OutdoorAir
+
+#### Modify the GetOAControllerInputs function to 
+
+1. Read a new choice of ProportionalControlBasedOnDesignOARate
+
+				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOARATE" ) { // Proportional Control based on design OA rate
+					thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOARate;
+					if ( !Contaminant.CO2Simulation ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
+						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+						ErrorsFound = true;
+					}
+
+
+2. Throw an error 
+
+If a user does not specify “OutdoorAirFlowRateFractionSchedule” and “Proportional Control Minimum Outdoor Air Flow Rate (m^3/s)” , and has zero values for fields “Outdoor Air Flow per Person” and “Outdoor Air Flow per Floor Area”, then throw an error.
+ 
+						thisVentilationMechanical.OAPropCtlMinRate( ventMechZoneNum ) = curOARequirements.OAPropCtlMinRate;						
+						if ( thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+							if ( thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) == 0 ) {
+								if ( thisVentilationMechanical.OAPropCtlMinRate( ventMechZoneNum ) == 0.0 && thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) == 0.0 && thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) == 0.0 ) {
+									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid input with System Outdoor Air Method = ProportionalControlBasedOnDesignOARate." );
+									ShowContinueError( " When fields of Outdoor Air Schedule Name and Base Ventilation Air Flow Rate are blank in DesignSpecification:OutdoorAir = " + curOARequirements.Name + ", " );
+									ShowContinueError( " the values of Outdoor Air Flow per Person and Outdoor Air Flow per Zone Floor Area in the same object can not be zero." );
+									ErrorsFound = true;
+								}
+							}
+						}
+
+3. Write input choice in .eio
+
+				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedOnDesignOARate,"; }
+
+#### Modify VentilationMechanicalProps::CalcMechVentController
+
+Check min and max zone OA values. If min is greater than max, it min value will be reset to the max value, reccursive warnings will be provided and simulation continues.
+
+							if ( this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+										ZoneOAMax = ZoneOABZ / ZoneEz;
+										if ( this->ZoneOASchPtr( ZoneIndex ) > 0.0 ) {
+											ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
+										} else {
+											ZoneOAMin = this->OAPropCtlMinRate( ZoneIndex ) / ZoneEz;
+										}
+										if ( ZoneOAMax <= ZoneOAMin ) {
+											ZoneOAMin = ZoneOAMax;
+											++this->OAMaxMinLimitErrorCount;
+											if ( this->OAMaxMinLimitErrorCount < 2 ) {
+												ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + this->Name + "\"." );
+												ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate (" + RoundSigDigits( ZoneOAMax, 4 ) + "), is not greater than minimum zone outdoor air rate (" + RoundSigDigits( ZoneOAMin, 4 ) + ")." );
+												ShowContinueError( " The minimum zone outdoor air rate is set to the maximum zone outdoor air rate. Simulation continues..." );
+												ShowContinueErrorTimeStamp( "" );
+											}
+											else {
+												ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate is not greater than minimum zone outdoor air rate. Error continues...", this->OAMaxMinLimitErrorIndex );
+											}
+										}
+									}
+
+#### Other minor modifications when this->SystemOAMethod == SOAM_ProportionalControlDesOARate
+
+1. Get ZoneMaxCO2 from a schedule, defined as the Maximum Carbon Dioxide Concentration Schedule Name field in the ZoneControl:ContaminantController objects
