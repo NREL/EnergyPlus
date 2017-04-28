@@ -62,6 +62,7 @@
 #include <DataHeatBalance.hh>
 #include <WindowComplexManager.hh>
 #include <DataBSDFWindow.hh>
+#include <CurveManager.hh>
 
 #include "WindowManagerExteriorData.hh"
 #include "OpticalLayer.hpp"
@@ -84,6 +85,7 @@ namespace EnergyPlus {
   using namespace DataHeatBalance;
   using namespace DataGlobals;
   using namespace WindowComplexManager;
+  using namespace CurveManager;
 
   using namespace SingleLayerOptics;
   using namespace FenestrationCommon;
@@ -218,8 +220,41 @@ namespace EnergyPlus {
         aSampleData->addRecord( aWl[ i ], aTf[ i ], aRf[ i ], aRb[ i ] );
       }
 
-      return aSampleData;
+	  return aSampleData;
     }
+
+	///////////////////////////////////////////////////////////////////////////////
+	shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample( const int i, const int t_TransTablePtr, const int t_FRefleTablePtr, const int t_BRefleTablePtr ) {
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads spectral data value
+		assert( t_TransTablePtr ); // It must be true for spectral and angle data
+		assert( t_FRefleTablePtr ); // It must be true for spectral and angle data
+		assert( t_BRefleTablePtr ); // It must be true for spectral and angle data
+		shared_ptr< CSpectralSampleData > aSampleData = make_shared< CSpectralSampleData >( );
+
+		auto TransTableData = TableData( PerfCurve( t_TransTablePtr ).TableIndex );
+		auto FReleTableData = TableData( PerfCurve( t_FRefleTablePtr ).TableIndex );
+		auto BReleTableData = TableData( PerfCurve( t_BRefleTablePtr ).TableIndex );
+		int numOfIn = TableLookup( PerfCurve( t_TransTablePtr ).TableIndex ).NumX1Vars;
+		int numOfWl = TableLookup( PerfCurve( t_TransTablePtr ).TableIndex ).NumX2Vars;
+		int num;
+
+		for (auto j = 1; j <= numOfWl; ++j) {
+			num =  i * numOfIn + j;
+			double wl = TransTableData.X2( num );
+			double T = TransTableData.Y( num );
+			double Rf = FReleTableData.Y( num );
+			double Rb = BReleTableData.Y( num );
+			aSampleData->addRecord( wl, T, Rf, Rb );
+		}
+		return aSampleData; 
+	}
 
     ///////////////////////////////////////////////////////////////////////////////
     //       CWindowConstructionsBSDF

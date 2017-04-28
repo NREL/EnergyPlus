@@ -58,6 +58,7 @@
 // EnergyPlus Headers
 #include <CurveManager.hh>
 #include <DataBranchAirLoopPlant.hh>
+#include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -414,6 +415,7 @@ namespace CurveManager {
 		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
+		using InputProcessor::SameString;
 		//  USE DataGlobals, ONLY: DisplayExtraWarnings, OutputFileInits
 
 		// Locals
@@ -489,6 +491,10 @@ namespace CurveManager {
 		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
 		int CurveFound;
+		int lineNum;
+		bool IndVarSwitch;
+		Real64 temp;
+		int fieldNum;
 
 		// Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -2038,13 +2044,15 @@ namespace CurveManager {
 		// Loop over two variable tables and load data
 		CurrentModuleObject = "Table:TwoIndependentVariables";
 		for ( CurveIndex = 1; CurveIndex <= NumTwoVarTab; ++CurveIndex ) {
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
-			NumTableEntries = ( NumNumbers - 7 ) / 3;
-			TableData( TableNum ).X1.allocate( NumTableEntries );
-			TableData( TableNum ).X2.allocate( NumTableEntries );
-			TableData( TableNum ).Y.allocate( NumTableEntries );
+			if ( lAlphaFieldBlanks( 7 ) ) {
+				NumTableEntries = ( NumNumbers - 7 ) / 3;
+				TableData( TableNum ).X1.allocate( NumTableEntries );
+				TableData( TableNum ).X2.allocate( NumTableEntries );
+				TableData( TableNum ).Y.allocate( NumTableEntries );
+			}
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -2149,6 +2157,18 @@ namespace CurveManager {
 				}
 			}
 
+			IndVarSwitch = false;
+			if ( SameString( Alphas( 4 ), "WAVELENGTH" ) && SameString( Alphas( 5 ), "ANGLE" ) ) {
+				IndVarSwitch = true;
+				// Switch min and max values 
+				temp = PerfCurve( CurveNum ).Var1Min;
+				PerfCurve( CurveNum ).Var1Min = PerfCurve( CurveNum ).Var2Min;
+				PerfCurve( CurveNum ).Var2Min = temp;
+				temp = PerfCurve( CurveNum ).Var1Max;
+				PerfCurve( CurveNum ).Var1Max = PerfCurve( CurveNum ).Var2Max;
+				PerfCurve( CurveNum ).Var2Max = temp;
+			}
+
 			if ( ! lNumericFieldBlanks( 7 ) ) {
 				TableData( TableNum ).NormalPoint = Numbers( 7 );
 				if ( Numbers( 7 ) == 0.0 ) {
@@ -2170,19 +2190,28 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveMaxPresent = true;
 			}
 
-			MaxTableNums = ( NumNumbers - 7 ) / 3;
-			if ( mod( ( NumNumbers - 7 ), 3 ) != 0 ) {
-				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
-				ErrorsFound = true;
-				TableData( TableNum ).X1 = 0.;
-				TableData( TableNum ).X2 = 0.;
-				TableData( TableNum ).Y = 0.;
+			if ( !lAlphaFieldBlanks( 7 ) ) {
+				ReadFromFile = true;
+				FileName = Alphas( 7 );
+				ReadTableDataFromFile( CurveNum, CurrentModuleObject, FileName, IndVarSwitch, MaxTableNums, ErrorsFound );
 			} else {
-				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
-					TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
-					TableData( TableNum ).X2( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 2 );
-					TableData( TableNum ).Y( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) / TableData( TableNum ).NormalPoint;
+				ReadFromFile = false;
+				FileName = "";
+
+				MaxTableNums = ( NumNumbers - 7 ) / 3;
+				if ( mod( ( NumNumbers - 7 ), 3 ) != 0 ) {
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
+					ErrorsFound = true;
+					TableData( TableNum ).X1 = 0.;
+					TableData( TableNum ).X2 = 0.;
+					TableData( TableNum ).Y = 0.;
+				} else {
+					for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
+						TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
+						TableData( TableNum ).X2( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 2 );
+						TableData( TableNum ).Y( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) / TableData( TableNum ).NormalPoint;
+					}
 				}
 			}
 
@@ -2312,9 +2341,11 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
 				if ( PerfCurve( CurveNum ).Var1MinPresent ) {
 					if ( PerfCurve( CurveNum ).Var1Min < minval( TableData( TableNum ).X1 ) ) {
+						fieldNum = 1;
+						if ( IndVarSwitch ) fieldNum = 3;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( 1 ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 1 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
 						PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 					}
 				} else {
@@ -2322,9 +2353,11 @@ namespace CurveManager {
 				}
 				if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var1Max > maxval( TableData( TableNum ).X1 ) ) {
+						fieldNum = 2;
+						if ( IndVarSwitch ) fieldNum = 4;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( 2 ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 2 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
 						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 					}
 				} else {
@@ -2332,9 +2365,11 @@ namespace CurveManager {
 				}
 				if ( PerfCurve( CurveNum ).Var2MinPresent ) {
 					if ( PerfCurve( CurveNum ).Var2Min < minval( TableData( TableNum ).X2 ) ) {
+						fieldNum = 3;
+						if ( IndVarSwitch ) fieldNum = 1;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( 3 ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 3 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X2 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X2 ), 6 ) );
 						PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
 					}
 				} else {
@@ -2342,9 +2377,11 @@ namespace CurveManager {
 				}
 				if ( PerfCurve( CurveNum ).Var2MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var2Max > maxval( TableData( TableNum ).X2 ) ) {
+						fieldNum = 4;
+						if ( IndVarSwitch ) fieldNum = 2;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( 4 ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 4 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X2 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X2 ), 6 ) );
 						PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
 					}
 				} else {
@@ -5108,6 +5145,10 @@ Label999: ;
 				IsCurveInputTypeValid = true;
 			} else if ( SameString( InInputType, "DISTANCE" ) ) {
 				IsCurveInputTypeValid = true;
+			} else if ( SameString( InInputType, "WAVELENGTH" ) ) {
+				IsCurveInputTypeValid = true;
+			} else if ( SameString( InInputType, "ANGLE" ) ) {
+				IsCurveInputTypeValid = true;
 			} else {
 				IsCurveInputTypeValid = false;
 			}
@@ -5981,6 +6022,513 @@ Label999: ;
 		return CurveOrTableObjectTypeNum;
 	}
 
+	int
+	GetCurveInterpolationMethodNum( int const CurveIndex ) // index of curve in curve array
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// get the interpolation type integer identifier for tables
+
+		// METHODOLOGY EMPLOYED:
+		// retrieve from data structure.
+
+		// Return value
+		int TableInterpolationMethodNum;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// na
+		if ( CurveIndex > 0 ) {
+			TableInterpolationMethodNum = PerfCurve( CurveIndex ).InterpolationType;
+		} else {
+			TableInterpolationMethodNum = 0;
+		}
+
+		return TableInterpolationMethodNum;
+	}
+
+	void
+	ReadTableDataFromFile(
+		int const CurveNum,
+		std::string & CurrentModuleObject,
+		std::string & FileName,
+		bool IndVarSwitch,
+		int & lineNum,
+		bool & ErrorsFound
+	)
+	{
+
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Lixing Gu, FSEC
+	//       DATE WRITTEN   Feb. 2017
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS FUNCTION:
+	// get data from an external file used to retrieve optical properties
+
+	// METHODOLOGY EMPLOYED:
+	// Recommended by NREL to read data
+
+	// Using/Aliasing
+	using DataSystemVariables::CheckForActualFileName;
+	using DataSystemVariables::TempFullFileName;
+	using General::splitString;
+
+	int TableNum;
+	bool FileExists;
+	std::ifstream infile( FileName );
+	std::string line;
+
+	CheckForActualFileName( FileName, FileExists, TempFullFileName );
+	if ( !FileExists ) {
+		ShowSevereError( "CurveManager: SearchTableDataFile: Could not open Table Data File, expecting it as file name = " + FileName );
+		ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
+		ShowContinueError( "Try again with putting full path and file name in the field." );
+		ShowFatalError( "Program terminates due to these conditions." );
+	}
+
+	TableNum = PerfCurve( CurveNum ).TableIndex;
+	TableData( TableNum ).X1.allocate( 0 );
+	TableData( TableNum ).X2.allocate( 0 );
+	TableData( TableNum ).Y.allocate( 0 );
+	lineNum = 0;
+	while (std::getline( infile, line )) {
+		std::vector<std::string> strings = splitString( line, ',' );
+		lineNum++;
+		if (strings.size() > 2) {
+			if (IndVarSwitch) {
+				TableData( TableNum ).X1.push_back( std::stod( strings[1] ) );
+				TableData( TableNum ).X2.push_back( std::stod( strings[0] ) );
+			} else {
+				TableData( TableNum ).X1.push_back( std::stod( strings[0] ) );
+				TableData( TableNum ).X2.push_back( std::stod( strings[1] ) );
+			}
+			TableData( TableNum ).Y.push_back( std::stod( strings[2] ) );
+		}
+	}
+
+	}
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Lixing Gu, FSEC
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Set up indenpendent varilable values the same in 3 table data 
+
+		// METHODOLOGY EMPLOYED:
+		// Recommended by NREL to read data
+
+		// Using/Aliasing
+		int X1TableNum;
+		int X2TableNum;
+		Array1D< Real64 > XX1;
+		Array1D< Real64 > XX2;
+		int i;
+		int j;
+		int k;
+		int l;
+		int m;
+		int n;
+		Real64 XX;
+		Real64 X1;
+		Real64 X2;
+		Real64 YY;
+		Array1D< int > Tables;
+		int TableNum;
+
+		Tables.allocate( 3 );
+		const Real64 tol = 1.0e-5;
+		bool found;
+
+		Tables( 1 ) = PerfCurve( TransCurveIndex ).TableIndex;
+		Tables( 2 ) = PerfCurve( FRefleCurveIndex ).TableIndex;
+		Tables( 3 ) = PerfCurve( BRefleCurveIndex ).TableIndex;
+
+		// Set up independent variable size to cover all independent varaible values in 3 tables
+		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
+			if ( TableNum == 1 ) {
+				X1TableNum = TableLookup( Tables( TableNum ) ).NumX1Vars;
+				X2TableNum = TableLookup( Tables( TableNum ) ).NumX2Vars;
+
+				XX1.allocate( X1TableNum );
+				XX2.allocate( X2TableNum );
+
+				for ( i = 1; i <= X1TableNum; i++ ) {
+					XX1( i ) = TableLookup( Tables( TableNum ) ).X1Var( i );
+				}
+				for ( i = 1; i <= X2TableNum; i++ ) {
+					XX2( i ) = TableLookup( Tables( TableNum ) ).X2Var( i );
+				}
+
+			} else {
+				// Add common wavelengths and angles
+				X1TableNum = TableLookup( Tables( TableNum ) ).NumX1Vars;
+				X2TableNum = TableLookup( Tables( TableNum ) ).NumX2Vars;
+				for ( i = 1; i <= X1TableNum; i++ ) {
+					XX = TableLookup( Tables( TableNum ) ).X1Var( i );
+					found = false;
+					for ( j = 1; j <= XX1.size( ); j++ ) {
+						if ( fabs( XX1( j ) - XX ) < tol ) {
+							found = true;
+						}
+					}
+					if ( !found ) {
+						XX1.push_back( XX );
+					}
+				}
+				for ( i = 1; i <= X2TableNum; i++ ) {
+					XX = TableLookup( Tables( TableNum ) ).X2Var( i );
+					found = false;
+					for ( j = 1; j <= XX2.size( ); j++ ) {
+						if ( fabs( XX2( j ) - XX ) < tol ) {
+							found = true;
+						}
+					}
+					if ( !found ) {
+						XX2.push_back( XX );
+					}
+				}
+			}
+		}
+
+		// ascend sort
+		for ( i = 1; i <= XX1.size(); i++ ) {
+			for ( j = 1; j <= XX1.size( ); j++ ) {
+				if ( XX1( i ) < XX1( j ) ) {
+					XX = XX1( i );
+					XX1( i ) = XX1( j );
+					XX1( j ) = XX;
+				}
+			}
+		}
+
+		for ( i = 1; i <= XX2.size( ); i++ ) {
+			for ( j = 1; j <= XX2.size( ); j++ ) {
+				if ( XX2( i ) < XX2( j ) ) {
+					XX = XX2( i );
+					XX2( i ) = XX2( j );
+					XX2( j ) = XX;
+				}
+			}
+		}
+
+		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
+			if ( XX2.size( ) > TableLookup( Tables( TableNum ) ).NumX2Vars ) {
+				l = 0;
+				for ( i = 1; i <= XX2.size( ); i++ ) {
+					if ( fabs( XX2( i ) - TableLookup( Tables( TableNum ) ).X2Var( i - l ) ) > tol ) {
+						for ( j = 2; j <= TableData( Tables( TableNum ) ).X2.size( ); j++ ) {
+							if ( TableData( Tables( TableNum ) ).X2( j - 1 ) < XX2( i ) && TableData( Tables( TableNum ) ).X2( j ) > XX2( i ) ) {
+								TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( j ) );
+								TableData( Tables( TableNum ) ).X2.push_back( XX2( i ) );
+								YY = TableData( Tables( TableNum ) ).Y( j - 1 ) + ( XX2( i ) - TableData( Tables( TableNum ) ).X2( j - 1 ) ) / ( TableData( Tables( TableNum ) ).X2( j ) - TableData( Tables( TableNum ) ).X2( j - 1 ) ) * ( TableData( Tables( TableNum ) ).Y( j ) - TableData( Tables( TableNum ) ).Y( j - 1 ) );
+								TableData( Tables( TableNum ) ).Y.push_back( YY );
+								X1 = TableData( Tables( TableNum ) ).X1( TableData( Tables( TableNum ) ).X2.size( ) );
+								X2 = TableData( Tables( TableNum ) ).X2( TableData( Tables( TableNum ) ).X2.size( ) );
+								YY = TableData( Tables( TableNum ) ).Y( TableData( Tables( TableNum ) ).X2.size( ) );
+								for ( k = TableData( Tables( TableNum ) ).X2.size( ) - 1; k >= j; k-- ) {
+									TableData( Tables( TableNum ) ).X1( k + 1 ) = TableData( Tables( TableNum ) ).X1( k );
+									TableData( Tables( TableNum ) ).X2( k + 1 ) = TableData( Tables( TableNum ) ).X2( k );
+									TableData( Tables( TableNum ) ).Y( k + 1 ) = TableData( Tables( TableNum ) ).Y( k );
+								}
+								TableData( Tables( TableNum ) ).X1( j ) = X1;
+								TableData( Tables( TableNum ) ).X2( j ) = X2;
+								TableData( Tables( TableNum ) ).Y( j ) = YY;
+							}
+						}
+						l++;
+					}
+				}
+			}
+
+			if ( XX1.size( ) > TableLookup( Tables( TableNum ) ).NumX1Vars ) {
+				l = 0;
+				for ( i = 1; i <= XX1.size( ); i++ ) {
+					if ( fabs( XX1( i ) - TableLookup( Tables( TableNum ) ).X1Var( i - l ) ) > tol ) {
+						m = TableData( Tables( TableNum ) ).X1.size( );
+						for ( k = 1; k <= XX2.size( ); k++ ) {
+							TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( m - XX2.size( ) + 1 ) );
+							TableData( Tables( TableNum ) ).X2.push_back( TableData( Tables( TableNum ) ).X2( m - XX2.size( ) + 1 ) );
+							TableData( Tables( TableNum ) ).Y.push_back( TableData( Tables( TableNum ) ).Y( m - XX2.size( ) + 1 ) );
+						}
+						for ( j = m / XX2.size( ); j >= i; j-- ) {
+							for ( k = 1; k <= XX2.size( ); k++ ) {
+								TableData( Tables( TableNum ) ).X1( j * XX2.size( ) + k ) = TableData( Tables( TableNum ) ).X1( ( j - 1 ) * XX2.size( ) + k );
+								TableData( Tables( TableNum ) ).X2( j * XX2.size( ) + k ) = TableData( Tables( TableNum ) ).X2( ( j - 1 ) * XX2.size( ) + k );
+								TableData( Tables( TableNum ) ).Y( j * XX2.size( ) + k ) = TableData( Tables( TableNum ) ).Y( ( j - 1 ) * XX2.size( ) + k );
+							}
+						}
+						YY = ( XX1( i ) - TableLookup( Tables( TableNum ) ).X1Var( i - l - 1 ) ) / ( TableLookup( Tables( TableNum ) ).X1Var( i - l ) - TableLookup( Tables( TableNum ) ).X1Var( i - l - 1 ) );
+						for ( k = 1; k <= XX2.size( ); k++ ) {
+							TableData( Tables( TableNum ) ).X1( ( i - 1 )* XX2.size( ) + k ) = XX1( i );
+							TableData( Tables( TableNum ) ).X2( ( i - 1 )* XX2.size( ) + k ) = XX2( k );
+							TableData( Tables( TableNum ) ).Y( ( i - 1 )* XX2.size( ) + k ) = TableData( Tables( TableNum ) ).Y( ( i - 2 )* XX2.size( ) + k ) + YY * ( TableData( Tables( TableNum ) ).Y( i * XX2.size( ) + k ) - TableData( Tables( TableNum ) ).Y( ( i - 2 )* XX2.size( ) + k ) );
+						}
+						l++;
+					}
+				}
+			}
+		}
+
+		// Re-organize performance curve table data structure
+		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
+			PerfCurveTableData( Tables( TableNum ) ).X1.allocate( XX1.size( ) );
+			PerfCurveTableData( Tables( TableNum ) ).X2.allocate( XX2.size( ) );
+			PerfCurveTableData( Tables( TableNum ) ).Y.allocate( XX2.size( ), XX1.size( ) );
+			PerfCurveTableData( Tables( TableNum ) ).X1 = -9999999.0;
+			PerfCurveTableData( Tables( TableNum ) ).X2 = -9999999.0;
+			PerfCurveTableData( Tables( TableNum ) ).Y = -9999999.0;
+			for ( i = 1; i <= XX1.size( ); ++i ) {
+				PerfCurveTableData( Tables( TableNum ) ).X1( i ) = XX1( i );
+				for ( j = 1; j <= XX2.size( ); ++j ) {
+					PerfCurveTableData( Tables( TableNum ) ).X2( j ) = XX2( j );
+					for ( k = 1; k <= XX1.size( ) * XX2.size( ); ++k ) {
+						if ( ( TableData( Tables( TableNum ) ).X1( k ) == PerfCurveTableData( Tables( TableNum ) ).X1( i ) ) && ( TableData( Tables( TableNum ) ).X2( k ) == PerfCurveTableData( Tables( TableNum ) ).X2( j ) ) ) {
+							PerfCurveTableData( Tables( TableNum ) ).Y( j, i ) = TableData( Tables( TableNum ) ).Y( k );
+						}
+					}
+				}
+			}
+		}
+
+		// Re-organize TableLookup data structure
+		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
+			TableLookup( Tables( TableNum ) ).NumIndependentVars = 2;
+			TableLookup( Tables( TableNum ) ).NumX1Vars = size( PerfCurveTableData( Tables( TableNum ) ).X1 );
+			TableLookup( Tables( TableNum ) ).NumX2Vars = size( PerfCurveTableData( Tables( TableNum ) ).X2 );
+			TableLookup( Tables( TableNum ) ).X1Var.allocate( TableLookup( Tables( TableNum ) ).NumX1Vars );
+			TableLookup( Tables( TableNum ) ).X2Var.allocate( TableLookup( Tables( TableNum ) ).NumX2Vars );
+			TableLookup( Tables( TableNum ) ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( Tables( TableNum ) ).Y( _, 1 ) ), size( PerfCurveTableData( Tables( TableNum ) ).Y( 1, _ ) ) );
+			TableLookup( Tables( TableNum ) ).X1Var = PerfCurveTableData( Tables( TableNum ) ).X1;
+			TableLookup( Tables( TableNum ) ).X2Var = PerfCurveTableData( Tables( TableNum ) ).X2;
+			TableLookup( Tables( TableNum ) ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( Tables( TableNum ) ).Y( _, _ );
+		}
+
+		XX1.deallocate( );
+		XX2.deallocate( );
+
+	}
+
+	void
+		SetCommonIncidentAngles(
+			int const ConstrNum,
+			int const NGlass,
+			int const SpecDataNum,
+			int & TotalIPhi,
+			Array1A_int Tables
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Lixing Gu, FSEC
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Set up common incident angle values in all materials with spectral and angular data in the same construction
+
+		// Using/Aliasing``
+		using DataHeatBalance::Material;
+		using DataHeatBalance::Construct;
+
+		int X1Num;
+		Real64 XX;
+		Real64 YY;
+		int i;
+		int j;
+		int k;
+		int l;
+		int m;
+		int n;
+		int TabNum;
+		int TabOpt;
+		int waveSize;
+		Array1D< Real64 > XX1;
+		const Real64 tol = 1.0e-5;
+		bool found;
+		bool Anglefound;
+		int TableNum;
+
+		Tables.dimension( NGlass );
+
+		Anglefound = false;
+
+		j = 0;
+		for ( i = 1; i <= NGlass; i++ ) {
+			if ( Tables( i ) > 0 ) j++;
+		}
+		if ( j == 0 ) return;
+
+		if ( TotalIPhi < 10 ) {
+			XX1.allocate( 10 );
+			for ( k = 1; k <= 10; k++ ) {
+				XX1( k ) = ( k - 1 )*10.0;
+			}
+		}
+
+		for ( i = 1; i <= NGlass; i++ ) {
+			if ( Tables( i ) > 0  ) {
+				if ( !XX1.allocated( ) ) {
+					TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( i ) ) ).GlassSpecAngTransDataPtr;
+					X1Num = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars;
+					XX1.allocate( X1Num );
+					for ( j = 1; j <= XX1.size( ); j++ ) {
+						XX1( j ) = TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( j );
+					}
+				} else {
+					TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( i ) ) ).GlassSpecAngTransDataPtr;
+					X1Num = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars;
+					if ( XX1.size( ) != X1Num ) Anglefound = true;
+					for ( j = 1; j <= X1Num; j++ ) {
+						XX = TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( j );
+						found = false;
+						for ( k = 1; k <= XX1.size( ); k++ ) {
+							if ( fabs( XX1( k ) - XX ) < tol ) {
+								found = true;
+							}
+						}
+						if ( !found ) {
+							XX1.push_back( XX );
+							Anglefound = true;
+						}
+					}
+				}
+			}
+		}
+
+		if ( !Anglefound ) return;
+
+		// ascend sort
+		for ( i = 1; i <= XX1.size( ); i++ ) {
+			for ( j = 1; j <= XX1.size( ); j++ ) {
+				if ( XX1( i ) < XX1( j ) ) {
+					XX = XX1( i );
+					XX1( i ) = XX1( j );
+					XX1( j ) = XX;
+				}
+			}
+		}
+
+		for ( TabNum = 1; TabNum <= Tables.size( ); TabNum++ ) {
+			if ( Tables( TabNum ) == 0 ) continue;
+			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
+				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
+				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
+				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
+				waveSize = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars;
+				if ( XX1.size( ) > TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) {
+					l = 0;
+					for ( i = 1; i <= XX1.size( ); i++ ) {
+						if ( fabs( XX1( i ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l ) ) > tol ) {
+							m = TableData( PerfCurve( TableNum ).TableIndex ).X1.size( );
+							for ( k = 1; k <= waveSize; k++ ) {
+								TableData( PerfCurve( TableNum ).TableIndex ).X1.push_back( TableData( PerfCurve( TableNum ).TableIndex ).X1( m - waveSize + 1 ) );
+								TableData( PerfCurve( TableNum ).TableIndex ).X2.push_back( TableData( PerfCurve( TableNum ).TableIndex ).X2( m - waveSize + 1 ) );
+								TableData( PerfCurve( TableNum ).TableIndex ).Y.push_back( TableData( PerfCurve( TableNum ).TableIndex ).Y( m - waveSize + 1 ) );
+							}
+							for ( j = m / waveSize; j >= i; j-- ) {
+								for ( k = 1; k <= waveSize; k++ ) {
+									TableData( PerfCurve( TableNum ).TableIndex ).X1( j * waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).X1( ( j - 1 ) * waveSize + k );
+									TableData( PerfCurve( TableNum ).TableIndex ).X2( j * waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).X2( ( j - 1 ) * waveSize + k );
+									TableData( PerfCurve( TableNum ).TableIndex ).Y( j * waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( ( j - 1 ) * waveSize + k );
+								}
+							}
+							YY = ( XX1( i ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l - 1 ) ) / ( TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l - 1 ) );
+							for ( k = 1; k <= waveSize; k++ ) {
+								TableData( PerfCurve( TableNum ).TableIndex ).X1( ( i - 1 )* waveSize + k ) = XX1( i );
+								TableData( PerfCurve( TableNum ).TableIndex ).Y( ( i - 1 )* waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( ( i - 2 )* waveSize + k ) + YY * ( TableData( PerfCurve( TableNum ).TableIndex ).Y( i * waveSize + k ) - TableData( PerfCurve( TableNum ).TableIndex ).Y( ( i - 2 )* waveSize + k ) );
+							}
+							l++;
+						}
+					}
+				}
+			}
+		}
+
+		// Re-organize performance curve table data structure
+		for ( TabNum = 1; TabNum <= Tables.size( ); TabNum++ ) {
+			if ( Tables( TabNum ) == 0 ) continue;
+			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
+				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
+				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
+				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
+				if ( XX1.size( ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
+				waveSize = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars;
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1.allocate( XX1.size( ) );
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y.allocate( waveSize, XX1.size( ) );
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1 = -9999999.0;
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 = -9999999.0;
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y = -9999999.0;
+				for ( i = 1; i <= XX1.size( ); ++i ) {
+					PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1( i ) = XX1( i );
+					for ( j = 1; j <= waveSize; ++j ) {
+						for ( k = 1; k <= XX1.size( ) * waveSize; ++k ) {
+							if ( ( TableData( PerfCurve( TableNum ).TableIndex ).X1( k ) == PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1( i ) ) && ( TableData( PerfCurve( TableNum ).TableIndex ).X2( k ) == PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2( j ) ) ) {
+								PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( j, i ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( k );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Re-organize TableLookup data structure
+		for ( TabNum = 1; TabNum <= Tables.size( ); TabNum++ ) {
+			if ( Tables( TabNum ) == 0 ) continue;
+			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
+				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
+				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
+				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
+				if ( XX1.size( ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).NumIndependentVars = 2;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1 );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, 1 ) ), size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( 1, _ ) ) );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, _ );
+			}
+		}
+
+		if ( TotalIPhi != XX1.size( ) ) {
+			TotalIPhi = XX1.size( );
+		}
+
+		XX1.deallocate( );
+
+	}
 	//=================================================================================================!
 
 } // CurveManager

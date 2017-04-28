@@ -69,6 +69,7 @@
 #include <DataGlobals.hh>
 #include <InputProcessor.hh>
 #include <General.hh>
+#include <CurveManager.hh>
 
 // Windows library headers
 #include "WindowManagerExteriorOptical.hh"
@@ -94,6 +95,7 @@
 #include "BSDFIntegrator.hpp"
 #include "OpticalLayer.hpp"
 #include "OpticalSurface.hpp"
+#include "AngularMeasurements.hpp"
 
 namespace EnergyPlus {
 
@@ -108,6 +110,7 @@ namespace EnergyPlus {
   using namespace DataHeatBalFanSys;
   using namespace DataGlobals;
   using namespace General;
+  using namespace CurveManager;
 
   namespace WindowManager {
 
@@ -199,15 +202,31 @@ namespace EnergyPlus {
     }
 
     void CWCESpecularMaterialsFactory::init() {
-      shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+		int i = 0;
+		int numOfIn;
+
+	  shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
       shared_ptr< CSpectralSampleData > aSampleData = nullptr;
-      if( m_MaterialProperties->GlassSpectralDataPtr > 0 ) {
-        aSampleData = CWCESpecturmProperties::getSpectralSample( m_MaterialProperties->GlassSpectralDataPtr );
+	  shared_ptr< CSpectralSample > aSample = nullptr;
+	  std::vector< std::shared_ptr< CSingleAngularMeasurement > > m_Measurements;
+	  if (m_MaterialProperties->GlassSpectralDataPtr > 0) {
+		  aSampleData = CWCESpecturmProperties::getSpectralSample( m_MaterialProperties->GlassSpectralDataPtr );
+	  } else if ( m_MaterialProperties->GlassSpectralAndAngle ) {
+		  numOfIn = TableLookup( PerfCurve( m_MaterialProperties->GlassSpecAngTransDataPtr ).TableIndex ).NumX1Vars;
+		  for ( auto i = 0; i < numOfIn; ++i ) {
+				double ia = TableLookup( PerfCurve( m_MaterialProperties->GlassSpecAngTransDataPtr ).TableIndex ).X1Var( i + 1 );
+				aSampleData = CWCESpecturmProperties::getSpectralSample( i, m_MaterialProperties->GlassSpecAngTransDataPtr, m_MaterialProperties->GlassSpecAngFRefleDataPtr, m_MaterialProperties->GlassSpecAngBRefleDataPtr );
+				shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
+				shared_ptr< CSingleAngularMeasurement > aAngular = make_shared< CSingleAngularMeasurement >( aSample, ia );
+				m_Measurements.push_back( aAngular );
+		  }
       } else {
         aSampleData = CWCESpecturmProperties::getSpectralSample( *m_MaterialProperties );
-      }
-      
-      shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
+	  }    
+
+	  if ( !m_MaterialProperties->GlassSpectralAndAngle ) {
+		  aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
+	  }
 
       MaterialType aType = MaterialType::Monolithic;
       CWavelengthRange aRange = CWavelengthRange( m_Range );
@@ -216,11 +235,22 @@ namespace EnergyPlus {
 
       if( m_Range == WavelengthRange::Visible ) {
         shared_ptr< CSeries > aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse();
-        aSample->setDetectorData( aPhotopicResponse );
+		if ( !m_MaterialProperties->GlassSpectralAndAngle ) {
+			aSample->setDetectorData( aPhotopicResponse );
+		} else {
+			for ( auto i = 0; i < numOfIn; ++i ) {
+				m_Measurements[ i ]->getData( )->setDetectorData( aPhotopicResponse );
+			}
+		}
       }
 
       double thickness = m_MaterialProperties->Thickness;
-      m_Material = make_shared< CMaterialSample >( aSample, thickness, aType, lowLambda, highLambda );
+	  if ( !m_MaterialProperties->GlassSpectralAndAngle ) {
+		  m_Material = make_shared< CMaterialSample >( aSample, thickness, aType, lowLambda, highLambda );
+	  } else {
+		  shared_ptr< CAngularMeasurements > angularMeasurement = make_shared< CAngularMeasurements >( m_Measurements );
+		  m_Material = make_shared< CMaterialMeasured >( angularMeasurement, lowLambda, highLambda );
+	  }
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -371,6 +401,7 @@ namespace EnergyPlus {
       shared_ptr< ICellDescription > aCellDescription = getCellDescription( );
       assert( aCellDescription != nullptr );
       shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Small );
+//	  shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
 
       CBSDFLayerMaker aMaker = CBSDFLayerMaker( aMaterial, aBSDF, aCellDescription );
       m_BSDFLayer = aMaker.getLayer();

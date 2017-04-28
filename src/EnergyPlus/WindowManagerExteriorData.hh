@@ -124,10 +124,11 @@ namespace EnergyPlus {
 	  ///////////////////////////////////////////////////////////////////////////////
 	  class CWCESpecturmProperties {
 	  public:
-	  	static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
-      static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
+		static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int i, const int t_TransTablePtr, const int t_FRefleTablePtr, const int t_BRefleTablePtr );
+		static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
+        static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
         const EnergyPlus::DataHeatBalance::MaterialProperties& t_MaterialProperties );
-	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
+		static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
 	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
 	  };
 

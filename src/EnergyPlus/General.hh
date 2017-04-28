@@ -451,6 +451,8 @@ namespace General {
 		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag );
 	}
 
+	std::vector <std::string> splitString( const std::string &string, char delimiter );
+
 } // General
 
 } // EnergyPlus
