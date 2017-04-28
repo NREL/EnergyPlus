@@ -71,7 +71,7 @@
 #include "BSDFLayer.hpp"
 #include "Series.hpp"
 #include "EquivalentBSDFLayer.hpp"
-#include "MultiBSDFLayer.hpp"
+#include "MultiPaneBSDF.hpp"
 #include "FenestrationCommon.hpp"
 #include "MeasuredSampleData.hpp"
 #include "BSDFDirections.hpp"
@@ -305,7 +305,7 @@ namespace EnergyPlus {
       iguLayers->push_back( t_Layer );
     }
 
-    shared_ptr< CMultiBSDFLayer > CWindowConstructionsBSDF::getEquivalentLayer(
+    shared_ptr< CMultiPaneBSDF > CWindowConstructionsBSDF::getEquivalentLayer(
       const WavelengthRange t_Range, const int t_ConstrNum ) {
       auto it = m_Equivalent.find( make_pair( t_Range, t_ConstrNum ) );
       if( it == m_Equivalent.end() ) {
@@ -318,8 +318,8 @@ namespace EnergyPlus {
         for( auto i = 1; i < iguLayers.size(); ++i ) {
           aEqLayer->addLayer( iguLayers[ i ] );
         }
-        shared_ptr< CMultiBSDFLayer > aMultiLayer =
-          make_shared< CMultiBSDFLayer >( aEqLayer, aSolarSpectrum );
+        shared_ptr< CMultiPaneBSDF > aMultiLayer =
+          make_shared< CMultiPaneBSDF >( aEqLayer, aSolarSpectrum );
         m_Equivalent[ make_pair( t_Range, t_ConstrNum ) ] = aMultiLayer;
       }
     

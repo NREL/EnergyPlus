@@ -161,7 +161,7 @@ namespace EnergyPlus {
               // This is necessary because rest of EnergyPlus code relies on TransDiff property 
               // of construction. It will basically trigger Window optical calculations if this
               // property is >0.
-              construction.TransDiff = material.Trans;
+              construction.TransDiff = 0.1;
 
               auto aRange = WavelengthRange::Solar;
               shared_ptr< CBSDFLayer > aSolarLayer = getBSDFLayer( aMaterial, aRange );
@@ -396,12 +396,11 @@ namespace EnergyPlus {
 
     void CWCEBSDFLayerFactory::init() {
       createMaterialFactory();
-      shared_ptr< CMaterial > aMaterial = m_MaterialFactory->getMaterial();;
+      shared_ptr< CMaterial > aMaterial = m_MaterialFactory->getMaterial();
       assert( aMaterial != nullptr );
       shared_ptr< ICellDescription > aCellDescription = getCellDescription( );
       assert( aCellDescription != nullptr );
-      shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Small );
-//	  shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
+      shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
 
       CBSDFLayerMaker aMaker = CBSDFLayerMaker( aMaterial, aBSDF, aCellDescription );
       m_BSDFLayer = aMaker.getLayer();
