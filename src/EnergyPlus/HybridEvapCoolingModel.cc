@@ -7,7 +7,7 @@
 #include <list>
 #include <math.h>
 #include <windows.h>
-
+#include <ScheduleManager.hh>
 
 namespace EnergyPlus {//***************
 
@@ -25,9 +25,53 @@ namespace EnergyPlus {//***************
 
 		#include <fstream>
 		fstream logfile;
-		Model::Model()
+		//ZoneHybridUnitaryACSystem
+		Model::Model() :
+				Tsa_schedule_pointer(0),
+				ZoneNodeNum(0),
+				MsaCapacityRatedCond(0),
+				SchedPtr(0),
+				UnitTotalCoolingRate(0.0),
+				UnitTotalCoolingEnergy(0.0),
+				UnitSensibleCoolingRate(0.0),
+				UnitSensibleCoolingEnergy(0.0),
+				RequestedLoadToCoolingSetpoint(0.0),
+				Mode(0),
+				ErrorCode(0),
+				InletNode(0),
+				OutletNode(0),
+				SecondaryInletNode(0),
+				SecondaryOutletNode(0),
+				InletMassFlowRate(0.0),
+				InletTemp(0.0),
+				InletWetBulbTemp(0.0),
+				InletHumRat(0.0),
+				InletEnthalpy(0.0),
+				InletPressure(0.0),
+				InletRH(0.0),
+				OutletMassFlowRate(0.0),
+				OutletTemp(0.0),
+				OutletWetBulbTemp(0.0),
+				OutletHumRat(0.0),
+				OutletEnthalpy(0.0),
+				OutletPressure(0.0),
+				OutletRH(0.0),
+				SecInletMassFlowRate(0.0),
+				SecInletTemp(0.0),
+				SecInletWetBulbTemp(0.0),
+				SecInletHumRat(0.0),
+				SecInletEnthalpy(0.0),
+				SecInletPressure(0.0),
+				SecInletRH(0.0),
+				SecOutletMassFlowRate(0.0),
+				SecOutletTemp(0.0),
+				SecOutletWetBulbTemp(0.0),
+				SecOutletHumRat(0.0),
+				SecOutletEnthalpy(0.0),
+				SecOutletPressure(0.0),
+				SecOutletRH(0.0)
 		{
-			InitializeModelParams();
+			//InitializeModelParams();
 			Minimum_Supply_Air_Temp = 8; //must set this propoerly 
 			cp = 1; //kJ/degreesC.kg ePlus should cary this as an avialble variable
 			Lambna = 2260; //(kJ/kg) latent heat of vaporization ePlus should carry this an available variable
@@ -35,7 +79,10 @@ namespace EnergyPlus {//***************
 			count_SAHR_OC_MetOnce = 0;
 			count_SAT_OC_MetOnce = 0;
 			count_DidWeMeetLoad = 0;
+
 		}
+		//*************************************************
+
 		void Model::InitializeModelParams()
 		{
 			optimal_EnvCondMet = false;
@@ -73,7 +120,7 @@ namespace EnergyPlus {//***************
 			RequestedLoad_t_n6 = 0;
 			RequestedLoad_t_n7 = 0;
 			RequestedLoad_t_n8 = 0;
-		
+
 		}
 
 		Model::~Model()                 // destructor, just an example
@@ -112,29 +159,32 @@ namespace EnergyPlus {//***************
 
 			return -Q;
 		}
-		void Model::Initialize(std::string fmuLocation)
+		void Model::Initialize(std::string fmuLocation)//, ConfigFile* pConfig)
 		{
+			if (Initialized) return;
 			std::string dir;
 			std::string file;
 			std::string strfmuLocation(fmuLocation);
-			//	Config.TrimFilename(strfmuLocation,dir);
+			
+			//	Config->TrimFilename(strfmuLocation,dir);
 			//	cout<<"debug 1"<<strfmuLocation;
-			Config.ParseConfigFile(strfmuLocation);
-
+			Config = new ConfigFile;
+			Config->ParseConfigFile(strfmuLocation);
+			Initialized = true;
 			//Iterate through modes of operation
 			ResolutionX = 0.02; //msa/msaRATED
 			ResolutionY = 0.02; //OSAF as absolute fraction (not %)
-		// get system values
+								// get system values
 
-			RatedH = Config.GetRatedH();
-			//	MinOA_Msa=Config.GetMinVR();
-			//	MsaRated=Config.GetRatedMsa();
+			RatedH = Config->GetRatedH();
+			//	MinOA_Msa=Config->GetMinVR();
+			//	MsaRated=Config->GetRatedMsa();
 			//	Generate point matrix using Tessellate function from operatiing conditions
-				//store in  XandYPoints
-				//int OC_N=Config.OperatingConditionN;
+			//store in  XandYPoints
+			//int OC_N=Config->OperatingConditionN;
 			vector<double>  Xvals;
 			vector<double>  Yvals;
-			while (Config.GetNextOpConst(Xvals, Yvals))//i=0,i<>OC_N,i++)
+			while (Config->GetNextOpConst(Xvals, Yvals))//i=0,i<>OC_N,i++)
 			{
 				try
 				{
@@ -149,6 +199,7 @@ namespace EnergyPlus {//***************
 					return;
 				}
 			}
+			Initialized = true;
 		}
 
 
@@ -168,7 +219,7 @@ namespace EnergyPlus {//***************
 			double Y_val = 0;
 			vector<double> curve2;
 			int CurveNumber = 3 * mode_number + curve_ID;
-			ConfigDataItem * curve = Config.GetBcoefficientCurve(CurveNumber);
+			ConfigDataItem * curve = Config->GetBcoefficientCurve(CurveNumber);
 			vector<double>  B = ((*curve).Items);
 			double B0 = B[0];
 			double t1 = B[0] * (X_0 * X_0);
@@ -582,7 +633,12 @@ namespace EnergyPlus {//***************
 		}
 		bool Model::MeetsSupplyAirTOC(double Tosa)
 		{
-			if (Tosa < 10) //implement
+			using ScheduleManager::GetCurrentScheduleValue;
+			double MinSAT = 10;
+			if (Tsa_schedule_pointer > 0) {
+				MinSAT = GetCurrentScheduleValue(Tsa_schedule_pointer);
+			}
+			if (Tosa < MinSAT) //implement
 				return false;
 			return true;
 		}
@@ -612,18 +668,18 @@ namespace EnergyPlus {//***************
 			}
 			return T;
 		}
-	
+
 		bool Model::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHosa, int ModeNumber)
 		{
 			bool OATempConstraintmet = false;
 			bool OARHConstraintmet = false;
-			double ToaConstrainLow = Config.GetECLow(DEF_Tdb, ModeNumber); // spencer make changes here
-			double ToaConstrainHi = Config.GetECHi(DEF_Tdb, ModeNumber);
+			double ToaConstrainLow = Config->GetECLow(DEF_Tdb, ModeNumber); // spencer make changes here
+			double ToaConstrainHi = Config->GetECHi(DEF_Tdb, ModeNumber);
 
-			double RHoaConstrainLow = Config.GetECLow(DEF_RH, ModeNumber);
-			double RHoaConstrainHi = Config.GetECHi(DEF_RH, ModeNumber);
+			double RHoaConstrainLow = Config->GetECLow(DEF_RH, ModeNumber);
+			double RHoaConstrainHi = Config->GetECHi(DEF_RH, ModeNumber);
 
-		//	double RHosa = Part_press(101.325, Wosa) / Sat_press(Tosa);
+			//	double RHosa = Part_press(101.325, Wosa) / Sat_press(Tosa);
 
 			if (Tosa >= ToaConstrainLow && Tosa <= ToaConstrainHi)
 			{
@@ -708,7 +764,7 @@ namespace EnergyPlus {//***************
 			double PreviousMaxiumOutput = 0;
 			double Wosa = CalcHum_ratio_W(Tosa, RHosa / 100, 101.325);
 			double Wra = CalcHum_ratio_W(Tra, RHra / 100, 101.325);
-			bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, MinVRMetOnce, SAT_OC_Met,SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
+			bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, MinVRMetOnce, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
 			EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
 			double SupplyAirDBTempAtRefCon = CalculateSupplyAirDBTempAtRefCon();
 			double MixedAirDBTempAtRefCon = CalculateMixedAirTemp();
@@ -808,7 +864,7 @@ namespace EnergyPlus {//***************
 					//Outside Air Temperature(°C)
 					if (MeetsOAEnvConstraints(Tosa, Wosa, RHosa, modenumber) == true)//fix this it should not end if it does not meet contraints.
 					{
-						EnvironmentConditionsMet = EnvironmentConditionsMetOnce= true;
+						EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
 					}
 					else
 					{
@@ -819,7 +875,7 @@ namespace EnergyPlus {//***************
 					{
 
 						for (point_number = 0;point_number != solution_map_sizeX;point_number++) // within each mode go though all the combinations of solution spaces.
-						{	
+						{
 							//Supply Air Mass Flow Rate(kg / s)
 							//Outside Air Fraction(0 - 1)
 							MsaRatio = solutionspace->PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
@@ -837,9 +893,9 @@ namespace EnergyPlus {//***************
 								solutionspace->PointMeta[point_number] = 1;
 								//'Set B_coefficients for DeltaH from lookup table for the specific mode
 								Tsa = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, TEMP_CURVE); //TEMP_CURVE W_CURVE POWER_CURVE
-								//Set B_coefficients for SHR from lookup table for the specific mode
-								//Return Air Temperature(°C)
-								if (MeetsSupplyAirTOC (Tsa)) SAT_OC_Met = SAT_OC_MetOnce = true;
+																														  //Set B_coefficients for SHR from lookup table for the specific mode
+																														  //Return Air Temperature(°C)
+								if (MeetsSupplyAirTOC(Tsa)) SAT_OC_Met = SAT_OC_MetOnce = true;
 								else
 								{
 									SAT_OC_Met = false;
@@ -851,7 +907,7 @@ namespace EnergyPlus {//***************
 								if (MeetsSupplyAirRHOC(Wsa)) SARH_OC_Met = SAHR_OC_MetOnce = true;
 								else
 								{
-									Wsa = 0;
+									//Wsa = 0;
 									SARH_OC_Met = false;
 								}
 
@@ -863,7 +919,7 @@ namespace EnergyPlus {//***************
 									Hma = 1.006 * Tma * (2501 + 1.86 * Tma);
 									Hsa = 1.006 * Tsa * (2501 + 1.86 * Tsa);
 									Y_DeltaH = (Hma - Hsa) * Msa;     //kW
-									//Calculate possible sensible load
+																	  //Calculate possible sensible load
 									H_SENS_ROOM = cp *Msa* (Tra - Tsa);
 									// even though we don't even know yet if this point can
 
@@ -875,9 +931,9 @@ namespace EnergyPlus {//***************
 										solutionspace->PointMeta[point_number] = 2;
 										double Y_val = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE);
 										ElectricalPower = Y_val / 1000;  //kW
-										//calculate the electrical power usage
-										//ElectricalPower = EIR * Y_DeltaH * H_Rated 'kw?
-										//Calculate EIR and SHR
+																		 //calculate the electrical power usage
+																		 //ElectricalPower = EIR * Y_DeltaH * H_Rated 'kw?
+																		 //Calculate EIR and SHR
 										EIR = ElectricalPower / Y_DeltaH;
 										SHR = cp * (Tma - Tsa) / (Hma - Hsa);
 										//NCD Additions------------------------------------
@@ -913,7 +969,7 @@ namespace EnergyPlus {//***************
 											PreviousMaxiumOutput = H_SENS_ROOM;
 											double Y_val = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE);
 											ElectricalPower = Y_val / 1000;  //kW
-											//Calculate EIR and SHR
+																			 //Calculate EIR and SHR
 											EIR = ElectricalPower / Y_DeltaH;
 											SHR = cp * (Tma - Tsa) / (Hma - Hsa);
 											//-------------------------------------------------
@@ -948,7 +1004,7 @@ namespace EnergyPlus {//***************
 				{
 					*bpErrorCode = 1;
 					count_EnvironmentConditionsMetOnce++;
-			
+
 					//error 
 				}
 				if (SAHR_OC_MetOnce == false)
@@ -966,7 +1022,7 @@ namespace EnergyPlus {//***************
 				if (DidWeMeetLoad == false)
 				{
 					//*bpErrorCode = 3;
-					count_DidWeMeetLoad++; 
+					count_DidWeMeetLoad++;
 					//what is this ??
 					if (RunningPeakCapacity_power > 100000)
 					{
@@ -991,7 +1047,7 @@ namespace EnergyPlus {//***************
 					ShowWarningError("Environmental conditions exceeded model limits, called in HybridEvapCooling:dostep");
 					//cout << "Environmental conditions exceeded model limits./n";
 				}
-				if (*bpErrorCode ==0)
+				if (*bpErrorCode == 0)
 				{
 					*returnQSensible = -optimal_H_sensible_room * 1000;//RequestedLoad/(2);//*communicationStepSize);
 					*returnQLatent = 0;
@@ -1012,20 +1068,20 @@ namespace EnergyPlus {//***************
 					*returnVentilationAir = 0;
 					*FMUmode = -2;
 					*ElectricalPowerUse = 0;
-				
+
 				}
 
 			}
 			else
 			{ //current heating mode, do nothing
-					*returnQSensible = 0;
-					*returnQLatent = 0;
-					*returnSupplyAirMassFlow = 0;
-					*returnSupplyAirTemp = Tra;
-					*returnSupplyAirRelHum = Wra;
-					*returnVentilationAir = 0;
-					*FMUmode = -1;
-					*ElectricalPowerUse = 0;
+				*returnQSensible = 0;
+				*returnQLatent = 0;
+				*returnSupplyAirMassFlow = 0;
+				*returnSupplyAirTemp = Tra;
+				*returnSupplyAirRelHum = Wra;
+				*returnVentilationAir = 0;
+				*FMUmode = -1;
+				*ElectricalPowerUse = 0;
 			}
 			InitializeModelParams();
 			//SetEnvironmentConditions
@@ -1041,5 +1097,7 @@ namespace EnergyPlus {//***************
 
 
 		}
+
 	}
 }
+

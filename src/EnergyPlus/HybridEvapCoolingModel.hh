@@ -10,6 +10,7 @@ using namespace std;
 
 using namespace std;
 
+
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 
@@ -24,19 +25,77 @@ namespace EnergyPlus {
 			vector<double> PointY;
 			vector<double> PointMeta;
 		};
-
+		
 
 		class Model                   // begin declaration of the class
 		{
 		public:                    // begin public section
-			Model();     // constructor
+			Model();
 			~Model();                  // destructor
-			int GetID();            // accessor function
-			void SetID(int vID) { ID = vID; };    // accessor function
-			void doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode);
-			void Initialize(string fmuLocation);
+	
+			// Default Constructor
+			std::string EvapCoolerHybridName; // Name of the EvapCoolerHybrid
+			std::string Name; // user identifier
+							  //std::unique_ptr <Model> pHybrid_Model;
+			//ZoneHybridUnitaryACSystem* Hybrid_Model;
+			bool Initialized;
+			int ZoneNodeNum;
+			std::string Path;//X:\\LBNL_WCEC\\FMUDev\\HybridEvapModel\\HybridEvapCooling
+			std::string Schedule; // HeatingCoil Operation Schedule
+			std::string Tsa_Lookup_Name;
+			std::string Mode1_Hsa_Lookup_Name;
+			std::string Mode1_Power_Lookup_Name;
+			Real64 MsaCapacityRatedCond;
+			int SchedPtr; // Pointer to the correct schedule
+			Real64 UnitTotalCoolingRate; // unit output to zone, total cooling rate [W]
+			Real64 UnitTotalCoolingEnergy; // unit output to zone, total cooling energy [J]
+			Real64 UnitSensibleCoolingRate;
+			Real64 UnitSensibleCoolingEnergy;
+			Real64 RequestedLoadToCoolingSetpoint;
+			int Tsa_schedule_pointer;
+			int Mode;
+			int ErrorCode;
+			int InletNode;
+			int OutletNode;
+			int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
+			int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
+			Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+			Real64 InletTemp;
+			Real64 InletWetBulbTemp;
+			Real64 InletHumRat;
+			Real64 InletEnthalpy;
+			Real64 InletPressure;
+			Real64 InletRH;
+			Real64 OutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+			Real64 OutletTemp;
+			Real64 OutletWetBulbTemp;
+			Real64 OutletHumRat;
+			Real64 OutletEnthalpy;
+			Real64 OutletPressure;
+			Real64 OutletRH;
+			Real64 SecInletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+			Real64 SecInletTemp;
+			Real64 SecInletWetBulbTemp;
+			Real64 SecInletHumRat;
+			Real64 SecInletEnthalpy;
+			Real64 SecInletPressure;
+			Real64 SecInletRH;
+			Real64 SecOutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+			Real64 SecOutletTemp;
+			Real64 SecOutletWetBulbTemp;
+			Real64 SecOutletHumRat;
+			Real64 SecOutletEnthalpy;
+			Real64 SecOutletPressure;
+			Real64 SecOutletRH;
+			// Default Constructor
+		//	ZoneHybridUnitaryACSystem();
+
+			int Model::GetID();            // accessor function
+			void Model::SetID(int vID) { ID = vID; };    // accessor function
+			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode);
+			void Model::Initialize(string fmuLocation);//, ConfigFile* pConfig);
 			void Model::InitializeModelParams();
-			void ModelLog(std::string fmuLocation);
+			void Model::ModelLog(std::string fmuLocation);
 			CModeSolutionSpace* Model::Tessellate(vector<double> & Xvals, vector<double> & Yvals);
 			double Model::CalcHum_ratio_W(double Tdb, double RH, double P);
 			bool Model::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHosa, int ModeNumber);
@@ -48,7 +107,11 @@ namespace EnergyPlus {
 			double Model::CalculateMixedAirTemp();
 			double Model::CheckVal_T(double T);
 			double Model::CheckVal_W(double W);
-			ConfigFile Config;
+			ConfigFile* Config;
+
+			double Tsa;
+			Real64 Wsa;
+			
 			// void Meow();
 		private:                   // begin private section
 			int ID;              // member variable
@@ -88,8 +151,8 @@ namespace EnergyPlus {
 			double optimal_Wsa;
 			double optimal_Tsa;
 			double optimal_Point; //this is used to identify the point that
-			double Tsa;
-			double Wsa;
+	//		double Tsa;
+	//		double Wsa;
 			bool DidWeMeetLoad;
 			double RunningPeakCapacity_power;
 			double RunningPeakCapacity_Msa;
@@ -116,5 +179,7 @@ namespace EnergyPlus {
 			double RequestedLoad_t_n8;
 			int NumberOfModes;
 		};
+
+	
 	}
 }
