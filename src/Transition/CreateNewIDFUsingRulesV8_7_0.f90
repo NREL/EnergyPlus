@@ -440,15 +440,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CurArgs = CurArgs + 2
 
 
-             CASE('OUTPUT:SURFACES:LIST')
-                 ObjectName='Output:Surfaces:List'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs=InArgs 
-                 IF (SameString(InArgs(1), 'DecayCurvesfromZoneComponentLoads')) THEN
-                   OutArgs(1) = 'DecayCurvesFromComponentLoadsSummary'
-                 ENDIF
-
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
