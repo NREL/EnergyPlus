@@ -63,18 +63,9 @@
 #include <WindowComplexManager.hh>
 #include <DataBSDFWindow.hh>
 
+#include <WCEMultiLayerOptics.hpp>
+
 #include "WindowManagerExteriorData.hh"
-#include "OpticalLayer.hpp"
-#include "FenestrationCommon.hpp"
-#include "CommonWavelengths.hpp"
-#include "BSDFLayer.hpp"
-#include "Series.hpp"
-#include "EquivalentBSDFLayer.hpp"
-#include "MultiPaneBSDF.hpp"
-#include "FenestrationCommon.hpp"
-#include "MeasuredSampleData.hpp"
-#include "BSDFDirections.hpp"
-#include "MaterialDescription.hpp"
 
 namespace EnergyPlus {
 

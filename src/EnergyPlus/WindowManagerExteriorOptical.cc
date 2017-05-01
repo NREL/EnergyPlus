@@ -71,29 +71,10 @@
 #include <General.hh>
 
 // Windows library headers
+#include <WCEMultiLayerOptics.hpp>
+
 #include "WindowManagerExteriorOptical.hh"
 #include "WindowManagerExteriorData.hh"
-#include "SpectralSample.hpp"
-#include "SurfaceCoating.hpp"
-#include "MeasuredSampleData.hpp"
-#include "FenestrationCommon.hpp"
-#include "Series.hpp"
-#include "MaterialDescription.hpp"
-#include "AngularSpectralSample.hpp"
-#include "Hemispherical2DIntegrator.hpp"
-#include "IntegratorStrategy.hpp"
-#include "WavelengthRange.hpp"
-#include "CellDescription.hpp"
-#include "SpecularCellDescription.hpp"
-#include "VenetianCellDescription.hpp"
-#include "WovenCellDescription.hpp"
-#include "PerfectDiffuseCellDescription.hpp"
-#include "BSDFDirections.hpp"
-#include "BSDFLayerMaker.hpp"
-#include "BSDFLayer.hpp"
-#include "BSDFIntegrator.hpp"
-#include "OpticalLayer.hpp"
-#include "OpticalSurface.hpp"
 
 namespace EnergyPlus {
 

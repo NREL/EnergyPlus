@@ -64,20 +64,9 @@
 #include <WindowManager.hh>
 
 // Windows library headers
+#include <WCETarcog.hpp>
+
 #include "WindowManagerExteriorThermal.hh"
-#include "IGU.hpp"
-#include "IGUSolidLayer.hpp"
-#include "IGUGapLayer.hpp"
-#include "OutdoorEnvironment.hpp"
-#include "IndoorEnvironment.hpp"
-#include "LayerInterfaces.hpp"
-#include "Surface.hpp"
-#include "SingleSystem.hpp"
-#include "GasProperties.hpp"
-#include "GasData.hpp"
-#include "GasItem.hpp"
-#include "FenestrationCommon.hpp"
-#include "Series.hpp"
 
 namespace EnergyPlus {
 

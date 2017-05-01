@@ -106,12 +106,9 @@
 #include <WindowModel.hh>
 #include <WindowManager.hh>
 #include <WindowManagerExteriorData.hh>
-#include <EquivalentBSDFLayer.hpp>
-#include <MultiPaneBSDF.hpp>
-#include <FenestrationCommon.hpp>
 #include <WindowComplexManager.hh>
-#include <BSDFDirections.hpp>
-#include <WavelengthRange.hpp>
+
+#include <WCEMultiLayerOptics.hpp>
 
 namespace EnergyPlus {
 
