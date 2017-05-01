@@ -102,10 +102,10 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    typedef std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > > IGU_Layers;
+    using IGU_Layers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
     // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers 
     // in between. So we will just use map to store layers so that we get optimized search.
-    typedef std::map< int, std::shared_ptr< IGU_Layers > > Layers_Map;
+    using Layers_Map = std::map< int, std::shared_ptr< IGU_Layers > >;
 
     // Test if surface is hit by beam defined with vector
     bool isSurfaceHit( const int t_SurfNum, const EnergyPlus::DataVectorTypes::Vector& t_Ray );
@@ -124,7 +124,8 @@ namespace EnergyPlus {
 	  ///////////////////////////////////////////////////////////////////////////////
 	  class CWCESpecturmProperties {
 	  public:
-	  	static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
+	  	static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
+        const int t_SampleDataPtr );
       static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
         const EnergyPlus::DataHeatBalance::MaterialProperties& t_MaterialProperties );
 	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();

@@ -92,7 +92,9 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    shared_ptr< CBSDFLayer > getBSDFLayer( const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) {
+    shared_ptr< CBSDFLayer > getBSDFLayer( 
+      const shared_ptr< MaterialProperties >& t_Material, 
+      const WavelengthRange t_Range ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -104,13 +106,13 @@ namespace EnergyPlus {
 
       shared_ptr< CWCEBSDFLayerFactory > aFactory = nullptr;
       if( t_Material->Group == WindowGlass ) {
-        aFactory = make_shared< CWCESpecularLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCESpecularBSDFLayerFactory >( t_Material, t_Range );
       } else if( t_Material->Group == WindowBlind ) {
-        aFactory = make_shared< CWCEVenetianBlindLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCEVenetianBlindBSDFLayerFactory >( t_Material, t_Range );
       } else if( t_Material->Group == Screen ) {
-        aFactory = make_shared< CWCEScreenLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCEScreenBSDFLayerFactory >( t_Material, t_Range );
       } else if( t_Material->Group == Shade ) {
-        aFactory = make_shared< CWCEDiffuseShadeLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCEDiffuseShadeBSDFLayerFactory >( t_Material, t_Range );
       }
       return aFactory->getBSDFLayer();
     }
@@ -159,7 +161,8 @@ namespace EnergyPlus {
     //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
     CWCEMaterialFactory::CWCEMaterialFactory( const shared_ptr< MaterialProperties >& t_Material,
-      const WavelengthRange t_Range ) : m_MaterialProperties( t_Material ), m_Range( t_Range ), m_Initialized( false ) {
+      const WavelengthRange t_Range ) : 
+      m_MaterialProperties( t_Material ), m_Range( t_Range ), m_Initialized( false ) {
 
     }
 
@@ -174,7 +177,8 @@ namespace EnergyPlus {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecularMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+    CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory( 
+      const shared_ptr< MaterialProperties >& t_Material,
       const WavelengthRange t_Range ) : CWCEMaterialFactory( t_Material, t_Range ) {
       
     }
@@ -207,7 +211,8 @@ namespace EnergyPlus {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialDualBandFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEMaterialDualBandFactory::CWCEMaterialDualBandFactory( const shared_ptr< MaterialProperties >& t_Material,
+    CWCEMaterialDualBandFactory::CWCEMaterialDualBandFactory( 
+      const shared_ptr< MaterialProperties >& t_Material,
       const WavelengthRange t_Range ) : CWCEMaterialFactory( t_Material, t_Range ) {
       
     }
@@ -227,7 +232,8 @@ namespace EnergyPlus {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+    CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory( 
+      const shared_ptr< MaterialProperties >& t_Material,
       const WavelengthRange t_Range ) : CWCEMaterialDualBandFactory( t_Material, t_Range ) {
       
     }
@@ -337,6 +343,82 @@ namespace EnergyPlus {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
+    //   CWCECellFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    IWCECellDescriptionFactory::IWCECellDescriptionFactory( const shared_ptr< MaterialProperties >& t_Material ) :
+      m_Material( t_Material ) {
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCESpecularCellFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCESpecularCellFactory::CWCESpecularCellFactory(
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material ) :
+      IWCECellDescriptionFactory( t_Material ) {
+
+    }
+
+    shared_ptr< ICellDescription > CWCESpecularCellFactory::getCellDescription() {
+      return make_shared< CSpecularCellDescription >();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEVenetianBlindCellFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEVenetianBlindCellFactory::CWCEVenetianBlindCellFactory(
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material ) :
+      IWCECellDescriptionFactory( t_Material ) {
+
+    }
+
+    shared_ptr< ICellDescription > CWCEVenetianBlindCellFactory::getCellDescription() {
+      assert( m_Material != nullptr );
+      int blindDataPtr = m_Material->BlindDataPtr;
+      auto& blind( Blind( blindDataPtr ) );
+      assert( blindDataPtr > 0 );
+
+      double slatWidth = blind.SlatWidth;
+      double slatSpacing = blind.SlatSeparation;
+      double slatTiltAngle = blind.SlatAngle;
+      double curvatureRadius = 0; // No curvature radius in current IDF definition
+      size_t numOfSlatSegments = 5; // Number of segments to use in venetian calculations
+      return make_shared< CVenetianCellDescription >( slatWidth, slatSpacing, slatTiltAngle,
+        curvatureRadius, numOfSlatSegments );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEScreenCellFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEScreenCellFactory::CWCEScreenCellFactory(
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material ) :
+      IWCECellDescriptionFactory( t_Material ) {
+
+    }
+
+    shared_ptr< ICellDescription > CWCEScreenCellFactory::getCellDescription() {
+      assert( m_Material != nullptr );
+      double diameter = m_Material->Thickness; // Thickness in this case is diameter
+                                               // ratio is not saved withing material but rather calculated from transmittance
+      double ratio = 1.0 - std::sqrt( m_Material->Trans );
+      double spacing = diameter / ratio;
+      return make_shared< CWovenCellDescription >( diameter, spacing );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEDiffuseShadeCellFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEDiffuseShadeCellFactory::CWCEDiffuseShadeCellFactory(
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material ) :
+      IWCECellDescriptionFactory( t_Material ) {
+
+    }
+
+    shared_ptr< ICellDescription > CWCEDiffuseShadeCellFactory::getCellDescription() {
+      return make_shared< CPerfectDiffuseCellDescription >();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
     //   CWCEBSDFLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
     CWCEBSDFLayerFactory::CWCEBSDFLayerFactory(
@@ -365,85 +447,60 @@ namespace EnergyPlus {
       return m_BSDFLayer;
     }
 
+    shared_ptr< ICellDescription > CWCEBSDFLayerFactory::getCellDescription() {
+      return m_CellFactory->getCellDescription();
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecularLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularLayerFactory::CWCESpecularLayerFactory( const shared_ptr< MaterialProperties >& t_Material,
+    CWCESpecularBSDFLayerFactory::CWCESpecularBSDFLayerFactory( 
+      const shared_ptr< MaterialProperties >& t_Material,
       const WavelengthRange t_Range ) : CWCEBSDFLayerFactory( t_Material, t_Range ) {
-
+      m_CellFactory = make_shared< CWCESpecularCellFactory >( t_Material );
     }
 
-    void CWCESpecularLayerFactory::createMaterialFactory() {
+    void CWCESpecularBSDFLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCESpecularMaterialsFactory >( m_Material, m_Range );
-    }
-
-    shared_ptr< ICellDescription > CWCESpecularLayerFactory::getCellDescription() {
-      return make_shared< CSpecularCellDescription >();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindLayerFactory::CWCEVenetianBlindLayerFactory( 
+    CWCEVenetianBlindBSDFLayerFactory::CWCEVenetianBlindBSDFLayerFactory( 
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
       CWCEBSDFLayerFactory( t_Material, t_Range ) {
-
+      m_CellFactory = make_shared< CWCEVenetianBlindCellFactory >( t_Material );
     }
 
-    void CWCEVenetianBlindLayerFactory::createMaterialFactory() {
+    void CWCEVenetianBlindBSDFLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCEVenetianBlindMaterialsFactory >( m_Material, m_Range );
-    }
-
-    shared_ptr< ICellDescription > CWCEVenetianBlindLayerFactory::getCellDescription() {
-      int blindDataPtr = m_Material->BlindDataPtr;
-      auto& blind( Blind( blindDataPtr ) );
-      assert( blindDataPtr > 0 );
-
-      double slatWidth = blind.SlatWidth;
-      double slatSpacing = blind.SlatSeparation;
-      double slatTiltAngle = blind.SlatAngle;
-      double curvatureRadius = 0; // No curvature radius in current IDF definition
-      size_t numOfSlatSegments = 5; // Number of segments to use in venetian calculations
-      return make_shared< CVenetianCellDescription >( slatWidth, slatSpacing, slatTiltAngle,
-          curvatureRadius, numOfSlatSegments );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenLayerFactory::CWCEScreenLayerFactory( 
+    CWCEScreenBSDFLayerFactory::CWCEScreenBSDFLayerFactory( 
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
       CWCEBSDFLayerFactory( t_Material, t_Range ) {
-      
+      m_CellFactory = make_shared< CWCEScreenCellFactory >( t_Material );
     }
 
-    void CWCEScreenLayerFactory::createMaterialFactory() {
+    void CWCEScreenBSDFLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCEScreenMaterialsFactory >( m_Material, m_Range );
-    }
-
-    shared_ptr< ICellDescription > CWCEScreenLayerFactory::getCellDescription() {
-      double diameter = m_Material->Thickness; // Thickness in this case is diameter
-      // ratio is not saved withing material but rather calculated from transmittance
-      double ratio = 1.0 - std::sqrt( m_Material->Trans );
-      double spacing = diameter / ratio;
-      return make_shared< CWovenCellDescription >( diameter, spacing );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeLayerFactory::CWCEDiffuseShadeLayerFactory(
+    CWCEDiffuseShadeBSDFLayerFactory::CWCEDiffuseShadeBSDFLayerFactory(
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) :
       CWCEBSDFLayerFactory( t_Material, t_Range ) {
-
+      m_CellFactory = make_shared< CWCEDiffuseShadeCellFactory >( t_Material );
     }
 
-    void CWCEDiffuseShadeLayerFactory::createMaterialFactory() {
+    void CWCEDiffuseShadeBSDFLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCEDiffuseShadeMaterialsFactory >( m_Material, m_Range );
-    }
-
-    shared_ptr< ICellDescription > CWCEDiffuseShadeLayerFactory::getCellDescription() {
-      return make_shared< CPerfectDiffuseCellDescription >();
     }
 
   }
