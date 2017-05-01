@@ -67,115 +67,16 @@
 #include <DataGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <HybridEvapCoolingModel.hh>
+#include <HybridModelConfigFile.hh>
 namespace EnergyPlus {
 
 	namespace HybridUnitaryAirConditioners {
 
 		// Using/Aliasing
 
+		//using HybridEvapCoolingModel::ZoneHybridUnitaryACSystem;
 		using HybridEvapCoolingModel::Model;
-		struct ZoneEvapCoolerHybridStruct
-		{
-			std::string EvapCoolerHybridName; // Name of the EvapCoolerHybrid
-			std::string Name; // user identifier
-			//std::unique_ptr <Model> pHybrid_Model;
-			Model* Hybrid_Model;
-			int ZoneNodeNum;
-			std::string Path;//X:\\LBNL_WCEC\\FMUDev\\HybridEvapModel\\HybridEvapCooling
-			std::string Schedule; // HeatingCoil Operation Schedule
-			std::string Tsa_Lookup_Name;   
-			std::string Mode1_Hsa_Lookup_Name;
-			std::string Mode1_Power_Lookup_Name;
-			Real64 MsaCapacityRatedCond;
-			int SchedPtr; // Pointer to the correct schedule
-			Real64 UnitTotalCoolingRate; // unit output to zone, total cooling rate [W]
-			Real64 UnitTotalCoolingEnergy; // unit output to zone, total cooling energy [J]
-			Real64 UnitSensibleCoolingRate;
-			Real64 UnitSensibleCoolingEnergy;
-			Real64 RequestedLoadToCoolingSetpoint;
-			int Tsa_schedule_pointer;
-			int Mode;
-			int ErrorCode;
-			int InletNode;
-			int OutletNode;
-			int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
-			int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
-			Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 InletTemp;
-			Real64 InletWetBulbTemp;
-			Real64 InletHumRat;
-			Real64 InletEnthalpy;
-			Real64 InletPressure;
-			Real64 InletRH;
-			Real64 OutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 OutletTemp;
-			Real64 OutletWetBulbTemp;
-			Real64 OutletHumRat;
-			Real64 OutletEnthalpy;
-			Real64 OutletPressure;
-			Real64 OutletRH;
-			Real64 SecInletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 SecInletTemp;
-			Real64 SecInletWetBulbTemp;
-			Real64 SecInletHumRat;
-			Real64 SecInletEnthalpy;
-			Real64 SecInletPressure;
-			Real64 SecInletRH;
-			Real64 SecOutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 SecOutletTemp;
-			Real64 SecOutletWetBulbTemp;
-			Real64 SecOutletHumRat;
-			Real64 SecOutletEnthalpy;
-			Real64 SecOutletPressure;
-			Real64 SecOutletRH;
-										   // Default Constructor
-			ZoneEvapCoolerHybridStruct() :
-				Tsa_schedule_pointer(0),
-				ZoneNodeNum(0),
-				MsaCapacityRatedCond(0),
-				SchedPtr(0),
-				UnitTotalCoolingRate(0.0),
-				UnitTotalCoolingEnergy(0.0),
-				UnitSensibleCoolingRate(0.0),
-				UnitSensibleCoolingEnergy(0.0),
-				RequestedLoadToCoolingSetpoint(0.0),
-				Mode(0),
-				ErrorCode(0),
-				InletNode(0),
-				OutletNode(0),
-				SecondaryInletNode(0),
-				SecondaryOutletNode(0),
-				InletMassFlowRate(0.0),
-				InletTemp(0.0),
-				InletWetBulbTemp(0.0),
-				InletHumRat(0.0),
-				InletEnthalpy(0.0),
-				InletPressure(0.0),
-				InletRH(0.0),
-				OutletMassFlowRate(0.0),
-				OutletTemp(0.0),
-				OutletWetBulbTemp(0.0),
-				OutletHumRat(0.0),
-				OutletEnthalpy(0.0),
-				OutletPressure(0.0),
-				OutletRH(0.0),
-				SecInletMassFlowRate(0.0),
-				SecInletTemp(0.0),
-				SecInletWetBulbTemp(0.0),
-				SecInletHumRat(0.0),
-				SecInletEnthalpy(0.0),
-				SecInletPressure(0.0),
-				SecInletRH(0.0),
-				SecOutletMassFlowRate(0.0),
-				SecOutletTemp(0.0),
-				SecOutletWetBulbTemp(0.0),
-				SecOutletHumRat(0.0),
-				SecOutletEnthalpy(0.0),
-				SecOutletPressure(0.0),
-				SecOutletRH(0.0)
-			{}
-
-		};
+		
 		// Data
 		// MODULE PARAMETER DEFINITIONS
 

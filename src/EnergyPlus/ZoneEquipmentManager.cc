@@ -83,7 +83,7 @@
 #include <ElectricBaseboardRadiator.hh>
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
-#include <HybridEvaporativeCooler.hh>
+#include <HybridUnitaryAirConditioners.hh>
 #include <FanCoilUnits.hh>
 #include <Fans.hh>
 #include <General.hh>
@@ -3035,7 +3035,7 @@ namespace ZoneEquipmentManager {
 		using SystemAvailabilityManager::GetZoneEqAvailabilityManager;
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
-		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
+		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners; 
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;

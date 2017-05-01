@@ -1,3 +1,5 @@
+#ifndef ConfigFile_hh_INCLUDED
+#define ConfigFile_hh_INCLUDED
 #include <iostream>  
 #include <string>
 #include <list>
@@ -54,3 +56,5 @@ namespace EnergyPlus {
 		};
 	}
 }
+
+#endif // ObjexxFCL_Array1D_hh_INCLUDED
