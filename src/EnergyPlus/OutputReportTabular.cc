@@ -11576,7 +11576,7 @@ namespace OutputReportTabular {
 		//   its own call to WriteTable.
 		// The overall methodology is explained below:
 		//
-        // Determine decay curve - Pulse of radiant heat which is about 5% of lighting and
+		// Determine decay curve - Pulse of radiant heat which is about 5% of lighting and
 		//   equipment input [radiantPulseUsed(iZone)] for a single timestep a few hours after
 		//   cooling or heat is scheduled on for each zone [radiantPulseTimestep(iZone)].
 		//   The radiant heat received on each wall is stored [radiantPulseReceived(jSurface)].
@@ -11585,7 +11585,7 @@ namespace OutputReportTabular {
 		//   The difference divided by the pulse received by each surface
 		//   [radiantPulseReceived(jSurface)] is stored in [decayCurve(jSurface,kTime,mode)].
 		//
-        // Determine delayed loads - From the last timestep of the peak load on the zone
+		// Determine delayed loads - From the last timestep of the peak load on the zone
 		//   working backwards any radiant heat that was absorbed by the wall from an internal gain
 		//   or solar gain is multiplied by the appropriate timesteps in the decay curve
 		//   [decayCurve(jSurface,kTime,mode)] for timesteps that make up
@@ -11593,13 +11593,13 @@ namespace OutputReportTabular {
 		//   [NumTimeStepsInAvg]. The sum for all surfaces in the zone are added together to
 		//   determine the delayed load.
 		//
-        // Determine instant loads - Average the convective portion of the internal gains
+		// Determine instant loads - Average the convective portion of the internal gains
 		//   for the timesteps made up of the peak load period. Average those across the peak
 		//   load period.
-        //
-        // The comments from ComputeDelayedComponents which was incorporated into this routine follow:
-        //
- 		// PURPOSE OF THIS SUBROUTINE:
+		//
+		// The comments from ComputeDelayedComponents which was incorporated into this routine follow:
+		//
+		// PURPOSE OF THIS SUBROUTINE:
 		//   For load component report, convert the sequence of radiant gains
 		//   for people and equipment and other internal loads into convective
 		//   gains based on the decay curves.
