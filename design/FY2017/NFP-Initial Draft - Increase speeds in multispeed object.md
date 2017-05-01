@@ -6,8 +6,11 @@
 **Richard Raustad, Florida Solar Energy Center**
 
  - NFP Initial draft submitted April 24, 2017
- - NFP Final: na
+ - NFP Initial draft accepted April 27, 2017
+ - NFP Final: submitted May 1, 2017 (same as draft)
+ - Design Doc: submitted May 1, 2017
  
+## Draft NFP ##
 
 ## Justification for New Feature ##
 
@@ -18,7 +21,7 @@ The ability to model up to 8 stages of compression with independent modulation o
 
 ## E-mail and  Conference Call Conclusions ##
 
-E-mail notes: na
+E-mail notes: no comments received other than initial draft looks acceptable
 
 
 ## Overview ##
@@ -305,6 +308,14 @@ Transition required.
 
 NA
 
+## Final NFP ##
+Same as draft NFP
 
+## Design Doc ##
 
+    1) No new code anticipated for this feature
+    2) Extend number of speeds in IDD to 10. See suggested IDD in draft NFP.
+    3) Test that number of speeds < 10 works with modified IDD
+    4) Test input file without UnitarySystemPerformance:Multispeed object (should already work).
+    5) Test use of UnitarySystemPerformance:Multispeed object with 10-spd DX coil object
 
