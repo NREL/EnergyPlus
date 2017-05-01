@@ -995,22 +995,6 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	SimWaterCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
-	);
-
-	void
-	SimSteamCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
-	);
-
-	void
 	SimMultiSpeedCoils(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		int const AirLoopNum, // Index to air loop
