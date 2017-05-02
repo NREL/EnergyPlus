@@ -8,6 +8,7 @@
 #include <math.h>
 #include <windows.h>
 #include <ScheduleManager.hh>
+#include <General.hh>
 
 namespace EnergyPlus {//***************
 
@@ -69,7 +70,9 @@ namespace EnergyPlus {//***************
 				SecOutletHumRat(0.0),
 				SecOutletEnthalpy(0.0),
 				SecOutletPressure(0.0),
-				SecOutletRH(0.0)
+				SecOutletRH(0.0), 
+				Wsa(0.0),
+			Initialized(false)
 		{
 			//InitializeModelParams();
 			Minimum_Supply_Air_Temp = 8; //must set this propoerly 
@@ -79,7 +82,7 @@ namespace EnergyPlus {//***************
 			count_SAHR_OC_MetOnce = 0;
 			count_SAT_OC_MetOnce = 0;
 			count_DidWeMeetLoad = 0;
-
+			InitializeModelParams();
 		}
 		//*************************************************
 
@@ -98,7 +101,7 @@ namespace EnergyPlus {//***************
 			optimal_Wsa = 0;
 			optimal_Tsa = 0;
 			Tsa = 0;
-			Wsa = 0;
+			//Wsa = 0;
 			DidWeMeetLoad = 0;
 			RunningPeakCapacity_EnvCondMet = false;
 			RunningPeakCapacity_power = 10e+10;
@@ -647,7 +650,9 @@ namespace EnergyPlus {//***************
 		{
 			// implement
 			if (Wosa < 0)
-				return false;
+				//temp fix
+				Wosa = 0.003;
+				//return false;
 			return true;
 		}
 		double Model::CheckVal_W(double W)
@@ -753,6 +758,8 @@ namespace EnergyPlus {//***************
 
 		}
 		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode) {
+			
+			using General::RoundSigDigits; 
 			int modenumber = 0;
 			int point_number = 0;
 			double MsaRatio = 0;
@@ -766,8 +773,8 @@ namespace EnergyPlus {//***************
 			double Wra = CalcHum_ratio_W(Tra, RHra / 100, 101.325);
 			bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, MinVRMetOnce, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
 			EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
-			double SupplyAirDBTempAtRefCon = CalculateSupplyAirDBTempAtRefCon();
-			double MixedAirDBTempAtRefCon = CalculateMixedAirTemp();
+			double SupplyAirDBTempAtRefCon = 10;// CalculateSupplyAirDBTempAtRefCon();
+			double MixedAirDBTempAtRefCon = 25;// CalculateMixedAirTemp();
 			MinOA_Msa = DesignMinVR;
 
 			if (CapacityFlag == 1)
@@ -908,6 +915,8 @@ namespace EnergyPlus {//***************
 								else
 								{
 									//Wsa = 0;
+									ShowWarningError("MeetsSupplyAirRHOC failed given a Wsa of"+ RoundSigDigits(Wsa,5));
+									
 									SARH_OC_Met = false;
 								}
 
