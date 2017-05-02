@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array5D.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -570,6 +571,35 @@ namespace CurveManager {
 
 	int
 	GetCurveObjectTypeNum( int const CurveIndex ); // index of curve in curve array
+
+	int
+	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
+
+	void
+	ReadTableDataFromFile(
+		int const CurveNum,
+		std::string & CurrentModuleObject,
+		std::string & FileName,
+		bool IndVarSwitch,
+		int & lineNum,
+		bool & ErrorsFound
+	);
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	);
+
+	void
+	SetCommonIncidentAngles(
+		int const ConstrNum,
+		int const NGlass,
+		int const SpecDataNum,
+		int & TotalIPhi,
+		Array1A_int const Tables
+	);
 
 	//=================================================================================================!
 
