@@ -578,11 +578,9 @@ namespace CurveManager {
 	void
 	ReadTableDataFromFile(
 		int const CurveNum,
-		std::string & CurrentModuleObject,
 		std::string & FileName,
 		bool IndVarSwitch,
-		int & lineNum,
-		bool & ErrorsFound
+		int & lineNum
 	);
 
 	void
@@ -596,7 +594,6 @@ namespace CurveManager {
 	SetCommonIncidentAngles(
 		int const ConstrNum,
 		int const NGlass,
-		int const SpecDataNum,
 		int & TotalIPhi,
 		Array1A_int const Tables
 	);

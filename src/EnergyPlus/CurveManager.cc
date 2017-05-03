@@ -493,7 +493,6 @@ namespace CurveManager {
 		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
 		int CurveFound;
-		int lineNum;
 		bool IndVarSwitch;
 		Real64 temp;
 		int fieldNum;
@@ -2591,7 +2590,7 @@ namespace CurveManager {
 			if ( !lAlphaFieldBlanks( 7 ) ) {
 				ReadFromFile = true;
 				FileName = Alphas( 7 );
-				ReadTableDataFromFile( CurveNum, CurrentModuleObject, FileName, IndVarSwitch, MaxTableNums, ErrorsFound );
+				ReadTableDataFromFile( CurveNum, FileName, IndVarSwitch, MaxTableNums );
 			} else {
 				ReadFromFile = false;
 				FileName = "";
@@ -6465,11 +6464,9 @@ Label999: ;
 	void
 	ReadTableDataFromFile(
 		int const CurveNum,
-		std::string & CurrentModuleObject,
 		std::string & FileName,
 		bool IndVarSwitch,
-		int & lineNum,
-		bool & ErrorsFound
+		int & lineNum
 	)
 	{
 
@@ -6555,7 +6552,6 @@ Label999: ;
 		int k;
 		int l;
 		int m;
-		int n;
 		Real64 XX;
 		Real64 X1;
 		Real64 X2;
@@ -6572,7 +6568,7 @@ Label999: ;
 		Tables( 3 ) = PerfCurve( BRefleCurveIndex ).TableIndex;
 
 		// Set up independent variable size to cover all independent varaible values in 3 tables
-		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
 			if ( TableNum == 1 ) {
 				X1TableNum = TableLookup( Tables( TableNum ) ).NumX1Vars;
 				X2TableNum = TableLookup( Tables( TableNum ) ).NumX2Vars;
@@ -6594,7 +6590,7 @@ Label999: ;
 				for ( i = 1; i <= X1TableNum; i++ ) {
 					XX = TableLookup( Tables( TableNum ) ).X1Var( i );
 					found = false;
-					for ( j = 1; j <= XX1.size( ); j++ ) {
+					for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
 						if ( fabs( XX1( j ) - XX ) < tol ) {
 							found = true;
 						}
@@ -6606,7 +6602,7 @@ Label999: ;
 				for ( i = 1; i <= X2TableNum; i++ ) {
 					XX = TableLookup( Tables( TableNum ) ).X2Var( i );
 					found = false;
-					for ( j = 1; j <= XX2.size( ); j++ ) {
+					for ( j = 1; j <= int( XX2.size( ) ); j++ ) {
 						if ( fabs( XX2( j ) - XX ) < tol ) {
 							found = true;
 						}
@@ -6620,7 +6616,7 @@ Label999: ;
 
 		// ascend sort
 		for ( i = 1; i <= XX1.size(); i++ ) {
-			for ( j = 1; j <= XX1.size( ); j++ ) {
+			for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
 				if ( XX1( i ) < XX1( j ) ) {
 					XX = XX1( i );
 					XX1( i ) = XX1( j );
@@ -6629,8 +6625,8 @@ Label999: ;
 			}
 		}
 
-		for ( i = 1; i <= XX2.size( ); i++ ) {
-			for ( j = 1; j <= XX2.size( ); j++ ) {
+		for ( i = 1; i <= int( XX2.size( ) ); i++ ) {
+			for ( j = 1; j <= int( XX2.size( ) ); j++ ) {
 				if ( XX2( i ) < XX2( j ) ) {
 					XX = XX2( i );
 					XX2( i ) = XX2( j );
@@ -6639,21 +6635,21 @@ Label999: ;
 			}
 		}
 
-		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
-			if ( XX2.size( ) > TableLookup( Tables( TableNum ) ).NumX2Vars ) {
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
+			if ( int( XX2.size( ) ) > TableLookup( Tables( TableNum ) ).NumX2Vars ) {
 				l = 0;
-				for ( i = 1; i <= XX2.size( ); i++ ) {
+				for ( i = 1; i <= int( XX2.size( ) ); i++ ) {
 					if ( fabs( XX2( i ) - TableLookup( Tables( TableNum ) ).X2Var( i - l ) ) > tol ) {
-						for ( j = 2; j <= TableData( Tables( TableNum ) ).X2.size( ); j++ ) {
+						for ( j = 2; j <= int( TableData( Tables( TableNum ) ).X2.size( ) ); j++ ) {
 							if ( TableData( Tables( TableNum ) ).X2( j - 1 ) < XX2( i ) && TableData( Tables( TableNum ) ).X2( j ) > XX2( i ) ) {
 								TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( j ) );
 								TableData( Tables( TableNum ) ).X2.push_back( XX2( i ) );
 								YY = TableData( Tables( TableNum ) ).Y( j - 1 ) + ( XX2( i ) - TableData( Tables( TableNum ) ).X2( j - 1 ) ) / ( TableData( Tables( TableNum ) ).X2( j ) - TableData( Tables( TableNum ) ).X2( j - 1 ) ) * ( TableData( Tables( TableNum ) ).Y( j ) - TableData( Tables( TableNum ) ).Y( j - 1 ) );
 								TableData( Tables( TableNum ) ).Y.push_back( YY );
-								X1 = TableData( Tables( TableNum ) ).X1( TableData( Tables( TableNum ) ).X2.size( ) );
-								X2 = TableData( Tables( TableNum ) ).X2( TableData( Tables( TableNum ) ).X2.size( ) );
-								YY = TableData( Tables( TableNum ) ).Y( TableData( Tables( TableNum ) ).X2.size( ) );
-								for ( k = TableData( Tables( TableNum ) ).X2.size( ) - 1; k >= j; k-- ) {
+								X1 = TableData( Tables( TableNum ) ).X1( int( TableData( Tables( TableNum ) ).X2.size( ) ) );
+								X2 = TableData( Tables( TableNum ) ).X2( int( TableData( Tables( TableNum ) ).X2.size( ) ) );
+								YY = TableData( Tables( TableNum ) ).Y( int( TableData( Tables( TableNum ) ).X2.size( ) ) );
+								for ( k = int( TableData( Tables( TableNum ) ).X2.size( ) ) - 1; k >= j; k-- ) {
 									TableData( Tables( TableNum ) ).X1( k + 1 ) = TableData( Tables( TableNum ) ).X1( k );
 									TableData( Tables( TableNum ) ).X2( k + 1 ) = TableData( Tables( TableNum ) ).X2( k );
 									TableData( Tables( TableNum ) ).Y( k + 1 ) = TableData( Tables( TableNum ) ).Y( k );
@@ -6668,28 +6664,28 @@ Label999: ;
 				}
 			}
 
-			if ( XX1.size( ) > TableLookup( Tables( TableNum ) ).NumX1Vars ) {
+			if ( int( XX1.size( ) ) > TableLookup( Tables( TableNum ) ).NumX1Vars ) {
 				l = 0;
-				for ( i = 1; i <= XX1.size( ); i++ ) {
+				for ( i = 1; i <= int( XX1.size( ) ); i++ ) {
 					if ( fabs( XX1( i ) - TableLookup( Tables( TableNum ) ).X1Var( i - l ) ) > tol ) {
-						m = TableData( Tables( TableNum ) ).X1.size( );
-						for ( k = 1; k <= XX2.size( ); k++ ) {
-							TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( m - XX2.size( ) + 1 ) );
-							TableData( Tables( TableNum ) ).X2.push_back( TableData( Tables( TableNum ) ).X2( m - XX2.size( ) + 1 ) );
-							TableData( Tables( TableNum ) ).Y.push_back( TableData( Tables( TableNum ) ).Y( m - XX2.size( ) + 1 ) );
+						m = int( TableData( Tables( TableNum ) ).X1.size( ) );
+						for ( k = 1; k <= int( XX2.size( ) ); k++ ) {
+							TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( m - int( XX2.size( ) ) + 1 ) );
+							TableData( Tables( TableNum ) ).X2.push_back( TableData( Tables( TableNum ) ).X2( m - int( XX2.size( ) ) + 1 ) );
+							TableData( Tables( TableNum ) ).Y.push_back( TableData( Tables( TableNum ) ).Y( m - int( XX2.size( ) ) + 1 ) );
 						}
-						for ( j = m / XX2.size( ); j >= i; j-- ) {
-							for ( k = 1; k <= XX2.size( ); k++ ) {
-								TableData( Tables( TableNum ) ).X1( j * XX2.size( ) + k ) = TableData( Tables( TableNum ) ).X1( ( j - 1 ) * XX2.size( ) + k );
-								TableData( Tables( TableNum ) ).X2( j * XX2.size( ) + k ) = TableData( Tables( TableNum ) ).X2( ( j - 1 ) * XX2.size( ) + k );
-								TableData( Tables( TableNum ) ).Y( j * XX2.size( ) + k ) = TableData( Tables( TableNum ) ).Y( ( j - 1 ) * XX2.size( ) + k );
+						for ( j = m / int( XX2.size( ) ); j >= i; j-- ) {
+							for ( k = 1; k <= int( XX2.size( ) ); k++ ) {
+								TableData( Tables( TableNum ) ).X1( j * int( XX2.size( ) ) + k ) = TableData( Tables( TableNum ) ).X1( ( j - 1 ) * int( XX2.size( ) ) + k );
+								TableData( Tables( TableNum ) ).X2( j * int( XX2.size( ) + k ) ) = TableData( Tables( TableNum ) ).X2( ( j - 1 ) * int( XX2.size( ) ) + k );
+								TableData( Tables( TableNum ) ).Y( j * int( XX2.size( ) ) + k ) = TableData( Tables( TableNum ) ).Y( ( j - 1 ) * int( XX2.size( ) ) + k );
 							}
 						}
 						YY = ( XX1( i ) - TableLookup( Tables( TableNum ) ).X1Var( i - l - 1 ) ) / ( TableLookup( Tables( TableNum ) ).X1Var( i - l ) - TableLookup( Tables( TableNum ) ).X1Var( i - l - 1 ) );
-						for ( k = 1; k <= XX2.size( ); k++ ) {
-							TableData( Tables( TableNum ) ).X1( ( i - 1 )* XX2.size( ) + k ) = XX1( i );
-							TableData( Tables( TableNum ) ).X2( ( i - 1 )* XX2.size( ) + k ) = XX2( k );
-							TableData( Tables( TableNum ) ).Y( ( i - 1 )* XX2.size( ) + k ) = TableData( Tables( TableNum ) ).Y( ( i - 2 )* XX2.size( ) + k ) + YY * ( TableData( Tables( TableNum ) ).Y( i * XX2.size( ) + k ) - TableData( Tables( TableNum ) ).Y( ( i - 2 )* XX2.size( ) + k ) );
+						for ( k = 1; k <= int( XX2.size( ) ); k++ ) {
+							TableData( Tables( TableNum ) ).X1( ( i - 1 )* int( XX2.size( ) ) + k ) = XX1( i );
+							TableData( Tables( TableNum ) ).X2( ( i - 1 )* int( XX2.size( ) ) + k ) = XX2( k );
+							TableData( Tables( TableNum ) ).Y( ( i - 1 )* int( XX2.size( ) ) + k ) = TableData( Tables( TableNum ) ).Y( ( i - 2 )* int( XX2.size( ) ) + k ) + YY * ( TableData( Tables( TableNum ) ).Y( i * int( XX2.size( ) ) + k ) - TableData( Tables( TableNum ) ).Y( ( i - 2 )* int( XX2.size( ) ) + k ) );
 						}
 						l++;
 					}
@@ -6698,18 +6694,18 @@ Label999: ;
 		}
 
 		// Re-organize performance curve table data structure
-		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
-			PerfCurveTableData( Tables( TableNum ) ).X1.allocate( XX1.size( ) );
-			PerfCurveTableData( Tables( TableNum ) ).X2.allocate( XX2.size( ) );
-			PerfCurveTableData( Tables( TableNum ) ).Y.allocate( XX2.size( ), XX1.size( ) );
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
+			PerfCurveTableData( Tables( TableNum ) ).X1.allocate( int( XX1.size( ) ) );
+			PerfCurveTableData( Tables( TableNum ) ).X2.allocate( int( XX2.size( ) ) );
+			PerfCurveTableData( Tables( TableNum ) ).Y.allocate( int( XX2.size( ) ), int( XX1.size( ) ) );
 			PerfCurveTableData( Tables( TableNum ) ).X1 = -9999999.0;
 			PerfCurveTableData( Tables( TableNum ) ).X2 = -9999999.0;
 			PerfCurveTableData( Tables( TableNum ) ).Y = -9999999.0;
-			for ( i = 1; i <= XX1.size( ); ++i ) {
+			for ( i = 1; i <= int( XX1.size( ) ); ++i ) {
 				PerfCurveTableData( Tables( TableNum ) ).X1( i ) = XX1( i );
-				for ( j = 1; j <= XX2.size( ); ++j ) {
+				for ( j = 1; j <= int( XX2.size( ) ); ++j ) {
 					PerfCurveTableData( Tables( TableNum ) ).X2( j ) = XX2( j );
-					for ( k = 1; k <= XX1.size( ) * XX2.size( ); ++k ) {
+					for ( k = 1; k <= int( XX1.size( ) ) * int( XX2.size( ) ); ++k ) {
 						if ( ( TableData( Tables( TableNum ) ).X1( k ) == PerfCurveTableData( Tables( TableNum ) ).X1( i ) ) && ( TableData( Tables( TableNum ) ).X2( k ) == PerfCurveTableData( Tables( TableNum ) ).X2( j ) ) ) {
 							PerfCurveTableData( Tables( TableNum ) ).Y( j, i ) = TableData( Tables( TableNum ) ).Y( k );
 						}
@@ -6719,7 +6715,7 @@ Label999: ;
 		}
 
 		// Re-organize TableLookup data structure
-		for ( TableNum = 1; TableNum <= Tables.size( ); TableNum++ ) {
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
 			TableLookup( Tables( TableNum ) ).NumIndependentVars = 2;
 			TableLookup( Tables( TableNum ) ).NumX1Vars = size( PerfCurveTableData( Tables( TableNum ) ).X1 );
 			TableLookup( Tables( TableNum ) ).NumX2Vars = size( PerfCurveTableData( Tables( TableNum ) ).X2 );
@@ -6740,7 +6736,6 @@ Label999: ;
 		SetCommonIncidentAngles(
 			int const ConstrNum,
 			int const NGlass,
-			int const SpecDataNum,
 			int & TotalIPhi,
 			Array1A_int Tables
 		)
@@ -6767,7 +6762,6 @@ Label999: ;
 		int k;
 		int l;
 		int m;
-		int n;
 		int TabNum;
 		int TabOpt;
 		int waveSize;
@@ -6800,17 +6794,17 @@ Label999: ;
 					TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( i ) ) ).GlassSpecAngTransDataPtr;
 					X1Num = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars;
 					XX1.allocate( X1Num );
-					for ( j = 1; j <= XX1.size( ); j++ ) {
+					for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
 						XX1( j ) = TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( j );
 					}
 				} else {
 					TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( i ) ) ).GlassSpecAngTransDataPtr;
 					X1Num = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars;
-					if ( XX1.size( ) != X1Num ) Anglefound = true;
+					if ( int( XX1.size( ) ) != X1Num ) Anglefound = true;
 					for ( j = 1; j <= X1Num; j++ ) {
 						XX = TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( j );
 						found = false;
-						for ( k = 1; k <= XX1.size( ); k++ ) {
+						for ( k = 1; k <= int( XX1.size( ) ); k++ ) {
 							if ( fabs( XX1( k ) - XX ) < tol ) {
 								found = true;
 							}
@@ -6827,8 +6821,8 @@ Label999: ;
 		if ( !Anglefound ) return;
 
 		// ascend sort
-		for ( i = 1; i <= XX1.size( ); i++ ) {
-			for ( j = 1; j <= XX1.size( ); j++ ) {
+		for ( i = 1; i <= int( XX1.size( ) ); i++ ) {
+			for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
 				if ( XX1( i ) < XX1( j ) ) {
 					XX = XX1( i );
 					XX1( i ) = XX1( j );
@@ -6837,18 +6831,18 @@ Label999: ;
 			}
 		}
 
-		for ( TabNum = 1; TabNum <= Tables.size( ); TabNum++ ) {
+		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
 			if ( Tables( TabNum ) == 0 ) continue;
 			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
 				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
 				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
 				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
 				waveSize = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars;
-				if ( XX1.size( ) > TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) {
+				if ( int( XX1.size( ) ) > TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) {
 					l = 0;
-					for ( i = 1; i <= XX1.size( ); i++ ) {
+					for ( i = 1; i <= int( XX1.size( ) ); i++ ) {
 						if ( fabs( XX1( i ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l ) ) > tol ) {
-							m = TableData( PerfCurve( TableNum ).TableIndex ).X1.size( );
+							m = int( TableData( PerfCurve( TableNum ).TableIndex ).X1.size( ) );
 							for ( k = 1; k <= waveSize; k++ ) {
 								TableData( PerfCurve( TableNum ).TableIndex ).X1.push_back( TableData( PerfCurve( TableNum ).TableIndex ).X1( m - waveSize + 1 ) );
 								TableData( PerfCurve( TableNum ).TableIndex ).X2.push_back( TableData( PerfCurve( TableNum ).TableIndex ).X2( m - waveSize + 1 ) );
@@ -6874,23 +6868,23 @@ Label999: ;
 		}
 
 		// Re-organize performance curve table data structure
-		for ( TabNum = 1; TabNum <= Tables.size( ); TabNum++ ) {
+		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
 			if ( Tables( TabNum ) == 0 ) continue;
 			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
 				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
 				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
 				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
-				if ( XX1.size( ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
+				if ( int( XX1.size( ) ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
 				waveSize = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars;
-				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1.allocate( XX1.size( ) );
-				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y.allocate( waveSize, XX1.size( ) );
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1.allocate( int( XX1.size( ) ) );
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y.allocate( waveSize, int( XX1.size( ) ) );
 				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1 = -9999999.0;
 				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 = -9999999.0;
 				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y = -9999999.0;
-				for ( i = 1; i <= XX1.size( ); ++i ) {
+				for ( i = 1; i <= int( XX1.size( ) ); ++i ) {
 					PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1( i ) = XX1( i );
 					for ( j = 1; j <= waveSize; ++j ) {
-						for ( k = 1; k <= XX1.size( ) * waveSize; ++k ) {
+						for ( k = 1; k <= int( XX1.size( ) ) * waveSize; ++k ) {
 							if ( ( TableData( PerfCurve( TableNum ).TableIndex ).X1( k ) == PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1( i ) ) && ( TableData( PerfCurve( TableNum ).TableIndex ).X2( k ) == PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2( j ) ) ) {
 								PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( j, i ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( k );
 							}
@@ -6901,13 +6895,13 @@ Label999: ;
 		}
 
 		// Re-organize TableLookup data structure
-		for ( TabNum = 1; TabNum <= Tables.size( ); TabNum++ ) {
+		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
 			if ( Tables( TabNum ) == 0 ) continue;
 			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
 				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
 				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
 				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
-				if ( XX1.size( ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
+				if ( int( XX1.size( ) ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
 				TableLookup( PerfCurve( TableNum ).TableIndex ).NumIndependentVars = 2;
 				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1 );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 );
@@ -6920,8 +6914,8 @@ Label999: ;
 			}
 		}
 
-		if ( TotalIPhi != XX1.size( ) ) {
-			TotalIPhi = XX1.size( );
+		if ( TotalIPhi != int( XX1.size( ) ) ) {
+			TotalIPhi = int( XX1.size( ) );
 		}
 
 		XX1.deallocate( );

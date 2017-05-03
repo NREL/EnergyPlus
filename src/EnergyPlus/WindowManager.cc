@@ -840,7 +840,7 @@ namespace WindowManager {
 					AngleNum( IGlass ) = LayerNum( IGlass );
 				}
 			}
-			SetCommonIncidentAngles( ConstrNum, NGlass, SpecDataNum, TotalIPhi, AngleNum );
+			SetCommonIncidentAngles( ConstrNum, NGlass, TotalIPhi, AngleNum );
 
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 				LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
