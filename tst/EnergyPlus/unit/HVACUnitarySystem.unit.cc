@@ -204,8 +204,8 @@ protected:
 			loopside.TotalBranches = 1;
 			loopside.Branch.allocate( 1 );
 			auto & loopsidebranch( PlantLoop( loopindex ).LoopSide( 1 ).Branch( 1 ) );
-			loopsidebranch.TotalComponents = 1;
-			loopsidebranch.Comp.allocate( 1 );
+			loopsidebranch.TotalComponents = 2;
+			loopsidebranch.Comp.allocate( 2 );
 		}
 		PlantLoop( 1 ).Name = "Hot Water Loop";
 		PlantLoop( 1 ).FluidName = "WATER";
@@ -254,8 +254,8 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 		"  ,                        !- Use DOAS DX Cooling Coil",
 		"  15.0,                    !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                        !- Latent Load Control",
-		"  ,                        !- Supplemental Heating Coil Object Type",
-		"  ,                        !- Supplemental Heating Coil Name",
+		"  Coil:Heating:Water,      !- Supplemental Heating Coil Object Type",
+		"  Supp Water Heating Coil, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                     !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
 		"  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
@@ -310,7 +310,24 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 		"  0.0006,                  !- Maximum Water Flow Rate { m3 / s }",
 		"  HWInletNode,             !- Water Inlet Node Name",
 		"  HWOutletNode,            !- Water Outlet Node Name",
-		"  Water Heating Coil Air Inlet Node, !- Air Inlet Node Name",
+		"  Water Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+		"  Water Heating Coil Air Outlet Node, !- Air Outlet Node Name",
+		"  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+		"  5000.0,                  !- Rated Capacity { W }",
+		"  82.2,                    !- Rated Inlet Water Temperature { C }",
+		"  16.6,                    !- Rated Inlet Air Temperature { C }",
+		"  71.1,                    !- Rated Outlet Water Temperature { C }",
+		"  32.2,                    !- Rated Outlet Air Temperature { C }",
+		"  ;                        !- Rated Ratio for Air and Water Convection",
+
+		"Coil:Heating:Water,",
+		"  Supp Water Heating Coil, !- Name",
+		"  AlwaysOne,               !- Availability Schedule Name",
+		"  300.0,                   !- U - Factor Times Area Value { W / K }",
+		"  0.0006,                  !- Maximum Water Flow Rate { m3 / s }",
+		"  SuppHWInletNode,         !- Water Inlet Node Name",
+		"  SuppHWOutletNode,        !- Water Outlet Node Name",
+		"  Water Heating Coil Air Outlet Node, !- Air Inlet Node Name",
 		"  Zone 2 Inlet Node,       !- Air Outlet Node Name",
 		"  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
 		"  5000.0,                  !- Rated Capacity { W }",
@@ -331,6 +348,20 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 		"  Until: 24:00, 1.0;       !- Field 3",
 
 		"Schedule:Compact,",
+		"  Always 16C,              !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 16.0;      !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 18C,              !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 18.0;      !- Field 3",
+
+		"Schedule:Compact,",
 		"  Always 20C,              !- Name",
 		"  Any Number,              !- Schedule Type Limits Name",
 		"  Through: 12/31,          !- Field 1",
@@ -346,7 +377,13 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 		"SetpointManager:Scheduled,",
 		"  HW Coil Setpoint Manager, !- Name",
 		"  Temperature, !- Control Variable",
-		"  Always 20C, !- Schedule Name",
+		"  Always 16C, !- Schedule Name",
+		"  Water Heating Coil Air Outlet Node;  !- Setpoint Node or NodeList Name",
+
+		"SetpointManager:Scheduled,",
+		"  Supp HW Coil Setpoint Manager, !- Name",
+		"  Temperature, !- Control Variable",
+		"  Always 18C, !- Schedule Name",
 		"  Zone 2 Inlet Node;  !- Setpoint Node or NodeList Name",
 
 	} );
@@ -359,97 +396,149 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 
 	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "WATER COOLING COIL";
 	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_CoilWaterCooling;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 7;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 8;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 10;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 11;
 
 	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "WATER HEATING COIL";
 	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
 	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 4;
 	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 5;
 
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).Name = "SUPP WATER HEATING COIL";
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumIn = 8;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 9;
+
 	SetPredefinedTables();
 
-	// UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, set to false for unit testing to size water coils
+	// UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable the 'return' on FirstHVACIteration = true
+	// set FirstHVACIteration to false for unit testing to size water coils
 	bool FirstHVACIteration = false;
 	DataGlobals::BeginEnvrnFlag = false;
 
-	// sizing routine will overwrite water coil inlet nodes with design conditions so no need set set up node conditions yet
+	// sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
 
 	// set up node conditions to test UnitarySystem set point based control
-	// Unitary system inlet node = 1
+	// Unitary system air inlet node = 1
 	Node( 1 ).MassFlowRate = 1.9;
-	Node( 1 ).MassFlowRateMaxAvail = 1.9; // max avail so fan won't limit flow
+	Node( 1 ).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
+
+	// test COOLING condition
 	Node( 1 ).Temp = 24.0; // 24C db
 	Node( 1 ).HumRat = 0.00922; // 17C wb
 	Node( 1 ).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
-	// Cooling coil intlet node = 3
-	Node( 3 ).MassFlowRate = 1.9;
+
+	// Cooling coil air inlet node = 3
 	Node( 3 ).MassFlowRateMax = 1.9; // max at fan outlet so fan won't limit flow
-	// Cooling coil outlet node = 6
+	// Cooling coil air outlet node = 6
 	Node( 6 ).TempSetPoint = 20.0;
-	// Heating coil inlet node = 6
-	Node( 6 ).MassFlowRate = 1.9;
-	// Heating coil outlet node = 2
-	Node( 2 ).TempSetPoint = 20.0;
-	// Cooling coil water inlet node = 7
-	Node( 7 ).MassFlowRate = 20.0;
-	Node( 7 ).Temp = 6.0;
-	Node( 7 ).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+	// Heating coil air inlet node = 6
+	// Heating coil air outlet node = 7
+	Node( 7 ).TempSetPoint = 16.0;
+	// Supp heating coil air inlet node = 7
+	// Supp heating coil air outlet node = 2
+	Node( 2 ).TempSetPoint = 18.0;
+
+	// Cooling coil water inlet node = 10
+	Node( 10 ).Temp = 6.0;
+	Node( 10 ).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
 	// Heating coil water inlet node = 4
-	Node( 4 ).MassFlowRate = 20.0;
 	Node( 4 ).Temp = 60.0;
 	Node( 4 ).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
-	Schedule( 1 ).CurrentValue = 1.0;
+	// Supp heating coil water inlet node = 8
+	Node( 8 ).Temp = 60.0;
+	Node( 8 ).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
-	DataGlobals::BeginEnvrnFlag = true;
+	Schedule( 1 ).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-	// cooling mode
+	DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+
+	// COOLING mode
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
-	// check that cooling coil outlet node is at set point
+
+	// check that CW coil air outlet node is at set point
 	EXPECT_NEAR( Node( 6 ).Temp, Node( 6 ).TempSetPoint, 0.001 );
+	// CW air inlet node temp is greater than CW air outlet node temp
+	EXPECT_GT( Node( 3 ).Temp, Node( 6 ).Temp );
 	// CW water inlet node flow is greater than 0
-	EXPECT_GT( Node( 7 ).MassFlowRate, 0.0 );
+	EXPECT_GT( Node( 10 ).MassFlowRate, 0.0 );
 	// CW water node flow is the same at inlet and outlet
-	EXPECT_EQ( Node( 7 ).MassFlowRate, Node( 8 ).MassFlowRate );
-	// CW water outlet node temp is greater than water inlet node temp
-	EXPECT_GT( Node( 8 ).Temp, Node( 7 ).Temp );
+	EXPECT_EQ( Node( 10 ).MassFlowRate, Node( 11 ).MassFlowRate );
+	// CW water outlet node temp is greater than CW inlet node temp
+	EXPECT_GT( Node( 11 ).Temp, Node( 10 ).Temp );
+	// HW air inlet and outlet nodes are at same temp
+	EXPECT_EQ( Node( 6 ).MassFlowRate, Node( 7 ).MassFlowRate );
+	// Supp HW air inlet and outlet nodes are at same temp
+	EXPECT_EQ( Node( 7 ).MassFlowRate, Node( 2 ).MassFlowRate );
 	// HW water node flow is 0
 	EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 );
 	// HW water node flow is the same at inlet and outlet
 	EXPECT_EQ( Node( 4 ).MassFlowRate, Node( 5 ).MassFlowRate );
 	// HW water outlet node temp is equal to water inlet node temp
 	EXPECT_EQ( Node( 4 ).Temp, Node( 5 ).Temp );
-	// if coil meets set point temperature expect water flow to be less than max water flow
-	EXPECT_LT( Node( 7 ).MassFlowRate, Node( 7 ).MassFlowRateMax );
-	EXPECT_LT( Node( 7 ).MassFlowRate, Node( 7 ).MassFlowRateMaxAvail );
+	// Supp HW water inlet node flow is equal to 0
+	EXPECT_EQ( Node( 8 ).MassFlowRate, 0.0 );
+	// Supp HW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 8 ).MassFlowRate, Node( 9 ).MassFlowRate );
+	// Supp HW water outlet node temp is equal to water inlet node temp
+	EXPECT_EQ( Node( 8 ).Temp, Node( 9 ).Temp );
 
-	// heating mode
-	// Unitary system inlet node = 1
-	Node( 1 ).Temp = 18.0; // 18C db
-	Node( 1 ).HumRat = 0.00922; // 14C wb
-	Node( 1 ).Enthalpy = 39179.1;
+	// if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
+	EXPECT_LT( Node( 10 ).MassFlowRate, Node( 10 ).MassFlowRateMax );
+	EXPECT_LT( Node( 10 ).MassFlowRate, Node( 10 ).MassFlowRateMaxAvail );
+	// expect cooling coil outlet air temp to be less than cooling coil inlet air temp
+	EXPECT_LT( Node( 6 ).Temp, Node( 3 ).Temp );
+	// expect heating coil outlet air temp to be greater than heating coil outlet air temp set point
+	EXPECT_GT( Node( 7 ).Temp, Node( 7 ).TempSetPoint );
+	// expect supp heating coil outlet air temp to be greater than supp heating coil outlet air temp set point
+	EXPECT_GT( Node( 2 ).Temp, Node( 2 ).TempSetPoint );
+
+	// HEATING mode
+	// Unitary system AIR inlet node = 1
+	Node( 1 ).Temp = 14.0; // 14C db
+	Node( 1 ).HumRat = 0.00693; // 11C wb
+	Node( 1 ).Enthalpy = 31598.76;
 
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// CW air inlet node temp is equal to CW air outlet node temp
+	EXPECT_EQ( Node( 3 ).Temp, Node( 6 ).Temp );
 	// check that heating coil outlet node is at set point
+	EXPECT_NEAR( Node( 7 ).Temp, Node( 7 ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( 7 ).Temp, 16.0, 0.001 );
+	// check that supp heating coil outlet node is at set point
 	EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( 2 ).Temp, 18.0, 0.001 );
+
 	// CW water inlet node flow is equal to 0
-	EXPECT_EQ( Node( 7 ).MassFlowRate, 0.0 );
+	EXPECT_EQ( Node( 10 ).MassFlowRate, 0.0 );
 	// CW water node flow is the same at inlet and outlet
-	EXPECT_EQ( Node( 7 ).MassFlowRate, Node( 8 ).MassFlowRate );
-	// CW water outlet node temp is equal to water inlet node temp
-	EXPECT_EQ( Node( 8 ).Temp, Node( 7 ).Temp );
+	EXPECT_EQ( Node( 10 ).MassFlowRate, Node( 11 ).MassFlowRate );
+	// CW water outlet node temp is equal to CW inlet node temp
+	EXPECT_EQ( Node( 11 ).Temp, Node( 10 ).Temp );
 	// HW water node flow is greater than 0
 	EXPECT_GT( Node( 4 ).MassFlowRate, 0.0 );
 	// HW water node flow is the same at inlet and outlet
 	EXPECT_EQ( Node( 4 ).MassFlowRate, Node( 5 ).MassFlowRate );
 	// HW water outlet node temp is lower than water inlet node temp
 	EXPECT_LT( Node( 5 ).Temp, Node( 4 ).Temp );
-	// if coil meets set point temperature expect water flow to be less than max water flow
+	// Supp HW water node flow is greater than 0 (since supp outlet SP is higher than HW coil outlet SP)
+	EXPECT_GT( Node( 8 ).MassFlowRate, 0.0 );
+	// HW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 8 ).MassFlowRate, Node( 9 ).MassFlowRate );
+	// HW water outlet node temp is lower than water inlet node temp
+	EXPECT_LT( Node( 9 ).Temp, Node( 8 ).Temp );
+
+	// if heating coil meets set point temperature expect heating coil water flow to be less than max water flow
 	EXPECT_LT( Node( 4 ).MassFlowRate, Node( 4 ).MassFlowRateMax );
 	EXPECT_LT( Node( 4 ).MassFlowRate, Node( 4 ).MassFlowRateMaxAvail );
+
+	// if supp heating coil meets set point temperature expect supp heating coil water flow to be less than max water flow
+	EXPECT_LT( Node( 8 ).MassFlowRate, Node( 8 ).MassFlowRateMax );
+	EXPECT_LT( Node( 8 ).MassFlowRate, Node( 8 ).MassFlowRateMaxAvail );
 
 }
 
