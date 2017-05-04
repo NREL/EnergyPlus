@@ -6615,7 +6615,7 @@ Label999: ;
 		}
 
 		// ascend sort
-		for ( i = 1; i <= XX1.size(); i++ ) {
+		for ( i = 1; i <= int( XX1.size() ); i++ ) {
 			for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
 				if ( XX1( i ) < XX1( j ) ) {
 					XX = XX1( i );
