@@ -34749,22 +34749,16 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to
-        \note central dedicated outdoor air through air terminal single duct mixer object.
   N6 ,  \field Heating Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to
-        \note central dedicated outdoor air through air terminal single duct mixer object.
   N7 ,  \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to
-        \note central dedicated outdoor air through air terminal single duct mixer object.
   A5 ,  \field Supply Air Fan Operating Mode Schedule Name
         \required-field
         \type object-list
