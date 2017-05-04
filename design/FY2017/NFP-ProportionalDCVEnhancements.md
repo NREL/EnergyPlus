@@ -23,7 +23,10 @@ Proportional Demand Control Ventilation (DCV) Enhancements
 
 ### Florida Solar Energy Center
 
- - The first revision
+ - Second revision
+ - 5/4/17
+ - Added more E-mail communications
+ - First revision
  - 4/24/17
  - Added E-mail communications and change a new field name from "Base Ventilation Flow Rate" to "Proportional Control Minimum Outdoor Air Flow Rate" in the DesignSpecification:OutdoorAir object.
  - The original version
@@ -55,6 +58,7 @@ The second request is to use the setpoint schedule value as C_{s - design}, in a
 
 ## E-mail and  Conference Call Conclusions ##
 
+### First revision
 
 -----Original Message-----
 From: Michael J Witte [mailto:mjwitte@gard.com] 
@@ -149,6 +153,183 @@ On 4/21/2017 1:58 PM, Lixing Gu wrote:
 >>
 >>
 
+### Second revision
+
+From: Lixing Gu [mailto:Gu@fsec.ucf.edu] 
+Sent: Thursday, May 04, 2017 1:37 PM
+To: 'Michael J Witte' <mjwitte@gard.com>; 'Lee, Edwin (NREL)' <edwin.lee@nrel.gov>
+Cc: 'Wu, Tiejun UTC CCS' <Tiejun.Wu@utc.com>
+Subject: RE: [energyplusdevteam] NFP to enhance Proportional Demand Control Ventilation (DCV)
+
+Mike:
+
+I like your point. The existing Outdoor Air Schedule should not be used to calculate V_{ot-min}. I also talked to Tiejun this morning. Here is what we agreed. Although the item lists two choices to calculate V_{ot-min}, it will use a single choice to calculate V_{ot-min} only with a new field: "Proportional Control Minimum Outdoor Air Flow Rate Schedule Name" in the DesignSpecification:OutdoorAir object.
+
+V_{ot-min} = DesignOAFloeRate * "Proportional Control Minimum Outdoor Air Flow Rate Schedule Value"
+
+Here is the DesignSpecification:OutdoorAir object in idd
+
+DesignSpecification:OutdoorAir,
+      \min-fields 1
+      \memo This object is used to describe general outdoor air requirements which
+      \memo are referenced by other objects.
+      A1, \field Name
+      \required-field
+      \type alpha
+      \reference DesignSpecificationOutdoorAirNames
+      A2, \field Outdoor Air Method
+      \type choice
+      \key Flow/Person
+      \key Flow/Area
+      \key Flow/Zone
+      \key AirChanges/Hour
+      \key Sum
+      \key Maximum
+      \default Flow/Person
+      \note Flow/Person => Outdoor Air Flow per Person * Occupancy = Design Flow Rate,
+      \note Flow/Area => Outdoor Air Flow per Zone Floor Area * Zone Floor Area = Design Flow Rate,
+      \note Flow/Zone => Outdoor Air Flow per Zone = Design Flow Rate,
+      \note AirChanges/Hour => Outdoor Air Flow Air Changes per Hour * Zone Volume adjusted for m3/s = Design Flow Rate
+      N1, \field Outdoor Air Flow per Person
+      \type real
+      \units m3/s-person
+      \default 0.00944
+      \minimum 0
+      \note 0.00944 m3/s is equivalent to 20 cfm per person
+      \note This input is only used if the field Outdoor Air Method is Flow/Person, Sum, or Maximum
+      \note For sizing, the design number of occupants is used. For outdoor air flow control, the use
+      \note of design occupants or current occupants depends on the component and DCV options.
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat use the DCV flag specified in Controller:MechanicalVentilation
+      \note AirTerminal:DualDuct:VAV:OutdoorAir and ZoneHVAC:IdealLoadsAirSystem have their own DCV control input.
+      \note ZoneHVAC:FourPipeFanCoil always uses current occupants.
+      N2, \field Outdoor Air Flow per Zone Floor Area
+      \units m3/s-m2
+      \default 0.0
+      \minimum 0
+      \note This input is only used if the field Outdoor Air Method is Flow/Area, Sum, or Maximum
+      N3, \field Outdoor Air Flow per Zone
+      \type real
+      \units m3/s
+      \default 0.0
+      \minimum 0
+      \note This input is only used if the field Outdoor Air Method is Flow/Zone, Sum, or Maximum
+      N4, \field Outdoor Air Flow Air Changes per Hour
+      \units 1/hr
+      \type real
+      \default 0.0
+      \minimum 0
+      \note This input is only used if the field Outdoor Air Method is AirChanges/Hour, Sum, or Maximum
+      A3, \field Outdoor Air Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note Schedule values are multiplied by the Outdoor Air Flow rate calculated using
+      \note the previous four inputs. Schedule values are limited to 0 to 1. If left blank, the schedule defaults to 1.0.
+      \note This schedule is ignored during sizing.  All other components which reference this design specification
+      \note use the current schedule value to calculate the current outdoor air requirement. This includes
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir, 
+      \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
+      \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
+New One
+      A4; \field Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note This input is only used to calculate the minimum outdoor air flow rate when the field 
+      \note System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in
+      \note Controller:MechanicalVentilation, 
+I am going to update NFP.
+
+Thanks.
+
+Gu
+From: Michael J Witte [mailto:mjwitte@gard.com] 
+Sent: Wednesday, May 03, 2017 5:14 PM
+To: Lixing Gu <gu@fsec.ucf.edu>; 'Lee, Edwin (NREL)' <edwin.lee@nrel.gov>
+Cc: 'Wu, Tiejun UTC CCS' <Tiejun.Wu@utc.com>
+Subject: Re: [energyplusdevteam] NFP to enhance Proportional Demand Control Ventilation (DCV)
+
+See comments below.
+
+On 5/3/2017 3:38 PM, Lixing Gu wrote:
+Mike:
+ 
+Thanks for more valuable comments.
+ 
+1.  The description for new field "Proportional Control Minimum Outdoor Air Flow Rate" says:
+I said it not clear and found a mistake. It should be
+ 
+"This field specifies the value of the minimum outdoor air flow rate used in the proportional demand controlled ventilation (DCV) control. This input is only used when the field System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation, and the schedule value of the Outdoor Air Schedule Name field is zero."
+This is what Tiejun defined in an enhancement item.
+
+On re-reading the enhancement item, I disagree with using the existing Outdoor Air Schedule for calculating the minimum flow.  The schedule value is currently multiplied times all of the design level inputs (oa/person, oa/area, oa/zone) regardless of the OA control method.
+See CalcMechVentController
+https://github.com/NREL/EnergyPlus/blob/cecaea1295fd603c9ae24d89a63339bd45fb454e/src/EnergyPlus/MixedAir.cc#L3780-L3802
+
+So it is already modifying the design level OA flow for proportional control.  It is already included in ZoneOAArea, ZoneOAPeople, ZoneOABZ, etc. 
+
+If we want to be able to schedule the min flow for proportional control, then we need a new schedule field "Proportional Control Minimum Outdoor Air Flow Rate Schedule Name".  If we follow the enhancement item, then this would be multiplied times the design OA flow, not times the new Proportional Control Minimum Outdoor Air Flow Rate - they would be either/or - so there should be a warning if both are entered and pick one to be ignored.
+
+Mike
+
+
+2. This impacts the design section also.
+This is a field in the DesignSpecification:OutdoorAir object and specified in Tiejun’s item.
+3. Maximum Carbon Dioxide Concentration Schedule Name
+Done.
+I am going to incorporate the above changes in NFP.
+ 
+Thanks.
+ 
+Gu
+ 
+ 
+ 
+ 
+ 
+ 
+From: Michael J Witte [mailto:mjwitte@gard.com] 
+Sent: Wednesday, May 03, 2017 1:03 PM
+To: Lixing Gu <gu@fsec.ucf.edu>; 'Lee, Edwin (NREL)' <edwin.lee@nrel.gov>
+Cc: 'Wu, Tiejun UTC CCS' <Tiejun.Wu@utc.com>
+Subject: Re: [energyplusdevteam] NFP to enhance Proportional Demand Control Ventilation (DCV)
+ 
+Gu:
+1.  The description for new field "Proportional Control Minimum Outdoor Air Flow Rate" says:
+"This field specifies the value of the minimum outdoor air flow rate used in the proportional demand controlled ventilation (DCV) control. This input is only used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation, and the value of above schedule is zero."
+You should delete "and the value of the above schedule is zero".  Correct?  
+
+2. This impacts the design section also.  The presence of the "Outdoor Air Schedule Name" should not be part of this.  It should multiply whatever the final OA calculation result is regardless of OA control type.
+
+3.  The description for new field "Maximum Carbon Dioxide Concentration Schedule Name" should say that this field is optional and say what happens when it is left blank.  Same for "Proportional Control Minimum Outdoor Air Flow Rate".
+Mike
+
+
+
+
+ 
+On 4/27/2017 3:10 PM, Lixing Gu wrote:
+All:
+ 
+The NFP was updated based on comments. I also added design document. Please review it (https://github.com/NREL/EnergyPlus/blob/ProportionalDCVEnhancements/design/FY2017/NFP-ProportionalDCVEnhancements.md) and give me your feedback.
+ 
+Thanks.
+ 
+Gu
+ 
+-----Original Message-----
+From: Lixing Gu [mailto:Gu@fsec.ucf.edu] 
+Sent: Friday, April 21, 2017 3:50 PM
+To: 'Michael J Witte' <mjwitte@gard.com>
+Cc: 'Wu, Tiejun UTC CCS' <Tiejun.Wu@utc.com>
+Subject: RE: [energyplusdevteam] NFP to enhance Proportional Demand Control Ventilation (DCV)
+ 
+Mike:
+ 
+To your first comment, my vote is "Proportional Control Minimum Outdoor Air Flow Rate". I prefer that each filed has its own special meaning and don't allow too much flexibility.
+ 
+Thanks.
+ 
+Gu
+ 
 
 ## Overview ##
 
@@ -337,12 +518,12 @@ The design outdoor air volume flow rate in air changes per hour. This factor is 
 
 This field is the name of schedule that defines how outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used, then the schedule values are multiplied by the outdoor air flow rate defined by the previous fields. The schedule values must be between 0 and 1, inclusive.  
 
-If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
+If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calculations.
 
- 	N5; \field Proportional Control Minimum Outdoor Air Flow Rate
-\paragraph{Field: Proportional Control Minimum Outdoor Air Flow Rate }\label{field-base-ventilation-air-flow-rate}
+ 	A4; \field Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
+\paragraph{Field: Proportional Control Minimum Outdoor Air Flow Rate }\label{field-base-ventilation-air-flow-rate-schedule-name}
 
-<span style="color:red;"> This field specifies the value of the minimum outdoor air flow rate used in the proportional demand controlled ventilation (DCV) control. This input is only used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation, and the value of above schedule is zero.
+<span style="color:red;"> This field is the name of schedule that defines how minimum outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used when the field System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation, then the schedule values are multiplied by the outdoor air flow rate. The schedule values must be between 0 and 1, inclusive.
 
 An IDF example:
 
@@ -402,15 +583,15 @@ This field contains the name of a schedule that determines whether or not the Zo
 
 \paragraph{Field:Carbon Dioxide Setpoint Schedule Name}\label{fieldcarbon-dioxide-setpoint-schedule-name}
 
-This field contains the name of a schedule that contains the zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. The setpoint values in the schedule must be between 0 and 2000 ppm. . This field is used when the field System Outdoor Air Method = IndoorAirQualityProcedure in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. The setpoint values in the schedule must be between 0 and 2000 ppm. This field is used when the field System Outdoor Air Method = IndoorAirQualityProcedure in the Controller:MechanicalVentilation object.
 
 \paragraph{Field:Minimum Carbon Dioxide Concentration Schedule Name}\label{fieldminimum-carbon-dioxide-concentration-schedule-name}
 
-This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, <span style="color:red;">or ProportionalControlBasedOnDesignOARate</span> in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. The field is optional. If left blank, the default values are set to outdoor CO2 levels. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, <span style="color:red;">or ProportionalControlBasedOnDesignOARate</span> in the Controller:MechanicalVentilation object. 
 
 <span style="color:red;"> \paragraph{Field:Maximum Carbon Dioxide Concentration Schedule Name}\label{fieldmaximum-carbon-dioxide-concentration-schedule-name}</span>
 
-<span style="color:red;">This field contains the name of a schedule that contains the maximum zone carbon dioxide concentration as a function of time and is used to calculate design CO2 concentration level in the proportional ventilation control. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the Controller:MechanicalVentilation object.</span>
+<span style="color:red;">This field contains the name of a schedule that contains the maximum zone carbon dioxide concentration as a function of time and is used to calculate design CO2 concentration level in the proportional ventilation control. The units for carbon dioxide setpoint are ppm. The field is optional. If left blank, the default values are set to outdoor CO2 levels. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the Controller:MechanicalVentilation object. </span>
 
 \paragraph{Field: Generic Contaminant Control Availability Schedule Name}\label{field-generic-contaminant-control-availability-schedule-name}
 
@@ -680,18 +861,14 @@ This section has three revised objects: ZoneControl:ContaminantController, Contr
       \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
       \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
 
-<span style="color:red;">  	N5; \field Proportional Control Minimum Outdoor Air Flow Rate 
+<span style="color:red;">  A4; \field Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
 
-      \units m3/s
-      \type real
-      \default 0.0
-      \minimum 0
-      \note This input is only used when the field System Outdoor Air Method =
-      \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy   
-      \note or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation
-
-
-
+      \type object-list
+      \object-list ScheduleNames
+      \note This input is only used to calculate the minimum outdoor air flow rate when the field 
+      \note System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in
+      \note Controller:MechanicalVentilation, 
+ 
 ## Outputs Description ##
 
 insert text
@@ -732,7 +909,7 @@ For the i-th zone, the outdoor air mass flow rate provided by the air loop is ca
 <span style="color:red;"> if ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:</span>
 
 <span style="color:red;"> \begin{equation}
-{V_{ot - design,i}} = \frac{ {Design OutDoor Air Flow Rate_i} \times {SchedFrac_i} } {E_i}
+{V_{ot - design,i}} = \frac{ {Design OutDoor Air Flow Rate_i} \times {PropCtrSchedFrac_i} } {E_i}
 \end{equation}
 
 </span> 
@@ -768,6 +945,8 @@ Where,
 \({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
 When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
+
+\({PropCtrSchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the Proportional Control Minimum Outdoor Air Flow Rate Schedule Name field in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
 \({A_{z,i}}\) ~ = Zone floor area, m\(^{2}\)
 
@@ -846,14 +1025,14 @@ The struct OARequirementsData represents an object of DesignSpecification:Outdoo
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
 
-<span style="color:red;">Real64 OAPropCtlMinRate; // - Based OA flow rate </span>
+<span style="color:red;">int OAPropCtlMinRateSchPtr; // - Fraction schedule applied to calculation of the Proportional Control Minimum Outdoor Air Flow Rate </span>
 
 ### SizingManager
 
 The ProcessInputOARequirements function in the SizingManager module reads inputs of DesignSpecification:OutdoorAir. A new section will be added to read the new field of A new field of Proportional Control Minimum Outdoor Air Flow Rate. 
 
-		if ( NumNumbers > 4 ) {
-			OARequirements( OAIndex ).OAPropCtlMinRate = Numbers( 5 );
+		if ( NumAlphas > 3 ) {
+			OARequirements( OAIndex ).OAPropCtlMinRateSchPtr = = GetScheduleIndex( Alphas( 4 ) );;
 		}
 
 ### DataContaminantBalance
@@ -943,9 +1122,7 @@ Check min and max zone OA values. If min is greater than max, it min value will 
 							if ( this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 										ZoneOAMax = ZoneOABZ / ZoneEz;
 										if ( this->ZoneOASchPtr( ZoneIndex ) > 0.0 ) {
-											ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
-										} else {
-											ZoneOAMin = this->OAPropCtlMinRate( ZoneIndex ) / ZoneEz;
+											ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue( this->OAPropCtlMinRateSchPtr( ZoneIndex ) );
 										}
 										if ( ZoneOAMax <= ZoneOAMin ) {
 											ZoneOAMin = ZoneOAMax;
