@@ -5,7 +5,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! VRF_ConnectedToDOAS.idf
+! DOAToVRF.idf
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
@@ -150,7 +150,7 @@
     ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
     3.5484,                  !- Gross Rated Heating COP {W/W}
     -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}
-    20,                      !- Maximum Outdoor Temperature in Heating Mode {C}
+    22,                      !- Maximum Outdoor Temperature in Heating Mode {C}
     VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name
     VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -513,9 +513,9 @@
     autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
     autosize,                !- No Heating Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -538,9 +538,9 @@
     autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
     autosize,                !- No Heating Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -563,9 +563,9 @@
     autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
     autosize,                !- No Heating Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -588,9 +588,9 @@
     autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
     autosize,                !- No Heating Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -613,9 +613,9 @@
     autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
     autosize,                !- No Heating Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -859,17 +859,21 @@
   Schedule:Compact,
     FanAvailSched,           !- Name
     Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2, !- Field 2
-    Until: 7:00,0.0,         !- Field 3
-    Until: 21:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Weekends Holiday,   !- Field 9
-    Until: 24:00,0.0,        !- Field 10
-    For: SummerDesignDay,    !- Field 12
-    Until: 24:00,1.0,        !- Field 13
-    For: WinterDesignDay,    !- Field 15
-    Until: 24:00,1.0;        !- Field 16
+    Through: 3/31,           !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0,        !- Field 3
+    Through: 9/30,           !- Field 5
+    For: WeekDays,           !- Field 6
+    Until: 7:00,1.0,         !- Field 7
+    Until: 17:00,1.0,        !- Field 9
+    Until: 24:00,1.0,        !- Field 11
+    For: SummerDesignDay WinterDesignDay, !- Field 13
+    Until: 24:00,1.0,        !- Field 14
+    For: AllOtherDays,       !- Field 16
+    Until: 24:00,1.0,        !- Field 17
+    Through: 12/31,          !- Field 19
+    For: AllDays,            !- Field 20
+    Until: 24:00,1.0;        !- Field 21
 
 !***************************************************************************
 

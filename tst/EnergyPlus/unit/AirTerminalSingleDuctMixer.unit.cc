@@ -175,9 +175,9 @@ namespace EnergyPlus {
 			"    0.300,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.300,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
@@ -418,9 +418,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
@@ -744,9 +744,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
@@ -1072,9 +1072,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
@@ -1484,9 +1484,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
@@ -1903,9 +1903,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
@@ -2575,9 +2575,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
@@ -3247,9 +3247,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:VariableVolume,      !- Supply Air Fan Object Type",
@@ -4899,7 +4899,7 @@ namespace EnergyPlus {
 
 		ZoneSysEnergyDemand.allocate( 1 );
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -10000.0;
 		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
 
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
@@ -4916,8 +4916,8 @@ namespace EnergyPlus {
 		// check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
 		HVACInletMassFlowRate = Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate;
 		ASSERT_EQ( HVACInletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 5.0 Watt of zone cooling load 
-		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 5.0 );
+		// check the cooling output delivered 
+		ASSERT_NEAR( -5389.0, QUnitOutVRFTU, 5.0 );
 
 	}
 
@@ -4998,9 +4998,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:VariableVolume,      !- Supply Air Fan Object Type",
@@ -6616,6 +6616,11 @@ namespace EnergyPlus {
 		VRFTUNum = 1;
 		VRFTU( VRFTUNum ).OpMode = CycFanCycCoil;
 		// initialize mass flow rates
+
+		VRFTU( VRFTUNum ).CoolOutAirMassFlow = PrimaryAirMassFlowRate;
+		VRFTU( VRFTUNum ).HeatOutAirMassFlow = PrimaryAirMassFlowRate;
+		VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow = PrimaryAirMassFlowRate;
+
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate = HVACInletMassFlowRate;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
@@ -6648,7 +6653,7 @@ namespace EnergyPlus {
 
 		ZoneSysEnergyDemand.allocate( 1 );
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -6600.0;
 		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
 
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
@@ -6665,8 +6670,8 @@ namespace EnergyPlus {
 		// check the terminal air mixer outlet flow rate must be equal to the mass flow rate of VRFTU + the primary air 
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
-		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
+		// check the cooling output delivered
+		ASSERT_NEAR( -5927.0, QUnitOutVRFTU, 2.0 );
 
 	}
 

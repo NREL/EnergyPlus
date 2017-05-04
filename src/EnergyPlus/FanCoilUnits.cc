@@ -1055,6 +1055,8 @@ namespace FanCoilUnits {
 			InNode = FanCoil( FanCoilNum ).AirInNode;
 			OutNode = FanCoil( FanCoilNum ).AirOutNode;
 			OutsideAirNode = FanCoil( FanCoilNum ).OutsideAirNode;
+			// set it here for use with ATM
+			if ( FanCoil( FanCoilNum ).ATMixerExists ) { OutsideAirNode = FanCoil( FanCoilNum ).ATMixerPriNode; }
 			RhoAir = StdRhoAir;
 			HotConNode = FanCoil( FanCoilNum ).HotControlNode;
 			ColdConNode = FanCoil( FanCoilNum ).ColdControlNode;
@@ -1083,7 +1085,7 @@ namespace FanCoilUnits {
 			//  Node(ColdConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxColdWaterFlow
 			//  Node(ColdConNode)%MassFlowRateMin = FanCoil(FanCoilNum)%MinColdWaterFlow
 
-			if ( FanCoil( FanCoilNum ).OutsideAirNode > 0 ) {
+			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRateMax = FanCoil( FanCoilNum ).OutAirMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMin = 0.0;
 			}
@@ -1101,6 +1103,7 @@ namespace FanCoilUnits {
 		// These initializations are done every iteration
 		InletNode = FanCoil( FanCoilNum ).AirInNode;
 		OutsideAirNode = FanCoil( FanCoilNum ).OutsideAirNode;
+		if ( FanCoil( FanCoilNum ).ATMixerExists ) { OutsideAirNode = FanCoil( FanCoilNum ).ATMixerPriNode; }
 		AirRelNode = FanCoil( FanCoilNum ).AirReliefNode;
 		FanCoil( FanCoilNum ).SpeedRatio = 0.0;
 		if ( FanCoil( FanCoilNum ).FanOpModeSchedPtr > 0 ) {
@@ -1120,9 +1123,11 @@ namespace FanCoilUnits {
 				Node( OutsideAirNode ).MassFlowRate = FanCoil( FanCoilNum ).OutAirMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMinAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
-				Node( AirRelNode ).MassFlowRate = FanCoil( FanCoilNum ).OutAirMassFlow;
-				Node( AirRelNode ).MassFlowRateMaxAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
-				Node( AirRelNode ).MassFlowRateMinAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = FanCoil( FanCoilNum ).OutAirMassFlow;
+					Node( AirRelNode ).MassFlowRateMaxAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
+					Node( AirRelNode ).MassFlowRateMinAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
+				}
 			}
 
 		} else {
@@ -1133,9 +1138,11 @@ namespace FanCoilUnits {
 				Node( OutsideAirNode ).MassFlowRate = 0.0;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = 0.0;
 				Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
-				Node( AirRelNode ).MassFlowRate = 0.0;
-				Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
-				Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = 0.0;
+					Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
+					Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+				}
 			}
 		}
 

@@ -5,7 +5,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! PTHP_ConnectedToDOAS.idf
+! DOAToPTHP.idf
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum
 !                          Illustrates the use of a dedicated outdoor air system (DOAS) with air to air heat pumps (PTHP)
@@ -2149,9 +2149,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE1-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
@@ -2364,9 +2364,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE2-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
@@ -2436,9 +2436,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE3-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
@@ -2508,9 +2508,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE4-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
@@ -2580,9 +2580,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE5-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type

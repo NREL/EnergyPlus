@@ -3690,32 +3690,32 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			if ( VRFTU( VRFTUNum ).ATMixerExists ) {
-				//   check that OA flow in cooling must be set to zero when connected to DOAS
-				if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow != 0 ) {
-					ShowWarningError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
-					ShowContinueError( ".. " + cNumericFieldNames( 5 ) + " must be zero when " + cCurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFieldNames( 5 ) + " is set to 0 and simulation continues." );
-					VRFTU( VRFTUNum ).CoolOutAirVolFlow = 0;
-				}
-				//   check that OA flow in heating must be set to zero when connected to DOAS
-				if ( VRFTU( VRFTUNum ).HeatOutAirVolFlow != 0 ) {
-					ShowWarningError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
-					ShowContinueError( ".. " + cNumericFieldNames( 6 ) + " must be zero when " + cCurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFieldNames( 6 ) + " is set to 0 and simulation continues." );
-					VRFTU( VRFTUNum ).HeatOutAirVolFlow = 0;
-				}
-				//   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
-				if ( VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow != 0 ) {
-					ShowWarningError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
-					ShowContinueError( ".. " + cNumericFieldNames( 7 ) + " must be zero when " + cCurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFieldNames( 7 ) + " is set to 0 and simulation continues." );
-					VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow = 0;
-				}
-			}
+			//if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			//	//   check that OA flow in cooling must be set to zero when connected to DOAS
+			//	if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow != 0 ) {
+			//		ShowWarningError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFieldNames( 5 ) + " must be zero when " + cCurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFieldNames( 5 ) + " is set to 0 and simulation continues." );
+			//		VRFTU( VRFTUNum ).CoolOutAirVolFlow = 0;
+			//	}
+			//	//   check that OA flow in heating must be set to zero when connected to DOAS
+			//	if ( VRFTU( VRFTUNum ).HeatOutAirVolFlow != 0 ) {
+			//		ShowWarningError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFieldNames( 6 ) + " must be zero when " + cCurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFieldNames( 6 ) + " is set to 0 and simulation continues." );
+			//		VRFTU( VRFTUNum ).HeatOutAirVolFlow = 0;
+			//	}
+			//	//   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
+			//	if ( VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow != 0 ) {
+			//		ShowWarningError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFieldNames( 7 ) + " must be zero when " + cCurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFieldNames( 7 ) + " is set to 0 and simulation continues." );
+			//		VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow = 0;
+			//	}
+			//}
 
 		} // end Number of VRF Terminal Unit Loop
 
@@ -4003,6 +4003,7 @@ namespace HVACVariableRefrigerantFlow {
 		InNode = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
 		OutNode = VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
 		OutsideAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) { OutsideAirNode = VRFTU( VRFTUNum ).ATMixerPriNode; }
 		IndexToTUInTUList = VRFTU( VRFTUNum ).IndexToTUInTUList;
 
 		// set condenser inlet temp, used as surrogate for OAT (used to check limits of operation)
@@ -4388,6 +4389,9 @@ namespace HVACVariableRefrigerantFlow {
 				Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
 			} else {
 				Node( InNode ).MassFlowRate = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
+				if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+					Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).HeatOutAirMassFlow;
+				}
 			}
 		} else if ( CoolingLoad( VRFCond ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
 			if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
@@ -4395,6 +4399,9 @@ namespace HVACVariableRefrigerantFlow {
 				Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
 			} else {
 				Node( InNode ).MassFlowRate = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
+				if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+					Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).CoolOutAirMassFlow;
+				}
 			}
 		} else {
 			if ( LastModeCooling( VRFCond ) ) {
@@ -4403,6 +4410,9 @@ namespace HVACVariableRefrigerantFlow {
 					Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 				} else {
 					Node( InNode ).MassFlowRate = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
+					if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+						Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow;
+					}
 				}
 			} else if ( LastModeHeating( VRFCond ) ) {
 				if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
@@ -4410,6 +4420,9 @@ namespace HVACVariableRefrigerantFlow {
 					Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
 				} else {
 					Node( InNode ).MassFlowRate = VRFTU( VRFTUNum ).MaxNoHeatAirMassFlow;
+					if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+						Node( OutsideAirNode ).MassFlowRate = VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow;
+					}
 				}
 			}
 		}
@@ -6779,6 +6792,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		InletNode = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
 		OutsideAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) { OutsideAirNode = VRFTU( VRFTUNum ).ATMixerPriNode; }
 		AirRelNode = VRFTU( VRFTUNum ).VRFTUOAMixerRelNodeNum;
 
 		if ( VRFTU( VRFTUNum ).OpMode == CycFanCycCoil ) {
@@ -6808,8 +6822,10 @@ namespace HVACVariableRefrigerantFlow {
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRate = AverageOAMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
+					Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				}
 			}
 			if ( AverageUnitMassFlow > 0.0 ) {
 				OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
@@ -6822,7 +6838,9 @@ namespace HVACVariableRefrigerantFlow {
 			Node( InletNode ).MassFlowRate = 0.0;
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRate = 0.0;
-				Node( AirRelNode ).MassFlowRate = 0.0;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = 0.0;
+				}
 			}
 			OnOffAirFlowRatio = 0.0;
 
@@ -9530,6 +9548,19 @@ namespace HVACVariableRefrigerantFlow {
 			Tin = Node( OAMixNode ).Temp;
 			Win = Node( OAMixNode ).HumRat;
 		}
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+			// There is an air terminal mixer
+			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) {															
+				//Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate );
+				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+				Tin = Node( VRFTU( VRFTUNum ).ATMixerOutNode ).Temp;
+				Win = Node( VRFTU( VRFTUNum ).ATMixerOutNode ).HumRat;
+			} else {
+				Tin = Node( VRFTU( VRFTUNum ).ATMixerSecNode ).Temp;
+				Win = Node( VRFTU( VRFTUNum ).ATMixerSecNode ).HumRat;
+			}
+		}
+
 		// Simulate the blow-through fan if there is any
 		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
 			if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {

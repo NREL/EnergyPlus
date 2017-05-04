@@ -5,7 +5,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! UnitarySystem_ConnectedToDOAS.idf
+! DOAToUnitarySystem.idf
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum
 !                          Illustrates the use of a dedicated outdoor air system (DOAS) with AirLoop Unitary System as zone Equipment.

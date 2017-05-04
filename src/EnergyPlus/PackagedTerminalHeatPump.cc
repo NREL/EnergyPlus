@@ -1327,32 +1327,32 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
-				//   check that OA flow in cooling must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
-				}
-				//   check that OA flow in heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
-				}
-				//   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
-				}
-			}
+			//if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+			//	//   check that OA flow in cooling must be set to zero when connected to DOAS
+			//	if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
+			//		ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
+			//		PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
+			//	}
+			//	//   check that OA flow in heating must be set to zero when connected to DOAS
+			//	if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
+			//		ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
+			//		PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
+			//	}
+			//	//   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
+			//	if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
+			//		ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
+			//		PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
+			//	}
+			//}
 
 			CompSetFanInlet = NodeID( FanInletNodeNum );
 			CompSetFanOutlet = NodeID( FanOutletNodeNum );
@@ -1956,32 +1956,32 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
-				//   check that OA flow in cooling must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
-				}
-				//   check that OA flow in heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
-				}
-				//  check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
-				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
-					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
-					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
-					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
-				}
-			}
+			//if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+			//	//   check that OA flow in cooling must be set to zero when connected to DOAS
+			//	if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow != 0.0 ) {
+			//		ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFields( 4 ) + " must be zero when " + CurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFields( 4 ) + " is set to 0 and simulation continues." );
+			//		PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0;
+			//	}
+			//	//   check that OA flow in heating must be set to zero when connected to DOAS
+			//	if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow != 0.0 ) {
+			//		ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFields( 5 ) + " must be zero when " + CurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFields( 5 ) + " is set to 0 and simulation continues." );
+			//		PTUnit( PTUnitNum ).HeatOutAirVolFlow = 0;
+			//	}
+			//	//  check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
+			//	if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != 0.0 ) {
+			//		ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+			//		ShowContinueError( ".. " + cNumericFields( 6 ) + " must be zero when " + CurrentModuleObject );
+			//		ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
+			//		ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
+			//		PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
+			//	}
+			//}
 
 			CompSetFanInlet = NodeID( FanInletNodeNum );
 			CompSetFanOutlet = NodeID( FanOutletNodeNum );
@@ -3340,6 +3340,7 @@ namespace PackagedTerminalHeatPump {
 			InNode = PTUnit( PTUnitNum ).AirInNode;
 			OutNode = PTUnit( PTUnitNum ).AirOutNode;
 			OutsideAirNode = PTUnit( PTUnitNum ).OutsideAirNode;
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) { OutsideAirNode = PTUnit( PTUnitNum ).ATMixerPriNode; }
 			RhoAir = StdRhoAir;
 			// set the mass flow rates from the input volume flow rates
 			PTUnit( PTUnitNum ).MaxCoolAirMassFlow = RhoAir * PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
@@ -3354,6 +3355,10 @@ namespace PackagedTerminalHeatPump {
 				Node( OutsideAirNode ).MassFlowRateMax = max( PTUnit( PTUnitNum ).CoolOutAirMassFlow, PTUnit( PTUnitNum ).HeatOutAirMassFlow );
 				Node( OutsideAirNode ).MassFlowRateMin = 0.0;
 				Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
+				if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+					Node( OutsideAirNode ).MassFlowRateMaxAvail = Node( OutsideAirNode ).MassFlowRateMax;
+					Node( OutsideAirNode ).MassFlowRateMinAvail = Node( OutsideAirNode ).MassFlowRateMax;
+				}
 			}
 			Node( OutNode ).MassFlowRateMax = max( PTUnit( PTUnitNum ).MaxCoolAirMassFlow, PTUnit( PTUnitNum ).MaxHeatAirMassFlow );
 			Node( OutNode ).MassFlowRateMin = 0.0;
@@ -5165,6 +5170,7 @@ namespace PackagedTerminalHeatPump {
 
 		InletNode = PTUnit( PTUnitNum ).AirInNode;
 		OutsideAirNode = PTUnit( PTUnitNum ).OutsideAirNode;
+		if ( PTUnit( PTUnitNum ).ATMixerExists ) { OutsideAirNode = PTUnit( PTUnitNum ).ATMixerPriNode; }
 		AirRelNode = PTUnit( PTUnitNum ).AirReliefNode;
 
 		AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
@@ -5182,8 +5188,10 @@ namespace PackagedTerminalHeatPump {
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRate = AverageOAMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
+					Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				}
 			}
 			if ( AverageUnitMassFlow > 0.0 ) {
 				OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
@@ -5196,7 +5204,9 @@ namespace PackagedTerminalHeatPump {
 			Node( InletNode ).MassFlowRate = 0.0;
 			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRate = 0.0;
-				Node( AirRelNode ).MassFlowRate = 0.0;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = 0.0;
+				}
 			}
 			OnOffAirFlowRatio = 0.0;
 
