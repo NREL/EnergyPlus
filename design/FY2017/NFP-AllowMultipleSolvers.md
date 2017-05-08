@@ -35,6 +35,8 @@ In addition, he prefer do something internally without user involvement.
 I will add new choices to let user select which algorithm is used.  
 
 	HVACSystemRootFindingAlgorithm,
+	  \memo Specifies a solving algorithm to find a root
+      \unique-object
   	A1 , \field Algorithm
        \type choice
        \key RegulaFalsi
@@ -277,6 +279,8 @@ The proposed approach is to use a hybrid approach by combining Regula Falsi and 
 A new object is proposed:
 
 	HVACSystemRootFindingAlgorithm,
+	  \memo Specifies a solving algorithm to find a root
+      \unique-object
   	A1 , \field Algorithm
        \type choice
        \key RegulaFalsi
@@ -327,6 +331,8 @@ A default IDF example is shown below:
 A new object is proposed.
 
 	HVACSystemRootFindingAlgorithm,
+	  \memo Specifies a solving algorithm to find a root
+      \unique-object
   	A1 , \field Algorithm
        \type choice
        \key RegulaFalsi
