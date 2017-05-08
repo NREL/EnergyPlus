@@ -4989,6 +4989,7 @@ namespace SingleDuct {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -5003,15 +5004,35 @@ namespace SingleDuct {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int MixedAirOutNode;
+		int PriInNode;
+		int SecInNode;
 
+		PriInNode = SysATMixer( SysNum ).PriInNode;
+		SecInNode = SysATMixer( SysNum ).SecInNode;
 		MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
-
+		
 		// mixed air data
 		Node( MixedAirOutNode ).Temp = SysATMixer( SysNum ).MixedAirTemp;
 		Node( MixedAirOutNode ).HumRat = SysATMixer( SysNum ).MixedAirHumRat;
 		Node( MixedAirOutNode ).Enthalpy = SysATMixer( SysNum ).MixedAirEnthalpy;
 		Node( MixedAirOutNode ).Press = SysATMixer( SysNum ).MixedAirPressure;
 		Node( MixedAirOutNode ).MassFlowRate = SysATMixer( SysNum ).MixedAirMassFlowRate;
+		
+		if ( Contaminant.CO2Simulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).CO2 = Node( PriInNode ).CO2;
+			} else {
+				Node( MixedAirOutNode ).CO2 = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).CO2 + Node( PriInNode ).MassFlowRate * Node( PriInNode ).CO2 ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
+
+		if ( Contaminant.GenericContamSimulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).GenContam = Node( PriInNode ).GenContam;
+			} else {
+				Node( MixedAirOutNode ).GenContam = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).GenContam + Node( PriInNode ).MassFlowRate * Node( PriInNode ).GenContam ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
 
 	}
 
