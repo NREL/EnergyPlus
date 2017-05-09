@@ -84,6 +84,7 @@ namespace DXCoils {
 	extern Real64 const RatedOutdoorAirTemp; // 35 C or 95F
 	extern Real64 const RatedInletAirTempHeat; // 21.11C or 70F
 	extern Real64 const RatedOutdoorAirTempHeat; // 8.33 C or 47F
+	extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
 	extern Real64 const RatedInletWetBulbTempHeat; // 15.55 or 60F
 
 	extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air

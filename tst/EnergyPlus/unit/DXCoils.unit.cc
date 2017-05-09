@@ -1773,4 +1773,70 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, CurveOutputLimitWarning ) {
+
+		// tests performance curves reports warning if rating point results is not near 1.0
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"	Schedule:Compact,",
+			"	Always On,            !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+
+			"Curve:Biquadratic,",
+			"	Biquadratic,     !- Name",
+			"	1.1001,          !- Coefficient1 Constant",
+			"	0.0,             !- Coefficient2 x",
+			"	0.0,             !- Coefficient3 x**2",
+			"	0.0,             !- Coefficient4 y",
+			"	0.0,             !- Coefficient5 y**2",
+			"	0.0,             !- Coefficient6 x*y",
+			"	12.0,            !- Minimum Value of x",
+			"	23.9,            !- Maximum Value of x",
+			"	18.0,            !- Minimum Value of y",
+			"	46.1,            !- Maximum Value of y",
+			"	,                !- Minimum Curve Output",
+			"	,                !- Maximum Curve Output",
+			"	Temperature,     !- Input Unit Type for X",
+			"	Temperature,     !- Input Unit Type for Y",
+			"	Dimensionless;   !- Output Unit Type",
+
+			"Curve:Quadratic,",
+			"	Quadratic, !- Name",
+			"	0.8,              !- Coefficient1 Constant",
+			"	0.2,              !- Coefficient2 x",
+			"	0.0,              !- Coefficient3 x**2",
+			"	0.5,              !- Minimum Value of x",
+			"	1.5;              !- Maximum Value of x",
+
+			"  COIL:Cooling:DX:VariableRefrigerantFlow,",
+			"    TU1 VRF DX Cooling Coil, !- Name",
+			"    Always On,           !- Availability Schedule Name",
+			"    6600.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    0.500,                   !- Rated Air Flow Rate {m3/s}",
+			"    Biquadratic,             !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    Quadratic,               !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+			"    TU1 Inlet Node,          !- Coil Air Inlet Node",
+			"    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+			"    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ProcessScheduleInput();
+		GetCurveInput();
+		GetDXCoils();
+
+		EXPECT_TRUE( has_cerr_output() ); // capacity as a function of temperature inputs will give output above 1.0 +- 10% and trip warning message
+
+		Real64 CurveVal = CurveValue( DXCoil( 1 ).CCapFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
+		ASSERT_EQ( CurveVal, 1.1001 ); // anything over 1.1 will trip warning message for capacity as a function of temperature
+
+	}
+
 }
