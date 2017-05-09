@@ -843,7 +843,7 @@ namespace CoolingPanelSimple {
 		using DataSizing::FractionOfAutosizedCoolingCapacity;
 		using DataSizing::DataConstantUsedForSizing;
 		using DataSizing::DataFractionUsedForSizing;
-		using DataSizing::CalcFinalZoneSizing;
+		using DataSizing::FinalZoneSizing;
 		using DataSizing::PlantSizData;
 		using DataSizing::AutoVsHardSizingThreshold;
 		using DataHVACGlobals::CoolingCapacitySizing;
@@ -925,8 +925,8 @@ namespace CoolingPanelSimple {
 						if ( ZoneSizingRunDone ) {
 							CheckZoneSizing( CompType, CompName );
 							SizingMethod = AutoCalculateSizing;
-							DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
-							DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							DataConstantUsedForSizing = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
+							DataFractionUsedForSizing = 1.0;
 						}
 						if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity == AutoSize ) {
 							TempSize = AutoSize;
@@ -937,14 +937,14 @@ namespace CoolingPanelSimple {
 						if ( ZoneSizingRunDone ) {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 						}
 						TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity * Zone( CoolingPanel( CoolingPanelNum ).ZonePtr ).FloorArea;
 						DataScalableCapSizingON = true;
 					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 						CheckZoneSizing( CompType, CompName );
 						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 						DataScalableCapSizingON = true;
 						
