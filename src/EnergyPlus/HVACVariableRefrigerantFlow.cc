@@ -5408,7 +5408,10 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( CurZoneEqNum > 0 ) {
-			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( VRFTU( VRFTUNum ).MaxCoolAirVolFlow, VRFTU( VRFTUNum ).MaxHeatAirVolFlow );
+			ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+			ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = VRFTU( VRFTUNum ).MaxCoolAirVolFlow;
+			ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+			ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = VRFTU( VRFTUNum ).MaxHeatAirVolFlow;
 		}
 
 		if ( CheckVRFCombinationRatio( VRFCond ) ) {
@@ -6402,6 +6405,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
+		using namespace DataSizing;
 		using DXCoils::DXCoilTotalCooling;
 		using DXCoils::DXCoilTotalHeating;
 
@@ -6539,6 +6543,27 @@ namespace HVACVariableRefrigerantFlow {
 		VRFTU( VRFTUNum ).TotalHeatingEnergy = VRFTU( VRFTUNum ).TotalHeatingRate * ReportingConstant;
 		VRFTU( VRFTUNum ).SensibleHeatingEnergy = VRFTU( VRFTUNum ).SensibleHeatingRate * ReportingConstant;
 		VRFTU( VRFTUNum ).LatentHeatingEnergy = VRFTU( VRFTUNum ).LatentHeatingRate * ReportingConstant;
+
+		if ( VRFTU( VRFTUNum ).firstPass ) {
+
+			if ( !MySizeFlag( VRFTUNum ) ) {
+
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).SystemAirFlow = false;
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).AirVolFlow = 0.0;
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).CoolingAirFlow = false;
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).CoolingAirVolFlow = 0.0;
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).HeatingAirFlow = false;
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).HeatingAirVolFlow = 0.0;
+				ZoneEqSizing( VRFTU( VRFTUNum ).ZoneNum ).OAVolFlow = 0.0;
+				ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
+				ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = 0.0;
+				ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
+				ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = 0.0;
+				VRFTU( VRFTUNum ).firstPass = false;
+
+			}
+
+		}
 
 	}
 
