@@ -576,10 +576,9 @@ namespace CurveManager {
 	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
 
 	void
-	ReadTableDataFromFile(
+	ReadTwoVarTableDataFromFile(
 		int const CurveNum,
 		std::string & FileName,
-		bool IndVarSwitch,
 		int & lineNum
 	);
 

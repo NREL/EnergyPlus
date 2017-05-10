@@ -493,7 +493,6 @@ namespace CurveManager {
 		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
 		int CurveFound;
-		bool IndVarSwitch;
 		Real64 temp;
 		int fieldNum;
 
@@ -2554,16 +2553,17 @@ namespace CurveManager {
 				}
 			}
 
-			IndVarSwitch = false;
-			if ( SameString( Alphas( 4 ), "WAVELENGTH" ) && SameString( Alphas( 5 ), "ANGLE" ) ) {
-				IndVarSwitch = true;
-				// Switch min and max values 
-				temp = PerfCurve( CurveNum ).Var1Min;
-				PerfCurve( CurveNum ).Var1Min = PerfCurve( CurveNum ).Var2Min;
-				PerfCurve( CurveNum ).Var2Min = temp;
-				temp = PerfCurve( CurveNum ).Var1Max;
-				PerfCurve( CurveNum ).Var1Max = PerfCurve( CurveNum ).Var2Max;
-				PerfCurve( CurveNum ).Var2Max = temp;
+			if ( SameString( Alphas( 4 ), "WAVELENGTH" ) ) {
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
+				ShowContinueError( cAlphaFieldNames( 4 ) + " = WAVELENGTH, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
+				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
+				ErrorsFound = true;
+			}
+			if ( SameString( Alphas( 4 ), "ANGLE" ) && !SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
+				ShowContinueError( cAlphaFieldNames( 4 ) + " = ANGLE, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
+				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
+				ErrorsFound = true;
 			}
 
 			if ( ! lNumericFieldBlanks( 7 ) ) {
@@ -2590,7 +2590,7 @@ namespace CurveManager {
 			if ( !lAlphaFieldBlanks( 7 ) ) {
 				ReadFromFile = true;
 				FileName = Alphas( 7 );
-				ReadTableDataFromFile( CurveNum, FileName, IndVarSwitch, MaxTableNums );
+				ReadTwoVarTableDataFromFile( CurveNum, FileName, MaxTableNums );
 			} else {
 				ReadFromFile = false;
 				FileName = "";
@@ -2738,11 +2738,9 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
 				if ( PerfCurve( CurveNum ).Var1MinPresent ) {
 					if ( PerfCurve( CurveNum ).Var1Min < minval( TableData( TableNum ).X1 ) ) {
-						fieldNum = 1;
-						if ( IndVarSwitch ) fieldNum = 3;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( 1 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 1 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X1 ), 6 ) );
 						PerfCurve( CurveNum ).Var1Min = minval( TableData( TableNum ).X1 );
 					}
 				} else {
@@ -2750,11 +2748,9 @@ namespace CurveManager {
 				}
 				if ( PerfCurve( CurveNum ).Var1MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var1Max > maxval( TableData( TableNum ).X1 ) ) {
-						fieldNum = 2;
-						if ( IndVarSwitch ) fieldNum = 4;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( 2 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 2 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X1 ), 6 ) );
 						PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 					}
 				} else {
@@ -2762,11 +2758,9 @@ namespace CurveManager {
 				}
 				if ( PerfCurve( CurveNum ).Var2MinPresent ) {
 					if ( PerfCurve( CurveNum ).Var2Min < minval( TableData( TableNum ).X2 ) ) {
-						fieldNum = 3;
-						if ( IndVarSwitch ) fieldNum = 1;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X2 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( 3 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 3 ), 6 ) + ", Minimum data range = " + RoundSigDigits( minval( TableData( TableNum ).X2 ), 6 ) );
 						PerfCurve( CurveNum ).Var2Min = minval( TableData( TableNum ).X2 );
 					}
 				} else {
@@ -2774,11 +2768,9 @@ namespace CurveManager {
 				}
 				if ( PerfCurve( CurveNum ).Var2MaxPresent ) {
 					if ( PerfCurve( CurveNum ).Var2Max > maxval( TableData( TableNum ).X2 ) ) {
-						fieldNum = 4;
-						if ( IndVarSwitch ) fieldNum = 2;
 						ShowWarningError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-						ShowContinueError( cNumericFieldNames( fieldNum ) + " exceeds the data range and will not be used." );
-						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( fieldNum ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X2 ), 6 ) );
+						ShowContinueError( cNumericFieldNames( 4 ) + " exceeds the data range and will not be used." );
+						ShowContinueError( " Entered value = " + RoundSigDigits( Numbers( 4 ), 6 ) + ", Maximum data range = " + RoundSigDigits( maxval( TableData( TableNum ).X2 ), 6 ) );
 						PerfCurve( CurveNum ).Var2Max = maxval( TableData( TableNum ).X2 );
 					}
 				} else {
@@ -6462,63 +6454,57 @@ Label999: ;
 	}
 
 	void
-	ReadTableDataFromFile(
+	ReadTwoVarTableDataFromFile(
 		int const CurveNum,
 		std::string & FileName,
-		bool IndVarSwitch,
 		int & lineNum
 	)
 	{
 
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Lixing Gu, FSEC
-	//       DATE WRITTEN   Feb. 2017
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Lixing Gu, FSEC
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS FUNCTION:
-	// get data from an external file used to retrieve optical properties
+		// PURPOSE OF THIS FUNCTION:
+		// get data from an external file used to retrieve optical properties
 
-	// METHODOLOGY EMPLOYED:
-	// Recommended by NREL to read data
+		// METHODOLOGY EMPLOYED:
+		// Recommended by NREL to read data
 
-	// Using/Aliasing
-	using DataSystemVariables::CheckForActualFileName;
-	using DataSystemVariables::TempFullFileName;
-	using General::splitString;
+		// Using/Aliasing
+		using DataSystemVariables::CheckForActualFileName;
+		using DataSystemVariables::TempFullFileName;
+		using General::splitString;
 
-	int TableNum;
-	bool FileExists;
-	std::ifstream infile( FileName );
-	std::string line;
+		int TableNum;
+		bool FileExists;
+		std::ifstream infile( FileName );
+		std::string line;
 
-	CheckForActualFileName( FileName, FileExists, TempFullFileName );
-	if ( !FileExists ) {
-		ShowSevereError( "CurveManager: SearchTableDataFile: Could not open Table Data File, expecting it as file name = " + FileName );
-		ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
-		ShowContinueError( "Try again with putting full path and file name in the field." );
-		ShowFatalError( "Program terminates due to these conditions." );
-	}
+		CheckForActualFileName( FileName, FileExists, TempFullFileName );
+		if ( !FileExists ) {
+			ShowSevereError( "CurveManager: SearchTableDataFile: Could not open Table Data File, expecting it as file name = " + FileName );
+			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
+			ShowContinueError( "Try again with putting full path and file name in the field." );
+			ShowFatalError( "Program terminates due to these conditions." );
+		}
 
-	TableNum = PerfCurve( CurveNum ).TableIndex;
-	TableData( TableNum ).X1.allocate( 0 );
-	TableData( TableNum ).X2.allocate( 0 );
-	TableData( TableNum ).Y.allocate( 0 );
-	lineNum = 0;
-	while (std::getline( infile, line )) {
-		std::vector<std::string> strings = splitString( line, ',' );
-		lineNum++;
-		if (strings.size() > 2) {
-			if (IndVarSwitch) {
-				TableData( TableNum ).X1.push_back( std::stod( strings[1] ) );
-				TableData( TableNum ).X2.push_back( std::stod( strings[0] ) );
-			} else {
+		TableNum = PerfCurve( CurveNum ).TableIndex;
+		TableData( TableNum ).X1.allocate( 0 );
+		TableData( TableNum ).X2.allocate( 0 );
+		TableData( TableNum ).Y.allocate( 0 );
+		lineNum = 0;
+		while (std::getline( infile, line )) {
+			std::vector<std::string> strings = splitString( line, ',' );
+			lineNum++;
+			if (strings.size() > 2) {
 				TableData( TableNum ).X1.push_back( std::stod( strings[0] ) );
 				TableData( TableNum ).X2.push_back( std::stod( strings[1] ) );
+				TableData( TableNum ).Y.push_back( std::stod( strings[2] ) );
 			}
-			TableData( TableNum ).Y.push_back( std::stod( strings[2] ) );
 		}
-	}
 
 	}
 
@@ -6567,7 +6553,7 @@ Label999: ;
 		Tables( 2 ) = PerfCurve( FRefleCurveIndex ).TableIndex;
 		Tables( 3 ) = PerfCurve( BRefleCurveIndex ).TableIndex;
 
-		// Set up independent variable size to cover all independent varaible values in 3 tables
+		// Set up independent variable size to cover all independent variable values in 3 tables
 		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
 			if ( TableNum == 1 ) {
 				X1TableNum = TableLookup( Tables( TableNum ) ).NumX1Vars;
@@ -6733,12 +6719,12 @@ Label999: ;
 	}
 
 	void
-		SetCommonIncidentAngles(
-			int const ConstrNum,
-			int const NGlass,
-			int & TotalIPhi,
-			Array1A_int Tables
-		)
+	SetCommonIncidentAngles(
+		int const ConstrNum,
+		int const NGlass,
+		int & TotalIPhi,
+		Array1A_int Tables
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
