@@ -8522,7 +8522,6 @@ namespace EnergyPlus {
 		Real64 SecondaryAirMassFlowRate2( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );
 		Real64 HotWaterMassFlowRate( 0.0);
-		Real64 OnOffAirFlowRatio( 1.0 );
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOut( 0.0 );
 		Real64 QZnReq( 0.0 );
