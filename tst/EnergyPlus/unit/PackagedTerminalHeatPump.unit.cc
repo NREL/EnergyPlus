@@ -527,13 +527,12 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_GasHeatingCoil ) {
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest ) {
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
 		Real64 PrimaryAirMassFlowRate( 0.0 );
-		Real64 SecondaryAirMassFlowRate( 0.0 );
 		Real64 OnOffAirFlowRatio( 1.0 );
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOut( 0.0 );
@@ -767,7 +766,9 @@ namespace EnergyPlus {
 
 		//// get input test for terminal air single duct mixer on inlet side of PTAC
 		ASSERT_EQ( 1, NumPTAC );
-		EXPECT_EQ( "ZoneHVAC:PackagedTerminalAirConditioner", PTUnit( 1 ).UnitType );  // zoneHVAC equipment type
+		EXPECT_EQ( "ZoneHVAC:PackagedTerminalAirConditioner", PTUnit( 1 ).UnitType ); // zoneHVAC equipment type
+		EXPECT_EQ( "COIL:HEATING:FUEL", PTUnit( 1 ).ACHeatCoilType ); // PTAC heating coil type
+		EXPECT_EQ( HeatingCoil( 1 ).HCoilType_Num, Coil_HeatingGasOrOtherFuel ); // gas heating coil type
 
 		BeginEnvrnFlag = false;
 
