@@ -60,6 +60,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <DataAirSystems.hh>
 #include <DataSizing.hh>
 #include <SimAirServingZones.hh>
@@ -154,6 +155,43 @@ namespace EnergyPlus {
 		FinalSysSizing.deallocate( );
 		FinalZoneSizing.deallocate( );
 		PrimaryAirSystem.deallocate( ); 
+
+	}
+
+	TEST_F( EnergyPlusFixture, SizingSystem_FlowPerCoolingCapacityMethodTest ) {
+		// this unit test is related to issue #5835
+
+		int AirLoopNum( 0 ); // index of air loops
+		Real64 ScaledCoolDesignFlowRate( 0.0 ); //system cooling design flow rate
+		Real64 ScaledHeatDesignFlowRate( 0.0 ); //system heating design flow rate
+
+		AirLoopNum = 1;
+		CalcSysSizing.allocate( AirLoopNum );
+		FinalSysSizing.allocate( AirLoopNum );
+		
+		// set system flow sizing method for cooling
+		FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+		FinalSysSizing( AirLoopNum ).CoolingCapMethod = CoolingDesignCapacity;
+		FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity = 12500.0;
+		FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity = 0.00006041;
+		// scale cooling flow rate using capacity
+		ScaledCoolDesignFlowRate = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.755125, ScaledCoolDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.755125, FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow );
+
+		// set system flow sizing method for heating
+		FinalSysSizing( AirLoopNum ).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+		FinalSysSizing( AirLoopNum ).HeatingCapMethod = HeatingDesignCapacity;
+		FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity = 14400.0;
+		FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity = 0.00006041;
+		// scale heating flow rate using capacity
+		ScaledHeatDesignFlowRate = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.869904, ScaledHeatDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.869904, FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow );
 
 	}
 
