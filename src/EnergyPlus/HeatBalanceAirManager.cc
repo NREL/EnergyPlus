@@ -2936,7 +2936,7 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					if ( GetNumObjectsFound( "AirflowNetwork:OccupantVentilationControl" ) == 0 ) {
+					if ( GetNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
 						ShowSevereError( "In " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 3 ) + " = AIRFLOWNETWORK."  );
 						ShowContinueError( "The AirflowNetwork model inputs are required." );
 						ErrorsFound = true;
