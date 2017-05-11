@@ -493,8 +493,6 @@ namespace CurveManager {
 		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
 		int CurveFound;
-		Real64 temp;
-		int fieldNum;
 
 		// Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
