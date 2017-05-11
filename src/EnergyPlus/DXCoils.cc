@@ -1234,7 +1234,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
+					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
 						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
@@ -1302,8 +1302,10 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
+					// curve ouput tested below
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
+					// curve ouput tested below
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1817,8 +1819,10 @@ namespace DXCoils {
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( PerfModeNum ) ) );
 
 								if ( SELECT_CASE_var == "QUADRATIC" ) {
+									// curve ouput tested below
 
 								} else if ( SELECT_CASE_var == "CUBIC" ) {
+									// curve ouput tested below
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -2197,7 +2201,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = Quadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
+					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedOutdoorAirTempHeat );
 					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
 						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
@@ -2215,7 +2219,7 @@ namespace DXCoils {
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = Cubic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
+					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedOutdoorAirTempHeat );
 					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
 						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
@@ -2283,10 +2287,10 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve limits at rating point tested below
+					// curve ouput tested below
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					// curve limits at rating point tested below
+					// curve ouput tested below
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2715,10 +2719,10 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve limits at rating point tested below
+					// curve ouput tested below
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					// curve limits at rating point tested below
+					// curve ouput tested below
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3477,10 +3481,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 					if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve limits at rating point tested below
+						// curve ouput tested below
 
 					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve limits at rating point tested below
+						// curve ouput tested below
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3839,10 +3843,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 						if ( SELECT_CASE_var == "CUBIC" ) {
-							// curve limits at rating point tested below
+							// curve ouput tested below
 
 						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-							// curve limits at rating point tested below
+							// curve ouput tested below
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4276,10 +4280,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSPLFFPLR( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve limits at rating point tested below
+						// curve ouput tested below
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve limits at rating point tested below
+						// curve ouput tested below
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4812,10 +4816,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSPLFFPLR( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve limits at rating point tested below
+						// curve ouput tested below
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve limits at rating point tested below
+						// curve ouput tested below
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
