@@ -1303,6 +1303,8 @@ namespace HVACVariableRefrigerantFlow {
 		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
+		using CurveManager::CurveValue;
+		using CurveManager::SetCurveOutputMinMaxValues;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanDesignVolumeFlowRate;
@@ -1317,8 +1319,15 @@ namespace HVACVariableRefrigerantFlow {
 		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
 		using DXCoils::GetCoilCondenserInletNode;
 		using DXCoils::GetCoilTypeNum;
+		using DXCoils::GetDXCoilCapFTCurveIndex;
 		using DXCoils::SetDXCoolingCoilData;
 		using DXCoils::GetDXCoilAvailSchPtr;
+		using DXCoils::RatedInletWetBulbTemp;
+		using DXCoils::RatedOutdoorAirTemp;
+		using DXCoils::RatedInletAirTempHeat;
+		using DXCoils::RatedOutdoorAirTempHeat;
+		using DXCoils::RatedOutdoorWetBulbTempHeat;
+		using DXCoils::GetDXCoilName;
 		using DataHeatBalance::Zone;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using WaterManager::SetupTankDemandComponent;
@@ -1387,6 +1396,12 @@ namespace HVACVariableRefrigerantFlow {
 		// Followings for VRF FluidTCtrl Only
 		int NumCompSpd; // XP_loop counter
 		int NumOfCompSpd; // XP_ number of compressor speed inputs
+		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
+		Real64 MinCurveVal; // used for testing PLF curve output
+		Real64 MinCurvePLR; // used for testing PLF curve output
+		Real64 MaxCurveVal; // used for testing PLF curve output
+		Real64 MaxCurvePLR; // used for testing PLF curve output
+		Real64 CurveInput; // index used for testing PLF curve output
 
 		// Flow
 		MaxAlphas = 0;
@@ -1543,6 +1558,12 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is biquadratic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCapFT ) );
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+					CurveVal = CurveValue( VRF( VRFNum ).CoolCapFT, RatedInletWetBulbTemp, RatedOutdoorAirTemp );
+					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\"" );
+						ShowContinueError( "..." + cAlphaFieldNames( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
+						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
+					}
 				} else {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCapFT ) );
 					ShowContinueError( "... curve type must be BiQuadratic." );
@@ -1666,6 +1687,37 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is linear, quadratic, or cubic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolPLFFPLR ) );
 				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+					//     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+					MinCurveVal = 999.0;
+					MaxCurveVal = -999.0;
+					CurveInput = 0.0;
+					while ( CurveInput <= 1.0 ) {
+						CurveVal = CurveValue( VRF( VRFNum ).CoolPLFFPLR, CurveInput );
+						if ( CurveVal < MinCurveVal ) {
+							MinCurveVal = CurveVal;
+							MinCurvePLR = CurveInput;
+						}
+						if ( CurveVal > MaxCurveVal ) {
+							MaxCurveVal = CurveVal;
+							MaxCurvePLR = CurveInput;
+						}
+						CurveInput += 0.01;
+					}
+					if ( MinCurveVal < 0.7 ) {
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+						ShowContinueError( "..." + cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\" has out of range values." );
+						ShowContinueError( "...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits( MinCurvePLR, 2 ) + " is " + TrimSigDigits( MinCurveVal, 3 ) );
+						ShowContinueError( "...Setting curve minimum to 0.7 and simulation continues." );
+						SetCurveOutputMinMaxValues( VRF( VRFNum ).CoolPLFFPLR, ErrorsFound, 0.7, _ );
+					}
+
+					if ( MaxCurveVal > 1.0 ) {
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+						ShowContinueError( "..." + cAlphaFieldNames( 12 ) + " = " + cAlphaArgs( 12 ) + " has out of range value." );
+						ShowContinueError( "...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits( MaxCurvePLR, 2 ) + " is " + TrimSigDigits( MaxCurveVal, 3 ) );
+						ShowContinueError( "...Setting curve maximum to 1.0 and simulation continues." );
+						SetCurveOutputMinMaxValues( VRF( VRFNum ).CoolPLFFPLR, ErrorsFound, _, 1.0 );
+					}
 				} else {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 12 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolPLFFPLR ) );
 					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
@@ -1692,6 +1744,23 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is biquadratic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFT ) );
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+					if ( SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
+						CurveVal = CurveValue( VRF( VRFNum ).HeatCapFT, RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
+						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\"" );
+							ShowContinueError( "..." + cAlphaFieldNames( 13 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
+							ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
+						}
+					} else if ( SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
+						CurveVal = CurveValue( VRF( VRFNum ).HeatCapFT, RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
+						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\"" );
+							ShowContinueError( "..." + cAlphaFieldNames( 13 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
+							ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
+						}
+					} else {
+						// do nothing, warning is issued below
+					}
 				} else {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 13 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCapFT ) );
 					ShowContinueError( "... curve type must be BiQuadratic." );
@@ -1819,6 +1888,37 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is linear, quadratic, or cubic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatPLFFPLR ) );
 				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+					//     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+					MinCurveVal = 999.0;
+					MaxCurveVal = -999.0;
+					CurveInput = 0.0;
+					while ( CurveInput <= 1.0 ) {
+						CurveVal = CurveValue( VRF( VRFNum ).HeatPLFFPLR, CurveInput );
+						if ( CurveVal < MinCurveVal ) {
+							MinCurveVal = CurveVal;
+							MinCurvePLR = CurveInput;
+						}
+						if ( CurveVal > MaxCurveVal ) {
+							MaxCurveVal = CurveVal;
+							MaxCurvePLR = CurveInput;
+						}
+						CurveInput += 0.01;
+					}
+					if ( MinCurveVal < 0.7 ) {
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+						ShowContinueError( "..." + cAlphaFieldNames( 23 ) + "=\"" + cAlphaArgs( 23 ) + "\" has out of range values." );
+						ShowContinueError( "...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits( MinCurvePLR, 2 ) + " is " + TrimSigDigits( MinCurveVal, 3 ) );
+						ShowContinueError( "...Setting curve minimum to 0.7 and simulation continues." );
+						SetCurveOutputMinMaxValues( VRF( VRFNum ).HeatPLFFPLR, ErrorsFound, 0.7, _ );
+					}
+
+					if ( MaxCurveVal > 1.0 ) {
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+						ShowContinueError( "..." + cAlphaFieldNames( 23 ) + " = " + cAlphaArgs( 23 ) + " has out of range value." );
+						ShowContinueError( "...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits( MaxCurvePLR, 2 ) + " is " + TrimSigDigits( MaxCurveVal, 3 ) );
+						ShowContinueError( "...Setting curve maximum to 1.0 and simulation continues." );
+						SetCurveOutputMinMaxValues( VRF( VRFNum ).HeatPLFFPLR, ErrorsFound, _, 1.0 );
+					}
 				} else {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 23 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatPLFFPLR ) );
 					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
@@ -3402,6 +3502,27 @@ namespace HVACVariableRefrigerantFlow {
 							} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio > 1.0 ) {
 								SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio );
 							}
+							// Check VRF DX heating coil heating capacity as a fuction of temperature performance curve. Only report here for biquadratic curve type.
+							std::string sCurveType = GetCurveType( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ) );
+							if ( VRFTU( VRFTUNum ).VRFSysNum > 0 && VRFTU( VRFTUNum ).HeatCoilIndex > 0 && InputProcessor::SameString( sCurveType, "BiQuadratic" ) ) {
+								if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType == WetBulbIndicator ) {
+									CurveVal = CurveValue( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
+									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+										ShowWarningError( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ) + "\"" );
+										ShowContinueError( "...Heating Capacity as a Function of Temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
+										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
+									}
+								} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType == DryBulbIndicator ) {
+									CurveVal = CurveValue( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
+									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+										ShowWarningError( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ) + "\"" );
+										ShowContinueError( "...Heating Capacity as a Function of Temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
+										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
+									}
+								} else {
+								}
+							}
+
 						} else {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 							ShowContinueError( "... illegal " + cAlphaFieldNames( 14 ) + " = " + cAlphaArgs( 14 ) );

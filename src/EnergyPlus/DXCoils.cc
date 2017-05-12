@@ -1302,10 +1302,10 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve ouput tested below
+					// curve output tested below
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					// curve ouput tested below
+					// curve output tested below
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1819,10 +1819,10 @@ namespace DXCoils {
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( PerfModeNum ) ) );
 
 								if ( SELECT_CASE_var == "QUADRATIC" ) {
-									// curve ouput tested below
+									// curve output tested below
 
 								} else if ( SELECT_CASE_var == "CUBIC" ) {
-									// curve ouput tested below
+									// curve output tested below
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -2287,10 +2287,10 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve ouput tested below
+					// curve output tested below
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					// curve ouput tested below
+					// curve output tested below
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2719,10 +2719,10 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve ouput tested below
+					// curve output tested below
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					// curve ouput tested below
+					// curve output tested below
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3481,10 +3481,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 					if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve ouput tested below
+						// curve output tested below
 
 					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve ouput tested below
+						// curve output tested below
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3843,10 +3843,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
 						if ( SELECT_CASE_var == "CUBIC" ) {
-							// curve ouput tested below
+							// curve output tested below
 
 						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-							// curve ouput tested below
+							// curve output tested below
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4280,10 +4280,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSPLFFPLR( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve ouput tested below
+						// curve output tested below
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve ouput tested below
+						// curve output tested below
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4816,10 +4816,10 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSPLFFPLR( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve ouput tested below
+						// curve output tested below
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve ouput tested below
+						// curve output tested below
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -5153,12 +5153,13 @@ namespace DXCoils {
 					}
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					// Can't check this here, don't know if using outdoor dry-bulb or outdoor wet-bulb temp as input. Make this check in VRF TU GetInput.
+//					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
+//					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+//						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
+//						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
+//						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
+//					}
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 					ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
@@ -13107,6 +13108,71 @@ Label50: ;
 
 	}
 
+	std::string
+	GetDXCoilName(
+		int & DXCoilIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType,
+		Optional_bool_const SuppressWarning
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   May 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a name for a given DX Coil -- issues error message if that
+		// DX Coil is not a legal DX Coil.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// na
+		if ( GetCoilsInputFlag ) {
+			GetDXCoils();
+			GetCoilsInputFlag = false;
+		}
+
+		if ( DXCoilIndex == 0 ) {
+			if ( present( SuppressWarning ) ) {
+				//     No warning printed if only searching for the existence of a DX Coil
+			} else {
+				if ( present( ThisObjectType ) ) {
+					ShowSevereError( ThisObjectType + ", GetDXCoilIndex: DX Coil not found " );
+				} else {
+					ShowSevereError( "GetDXCoilIndex: DX Coil not found " );
+				}
+			}
+			ErrorsFound = true;
+			return " ";
+
+		} else {
+
+			return DXCoil( DXCoilIndex ).Name;
+
+		}
+
+	}
+
 	Real64
 	GetCoilCapacity(
 		std::string const & CoilType, // must match coil types in this module
@@ -14067,6 +14133,8 @@ Label50: ;
 				CapFTCurveIndex = DXCoil( CoilIndex ).CCapFTemp( 1 );
 			} else if ( ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) || ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) ) {
 				CapFTCurveIndex = DXCoil( CoilIndex ).MSCCapFTemp( 1 );
+			} else if ( SELECT_CASE_var == CoilVRF_Heating ) {
+				CapFTCurveIndex = DXCoil( CoilIndex ).CCapFTemp( 1 );
 			} else {
 				//        CALL ShowSevereError('GetDXCoilCapFTCurveIndex: Could not find Coil, Type="'// &
 				//             TRIM(cAllCoilTypes(DXCoil(CoilIndex)%DXCoilType_Num))//'" Name="'//TRIM(DXCoil(CoilIndex)%Name)//  &

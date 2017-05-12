@@ -1003,6 +1003,14 @@ namespace DXCoils {
 		Optional_bool_const SuppressWarning = _
 	);
 
+	std::string
+	GetDXCoilName(
+		int & DXCoilIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType = _,
+		Optional_bool_const SuppressWarning = _
+	);
+
 	Real64
 	GetCoilCapacity(
 		std::string const & CoilType, // must match coil types in this module
