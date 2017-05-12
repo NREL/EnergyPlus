@@ -6301,6 +6301,7 @@ namespace SimAirServingZones {
 
 		if ( AirLoopNum > 0 ) {
 
+			TempSize = 0.0;
 			FractionOfAutosize = 1.0;
 
 			// scalable sizing option for cooling supply air flow rate
