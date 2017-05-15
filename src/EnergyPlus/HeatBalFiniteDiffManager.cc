@@ -233,17 +233,10 @@ namespace HeatBalFiniteDiffManager {
 			GetCondFDInput();
 			GetHBFiniteDiffInputFlag = false;
 		}
-
-		// Condition is taken care of by calling routine:
-		// IF (Surface(SurfNum)%HeatTransSurf .and. Surface(SurfNum)%Class /= SurfaceClass_Window)
-
 		// Solve the zone heat & moisture balance using a finite difference solution
 		CalcHeatBalFiniteDiff( SurfNum, TempSurfInTmp, TempSurfOutTmp );
 
 	}
-
-	// Get Input Section of the Module
-	//******************************************************************************
 
 	void
 	GetCondFDInput()
@@ -678,7 +671,7 @@ namespace HeatBalFiniteDiffManager {
 			for ( Layer = 1; Layer <= Construct( ConstrNum ).TotLayers; ++Layer ) { // Begin layer loop ...
 
 				// Loop through all of the layers in the current construct. The purpose
-				// of this loop is to define the thermal properties  and to.
+				// of this loop is to define the thermal properties and to.
 				// determine the total number of full size nodes in each layer.
 				// The number of temperature points is one more than this
 				// because of the two half nodes at the layer faces.
@@ -2004,8 +1997,7 @@ namespace HeatBalFiniteDiffManager {
 				SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; // Inside face  does not have an inner half node
 
 			} // Regular or R layer
-
-			// Limit clipping
+				// Limit clipping
 			if ( TDT_i < MinSurfaceTempLimit ) {
 				TDT_i = MinSurfaceTempLimit;
 			} else if ( TDT_i > MaxSurfaceTempLimit ) {
