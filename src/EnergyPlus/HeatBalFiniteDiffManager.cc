@@ -1051,7 +1051,7 @@ namespace HeatBalFiniteDiffManager {
 				}
 
 				// the following could blow up when all the node temps sum to less than 1.0.  seems poorly formulated for temperature in C.
-				//PT delete one zero and decrese number of minimum iterations, from 3 (which actually requires 4 iterations) to 2.
+				//PT delete one zero and decrease number of minimum iterations, from 3 (which actually requires 4 iterations) to 2.
 
 				if ( ( GSiter > 2 ) && ( std::abs( sum_array_diff( TDT, TDTLast ) / sum( TDT ) ) < 0.00001 ) ) break;
 
@@ -1318,7 +1318,7 @@ namespace HeatBalFiniteDiffManager {
 			int const LayIn( Construct( ext_bound_construction ).TotLayers ); // layer number for call to interior eqs
 			int const NodeIn( ConstructFD( ext_bound_construction ).TotNodes + 1 ); // node number "I" for call to interior eqs
 			int const TotNodesPlusOne( TotNodes + 1 );
-			if ( surface_ExtBoundCond == Surf ) { // adiabatic surface, PT addded since it is not the same as interzone wall
+			if ( surface_ExtBoundCond == Surf ) { // adiabatic surface, PT added since it is not the same as interzone wall
 				// as Outside Boundary Condition Object can be left blank.
 
 				auto & surfaceFD( SurfaceFD( Surf ) );
@@ -1707,7 +1707,9 @@ namespace HeatBalFiniteDiffManager {
 				if ( RLayerPresent && ! RLayer2Present ) { // R-layer first
 
 					// Check for PCM second layer
-					if ( ( matFD_sum < 0.0 ) && ( matFD2_sum > 0.0 ) ) { // Phase change material Layer2, Use TempEnth Data
+					if ( mat2.phaseChange ) {
+						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i );
+					} else if ( ( matFD_sum < 0.0 ) && ( matFD2_sum > 0.0 ) ) { // Phase change material Layer2, Use TempEnth Data
 						Real64 const Enth2Old( terpld( matFD2_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth2New( terpld( matFD2_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						EnthNew( i ) = Enth2New; // This node really doesn't have an enthalpy, this gives it a value
@@ -1740,7 +1742,9 @@ namespace HeatBalFiniteDiffManager {
 				} else if ( ! RLayerPresent && RLayer2Present ) { // R-layer second
 
 					// Check for PCM layer before R layer
-					if ( ( matFD_sum > 0.0 ) && ( matFD2_sum < 0.0 ) ) { // Phase change material Layer1, Use TempEnth Data
+					if ( mat.phaseChange ) {
+						Cp1 = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i );
+					} else if ( ( matFD_sum > 0.0 ) && ( matFD2_sum < 0.0 ) ) { // Phase change material Layer1, Use TempEnth Data
 						Real64 const Enth1Old( terpld( matFD_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth1New( terpld( matFD_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						EnthNew( i ) = Enth1New; // This node really doesn't have an enthalpy, this gives it a value
@@ -1812,6 +1816,13 @@ namespace HeatBalFiniteDiffManager {
 						}
 
 					} // Phase change material check
+
+					if ( mat.phaseChange ) {
+						Cp1 = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i );
+					}
+					if ( mat2.phaseChange ) {
+						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i );
+					}
 
 					Real64 const Delt_Delx1( Delt * Delx1 );
 					Real64 const Delt_Delx2( Delt * Delx2 );
