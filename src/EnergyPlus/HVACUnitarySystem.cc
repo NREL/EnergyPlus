@@ -2137,10 +2137,14 @@ namespace HVACUnitarySystem {
 				SizingMethod = AutoCalculateSizing;
 				if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
 					DataConstantUsedForSizing = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-					if( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 						minNoLoadFlow = 0.6667;
 					} else {
-						minNoLoadFlow = 0.5;
+						if ( UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio < 1.0 ) {
+							minNoLoadFlow = UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio;
+						} else {
+							minNoLoadFlow = 0.5;
+						}
 					}
 					if( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow >= UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow ) {
 						DataFractionUsedForSizing = min( minNoLoadFlow, ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow ) - 0.01 ) ;
@@ -2175,6 +2179,8 @@ namespace HVACUnitarySystem {
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
 				UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+			} else {
+				DataFractionUsedForSizing = UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio;
 			}
 
 			FieldNum = 11;	// N11 , \field No Load Supply Air Flow Rate
@@ -3010,30 +3016,31 @@ namespace HVACUnitarySystem {
 					ErrorsFound = true;
 				}
 			}
+			DesignSpecMSHP( DesignSpecNum ).NoLoadAirFlowRateRatio = Numbers( 3 );
 
 			// initialize number of speeds (MIN = 4 or greater of cooling and heating speeds x 2)
 			MaxSpeedNum = 0; // set to 0 so we know if the inputs are valid
 
-			if ( mod( double( NumNumbers - 2 ), 2.0 ) > 0.0 ) {
+			if ( mod( double( NumNumbers - 3 ), 2.0 ) > 0.0 ) {
 				// check that the number of numeric speed input fields match the number of speeds
 				ShowSevereError( CurrentModuleObject + " = " + DesignSpecMSHP( DesignSpecNum ).Name );
 				ShowContinueError( "Illegal number of entries in Supply Air Flow Rate fields." );
 				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) );
-				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 2 ) );
+				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 3 ) );
 				ErrorsFound = true;
 			} else {
-				MaxSpeedNum = ( NumNumbers - 2 ) / 2; // Extensible fields included (>4) for cooling and heating
+				MaxSpeedNum = ( NumNumbers - 3 ) / 2; // Extensible fields included (>4) for cooling and heating
 			}
 
 			if ( MaxSpeedNum < max( NumOfSpeedHeating, NumOfSpeedCooling ) ) {
 				ShowSevereError( CurrentModuleObject + " = " + DesignSpecMSHP( DesignSpecNum ).Name );
 				ShowContinueError( "Illegal number of entries in Supply Air Flow Rate fields." );
 				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) );
-				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 2 ) );
+				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 3 ) );
 				ErrorsFound = true;
 			}
 
-			StartingSpeedRatioInput = 3; // start the index counter at the first input for heating (e.g. 3+0*2)
+			StartingSpeedRatioInput = 4; // start the index counter at the first input for heating (e.g. 4+0*2)
 			if ( NumOfSpeedHeating > 0 && MaxSpeedNum > 0 ) {
 				DesignSpecMSHP( DesignSpecNum ).HeatingVolFlowRatio.allocate( MaxSpeedNum );
 				for ( SpeedNum = 1; SpeedNum <= NumOfSpeedHeating; ++SpeedNum ) {
@@ -6104,6 +6111,8 @@ namespace HVACUnitarySystem {
 
 				if ( DesignSpecNum > 0 ) {
 
+					UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio = DesignSpecMSHP( DesignSpecNum ).NoLoadAirFlowRateRatio;
+
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
 						UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = DesignSpecMSHP( DesignSpecNum ).NumOfSpeedHeating;
 						UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( DesignSpecMSHP( DesignSpecNum ).NumOfSpeedHeating );
@@ -6132,7 +6141,7 @@ namespace HVACUnitarySystem {
 				ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPTypeAlphaNum ) + " = " + Alphas( iDesignSpecMSHPTypeAlphaNum ) );
 				ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPNameAlphaNum ) + " = " + Alphas( iDesignSpecMSHPNameAlphaNum ) );
 				ErrorsFound = true;
-			} else if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
+			} else if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) { // how do these last 2 get called?
 				NumOfSpeedHeating = UnitarySystem( UnitarySysNum ).NumOfSpeedHeating;
 
 				UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( NumOfSpeedHeating );

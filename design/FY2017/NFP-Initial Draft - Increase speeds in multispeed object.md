@@ -62,7 +62,7 @@ This makes it difficult for users and interface developers to use HVAC systems w
 The team will:
 
  - add a new field for No Load Supply Air Flow Rate Ratio
- - modiy the IDD to include up to 10 fields for heating/cooling supply air flow ratio
+ - modify the IDD to include up to 10 fields for heating/cooling supply air flow ratio
  - revise function GetUnitarySystemInput to allow optional fields up to speed 10
 
 ## Known Issues ##
@@ -313,7 +313,7 @@ Same as draft NFP
 
 ## Design Doc ##
 
-    1) No new code anticipated for this feature
+    1) Minimal new code anticipated for this feature
     2) Extend number of speeds in IDD to 10. See suggested IDD in draft NFP.
     3) Test that number of speeds < 10 works with modified IDD
     4) Test input file without UnitarySystemPerformance:Multispeed object (should already work).

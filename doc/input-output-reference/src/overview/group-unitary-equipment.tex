@@ -454,6 +454,7 @@ AirLoopHVAC:UnitarySystem,
   4,                           !- Number of Speeds for Heating
   4,                           !- Number of Speeds for Cooling
   No,                          !- Single Mode Operation
+  ,                            !- No Load Supply Air Flow Rate Ratio
   0.235294118,                 !- Heating Speed 1 Supply Air Flow Ratio
   0.235294118,                 !- Cooling Speed 1 Supply Air Flow Ratio
   0.470588235,                 !- Heating Speed 2 Supply Air Flow Ratio
@@ -707,6 +708,10 @@ This field specifies the coil operation mode for multiple speed DX cooling and h
 The allowed cooling and heating coil types are restricted to the following combinations:
 
 Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:MultiSpeed and Coil:Heating:Fuel. 
+
+\paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
+
+This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
 \paragraph{Field: Heating Speed 1 Supply Air Flow Ratio}\label{field-heating-speed-1-supply-air-flow-ratio}
 
