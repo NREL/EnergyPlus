@@ -1884,7 +1884,13 @@ namespace HVACUnitarySystem {
 		SupFanNum = 0;
 
 		if ( CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
-			PrimaryAirSystem( CurSysNum ).SupFanNum = UnitarySystem( UnitarySysNum ).FanIndex;
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				PrimaryAirSystem( CurSysNum ).supFanVecIndex = UnitarySystem( UnitarySysNum ).FanIndex ;
+				PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+			} else {
+				PrimaryAirSystem( CurSysNum ).SupFanNum = UnitarySystem( UnitarySysNum ).FanIndex;
+				PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+			}
 		}
 
 		// STEP 1: find the autosized cooling air flow rate and capacity
