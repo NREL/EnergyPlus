@@ -16063,6 +16063,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
     CALL AddToObjStr('Single Mode Operation', 'No')
+    CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', '')
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
