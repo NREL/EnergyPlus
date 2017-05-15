@@ -4516,7 +4516,6 @@ Material,
        \units m
        \type real
        \minimum> 0
-       \maximum 3.0
        \ip-units in
   N2 , \field Conductivity
        \required-field
