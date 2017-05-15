@@ -49,9 +49,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
@@ -192,11 +189,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT )
 }
 TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 
-	int write_stat;
-	// Open the Initialization Output File
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-
 	std::string CompName; // component name
 	std::string CompType; // component type
 	std::string SizingString; // input field sizing description
@@ -262,9 +254,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
 	EXPECT_NEAR( 19234.6, SizingResult, 0.1 );
 
-	// close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
 	// clean
 	DataSizing::NumSysSizInput = 0;
 	FinalSysSizing.deallocate();
@@ -276,11 +265,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 
 TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	ShowMessage( "Begin Test: ReportSizingManager, RequestSizingZone" );
-
-	int write_stat;
-	// Open the Initialization Output File
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	int const ZoneNum = 1;
 	std::string CompName; // component name
@@ -342,9 +326,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	// chilled water cooling coil capacity sizing
 	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
 	EXPECT_NEAR( 5770.4, SizingResult, 0.1 );
-
-	// close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 	// clean
 	DataSizing::NumZoneSizingInput = 0;

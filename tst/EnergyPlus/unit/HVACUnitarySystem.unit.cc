@@ -49,14 +49,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <General.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
