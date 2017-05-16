@@ -9137,7 +9137,7 @@ namespace SurfaceGeometry {
 
 		int selectedSurNum = zonePoly.SurfaceFace( faceIndex ).SurfNum;
 		Real64 selectedAzimuth = Surface( selectedSurNum ).Azimuth;
-		Real64 oppositeAzimuth = Real64((int(selectedAzimuth) + 180 ) % 360);
+		Real64 oppositeAzimuth = fmod(selectedAzimuth + 180., 360.);
 		Real64 selectedArea = Surface( selectedSurNum ).Area;
 		int selectedNumCorners = zonePoly.SurfaceFace( faceIndex ).NSides;
 		int found = -1;

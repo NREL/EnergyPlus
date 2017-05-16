@@ -1489,3 +1489,78 @@ TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
 	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
 
 }
+
+TEST( SurfaceGeometryUnitTests, findPossibleOppositeFace_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, findPossibleOppositeFace_test" );
+
+	DataVectorTypes::Polyhedron zonePoly;
+
+	Surface.allocate( 4 );
+	Surface( 1 ).Azimuth = 0.;
+	Surface( 1 ).Area = 10.;
+
+	Surface( 2 ).Azimuth = 90.;
+	Surface( 2 ).Area = 10.;
+
+	Surface( 3 ).Azimuth = 180.;
+	Surface( 3 ).Area = 10.;
+
+	Surface( 4 ).Azimuth = 270.;
+	Surface( 4 ).Area = 10.;
+
+	zonePoly.NumSurfaceFaces = 4;
+	zonePoly.SurfaceFace.allocate( 4 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 1 ).NSides = 4;
+
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 2 ).NSides = 4;
+
+	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
+	zonePoly.SurfaceFace( 3 ).NSides = 4;
+
+	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
+	zonePoly.SurfaceFace( 4 ).NSides = 4;
+
+
+	EXPECT_EQ( 3, findPossibleOppositeFace( zonePoly, 1 ) );
+	EXPECT_EQ( 1, findPossibleOppositeFace( zonePoly, 3 ) );
+
+	EXPECT_EQ( 4, findPossibleOppositeFace( zonePoly, 2 ) );
+	EXPECT_EQ( 2, findPossibleOppositeFace( zonePoly, 4 ) );
+
+	Surface( 2 ).Azimuth = 90.5;
+
+	EXPECT_EQ( 4, findPossibleOppositeFace( zonePoly, 2 ) );
+	EXPECT_EQ( 2, findPossibleOppositeFace( zonePoly, 4 ) );
+
+	Surface( 2 ).Azimuth = 89.5;
+
+	EXPECT_EQ( 4, findPossibleOppositeFace( zonePoly, 2 ) );
+	EXPECT_EQ( 2, findPossibleOppositeFace( zonePoly, 4 ) );
+
+	Surface( 2 ).Azimuth = 45.;
+
+	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 2 ) ); // not found
+	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 4 ) ); // not found
+
+	Surface( 1 ).Area = 9.;
+
+	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 1 ) ); // not found
+	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 3 ) ); // not found
+
+	Surface( 1 ).Area = 10.;
+
+	EXPECT_EQ( 3, findPossibleOppositeFace( zonePoly, 1 ) );
+	EXPECT_EQ( 1, findPossibleOppositeFace( zonePoly, 3 ) );
+
+	zonePoly.SurfaceFace( 1 ).NSides = 3;
+
+	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 1 ) ); // not found
+	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 3 ) ); // not found
+
+
+}
+
+
