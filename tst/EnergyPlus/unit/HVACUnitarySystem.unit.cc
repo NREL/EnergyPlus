@@ -69,7 +69,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPLus/Fans.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACFan.hh>
