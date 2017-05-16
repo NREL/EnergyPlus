@@ -1559,7 +1559,11 @@ namespace ChillerAbsorption {
 		PumpingPower = ElectricInputRat * NomPumpPower * FRAC;
 
 		//Calculate steam load
-		QGenerator = SteamInputRat * QEvaporator * FRAC;
+		if ( FRAC < 1.0 ) {
+			QGenerator = SteamInputRat * MinPartLoadRat * AbsorberNomCap * FRAC;
+		} else {
+			QGenerator = SteamInputRat * QEvaporator;
+		}
 
 		if ( EvapMassFlowRate == 0.0 ) {
 			QGenerator = 0.0;
@@ -1589,7 +1593,7 @@ namespace ChillerAbsorption {
 				if ( ( BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow ) || ( BLASTAbsorber( ChillNum ).FlowMode == NotModulated ) ) {
 					SteamMassFlowRate = BLASTAbsorber( ChillNum ).GenMassFlowRateMax;
 				} else {
-					SteamMassFlowRate = QGenerator / CpFluid / BLASTAbsorber( ChillNum ).GeneratorDeltaTemp;
+					SteamMassFlowRate = min( BLASTAbsorber( ChillNum ).GenMassFlowRateMax, QGenerator / CpFluid / BLASTAbsorber( ChillNum ).GeneratorDeltaTemp );
 				}
 
 				SetComponentFlowRate( SteamMassFlowRate, GeneratorInletNode, GeneratorOutletNode, BLASTAbsorber( ChillNum ).GenLoopNum, BLASTAbsorber( ChillNum ).GenLoopSideNum, BLASTAbsorber( ChillNum ).GenBranchNum, BLASTAbsorber( ChillNum ).GenCompNum );
