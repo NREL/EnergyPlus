@@ -9182,6 +9182,7 @@ namespace SurfaceGeometry {
 		} else {
 			allAreEquidistant = false;
 		}
+		if ( allAreEquidistant ) distanceBetween = firstDistance;
 		return allAreEquidistant;
 	}
 

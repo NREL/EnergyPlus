@@ -1218,7 +1218,6 @@ TEST( SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test" );
 
 	DataVectorTypes::Polyhedron zonePoly;
-	Real64 azimuth;
 	std::vector<int> results;
 
 	Surface.allocate( 9 );
@@ -1245,41 +1244,41 @@ TEST( SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test )
 	zonePoly.SurfaceFace( 9 ).SurfNum = 9;
 
 	results = listOfFacesFacingAzimuth(zonePoly, 90.);
-	EXPECT_EQ( 0, results.size());
+	EXPECT_EQ( size_t( 0 ), results.size());
 
 	results = listOfFacesFacingAzimuth( zonePoly, 0. );
-	EXPECT_EQ( 1, results.size() );
+	EXPECT_EQ( size_t( 1 ), results.size() );
 	EXPECT_EQ( 1, results.at( 0 ) );
 
 	results = listOfFacesFacingAzimuth( zonePoly, 30. );
-	EXPECT_EQ( 3, results.size() );
+	EXPECT_EQ( size_t( 3 ), results.size() );
 	EXPECT_EQ( 2, results.at( 0 ) );
 	EXPECT_EQ( 3, results.at( 1 ) );
 	EXPECT_EQ( 4, results.at( 2 ) );
 
 	results = listOfFacesFacingAzimuth( zonePoly, 45. );
-	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( size_t( 2 ), results.size() );
 	EXPECT_EQ( 5, results.at( 0 ) );
 	EXPECT_EQ( 6, results.at( 1 ) );
 
 	results = listOfFacesFacingAzimuth( zonePoly, 71.9 );
-	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( size_t( 2 ), results.size() );
 	EXPECT_EQ( 7, results.at( 0 ) );
 	EXPECT_EQ( 8, results.at( 1 ) );
 
 	results = listOfFacesFacingAzimuth( zonePoly, 72.0 );
-	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( size_t( 2 ), results.size() );
 	EXPECT_EQ( 7, results.at( 0 ) );
 	EXPECT_EQ( 8, results.at( 1 ) );
 
 	results = listOfFacesFacingAzimuth( zonePoly, 72.1 );
-	EXPECT_EQ( 3, results.size() );
+	EXPECT_EQ( size_t( 3 ), results.size() );
 	EXPECT_EQ( 7, results.at( 0 ) );
 	EXPECT_EQ( 8, results.at( 1 ) );
 	EXPECT_EQ( 9, results.at( 2 ) );
 
 	results = listOfFacesFacingAzimuth( zonePoly, 73.0 );
-	EXPECT_EQ( 2, results.size() );
+	EXPECT_EQ( size_t( 2 ), results.size() );
 	EXPECT_EQ( 8, results.at( 0 ) );
 	EXPECT_EQ( 9, results.at( 1 ) );
 }
@@ -1290,7 +1289,6 @@ TEST( SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test" );
 
 	DataVectorTypes::Polyhedron zonePoly;
-	Real64 azimuth;
 
 	Surface.allocate( 9 );
 	Surface( 1 ).Class = SurfaceClass_Floor;
@@ -1419,7 +1417,6 @@ TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, areWallHeightSame_test" );
 
 	DataVectorTypes::Polyhedron zonePoly;
-	Real64 azimuth;
 	std::vector<int> results;
 
 	Surface.allocate( 3 );
