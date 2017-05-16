@@ -1560,7 +1560,66 @@ TEST( SurfaceGeometryUnitTests, findPossibleOppositeFace_test )
 	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 1 ) ); // not found
 	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 3 ) ); // not found
 
+}
+
+TEST( SurfaceGeometryUnitTests, areCornersEquidistant_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, areCornersEquidistant_test" );
+
+	DataVectorTypes::Polyhedron zonePoly;
+
+	zonePoly.NumSurfaceFaces = 2;
+	zonePoly.SurfaceFace.allocate( 2 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 1 ).NSides = 4;
+	zonePoly.SurfaceFace( 1 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 2 ).NSides = 4;
+	zonePoly.SurfaceFace( 2 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).x = 10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).x = 10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
+
+	Real64 dist;
+	EXPECT_EQ( true, areCornersEquidistant( zonePoly , 1 , 2 , dist ) );
+	EXPECT_EQ( 8. , dist );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 7.;
+	EXPECT_EQ( false, areCornersEquidistant( zonePoly, 1, 2, dist ) );
+
+
 
 }
+
 
 
