@@ -836,7 +836,7 @@ namespace DXCoils {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using CurveManager::CurveValue;
-		using CurveManager::checkCurveValue;
+		using CurveManager::checkCurveIsNormalizedToOne;
 		using CurveManager::SetCurveOutputMinMaxValues;
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1085,7 +1085,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1109,7 +1109,7 @@ namespace DXCoils {
 				// Verify Curve Object, only legal type is Quadratic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1135,7 +1135,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1160,7 +1160,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1381,7 +1381,7 @@ namespace DXCoils {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 					ShowContinueError( "...not found " + cAlphaFields( 16 ) + "=\"" + Alphas( 16 ) + "\"." );
 				} else {
-					// Verify Curve Object, only legal type is BiQuadratic
+					// Verify Curve Object, only legal type is Quadratic and Cubic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).SHRFFlow( 1 ) ) );
 					if ( ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
 
@@ -1562,7 +1562,7 @@ namespace DXCoils {
 
 								if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 									DXCoil( DXCoilNum ).TotCapTempModFacCurveType( PerfModeNum ) = BiQuadratic;
-									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( PerfModeNum ), cAlphaFields2( 2 ), Alphas2( 2 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+									checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( PerfModeNum ), cAlphaFields2( 2 ), Alphas2( 2 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1587,7 +1587,7 @@ namespace DXCoils {
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ) ) );
 
 								if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ), cAlphaFields2( 3 ), Alphas2( 3 ), 1.0, _, _, _, _ );
+									checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ), cAlphaFields2( 3 ), Alphas2( 3 ), 1.0 );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1613,7 +1613,7 @@ namespace DXCoils {
 
 								if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 									DXCoil( DXCoilNum ).EIRTempModFacCurveType( PerfModeNum ) = BiQuadratic;
-									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( PerfModeNum ), cAlphaFields2( 4 ), Alphas2( 4 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+									checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( PerfModeNum ), cAlphaFields2( 4 ), Alphas2( 4 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1638,7 +1638,7 @@ namespace DXCoils {
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ) ) );
 
 								if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ), cAlphaFields2( 5 ), Alphas2( 5 ), 1.0, _, _, _, _ );
+									checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ), cAlphaFields2( 5 ), Alphas2( 5 ), 1.0 );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1955,15 +1955,15 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedOutdoorAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedOutdoorAirTempHeat );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1988,7 +1988,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2014,15 +2014,15 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = Quadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedOutdoorAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = Cubic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedOutdoorAirTempHeat );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2047,7 +2047,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2136,7 +2136,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).DefrostEIRFT ) );
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DefrostEIRFT, cAlphaFields( 10 ), Alphas( 10 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DefrostEIRFT, cAlphaFields( 10 ), Alphas( 10 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2358,7 +2358,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2383,7 +2383,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2410,7 +2410,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2435,7 +2435,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( 1 ) ) );
 
 				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2529,7 +2529,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 2 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp2, cAlphaFields( 10 ), Alphas( 10 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp2, cAlphaFields( 10 ), Alphas( 10 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2555,7 +2555,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 2 ) = BiQuadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp2, cAlphaFields( 11 ), Alphas( 11 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp2, cAlphaFields( 11 ), Alphas( 11 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2996,11 +2996,11 @@ namespace DXCoils {
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).HCapFTempCurveType = BiQuadratic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 10 ), Alphas( 10 ), InletAirTemp, InletWaterTemp, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 10 ), Alphas( 10 ), InletAirTemp, InletWaterTemp );
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).HCapFTempCurveType = Cubic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 10 ), Alphas( 10 ), InletAirTemp, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 10 ), Alphas( 10 ), InletAirTemp );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3023,7 +3023,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFAirFlow, cAlphaFields( 11 ), Alphas( 11 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFAirFlow, cAlphaFields( 11 ), Alphas( 11 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3046,7 +3046,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFWaterFlow ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFWaterFlow, cAlphaFields( 12 ), Alphas( 12 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFWaterFlow, cAlphaFields( 12 ), Alphas( 12 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3068,9 +3068,13 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are BiQuadratic or Cubic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFTemp ) );
 
-					if ( SELECT_CASE_var == "BIQUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).HCOPFTempCurveType = BiQuadratic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 13 ), Alphas( 13 ), InletAirTemp, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 13 ), Alphas( 13 ), InletAirTemp, InletWaterTemp );
+
+					} else if ( SELECT_CASE_var == "CUBIC" ) {
+						DXCoil( DXCoilNum ).HCOPFTempCurveType = Cubic;
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 13 ), Alphas( 13 ), InletAirTemp );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3093,7 +3097,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFAirFlow, cAlphaFields( 14 ), Alphas( 14 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFAirFlow, cAlphaFields( 14 ), Alphas( 14 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3116,7 +3120,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFWaterFlow ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFWaterFlow, cAlphaFields( 15 ), Alphas( 15 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFWaterFlow, cAlphaFields( 15 ), Alphas( 15 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3355,11 +3359,11 @@ namespace DXCoils {
 
 						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 							DXCoil( DXCoilNum ).HCapFTempCurveType = BiQuadratic;
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 6 ), Alphas( 6 ), InletAirTemp, InletWaterTemp, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 6 ), Alphas( 6 ), InletAirTemp, InletWaterTemp );
 
 						} else if ( SELECT_CASE_var == "CUBIC" ) {
 							DXCoil( DXCoilNum ).HCapFTempCurveType = Cubic;
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 6 ), Alphas( 6 ), InletAirTemp, _, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 6 ), Alphas( 6 ), InletAirTemp );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3382,7 +3386,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
 
 						if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFAirFlow, cAlphaFields( 7 ), Alphas( 7 ), 1.0, _, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFAirFlow, cAlphaFields( 7 ), Alphas( 7 ), 1.0 );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3406,11 +3410,11 @@ namespace DXCoils {
 
 						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 							DXCoil( DXCoilNum ).HCOPFTempCurveType = BiQuadratic;
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 8 ), Alphas( 8 ), InletAirTemp, InletWaterTemp, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 8 ), Alphas( 8 ), InletAirTemp, InletWaterTemp );
 
 						} else if ( SELECT_CASE_var == "CUBIC" ) {
 							DXCoil( DXCoilNum ).HCOPFTempCurveType = Cubic;
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 8 ), Alphas( 8 ), InletAirTemp, _, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 8 ), Alphas( 8 ), InletAirTemp );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3433,7 +3437,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
 
 						if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFAirFlow, cAlphaFields( 9 ), Alphas( 9 ), 1.0, _, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFAirFlow, cAlphaFields( 9 ), Alphas( 9 ), 1.0 );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3749,7 +3753,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSCCapFTemp( I ) ) );
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 13 + ( I - 1 ) * 6 ), Alphas( 13 + ( I - 1 ) * 6 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 13 + ( I - 1 ) * 6 ), Alphas( 13 + ( I - 1 ) * 6 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3774,7 +3778,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSCCapFFlow( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFFlow( I ), cAlphaFields( 14 + ( I - 1 ) * 6 ), Alphas( 14 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFFlow( I ), cAlphaFields( 14 + ( I - 1 ) * 6 ), Alphas( 14 + ( I - 1 ) * 6 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3799,7 +3803,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSEIRFTemp( I ) ) );
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 15 + ( I - 1 ) * 6 ), Alphas( 15 + ( I - 1 ) * 6 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 15 + ( I - 1 ) * 6 ), Alphas( 15 + ( I - 1 ) * 6 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3824,7 +3828,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSEIRFFlow( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFFlow( I ), cAlphaFields( 16 + ( I - 1 ) * 6 ), Alphas( 16 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFFlow( I ), cAlphaFields( 16 + ( I - 1 ) * 6 ), Alphas( 16 + ( I - 1 ) * 6 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4068,7 +4072,7 @@ namespace DXCoils {
 					// Verify Curve Object, only legal type is BiQuadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).DefrostEIRFT ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DefrostEIRFT, cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DefrostEIRFT, cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTempHeat, RatedOutdoorAirTempHeat );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4203,15 +4207,15 @@ namespace DXCoils {
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( I ) = Quadratic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat );
 
 					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( I ) = BiQuadratic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( I ) = Cubic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4236,7 +4240,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSCCapFFlow( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFFlow( I ), cAlphaFields( 11 + ( I - 1 ) * 6 ), Alphas( 11 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFFlow( I ), cAlphaFields( 11 + ( I - 1 ) * 6 ), Alphas( 11 + ( I - 1 ) * 6 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4262,15 +4266,15 @@ namespace DXCoils {
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( I ) = Quadratic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat );
 
 					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( I ) = BiQuadratic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( I ) = Cubic;
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4295,7 +4299,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSEIRFFlow( I ) ) );
 
 					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
-						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFFlow( I ), cAlphaFields( 13 + ( I - 1 ) * 6 ), Alphas( 13 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
+						checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFFlow( I ), cAlphaFields( 13 + ( I - 1 ) * 6 ), Alphas( 13 + ( I - 1 ) * 6 ), 1.0 );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4375,7 +4379,7 @@ namespace DXCoils {
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
 						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSWasteHeat( I ), cAlphaFields( 15 + ( I - 1 ) * 6 ), Alphas( 15 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, RatedInletAirTempHeat, _, _, _ );
+							checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSWasteHeat( I ), cAlphaFields( 15 + ( I - 1 ) * 6 ), Alphas( 15 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, RatedInletAirTempHeat );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4471,19 +4475,19 @@ namespace DXCoils {
 
 			if ( SELECT_CASE_var == "LINEAR" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
-				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, _, _, _, _ );
+				checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp );
 
 			} else if ( SELECT_CASE_var == "QUADRATIC" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, _, _, _, _ );
+				checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp );
 
 			} else if ( SELECT_CASE_var == "CUBIC" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, _, _, _, _ );
+				checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp );
 
 			} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
+				checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4507,7 +4511,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
 				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 4 ), Alphas( 4 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 4 ), Alphas( 4 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4600,15 +4604,15 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "LINEAR" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat );
 
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
@@ -4637,7 +4641,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
 				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
+					checkCurveIsNormalizedToOne( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0 );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );

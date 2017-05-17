@@ -1304,6 +1304,7 @@ namespace HVACVariableRefrigerantFlow {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using CurveManager::CurveValue;
+		using CurveManager::checkCurveIsNormalizedToOne;
 		using CurveManager::SetCurveOutputMinMaxValues;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -1558,12 +1559,7 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is biquadratic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCapFT ) );
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-					CurveVal = CurveValue( VRF( VRFNum ).CoolCapFT, RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFieldNames( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).CoolCapFT, cAlphaFieldNames( 3 ), cAlphaArgs( 3 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
 				} else {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCapFT ) );
 					ShowContinueError( "... curve type must be BiQuadratic." );
@@ -1745,19 +1741,9 @@ namespace HVACVariableRefrigerantFlow {
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFT ) );
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					if ( SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
-						CurveVal = CurveValue( VRF( VRFNum ).HeatCapFT, RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\"" );
-							ShowContinueError( "..." + cAlphaFieldNames( 13 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-							ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).HeatCapFT, cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
 					} else if ( SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
-						CurveVal = CurveValue( VRF( VRFNum ).HeatCapFT, RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\"" );
-							ShowContinueError( "..." + cAlphaFieldNames( 13 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-							ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).HeatCapFT, cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 					} else {
 						// do nothing, warning is issued below
 					}
@@ -3506,20 +3492,9 @@ namespace HVACVariableRefrigerantFlow {
 							std::string sCurveType = GetCurveType( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ) );
 							if ( VRFTU( VRFTUNum ).VRFSysNum > 0 && VRFTU( VRFTUNum ).HeatCoilIndex > 0 && InputProcessor::SameString( sCurveType, "BiQuadratic" ) ) {
 								if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType == WetBulbIndicator ) {
-									CurveVal = CurveValue( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ) + "\"" );
-										ShowContinueError( "...Heating Capacity as a Function of Temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
+									checkCurveIsNormalizedToOne( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ), GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), "Heating Capacity Ratio Modifier Function of Temperature Curve Name", CurveManager::GetCurveName( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ) ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
 								} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType == DryBulbIndicator ) {
-									CurveVal = CurveValue( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ) + "\"" );
-										ShowContinueError( "...Heating Capacity as a Function of Temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
-								} else {
+									checkCurveIsNormalizedToOne( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ), GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), "Heating Capacity Ratio Modifier Function of Temperature Curve Name", CurveManager::GetCurveName( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ) ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 								}
 							}
 
