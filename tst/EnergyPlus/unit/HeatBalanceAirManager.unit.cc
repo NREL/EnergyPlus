@@ -93,9 +93,11 @@ namespace EnergyPlus {
 
 		std::string const error_string = delimited_string( {
 			"   ** Severe  ** In RoomAirModelType = SKINNY_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
-			"   **   ~~~   ** The AirflowNetwork model inputs are required.",
+			"   **   ~~~   ** The model requires a complete set of other AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
+			"   **   ~~~   ** AirflowNetwork:SimulationControl and related inputs are required.",
 			"   ** Severe  ** In RoomAirModelType = PHAT_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
-			"   **   ~~~   ** The AirflowNetwork model inputs are required.",
+			"   **   ~~~   ** The model requires a complete set of other AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
+			"   **   ~~~   ** AirflowNetwork:SimulationControl and related inputs are required.",
 			"   ** Severe  ** Errors found in processing input for RoomAirModelType",
 		} );
 
