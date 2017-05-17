@@ -4928,6 +4928,8 @@ namespace ZoneTempPredictorCorrector {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::ZoneEquipList;
+		using DataZoneEquipment::ZoneExhaustFan_Num;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
 		using ZonePlenum::NumZoneReturnPlenums;
@@ -4936,6 +4938,7 @@ namespace ZoneTempPredictorCorrector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_HAMT;
 		using DataSurfaces::HeatTransferModel_EMPD;
+		using DataHeatBalance::MassConservation;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4975,6 +4978,9 @@ namespace ZoneTempPredictorCorrector {
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
+		int iList;
+		bool ExhaustNodeFlag;
+		bool ExhaustListFlag;
 
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
@@ -5017,10 +5023,25 @@ namespace ZoneTempPredictorCorrector {
 				ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
 
+			ExhaustNodeFlag = false;
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
+				ExhaustListFlag = false;
+				for ( iList = 1; iList <= ZoneEquipList( ZoneNum ).NumOfEquipTypes; ++iList ) {
+					if ( ( ZoneEquipList( ZoneNum ).EquipType_Num( iList ) == ZoneExhaustFan_Num ) && 
+						( ZoneEquipList( ZoneNum ).EquipData( iList ).NumInlets > 0 && ZoneEquipList( ZoneNum ).EquipData( iList ).InletNodeNums( 1 ) == ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ) ) {
+						if ( !( ZoneEquipConfig( ZoneEquipConfigNum ).AirLoopNum > 0 || ZoneAirMassFlow.EnforceZoneMassBalance || AirflowNetworkNumOfExhFan > 0 ) ) {
+							ExhaustNodeFlag = true;
+							ExhaustListFlag = true;
+						}
+					}
+				}
+				if ( !ExhaustListFlag ) {
+					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
+				}
 			} // NodeNum
-			ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
+			if ( !ExhaustNodeFlag ) {
+				ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
+			}
 
 			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
 				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;

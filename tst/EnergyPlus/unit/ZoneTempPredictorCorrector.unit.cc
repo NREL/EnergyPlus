@@ -118,6 +118,15 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
 
+	ZoneEquipList.allocate( 1 );
+	ZoneEquipList( 1 ).NumOfEquipTypes = 1;
+	ZoneEquipList( 1 ).EquipType_Num.allocate( 1 );
+	ZoneEquipList( 1 ).EquipType_Num( 1 ) = 10; // none exhaust fan
+	ZoneEquipList( 1 ).EquipData.allocate( 1 );
+	ZoneEquipList( 1 ).EquipData( 1 ).NumInlets = 1;
+	ZoneEquipList( 1 ).EquipData( 1 ).InletNodeNums.allocate( 1 );
+	ZoneEquipList( 1 ).EquipData( 1 ).InletNodeNums( 1 ) = 3;
+
 	Node.allocate( 5 );
 
 	Zone.allocate( 1 );
@@ -265,6 +274,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
 	EXPECT_FALSE( (0.008 == Node( 5 ).HumRat) );
 
+	// Add a section to check #6119 by L. Gu on 5/16/17
+	ZoneEquipList( 1 ).EquipType_Num( 1 ) = 20; // exhaust fan
+	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	EXPECT_NEAR( 0.0081218, Node( 5 ).HumRat, 0.00001 );
+
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate();
 	ZoneEquipConfig( 1 ).ExhaustNode.deallocate();
@@ -290,6 +304,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneAirHumRatTemp.deallocate();
 	ZoneW1.deallocate();
 	AirModel.deallocate();
+	ZoneEquipList.deallocate( );
 
 }
 
