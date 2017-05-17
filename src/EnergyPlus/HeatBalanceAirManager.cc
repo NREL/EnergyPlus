@@ -2938,8 +2938,8 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					if ( GetNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
 						ShowSevereError( "In " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 3 ) + " = AIRFLOWNETWORK."  );
-						ShowContinueError( "The model requires a complete set of other AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage." );
-						ShowContinueError( "AirflowNetwork:SimulationControl and related inputs are required." );
+						ShowContinueError( "This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage." );
+						ShowContinueError( "AirflowNetwork:SimulationControl not found." );
 						ErrorsFound = true;
 					}
 				} else {
