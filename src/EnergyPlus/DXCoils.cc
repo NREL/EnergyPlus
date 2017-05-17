@@ -108,7 +108,6 @@ namespace DXCoils {
 	//                                Coil:Cooling:DX:MultiSpeed, and Coil:Cooling:DX:TwoStageWithHumidityControlMode
 	//                      Feb 2013, Bereket Nigusse, FSEC, Added DX Coil Model For 100% OA systems
 	//                      Jul 2015, RP Zhang, XF Pang, LBNL, Added new coil type for VRF-FluidTemperatureControl Model
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// To encapsulate the data and algorithms required to simulate DX cooling coils in
@@ -117,12 +116,6 @@ namespace DXCoils {
 	// air conditions. The module also determines the DX unit's electrical energy usage.
 	// Neither the air-side performance nor the electrical energy usage includes the effect
 	// of supply air fan heat/energy usage. The supply air fan is modeled by other modules.
-
-	// METHODOLOGY EMPLOYED:
-
-	// REFERENCES:
-
-	// OTHER NOTES:
 
 	// USE STATEMENTS:
 	// Use statements for data only modules
@@ -279,39 +272,18 @@ namespace DXCoils {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   May 2000
 		//       MODIFIED       Don Shirey, Sept 2000, October 2001, June 2005
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a single speed on/off DX coil.
-
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // index of fan coil unit being simulated
 		Real64 AirFlowRatio; // ratio of compressor on airflow to compressor off airflow
 		Real64 CompCycRatio; // compressor cycling ratio of VRF condenser
-
-		// FLOW
 
 		// First time SimDXCoil is called, get the input for all the DX coils (condensing units)
 		if ( GetCoilsInputFlag ) {
@@ -425,16 +397,9 @@ namespace DXCoils {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   September 2002
 		//       MODIFIED       Lixing Gu, Sep. 2007
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a multi speed DX coil.
-
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
@@ -445,15 +410,6 @@ namespace DXCoils {
 		//   (CompressorSpeedMax - CompressorSpeedMin)
 		// for variable speed or 2 speed compressors
 		// or 2 speed compressors
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // index of fan coil unit being simulated
@@ -543,33 +499,17 @@ namespace DXCoils {
 		//       AUTHOR         M. J. Witte (based on SimDXCoilMultiSpeed by Fred Buhl)
 		//       DATE WRITTEN   February 2005
 		//       MODIFIED       April 2010, Chandan sharma, added basin heater
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a DX coil with multiple performance modes, such as
 		// multiple stages, or sub-cool reheat for humidity control.
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimDXCoilMultiMode" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // index of coil being simulated
@@ -597,7 +537,6 @@ namespace DXCoils {
 		Real64 S12OutletAirTemp; // Stage 1&2 Outlet air dry bulb temp [C]
 		Real64 S12OutletAirHumRat; // Stage 1&2 Outlet air humidity ratio [kgWater/kgDryAir]
 		Real64 S12OutletAirEnthalpy; // Stage 1&2 Outlet air enthalpy
-		//  REAL(r64) :: S12PLR                  ! Stage 1&2 Ratio of actual sensible cooling load to
 		//                                       !           steady-state sensible cooling capacity
 		Real64 S12TotalCoolingEnergyRate; // Stage 1&2 Total cooling rate [W]
 		Real64 S12SensCoolingEnergyRate; // Stage 1&2 Sensible cooling rate [W]
@@ -880,16 +819,12 @@ namespace DXCoils {
 		//                      Jun 2007, L. Gu, FSEC, Added new coil type COIL:DX:MULTISPEED:COOLING and COIL:DX:MULTISPEED:HEATING
 		//                      Apr 2010, Chandan Sharma, FSEC, added basin heater inputs
 		//                      Jul 2015, RP Zhang, XF Pang, LBNL, Added new coil type for VRF-FluidTemperatureControl Model
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Obtains input data for DX coils and stores it in DX coil data structure
 
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
@@ -901,6 +836,7 @@ namespace DXCoils {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using CurveManager::CurveValue;
+		using CurveManager::checkCurveValue;
 		using CurveManager::SetCurveOutputMinMaxValues;
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -922,19 +858,8 @@ namespace DXCoils {
 		using InputProcessor::FindItemInList;
 		using DataHeatBalance::Zone;
 
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDXCoils: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilIndex; // loop index
@@ -964,12 +889,6 @@ namespace DXCoils {
 		std::string PerfObjectName; // Performance object name for getting and error messages
 		Real64 InletAirTemp; // Used to pass proper inlet air temp to HPWH DX coil performance curves
 		Real64 InletWaterTemp; // Used to pass proper inlet water temp to HPWH DX coil performance curves
-		Real64 HeatCapFTemp; // Used to verify HPWH DX coil heating capacity (function of temp) performance curve
-		Real64 HeatCOPFTemp; // Used to verify HPWH DX coil heating COP (function of temp) performance curve
-		Real64 HeatCapFAirFlow; // Used to verify HPWH DX coil heating capacity (function of air flow) performance curve
-		Real64 HeatCOPFAirFlow; // Used to verify HPWH DX coil heating COP (function of air flow) performance curve
-		Real64 HeatCapFWaterFlow; // Used to verify HPWH DX coil heating capacity (function of water flow) performance curve
-		Real64 HeatCOPFWaterFlow; // Used to verify HPWH DX coil heating COP (function of water flow) performance curve
 		int I; // Index of speeds
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
 		Array1D_string Alphas; // Alpha input items for object
@@ -1166,12 +1085,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1194,21 +1108,8 @@ namespace DXCoils {
 			} else {
 				// Verify Curve Object, only legal type is Quadratic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1234,12 +1135,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1263,21 +1159,8 @@ namespace DXCoils {
 				// Verify Curve Object, only legal type is Quadratic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 8 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 8 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -1301,10 +1184,7 @@ namespace DXCoils {
 				// Verify Curve Object, only legal types are Quadratic or Cubic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve output tested below
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 					// curve output tested below
 
 				} else {
@@ -1682,12 +1562,7 @@ namespace DXCoils {
 
 								if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 									DXCoil( DXCoilNum ).TotCapTempModFacCurveType( PerfModeNum ) = BiQuadratic;
-									CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( PerfModeNum ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-										ShowContinueError( "..." + cAlphaFields2( 2 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
+									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( PerfModeNum ), cAlphaFields2( 2 ), Alphas2( 2 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1711,21 +1586,8 @@ namespace DXCoils {
 								// Verify Curve Object, only legal type is Quadratic
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ) ) );
 
-								if ( SELECT_CASE_var == "QUADRATIC" ) {
-									CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ), 1.0 );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-										ShowContinueError( "..." + cAlphaFields2( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
-
-								} else if ( SELECT_CASE_var == "CUBIC" ) {
-									CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ), 1.0 );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-										ShowContinueError( "..." + cAlphaFields2( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
+								if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( PerfModeNum ), cAlphaFields2( 3 ), Alphas2( 3 ), 1.0, _, _, _, _ );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1751,12 +1613,7 @@ namespace DXCoils {
 
 								if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 									DXCoil( DXCoilNum ).EIRTempModFacCurveType( PerfModeNum ) = BiQuadratic;
-									CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( PerfModeNum ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-										ShowContinueError( "..." + cAlphaFields2( 4 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
+									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( PerfModeNum ), cAlphaFields2( 4 ), Alphas2( 4 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1780,21 +1637,8 @@ namespace DXCoils {
 								// Verify Curve Object, only legal type is Quadratic
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ) ) );
 
-								if ( SELECT_CASE_var == "QUADRATIC" ) {
-									CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ), 1.0 );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-										ShowContinueError( "..." + cAlphaFields2( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
-
-								} else if ( SELECT_CASE_var == "CUBIC" ) {
-									CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ), 1.0 );
-									if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-										ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-										ShowContinueError( "..." + cAlphaFields2( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-										ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-									}
+								if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+									checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( PerfModeNum ), cAlphaFields2( 5 ), Alphas2( 5 ), 1.0, _, _, _, _ );
 
 								} else {
 									ShowSevereError( RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid" );
@@ -1818,10 +1662,7 @@ namespace DXCoils {
 								// Verify Curve Object, only legal types are Quadratic or Cubic
 								{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( PerfModeNum ) ) );
 
-								if ( SELECT_CASE_var == "QUADRATIC" ) {
-									// curve output tested below
-
-								} else if ( SELECT_CASE_var == "CUBIC" ) {
+								if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 									// curve output tested below
 
 								} else {
@@ -2114,30 +1955,15 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedOutdoorAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedOutdoorAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2161,21 +1987,8 @@ namespace DXCoils {
 				// Verify Curve Object, only legal type is Quadratic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2201,30 +2014,15 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = Quadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedOutdoorAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
 
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = Cubic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedOutdoorAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2248,21 +2046,8 @@ namespace DXCoils {
 				// Verify Curve Object, only legal type is Quadratic or Cubic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 8 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 8 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2286,10 +2071,7 @@ namespace DXCoils {
 				// Verify Curve Object, only legal types are Quadratic or Cubic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve output tested below
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 					// curve output tested below
 
 				} else {
@@ -2354,12 +2136,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).DefrostEIRFT ) );
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-							ShowContinueError( "..." + cAlphaFields( 10 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-							ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DefrostEIRFT, cAlphaFields( 10 ), Alphas( 10 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2581,12 +2358,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2610,21 +2382,8 @@ namespace DXCoils {
 				// Verify Curve Object, only legal type is Quadratic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2651,12 +2410,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 7 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp( 1 ), cAlphaFields( 7 ), Alphas( 7 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2680,21 +2434,8 @@ namespace DXCoils {
 				// Verify Curve Object, only legal type is Quadratic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).EIRFFlow( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 8 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 8 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFFlow( 1 ), cAlphaFields( 8 ), Alphas( 8 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2718,10 +2459,7 @@ namespace DXCoils {
 				// Verify Curve Object, only legal types are Quadratic or Cubic
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
-				if ( SELECT_CASE_var == "QUADRATIC" ) {
-					// curve output tested below
-
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
+				if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 					// curve output tested below
 
 				} else {
@@ -2791,12 +2529,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 2 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp2, RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "Capacity ratio as a function of temperature curve output at speed 2 is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp2, cAlphaFields( 10 ), Alphas( 10 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2822,12 +2555,7 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).EIRTempModFacCurveType( 2 ) = BiQuadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).EIRFTemp2, RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "Enegy input ratio as a function of temperature curve output at speed 2 is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).EIRFTemp2, cAlphaFields( 11 ), Alphas( 11 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -3268,27 +2996,18 @@ namespace DXCoils {
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).HCapFTempCurveType = BiQuadratic;
-						HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp, InletWaterTemp );
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 10 ), Alphas( 10 ), InletAirTemp, InletWaterTemp, _, _, _ );
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).HCapFTempCurveType = Cubic;
-						HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp );
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 10 ), Alphas( 10 ), InletAirTemp, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...illegal " + cAlphaFields( 10 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFTemp ) );
 						ShowContinueError( "Curve type must be BiQuadratic or Cubic." );
 						ErrorsFound = true;
-						HeatCapFTemp = 1.0;
 					}}
-
-					if ( std::abs( HeatCapFTemp - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 10 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at the rating point = " + TrimSigDigits( HeatCapFTemp, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3303,27 +3022,15 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
 
-					if ( SELECT_CASE_var == "CUBIC" ) {
-						HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, 1.0 );
-
-					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-						HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, 1.0 );
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFAirFlow, cAlphaFields( 11 ), Alphas( 11 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...illegal " + cAlphaFields( 11 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
-						HeatCapFAirFlow = 1.0;
 					}}
-
-					if ( std::abs( HeatCapFAirFlow - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 11 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCapFAirFlow, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3338,27 +3045,15 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFWaterFlow ) );
 
-					if ( SELECT_CASE_var == "CUBIC" ) {
-						HeatCapFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCapFWaterFlow, 1.0 );
-
-					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-						HeatCapFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCapFWaterFlow, 1.0 );
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFWaterFlow, cAlphaFields( 12 ), Alphas( 12 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...illegal " + cAlphaFields( 12 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFWaterFlow ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
-						HeatCapFWaterFlow = 1.0;
 					}}
-
-					if ( std::abs( HeatCapFWaterFlow - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 11 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCapFWaterFlow, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3373,29 +3068,16 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are BiQuadratic or Cubic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFTemp ) );
 
-					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+					if ( SELECT_CASE_var == "BIQUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).HCOPFTempCurveType = BiQuadratic;
-						HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp, InletWaterTemp );
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						DXCoil( DXCoilNum ).HCOPFTempCurveType = Cubic;
-						HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp );
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 13 ), Alphas( 13 ), InletAirTemp, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...illegal " + cAlphaFields( 13 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFTemp ) );
 						ShowContinueError( "Curve type must be BiQuadratic or Cubic." );
 						ErrorsFound = true;
-						HeatCOPFTemp = 1.0;
 					}}
-
-					if ( std::abs( HeatCOPFTemp - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 13 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCOPFTemp, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3410,27 +3092,15 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
 
-					if ( SELECT_CASE_var == "CUBIC" ) {
-						HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, 1.0 );
-
-					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-						HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, 1.0 );
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFAirFlow, cAlphaFields( 14 ), Alphas( 14 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...illegal " + cAlphaFields( 14 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
-						HeatCOPFAirFlow = 1.0;
 					}}
-
-					if ( std::abs( HeatCOPFAirFlow - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 14 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCOPFAirFlow, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3445,27 +3115,15 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFWaterFlow ) );
 
-					if ( SELECT_CASE_var == "CUBIC" ) {
-						HeatCOPFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFWaterFlow, 1.0 );
-
-					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-						HeatCOPFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFWaterFlow, 1.0 );
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFWaterFlow, cAlphaFields( 15 ), Alphas( 15 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...illegal " + cAlphaFields( 15 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFWaterFlow ) );
 						ShowContinueError( "Curve type must be Quadratic or Cubic." );
 						ErrorsFound = true;
-						HeatCOPFWaterFlow = 1.0;
 					}}
-
-					if ( std::abs( HeatCOPFWaterFlow - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 15 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at a water flow fraction of 1 = " + TrimSigDigits( HeatCOPFWaterFlow, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3480,10 +3138,7 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
-					if ( SELECT_CASE_var == "CUBIC" ) {
-						// curve output tested below
-
-					} else if ( SELECT_CASE_var == "QUADRATIC" ) {
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 						// curve output tested below
 
 					} else {
@@ -3700,27 +3355,18 @@ namespace DXCoils {
 
 						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 							DXCoil( DXCoilNum ).HCapFTempCurveType = BiQuadratic;
-							HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp, InletWaterTemp );
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 6 ), Alphas( 6 ), InletAirTemp, InletWaterTemp, _, _, _ );
 
 						} else if ( SELECT_CASE_var == "CUBIC" ) {
 							DXCoil( DXCoilNum ).HCapFTempCurveType = Cubic;
-							HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp );
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFTemp, cAlphaFields( 6 ), Alphas( 6 ), InletAirTemp, _, _, _, _ );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 6 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFTemp ) );
 							ShowContinueError( "Curve type must be BiQuadratic or Cubic." );
 							ErrorsFound = true;
-							HeatCapFTemp = 1.0;
 						}}
-
-					if ( std::abs( HeatCapFTemp - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 6 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at the rating point = " + TrimSigDigits( HeatCapFTemp, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3735,27 +3381,15 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
 
-						if ( SELECT_CASE_var == "CUBIC" ) {
-							HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, 1.0 );
-
-						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-							HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, 1.0 );
+						if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCapFAirFlow, cAlphaFields( 7 ), Alphas( 7 ), 1.0, _, _, _, _ );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 7 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
 							ShowContinueError( "Curve type must be Quadratic or Cubic." );
 							ErrorsFound = true;
-							HeatCapFAirFlow = 1.0;
 						}}
-
-					if ( std::abs( HeatCapFAirFlow - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 7 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCapFAirFlow, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3772,27 +3406,18 @@ namespace DXCoils {
 
 						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 							DXCoil( DXCoilNum ).HCOPFTempCurveType = BiQuadratic;
-							HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp, InletWaterTemp );
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 8 ), Alphas( 8 ), InletAirTemp, InletWaterTemp, _, _, _ );
 
 						} else if ( SELECT_CASE_var == "CUBIC" ) {
 							DXCoil( DXCoilNum ).HCOPFTempCurveType = Cubic;
-							HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp );
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFTemp, cAlphaFields( 8 ), Alphas( 8 ), InletAirTemp, _, _, _, _ );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 8 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFTemp ) );
 							ShowContinueError( "Curve type must be BiQuadratic or Cubic." );
 							ErrorsFound = true;
-							HeatCOPFTemp = 1.0;
 						}}
-
-					if ( std::abs( HeatCOPFTemp - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 8 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCOPFTemp, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3807,27 +3432,15 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
 
-						if ( SELECT_CASE_var == "CUBIC" ) {
-							HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, 1.0 );
-
-						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-							HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, 1.0 );
+						if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).HCOPFAirFlow, cAlphaFields( 9 ), Alphas( 9 ), 1.0, _, _, _, _ );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 9 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
 							ShowContinueError( "Curve type must be Quadratic or Cubic." );
 							ErrorsFound = true;
-							HeatCOPFAirFlow = 1.0;
 						}}
-
-					if ( std::abs( HeatCOPFAirFlow - 1.0 ) > 0.05 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
-						// could remove name from the field for output
-						ShowContinueError( "...The " + cAlphaFields( 9 ) + " should be normalized to 1.0 at the rating point." );
-						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCOPFAirFlow, 3 ) );
-						ShowContinueError( "...The simulation continues using the user-specified curve." );
-					}
 
 				}
 			}
@@ -3842,10 +3455,7 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Cubic or Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
 
-						if ( SELECT_CASE_var == "CUBIC" ) {
-							// curve output tested below
-
-						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
+						if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 							// curve output tested below
 
 						} else {
@@ -4139,12 +3749,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSCCapFTemp( I ) ) );
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( I ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 13 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 13 + ( I - 1 ) * 6 ), Alphas( 13 + ( I - 1 ) * 6 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4168,23 +3773,8 @@ namespace DXCoils {
 					// Verify Curve Object, only legal type is Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSCCapFFlow( I ) ) );
 
-					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( cAlphaFields( 14 + ( I - 1 ) * 6 ) + " = " + Alphas( 14 + ( I - 1 ) * 6 ) );
-							ShowContinueError( "..." + cAlphaFields( 14 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( cAlphaFields( 14 + ( I - 1 ) * 6 ) + " = " + Alphas( 14 + ( I - 1 ) * 6 ) );
-							ShowContinueError( "..." + cAlphaFields( 14 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFFlow( I ), cAlphaFields( 14 + ( I - 1 ) * 6 ), Alphas( 14 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4209,13 +3799,7 @@ namespace DXCoils {
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSEIRFTemp( I ) ) );
 
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( I ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( cAlphaFields( 15 + ( I - 1 ) * 6 ) + " = " + Alphas( 15 + ( I - 1 ) * 6 ) );
-							ShowContinueError( "..." + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 15 + ( I - 1 ) * 6 ), Alphas( 15 + ( I - 1 ) * 6 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4239,23 +3823,8 @@ namespace DXCoils {
 					// Verify Curve Object, only legal type is Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSEIRFFlow( I ) ) );
 
-					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( cAlphaFields( 16 + ( I - 1 ) * 6 ) + " = " + Alphas( 16 + ( I - 1 ) * 6 ) );
-							ShowContinueError( "..." + cAlphaFields( 16 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( cAlphaFields( 16 + ( I - 1 ) * 6 ) + " = " + Alphas( 16 + ( I - 1 ) * 6 ) );
-							ShowContinueError( "..." + cAlphaFields( 16 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFFlow( I ), cAlphaFields( 16 + ( I - 1 ) * 6 ), Alphas( 16 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4279,10 +3848,7 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Quadratic or Cubic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSPLFFPLR( I ) ) );
 
-					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve output tested below
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 						// curve output tested below
 
 					} else {
@@ -4502,13 +4068,7 @@ namespace DXCoils {
 					// Verify Curve Object, only legal type is BiQuadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).DefrostEIRFT ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, RatedInletWetBulbTempHeat, RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
-							ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DefrostEIRFT, cAlphaFields( 5 ), Alphas( 5 ), RatedInletWetBulbTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4643,30 +4203,15 @@ namespace DXCoils {
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( I ) = Quadratic;
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( I ), RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 10 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( I ) = BiQuadratic;
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( I ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 10 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( I ) = Cubic;
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( I ), RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 10 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFTemp( I ), cAlphaFields( 10 + ( I - 1 ) * 6 ), Alphas( 10 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4690,21 +4235,8 @@ namespace DXCoils {
 					// Verify Curve Object, only legal type is Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSCCapFFlow( I ) ) );
 
-					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 11 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 11 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSCCapFFlow( I ), cAlphaFields( 11 + ( I - 1 ) * 6 ), Alphas( 11 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4730,30 +4262,15 @@ namespace DXCoils {
 
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( I ) = Quadratic;
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( I ), RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 12 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 						DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( I ) = BiQuadratic;
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( I ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 12 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat, _, _, _ );
 
 					} else if ( SELECT_CASE_var == "CUBIC" ) {
 						DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( I ) = Cubic;
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( I ), RatedOutdoorAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 12 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFTemp( I ), cAlphaFields( 12 + ( I - 1 ) * 6 ), Alphas( 12 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4777,21 +4294,8 @@ namespace DXCoils {
 					// Verify Curve Object, only legal type is Quadratic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSEIRFFlow( I ) ) );
 
-					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 13 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( I ), 1.0 );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 13 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-						}
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
+						checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSEIRFFlow( I ), cAlphaFields( 13 + ( I - 1 ) * 6 ), Alphas( 13 + ( I - 1 ) * 6 ), 1.0, _, _, _, _ );
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4815,10 +4319,7 @@ namespace DXCoils {
 					// Verify Curve Object, only legal types are Quadratic or Cubic
 					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSPLFFPLR( I ) ) );
 
-					if ( SELECT_CASE_var == "QUADRATIC" ) {
-						// curve output tested below
-
-					} else if ( SELECT_CASE_var == "CUBIC" ) {
+					if ( SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC" ) {
 						// curve output tested below
 
 					} else {
@@ -4874,12 +4375,7 @@ namespace DXCoils {
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
 						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-							CurveVal = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( I ), RatedOutdoorAirTempHeat, RatedInletAirTempHeat );
-							if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-								ShowContinueError( "..." + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-								ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
-							}
+							checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).MSWasteHeat( I ), cAlphaFields( 15 + ( I - 1 ) * 6 ), Alphas( 15 + ( I - 1 ) * 6 ), RatedOutdoorAirTempHeat, RatedInletAirTempHeat, _, _, _ );
 
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -4975,39 +4471,19 @@ namespace DXCoils {
 
 			if ( SELECT_CASE_var == "LINEAR" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
-				CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletWetBulbTemp );
-				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-					ShowContinueError( "..." + cAlphaFields( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-					ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-				}
+				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, _, _, _, _ );
 
 			} else if ( SELECT_CASE_var == "QUADRATIC" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-				CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletWetBulbTemp );
-				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-					ShowContinueError( "..." + cAlphaFields( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-					ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-				}
+				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, _, _, _, _ );
 
 			} else if ( SELECT_CASE_var == "CUBIC" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-				CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletWetBulbTemp );
-				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-					ShowContinueError( "..." + cAlphaFields( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-					ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-				}
+				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, _, _, _, _ );
 
 			} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-				CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
-				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-					ShowContinueError( "..." + cAlphaFields( 3 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-					ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-				}
+				checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 3 ), Alphas( 3 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp, _, _, _ );
 
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -5031,12 +4507,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
 				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 4 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 4 ), Alphas( 4 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -5129,37 +4600,20 @@ namespace DXCoils {
 
 				if ( SELECT_CASE_var == "LINEAR" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, _, _, _, _ );
+
 				} else if ( SELECT_CASE_var == "QUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, _, _, _, _ );
+
 				} else if ( SELECT_CASE_var == "CUBIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFTemp( 1 ), cAlphaFields( 5 ), Alphas( 5 ), RatedInletAirTempHeat, _, _, _, _ );
+
 				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
 					// Can't check this here, don't know if using outdoor dry-bulb or outdoor wet-bulb temp as input. Make this check in VRF TU GetInput.
-//					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
-//					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-//						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-//						ShowContinueError( "..." + cAlphaFields( 5 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-//						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-//					}
+
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 					ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
@@ -5183,12 +4637,7 @@ namespace DXCoils {
 				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
 
 				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					CurveVal = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( 1 ), 1.0 );
-					if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\"" );
-						ShowContinueError( "..." + cAlphaFields( 6 ) + " output is not equal to 1.0 (+ or - 10%) at reference conditions." );
-						ShowContinueError( "...Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
-					}
+					checkCurveValue( RoutineName + CurrentModuleObject, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).CCapFFlow( 1 ), cAlphaFields( 6 ), Alphas( 6 ), 1.0, _, _, _, _ );
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
@@ -5684,7 +5133,6 @@ namespace DXCoils {
 		//                      Jul 2005, R. Raustad, FSEC. Add new coil type COIL:DX:HEATPUMPWATERHEATER
 		//                      Jun 2007, L. Gu, FSEC. Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
 		//                      Aug 2015, R. Zhang, LBNL. Add new coil types for VRF_FluidTCtrl
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for initializations of DX Coil Components.
@@ -5692,29 +5140,16 @@ namespace DXCoils {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataAirLoop::AirLoopInputsFilled;
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataHeatBalFanSys::ZT;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 SmallDifferenceTest( 0.00000001 );
 		static std::string const RoutineName( "InitDXCoil" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyEnvrnFlag; // One time environment flag
@@ -6052,9 +5487,6 @@ namespace DXCoils {
 		// METHODOLOGY EMPLOYED:
 		// Obtains cooling capacities and air flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using CurveManager::CurveValue;
@@ -6066,17 +5498,8 @@ namespace DXCoils {
 		using DataAirSystems::PrimaryAirSystem;
 		using StandardRatings::CalcDXCoilStandardRating;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeDXCoil" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
@@ -7370,8 +6793,6 @@ namespace DXCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   May 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the gross cooling capacity of a heat pump water heater evaporator and
@@ -7392,17 +6813,8 @@ namespace DXCoils {
 		using DataHVACGlobals::HPWHInletWBTemp;
 		using DataHVACGlobals::DXCoilTotalCapacity;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcHPWHDXCoil" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 RatedHeatingCapacity; // Water heating rated capacity with or without condenser water pump heat (W)
@@ -7748,18 +7160,9 @@ namespace DXCoils {
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataHeatBalFanSys::ZT;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDoe2DXCoil: " );
 		static std::string const calcDoe2DXCoil( "CalcDoe2DXCoil" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s] (adjusted for bypass if any)
@@ -7822,15 +7225,7 @@ namespace DXCoils {
 
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 		static Real64 MinAirHumRat( 0.0 ); // minimum of the inlet air humidity ratio and the outlet air humidity ratio
-		//CHARACTER(len=6) :: OutputChar = ' '     ! character string for warning messages
-		//INTEGER,SAVE     :: ErrCount3=0    ! Counter used to minimize the occurrence of output warnings
-		//INTEGER,SAVE     :: ErrCount4=0    ! Counter used to minimize the occurrence of output warnings
-		//CHARACTER(len=6) :: CharPLR        ! used in warning messages
-		//CHARACTER(len=6) :: CharPLF        ! used in warning messages
 		int Mode; // Performance mode for Multimode DX coil; Always 1 for other coil types
-		//CHARACTER(len=MaxNameLength) :: MinVol      ! character string used for error messages
-		//CHARACTER(len=MaxNameLength) :: MaxVol      ! character string used for error messages
-		//CHARACTER(len=MaxNameLength) :: VolFlowChar ! character string used for error messages
 		Real64 OutletAirTemp; // Supply air temperature (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirHumRat; // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
@@ -8569,8 +7964,6 @@ namespace DXCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the air-side performance of a direct-expansion, air-cooled
@@ -8601,9 +7994,6 @@ namespace DXCoils {
 		// The model checks for coil dryout conditions, and adjusts the calculated performance
 		// appropriately.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataGlobals::CurrentTime;
@@ -8615,18 +8005,11 @@ namespace DXCoils {
 		using General::CreateSysTimeIntervalString;
 		using DataWater::WaterStorage;
 
-		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		//  REAL(r64), INTENT(IN), OPTIONAL :: CoolingHeatingPLR   ! used for cycling fan RH control
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcVRFCoolingCoil" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s] (adjusted for bypass if any)
@@ -9175,7 +8558,6 @@ Label50: ;
 		//                      Kenneth Tang 2004 (Sensitivity of TotCapTempModFac & EIRTempModFac  to indoor dry bulb temp)
 		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
 		//                        Add new coil type COIL:DX:MultiMode:CoolingEmpirical:
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the air-side heating performance and electrical heating energy
@@ -9213,18 +8595,9 @@ Label50: ;
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataHeatBalFanSys::ZT;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDXHeatingCoil" );
 		static std::string const RoutineNameFullLoad( "CalcDXHeatingCoil:fullload" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s]
@@ -9595,7 +8968,6 @@ Label50: ;
 		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
 		//                        Add new coil type COIL:DX:MultiMode:CoolingEmpirical:
 		//                      April 2010, Chandan sharma, FSEC, added basin heater
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the air-side performance and electrical energy use of a direct-
@@ -9614,7 +8986,6 @@ Label50: ;
 		using DataHeatBalFanSys::ZT;
 		//USE ScheduleManager, ONLY: GetCurrentScheduleValue
 
-		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
 
@@ -9623,12 +8994,6 @@ Label50: ;
 		static std::string const RoutineNameHighSpeedOutlet( "CalcMultiSpeedDXCoil:highspeedoutlet" );
 		static std::string const RoutineNameLowSpeedOutlet( "CalcMultiSpeedDXCoil:lowspeedoutlet" );
 		static std::string const RoutineNameNewDewPointConditions( "CalcMultiSpeedDXCoil:newdewpointconditions" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s]
@@ -10038,8 +9403,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Chandan Sharma, FSEC
 		//       DATE WRITTEN   May 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To calculate the basin heater power for multi mode DX cooling coil
@@ -10053,24 +9416,6 @@ Label50: ;
 		//       (1-runtimefractionofstage1) of DX coil
 		//    b) Elseif the CondenserType for stage 2 is EvapCooled, then the basin heater power is calculated for
 		//       (1-runtimefractionofstage2) of DX coil
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PerfMode; // Performance mode for MultiMode DX coil; Always 1 for other coil types
@@ -10102,8 +9447,6 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl using Don Shirey's code
 		//       DATE WRITTEN   September 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		//    Adjust coil bypass factor for actual air flow rate.
@@ -10111,26 +9454,9 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		// Uses relation CBF = exp(-NTU) whereNTU = A0/(m*cp). Relationship models the cooling coil
 		// as a heat exchanger with Cmin/Cmax = 0.
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 
 		// Return value
 		Real64 CBFAdj; // the result - the adjusted coil bypass factor
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 A0; // intermediate variable
@@ -10168,8 +9494,6 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl using Don Shirey's code
 		//       DATE WRITTEN   September 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// Calculate the coil bypass factor for a coil given the total capacity at the entering conditions,
@@ -10183,27 +9507,15 @@ Label50: ;
 		// When the slopes are equal, then we have located the apparatus dewpoint of the coil at rated
 		// conditions. From this information, coil bypass factor is calculated.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 
 		// Return value
 		Real64 CBF( 0.0 ); // the result - the coil bypass factor
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcCBF" );
 		static Real64 SmallDifferenceTest( 0.00000001 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InletAirEnthalpy; // Enthalpy of inlet air to evaporator at given conditions [J/kg]
@@ -10407,7 +9719,6 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//    AUTHOR         Richard Raustad, FSEC
 		//    DATE WRITTEN   December 2015
-		//    RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		//    Validates that the calcualted bypass factor represents valid SHR based on total capacity and air mass flow rate.
@@ -10420,19 +9731,9 @@ Label50: ;
 		//    on coil delta W and calculated bypass factor land on the saturation curve at the same place within a tolerance.
 		//    The result is passed back to the sizing routine as the new value for SHR.
 		//    If the SHR is not autosized, this routine will still adjust the design SHR appropriately, however, the hard-sized SHR will not change.
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		//    na
 
 		// Return value
 		Real64 SHR( 0.0 ); // the result - the adjusted design SHR
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 CBF_calculated( 0.0 ); // coil bypass factor based on TotCap, AirFlow, SHR, and BaroPress
@@ -10516,7 +9817,6 @@ Label50: ;
 		//                    Add new coil type COIL:DX:MultiMode:CoolingEmpirical:
 		//                   Nov 2008 R. Raustad, FSEC
 		//                    Modified to allow latent degradation with cycling fan
-		//    RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		//    Adjust sensible heat ratio to account for degradation of DX coil latent
@@ -10536,23 +9836,8 @@ Label50: ;
 		//    1996 ASHRAE Transactions, Volume 102, Part 1, Pp. 266 - 274,
 		//    Hugh I. Henderson, Jr., P.E., Kannan Rengarajan, P.E.
 
-		// USE STATEMENTS:
-		//    na
-
 		// Return value
 		Real64 SHReff; // Effective sensible heat ratio, includes degradation due to cycling effects
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 Twet; // Nominal time for condensate to begin leaving the coil's condensate drain line
@@ -10679,8 +9964,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl using Don Shirey's code
 		//       DATE WRITTEN   September 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates total capacity and sensible heat ratio of a DX coil at the specified conditions
@@ -10717,12 +10000,6 @@ Label50: ;
 		Real64 const RF( 0.4 ); // Relaxation factor for dry evaporator iterations
 		Real64 const Tolerance( 0.01 ); // Error tolerance for dry evaporator iterations
 		Real64 const MinHumRatCalc( 0.00001 ); // Error tolerance for dry evaporator iterations
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 InletWetBulbCalc; // calculated inlet wetbulb temperature used for finding dry coil point [C]
@@ -10846,12 +10123,6 @@ Label50: ;
 		static std::string const RoutineNameHighSpeedAlt( "CalcMultiSpeedDXCoilCooling highspeed" );
 		static std::string const RoutineNameHighSpeedOutlet( "CalcMultiSpeedDXCoilCooling:highspeedoutlet" );
 		static std::string const RoutineNameLowSpeedOutlet( "CalcMultiSpeedDXCoilCooling:lowspeedoutlet" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s]
@@ -11504,7 +10775,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Lixing Gu, FSEC
 		//       DATE WRITTEN   June 2007
-		//       MODIFIED       na
 		//       RE-ENGINEERED  Revised based on CalcDXHeatingCoil
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -11528,7 +10798,6 @@ Label50: ;
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataHeatBalFanSys::ZT;
 
-		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
 
@@ -11536,12 +10805,6 @@ Label50: ;
 		static std::string const RoutineName( "CalcMultiSpeedDXCoilHeating" );
 		static std::string const RoutineNameAverageLoad( "CalcMultiSpeedDXCoilHeating:Averageload" );
 		static std::string const RoutineNameFullLoad( "CalcMultiSpeedDXCoilHeating:fullload" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s]
@@ -12149,32 +11412,12 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for passing results to the outlet air node.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataContaminantBalance::Contaminant;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirOutletNode; // air outlet node number
@@ -12215,16 +11458,9 @@ Label50: ;
 		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
 		//                        Always update evap value to support new coil type COIL:DX:MultiMode:CoolingEmpirical:
 		//                      Lixing Gu. Jan. 5, 2007, pass information to the AirflowNetwork model
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fills some of the report variables for the DX coils
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
@@ -12233,18 +11469,6 @@ Label50: ;
 		using Psychrometrics::RhoH2O;
 		using DataWater::WaterStorage;
 		using DataAirLoop::LoopDXCoilRTF;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 RhoWater;
@@ -12343,8 +11567,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith, (Derived from CalcDXCoilStandardRating by Bereket Nigusse & Chandan Sharma)
 		//       DATE WRITTEN   July 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculate the following
@@ -12352,14 +11574,9 @@ Label50: ;
 		//                 (2) Energy Efficiency Ratio (EER),
 		//                 (3) Integrated Energy Efficiency Ratio (IEER)
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		// REFERENCES:
 		// ANSI/AHRI Standard 340/360-2007, Peformance Rating of Commercial and Industrial Unitary Air-Conditioning and
 		//  Heat Pump Equipment, Air-Conditioning, Heating, and Refrigeration Institute, Arlingtion VA.
-
-		// USE STATEMENTS:
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
@@ -12367,9 +11584,6 @@ Label50: ;
 		using General::SolveRegulaFalsi;
 		using General::RoundSigDigits;
 		using namespace OutputReportPredefined;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// AHRI Standard 340/360-2007 Peformance Rating of Commercial and Industrial Unitary Air-Conditioning and Heat Pump Equipment
@@ -12388,11 +11602,6 @@ Label50: ;
 		// volume flow rate to account for indoor fan electric power consumption
 		// when the standard tests are conducted on units that do not have an
 		// indoor air circulting fan. Used if user doesn't enter a specific value.
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "CalcTwoSpeedDXCoilStandardRating" );
@@ -12808,17 +12017,9 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         <author>
 		//       DATE WRITTEN   <date_written>
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine looks up the given TwoSpeed DX coil and returns the companion supply fan index
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
@@ -12827,17 +12028,9 @@ Label50: ;
 
 		using DataHVACGlobals::NumPrimaryAirSys;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const DXSystem( 14 ); // must match SimAirServingZones.cc (not public)
 		int const UnitarySystem( 19 ); // must match SimAirServingZones.cc (not public)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FoundBranch;
@@ -12906,8 +12099,6 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Brent Griffith
 		//       DATE WRITTEN   July 2012
-		//       MODIFIED
-		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS FUNCTION:
 		// Calculates residual function (desired outlet temp - actual outlet temp)
@@ -12916,8 +12107,6 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		// Calls CalcMultiSpeedDXCoil to get outlet temperature at the given supply flow rate and SpeedRatio
 		// and calculates the residual as defined above
-
-		// REFERENCES:
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
@@ -12934,15 +12123,6 @@ Label50: ;
 		// par(3) = speed ratio
 		// par(4) = cycling Ratio
 		// par(5) = supply air fan operating mode (ContFanCycCoil)
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "CalcTwoSpeedDXCoilIEERResidual" );
@@ -13057,36 +12237,14 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   March 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine sets an index for a given DX Coil -- issues error message if that
 		// DX Coil is not a legal DX Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( GetCoilsInputFlag ) {
 			GetDXCoils();
 			GetCoilsInputFlag = false;
@@ -13114,7 +12272,8 @@ Label50: ;
 		bool & ErrorsFound,
 		Optional_string_const ThisObjectType,
 		Optional_bool_const SuppressWarning
-	) {
+	)
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
@@ -13124,29 +12283,9 @@ Label50: ;
 		// This subroutine gets a name for a given DX Coil -- issues error message if that
 		// DX Coil is not a legal DX Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( GetCoilsInputFlag ) {
 			GetDXCoils();
 			GetCoilsInputFlag = false;
@@ -13184,19 +12323,11 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   February 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the coil capacity for the given coil and returns it.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItem;
@@ -13204,18 +12335,6 @@ Label50: ;
 
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13272,19 +12391,11 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   October 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the coil capacity for the given coil and returns it.  If
 		// incorrect coil index or type is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItem;
@@ -13292,21 +12403,6 @@ Label50: ;
 
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates DXCoils
 		if ( GetCoilsInputFlag ) {
@@ -13352,37 +12448,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         R. Raustad - FSEC
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the integerized coil type for the given coil and returns it.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int TypeNum; // returned integerized type of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13426,19 +12502,11 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   February 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the the min oat for the heating coil compressor and returns it.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as negative.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItem;
@@ -13446,18 +12514,6 @@ Label50: ;
 
 		// Return value
 		Real64 MinOAT; // returned min oa temperature of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13499,37 +12555,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   February 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the inlet node number.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13564,37 +12600,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   February 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the inlet node number.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13629,36 +12645,16 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         R. Raustad
 		//       DATE WRITTEN   January 2007
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the condenser inlet node.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int CondNode; // returned condenser node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13693,37 +12689,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         R. Raustad
 		//       DATE WRITTEN   June 2007
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the bypassed air flow fraction.
 		// Bypassed air flow fraction can only be greater than 0 for multimode DX cooling coils and is typical for 1st stage
 		// If incorrect coil type or name is given, ErrorsFound is returned as true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 BypassFraction; // returned bypass air fraction of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13758,17 +12734,9 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         R. Raustad
 		//       DATE WRITTEN   February 2007
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given DX heating coil and returns the companion DX cooling coil.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
@@ -13778,18 +12746,6 @@ Label50: ;
 
 		// Return value
 		int DXCoolingCoilIndex; // Index of HP DX cooling coil returned from this function
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichComp; // DO loop counter to find correct comp set
@@ -13869,36 +12825,16 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         L. Gu
 		//       DATE WRITTEN   July 2007
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the number of speeds for multispeed coils.
 		// If incorrect coil type or name is given, ErrorsFound is returned as true.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NumberOfSpeeds; // returned the number of speed of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -13934,37 +12870,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   January 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the availability schedule index.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and schedule index is returned
 		// as -1.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int SchPtr; // returned availabiltiy schedule of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -14013,37 +12929,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   January 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the availability schedule index.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and schedule index is returned
 		// as -1.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 AirFlow; // returned coil air flow rate
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -14086,40 +12982,17 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   August 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns the CapFT schedule index.  If
 		// incorrect coil index is given, ErrorsFound is returned as true and schedule index is returned
 		// as -1.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
 		// Return value
 		int CapFTCurveIndex; // returned coil CapFT curve index
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates DXCoils
 		if ( GetCoilsInputFlag ) {
@@ -14185,37 +13058,14 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   December 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine was designed to allow the DX coil to access information from a gas or
 		// electric heating coil when these coils are each used in a parent object.
 		// Also, this is an illustration of setting Data from an outside source.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates DXCoils
 		if ( GetCoilsInputFlag ) {
@@ -14329,8 +13179,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Jan. 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// inform DX heating coil that is is part of a CoilSystem:Heating:DX
@@ -14339,23 +13187,8 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		// set value of logical flag FindCompanionUpStreamCoil to true
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -14386,32 +13219,12 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   July 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// inform the child DX coil what the name of its parent is.
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -14444,8 +13257,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Bereket Nigusse, FSEC
 		//       DATE WRITTEN   December 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		//    Returns the oprating sensible heat ratio for a given Rated SHR abd coil entering
@@ -14458,8 +13269,6 @@ Label50: ;
 		//    The biquadratic and quadratic curves are normalized caurves generated from manufacturer's
 		//    performance data
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 
@@ -14467,14 +13276,9 @@ Label50: ;
 		Real64 SHRopr; // operating SHR, corrected for Temp and Flow Fraction
 
 		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
+		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcSHRUserDefinedCurves" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 SHRTempModFac; // Sensible Heat Ratio modifier (function of entering wetbulb, entering drybulb)
 		Real64 SHRFlowModFac; // Sensible Heat Ratio modifier (function of actual vs rated flow)
@@ -14513,32 +13317,12 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Nigusse
 		//       DATE WRITTEN   January 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// inform the child DX coil if the DX cooling coil is for 100% DOAS application.
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -14566,8 +13350,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Nigusse
 		//       DATE WRITTEN   February 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates secondary zone heat gain from secondary DX coils placed in a zone.
@@ -14581,9 +13363,6 @@ Label50: ;
 		//      Furthermore, the evaporator total heat removal is split into
 		//      latent and sensible components using user specified SHR
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
@@ -14591,17 +13370,8 @@ Label50: ;
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataHeatBalFanSys::ZT;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcSecondaryDXCoils" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CondInletDryBulb; // condenser entering air dry-bulb temperature (C)
@@ -14802,8 +13572,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Nigusse
 		//       DATE WRITTEN   February 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates secondary coil (evaporator) sensible heat ratio.
@@ -14816,16 +13584,10 @@ Label50: ;
 		//  (3) if secondary coil operates dry then the larger of the user SHR value and dry
 		//      coil operation SHR is selected.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIter( 30 );
@@ -14833,12 +13595,6 @@ Label50: ;
 		Real64 const Tolerance( 0.1 );
 		Real64 const DryCoilTestEvapInletHumRatReset( 0.00001 );
 		static std::string const RoutineName( "CalcSecondaryDXCoilsSHR" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 DryCoilTestEvapInletHumRat; // evaporator coil inlet humidity ratio test for dry coil
@@ -14921,7 +13677,6 @@ Label50: ;
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Jan 2013
 		//       MODIFIED       Nov 2015, RP Zhang, LBNL
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// 		Calculates the air-side performance of a direct-expansion, air-cooled
@@ -14929,9 +13684,6 @@ Label50: ;
 
 		// METHODOLOGY EMPLOYED:
 		// 		This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
@@ -14950,12 +13702,6 @@ Label50: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcVRFCoolingCoil_FluidTCtrl" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -15351,8 +14097,6 @@ Label50: ;
 		//       AUTHOR         Xiufeng Pang (XP), LBNL
 		//       DATE WRITTEN   Mar 2013
 		//       MODIFIED       Nov 2015, RP Zhang, LBNL
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// 		Calculates the air-side performance of a direct-expansion, air-cooled
@@ -15360,9 +14104,6 @@ Label50: ;
 
 		// METHODOLOGY EMPLOYED:
 		// 		This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
@@ -15372,17 +14113,8 @@ Label50: ;
 		using namespace DataZoneEnergyDemands;
 		using namespace HVACVariableRefrigerantFlow;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
 		// INTERFACE BLOCK SPECIFICATIONS
 		static std::string const RoutineNameFullLoad( "CalcVRFHeatingCoil_FluidTCtrl:fullload" );
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s]
@@ -15652,8 +14384,6 @@ Label50: ;
 		//       DATE WRITTEN   Feb 2013
 		//       MODIFIED       Nov 2015, RP Zhang, LBNL
 		//
-		//       RE-ENGINEERED  na
-		//
 		// PURPOSE OF THIS SUBROUTINE:
 		//       Analyze the VRF Indoor Unit operations given coil loads.
 		//       Calculated parameters include: (1) Fan Speed Ratio (2) SH/SC, (3) Coil Outlet conditions
@@ -15661,22 +14391,11 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		//       A new physics based VRF model applicable for Fluid Temperature Control.
 		//
-		// REFERENCES:
-		//       na
-		//
 		// USE STATEMENTS:
 		using namespace DataZoneEnergyDemands;
 		using General::SolveRegulaFalsi;
 		using Psychrometrics::PsyHFnTdbW;
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		//
-		// DERIVED TYPE DEFINITIONS
-		// na
-		//
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D< Real64 > Par( 11 ); // Parameter array for SolveRegulaFalsi
 		int MaxIter( 500 ); // Max iteration numbers (-)
@@ -15930,9 +14649,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jul 2015
-		//       MODIFIED       na
-		//
-		//       RE-ENGINEERED  na
 		//
 		// PURPOSE OF THIS SUBROUTINE:
 		//        Calculate the VRF coil sensible capacity per air mass flow rate, given:
@@ -15941,10 +14657,6 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		//        A new physics based VRF model appliable for Fluid Temperature Control.
 		//
-		// REFERENCES:
-		//        na
-		//
-		// USE STATEMENTS:
 
 		int const FlagCoolMode( 0 ); // Flag for cooling mode
 		int const FlagHeatMode( 1 ); // Flag for heating mode
@@ -16017,9 +14729,6 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jul 2015
-		//       MODIFIED       na
-		//
-		//       RE-ENGINEERED  na
 		//
 		// PURPOSE OF THIS SUBROUTINE:
 		//        Calculate the VRF coil capacity modification factor, which is the ratio of
@@ -16029,10 +14738,6 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		//        A new physics based VRF model applicable for Fluid Temperature Control.
 		//
-		// REFERENCES:
-		//        na
-		//
-		// USE STATEMENTS:
 
 		bool ErrorsFound( false );       // Flag for errors
 		int const FlagCoolMode( 0 );     // Flag for cooling mode
@@ -16135,20 +14840,12 @@ Label50: ;
 		//       AUTHOR         Xiufeng Pang (XP)
 		//       DATE WRITTEN   Mar 2013
 		//       MODIFIED       Nov 2015, RP Zhang, LBNL
-		//       RE-ENGINEERED
 		//
 		// PURPOSE OF THIS FUNCTION:
 		//       Calculates residual function (desired zone cooling load - actual coil cooling capacity)
 		//       This is used to modify the fan speed to adjust the coil cooling capacity to match
 		//       the zone cooling load.
 		//
-		// METHODOLOGY EMPLOYED:
-		//
-		// REFERENCES:
-		// na
-		//
-		// USE STATEMENTS:
-		// na
 
 		//FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 BF; // Bypass factor (-)
@@ -16185,20 +14882,12 @@ Label50: ;
 		//       AUTHOR         Xiufeng Pang (XP)
 		//       DATE WRITTEN   Mar 2013
 		//       MODIFIED       Nov 2015, RP Zhang, LBNL
-		//       RE-ENGINEERED
 		//
 		// PURPOSE OF THIS FUNCTION:
 		//       Calculates residual function (desired zone heating load - actual heating coil capacity)
 		//       This is used to modify the fan speed to adjust the coil heating capacity to match
 		//       the zone heating load.
 		//
-		// METHODOLOGY EMPLOYED:
-		//
-		// REFERENCES:
-		// na
-		//
-		// USE STATEMENTS:
-		// na
 
 		Real64 BF; // Bypass factor (-)
 		Real64 FanSpdResidualHeat; // Modified fan speed ratio to meet actual zone load (-)
@@ -16231,34 +14920,9 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         L. Gu
 		//       DATE WRITTEN   Sep. 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Set the heat recovery flag true when the parent object requests heat recovery.
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
 			DXCoil( DXCoilNum ).MSHPHeatRecActive = true;
