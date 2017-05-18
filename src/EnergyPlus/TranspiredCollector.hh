@@ -121,6 +121,7 @@ namespace TranspiredCollector {
 		Real64 Tcoll; // modeled surface temperature for collector [C]
 		Real64 TplenLast; // Old Value for modeled drybulb temp if air between collector and wall [C]
 		Real64 TcollLast; // Old value for modeled surface temperature for collector [C]
+		Real64 TairHXLast; // Old value for modeled leaving air drybulb temperature for collector [C]
 		Real64 HrPlen; // Modeled radiation coef for OSCM [W/m2-C]
 		Real64 HcPlen; // Modeled Convection coef for OSCM [W/m2-C]
 		Real64 MdotVent; // air mass flow exchanging with ambient when passive.
@@ -182,6 +183,7 @@ namespace TranspiredCollector {
 			Tcoll( 0.0 ),
 			TplenLast( 22.5 ),
 			TcollLast( 22.0 ),
+			TairHXLast( 22.5 ),
 			HrPlen( 0.0 ),
 			HcPlen( 0.0 ),
 			MdotVent( 0.0 ),

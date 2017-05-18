@@ -672,6 +672,8 @@ namespace TranspiredCollector {
 		using namespace DataLoopNode;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -694,6 +696,7 @@ namespace TranspiredCollector {
 		//unused  INTEGER             :: InletNode
 		int SplitBranch;
 		int thisUTSC;
+		Real64 Tamb;
 
 		if ( MyOneTimeFlag ) {
 			// do various one time setups and pitch adjustments across all UTSC
@@ -747,9 +750,18 @@ namespace TranspiredCollector {
 			MySetPointCheckFlag = false;
 		}
 
+		// determine average ambient temperature
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
+		if ( !DataEnvironment::IsRain ) {
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea;
+		} else { // when raining we use wet bulb not drybulb
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea;
+		}
+
 		if ( BeginEnvrnFlag && MyEnvrnFlag( UTSCNum ) ) {
 			UTSC( UTSCNum ).TplenLast = 22.5;
 			UTSC( UTSCNum ).TcollLast = 22.0;
+			UTSC( UTSCNum ).TairHXLast = Tamb;
 			MyEnvrnFlag( UTSCNum ) = false;
 		}
 		if ( ! BeginEnvrnFlag ) {
@@ -760,10 +772,10 @@ namespace TranspiredCollector {
 //		UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		UTSC( UTSCNum ).InletMDot = sum_sub( Node, &DataLoopNode::NodeData::MassFlowRate, UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
 		UTSC( UTSCNum ).IsOn = false; // intialize then turn on if appropriate
-		UTSC( UTSCNum ).Tplen = 0.0;
-		UTSC( UTSCNum ).Tcoll = 0.0;
+		UTSC( UTSCNum ).Tplen = UTSC( UTSCNum ).TplenLast;
+		UTSC( UTSCNum ).Tcoll = UTSC( UTSCNum ).TcollLast;
+		UTSC( UTSCNum ).TairHX = UTSC( UTSCNum ).TairHXLast;
 		UTSC( UTSCNum ).MdotVent = 0.0;
-		UTSC( UTSCNum ).TairHX = 0.0;
 		UTSC( UTSCNum ).HXeff = 0.0;
 		UTSC( UTSCNum ).Isc = 0.0;
 
@@ -1112,6 +1124,7 @@ namespace TranspiredCollector {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
+		using DataEnvironment::IsRain;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1161,6 +1174,7 @@ namespace TranspiredCollector {
 		AspRat = UTSC( UTSCNum ).Height / UTSC( UTSCNum ).PlenGapThick;
 		TmpTscoll = UTSC( UTSCNum ).TcollLast;
 		TmpTaPlen = UTSC( UTSCNum ).TplenLast;
+		if ( IsRain ) Tamb = Twbamb;
 
 		// all the work is done in this routine located in GeneralRoutines.cc
 
@@ -1172,7 +1186,7 @@ namespace TranspiredCollector {
 		UTSC( UTSCNum ).Tcoll = TmpTscoll;
 		UTSC( UTSCNum ).HrPlen = HrPlen;
 		UTSC( UTSCNum ).HcPlen = HcPlen;
-		UTSC( UTSCNum ).TairHX = 0.0;
+		UTSC( UTSCNum ).TairHX = Tamb; // the collector is off, set to Tamb, should not be set to 0.0
 		UTSC( UTSCNum ).InletMDot = 0.0;
 		UTSC( UTSCNum ).InletTempDB = Tamb;
 		UTSC( UTSCNum ).Vsuction = 0.0;
@@ -1235,6 +1249,7 @@ namespace TranspiredCollector {
 		//update "last" values in Derived type
 		UTSC( UTSCNum ).TplenLast = UTSC( UTSCNum ).Tplen;
 		UTSC( UTSCNum ).TcollLast = UTSC( UTSCNum ).Tcoll;
+		UTSC( UTSCNum ).TairHXLast = UTSC( UTSCNum ).TairHX;
 
 		// Set the outlet air nodes of the UTSC
 
