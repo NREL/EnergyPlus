@@ -272,7 +272,9 @@ namespace SetPointManager {
 		int NumCtrlNodes;
 		std::string CtrlNodeListName;
 		Array1D_int CtrlNodes;
-		Real64 SetPt;
+		Real64 SetPt; // current setpoint value
+		Real64 SetPtHi; // current setpoint limit value at low outside temp
+		Real64 SetPtLo; // current setpoint limit value at high outside temp
 
 		// Default Constructor
 		DefineOutsideAirSetPointManager() :
@@ -287,7 +289,10 @@ namespace SetPointManager {
 			OutHighSetPt2( 0.0 ),
 			OutHigh2( 0.0 ),
 			NumCtrlNodes( 0 ),
-			SetPt( 0.0 )
+			SetPt( 0.0 ),
+			SetPtHi( 0.0 ),
+			SetPtLo( 0.0 )
+
 		{}
 
 		void calculate(

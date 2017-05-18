@@ -1056,6 +1056,10 @@ namespace SetPointManager {
 			OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
+			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
+			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -3917,6 +3921,16 @@ namespace SetPointManager {
 						// Call the CALC routine, with an optional argument to only set
 						// the initialization NODE(:)% setpoint, and not the OutAirSetPtMgr(:)%SetPt
 						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
+						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
+						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
+					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
+						// set to low oudoor air temp reset value
+						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
+						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
+					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
+						// set to high oudoor air temp reset value
+						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
+						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
 					}
 				}
 			}
@@ -4686,8 +4700,10 @@ namespace SetPointManager {
 		Real64 SetTempAtOutHigh;
 		int SchedPtr;
 		Real64 SetPt;
+		int CtrlType;
 
 		SchedPtr = this->SchedPtr;
+		CtrlType = this->CtrlTypeMode;
 
 		if ( SchedPtr > 0 ) {
 			SchedVal = GetCurrentScheduleValue( SchedPtr );
@@ -4707,7 +4723,17 @@ namespace SetPointManager {
 			SetTempAtOutHigh = this->OutHighSetPt1;
 		}
 
-		SetPt = CalcSetPoint(OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
+		if ( CtrlType == iCtrlVarType_MaxTemp ) {
+			SetPt = SetTempAtOutLow;
+			this->SetPtHi = SetPt;
+		} else if ( CtrlType == iCtrlVarType_MinTemp ) {
+			SetPt = SetTempAtOutHigh;
+			this->SetPtLo = SetPt;
+		} else {
+			SetPt = CalcSetPoint( OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh );
+			this->SetPtLo = SetTempAtOutHigh;
+			this->SetPtHi = SetTempAtOutLow;
+		}
 
 		if ( present( InitFlag ) ) {
 			Node( NodeNum ).TempSetPoint = SetPt; //Setpoint for Initial Routine
@@ -7421,8 +7447,17 @@ namespace SetPointManager {
 
 				if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
 					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the setpoint
+					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
+					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
+				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
+					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the high temperature setpoint
+					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
+					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the high temperature setpoint
+				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
+					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the low temperature setpoint
+					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the low temperature setpoint
+					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
 				}
-
 			}
 
 		}

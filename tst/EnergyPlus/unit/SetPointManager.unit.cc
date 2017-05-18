@@ -1156,3 +1156,53 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 }
 
+TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
+{
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.7;",
+
+		"  SetpointManager:OutdoorAirReset,",
+		"    Hot Water Loop Setpoint Manager,  !- Name",
+		"    MaximumTemperature,      !- Control Variable",
+		"    80.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+		"    -17.778,                 !- Outdoor Low Temperature {C}",
+		"    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+		"    21.11,                   !- Outdoor High Temperature {C}",
+		"    HW Supply Outlet Node;   !- Setpoint Node or NodeList Name",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	bool ErrorsFound = false;
+
+	SetPointManager::GetSetPointManagerInputs();
+	// check Set Point Manager get inputs
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlVarType, "MAXIMUMTEMPERATURE" );
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlTypeMode, SetPointManager::iCtrlVarType_MaxTemp );
+	EXPECT_EQ( SetPointManager::AllSetPtMgr( 1 ).SPMType, SetPointManager::iSPMType_OutsideAir );
+	EXPECT_EQ( 80.0, SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 );
+	EXPECT_EQ( -17.778, SetPointManager::OutAirSetPtMgr( 1 ).OutLow1 );
+	EXPECT_EQ( 40.0, SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 );
+	EXPECT_EQ( 21.11, SetPointManager::OutAirSetPtMgr( 1 ).OutHigh1 );
+
+	SetPointManager::InitSetPointManagers();
+	// check OA Reset Set Point Manager initialization
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPoint );
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPoint );
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+
+	// change the low outdoor air setpoint reset value to 60.0C 
+	SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 = 60.0;
+	// re simulate OA Reset Set Point Manager
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check the new reset value is set
+	EXPECT_EQ( 60.0, DataLoopNode::Node( 1 ).TempSetPoint );
+	EXPECT_EQ( 60.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+
+}
