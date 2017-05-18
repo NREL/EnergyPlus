@@ -4938,7 +4938,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_HAMT;
 		using DataSurfaces::HeatTransferModel_EMPD;
-		using DataHeatBalance::MassConservation;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
