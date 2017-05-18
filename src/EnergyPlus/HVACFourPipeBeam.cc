@@ -775,18 +775,23 @@ namespace FourPipeBeam {
 		this->mDotDesignPrimAir = this->vDotDesignPrimAir * DataEnvironment::StdRhoAir;
 
 		if ( ( originalTermUnitSizeMaxVDot > 0.0 ) && ( originalTermUnitSizeMaxVDot != this->vDotDesignPrimAir ) && ( CurZoneEqNum > 0 ) ) {
-			// perturb system size to handle chnage in system size calculated without knowing about 4 pipe beam
-			DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig(CurZoneEqNum).AirLoopNum ).DesMainVolFlow
-				+= ( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot );
-			DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig(CurZoneEqNum).AirLoopNum ).DesCoolVolFlow
-				+= ( this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot );
-			DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig(CurZoneEqNum).AirLoopNum ).DesHeatVolFlow
-				+= ( this->vDotDesignPrimAir - originalTermUnitSizeHeatVDot );
-			DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig(CurZoneEqNum).AirLoopNum ).MassFlowAtCoolPeak
-				+= ( this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot ) * DataEnvironment::StdRhoAir;
+			if ( DataSizing::FinalSysSizing.size() > 0 ) {
+				// perturb system size to handle chnage in system size calculated without knowing about 4 pipe beam
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesMainVolFlow
+					+= ( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot );
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesCoolVolFlow
+					+= ( this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot );
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesHeatVolFlow
+					+= ( this->vDotDesignPrimAir - originalTermUnitSizeHeatVDot );
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).MassFlowAtCoolPeak
+					+= ( this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot ) * DataEnvironment::StdRhoAir;
 
-			ReportSizingOutput( this->unitType, this->name, "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]",
-								( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot ) );
+				ReportSizingOutput( this->unitType, this->name, "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]",
+					( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot ) );
+			} else {
+				ShowSevereError( "Four pipe beam requires system sizing. Turn on system sizing." );
+				ShowFatalError( "Program terminating due to previous errors" );
+			}
 		}
 
 		if ( this->beamCoolingPresent ) {
