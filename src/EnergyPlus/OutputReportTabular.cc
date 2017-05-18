@@ -695,11 +695,15 @@ namespace OutputReportTabular {
 		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
 			OutputReportTabularAnnual::GetInputTabularAnnual();
+			OutputReportTabularAnnual::checkAggregationOrderForAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
 			GetInputOutputTableSummaryReports();
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
+			if ( isInvalidAggregationOrder( ) ) {
+				ShowFatalError( "OutputReportTabular: Invalid aggregations detected, no simulation performed." );
+			}
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
@@ -1049,7 +1053,6 @@ namespace OutputReportTabular {
 		bool environmentKeyFound;
 		static bool VarWarning( true );
 		static int ErrCount1( 0 );
-		static int ErrCount2( 0 );
 		//INTEGER       :: maxKeyCount
 
 		// if not a running a weather simulation do not create reports
@@ -1216,7 +1219,7 @@ namespace OutputReportTabular {
 
 				if ( KeyCount == 0 ) {
 					++ErrCount1;
-					if ( ErrCount1 == 1 && ! DisplayExtraWarnings && ! VarWarning && KindOfSim == ksRunPeriodWeather ) {
+					if ( ErrCount1 == 1 && ! DisplayExtraWarnings && KindOfSim == ksRunPeriodWeather ) {
 						ShowWarningError( "Processing Monthly Tabular Reports: Variable names not valid for this simulation" );
 						ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables." );
 					}
@@ -1369,11 +1372,6 @@ namespace OutputReportTabular {
 							MonthlyColumns( mColumn ).timeStamp = 0;
 						}}
 					} else { //if no key corresponds to this instance of the report
-						++ErrCount2;
-						if ( ErrCount2 == 1 && ! DisplayExtraWarnings && ! VarWarning && KindOfSim == ksRunPeriodWeather ) {
-							ShowWarningError( "Processing Monthly Tabular Reports: Variable names not valid for this simulation" );
-							ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables." );
-						}
 						//fixing CR5878 removed the showing of the warning once about a specific variable.
 						if ( DisplayExtraWarnings && KindOfSim == ksRunPeriodWeather ) {
 							ShowWarningError( "Processing Monthly Tabular Reports: " + MonthlyInput( TabNum ).name );
@@ -1405,6 +1403,54 @@ namespace OutputReportTabular {
 		//DEALLOCATE(NamesOfKeys)
 		//DEALLOCATE(IndexesForKeyVar)
 		//#endif
+	}
+
+	bool
+	isInvalidAggregationOrder( )
+	{
+		bool foundError = false;
+		if ( !DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
+			return foundError;
+		}
+		for ( int iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
+			bool foundMinOrMax = false;
+			bool foundHourAgg = false;
+			bool missingMaxOrMinError = false;
+			bool missingHourAggError = false;
+			for ( int jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
+				int curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
+				// test if the aggregation types are in the correct order
+				for ( int kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+					int curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+					if (MonthlyColumns( curCol ).varNum == 0) break; // if no variable was ever found than stop checking
+					int curAggType = MonthlyColumns( curCol ).aggType;
+					if ( ( curAggType == aggTypeMaximum ) || ( curAggType == aggTypeMinimum ) ) {
+						foundMinOrMax = true;
+					} else if ( ( curAggType == aggTypeHoursNonZero ) || ( curAggType == aggTypeHoursZero ) ||
+						( curAggType == aggTypeHoursPositive ) || ( curAggType == aggTypeHoursNonPositive ) ||
+								( curAggType == aggTypeHoursNegative ) || ( curAggType == aggTypeHoursNonNegative ) ) {
+						foundHourAgg = true;
+					} else if ( curAggType == aggTypeValueWhenMaxMin ) {
+						if ( !foundMinOrMax ) {
+							missingMaxOrMinError = true;
+						}
+					} else if ( ( curAggType == aggTypeSumOrAverageHoursShown ) || ( curAggType == aggTypeMaximumDuringHoursShown ) || ( curAggType == aggTypeMinimumDuringHoursShown ) ) {
+						if ( !foundHourAgg ) {
+							missingHourAggError = true;
+						}
+					}
+				}
+			}
+			if ( missingMaxOrMinError ) {
+				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
+				foundError = true;
+			}
+			if ( missingHourAggError ) {
+				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
+				foundError = true;
+			}
+		}	
+		return foundError;
 	}
 
 	void
