@@ -1158,6 +1158,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 {
+	bool ErrorsFound = false;
 
 	std::string const idf_objects = delimited_string( {
 		"Version,8.7;",
@@ -1174,7 +1175,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	bool ErrorsFound = false;
+	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 	SetPointManager::GetSetPointManagerInputs();
 	// check Set Point Manager get inputs

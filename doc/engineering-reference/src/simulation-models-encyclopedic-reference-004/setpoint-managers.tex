@@ -56,7 +56,7 @@ IF \emph{SchedVal = 2}
 {T_{set,atOAhigh}} = {T_{2,set,atOAhigh}}
 \end{equation}
 
-otherwise
+Otherwise
 
 \begin{equation}
 {T_{out,low}} = {T_{1,out,low}}
@@ -70,25 +70,43 @@ otherwise
 {T_{set,atOAlow}} = {T_{1,set,atOAlow}}
 \end{equation}
 
-\({T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}\) .
+\begin{equation}
+{T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}
+\end{equation}
 
-If \({T_{out,low}} < {T_{out,high}}\) and \({T_{set,atOAlow}} > {T_{set,atOAhigh}}\) ~then
+IF \emph{ControlVariable == Temperature} ~then
+ 
+~~~~If \({T_{out,low}} < {T_{out,high}}\) ~then
 
-~~~~~ If \({T_{out}} \le {T_{out,low}}\) ~then
+~~~~~~~ If \({T_{out}} \le {T_{out,low}}\) ~then
 
-~~~~~ \({T_{set}} = {T_{out,low}}\)
+~~~~~~~~~ \({T_{set}} = {T_{set,atOAlow}}\)
 
-~~~~~ if \({T_{out}} \ge {T_{out,high}}\) ~then
+~~~~~~~ If \({T_{out}} \ge {T_{out,high}}\) ~then
 
-~~~~~ \({T_{set}} = {T_{out,high}}\)
+~~~~~~~~~ \({T_{set}} = {T_{set,atOAhigh}}\)
 
-~~~~~ otherwise
+~~~~~~~ Otherwise
 
-~~~~~ \({T_{set}} = {T_{set,atOAlow}} - (({T_{out}} - {T_{out,low}})/({T_{out,high}} - {T_{out,low}}))\cdot ({T_{set,atOAlow}} - {T_{set,atOAhigh}})\)
+~~~~~~~~~ \({T_{set}} = {T_{set,atOAlow}} - (({T_{out}} - {T_{out,low}})/({T_{out,high}} - {T_{out,low}}))\cdot ({T_{set,atOAlow}} - {T_{set,atOAhigh}})\)
 
-otherwise
+~~~~~~~ End If
 
-~~~~~ \({T_{set}} = 0.5({T_{set,atOAlow}} + {T_{set,atOAhigh)}}\) .
+~~~~Otherwise
+
+~~~~~~~ \({T_{set}} = 0.5({T_{set,atOAlow}} + {T_{set,atOAhigh)}}\)
+
+~~~~End IF
+
+ELSE IF \emph{ControlVariable == MaximumTemperature} ~then
+
+~~~~ \({T_{set}} = {T_{set,atOAlow}}\)
+
+ELSE IF \emph{ControlVariable == MinimumTemperature} ~then
+
+~~~~ \({T_{set}} = {T_{set,atOAhigh}}\)
+
+ENDIF 
 
 \emph{\({T_{set}}\)}will be applied to the node or nodes specified in the \emph{SetpointManager:OutdoorAirReset} object input.
 

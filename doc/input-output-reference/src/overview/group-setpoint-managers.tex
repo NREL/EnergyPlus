@@ -195,7 +195,18 @@ A unique, user-assigned name for an instance of an outdoor air reset setpoint ma
 
 \paragraph{Field: Control Variable}\label{field-control-variable-2}
 
-The type of variable that will be controlled. There is only one choice for this type of setpoint manager: Temperature.
+The type of variable that will be controlled. There are three key choices for this type of set point manager:
+
+\begin{itemize}
+\item
+  Temperature
+\item
+  MaximumTemperature
+\item
+  MinimumTemperature
+\end{itemize}
+
+If the Control Variable input field is set to MaximumTemperature, then the setpoint will be set to a setpoint value specified at Setpoint at Outdoor Low Temperature input field, else if the Control Variable input field is set to MinimumTemperature, then the setpoint will be set to a setpoint value specified in Setpoint at Outdoor High Temperature input field, else if the Control Variable input field is set to Temperature, then the setpoint will be set to a setpoint value determined based on the current time outdoor air temperature, and the setpoint values specified at Setpoint Outdoor Low and High Temperature input fields.
 
 \paragraph{Field: Setpoint at Outdoor Low Temperature}\label{field-setpoint-at-outdoor-low-temperature}
 
