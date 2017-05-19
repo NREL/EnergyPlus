@@ -4113,6 +4113,7 @@ namespace SimAirServingZones {
 						// For re-circulation systems, Vpz used to determine Zpz is the design terminal airflow
 						// Std 62.1-2010, section 6.2.5.1: "Vpz (used to determin Zpz) is the primary airflow rate
 						// rate to the ventilation zone from the air handler, including outdoor air and recirculated air.
+						//MJW - Not sure this is correct, seems like it should be ZonePA - above comments contradict each other
 						VpzMinClgByZone( CtrlZoneNum ) = ZoneSA;
 
 					} else { // single path system
@@ -4360,14 +4361,14 @@ namespace SimAirServingZones {
 //			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // commented line allows ZoneSum method to report tables to the html file
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 				//System Ventilation Requirements for Cooling
-				PreDefTableEntry( pdchS62svrClSumVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzClgSumBySys( AirLoopNum ), 3 ); //Vpz-sum
+				PreDefTableEntry( pdchS62svrClSumVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzClgSumBySys( AirLoopNum ), 4 ); //Vpz-sum
 				PreDefTableEntry( pdchS62svrClPs, FinalSysSizing( AirLoopNum ).AirPriLoopName, PsBySysCool( AirLoopNum ) ); //Ps
 				PreDefTableEntry( pdchS62svrClSumPz, FinalSysSizing( AirLoopNum ).AirPriLoopName, PzSumBySysCool( AirLoopNum ) ); //Pz-sum
 				PreDefTableEntry( pdchS62svrClD, FinalSysSizing( AirLoopNum ).AirPriLoopName, DBySysCool( AirLoopNum ) ); //D
 				PreDefTableEntry( pdchS62svrClVou, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).SysUncOA, 4 ); //Vou
 
 				//System Ventilation Requirements for Heating
-				PreDefTableEntry( pdchS62svrHtSumVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzHtgSumBySys( AirLoopNum ), 3 ); //Vpz-sum
+				PreDefTableEntry( pdchS62svrHtSumVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzHtgSumBySys( AirLoopNum ), 4 ); //Vpz-sum
 				PreDefTableEntry( pdchS62svrHtPs, FinalSysSizing( AirLoopNum ).AirPriLoopName, PsBySysHeat( AirLoopNum ) ); //Ps
 				PreDefTableEntry( pdchS62svrHtSumPz, FinalSysSizing( AirLoopNum ).AirPriLoopName, PzSumBySysHeat( AirLoopNum ) ); //Pz-sum
 				PreDefTableEntry( pdchS62svrHtD, FinalSysSizing( AirLoopNum ).AirPriLoopName, DBySysHeat( AirLoopNum ) ); //D
@@ -4408,7 +4409,7 @@ namespace SimAirServingZones {
 					AzSum += FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
 					VbzSum += VbzByZone( CtrlZoneNum );
 					//Zone Ventilation Calculations for Cooling Design
-					PreDefTableEntry( pdchS62zcdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzClgByZone( CtrlZoneNum ), 3 ); //Vpz LS:
+					PreDefTableEntry( pdchS62zcdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzClgByZone( CtrlZoneNum ), 4 ); //Vpz LS:
 					VpzMin += VpzMinClgByZone( CtrlZoneNum );
 					PreDefTableEntry( pdchS62zcdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzClgByZone( CtrlZoneNum ), 4 ); //Vdz
 					PreDefTableEntry( pdchS62zcdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzMinClgByZone( CtrlZoneNum ), 4 ); //Vpz-min
@@ -4429,7 +4430,7 @@ namespace SimAirServingZones {
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						//Zone Ventilation Calculations for Heating Design
-						PreDefTableEntry( pdchS62zhdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 3 ); //Vpz
+						PreDefTableEntry( pdchS62zhdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 4 ); //Vpz
 						VpzMin += VpzMinHtgByZone( CtrlZoneNum );
 
 						PreDefTableEntry( pdchS62zhdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 4 ); //Vdz
@@ -4456,10 +4457,10 @@ namespace SimAirServingZones {
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) { // loop over the cooled zones if no centrally heated zones
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 						//Zone Ventilation Calculations for Heating Design
-						PreDefTableEntry( pdchS62zhdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 3 ); //Vpz
+						PreDefTableEntry( pdchS62zhdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 4 ); //Vpz
 						VpzMin += VpzMinHtgByZone( CtrlZoneNum );
-						PreDefTableEntry( pdchS62zhdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 3 ); //Vdz
-						PreDefTableEntry( pdchS62zhdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzMinHtgByZone( CtrlZoneNum ), 3 ); //Vpz-min
+						PreDefTableEntry( pdchS62zhdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 4 ); //Vdz
+						PreDefTableEntry( pdchS62zhdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzMinHtgByZone( CtrlZoneNum ), 4 ); //Vpz-min
 						VdzHtgSum += VdzHtgByZone( CtrlZoneNum );
 						//box type
 						for ( iAirDistUnit = 1; iAirDistUnit <= NumAirDistUnits; ++iAirDistUnit ) {
@@ -4482,7 +4483,7 @@ namespace SimAirServingZones {
 					}
 				}
 
-				PreDefTableEntry( pdchS62shdVpzmin, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzMin ); //Vpz-min
+				PreDefTableEntry( pdchS62shdVpzmin, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzMin, 4 ); //Vpz-min
 				//System Ventilation Parameters
 				if ( PzSumBySysCool( AirLoopNum ) != 0.0 ) {
 					PreDefTableEntry( pdchS62svpRp, FinalSysSizing( AirLoopNum ).AirPriLoopName, RpPzSum / PzSumBySysCool( AirLoopNum ), 6 );
@@ -4496,12 +4497,12 @@ namespace SimAirServingZones {
 				PreDefTableEntry( pdchS62svpClVoz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozClgSum, 4 ); //Voz-clg
 				PreDefTableEntry( pdchS62svpHtVoz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozHtgSum, 4 ); //Voz-htg
 				//System Ventilation Calculations for Cooling Design
-				PreDefTableEntry( pdchS62scdVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzClgSumBySys( AirLoopNum ) ); //Vpz-sum
-				PreDefTableEntry( pdchS62scdVdz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VdzSum ); //Vdz-sum
+				PreDefTableEntry( pdchS62scdVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzClgSumBySys( AirLoopNum ), 4 ); //Vpz-sum
+				PreDefTableEntry( pdchS62scdVdz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VdzSum, 4 ); //Vdz-sum
 				PreDefTableEntry( pdchS62scdVozclg, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozClgSum, 4 ); //Voz-clg
 				//System Ventilation Calculations for Heating Design
-				PreDefTableEntry( pdchS62shdVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzHtgSumBySys( AirLoopNum ) ); //Vpz-sum
-				PreDefTableEntry( pdchS62shdVdz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VdzHtgSum ); //Vdz-sum
+				PreDefTableEntry( pdchS62shdVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzHtgSumBySys( AirLoopNum ), 4 ); //Vpz-sum
+				PreDefTableEntry( pdchS62shdVdz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VdzHtgSum, 4 ); //Vdz-sum
 				PreDefTableEntry( pdchS62shdVozhtg, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozHtgSum, 4 ); //Voz-htg
 //			} // if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) // commented line allows ZoneSum method to report tables to the html file
 		}
@@ -5057,7 +5058,6 @@ namespace SimAirServingZones {
 
 									// Calc zone ventilation efficiency
 									if ( Fa > 0.0 ) {
-										// MJW ?? - Std 62.1
 										SysCoolingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
 									} else {
 										SysCoolingEv = 1.0;
@@ -6177,11 +6177,11 @@ namespace SimAirServingZones {
 //  This if block is commented out to allow Standard 62.1 Summary Report to output when ZoneSum is used
 //				if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {  // commented line allows ZoneSum method to report tables to the html file
 					//system ventilation requirements for cooling table
-					PreDefTableEntry( pdchS62svrClVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps
+					PreDefTableEntry( pdchS62svrClVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 4 ); //Vps
 					PreDefTableEntry( pdchS62svrClXs, FinalSysSizing( AirLoopNum ).AirPriLoopName, XsBySysCool( AirLoopNum ), 3 ); //Xs
 					PreDefTableEntry( pdchS62svrClEv, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysCool( AirLoopNum ), 3 ); //Ev
 					//system ventilation requirements for heating table
-					PreDefTableEntry( pdchS62svrHtVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, 3 ); //Vps
+					PreDefTableEntry( pdchS62svrHtVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, 4 ); //Vps
 					PreDefTableEntry( pdchS62svrHtXs, FinalSysSizing( AirLoopNum ).AirPriLoopName, XsBySysHeat( AirLoopNum ), 3 ); //Xs
 					PreDefTableEntry( pdchS62svrHtEv, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysHeat( AirLoopNum ), 3 ); //Ev
 					PreDefTableEntry( pdchS62svrHtVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ), 4 ); //Vot
@@ -6189,7 +6189,7 @@ namespace SimAirServingZones {
 						PreDefTableEntry( pdchS62svrHtPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesHeatVolFlow ); //%OA
 					}
 					//system ventilation calculations for cooling table
-					PreDefTableEntry( pdchS62scdVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps
+					PreDefTableEntry( pdchS62scdVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 4 ); //Vps
 					PreDefTableEntry( pdchS62scdEvz, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysCool( AirLoopNum ), 3 ); //Evz-min
 					PreDefTableEntry( pdchS62svrClVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotClgBySys( AirLoopNum ), 4 ); //Vot
 					if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow != 0.0 ) { // Move here
@@ -6197,7 +6197,7 @@ namespace SimAirServingZones {
 					}
 
 					//system ventilation calculations for heating table
-					PreDefTableEntry( pdchS62shdVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, 3 ); //Vps
+					PreDefTableEntry( pdchS62shdVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, 4 ); //Vps
 					PreDefTableEntry( pdchS62shdEvz, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysHeat( AirLoopNum ), 3 ); //Evz-min
 					//zone cooling design table
 					NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
@@ -6617,6 +6617,7 @@ namespace SimAirServingZones {
 		// na
 
 		// Using/Aliasing
+		using namespace OutputReportPredefined;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
@@ -6635,6 +6636,24 @@ namespace SimAirServingZones {
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = max( AvailSAFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
 			// set the system ventilation efficiency to the user specified minimum
 			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+
+			//Vpz: "Primary" supply air from main air handler served by an oa mixer
+			Real64 VpzClgByZone = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+
+			//Vdz: "Discharge" supply air delivered to zone by terminal unit
+			Real64 VdzClgByZone = 0.0;
+			// Taken from similar section in SetUpSysSizingArrays
+			if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+				VdzClgByZone = max( TermUnitSizing( CtrlZoneNum ).AirVolFlow, VpzClgByZone );
+			} else { // single path system
+				VdzClgByZone = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+			}
+
+			// Update VRP table entries:
+			PreDefTableEntry( pdchS62zcdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzClgByZone, 4 ); //Vpz
+			PreDefTableEntry( pdchS62zcdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzClgByZone, 4 ); //Vdz
+			PreDefTableEntry( pdchS62zcdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 4 ); //Vpz-min
+			PreDefTableEntry( pdchS62zcdZpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone, 3 ); //Zpz = Voz/Vpz		}
 		}
 	}
 
