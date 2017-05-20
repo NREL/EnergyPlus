@@ -503,8 +503,8 @@ namespace HeatBalanceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NumConstrObjects( 5 );
-		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
+		int const NumConstrObjects( 6 );
+		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular", "EnergyManagementSystem:ConstructionIndexVariable" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -530,13 +530,20 @@ namespace HeatBalanceManager {
 			NumObjects = GetNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
 				GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
-				if ( ONum != 5 ) {
-					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
-				} else {
+				if ( ONum == 5 ) {
 					CNum = FindItemInList( cAlphaArgs( 4 ), Construct );
+				} else {
+					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;
+				if ( ONum == 4 || ONum == 6 ) {
+					// GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
+					// Include all EMS constructions since they can potentially be used by a CTF surface
+					if ( !Construct( CNum ).TypeIsWindow ) {
+						Construct( CNum ).IsUsedCTF = true;
+					}
+				}
 			}
 		}
 		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
@@ -1323,6 +1330,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::ScanForReports;
+		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3249,6 +3257,16 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
 				ShowContinueError( cNumericFieldNames( 7 ) + " is <=0." );
 				ErrorsFound = true;
+			}
+
+			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
+				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
 			}
 
 		}

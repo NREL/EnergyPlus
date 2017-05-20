@@ -184,6 +184,7 @@ namespace WaterToAirHeatPumpSimple {
 	void
 	clear_state() {
 		MyOneTimeFlag = true;
+		SimpleWatertoAirHP.deallocate();
 	}
 
 	void
@@ -772,18 +773,6 @@ namespace WaterToAirHeatPumpSimple {
 
 			InitComponentNodes( 0.0, SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
 
-			Node( WaterInletNode ).Temp = 5.0;
-			Node( WaterInletNode ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
-			Node( WaterInletNode ).Quality = 0.0;
-			Node( WaterInletNode ).Press = 0.0;
-			Node( WaterInletNode ).HumRat = 0.0;
-
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Temp = 5.0;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Quality = 0.0;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Press = 0.0;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).HumRat = 0.0;
-
 			SimpleWatertoAirHP( HPNum ).SimFlag = true;
 
 			MyEnvrnFlag( HPNum ) = false;
@@ -810,10 +799,10 @@ namespace WaterToAirHeatPumpSimple {
 
 			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
 
-			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
+			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, RoutineName );
 			//If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
-			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat ) ) {
-				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
+			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, RoutineName ) ) {
+				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, RoutineName );
 			}
 			SimpleWatertoAirHP( HPNum ).WaterFlowMode = true;
 		} else { //heat pump is off
@@ -861,6 +850,8 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).InletAirEnthalpy = Node( AirInletNode ).Enthalpy;
 		SimpleWatertoAirHP( HPNum ).InletWaterTemp = Node( WaterInletNode ).Temp;
 		SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy = Node( WaterInletNode ).Enthalpy;
+		SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SimpleWatertoAirHP( HPNum ).InletWaterTemp;
+		SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy;
 
 		SimpleWatertoAirHP( HPNum ).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
 		SimpleWatertoAirHP( HPNum ).HPTimeConstant = HPTimeConstant;
@@ -878,12 +869,6 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).EnergyLatent = 0.0;
 		SimpleWatertoAirHP( HPNum ).EnergySource = 0.0;
 		SimpleWatertoAirHP( HPNum ).COP = 0.0;
-
-		SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletWaterTemp = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletAirHumRat = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = 0.0;
 
 	}
 
@@ -1827,7 +1812,7 @@ namespace WaterToAirHeatPumpSimple {
 			ratioTDB = ( ( LoadSideInletDBTemp + CelsiustoKelvin ) / Tref );
 			ratioTWB = ( ( LoadSideInletWBTemp + CelsiustoKelvin ) / Tref );
 			ratioTS = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
-			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat ) ) );
+			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName ) ) );
 
 			if ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
 				ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate );
@@ -1915,10 +1900,13 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
 
 		if ( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterCycling ) {
-			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate * PartLoadRatio;
+			// plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
+			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * PartLoadRatio;
 			SetComponentFlowRate( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
-			SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp + QSource_fullload / ( SourceSideMassFlowRate * CpWater );
-			SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth + QSource_fullload / SourceSideMassFlowRate;
+			if( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate > 0.0 ) {
+				SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate * CpWater );
+				SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
+			}
 		} else {
 			if( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterConstant ) {
 				if ( SimpleWatertoAirHP( HPNum ).WaterFlowMode ) {
@@ -2131,10 +2119,13 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
 
 		if ( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterCycling ) {
-			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate * PartLoadRatio;
+			// plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
+			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * PartLoadRatio;
 			SetComponentFlowRate( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
-			SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp - QSource_fullload / ( SourceSideMassFlowRate * CpWater );
-			SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth - QSource_fullload / SourceSideMassFlowRate;
+			if ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate > 0.0 ) {
+				SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp - QSource / ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate * CpWater );
+				SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth - QSource / SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
+			}
 		} else {
 			if( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterConstant ) {
 				if( SimpleWatertoAirHP( HPNum ).WaterFlowMode ) {

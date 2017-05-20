@@ -76,11 +76,11 @@ This numeric field is the electric power consumption at the full Design Maximum 
 
 \paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method}
 
-This field is used to select how the fan's Design Electric Power Consumption is sized when the previous field is set to autosize.  There are three choices: PowerPerFlow, PowerPerFlowPerPressure, or TotalEfficiency.  The default is PowerPerFlowPerPressure. 
+This field is used to select how the fan's Design Electric Power Consumption is sized when the previous field is set to autosize.  There are three choices: PowerPerFlow, PowerPerFlowPerPressure, or TotalEfficiencyAndPressure.  The default is PowerPerFlowPerPressure. 
 When PowerPerFlow is selected, the value entered in the input field called Electric Power Per Unit Flow Rate is used to size the Design Electric Power Consumption.  This method is useful during early-phase design modeling when little information is available for determining the Design Pressure Rise.  Although the pressure rise is not used to size the Design Electric Power Consumption it is still used to determine the heat added to the air stream as a result of the work done by the fan.
 
 When PowerPerFlowPerPressure is selected, the value entered in the input field called Electric Power Per Unit Flow Rate Per Unit Pressure is used to size the power.  This method takes into account the Design Pressure Rise when sizing the Design Electric Power Consumption. 
-When TotalEfficiency is selected, the value entered in the input field called Fan Total Efficiency is used to size the power.  This is the legacy method used by the older fan objects prior to verson 8.6.
+When TotalEfficiencyAndPressure is selected, the values entered in the input fields called Fan Total Efficiency and Design Pressure Rise are used to size the power.  This is the legacy method used by the older fan objects prior to verson 8.6.
 
 \paragraph{Field: Electric Power Per Unit Flow Rate}\label{field-power-per-unit-flow-fansysmodel}
 
