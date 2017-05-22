@@ -1181,7 +1181,6 @@ namespace TranspiredCollector {
 		AspRat = UTSC( UTSCNum ).Height / UTSC( UTSCNum ).PlenGapThick;
 		TmpTscoll = UTSC( UTSCNum ).TcollLast;
 		TmpTaPlen = UTSC( UTSCNum ).TplenLast;
-		if ( IsRain ) Tamb = Twbamb;
 
 		// all the work is done in this routine located in GeneralRoutines.cc
 
@@ -1193,7 +1192,7 @@ namespace TranspiredCollector {
 		UTSC( UTSCNum ).Tcoll = TmpTscoll;
 		UTSC( UTSCNum ).HrPlen = HrPlen;
 		UTSC( UTSCNum ).HcPlen = HcPlen;
-		UTSC( UTSCNum ).TairHX = Tamb; // collector is off, set to Tamb
+		UTSC( UTSCNum ).TairHX = Tamb;
 		UTSC( UTSCNum ).InletMDot = 0.0;
 		UTSC( UTSCNum ).InletTempDB = Tamb;
 		UTSC( UTSCNum ).Vsuction = 0.0;

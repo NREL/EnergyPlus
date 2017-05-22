@@ -75,7 +75,6 @@ using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataEnvironment;
-//using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::DataSurfaces;
@@ -90,12 +89,6 @@ using DataGlobals::BeginEnvrnFlag;
 
 TEST_F( EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest ) {
 	// Issue #6082
-
-	//int const NumOfSurf( 1 );
-	//int SurfNum;
-	//int ZoneNum;
-	//int ConstrNum;
-	//int MatNum;
 	bool ErrorsFound = false;
 	int UTSCNum( 1 );
 
