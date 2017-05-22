@@ -2,14 +2,13 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! HeatPumpIAQP_GenericContamControl.idf
+! HeatPumpProportionalControl_DCV.idf
 ! Basic file description:  Heat pump with DX coil for cooling (w/ 10% outdoor air max.)
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Outdoor air is modulated based on occupancy and floor area.
 !
-! Highlights:              Example of indoor air quality procedure (IAQP) controlled ventilation (see
-!                          Controller:MechanicalVentilation object). The method is defined in ASHRAE Standard 62.1-2007.
-!                          CO2 and generic cotaminant are simulated.
+! Highlights:              Example of demand controlled ventilation (see Controller:MechanicalVentilation object).
+!                          Enhance CO2 based DCV control by using Proportional Control Based On Design OA Rate.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 1 run period
 !                          Run Control executes 1 run period(see RUN PERIOD object)
@@ -84,7 +83,7 @@
 !                                 schedule (see Controller:MechanicalVentilation object):
 !
 !                                 Zone:                   Outdoor Air:
-!                                 West Zone               0.000381 m3/s-m2 and 0.002952 m3/s-person
+!                                 West Zone          0.000381 m3/s-m2 and 0.002952 m3/s-person
 !                                 East Zone               0.000407 m3/s-m2 and 0.003149 m3/s-person
 !                                 North Zone              0.000407 m3/s-m2 and 0.003149 m3/s-person
 !
@@ -220,9 +219,7 @@
 
   ZoneAirContaminantBalance,
     Yes,                     !- Carbon Dioxide Concentration
-    Outdoor CO2 Schedule,    !- Outdoor Carbon Dioxide Schedule Name
-    Yes,                     !- Generic Contaminant Concentration
-    Outdoor Generic Contaminant Schedule;  !- Outdoor Generic Contaminant Schedule Name
+    Outdoor CO2 Schedule;    !- Outdoor Carbon Dioxide Schedule Name
 
   Material,
     A1 - 1 IN STUCCO,        !- Name
@@ -971,25 +968,18 @@
     Until: 24:00,900.0;      !- Field 3
 
   Schedule:Compact,
-    Outdoor Generic Contaminant Schedule,  !- Name
+    CO2MinSchedule,     !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,100.0;      !- Field 3
+    Until: 24:00,300.0;      !- Field 3
 
   Schedule:Compact,
-    GCAvailSchedule,         !- Name
+    CO2MaxSchedule,     !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    GCSetpointSchedule,      !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,500.0;      !- Field 3
+    Until: 24:00,900.0;      !- Field 3
 
   Schedule:Compact,
     INF-SCHED,               !- Name
@@ -1006,19 +996,12 @@
     Until: 24:00,1.0;        !- Field 3
 
   Schedule:Compact,
-    GC Source Schedule,      !- Name
+    Minimum Outdoor Air Flow Rate Schedule,     !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    GC Removal Schedule,     !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
+    Until: 24:00,0.01;        !- Field 3
+ 
   People,
     WestPeople,              !- Name
     West Zone,               !- Zone or ZoneList Name
@@ -1196,70 +1179,6 @@
     NORTH ZONE,              !- Zone Name
     1.0E-7,                  !- Design Generation Rate {m3/s}
     CO2 Source Schedule;     !- Schedule Name
-
-  ZoneContaminantSourceAndSink:Generic:Constant,
-    NORTH ZONE GC,           !- Name
-    NORTH ZONE,              !- Zone Name
-    1.0E-6,                  !- Design Generation Rate {m3/s}
-    GC Source Schedule,      !- Generation Schedule Name
-    1.0E-7,                  !- Design Removal Coefficient {m3/s}
-    GC Removal Schedule;     !- Removal Schedule Name
-
-  ZoneContaminantSourceAndSink:Generic:Constant,
-    WEST ZONE GC,            !- Name
-    WEST ZONE,               !- Zone Name
-    1.0E-6,                  !- Design Generation Rate {m3/s}
-    GC Source Schedule,      !- Generation Schedule Name
-    1.0E-7,                  !- Design Removal Coefficient {m3/s}
-    GC Removal Schedule;     !- Removal Schedule Name
-
-  ZoneContaminantSourceAndSink:Generic:Constant,
-    EAST ZONE GC,            !- Name
-    EAST ZONE,               !- Zone Name
-    1.0E-6,                  !- Design Generation Rate {m3/s}
-    GC Source Schedule,      !- Generation Schedule Name
-    1.0E-7,                  !- Design Removal Coefficient {m3/s}
-    GC Removal Schedule;     !- Removal Schedule Name
-
-  ZoneContaminantSourceAndSink:Generic:CutoffModel,
-    NORTH ZONE GC CutoffModel,  !- Name
-    NORTH ZONE,              !- Zone Name
-    1.0E-5,                  !- Design Generation Rate Coefficient {m3/s}
-    GC Source Schedule,      !- Schedule Name
-    100000;                  !- Cutoff Generic Contaminant at which Emission Ceases {ppm}
-
-  ZoneContaminantSourceAndSink:Generic:CutoffModel,
-    EAST ZONE GC CutoffModel,!- Name
-    EAST ZONE,               !- Zone Name
-    1.0E-5,                  !- Design Generation Rate Coefficient {m3/s}
-    GC Source Schedule,      !- Schedule Name
-    50000;                   !- Cutoff Generic Contaminant at which Emission Ceases {ppm}
-
-  ZoneContaminantSourceAndSink:Generic:DecaySource,
-    WEST ZONE GC DecaySource,!- Name
-    WEST ZONE,               !- Zone Name
-    1.0E-5,                  !- Initial Emission Rate {m3/s}
-    GC Source Schedule,      !- Schedule Name
-    100000;                  !- Delay Time Constant {s}
-
-  SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
-    WEST ZONE GC BLD,        !- Name
-    Zn001:Wall001,           !- Surface Name
-    1.0E-2,                  !- Mass Transfer Coefficient {m/s}
-    GC Source Schedule,      !- Schedule Name
-    2.0;                     !- Henry Adsorption Constant or Partition Coefficient {dimensionless}
-
-  SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
-    EAST ZONE GC DVS,        !- Name
-    Zn002:Wall001,           !- Surface Name
-    1.0E-3,                  !- Deposition Velocity {m/s}
-    GC Source Schedule;      !- Schedule Name
-
-  ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
-    NORTH ZONE GC DRS,       !- Name
-    NORTH ZONE,              !- Zone Name
-    1.0E-5,                  !- Deposition Rate {m/s}
-    GC Source Schedule;      !- Schedule Name
 
   Curve:Biquadratic,
     HPACCoolCapFT,           !- Name
@@ -1490,7 +1409,7 @@
     DCVObject,               !- Name
     VentSchedule,            !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    IndoorAirQualityProcedureGenericContaminant,  !- System Outdoor Air Method
+    ProportionalControlBasedOnDesignOARate,  !- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     West Zone,               !- Zone 1 Name
     CM DSOA West Zone,       !- Design Specification Outdoor Air Object Name 1
@@ -1515,8 +1434,12 @@
     CM DSOA West Zone,       !- Name
     Sum,                     !- Outdoor Air Method
     0.002952,                !- Outdoor Air Flow per Person {m3/s-person}
-    0.000381;                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-
+    0.000381,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow per Zone
+    ,                        !- Outdoor Air Flow Air Changes per Hour
+    ,                        !- Outdoor Air Schedule Name
+    Minimum Outdoor Air Flow Rate Schedule;  !- Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
+    
   DesignSpecification:OutdoorAir,
     CM DSOA DCV Zone List,   !- Name
     Sum,                     !- Outdoor Air Method
@@ -1630,10 +1553,8 @@
     EAST ZONE,               !- Zone Name
     CO2AvailSchedule,        !- Carbon Dioxide Control Availability Schedule Name
     CO2SetpointSchedule,     !- Carbon Dioxide Setpoint Schedule Name
-    ,                        !- Minimum Carbon Dioxide Concentration Schedule Name
-    ,                        !- Maximum Carbon Dioxide Concentration Schedule Name
-    GCAvailSchedule,         !- Generic Contaminant Control Availability Schedule Name
-    GCSetpointSchedule;      !- Generic Contaminant Setpoint Schedule Name
+    CO2MinSchedule,          !- Minimum Carbon Dioxide Concentration Schedule Name
+    CO2MaxSchedule;          !- Maximum Carbon Dioxide Concentration Schedule Name
 
   AirLoopHVAC:SupplyPath,
     HeatPumpSupplyPath,      !- Name
@@ -1722,81 +1643,57 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,*,Unitary System Fan Part Load Ratio,TimeStep;
+  Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 
-  Output:Variable,*,Unitary System Compressor Part Load Ratio,TimeStep;
+  Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Heating Energy,TimeStep;
+  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,TimeStep;
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Air Temperature,TimeStep;
+  Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Zone Air Relative Humidity,TimeStep;
+  Output:Variable,*,Zone Air Relative Humidity,timestep;
 
-  Output:Variable,*,Zone Air Humidity Ratio,TimeStep;
+  Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,TimeStep;
+  Output:Variable,*,Fan Electric Power,timestep;
 
-  Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep;
+  Output:Variable,*,Cooling Coil Total Cooling Energy,timestep;
 
-  Output:Variable,*,Cooling Coil Sensible Cooling Rate,TimeStep;
+  Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Sensible Cooling Energy,TimeStep;
+  Output:Variable,*,Cooling Coil Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,TimeStep;
+  Output:Variable,*,Cooling Coil Electric Power,timestep;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,TimeStep;
+  Output:Variable,*,Heating Coil Total Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Total Heating Energy,TimeStep;
+  Output:Variable,*,Heating Coil Total Heating Energy,timestep;
 
-  Output:Variable,*,Heating Coil Electric Power,TimeStep;
+  Output:Variable,*,Heating Coil Electric Power,timestep;
 
-  Output:Variable,*,Heating Coil Defrost Electric Power,TimeStep;
+  Output:Variable,*,Heating Coil Defrost Electric Power,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,TimeStep;
+  Output:Variable,*,Heating Coil Air Heating Energy,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,TimeStep;
+  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,TimeStep;
+  Output:Variable,*,Heating Coil Gas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,TimeStep;
+  Output:Variable,*,Heating Coil Defrost Electric Energy,timestep;
 
-  Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,TimeStep;
+  Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,DX Cooling Coil Air Inlet Node,System Node Mass Flow Rate,TimeStep;
+  Output:Variable,*,Zone People Occupant Count,timestep;
 
-  Output:Variable,*,Zone People Occupant Count,TimeStep;
+  Output:Variable,*,System Node CO2 Concentration,timestep;
 
-  Output:Variable,*,System Node CO2 Concentration,TimeStep;
+  Output:Variable,*,Zone Air CO2 Concentration,timestep;
 
-  Output:Variable,*,Zone Air CO2 Concentration,TimeStep;
+  Output:Variable,*,Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate,timestep;
 
-  Output:Variable,*,Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate,TimeStep;
-
-  Output:Variable,*,System Node Generic Air Contaminant Concentration,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Constant Source Generation Volume Flow Rate,TimeStep;
-
-  Output:Variable,*,Zone Air Generic Air Contaminant Concentration,TimeStep;
-
-  Output:Variable,*,Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate,TimeStep;
-
-  Output:Variable,*,Zone Generic Air Contaminant Setpoint Concentration,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Cutoff Model Generation Volume Flow Rate,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Decay Model Generation Volume Flow Rate,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate,TimeStep;
-
-  Output:Variable,*,Generic Air Contaminant Deposition Rate Removal Volume Flow Rate,TimeStep;
+  Output:Variable,*,Air System Outdoor Air Mass Flow Rate,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
