@@ -266,7 +266,8 @@ namespace WindowManager {
 	Array1D< Real64 > rbvisPhi( 10, 0.0 ); // Glazing system visible back reflectance for each angle of incidence
 	Array1D< Real64 > CosPhiIndepVar( 10, 0.0 ); // Cos of incidence angles at 10-deg increments for curve fits
 
-  std::shared_ptr< CWindowModel > inExtWindowModel = nullptr; // Information about window model (interior or exterior)
+  std::shared_ptr< CWindowModel > inExtWindowModel = nullptr; // Information about windows model (interior or exterior)
+  std::shared_ptr< CWindowOpticalModel > winOpticalModel = nullptr; // Information about windows optical model (Simplified or BSDF)
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines
@@ -391,7 +392,7 @@ namespace WindowManager {
     // check and read custom solar and/or visible spectrum data if any
     CheckAndReadCustomSprectrumData();
     if( inExtWindowModel->isExternalLibraryModel() ) {
-      InitWCEOpticalData();
+      InitWCE_SimplifiedOpticalData();
     } else {
       InitGlassOpticalCalculations();
     }
@@ -9082,6 +9083,7 @@ Label99999: ;
   void initWindowModel() {
     const std::string objectName = "WindowsCalculationEngine";
     inExtWindowModel = CWindowModel::WindowModelFactory( objectName );
+    winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();
   }
 
   //*****************************************************************************************

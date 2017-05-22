@@ -129,6 +129,10 @@
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
 #include <WindowModel.hh>
+#include <WindowManagerExteriorData.hh>
+#include <WCECommon.hpp>
+#include <WCESingleLayerOptics.hpp>
+#include <WCEMultiLayerOptics.hpp>
 
 namespace EnergyPlus {
 
@@ -184,6 +188,9 @@ namespace HeatBalanceSurfaceManager {
 	using namespace SolarShading;
 	using namespace DaylightingManager;
   using namespace WindowManager;
+  using namespace FenestrationCommon;
+  using namespace SingleLayerOptics;
+  using namespace MultiLayerOptics;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -2118,7 +2125,11 @@ namespace HeatBalanceSurfaceManager {
 
 			if ( CalcWindowRevealReflection ) CalcBeamSolarOnWinRevealSurface();
 
-			CalcInteriorSolarDistribution();
+      if( inExtWindowModel->isExternalLibraryModel() && winOpticalModel->isSimplifiedModel() ) {
+        CalcInteriorSolarDistributionWCE();
+      } else {
+        CalcInteriorSolarDistribution();
+      }
 
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -2139,7 +2150,8 @@ namespace HeatBalanceSurfaceManager {
 				//  DBZone needs to subtract this part since it is already counted in DBZone.
 				//  Use InitialZoneDifSolReflW (Rob's previous work) as it better counts initial distribution of
 				//   diffuse solar rather than using weighted area*absorptance
-				QDforDaylight( ZoneNum ) = ( DBZone( ZoneNum ) - DBZoneIntWin( ZoneNum ) ) * BeamSolarRad + DBZoneSSG( ZoneNum ) + InitialZoneDifSolReflW( ZoneNum );
+				QDforDaylight( ZoneNum ) = ( DBZone( ZoneNum ) - DBZoneIntWin( ZoneNum ) ) * BeamSolarRad + 
+          DBZoneSSG( ZoneNum ) + InitialZoneDifSolReflW( ZoneNum );
 
 				// RJH 08/30/07 - Substitute InitialZoneDifSolReflW(ZoneNum) for DSZone and DGZone here
 				// to exclude diffuse solar now absorbed/transmitted in CalcWinTransDifSolInitialDistribution
@@ -2149,7 +2161,8 @@ namespace HeatBalanceSurfaceManager {
 				//QD(ZoneNum)  = DBZone(ZoneNum)*BeamSolarRad  &
 				//                +DSZone(ZoneNum)*DifSolarRad  &
 				//                +DGZone(ZoneNum)*GndSolarRad
-				QD( ZoneNum ) = DBZone( ZoneNum ) * BeamSolarRad + DBZoneSSG( ZoneNum ) + InitialZoneDifSolReflW( ZoneNum );
+				QD( ZoneNum ) = DBZone( ZoneNum ) * BeamSolarRad + DBZoneSSG( ZoneNum ) + 
+          InitialZoneDifSolReflW( ZoneNum );
 			}
 
 			// Flux of diffuse solar in each zone
@@ -2437,7 +2450,31 @@ namespace HeatBalanceSurfaceManager {
 										QRadSWwinAbsTot( SurfNum ) += QRadSWwinAbsLayer( Lay, SurfNum );
 									}
 									QRadSWwinAbsTotEnergy( SurfNum ) = QRadSWwinAbsTot( SurfNum ) * TimeStepZoneSec;
-								} // IF (SurfaceWindow(SurfNum)%WindowModelType /= WindowBSDFModel) THEN
+                } else if( inExtWindowModel->isExternalLibraryModel() ) {
+                  std::pair< double, double > incomingAngle = getSunWCEAngles( SurfNum2, BSDFHemisphere::Incoming );
+                  double Theta = incomingAngle.first;
+                  double Phi = incomingAngle.second;
+
+                  std::shared_ptr< CMultiLayerScattered > aLayer =
+                    CWindowConstructionsSimplified::instance().getEquivalentLayer( WavelengthRange::Solar,
+                      ConstrNum );
+
+                  size_t totLayers = aLayer->getNumOfLayers();
+                  for( size_t Lay = 1; Lay <= totLayers; ++Lay ) {
+
+                    double AbWinDiff = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse,
+                      Theta, Phi );
+
+                    QRadSWwinAbs( Lay, SurfNum ) = AbWinDiff *
+                      ( SkySolarInc + GndSolarInc ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
+
+                    // Total solar absorbed in solid layer (W), for reporting
+                    QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
+
+                    // Total solar absorbed in all glass layers (W), for reporting
+                    QRadSWwinAbsTot( SurfNum ) += QRadSWwinAbsLayer( Lay, SurfNum );
+                  }
+                }
 
 								// Solar absorbed by window frame and dividers
 								FrDivNum = Surface( SurfNum ).FrameDivider;

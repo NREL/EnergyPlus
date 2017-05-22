@@ -372,12 +372,13 @@ namespace EnergyPlus {
       }
       if( material.Group == WindowBlind ) {
         int blNum = m_Window.BlindNumber;
-        thickness = Blind( blNum ).SlatThickness;
-        conductivity = Blind( blNum ).SlatConductivity;
-        absFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, Blind( blNum ).IRFrontEmiss );
-        absBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, Blind( blNum ).IRBackEmiss );
-        transThermalFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, Blind( blNum ).IRFrontTrans );
-        transThermalBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, Blind( blNum ).IRBackTrans );
+        auto blind = Blind( blNum );
+        thickness = blind.SlatThickness;
+        conductivity = blind.SlatConductivity;
+        absFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontEmiss );
+        absBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRBackEmiss );
+        transThermalFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontTrans );
+        transThermalBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRBackTrans );
         if( t_Index == 1 ) {
           m_ExteriorShade = true;
         }

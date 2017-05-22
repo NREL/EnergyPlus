@@ -199,8 +199,10 @@ namespace WindowManager {
 	extern Array1D< Real64 > CosPhiIndepVar; // Cos of incidence angles at 10-deg increments for curve fits
 
   class CWindowModel;
+  class CWindowOpticalModel;
 
   extern std::shared_ptr< CWindowModel > inExtWindowModel;
+  extern std::shared_ptr< CWindowOpticalModel > winOpticalModel;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines

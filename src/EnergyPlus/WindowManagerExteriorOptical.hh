@@ -89,6 +89,7 @@ namespace SpectralAveraging {
 namespace SingleLayerOptics {
 
   class CBSDFLayer;
+  class CScatteringLayer;
   class ICellDescription;
   class CMaterial;
   class CMaterialSingleBand;
@@ -101,10 +102,16 @@ namespace EnergyPlus {
 
     class CWCEIntegrator;
 
-    // Initialize window optical properties with Windows-CalcEngine routines
-    void InitWCEOpticalData();
+    // Initialize window optical properties with Windows-CalcEngine routines that are BSDF based
+    void InitWCE_BSDFOpticalData();
+
+    void InitWCE_SimplifiedOpticalData();
 
     std::shared_ptr< SingleLayerOptics::CBSDFLayer > getBSDFLayer(
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+      const FenestrationCommon::WavelengthRange t_Range );
+
+    std::shared_ptr< SingleLayerOptics::CScatteringLayer > getScatteringLayer(
       const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
       const FenestrationCommon::WavelengthRange t_Range );
 
@@ -269,37 +276,41 @@ namespace EnergyPlus {
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEBSDFLayerFactory
+    //   CWCELayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEBSDFLayerFactory {
+    class CWCELayerFactory {
     public:
-      CWCEBSDFLayerFactory( 
+      CWCELayerFactory( 
         const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
       std::shared_ptr< SingleLayerOptics::CBSDFLayer > getBSDFLayer();
+      std::shared_ptr< SingleLayerOptics::CScatteringLayer > getLayer();
 
     protected:
-      void init();
+      // void init();
+      std::pair< std::shared_ptr< SingleLayerOptics::CMaterial >, std::shared_ptr< SingleLayerOptics::ICellDescription > > init();
 
       virtual void createMaterialFactory() = 0;
       std::shared_ptr< SingleLayerOptics::ICellDescription > getCellDescription();
 
       const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties > m_Material;
       const FenestrationCommon::WavelengthRange m_Range;
-      bool m_Initialized;
+      bool m_BSDFInitialized;
+      bool m_SimpleInitialized;
 
       std::shared_ptr< CWCEMaterialFactory > m_MaterialFactory;
       std::shared_ptr< IWCECellDescriptionFactory > m_CellFactory;
       std::shared_ptr< SingleLayerOptics::CBSDFLayer > m_BSDFLayer;
+      std::shared_ptr< SingleLayerOptics::CScatteringLayer > m_ScatteringLayer;
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCESpecularBSDFLayerFactory
+    //   CWCESpecularLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCESpecularBSDFLayerFactory : public CWCEBSDFLayerFactory {
+    class CWCESpecularLayerFactory : public CWCELayerFactory {
     public:
-      CWCESpecularBSDFLayerFactory( 
+      CWCESpecularLayerFactory( 
         const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
@@ -309,11 +320,11 @@ namespace EnergyPlus {
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEVenetianBlindBSDFLayerFactory
+    //   CWCEVenetianBlindLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEVenetianBlindBSDFLayerFactory : public CWCEBSDFLayerFactory {
+    class CWCEVenetianBlindLayerFactory : public CWCELayerFactory {
     public:
-      CWCEVenetianBlindBSDFLayerFactory( 
+      CWCEVenetianBlindLayerFactory( 
         const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
@@ -323,11 +334,11 @@ namespace EnergyPlus {
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEScreenBSDFLayerFactory
+    //   CWCEScreenLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEScreenBSDFLayerFactory : public CWCEBSDFLayerFactory {
+    class CWCEScreenLayerFactory : public CWCELayerFactory {
     public:
-      CWCEScreenBSDFLayerFactory( 
+      CWCEScreenLayerFactory( 
         const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
@@ -337,17 +348,16 @@ namespace EnergyPlus {
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEDiffuseShadeBSDFLayerFactory
+    //   CWCEDiffuseShadeLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEDiffuseShadeBSDFLayerFactory : public CWCEBSDFLayerFactory {
+    class CWCEDiffuseShadeLayerFactory : public CWCELayerFactory {
     public:
-      CWCEDiffuseShadeBSDFLayerFactory( 
+      CWCEDiffuseShadeLayerFactory( 
         const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
     private:
       void createMaterialFactory();
-      std::shared_ptr< SingleLayerOptics::ICellDescription > getCellDescription();
 
     };
 

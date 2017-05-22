@@ -13,7 +13,7 @@ namespace EnergyPlus {
   public:
     EnumParser() {};
 
-    T StringToEnum( const std::string &value ) {
+    T StringToEnum( const std::string& value ) {
       auto iValue = m_Map.find( value );
       if( iValue == m_Map.end() )
         throw std::runtime_error( "Incorrect enumerator assigned." );
@@ -39,6 +39,21 @@ namespace EnergyPlus {
     private:
       WindowsModel m_Model;
 
+    };
+
+    enum WindowsOpticalModel { Simplified, BSDF };
+
+    class CWindowOpticalModel {
+    public:
+      CWindowOpticalModel();
+
+      static std::shared_ptr< CWindowOpticalModel > WindowOpticalModelFactory();
+
+      WindowsOpticalModel getWindowsOpticalModel();
+      bool isSimplifiedModel();
+
+    private:
+      WindowsOpticalModel m_Model;
     };
   }
 

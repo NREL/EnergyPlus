@@ -69,6 +69,7 @@
 #include <DataGlobals.hh>
 #include <InputProcessor.hh>
 #include <General.hh>
+#include <WindowManager.hh>
 
 // Windows library headers
 #include <WCEMultiLayerOptics.hpp>
@@ -104,20 +105,45 @@ namespace EnergyPlus {
       // PURPOSE OF THIS SUBROUTINE:
       // BSDF will be created in different ways that is based on material type
 
-      shared_ptr< CWCEBSDFLayerFactory > aFactory = nullptr;
+      shared_ptr< CWCELayerFactory > aFactory = nullptr;
       if( t_Material->Group == WindowGlass ) {
-        aFactory = make_shared< CWCESpecularBSDFLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCESpecularLayerFactory >( t_Material, t_Range );
       } else if( t_Material->Group == WindowBlind ) {
-        aFactory = make_shared< CWCEVenetianBlindBSDFLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCEVenetianBlindLayerFactory >( t_Material, t_Range );
       } else if( t_Material->Group == Screen ) {
-        aFactory = make_shared< CWCEScreenBSDFLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCEScreenLayerFactory >( t_Material, t_Range );
       } else if( t_Material->Group == Shade ) {
-        aFactory = make_shared< CWCEDiffuseShadeBSDFLayerFactory >( t_Material, t_Range );
+        aFactory = make_shared< CWCEDiffuseShadeLayerFactory >( t_Material, t_Range );
       }
       return aFactory->getBSDFLayer();
     }
 
-    void InitWCEOpticalData() {
+    shared_ptr< CScatteringLayer > getScatteringLayer(
+      const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   May 2017
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Scattering will be created in different ways that is based on material type
+
+      shared_ptr< CWCELayerFactory > aFactory = nullptr;
+      if( t_Material->Group == WindowGlass ) {
+        aFactory = make_shared< CWCESpecularLayerFactory >( t_Material, t_Range );
+      } else if( t_Material->Group == WindowBlind ) {
+        aFactory = make_shared< CWCEVenetianBlindLayerFactory >( t_Material, t_Range );
+      } else if( t_Material->Group == Screen ) {
+        aFactory = make_shared< CWCEScreenLayerFactory >( t_Material, t_Range );
+      } else if( t_Material->Group == Shade ) {
+        aFactory = make_shared< CWCEDiffuseShadeLayerFactory >( t_Material, t_Range );
+      }
+      return aFactory->getLayer();
+    }
+
+    void InitWCE_BSDFOpticalData() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -125,9 +151,9 @@ namespace EnergyPlus {
       //       RE-ENGINEERED  na
 
       // PURPOSE OF THIS SUBROUTINE:
-      // Initialize construction layers in Solar and Visible spectrum.
+      // Initialize BSDF construction layers in Solar and Visible spectrum.
 
-      CWindowConstructionsBSDF aWinConst = CWindowConstructionsBSDF::instance();
+      CWindowConstructionsBSDF aWinConstBSDF = CWindowConstructionsBSDF::instance();
       for( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
         auto& construction( Construct( ConstrNum ) );
         if( construction.isGlazingConstruction() ) {
@@ -145,16 +171,118 @@ namespace EnergyPlus {
 
               auto aRange = WavelengthRange::Solar;
               shared_ptr< CBSDFLayer > aSolarLayer = getBSDFLayer( aMaterial, aRange );
-              aWinConst.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
+              aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
 
               aRange = WavelengthRange::Visible;
               shared_ptr< CBSDFLayer > aVisibleLayer = getBSDFLayer( aMaterial, aRange );
-              aWinConst.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+              aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
             }
 
           }
         }
       }
+    }
+
+    void InitWCE_SimplifiedOpticalData() {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   May 2017
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Initialize scattering construction layers in Solar and Visible spectrum.
+
+      // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
+		if ( TotBlinds > 0 ) CalcWindowBlindProperties();
+
+		// Initialize SurfaceScreen structure
+		if ( NumSurfaceScreens > 0 ) CalcWindowScreenProperties();
+
+      CWindowConstructionsSimplified aWinConstSimp = CWindowConstructionsSimplified::instance();
+      for( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
+        auto& construction( Construct( ConstrNum ) );
+        if( construction.isGlazingConstruction() ) {
+          for( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
+            auto& material( Material( construction.LayerPoint( LayNum ) ) );
+            if( material.Group != WindowGas && material.Group != WindowGasMixture &&
+              material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
+              shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
+              *aMaterial = material;
+
+              // This is necessary because rest of EnergyPlus code relies on TransDiff property 
+              // of construction. It will basically trigger Window optical calculations if this
+              // property is >0.
+              construction.TransDiff = 0.1;
+
+              auto aRange = WavelengthRange::Solar;
+              shared_ptr< CScatteringLayer > aSolarLayer = getScatteringLayer( aMaterial, aRange );
+              aWinConstSimp.pushLayer( aRange, ConstrNum, aSolarLayer );
+
+              aRange = WavelengthRange::Visible;
+              shared_ptr< CScatteringLayer > aVisibleLayer = getScatteringLayer( aMaterial, aRange );
+              aWinConstSimp.pushLayer( aRange, ConstrNum, aVisibleLayer );
+            }
+
+          }
+        }
+      }
+
+    // Get effective glass and shade/blind emissivities for windows that have interior blind or
+		// shade. These are used to calculate zone MRT contribution from window when
+		// interior blind/shade is deployed.
+
+		for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
+			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+			if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) continue; //Irrelevant for Complex Fen
+			if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) continue; // not required
+			int ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
+			if ( ConstrNumSh == 0 ) continue;
+			int TotLay = Construct( ConstrNumSh ).TotLayers;
+			bool IntShade = false;
+			bool IntBlind = false;
+      int ShadeLayPtr = 0;
+      int BlNum = 0;
+			if ( Material( Construct( ConstrNumSh ).LayerPoint( TotLay ) ).Group == Shade ) {
+				IntShade = true;
+				ShadeLayPtr = Construct( ConstrNumSh ).LayerPoint( TotLay );
+			}
+			if ( Material( Construct( ConstrNumSh ).LayerPoint( TotLay ) ).Group == WindowBlind ) {
+				IntBlind = true;
+				BlNum = Material( Construct( ConstrNumSh ).LayerPoint( TotLay ) ).BlindDataPtr;
+			}
+
+			if ( IntShade || IntBlind ) {
+				for ( int ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng ) {
+          double EpsGlIR = 0;
+          double RhoGlIR = 0;
+					if ( IntShade || IntBlind ) {
+						EpsGlIR = Material( Construct( ConstrNumSh ).LayerPoint( TotLay - 1 ) ).AbsorpThermalBack;
+						RhoGlIR = 1 - EpsGlIR;
+					}
+					if ( IntShade ) {
+						double TauShIR = Material( ShadeLayPtr ).TransThermal;
+						double EpsShIR = Material( ShadeLayPtr ).AbsorpThermal;
+						double RhoShIR = max( 0.0, 1.0 - TauShIR - EpsShIR );
+						SurfaceWindow( SurfNum ).EffShBlindEmiss( 1 ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
+						SurfaceWindow( SurfNum ).EffGlassEmiss( 1 ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
+					}
+					if ( IntBlind ) {
+						double TauShIR = Blind( BlNum ).IRFrontTrans( ISlatAng );
+						double EpsShIR = Blind( BlNum ).IRBackEmiss( ISlatAng );
+						double RhoShIR = max( 0.0, 1.0 - TauShIR - EpsShIR );
+						SurfaceWindow( SurfNum ).EffShBlindEmiss( ISlatAng ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
+						SurfaceWindow( SurfNum ).EffGlassEmiss( ISlatAng ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
+					}
+					// Loop over remaining slat angles only if blind with movable slats
+					if ( IntShade ) break; // Loop over remaining slat angles only if blind
+					if ( IntBlind ) {
+						if ( Blind( BlNum ).SlatAngleType == FixedSlats ) break;
+					}
+				} // End of slat angle loop
+			} // End of check if interior shade or interior blind
+		} // End of surface loop
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -421,85 +549,100 @@ namespace EnergyPlus {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEBSDFLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEBSDFLayerFactory::CWCEBSDFLayerFactory(
+    CWCELayerFactory::CWCELayerFactory(
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
-      m_Material( t_Material ), m_Range( t_Range ), m_Initialized( false ), m_MaterialFactory( nullptr ) {
+      m_Material( t_Material ), m_Range( t_Range ), m_BSDFInitialized( false ), 
+      m_SimpleInitialized( false ), m_MaterialFactory( nullptr ) {
       
     }
 
-    void CWCEBSDFLayerFactory::init() {
+    pair< shared_ptr< CMaterial >, shared_ptr< ICellDescription > > CWCELayerFactory::init() {
       createMaterialFactory();
       shared_ptr< CMaterial > aMaterial = m_MaterialFactory->getMaterial();
       assert( aMaterial != nullptr );
       shared_ptr< ICellDescription > aCellDescription = getCellDescription( );
       assert( aCellDescription != nullptr );
-      shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
-
-      CBSDFLayerMaker aMaker = CBSDFLayerMaker( aMaterial, aBSDF, aCellDescription );
-      m_BSDFLayer = aMaker.getLayer();
+      
+      return make_pair( aMaterial, aCellDescription );
     }
 
-    shared_ptr< CBSDFLayer > CWCEBSDFLayerFactory::getBSDFLayer() {
-      if( !m_Initialized ) {
-        init();
-        m_Initialized = true;
+    shared_ptr< CBSDFLayer > CWCELayerFactory::getBSDFLayer() {
+      if( !m_BSDFInitialized ) {
+        pair< shared_ptr< CMaterial >, shared_ptr< ICellDescription > > res;
+        res = init();
+        shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
+        
+        CBSDFLayerMaker aMaker = CBSDFLayerMaker( res.first, aBSDF, res.second );
+        m_BSDFLayer = aMaker.getLayer();
+        m_BSDFInitialized = true;
       }
       return m_BSDFLayer;
     }
 
-    shared_ptr< ICellDescription > CWCEBSDFLayerFactory::getCellDescription() {
+    shared_ptr< CScatteringLayer > CWCELayerFactory::getLayer() {
+      if( !m_SimpleInitialized ) {
+        pair< shared_ptr< CMaterial >, shared_ptr< ICellDescription > > res;
+        res = init();
+
+        m_ScatteringLayer = make_shared< CScatteringLayer >( res.first, res.second );
+        m_SimpleInitialized = true;
+      }
+      return m_ScatteringLayer;
+    }
+
+    shared_ptr< ICellDescription > CWCELayerFactory::getCellDescription() {
       return m_CellFactory->getCellDescription();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecularLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularBSDFLayerFactory::CWCESpecularBSDFLayerFactory( 
+    CWCESpecularLayerFactory::CWCESpecularLayerFactory( 
       const shared_ptr< MaterialProperties >& t_Material,
-      const WavelengthRange t_Range ) : CWCEBSDFLayerFactory( t_Material, t_Range ) {
+      const WavelengthRange t_Range ) : CWCELayerFactory( t_Material, t_Range ) {
       m_CellFactory = make_shared< CWCESpecularCellFactory >( t_Material );
     }
 
-    void CWCESpecularBSDFLayerFactory::createMaterialFactory() {
+    void CWCESpecularLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCESpecularMaterialsFactory >( m_Material, m_Range );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindBSDFLayerFactory::CWCEVenetianBlindBSDFLayerFactory( 
+    CWCEVenetianBlindLayerFactory::CWCEVenetianBlindLayerFactory( 
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
-      CWCEBSDFLayerFactory( t_Material, t_Range ) {
+      CWCELayerFactory( t_Material, t_Range ) {
       m_CellFactory = make_shared< CWCEVenetianBlindCellFactory >( t_Material );
     }
 
-    void CWCEVenetianBlindBSDFLayerFactory::createMaterialFactory() {
+    void CWCEVenetianBlindLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCEVenetianBlindMaterialsFactory >( m_Material, m_Range );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenBSDFLayerFactory::CWCEScreenBSDFLayerFactory( 
+    CWCEScreenLayerFactory::CWCEScreenLayerFactory( 
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
-      CWCEBSDFLayerFactory( t_Material, t_Range ) {
+      CWCELayerFactory( t_Material, t_Range ) {
       m_CellFactory = make_shared< CWCEScreenCellFactory >( t_Material );
     }
 
-    void CWCEScreenBSDFLayerFactory::createMaterialFactory() {
+    void CWCEScreenLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCEScreenMaterialsFactory >( m_Material, m_Range );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeBSDFLayerFactory::CWCEDiffuseShadeBSDFLayerFactory(
+    CWCEDiffuseShadeLayerFactory::CWCEDiffuseShadeLayerFactory(
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) :
-      CWCEBSDFLayerFactory( t_Material, t_Range ) {
+      CWCELayerFactory( t_Material, t_Range ) {
       m_CellFactory = make_shared< CWCEDiffuseShadeCellFactory >( t_Material );
     }
 
-    void CWCEDiffuseShadeBSDFLayerFactory::createMaterialFactory() {
+    void CWCEDiffuseShadeLayerFactory::createMaterialFactory() {
       m_MaterialFactory = make_shared< CWCEDiffuseShadeMaterialsFactory >( m_Material, m_Range );
     }
 
