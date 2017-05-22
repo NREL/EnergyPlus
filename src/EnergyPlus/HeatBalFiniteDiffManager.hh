@@ -134,6 +134,7 @@ namespace HeatBalFiniteDiffManager {
 		int GSloopCounter; // count of inner loop iterations
 		int GSloopErrorCount; // recurring error counter
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
+		Array1D< int > PhaseChangeState;
 
 		// Default Constructor
 		SurfaceDataFD() :
@@ -141,7 +142,8 @@ namespace HeatBalFiniteDiffManager {
 			QSource( 0.0 ),
 			GSloopCounter( 0 ),
 			GSloopErrorCount( 0 ),
-			MaxNodeDelTemp( 0.0 )
+			MaxNodeDelTemp( 0.0 ),
+			PhaseChangeState( 0 )
 		{}
 
 		inline

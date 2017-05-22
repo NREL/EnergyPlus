@@ -48,16 +48,16 @@ namespace HysteresisPhaseChange {
 	}
 
 	Real64 HysteresisPhaseChange::getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2, Real64 deltaH, Real64 CpSolid, Real64 CpLiquid ) {
-		Real64 eta1 = (deltaH /2)* exp(-2* abs(T - Tc)/tau1);
-		Real64 eta2 = (deltaH /2)* exp(-2* abs(T - Tc)/tau2);
-		if (T<=Tc) {
-			return (CpSolid*T) + eta1;
+		Real64 eta1 = ( deltaH / 2 ) * exp( -2 * abs( T - Tc ) / tau1 );
+		Real64 eta2 = ( deltaH / 2 ) * exp( -2 * abs( T - Tc ) / tau2 );
+		if ( T <= Tc ) {
+			return ( CpSolid * T ) + eta1;
 		} else {
-			return (CpSolid*Tc) + deltaH + CpLiquid * (T-Tc) - eta2;
+			return ( CpSolid * Tc ) + deltaH + CpLiquid * ( T - Tc ) - eta2;
 		}
 	}
 
-	Real64 HysteresisPhaseChange::getCurrentSpecificHeat( Real64 temperatureTD, Real64 temperatureTDT ) {
+	Real64 HysteresisPhaseChange::getCurrentSpecificHeat( Real64 temperatureTD, Real64 temperatureTDT, int & phaseChangeState ) {
 
 		Real64 TcF = this->peakTempFreezing;
 		Real64 TcM = this->peakTempMelting;
@@ -224,6 +224,7 @@ namespace HysteresisPhaseChange {
 			Cp = this->CpOld;
 		}
 		this->CpOld = Cp;
+		phaseChangeState = this->phaseChangeState;
 		return Cp;
 	}
 

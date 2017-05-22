@@ -79,7 +79,7 @@ namespace HysteresisPhaseChange {
 
 		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2, Real64 deltaH, Real64 CpSolid, Real64 CpLiquid );
 
-		Real64 getCurrentSpecificHeat( Real64, Real64 ) override;
+		Real64 getCurrentSpecificHeat( Real64, Real64, int & ) override;
 	
 	};
 
