@@ -53,8 +53,10 @@
 #include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -65,9 +67,11 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
+//#include <SQLiteProcedures.hh>;
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
+using namespace EnergyPlus::Boilers;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
@@ -77,6 +81,7 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ReportSizingManager;
+//using namespace EnergyPlus::SQLiteProcedures;
 
 TEST_F( EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT )
 {
@@ -352,4 +357,26 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	ZoneEqSizing.deallocate();
 	ZoneSizingInput.deallocate();
 
+}
+
+TEST_F( EnergyPlusFixture, ReportSizingManager_ReportSizingOutputTest ) {
+	// issue #6112
+	std::string CompName;
+	std::string CompType;
+	std::string VarDesc;
+	std::string UsrDesc;
+	Real64 VarValue;
+	Real64 UsrValue;
+
+	// input values
+	CompType = "BOILER:HOTWATER";
+	CompName = "RESIDENTIAL BOILER ELECTRIC";
+	VarDesc = "Design Size Nominal Capacity[W]";
+	VarValue = 105977.98934;
+	UsrDesc = "User-Specified Nominal Capacity[W]";
+	UsrValue = 26352.97405;
+
+	// boiler hot water autosizing and userspecified nominal capacity reporting
+	ReportSizingManager::ReportSizingOutput( CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue );
+	
 }
