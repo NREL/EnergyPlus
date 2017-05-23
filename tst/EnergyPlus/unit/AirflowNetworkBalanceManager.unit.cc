@@ -7246,8 +7246,8 @@ namespace EnergyPlus {
 		SurfaceGeometry::CosBldgRotAppGonly = 1.0;
 		SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-		//SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
-		//EXPECT_FALSE(errors); // expect no errors
+		SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+		EXPECT_FALSE(errors); // expect no errors
 
 		CurveManager::GetCurveInput();
 		EXPECT_EQ( CurveManager::NumCurves, 1 );
@@ -8315,6 +8315,25 @@ namespace EnergyPlus {
 			"  20.0,                    !- Reference Temperature {C}",
 			"  101320,                  !- Reference Barometric Pressure {Pa}",
 			"  0.005;                   !- Reference Humidity Ratio {kgWater/kgDryAir}" });
+
+		std::vector<Real64> valsForLeftWindow = { -1.3130779955194276, -1.7404152241877022, -1.9384350312723766,
+			-1.8112879523426120, -1.4903484929957291, -1.1589328567607411, -0.90795075070620501, -0.75899946242534944,
+			-0.70518117657458634, -0.73794026769189536, -0.70518117657458634, -0.75899946242534944, -0.90795075070620501,
+			-1.1589328567607411, -1.4903484929957291, -1.8112879523426120, -1.9384350312723766, -1.7404152241877022,
+			-1.3130779955194276, -0.81787534059945755, -0.32789581427586245, -0.051561623181424314, 0.15922353989407620,
+			0.38420139813526627, 0.61892682388527165, 0.85109949645405880, 1.0664888091014251, 1.2510276050004789,
+			1.0664888091014251, 0.85109949645405880, 0.61892682388527165, 0.38420139813526627, 0.15922353989407620,
+			-0.051561623181424314, -0.32789581427586245, -0.81787534059945755, -1.3130779955194276 };
+
+		std::vector<Real64> valsForRightWindow = { -0.56146269488642231, -0.81031499432463261, -0.88587800418632712,
+			-0.70219756773378639, -0.39543597375365452, -0.14821874325853215, -0.045339946833489957, -0.097330100392452740,
+			-0.28213089764929783, -0.57310708635195429, -0.28213089764929783, -0.097330100392452740, -0.045339946833489957,
+			-0.14821874325853215, -0.39543597375365452, -0.70219756773378639, -0.88587800418632712, -0.81031499432463261,
+			-0.56146269488642231, -0.28653692388308377, -0.041152159946210520, 0.37465991281286887, 0.81696925904461237,
+			1.1829453813575432, 1.4391966568855996, 1.5699546250680769, 1.5837385005116038, 1.5105973452216215,
+			1.5837385005116038, 1.5699546250680769, 1.4391966568855996, 1.1829453813575432, 0.81696925904461237,
+			0.37465991281286887, -0.041152159946210520, -0.28653692388308377, -0.56146269488642231 };
+
 		ASSERT_FALSE(process_idf(idf_objects));
 
 		bool errors = false;
@@ -8325,11 +8344,6 @@ namespace EnergyPlus {
 		HeatBalanceManager::GetConstructData(errors); // read construction data
 		EXPECT_FALSE(errors); // expect no errors
 
-		// Magic to get surfaces read in correctly
-		//DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-		//DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
-		//SurfaceGeometry::SetupZoneGeometry(errors);
-		//EXPECT_FALSE(errors); // expect no errors
 		HeatBalanceManager::GetZoneData(errors); // read zone data
 		EXPECT_FALSE(errors); // expect no errors
 
@@ -8347,61 +8361,33 @@ namespace EnergyPlus {
 
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
-		/*
+		// Check that the correct number of curves has been generated (5 facade directions + 2 windows)
+		EXPECT_EQ(6, CurveManager::NumCurves);
+
 		// Check the airflow elements
-		EXPECT_EQ(2u, DataAirflowNetwork::MultizoneExternalNodeData.size());
-		EXPECT_EQ(3u, DataAirflowNetwork::MultizoneZoneData.size());
-		EXPECT_EQ(4u, DataAirflowNetwork::MultizoneSurfaceData.size());
+		ASSERT_EQ(3u, DataAirflowNetwork::MultizoneExternalNodeData.size());
+		EXPECT_EQ(1u, DataAirflowNetwork::MultizoneZoneData.size());
+		EXPECT_EQ(3u, DataAirflowNetwork::MultizoneSurfaceData.size());
 		EXPECT_EQ(1u, DataAirflowNetwork::MultizoneSurfaceCrackData.size());
+		EXPECT_EQ(1u, DataAirflowNetwork::MultizoneCompDetOpeningData.size());
 		EXPECT_EQ(2u, DataAirflowNetwork::MultizoneSurfaceStdConditionsCrackData.size());
 
-		EXPECT_EQ(0.0, DataAirflowNetwork::MultizoneExternalNodeData(1).azimuth);
-		EXPECT_TRUE(DataAirflowNetwork::MultizoneExternalNodeData(1).symmetricCurve);
-		EXPECT_FALSE(DataAirflowNetwork::MultizoneExternalNodeData(1).useRelativeAngle);
-		EXPECT_EQ(1, DataAirflowNetwork::MultizoneExternalNodeData(1).curve);
+		EXPECT_EQ(270.0, DataAirflowNetwork::MultizoneExternalNodeData(1).azimuth);
+		EXPECT_EQ(270.0, DataAirflowNetwork::MultizoneExternalNodeData(2).azimuth);
+		EXPECT_EQ(270.0, DataAirflowNetwork::MultizoneExternalNodeData(3).azimuth);
 
-		EXPECT_EQ(180.0, DataAirflowNetwork::MultizoneExternalNodeData(2).azimuth);
-		EXPECT_TRUE(DataAirflowNetwork::MultizoneExternalNodeData(2).symmetricCurve);
-		EXPECT_TRUE(DataAirflowNetwork::MultizoneExternalNodeData(2).useRelativeAngle);
-		EXPECT_EQ(1, DataAirflowNetwork::MultizoneExternalNodeData(2).curve);
+		// Check the curve values for the left window, taken from v8.6.0
+		unsigned i = 0;
+		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
+			EXPECT_EQ(valsForLeftWindow[i++], value) << ("Issue at index: " + std::to_string(i));
+		}
 
-		// Check the curves
-		Real64 cp105N = -0.590653062499999;
-		Real64 cp105S = -0.298039062499999;
-		EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(1, 0)); // In-range value
-		EXPECT_NEAR(cp105N, CurveManager::CurveValue(1, 105), 1e-14); // In-range value
-		EXPECT_NEAR(cp105S, CurveManager::CurveValue(1, 75), 1e-14); // In-range value
-		EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(1, -10.0)); // Minimum x
-		EXPECT_NEAR(-0.403903999999994, CurveManager::CurveValue(1, 5000), 1e-14); // Maximum x
-
-																				   // Set up some environmental parameters
-		DataEnvironment::OutBaroPress = 101325.0;
-		DataEnvironment::OutDryBulbTemp = 25.0;
-		DataEnvironment::WindDir = 105.0;
-		DataEnvironment::OutHumRat = 0.0; // Dry air only
-		DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-		DataEnvironment::SiteWindExp = 0.0; // Disconnect variation by height
-		DataEnvironment::WindSpeed = 10.0;
-
-		// Make sure we can compute the right wind pressure
-		Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp,
-			DataEnvironment::OutHumRat);
-		EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(DataAirflowNetwork::MultizoneExternalNodeData(1).curve,
-			1.0, 0.0, 0.0, false, false);
-		EXPECT_DOUBLE_EQ(cp105N*0.5*1.1841123742118911, p);
-
-		// Make sure the reference velocity comes out right
-		EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(MultizoneExternalNodeData(1).height));
-
-		EXPECT_EQ(5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size());
-
-		// Run the balance routine, for now only to get the pressure set at the external nodes
-		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
-
-		EXPECT_NEAR(cp105N*0.5*118.41123742118911, DataAirflowNetwork::AirflowNetworkNodeSimu(4).PZ, 1e-13);
-		EXPECT_NEAR(cp105S*0.5*118.41123742118911, DataAirflowNetwork::AirflowNetworkNodeSimu(5).PZ, 1e-13);
-		*/
+		// Check the curve values for the left window, taken from v8.6.0
+		i = 0;
+		for (auto value : CurveManager::PerfCurveTableData(5).Y) {
+			EXPECT_EQ(valsForRightWindow[i++], value) << ("Issue at index: " + std::to_string(i));
+		}
+		
 	}
 
 }
