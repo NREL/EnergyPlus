@@ -4660,7 +4660,7 @@ namespace SimAirServingZones {
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
-		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flaw rate [m3/s]
+		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
