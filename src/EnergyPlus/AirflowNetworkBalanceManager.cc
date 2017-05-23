@@ -2210,7 +2210,7 @@ namespace AirflowNetworkBalanceManager {
 			for ( j = 1; j <= 5; ++j ) {
 				found = false;
 				for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
-					if ( MultizoneExternalNodeData( i ).CPVNum == j ) {
+					if ( MultizoneExternalNodeData( i ).facadeNum == j ) {
 						found = true;
 						break;
 					}
@@ -8697,6 +8697,7 @@ namespace AirflowNetworkBalanceManager {
 			int ExtNodeNum; // External node number; = row index in MultizoneExternalNodeData array + AirflowNetworkNumOfZones
 			std::string ZoneName; // EnergyPlus zone name
 			int CPVNum;
+			int facadeNum;
 			int curve; // wind pressure coefficient curve index
 			int CompTypeNum; // Opening type (detailed, simple, etc.)
 			Real64 NodeHeight; // Elevation of the opening node
@@ -8713,6 +8714,7 @@ namespace AirflowNetworkBalanceManager {
 				MZDZoneNum( 0 ),
 				ExtNodeNum( 0 ),
 				CPVNum( 0 ),
+				facadeNum( 0 ),
 				curve( 0 ),
 				CompTypeNum( 0 ),
 				NodeHeight( 0.0 ),
@@ -8819,6 +8821,7 @@ namespace AirflowNetworkBalanceManager {
 							AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
 							AFNExtSurfaces( ExtOpenNum ).OpeningArea = MultizoneSurfaceData( SrfNum ).Width * MultizoneSurfaceData( SrfNum ).Height * MultizoneSurfaceData( SrfNum ).OpenFactor;
 							AFNExtSurfaces( ExtOpenNum ).ExtNodeNum = MultizoneSurfaceData( ExtOpenNum ).NodeNums( 2 );
+							AFNExtSurfaces( ExtOpenNum ).facadeNum = MultizoneExternalNodeData( AFNExtSurfaces(ExtOpenNum).ExtNodeNum - AirflowNetworkNumOfZones ).facadeNum;
 							AFNExtSurfaces( ExtOpenNum ).curve = MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).curve;
 							AFNExtSurfaces( ExtOpenNum ).DischCoeff = MultizoneCompDetOpeningData( DetOpenNum ).DischCoeff2;
 							++ExtOpenNum;
@@ -8909,7 +8912,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 		int numOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
 		MultizoneCPValueDataTemp.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps
-		MultizoneCPValueDataTempUnMod.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
+		//MultizoneCPValueDataTempUnMod.allocate( numOfCPValue ); //Allocate a temporary array for single sided Cps without the modification factor
 		// Copy in Cp values for the 4 main facades
 		for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
 			//gio::write( Name, "(\"FacadeNum\",I1)" ) << FacadeNum;
@@ -8917,14 +8920,14 @@ namespace AirflowNetworkBalanceManager {
 			//MultizoneCPValueDataTemp( FacadeNum ).CPArrayName = MultizoneCPValueData( FacadeNum ).CPArrayName;
 			MultizoneCPValueDataTemp( FacadeNum ).CPValue.allocate( numWindDir );
 			for ( int i = 1; i <= numWindDir; ++i ) {
-				MultizoneCPValueDataTemp( FacadeNum ).CPValue( i ) = valsByFacade[ FacadeNum-1 ][ i ];
+				MultizoneCPValueDataTemp( FacadeNum ).CPValue( i ) = valsByFacade[ FacadeNum-1 ][ i-1 ];
 			}
 		}
 		//Allocate the rest of the array for single sided openings
 		for ( SrfNum = 5; SrfNum <= numOfCPValue; ++SrfNum ) {
 			//MultizoneCPValueDataTemp( SrfNum ).CPArrayName = "EVERY10DEGREES";
 			MultizoneCPValueDataTemp( SrfNum ).CPValue.allocate( numWindDir );
-			MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( numWindDir );
+			//MultizoneCPValueDataTempUnMod( SrfNum ).CPValue.allocate( numWindDir );
 			MultizoneCPValueDataTemp( SrfNum ).CPValue = 0.0;
 		}
 		//Calculate the single sided Cp arrays from DeltaCp for each single sided opening
@@ -8943,26 +8946,21 @@ namespace AirflowNetworkBalanceManager {
 						Real64 const AFNEExtSurface_fac( 0.5 * ( 1.0 / pow_2( AFNExtSurfaces( ExtOpenNum ).DischCoeff ) ) );
 						if ( OpenNuminZone == 1 ) {
 							for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
-								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
-								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
-								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
-								MultizoneCPValueDataTemp( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
+								Real64 unmodifiedValue = valsByFacade[ AFNExtSurfaces(ExtOpenNum).facadeNum-1 ][ WindDirNum-1 ] + AFNEExtSurface_fac * DeltaCp(ZnNum).WindDir(WindDirNum);
+								MultizoneCPValueDataTemp(SrfNum).CPValue(WindDirNum) = VelRatio_2 * unmodifiedValue;
 								CPV1( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 							}
-							MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).CPVNum = SrfNum;
+							MultizoneExternalNodeData(AFNExtSurfaces(ExtOpenNum).ExtNodeNum - AirflowNetworkNumOfZones).facadeNum = SrfNum;
 							AFNExtSurfaces( ExtOpenNum ).CPVNum = SrfNum;
 							++OpenNuminZone;
 							++SrfNum;
 						} else if ( OpenNuminZone == 2 ) {
 							for ( WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum ) {
-								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
-								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
-								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
-								MultizoneCPValueDataTemp( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
+								Real64 unmodifiedValue = valsByFacade[ AFNExtSurfaces( ExtOpenNum ).facadeNum-1 ][ WindDirNum-1 ] - AFNEExtSurface_fac * DeltaCp(ZnNum).WindDir(WindDirNum);
+								MultizoneCPValueDataTemp(SrfNum).CPValue(WindDirNum) = VelRatio_2 * unmodifiedValue;
 								CPV2( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 								EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = std::abs( CPV2( WindDirNum ) - CPV1( WindDirNum ) );
 							}
-							//MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).CPVNum = SrfNum;
 							MultizoneExternalNodeData( AFNExtSurfaces( ExtOpenNum ).ExtNodeNum - AirflowNetworkNumOfZones ).facadeNum = SrfNum;
 							AFNExtSurfaces( ExtOpenNum ).CPVNum = SrfNum;
 							++OpenNuminZone;

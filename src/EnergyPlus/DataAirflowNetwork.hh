@@ -652,7 +652,7 @@ namespace DataAirflowNetwork {
 		Real64 azimuth; // Azimuthal angle of the associated surface
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
-		int CPVNum; // CP Value number
+		//int CPVNum; // CP Value number
 		int facadeNum; // Facade number
 		int curve; // Curve ID, replace with pointer after curve refactor
 		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
@@ -1462,9 +1462,7 @@ namespace DataAirflowNetwork {
 	extern Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
 	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
 	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueData;
 	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modification factor
 	extern Array1D< DeltaCpProp > DeltaCp;
 	extern Array1D< DeltaCpProp > EPDeltaCP;
 	extern Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
