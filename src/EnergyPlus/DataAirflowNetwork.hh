@@ -652,7 +652,6 @@ namespace DataAirflowNetwork {
 		Real64 azimuth; // Azimuthal angle of the associated surface
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
-		//int CPVNum; // CP Value number
 		int facadeNum; // Facade number
 		int curve; // Curve ID, replace with pointer after curve refactor
 		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
@@ -663,38 +662,10 @@ namespace DataAirflowNetwork {
 			azimuth( 0.0 ),
 			height( 0.0 ),
 			ExtNum( 0 ),
-			//CPVNum( 0 ),
 			facadeNum( 0 ),
 			curve( 0 ),
 			symmetricCurve( false ),
 			useRelativeAngle( false )
-		{}
-
-	};
-
-	struct MultizoneCPArrayProp // CP Array
-	{
-		// Members
-		std::string Name; // Name of CP array
-		int NumWindDir; // Number of wind directions
-		Array1D< Real64 > WindDir; // Wind direction
-
-		// Default Constructor
-		MultizoneCPArrayProp() :
-			NumWindDir( 0 )
-		{}
-
-	};
-
-	struct MultizoneCPValueProp // CP Value
-	{
-		// Members
-		std::string Name; // Name of CP Value
-		std::string CPArrayName; // CP array Name
-		Array1D< Real64 > CPValue; // CP Value
-
-		// Default Constructor
-		MultizoneCPValueProp()
 		{}
 
 	};
@@ -1460,9 +1431,6 @@ namespace DataAirflowNetwork {
 	extern Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
 	extern Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
 	extern Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
 	extern Array1D< DeltaCpProp > DeltaCp;
 	extern Array1D< DeltaCpProp > EPDeltaCP;
 	extern Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
