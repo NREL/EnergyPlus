@@ -74,6 +74,7 @@
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <PlantLocation.hh>
 #include <PlantUtilities.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -125,6 +126,9 @@ namespace FuelCellElectricGenerator {
 	// MODULE VARIABLE DECLARATIONS:
 	bool GetFuelCellInput( true ); // When TRUE, calls subroutine to read input file.
 	Array1D_bool CheckEquipName;
+	Array1D< FCDataStruct > FuelCell; // dimension to number of machines
+
+	// If clear_state ever added here, need to do this: FuelCell.deallocate();
 
 	void
 	SimFuelCellGenerator(
@@ -3632,21 +3636,32 @@ namespace FuelCellElectricGenerator {
 
 	}
 
-	void
-	SimFuelCellPlantHeatRecovery(
-		std::string const & EP_UNUSED( CompType ),
-		std::string const & CompName,
-		int const CompTypeNum,
-		int & CompNum,
-		bool const EP_UNUSED( RunFlag ),
-		bool & InitLoopEquip,
-		Real64 & EP_UNUSED( MyLoad ), // unused1208
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	)
-	{
+	PlantComponent * FCDataStruct::factory(int EP_UNUSED(objectType), std::string objectName) {
+		if ( GetFuelCellInput ) {
+
+			// Read input data.
+			GetFuelCellGeneratorInput();
+			GetFuelCellInput = false;
+		}
+		// Now look for this particular exhaust HX or stack cooler in the list
+		for ( auto & item : FuelCell) {
+			if ( ( item.NameExhaustHX == objectName ) || ( item.NameStackCooler == objectName ) ){
+				return &item;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError( "FuelCellFactory: Error getting inputs for Generator:FuelCell named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
+	}
+
+	void FCDataStruct::getDesignCapacities(const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad){
+		MinLoad = 0.0;
+		MaxLoad = 0.0;
+		OptLoad = 0.0;
+	}
+
+	void FCDataStruct::simulate(const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
@@ -3658,62 +3673,17 @@ namespace FuelCellElectricGenerator {
 		// makes sure input are gotten and setup from Plant loop perspective.
 		// does not (re)simulate entire FuelCell model
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataPlant::TypeOf_Generator_FCExhaust;
 		using DataPlant::TypeOf_Generator_FCStackCooler;
+		using DataPlant::PlantLoop;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( GetFuelCellInput ) {
-
-			// Read input data.
-			GetFuelCellGeneratorInput();
-			GetFuelCellInput = false;
-		}
-
-		if ( InitLoopEquip ) {
-			if ( CompTypeNum == TypeOf_Generator_FCExhaust ) {
-				CompNum = FindItemInList( CompName, FuelCell, &FCDataStruct::NameExhaustHX );
-			} else if ( CompTypeNum == TypeOf_Generator_FCStackCooler ) {
-				CompNum = FindItemInList( CompName, FuelCell, &FCDataStruct::NameStackCooler );
-			}
-			if ( CompNum == 0 ) {
-				ShowFatalError( "SimFuelCellPlantHeatRecovery: Fuel Cell Generator Unit not found=" + CompName );
-			}
-			MinCap = 0.0;
-			MaxCap = 0.0;
-			OptCap = 0.0;
-			return;
-		} // End Of InitLoopEquip
-
+		int CompTypeNum;
+		CompTypeNum = PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).TypeOf_Num;
 		if ( CompTypeNum == TypeOf_Generator_FCStackCooler ) {
-			UpdateComponentHeatRecoverySide( FuelCell( CompNum ).CWLoopNum, FuelCell( CompNum ).CWLoopSideNum, TypeOf_Generator_FCStackCooler, FuelCell( CompNum ).StackCooler.WaterInNode, FuelCell( CompNum ).StackCooler.WaterOutNode, FuelCell( CompNum ).Report.qHX, FuelCell( CompNum ).Report.HeatRecInletTemp, FuelCell( CompNum ).Report.HeatRecOutletTemp, FuelCell( CompNum ).Report.HeatRecMdot, FirstHVACIteration );
+			UpdateComponentHeatRecoverySide( this->CWLoopNum, this->CWLoopSideNum, TypeOf_Generator_FCStackCooler, this->StackCooler.WaterInNode, this->StackCooler.WaterOutNode, this->Report.qHX, this->Report.HeatRecInletTemp, this->Report.HeatRecOutletTemp, this->Report.HeatRecMdot, FirstHVACIteration );
 		} else if ( CompTypeNum == TypeOf_Generator_FCExhaust ) {
-			UpdateComponentHeatRecoverySide( FuelCell( CompNum ).CWLoopNum, FuelCell( CompNum ).CWLoopSideNum, TypeOf_Generator_FCExhaust, FuelCell( CompNum ).ExhaustHX.WaterInNode, FuelCell( CompNum ).ExhaustHX.WaterOutNode, FuelCell( CompNum ).Report.qHX, FuelCell( CompNum ).Report.HeatRecInletTemp, FuelCell( CompNum ).Report.HeatRecOutletTemp, FuelCell( CompNum ).Report.HeatRecMdot, FirstHVACIteration );
+			UpdateComponentHeatRecoverySide( this->CWLoopNum, this->CWLoopSideNum, TypeOf_Generator_FCExhaust, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode, this->Report.qHX, this->Report.HeatRecInletTemp, this->Report.HeatRecOutletTemp, this->Report.HeatRecMdot, FirstHVACIteration );
 
 		}
 

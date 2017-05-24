@@ -67,6 +67,7 @@
 #include <DataSizing.hh>
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
+#include <FuelCellElectricGenerator.hh>
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
@@ -1123,6 +1124,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(TypeOf_Pipe, CompNames(CompNum));
 						} else if ( SameString( this_comp_type, "WaterHeater:HeatPump:PumpedCondenser" ) ) {
 							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -1214,6 +1216,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(TypeOf_Pipe, CompNames(CompNum));
 						} else if ( SameString( this_comp_type, "Fluidcooler:SingleSpeed" ) ) {
 							this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
 							this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;

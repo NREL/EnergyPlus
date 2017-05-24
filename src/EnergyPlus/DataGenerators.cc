@@ -155,7 +155,6 @@ namespace DataGenerators {
 	int NumGensWDynamics( 0 ); // number of dynamics controls for generators
 
 	// Object Data
-	Array1D< FCDataStruct > FuelCell; // dimension to number of machines
 	Array1D< GasPropertyDataStruct > GasPhaseThermoChemistryData;
 	Array1D< GeneratorFuelSupplyDataStruct > FuelSupply; // fuel supply (reused across various)
 	Array1D< MicroCHPDataStruct > MicroCHP;
@@ -171,7 +170,6 @@ namespace DataGenerators {
 		NumMicroCHPs = 0;
 		NumMicroCHPParams = 0;
 		NumGensWDynamics = 0;
-		FuelCell.deallocate();
 		GasPhaseThermoChemistryData.deallocate();
 		FuelSupply.deallocate();
 		MicroCHP.deallocate();

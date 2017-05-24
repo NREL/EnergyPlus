@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <DataGenerators.hh>
 
 namespace EnergyPlus {
 
@@ -65,10 +66,67 @@ namespace FuelCellElectricGenerator {
 	// MODULE VARIABLE DECLARATIONS:
 	extern bool GetFuelCellInput; // When TRUE, calls subroutine to read input file.
 	extern Array1D_bool CheckEquipName;
+	using namespace DataGenerators;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE FuelCell ElectricGenerator
+	struct FCDataStruct : public PlantComponent
+	{
+		// Members
+		// from input data and nested types for subsystems
+		std::string Name; // user identifier
+		std::string NameFCPM; // name of FC Power Module
+		FCPowerModuleStruct FCPM; // data for Power Module
+		std::string NameFCAirSup; // name of air supply module for fuel cell
+		FCAirSupplyDataStruct AirSup; // data for air supply module
+		std::string NameFCFuelSup; // name of fuel supply module
+		int FuelSupNum; // indes for fuel supply module structure
+		std::string NameFCWaterSup; // name of water supply module
+		FCWaterSupplyDataStruct WaterSup; // data for water supply module
+		std::string NameFCAuxilHeat; // name of auxiliary heating module
+		FCAuxilHeatDataStruct AuxilHeat; // data for auxiliary heating module
+		std::string NameExhaustHX; // name of Exhaust HX module
+		FCExhaustHXDataStruct ExhaustHX; // data for Exhaust heat exchanger module
+		std::string NameElecStorage; // name of Battery module
+		FCElecStorageDataStruct ElecStorage; // data for Battery module
+		std::string NameInverter; // name of Inverter Module
+		FCInverterDataStruct Inverter; // data for INverter module
+		std::string NameStackCooler; // name of Inverter Module
+		FCStackCoolerDataStruct StackCooler; // data for INverter module
+		int CWLoopNum; // cooling water plant loop index number
+		int CWLoopSideNum; // cooling water plant loop side index
+		int CWBranchNum; // cooling water plant loop branch index
+		int CWCompNum; // cooling water plant loop component index
+		FCReportDataStruct Report; // data for reporting as E+ output variables
+		// calculated whole-system level variables
+		Real64 ACPowerGen; // Net output from SOFC unit
+		Real64 QconvZone; // convective heat lost to surrounding zone
+		Real64 QradZone; // radiative heat lost to surrounding zone
+		int DynamicsControlID;
+		Real64 TimeElapsed; // used to track when timestep has changed
 
-	//PRIVATE    SetupFuelAndAirConstituentData ! hardwired data for gas phase thermochemistry calcs
+		// Default Constructor
+		FCDataStruct() :
+			FuelSupNum( 0 ),
+			CWLoopNum( 0 ),
+			CWLoopSideNum( 0 ),
+			CWBranchNum( 0 ),
+			CWCompNum( 0 ),
+			ACPowerGen( 0.0 ),
+			QconvZone( 0.0 ),
+			QradZone( 0.0 ),
+			DynamicsControlID( 0 ),
+			TimeElapsed( 0.0 )
+		{}
+
+		// Functions
+		static
+		PlantComponent * factory( int objectType, std::string objectName );
+
+		void
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+
+		void getDesignCapacities(const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad) override;
+
+	};
 
 	// Functions
 
@@ -230,21 +288,6 @@ namespace FuelCellElectricGenerator {
 	void
 	CalcFuelCellGenHeatRecovery( int const Num ); // Generator number
 
-	void
-	SimFuelCellPlantHeatRecovery(
-		std::string const & CompType,
-		std::string const & CompName,
-		int const CompTypeNum,
-		int & CompNum,
-		bool const RunFlag,
-		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	);
-
 	// End FuelCell Generator Module Model Subroutines
 	// *****************************************************************************
 
@@ -287,6 +330,8 @@ namespace FuelCellElectricGenerator {
 		Real64 & ThermalPower, // heat power
 		Real64 & ThermalEnergy // heat energy
 	);
+
+	extern Array1D< FCDataStruct > FuelCell; // dimension to number of machines
 
 } // FuelCellElectricGenerator
 
