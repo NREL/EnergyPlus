@@ -53,10 +53,8 @@
 #include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -67,11 +65,9 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
-//#include <SQLiteProcedures.hh>;
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::Boilers;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
@@ -81,7 +77,6 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ReportSizingManager;
-//using namespace EnergyPlus::SQLiteProcedures;
 
 TEST_F( EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT )
 {
