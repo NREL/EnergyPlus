@@ -2274,10 +2274,10 @@ namespace AirflowNetworkBalanceManager {
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, "; }
 		gio::write( OutputFileInits, fmtA ) << "Wind Pressure Coefficients #1 to n (dimensionless)";
 
-		int numWinDirs = 12;
+		int numWinDirs = 11;
 		Real64 angleDelta = 30.0;
 		if (AirflowNetworkNumOfSingleSideZones > 0) {
-			numWinDirs = 37;
+			numWinDirs = 35;
 			angleDelta = 10.0;
 		}
 
@@ -8643,8 +8643,6 @@ namespace AirflowNetworkBalanceManager {
 		int SrfNum;
 		int ExtOpenNum;
 		int ZnNum;
-		int FacadeNum;
-		int NodeNum;
 		int DetOpenNum; // row index of surface in MultizoneCompDetOpeningData
 		int SimOpenNum; // row index of surface in MultizoneCompSimOpeningData
 		int MZDZoneNum; // row index of surface zone in MultizoneZoneData
@@ -8888,7 +8886,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 		}
-		int numOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
+		//int numOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
 
 		//Calculate the single sided Cp arrays from DeltaCp for each single sided opening
 		CPV1.allocate( numWindDir ); // These two arrays should be removed

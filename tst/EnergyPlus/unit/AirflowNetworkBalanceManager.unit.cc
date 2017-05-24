@@ -8376,16 +8376,16 @@ namespace EnergyPlus {
 		EXPECT_EQ(270.0, DataAirflowNetwork::MultizoneExternalNodeData(2).azimuth);
 		EXPECT_EQ(270.0, DataAirflowNetwork::MultizoneExternalNodeData(3).azimuth);
 
-		// Check the curve values for the left window, taken from v8.6.0
+		// Check the curve values for the left window, taken from v8.6.0 on Windows
 		unsigned i = 0;
 		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
-			EXPECT_EQ(valsForLeftWindow[i++], value) << ("Issue at index: " + std::to_string(i));
+			EXPECT_DOUBLE_EQ(valsForLeftWindow[i++], value) << ("Issue at index: " + std::to_string(i));
 		}
 
-		// Check the curve values for the left window, taken from v8.6.0
+		// Check the curve values for the left window, taken from v8.6.0 on Windows
 		i = 0;
 		for (auto value : CurveManager::PerfCurveTableData(5).Y) {
-			EXPECT_EQ(valsForRightWindow[i++], value) << ("Issue at index: " + std::to_string(i));
+			EXPECT_DOUBLE_EQ(valsForRightWindow[i++], value) << ("Issue at index: " + std::to_string(i));
 		}
 		
 	}
