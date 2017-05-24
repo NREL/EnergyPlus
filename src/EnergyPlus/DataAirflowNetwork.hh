@@ -188,7 +188,6 @@ namespace DataAirflowNetwork {
 		// and NO MULTIZONE OR DISTRIBUTION
 		std::string WPCCntr; // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
 		int iWPCCntr; // Integer equivalent for WPCCntr field
-		std::string CpArrayName; // CP Array name at WPCCntr = "INPUT"
 		std::string BldgType; // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
 		std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
 		int MaxIteration; // Maximum number of iteration, default 500
@@ -199,7 +198,6 @@ namespace DataAirflowNetwork {
 		Real64 MaxPressure; // Maximum pressure change in an element [Pa]
 		Real64 Azimuth; // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
 		Real64 AspectRatio; // Ratio of Building Width Along Short Axis to Width Along Long Axis
-		int NWind; // Number of wind directions
 		Real64 DiffP; // Minimum pressure difference
 		int ExtLargeOpeningErrCount; // Exterior large opening error count during HVAC system operation
 		int ExtLargeOpeningErrIndex; // Exterior large opening error index during HVAC system operation
@@ -221,7 +219,6 @@ namespace DataAirflowNetwork {
 			MaxPressure( 500.0 ),
 			Azimuth( 0.0 ),
 			AspectRatio( 1.0 ),
-			NWind( 0 ),
 			DiffP( 1.0e-4 ),
 			ExtLargeOpeningErrCount( 0 ),
 			ExtLargeOpeningErrIndex( 0 ),
@@ -237,7 +234,6 @@ namespace DataAirflowNetwork {
 			std::string const & Control, // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
 			std::string const & WPCCntr, // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
 			int const iWPCCntr, // Integer equivalent for WPCCntr field
-			std::string const & CpArrayName, // CP Array name at WPCCntr = "INPUT"
 			std::string const & BldgType, // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATION"
 			std::string const & HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
 			int const MaxIteration, // Maximum number of iteration, default 500
@@ -248,7 +244,6 @@ namespace DataAirflowNetwork {
 			Real64 const MaxPressure, // Maximum pressure change in an element [Pa]
 			Real64 const Azimuth, // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
 			Real64 const AspectRatio, // Ratio of Building Width Along Short Axis to Width Along Long Axis
-			int const NWind, // Number of wind directions
 			Real64 const DiffP, // Minimum pressure difference
 			int const ExtLargeOpeningErrCount, // Exterior large opening error count during HVAC system operation
 			int const ExtLargeOpeningErrIndex, // Exterior large opening error index during HVAC system operation
@@ -261,7 +256,6 @@ namespace DataAirflowNetwork {
 			Control( Control ),
 			WPCCntr( WPCCntr ),
 			iWPCCntr( iWPCCntr ),
-			CpArrayName( CpArrayName ),
 			BldgType( BldgType ),
 			HeightOption( HeightOption ),
 			MaxIteration( MaxIteration ),
@@ -272,7 +266,6 @@ namespace DataAirflowNetwork {
 			MaxPressure( MaxPressure ),
 			Azimuth( Azimuth ),
 			AspectRatio( AspectRatio ),
-			NWind( NWind ),
 			DiffP( DiffP ),
 			ExtLargeOpeningErrCount( ExtLargeOpeningErrCount ),
 			ExtLargeOpeningErrIndex( ExtLargeOpeningErrIndex ),

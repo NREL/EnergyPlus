@@ -8379,13 +8379,13 @@ namespace EnergyPlus {
 		// Check the curve values for the left window, taken from v8.6.0 on Windows
 		unsigned i = 0;
 		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
-			EXPECT_DOUBLE_EQ(valsForLeftWindow[i++], value) << ("Issue at index: " + std::to_string(i));
+			EXPECT_NEAR(valsForLeftWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
 		}
 
 		// Check the curve values for the left window, taken from v8.6.0 on Windows
 		i = 0;
 		for (auto value : CurveManager::PerfCurveTableData(5).Y) {
-			EXPECT_DOUBLE_EQ(valsForRightWindow[i++], value) << ("Issue at index: " + std::to_string(i));
+			EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
 		}
 		
 	}

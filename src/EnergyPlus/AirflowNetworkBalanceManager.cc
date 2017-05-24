@@ -2297,6 +2297,21 @@ namespace AirflowNetworkBalanceManager {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
+		if (AirflowNetworkNumOfSingleSideZones > 0) {
+			for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
+				if ( MultizoneZoneData( i ).SingleSidedCpType == "ADVANCED" ) {
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), "; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneZoneData( i ).ZoneName + ", "; }
+					for ( j = 1; j <= EPDeltaCP( i ).WindDir.size() - 1; ++j ) {
+						StringOut = RoundSigDigits( EPDeltaCP( i ).WindDir( j ), 2 );
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+					}
+					StringOut = RoundSigDigits( EPDeltaCP( i ).WindDir( EPDeltaCP( i ).WindDir.size() ), 2 );
+					gio::write( OutputFileInits, fmtA ) << StringOut;
+				}
+			}
+		}
+
 		// If no zone object, exit
 		if ( AirflowNetworkNumOfZones == 0 ) {
 			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
@@ -5119,6 +5134,10 @@ namespace AirflowNetworkBalanceManager {
 				190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360 };
 
 			// Calculate the wind pressure coefficients vs. wind direction for each external node
+			// The wind pressure coeffients are stored temporarily in the "valsByFacade" vector and then
+			// converted into a table near the end of this else. There will be at least six profiles 
+			// (four sides plus two for each pair of windows). The name is thus a little misleading, as
+			// it isn't really the values by facade once you get beyond the first four.
 			std::vector< std::vector< Real64 > > valsByFacade( 4 );
 			for ( FacadeNum = 0; FacadeNum < 4; ++FacadeNum ) {
 				valsByFacade[ FacadeNum ] = std::vector< Real64 >( 36 );
@@ -8889,7 +8908,7 @@ namespace AirflowNetworkBalanceManager {
 		//int numOfCPValue = ( 4 + 2 * AirflowNetworkNumOfSingleSideZones );
 
 		//Calculate the single sided Cp arrays from DeltaCp for each single sided opening
-		CPV1.allocate( numWindDir ); // These two arrays should be removed
+		CPV1.allocate( numWindDir ); // These two arrays should probably be removed
 		CPV2.allocate( numWindDir );
 		CPV1 = 0.0;
 		CPV2 = 0.0;
