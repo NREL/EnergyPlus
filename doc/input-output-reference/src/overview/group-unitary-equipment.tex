@@ -49,8 +49,6 @@ Links to the fan, cooling coil, heating coil and reheat coil specifications are 
 
 For unitary systems, don't use the night cycle manager. Use a scheduled availability manager and let the system be always on. Then use the Supply Air Fan Operating Mode Schedule Name in the unitary system to switch between continuous fan (for ventilation) during occupied periods and switch to cycling fan for unoccupied. The system will cycle on as the thermostat requests, and this way it will run just enough to meet the load - no need for a minimum cycle time.
 
-\subsubsection{Inputs}\label{inputs-049}
-
 Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying Fan:OnOff and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified. When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
 
 \subsubsection{Inputs}\label{inputs-049}
@@ -713,85 +711,18 @@ Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:Mul
 
 This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
-\paragraph{Field: Heating Speed 1 Supply Air Flow Ratio}\label{field-heating-speed-1-supply-air-flow-ratio}
+\paragraph{Field Group: Heating and Cooling Speeds 1 to 10}\label{field-group-heating-and-cooling-speeds-1-to-10}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 1 (lowest speed). Values must be greater than 0.
+The air flow through a multispeed coil system is specified as a group of two air flow ratio inputs, one each for heating and cooling. If the number of speeds for heating and cooling are different, inputs for both heating and cooling are still required for a given speed yet one input may be blank. The maximum of the inputs for Number of Speeds for Cooling and Number of Speeds for Heating specified above determines how many groups of heating and cooling supply air flow ratio inputs are required. Both inputs for Speed 1 are required and specify the air flow ratio for the lowest speed, followed by the inputs for Speed 2, Speed 3, etc. up to a maximum of 10 speeds. These inputs are applicable only to multispeed or variable speed coils.
 
-\paragraph{Field: Cooling Speed 1 Supply Air Flow Ratio}\label{field-cooling-speed-1-supply-air-flow-ratio}
+\paragraph{Field: Heating Speed \textless{}x\textgreater{} Supply Air Flow Ratio}\label{field-heating-speed-x-supply-air-flow-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 1 (lowest speed). Values must be greater than 0.
+This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil is operating at Speed \textless{}x\textgreater{}. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for the previous heating speed. If the `Number of Speeds for Heating' is less than \textless{}x\textgreater{}, then this field can be left blank.
 
-\paragraph{Field: Heating Speed 2 Supply Air Flow Ratio}\label{field-heating-speed-2-supply-air-flow-ratio}
+\paragraph{Field: Cooling Speed \textless{}x\textgreater{} Supply Air Flow Ratio}\label{field-cooling-speed-x-supply-
+air-flow-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 1. If the `Number of Speeds for Heating' is less than 2, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 2 Supply Air Flow Ratio}\label{field-cooling-speed-2-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 1. If the `Number of Speeds for Cooling' is less than 2, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 3 Supply Air Flow Ratio}\label{field-heating-speed-3-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 2. If the `Number of Speeds for Heating' is less than 3, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 3 Supply Air Flow Ratio}\label{field-cooling-speed-3-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 2. If the `Number of Speeds for Cooling' is less than 3, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 4 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 4. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 3. If the `Number of Speeds for Heating' is less than 4, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 4 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 4. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 3. If the `Number of Speeds for Cooling' is less than 4, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 5 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 5. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 3. If the `Number of Speeds for Heating' is less than 4, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 5 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 5. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 4. If the `Number of Speeds for Cooling' is less than 5, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 6 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 6. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 5. If the `Number of Speeds for Heating' is less than 6, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 6 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 6. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 5. If the `Number of Speeds for Cooling' is less than 6, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 7 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 7. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 6. If the `Number of Speeds for Heating' is less than 7, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 7 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 7. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 6. If the `Number of Speeds for Cooling' is less than 7, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 8 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 8. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 7. If the `Number of Speeds for Heating' is less than 8, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 8 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 8. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 7. If the `Number of Speeds for Cooling' is less than 8, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 9 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 9. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 8. If the `Number of Speeds for Heating' is less than 9, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 9 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 9. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 8. If the `Number of Speeds for Cooling' is less than 9, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 10 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 10. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 9. If the `Number of Speeds for Heating' is less than 10, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 10 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 10. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 9. If the `Number of Speeds for Cooling' is less than 10, then this field can be left blank.
+This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the cooling coil is operating at Speed \textless{}x\textgreater{}. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for the previous cooling speed. If the `Number of Speeds for Cooling' is less than \textless{}x\textgreater{}, then this field can be left blank.
 
 \subsection{AirLoopHVAC:Unitary:Furnace:HeatCool}\label{airloophvacunitaryfurnaceheatcool}
 
