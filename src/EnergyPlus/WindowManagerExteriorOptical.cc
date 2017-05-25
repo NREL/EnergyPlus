@@ -194,12 +194,15 @@ namespace EnergyPlus {
       // Initialize scattering construction layers in Solar and Visible spectrum.
 
       // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
+      // Calculation from this is used for IR properties. Need to make sure that properties
+      // are calculated with new WCE optical engine (for both blinds and screens)
 		if ( TotBlinds > 0 ) CalcWindowBlindProperties();
 
 		// Initialize SurfaceScreen structure
-		if ( NumSurfaceScreens > 0 ) CalcWindowScreenProperties();
+    NumSurfaceScreens = TotScreens;
+    if ( NumSurfaceScreens > 0 ) CalcWindowScreenProperties();
 
-      CWindowConstructionsSimplified aWinConstSimp = CWindowConstructionsSimplified::instance();
+      auto aWinConstSimp = CWindowConstructionsSimplified::instance();
       for( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
         auto& construction( Construct( ConstrNum ) );
         if( construction.isGlazingConstruction() ) {
@@ -207,7 +210,7 @@ namespace EnergyPlus {
             auto& material( Material( construction.LayerPoint( LayNum ) ) );
             if( material.Group != WindowGas && material.Group != WindowGasMixture &&
               material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
-              shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
+              auto aMaterial = make_shared< MaterialProperties >();
               *aMaterial = material;
 
               // This is necessary because rest of EnergyPlus code relies on TransDiff property 

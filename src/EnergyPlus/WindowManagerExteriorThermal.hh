@@ -109,8 +109,8 @@ namespace EnergyPlus {
       std::shared_ptr< Tarcog::CSingleSystem > getTarcogSystem( double const t_HextConvCoeff );
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getIGULayer( int const t_Index );
-      std::shared_ptr< Tarcog::CEnvironment > getIndoor();
-      std::shared_ptr< Tarcog::CEnvironment > getOutdoor( double const t_Hext );
+      std::shared_ptr< Tarcog::CEnvironment > getIndoor() const;
+      std::shared_ptr< Tarcog::CEnvironment > getOutdoor( double const t_Hext ) const;
       std::shared_ptr< Tarcog::CIGU > getIGU( );
 
       // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
@@ -136,21 +136,21 @@ namespace EnergyPlus {
       int getNumOfLayers() const;
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getSolidLayer(
-        const EnergyPlus::DataSurfaces::SurfaceData &surface,
-        const EnergyPlus::DataHeatBalance::MaterialProperties &material,
-        const int t_Index, const int t_SurfNum );
+        EnergyPlus::DataSurfaces::SurfaceData const & surface,
+        EnergyPlus::DataHeatBalance::MaterialProperties const & material,
+        int const t_Index, int const t_SurfNum );
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getGapLayer(
-        const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+        EnergyPlus::DataHeatBalance::MaterialProperties const & material ) const;
 
-      std::shared_ptr< Tarcog::CBaseIGULayer > getShadeToGlassLayer( const int t_Index );
+      std::shared_ptr< Tarcog::CBaseIGULayer > getShadeToGlassLayer( int const t_Index ) const;
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getComplexGapLayer(
-        const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+        EnergyPlus::DataHeatBalance::MaterialProperties const & material ) const;
 
-      std::shared_ptr< Gases::CGas > getGas( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
-      std::shared_ptr< Gases::CGas > getAir();
-      EnergyPlus::DataHeatBalance::MaterialProperties* getLayerMaterial( const int t_Index );
+      std::shared_ptr< Gases::CGas > getGas( EnergyPlus::DataHeatBalance::MaterialProperties const & material ) const;
+      std::shared_ptr< Gases::CGas > getAir() const;
+      EnergyPlus::DataHeatBalance::MaterialProperties* getLayerMaterial( int const t_Index ) const;
 
     };        
   }

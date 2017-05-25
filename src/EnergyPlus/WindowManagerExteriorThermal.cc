@@ -103,19 +103,19 @@ namespace EnergyPlus {
 
       auto & window( SurfaceWindow( SurfNum ) );
       auto & surface( Surface( SurfNum ) );
-      int ConstrNum = surface.Construction;
+      auto ConstrNum = surface.Construction;
       auto & construction( Construct( ConstrNum ) );
 
-      const double solutionTolerance = 0.02;
+      auto const solutionTolerance = 0.02;
 
       // Tarcog thermal system for solving heat transfer through the window
-      CWCEHeatTransferFactory aFactory = CWCEHeatTransferFactory( surface, SurfNum );
-      shared_ptr< CSingleSystem > aSystem = aFactory.getTarcogSystem( HextConvCoeff );
+      auto aFactory = CWCEHeatTransferFactory( surface, SurfNum );
+      auto aSystem = aFactory.getTarcogSystem( HextConvCoeff );
       aSystem->setTolerance( solutionTolerance );
 
       // get previous timestep temperatures solution for faster iterations
-      shared_ptr< vector< double > > Guess = make_shared< vector< double > >();
-      int totSolidLayers = construction.TotSolidLayers;
+      auto Guess = make_shared< vector< double > >();
+      auto totSolidLayers = construction.TotSolidLayers;
       
       // Interior and exterior shading layers have gas between them and IGU but that gas
       // was not part of construction so it needs to be increased by one
@@ -126,17 +126,17 @@ namespace EnergyPlus {
         ++totSolidLayers;
       }
 
-      for( int k = 1; k <= 2 * totSolidLayers; ++k ) {
+      for( auto k = 1; k <= 2 * totSolidLayers; ++k ) {
         Guess->push_back( SurfaceWindow( SurfNum ).ThetaFace( k ) );
       }
       aSystem->setInitialGuess( Guess );
       aSystem->solve();
-      
-      vector< shared_ptr < CIGUSolidLayer > > aLayers = aSystem->getSolidLayers();
-      int i = 1;
-      for( shared_ptr< CIGUSolidLayer > aLayer : aLayers ) {
+
+      auto aLayers = aSystem->getSolidLayers();
+      auto i = 1;
+      for( auto aLayer : aLayers ) {
         double aTemp = 0;
-        for( Side aSide : EnumSide() ) {
+        for( auto aSide : EnumSide() ) {
           aTemp = aLayer->getTemperature( aSide );
           thetas( i ) = aTemp;
           if( i == 1 ) {
@@ -146,8 +146,8 @@ namespace EnergyPlus {
         }
         SurfInsideTemp = aTemp - KelvinConv;
         if( window.ShadingFlag == IntShadeOn || window.ShadingFlag == IntBlindOn ) {
-          double EffShBlEmiss = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffShBlindEmiss );
-          double EffGlEmiss = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffGlassEmiss );
+          auto EffShBlEmiss = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffShBlindEmiss );
+          auto EffGlEmiss = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffGlassEmiss );
           window.EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( thetas( 2 * totSolidLayers - 2 ) - TKelvin ) ) / ( EffShBlEmiss + EffGlEmiss );
         }
       }
@@ -158,43 +158,43 @@ namespace EnergyPlus {
         // soltuion from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
         // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
         // these calculations just to confirm that current exterior engine is giving close results to what is in here. (Simon)
-        size_t totLayers = aLayers.size();
+        auto totLayers = aLayers.size();
         nglface = 2 * totLayers - 2;
         nglfacep = nglface + 2;
-        shared_ptr< CIGUSolidLayer > aShadeLayer = aLayers[ totLayers - 1 ];
-        shared_ptr< CIGUSolidLayer > aGlassLayer = aLayers[ totLayers - 2 ];
-        double ShadeArea = Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea;
-        shared_ptr< ISurface > frontSurface = aShadeLayer->getSurface( Side::Front );
-        shared_ptr< ISurface > backSurface = aShadeLayer->getSurface( Side::Back );
-        double EpsShIR1 = frontSurface->getEmissivity();
-        double EpsShIR2 = backSurface->getEmissivity();
-        double TauShIR = frontSurface->getTransmittance();
-        double RhoShIR1 = max( 0.0, 1.0 - TauShIR - EpsShIR1 );
-        double RhoShIR2 = max( 0.0, 1.0 - TauShIR - EpsShIR2 );
+        auto aShadeLayer = aLayers[ totLayers - 1 ];
+        auto aGlassLayer = aLayers[ totLayers - 2 ];
+        auto ShadeArea = Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea;
+        auto frontSurface = aShadeLayer->getSurface( Side::Front );
+        auto backSurface = aShadeLayer->getSurface( Side::Back );
+        auto EpsShIR1 = frontSurface->getEmissivity();
+        auto EpsShIR2 = backSurface->getEmissivity();
+        auto TauShIR = frontSurface->getTransmittance();
+        auto RhoShIR1 = max( 0.0, 1.0 - TauShIR - EpsShIR1 );
+        auto RhoShIR2 = max( 0.0, 1.0 - TauShIR - EpsShIR2 );
         // double RhoGlIR2 = 1.0 - emis( 2 * ngllayer );
-        double glassEmiss = aGlassLayer->getSurface( Side::Back )->getEmissivity();
-        double RhoGlIR2 = 1.0 - glassEmiss;
-        double ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-        double rmir = surface.getInsideIR( SurfNum );
-        double NetIRHeatGainShade = ShadeArea * EpsShIR2 * ( sigma * pow( thetas( nglfacep ), 4 ) - rmir ) + 
+        auto glassEmiss = aGlassLayer->getSurface( Side::Back )->getEmissivity();
+        auto RhoGlIR2 = 1.0 - glassEmiss;
+        auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
+        auto rmir = surface.getInsideIR( SurfNum );
+        auto NetIRHeatGainShade = ShadeArea * EpsShIR2 * ( sigma * pow( thetas( nglfacep ), 4 ) - rmir ) + 
           EpsShIR1 * ( sigma * pow( thetas( nglfacep - 1 ), 4 ) - rmir ) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
-        double NetIRHeatGainGlass = ShadeArea * ( glassEmiss * TauShIR / ShGlReflFacIR ) * 
+        auto NetIRHeatGainGlass = ShadeArea * ( glassEmiss * TauShIR / ShGlReflFacIR ) * 
           ( sigma * pow( thetas( nglface ), 4 ) - rmir );
-        double tind = surface.getInsideAirTemperature( SurfNum ) + KelvinConv;
-        double ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn( SurfNum ) * ( thetas( nglfacep ) - tind );
+        auto tind = surface.getInsideAirTemperature( SurfNum ) + KelvinConv;
+        auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn( SurfNum ) * ( thetas( nglfacep ) - tind );
         WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfShade + 
           NetIRHeatGainGlass + NetIRHeatGainShade;
         WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 
         // Effective shade and glass emissivities that are used later for energy calculations.
         // This needs to be checked as well. (Simon)
-        double EffShBlEmiss = EpsShIR1 * ( 1.0 + RhoGlIR2 * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 ) );
+        auto EffShBlEmiss = EpsShIR1 * ( 1.0 + RhoGlIR2 * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 ) );
         SurfaceWindow( SurfNum ).EffShBlindEmiss = EffShBlEmiss;
 
-        double EffGlEmiss = glassEmiss * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 );
+        auto EffGlEmiss = glassEmiss * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 );
         SurfaceWindow( SurfNum ).EffGlassEmiss = EffGlEmiss;
 
-        double glassTemperature = aGlassLayer->getSurface( Side::Back )->getTemperature();
+        auto glassTemperature = aGlassLayer->getSurface( Side::Back )->getTemperature();
         //double EffShBlEmiss = EpsShIR2 * ( 1.0 + RhoGlIR2 * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 ) );
         SurfaceWindow( SurfNum ).EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + 
           EffGlEmiss * ( glassTemperature - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
@@ -205,28 +205,28 @@ namespace EnergyPlus {
         // window is actually matching these values. (Simon)
         // double heatFlow = aSystem->getHeatFlow() * surface.Area;
         // 
-        size_t totLayers = aLayers.size();
-        shared_ptr< CIGUSolidLayer > aGlassLayer = aLayers[ totLayers - 1 ];
-        shared_ptr< ISurface > backSurface = aGlassLayer->getSurface( Side::Back );
-        
-        double h_cin = aSystem->getHc( Environment::Indoor );
-        double ConvHeatGainFrZoneSideOfGlass = surface.Area * h_cin * 
+        auto totLayers = aLayers.size();
+        auto aGlassLayer = aLayers[ totLayers - 1 ];
+        auto backSurface = aGlassLayer->getSurface( Side::Back );
+
+        auto h_cin = aSystem->getHc( Environment::Indoor );
+        auto ConvHeatGainFrZoneSideOfGlass = surface.Area * h_cin * 
           ( backSurface->getTemperature() - aSystem->getAirTemperature( Environment::Indoor ) );
 
-        double rmir = surface.getInsideIR( SurfNum );
-        double NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() *
+        auto rmir = surface.getInsideIR( SurfNum );
+        auto NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() *
           ( sigma * pow( backSurface->getTemperature(), 4 ) - rmir );
 
         WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
 
         WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
       }
-      
-      double TransDiff = construction.TransDiff;
+
+      auto TransDiff = construction.TransDiff;
       WinHeatGain( SurfNum ) -= QS( surface.Zone ) * surface.Area * TransDiff;
       WinHeatTransfer( SurfNum ) -= QS( surface.Zone ) * surface.Area * TransDiff;
       
-      for( int k = 1; k <= surface.getTotLayers(); ++k ) {
+      for( auto k = 1; k <= surface.getTotLayers(); ++k ) {
         SurfaceWindow( SurfNum ).ThetaFace( 2 * k - 1 ) = thetas( 2 * k - 1 );
         SurfaceWindow( SurfNum ).ThetaFace( 2 * k ) = thetas( 2 * k );
 
@@ -356,12 +356,12 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates solid layer object from material properties in EnergyPlus
-      double absFront = 0;
-      double absBack = 0;
-      double transThermalFront = 0;
-      double transThermalBack = 0;
-      double thickness = 0;
-      double conductivity = 0;
+      auto absFront = 0.0;
+      auto absBack = 0.0;
+      auto transThermalFront = 0.0;
+      auto transThermalBack = 0.0;
+      auto thickness = 0.0;
+      auto conductivity = 0.0;
 
       if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ) {
         absFront = material.AbsorpThermalFront;
@@ -372,7 +372,7 @@ namespace EnergyPlus {
         conductivity = material.Conductivity;
       }
       if( material.Group == WindowBlind ) {
-        int blNum = m_Window.BlindNumber;
+        auto blNum = m_Window.BlindNumber;
         auto blind = Blind( blNum );
         thickness = blind.SlatThickness;
         conductivity = blind.SlatConductivity;
@@ -396,8 +396,19 @@ namespace EnergyPlus {
           m_ExteriorShade = true;
         }
       }
+      if( material.Group == Screen ) {
+        absFront = material.AbsorpThermal;
+        absBack = material.AbsorpThermal;
+        transThermalFront = material.TransThermal;
+        transThermalBack = material.TransThermal;
+        thickness = material.Thickness;
+        conductivity = material.Conductivity;
+        if( t_Index == 1 ) {
+          m_ExteriorShade = true;
+        }
+      }
       if( material.Group == ComplexWindowShade ) {
-        int shdPtr = material.ComplexShadePtr;
+        auto shdPtr = material.ComplexShadePtr;
         auto &shade( ComplexShade( shdPtr ) );
         thickness = shade.Thickness;
         conductivity = shade.Conductivity;
@@ -410,14 +421,13 @@ namespace EnergyPlus {
 
       shared_ptr< ISurface > frontSurface = make_shared< CSurface >( absFront, transThermalFront );
       shared_ptr< ISurface > backSurface = make_shared< CSurface >( absBack, transThermalBack );
-      shared_ptr< CIGUSolidLayer > aSolidLayer =
-        make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
-      double swRadiation = surface.getSWIncident( t_SurfNum );
+      auto aSolidLayer = make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
+      auto swRadiation = surface.getSWIncident( t_SurfNum );
       if( swRadiation > 0 ) {
         double absCoeff = 0;
         if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ||
           material.Group == ComplexWindowShade ) {
-          int aIndex = t_Index;
+          auto aIndex = t_Index;
           if( m_ExteriorShade ) {
             --aIndex;
           }
@@ -434,7 +444,8 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getGapLayer( const MaterialProperties &material ) {
+    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getGapLayer( 
+      MaterialProperties const & material ) const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -443,15 +454,15 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates gap layer object from material properties in EnergyPlus
-      const double pres = 1e5; // Old code uses this constant pressure
-      double thickness = material.Thickness;
-      shared_ptr< CGas > aGas = getGas( material );
+      auto const pres = 1e5; // Old code uses this constant pressure
+      auto thickness = material.Thickness;
+      auto aGas = getGas( material );
       shared_ptr< CBaseIGULayer > aLayer = make_shared< CIGUGapLayer >( thickness, pres, aGas );
       return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getShadeToGlassLayer( const int t_Index ) {
+    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getShadeToGlassLayer( int const t_Index ) const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   August 2016
@@ -460,15 +471,16 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates gap layer object from material properties in EnergyPlus
-      const double pres = 1e5; // Old code uses this constant pressure
-      shared_ptr< CGas > aGas = getAir();
-      double thickness = 0;
+      auto const pres = 1e5; // Old code uses this constant pressure
+      auto aGas = getAir();
+      auto thickness = 0.0;
       
       if( m_Window.ShadingFlag == IntBlindOn || m_Window.ShadingFlag == ExtBlindOn ) {
         thickness = Blind( m_Window.BlindNumber ).BlindToGlassDist;
       }
-      if( m_Window.ShadingFlag == IntShadeOn || m_Window.ShadingFlag == ExtShadeOn ) {
-        MaterialProperties* material = getLayerMaterial( t_Index );
+      if( m_Window.ShadingFlag == IntShadeOn || m_Window.ShadingFlag == ExtShadeOn || 
+        m_Window.ShadingFlag == ExtScreenOn ) {
+        auto material = getLayerMaterial( t_Index );
         thickness = material->WinShadeToGlassDist;
       }
       shared_ptr< CBaseIGULayer > aLayer = make_shared< CIGUGapLayer >( thickness, pres, aGas );
@@ -476,7 +488,8 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getComplexGapLayer( const MaterialProperties &material ) {
+    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getComplexGapLayer( 
+      MaterialProperties const & material ) const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -485,17 +498,17 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates gap layer object from material properties in EnergyPlus
-      const double pres = 1e5; // Old code uses this constant pressure
-      double thickness = material.Thickness;
-      int gasPointer = material.GasPointer;
+      auto const pres = 1e5; // Old code uses this constant pressure
+      auto thickness = material.Thickness;
+      auto gasPointer = material.GasPointer;
       auto & gasMaterial( Material( gasPointer ) );
-      shared_ptr< CGas > aGas = getGas( gasMaterial );
+      auto aGas = getGas( gasMaterial );
       shared_ptr< CBaseIGULayer > aLayer = make_shared< CIGUGapLayer >( thickness, pres, aGas );
       return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CGas > CWCEHeatTransferFactory::getGas( const MaterialProperties &material ) {
+    shared_ptr< CGas > CWCEHeatTransferFactory::getGas( MaterialProperties const & material ) const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -504,33 +517,33 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates gap layer object from material properties in EnergyPlus
-      int numGases = material.NumberOfGasesInMixture;
-      const double vacuumCoeff = 1.4; //Load vacuum coefficient once it is implemented (Simon).
-      string gasName = material.Name;
-      shared_ptr< CGas > aGas = make_shared< CGas >();
-      for( int i = 1; i <= numGases; ++i ) {
-        double wght = material.GasWght( i );
-        double fract = material.GasFract( i );
+      auto numGases = material.NumberOfGasesInMixture;
+      auto const vacuumCoeff = 1.4; //Load vacuum coefficient once it is implemented (Simon).
+      auto gasName = material.Name;
+      auto aGas = make_shared< CGas >();
+      for( auto i = 1; i <= numGases; ++i ) {
+        auto wght = material.GasWght( i );
+        auto fract = material.GasFract( i );
         vector< double > gcon;
         vector< double > gvis;
         vector< double > gcp;
-        for( int j = 1; j <= 3; ++j ) {
+        for( auto j = 1; j <= 3; ++j ) {
           gcon.push_back( material.GasCon( j, i ) );
           gvis.push_back( material.GasVis( j, i ) );
           gcp.push_back( material.GasCp( j, i ) );
         }
-        shared_ptr< CIntCoeff > aCon = make_shared< CIntCoeff >( gcon[ 0 ], gcon[ 1 ], gcon[ 2 ] );
-        shared_ptr< CIntCoeff > aCp = make_shared< CIntCoeff >( gcp[ 0 ], gcp[ 1 ], gcp[ 2 ] );
-        shared_ptr< CIntCoeff > aVis = make_shared< CIntCoeff >( gvis[ 0 ], gvis[ 1 ], gvis[ 2 ] );
-        shared_ptr< CGasData > aData = make_shared< CGasData >( gasName, wght, vacuumCoeff, aCp, aCon, aVis );
-        shared_ptr< CGasItem > aGasItem = make_shared< CGasItem >( fract, aData );
+        auto aCon = make_shared< CIntCoeff >( gcon[ 0 ], gcon[ 1 ], gcon[ 2 ] );
+        auto aCp = make_shared< CIntCoeff >( gcp[ 0 ], gcp[ 1 ], gcp[ 2 ] );
+        auto aVis = make_shared< CIntCoeff >( gvis[ 0 ], gvis[ 1 ], gvis[ 2 ] );
+        auto aData = make_shared< CGasData >( gasName, wght, vacuumCoeff, aCp, aCon, aVis );
+        auto aGasItem = make_shared< CGasItem >( fract, aData );
         aGas->addGasItem( aGasItem );
       }
       return aGas;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CGas > CWCEHeatTransferFactory::getAir() {
+    shared_ptr< CGas > CWCEHeatTransferFactory::getAir() const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   August 2016
@@ -539,12 +552,12 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates air gas layer for tarcog routines
-      shared_ptr< CGas > aGas = make_shared< CGas >();
+      auto aGas = make_shared< CGas >();
       return aGas;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CEnvironment > CWCEHeatTransferFactory::getIndoor() {
+    shared_ptr< CEnvironment > CWCEHeatTransferFactory::getIndoor() const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -553,10 +566,10 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates indoor environment object from surface properties in EnergyPlus
-      double tin = m_Surface.getInsideAirTemperature( m_SurfNum ) + KelvinConv;
-      double hcin = HConvIn( m_SurfNum );
+      auto tin = m_Surface.getInsideAirTemperature( m_SurfNum ) + KelvinConv;
+      auto hcin = HConvIn( m_SurfNum );
 
-      double IR = m_Surface.getInsideIR( m_SurfNum );
+      auto IR = m_Surface.getInsideIR( m_SurfNum );
 
       shared_ptr< CEnvironment > Indoor = make_shared< CIndoorEnvironment >( tin, OutBaroPress );
       Indoor->setHCoeffModel( BoundaryConditionsCoeffModel::CalculateH, hcin );
@@ -565,7 +578,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CEnvironment > CWCEHeatTransferFactory::getOutdoor( const double t_Hext ) {
+    shared_ptr< CEnvironment > CWCEHeatTransferFactory::getOutdoor( double const t_Hext ) const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -579,7 +592,7 @@ namespace EnergyPlus {
       // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
       double swRadiation = m_Surface.getSWIncident( m_SurfNum );
       double tSky = SkyTempKelvin;
-      double airSpeed = 0;
+      double airSpeed = 0.0;
       if( m_Surface.ExtWind ) {
         airSpeed = m_Surface.WindSpeed;
       }
