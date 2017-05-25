@@ -92,6 +92,7 @@ namespace EnergyPlus {
 
     enum class ShadePosition { NoShade, Interior, Exterior, Between };
 
+    // Routine that calculates heat transfer balance by using Windows-CalcEngine routines
     void CalcWindowHeatBalanceExternalRoutines(
       int const SurfNum, // Surface number
       Real64 const HextConvCoeff, // Outside air film conductance coefficient
@@ -103,13 +104,13 @@ namespace EnergyPlus {
     class CWCEHeatTransferFactory {
     public:
 
-      CWCEHeatTransferFactory( const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
+      CWCEHeatTransferFactory( EnergyPlus::DataSurfaces::SurfaceData const & surface, int const t_SurfNum );
+      
+      std::shared_ptr< Tarcog::CSingleSystem > getTarcogSystem( double const t_HextConvCoeff );
 
-      std::shared_ptr< Tarcog::CSingleSystem > getTarcogSystem( const double t_HextConvCoeff );
-
-      std::shared_ptr< Tarcog::CBaseIGULayer > getIGULayer( const int t_Index );
+      std::shared_ptr< Tarcog::CBaseIGULayer > getIGULayer( int const t_Index );
       std::shared_ptr< Tarcog::CEnvironment > getIndoor();
-      std::shared_ptr< Tarcog::CEnvironment > getOutdoor( const double t_Hext );
+      std::shared_ptr< Tarcog::CEnvironment > getOutdoor( double const t_Hext );
       std::shared_ptr< Tarcog::CIGU > getIGU( );
 
       // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side

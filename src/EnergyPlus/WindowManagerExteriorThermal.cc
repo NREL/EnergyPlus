@@ -241,11 +241,11 @@ namespace EnergyPlus {
     //  CWCEHeatTransferFactory
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    CWCEHeatTransferFactory::CWCEHeatTransferFactory( const SurfaceData &surface, const int t_SurfNum  ) : m_Surface( surface ), 
-	    m_SurfNum( t_SurfNum ), m_SolidLayerIndex( 0 ), m_InteriorBSDFShade( false ), 
+    CWCEHeatTransferFactory::CWCEHeatTransferFactory( SurfaceData const & surface, int const t_SurfNum  ) : 
+      m_Surface( surface ), m_SurfNum( t_SurfNum ), m_SolidLayerIndex( 0 ), m_InteriorBSDFShade( false ), 
       m_ExteriorShade( false ) {
       m_Window = SurfaceWindow( t_SurfNum );
-      int ShadeFlag = m_Window.ShadingFlag;
+      auto ShadeFlag = m_Window.ShadingFlag;
 
       m_ConstructionNumber = m_Surface.Construction;
       m_ShadePosition = ShadePosition::NoShade;
@@ -274,36 +274,36 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSingleSystem > CWCEHeatTransferFactory::getTarcogSystem( const double t_HextConvCoeff ) {
-      shared_ptr< CEnvironment > Indoor = getIndoor();
-      shared_ptr< CEnvironment > Outdoor = getOutdoor( t_HextConvCoeff );
-      shared_ptr< CIGU > aIGU = getIGU();
+    shared_ptr< CSingleSystem > CWCEHeatTransferFactory::getTarcogSystem( double const t_HextConvCoeff ) {
+      auto Indoor = getIndoor();
+      auto Outdoor = getOutdoor( t_HextConvCoeff );
+      auto aIGU = getIGU();
 
       // pick-up all layers and put them in IGU (this includes gap layers as well)
-      for( int i = 0; i < m_TotLay; ++i ) {
-        shared_ptr< CBaseIGULayer > aLayer = getIGULayer( i + 1 );
+      for( auto i = 0; i < m_TotLay; ++i ) {
+        auto aLayer = getIGULayer( i + 1 );
         assert( aLayer != nullptr );
         // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
         // and it will be created here
         if( m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1 ) {
-          shared_ptr< CBaseIGULayer > aAirLayer = getShadeToGlassLayer( i + 1 );
+          auto aAirLayer = getShadeToGlassLayer( i + 1 );
           aIGU->addLayer( aAirLayer );
         }
         aIGU->addLayer( aLayer );
         if( m_ShadePosition == ShadePosition::Exterior && i == 0 ) {
-          shared_ptr< CBaseIGULayer > aAirLayer = getShadeToGlassLayer( i + 1 );
+          auto aAirLayer = getShadeToGlassLayer( i + 1 );
           aIGU->addLayer( aAirLayer );
         }
       }
 
-      shared_ptr< CSingleSystem > aSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+      auto aSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 
       return aSystem;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    MaterialProperties* CWCEHeatTransferFactory::getLayerMaterial( const int t_Index ) {
-      int ConstrNum = m_Surface.Construction;
+    MaterialProperties* CWCEHeatTransferFactory::getLayerMaterial( int const t_Index ) const {
+      auto ConstrNum = m_Surface.Construction;
 
       if( m_Window.ShadingFlag == IntShadeOn || m_Window.ShadingFlag == ExtShadeOn ||
         m_Window.ShadingFlag == IntBlindOn || m_Window.ShadingFlag == ExtBlindOn ||
@@ -314,20 +314,21 @@ namespace EnergyPlus {
       }
 
       auto & construction( Construct( ConstrNum ) );
-      int LayPtr = construction.LayerPoint( t_Index );
+      auto LayPtr = construction.LayerPoint( t_Index );
       return &Material( LayPtr );
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getIGULayer( const int t_Index ) {
+    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getIGULayer( int const t_Index ) {
       shared_ptr< CBaseIGULayer > aLayer = nullptr;
 
-      MaterialProperties* material = getLayerMaterial( t_Index );
+      auto material = getLayerMaterial( t_Index );
 
-      int matGroup = material->Group;
+      auto matGroup = material->Group;
 
       if( matGroup == WindowGlass || matGroup == WindowSimpleGlazing ||
-        matGroup == WindowBlind || matGroup == Shade || matGroup == ComplexWindowShade ) {
+        matGroup == WindowBlind || matGroup == Shade || matGroup == Screen || 
+        matGroup == ComplexWindowShade ) {
         ++m_SolidLayerIndex;
         aLayer = getSolidLayer( m_Surface, *material, m_SolidLayerIndex, m_SurfNum );
       } else if( matGroup == WindowGas || matGroup == WindowGasMixture ) {
@@ -345,8 +346,8 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getSolidLayer( const SurfaceData &surface, 
-      const MaterialProperties &material, const int t_Index, const int t_SurfNum ) {
+    shared_ptr< CBaseIGULayer > CWCEHeatTransferFactory::getSolidLayer( SurfaceData const & surface, 
+      MaterialProperties const & material, int const t_Index, int const t_SurfNum ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
