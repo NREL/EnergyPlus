@@ -5063,9 +5063,13 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		std::vector< Real64 > dirs30 = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 };
+		std::vector< Real64 > dirs10 = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180,
+			190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360 };
+
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) { //do the standard surface average coefficient calculation
 			// Create the array of wind directions
-			std::vector< Real64 > dirs = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 };
+			
 
 			// Create a curve for each facade
 			for ( FacadeNum = 1; FacadeNum <= 5; ++FacadeNum ) {
@@ -5126,22 +5130,22 @@ namespace AirflowNetworkBalanceManager {
 				} // End of wind direction loop
 				// Add new table
 				vals[ 12 ] = vals[ 0 ]; // Enforce periodicity
-				curveIndex[ FacadeNum - 1 ] = makeTable("!WPCTABLE" + std::to_string( FacadeNum ), dirs, vals);
+				curveIndex[ FacadeNum - 1 ] = makeTable("!WPCTABLE" + std::to_string( FacadeNum ), dirs30, vals);
 			} // End of facade number loop
 
 		} else { //-calculate the advanced single sided wind pressure coefficients
-			std::vector< Real64 > dirs = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180,
-				190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360 };
 
 			// Calculate the wind pressure coefficients vs. wind direction for each external node
 			// The wind pressure coeffients are stored temporarily in the "valsByFacade" vector and then
-			// converted into a table near the end of this else. There will be at least six profiles 
-			// (four sides plus two for each pair of windows). The name is thus a little misleading, as
-			// it isn't really the values by facade once you get beyond the first four.
-			std::vector< std::vector< Real64 > > valsByFacade( 4 );
+			// converted into a table near the end of this else. There will be at least seven profiles 
+			// (four sides plus one roof plus two for each pair of windows). The name is thus a little
+			// misleading, as it isn't really the values by facade once you get beyond the first five.
+			std::vector< std::vector< Real64 > > valsByFacade( 5 );
 			for ( FacadeNum = 0; FacadeNum < 4; ++FacadeNum ) {
 				valsByFacade[ FacadeNum ] = std::vector< Real64 >( 36 );
 			}
+			FacadeNum = 4;
+			valsByFacade[FacadeNum] = std::vector< Real64 >(12);
 			for ( FacadeNum = 1; FacadeNum <= 4; ++FacadeNum ) {
 				if ( FacadeNum == 1 || FacadeNum == 3 ) {
 					SideRatio = AirflowNetworkSimu.AspectRatio;
@@ -5164,15 +5168,43 @@ namespace AirflowNetworkBalanceManager {
 					valsByFacade[ FacadeNum - 1 ][ WindDirNum - 1 ] = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * std::cos( IncRad / 2.0 ) + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( std::cos( IncRad / 2.0 ) ) );
 				} // End of wind direction loop
 			} // End of facade number loop
+			// Add a roof
+			FacadeNum = 5;
+			SR = min(max(SideRatio, 0.25), 1.0);
+			if (SR >= 0.25 && SR < 0.5) {
+				ISR = 1;
+				WtSR = (0.5 - SR) / 0.25;
+			}
+			else { // 0.5 <= SR <= 1.0
+				ISR = 2;
+				WtSR = (1.0 - SR) / 0.5;
+			}
+			for ( WindDirNum = 1; WindDirNum <= 12; ++WindDirNum ) {
+				WindAng = ( WindDirNum - 1 ) * 30.0;
+				IncAng = std::abs( WindAng - FacadeAng( FacadeNum ) );
+				if ( IncAng > 180.0 ) IncAng = 360.0 - IncAng;
+				IAng = int( IncAng / 30.0 ) + 1;
+				DelAng = mod( IncAng, 30.0 );
+				WtAng = 1.0 - DelAng / 30.0;
+				// Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
+				valsByFacade[ FacadeNum - 1 ][ WindDirNum - 1 ] = WtSR * ( WtAng * CPHighRiseRoof( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR, IAng + 1 ) )
+					+ ( 1.0 - WtSR ) * ( WtAng * CPHighRiseRoof( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR + 1, IAng + 1 ) );
+			}
 			CalcSingleSidedCps( valsByFacade ); //run the advanced single sided subroutine if at least one zone calls for it
 			// Resize the curve index array
 			curveIndex.resize( valsByFacade.size() );
 			// Create the curves
+			for ( FacadeNum = 1; FacadeNum <=4; ++FacadeNum ) {
+				valsByFacade[ FacadeNum - 1 ].push_back( valsByFacade[ FacadeNum - 1 ][ 0 ] ); // Enforce periodicity
+				curveIndex[ FacadeNum - 1 ] = makeTable( "!SSWPCTABLEFACADE" + std::to_string( FacadeNum ), dirs10, valsByFacade[ FacadeNum - 1 ]);
+			}
+			FacadeNum = 5;
+			valsByFacade[ FacadeNum - 1 ].push_back( valsByFacade[ FacadeNum - 1 ][ 0 ] ); // Enforce periodicity
+			curveIndex[ FacadeNum - 1 ] = makeTable( "!SSWPCTABLEFACADE" + std::to_string( FacadeNum ), dirs30, valsByFacade[ FacadeNum - 1 ] );
 			FacadeNum = 1;
-			for ( auto vals : valsByFacade ) {
-				vals.push_back( vals[0] ); // Enforce periodicity
-				curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLE" + std::to_string(FacadeNum), dirs, vals);
-				FacadeNum += 1;
+			for ( FacadeNum = 6; FacadeNum <= valsByFacade.size(); ++FacadeNum ) {
+				valsByFacade[ FacadeNum - 1 ].push_back( valsByFacade[ FacadeNum - 1 ][ 0 ] ); // Enforce periodicity
+				curveIndex[ FacadeNum - 1 ] = makeTable( "!SSWPCTABLE" + std::to_string( FacadeNum ), dirs10, valsByFacade[ FacadeNum - 1 ]);
 			}
 		}
 		// Connect the external nodes to the new curves
@@ -8912,7 +8944,7 @@ namespace AirflowNetworkBalanceManager {
 		CPV2.allocate( numWindDir );
 		CPV1 = 0.0;
 		CPV2 = 0.0;
-		SrfNum = 5;
+		SrfNum = 6;
 		for ( ZnNum = 1; ZnNum <= AirflowNetworkNumOfZones; ++ZnNum ) {
 			if ( MultizoneZoneData( ZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				OpenNuminZone = 1;

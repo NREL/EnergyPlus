@@ -8362,7 +8362,7 @@ namespace EnergyPlus {
 		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
 
 		// Check that the correct number of curves has been generated (5 facade directions + 2 windows)
-		EXPECT_EQ(6, CurveManager::NumCurves);
+		EXPECT_EQ(7, CurveManager::NumCurves);
 
 		// Check the airflow elements
 		ASSERT_EQ(3u, DataAirflowNetwork::MultizoneExternalNodeData.size());
@@ -8378,13 +8378,13 @@ namespace EnergyPlus {
 
 		// Check the curve values for the left window, taken from v8.6.0 on Windows
 		unsigned i = 0;
-		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
+		for (auto value : CurveManager::PerfCurveTableData(7).Y) {
 			EXPECT_NEAR(valsForLeftWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
 		}
 
 		// Check the curve values for the left window, taken from v8.6.0 on Windows
 		i = 0;
-		for (auto value : CurveManager::PerfCurveTableData(5).Y) {
+		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
 			EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
 		}
 		
