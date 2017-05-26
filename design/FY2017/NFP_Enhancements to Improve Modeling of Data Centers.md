@@ -1,5 +1,3 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
- 
 
 Enhancements to Improve Modeling of Data Centers
 ================
@@ -22,10 +20,9 @@ No team call yet.
 The existing ITE object in EnergyPlus addressed some critical needs of modeling data centers. We propose enhancements to consider airflow containment configuration in data centers, which supports energy efficiency design of data centers and activities under ASHRAE Standard 90.4 and TC 9.9. The enhancements introduce a concept of two temperature differences to represent the air flow management (air bypass, recirculation, mixing) of data centers for the purpose of energy calculation.
 Based on discussions with data center experts and manufacturers, data centers are different from normal well-mixed zones due to the uneven air distribution (Figure 1): The IT inlet temperature differs from AHU supply air temperature, and the actual AHU return air temperature differs from the regular return air temperature if the zone is well mixed. We propose two indices to represent the deviation: (1) **Supply approach temperature (∆T<sub>supply</sub>)** and (2) **Return approach temperature (∆T<sub>return</sub>)**. The two temperature differences indicate to what degree the air flow management of data centers affects the air distribution, and how much they deviate from the regular well-mixed zone scenario.
 
+$$\Delta T_{supply}=\Delta T_{in}-\Delta T_{supply}$$
 
-**∆T<sub>supply</sub>=∆T<sub>in</sub> - ∆T<sub>supply</sub>** (1)
-
-**∆T<sub>return</sub>=∆T<sub>return</sub> - ∆T<sub>return-mixed</sub>** (2)
+$$\Delta T_{return}=\Delta T_{return}-\Delta T_{return-mixed</sub}$$
 
 Where, 
 
@@ -51,7 +48,7 @@ We propose a calculation logic as shown in Figure 2. Detailed calculation steps 
 + **Step 1**: 
 	Calculate IT inlet temperature (Tin):
 
-	$$T_{in}=T_{supply}+\Delta T_{supply}$$	(3)
+	$$T_{in}=T_{supply}+\Delta T_{supply}$$
 	- Input:
 		- T<sub>supply</sub>*: AHU supply air temperature	
 		- ∆T<sub>supply</sub>: Supply approach temperature
@@ -61,13 +58,13 @@ We propose a calculation logic as shown in Figure 2. Detailed calculation steps 
 + **Step 2**:
 	Calculate CPU power (Q\_IT), IT fan air flow rate (V\_IT\_fan), IT fan power (Q\_IT\_fan), and IT outlet temperature (Tout).
 	
-	$$Q_{IT}=f1(T_{in},SchCPULoading)$$ (4)	
+	$$Q_{IT}=f1(T_{in},SchCPULoading)$$	
 
-	$$V_{ITfan}=f2(T_{in},SchCPULoading)$$ (5)	
+	$$V_{ITfan}=f2(T_{in},SchCPULoading)$$	
 
-	$$Q_{ITfan}=f3(V_{ITfan} )$$ (6)	
+	$$Q_{ITfan}=f3(V_{ITfan} )$$	
 
-	$$T_{out}=T_{in}+(Q_{IT}+Q_{ITfan})/V_{ITfan}$$ (7)
+	$$T_{out}=T_{in}+(Q_{IT}+Q_{ITfan})/V_{ITfan}$$
 	- Input:
 		- SchCPULoading*: Scheduled fraction of CPU loading, namely CPU load ratio
 		- T<sub>in</sub>: IT equipment inlet temperature
@@ -84,11 +81,11 @@ We propose a calculation logic as shown in Figure 2. Detailed calculation steps 
 + **Step 3**:
 	Calculate AHU return air temperature (Treturn) and AHU air flow rate (V\_AHU).
 	
-	$$T_{return}=\Delta T_{return}+T_{return-mixed}$$(8)
+	$$T_{return}=\Delta T_{return}+T_{return-mixed}$$
 
-	$$Q_{AHU}=Q_{IT}+Q_{ITfan}+Q_{UPS}$$(9)
+	$$Q_{AHU}=Q_{IT}+Q_{ITfan}+Q_{UPS}$$
 
-	$$V_{AHU}=Q_{AHU}/(T_{return}-T_{supply})$$(10)
+	$$V_{AHU}=Q_{AHU}/(T_{return}-T_{supply})$$
 	- Input:
 		- T<sub>return-mixed</sub>: The calculated AHU return air temperature if air is well-mixed. This is the simulated result from the last time step based on the zone setpoint in EnergyPlus
 		- ∆T<sub>return</sub>: Return approach temperature
