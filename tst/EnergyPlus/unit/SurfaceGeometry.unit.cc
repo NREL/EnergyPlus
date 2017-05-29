@@ -1617,9 +1617,143 @@ TEST( SurfaceGeometryUnitTests, areCornersEquidistant_test )
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 7.;
 	EXPECT_FALSE( areCornersEquidistant( zonePoly, 1, 2, dist ) );
 
-
-
 }
 
+TEST( SurfaceGeometryUnitTests, areOppositeWallsSame_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, areOppositeWallsSame_test" );
+
+	DataVectorTypes::Polyhedron zonePoly;
+
+	Surface.allocate( 4 );
+	Surface( 1 ).Azimuth = 0.;
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).Area = 30.;
+
+	Surface( 2 ).Azimuth = 90.;
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).Area = 24.;
+
+	Surface( 3 ).Azimuth = 180.;
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).Area = 30.;
+
+	Surface( 4 ).Azimuth = 270.;
+	Surface( 4 ).Class = SurfaceClass_Wall;
+	Surface( 4 ).Area = 24.;
+
+	zonePoly.NumSurfaceFaces = 4;
+	zonePoly.SurfaceFace.allocate( 4 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 1 ).NSides = 4;
+	zonePoly.SurfaceFace( 1 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 2 ).NSides = 4;
+	zonePoly.SurfaceFace( 2 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
+
+
+	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
+	zonePoly.SurfaceFace( 3 ).NSides = 4;
+	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).x = 10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).x = 10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).x = 0.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).x = 0.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 3.;
+
+
+	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
+	zonePoly.SurfaceFace( 4 ).NSides = 4;
+	zonePoly.SurfaceFace( 4 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 1 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 2 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 4 ).z = 3.;
+
+	Real64 area;
+	Real64 dist;
+
+	EXPECT_TRUE( areOppositeWallsSame( zonePoly, area, dist ) );
+	EXPECT_EQ( 30. , area );
+	EXPECT_EQ( 8. , dist );
+
+	Surface( 3 ).Area = 29.;  // make surface 1 and 3 no longer match areas - now compare 2 and 4
+	EXPECT_TRUE( areOppositeWallsSame( zonePoly, area, dist ) );
+	EXPECT_EQ( 24., area );
+	EXPECT_EQ( 10., dist );
+
+	Surface( 4 ).Area = 23.;  // make surface 2 and 4 no longer match areas
+	EXPECT_FALSE( areOppositeWallsSame( zonePoly, area, dist ) );
+
+	Surface( 3 ).Area = 30.;  // make surface 1 and 3 have same areas again
+	Surface( 4 ).Area = 24.;  // make surface 2 and 4 have same areas again
+
+	EXPECT_TRUE( areOppositeWallsSame( zonePoly, area, dist ) ); // retest
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).y = 7.; // move one corner in so distances are not all equal
+	EXPECT_TRUE( areOppositeWallsSame( zonePoly, area, dist ) ); // should pick other walls
+	EXPECT_EQ( 24., area );
+	EXPECT_EQ( 10., dist );
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).x = 11.; //move one corner out so distances are not all equal
+	EXPECT_FALSE( areOppositeWallsSame( zonePoly, area, dist ) ); // now neither wall matches
+
+}
 
 
