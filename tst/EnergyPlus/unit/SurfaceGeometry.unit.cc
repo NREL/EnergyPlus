@@ -1335,79 +1335,79 @@ TEST( SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test )
 	bool areWallsVertical;
 
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 1 ).Tilt = 170.;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( false, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_FALSE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 1 ).Tilt = 180.;
 	Surface( 2 ).Tilt = 178.9;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( false, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_FALSE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 2 ).Tilt = 181.0;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 2 ).Tilt = 181.1;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( false, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_FALSE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 2 ).Tilt = 179.5;
 	Surface( 8 ).Tilt = 180.;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( false, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_FALSE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 8 ).Tilt = 1.1;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( false, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_FALSE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 8 ).Tilt = -1.1;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( false, isCeilingHorizontal );
-	EXPECT_EQ( true, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_FALSE( isCeilingHorizontal );
+	EXPECT_TRUE( areWallsVertical );
 
 	Surface( 8 ).Tilt = 0.;
 	Surface( 4 ).Tilt = 270.;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( false, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_FALSE( areWallsVertical );
 
 	Surface( 4 ).Tilt = 91.1;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( false, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_FALSE( areWallsVertical );
 
 	Surface( 4 ).Tilt = 88.9;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( true, isFloorHorizontal );
-	EXPECT_EQ( true, isCeilingHorizontal );
-	EXPECT_EQ( false, areWallsVertical );
+	EXPECT_TRUE( isFloorHorizontal );
+	EXPECT_TRUE( isCeilingHorizontal );
+	EXPECT_FALSE( areWallsVertical );
 
 	Surface( 1 ).Tilt = 170.;
 	Surface( 8 ).Tilt = 1.1;
 	std::tie( isFloorHorizontal, isCeilingHorizontal, areWallsVertical ) = areSurfaceHorizAndVert( zonePoly );
-	EXPECT_EQ( false, isFloorHorizontal );
-	EXPECT_EQ( false, isCeilingHorizontal );
-	EXPECT_EQ( false, areWallsVertical );
+	EXPECT_FALSE( isFloorHorizontal );
+	EXPECT_FALSE( isCeilingHorizontal );
+	EXPECT_FALSE( areWallsVertical );
 
 }
 
@@ -1450,20 +1450,20 @@ TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
 	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).z = 10.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 0.;
 
-	EXPECT_EQ(true, areWallHeightSame(zonePoly));
+	EXPECT_TRUE( areWallHeightSame(zonePoly));
 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 9.;
-	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+	EXPECT_TRUE( areWallHeightSame( zonePoly ) );
 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 11.;
-	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
+	EXPECT_FALSE( areWallHeightSame( zonePoly ) );
 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 10.;
 	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 10.02;
-	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+	EXPECT_TRUE( areWallHeightSame( zonePoly ) );
 
 	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 10.03;
-	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
+	EXPECT_FALSE( areWallHeightSame( zonePoly ) );
 
 	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = -10.;
 	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = -0.5;
@@ -1480,13 +1480,13 @@ TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
 	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).z = -10.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = -0.5;
 
-	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+	EXPECT_TRUE( areWallHeightSame( zonePoly ) );
 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = -0.6;
-	EXPECT_EQ( true, areWallHeightSame( zonePoly ) );
+	EXPECT_TRUE( areWallHeightSame( zonePoly ) );
 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = -0.4;
-	EXPECT_EQ( false, areWallHeightSame( zonePoly ) );
+	EXPECT_FALSE( areWallHeightSame( zonePoly ) );
 
 }
 
@@ -1611,11 +1611,11 @@ TEST( SurfaceGeometryUnitTests, areCornersEquidistant_test )
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
 
 	Real64 dist;
-	EXPECT_EQ( true, areCornersEquidistant( zonePoly , 1 , 2 , dist ) );
+	EXPECT_TRUE( areCornersEquidistant( zonePoly , 1 , 2 , dist ) );
 	EXPECT_EQ( 8. , dist );
 
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 7.;
-	EXPECT_EQ( false, areCornersEquidistant( zonePoly, 1, 2, dist ) );
+	EXPECT_FALSE( areCornersEquidistant( zonePoly, 1, 2, dist ) );
 
 
 
