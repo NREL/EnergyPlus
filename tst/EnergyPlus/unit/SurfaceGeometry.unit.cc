@@ -1817,5 +1817,149 @@ TEST( SurfaceGeometryUnitTests, areFloorAndCeilingSame_test )
 
 }
 
+TEST( SurfaceGeometryUnitTests, makeListOfUniqueVertices_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, makeListOfUniqueVertices_test" );
+
+	DataVectorTypes::Polyhedron zonePoly;
+
+	zonePoly.NumSurfaceFaces = 6;
+	zonePoly.SurfaceFace.allocate( 6 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 1 ).NSides = 4;
+	zonePoly.SurfaceFace( 1 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 2 ).NSides = 4;
+	zonePoly.SurfaceFace( 2 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
+
+
+	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
+	zonePoly.SurfaceFace( 3 ).NSides = 4;
+	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).x = 10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).x = 10.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).x = 0.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).x = 0.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 3.;
+
+
+	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
+	zonePoly.SurfaceFace( 4 ).NSides = 4;
+	zonePoly.SurfaceFace( 4 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 1 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 2 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 4 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 4 ).FacePoints( 4 ).z = 3.;
+
+	zonePoly.SurfaceFace( 5 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 5 ).NSides = 4;
+	zonePoly.SurfaceFace( 5 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 5 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 1 ).z = 0.;
+
+	zonePoly.SurfaceFace( 5 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 5 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 5 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 5 ).FacePoints( 4 ).z = 0.;
+
+	zonePoly.SurfaceFace( 6 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 6 ).NSides = 4;
+	zonePoly.SurfaceFace( 6 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 6 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 6 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 2 ).z = 3.;
+
+	zonePoly.SurfaceFace( 6 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 3 ).z = 3.;
+
+	zonePoly.SurfaceFace( 6 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 6 ).FacePoints( 4 ).z = 3.;
+
+	std::vector<Vector>  uniqueVertices;
+	makeListOfUniqueVertices( zonePoly, uniqueVertices );
+
+	EXPECT_EQ(8, uniqueVertices.size() );
+	EXPECT_EQ( Vector( 0., 0., 3. ), uniqueVertices.at( 0 ) );
+	EXPECT_EQ( Vector( 0., 0., 0. ), uniqueVertices.at( 1 ) );
+	EXPECT_EQ( Vector( 10., 0., 0. ), uniqueVertices.at( 2 ) );
+	EXPECT_EQ( Vector( 10., 0., 3. ), uniqueVertices.at( 3 ) );
+	EXPECT_EQ( Vector( 0., 8., 3. ), uniqueVertices.at( 4 ) );
+	EXPECT_EQ( Vector( 0., 8., 0. ), uniqueVertices.at( 5 ) );
+	EXPECT_EQ( Vector( 10., 8., 3. ), uniqueVertices.at( 6 ) );
+	EXPECT_EQ( Vector( 10., 8., 0. ), uniqueVertices.at( 7 ) );
+
+}
 
 
