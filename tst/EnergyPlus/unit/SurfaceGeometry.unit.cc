@@ -1756,4 +1756,66 @@ TEST( SurfaceGeometryUnitTests, areOppositeWallsSame_test )
 
 }
 
+TEST( SurfaceGeometryUnitTests, areFloorAndCeilingSame_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, areFloorAndCeilingSame_test" );
+
+	DataVectorTypes::Polyhedron zonePoly;
+
+	Surface.allocate( 2 );
+	Surface( 1 ).Class = SurfaceClass_Floor;
+
+	Surface( 2 ).Class = SurfaceClass_Roof;
+
+	zonePoly.NumSurfaceFaces = 2;
+	zonePoly.SurfaceFace.allocate( 2 );
+	zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	zonePoly.SurfaceFace( 1 ).NSides = 4;
+	zonePoly.SurfaceFace( 1 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 1 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).y = 8.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 2 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).y = 8.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 3 ).z = 0.;
+
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).y = 0.;
+	zonePoly.SurfaceFace( 1 ).FacePoints( 4 ).z = 0.;
+
+	zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	zonePoly.SurfaceFace( 2 ).NSides = 4;
+	zonePoly.SurfaceFace( 2 ).FacePoints.allocate( 4 );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 1 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).x = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).y = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 2 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).x = 10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).y = 0.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 3 ).z = 3.;
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).x = 10.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 8.;
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
+
+	EXPECT_TRUE( areFloorAndCeilingSame( zonePoly ) );
+
+	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).x = 7.; // move one corner
+
+	EXPECT_FALSE( areFloorAndCeilingSame( zonePoly ) );
+
+}
+
+
 

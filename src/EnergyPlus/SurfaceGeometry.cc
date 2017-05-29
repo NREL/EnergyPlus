@@ -8945,13 +8945,7 @@ namespace SurfaceGeometry {
 
 		using DataVectorTypes::Vector;
 		using DataVectorTypes::Vector_2d;
-
-		struct Vector2dCount: Vector_2d {
-			int count;
-			Vector2dCount( ):
-				count( 0 )
-			{}
-		};
+		using DataVectorTypes::Vector2dCount;
 
 		std::vector<Vector2dCount> floorCeilingXY;
 		floorCeilingXY.reserve( zonePoly.NumSurfaceFaces * 6 );
@@ -8962,23 +8956,20 @@ namespace SurfaceGeometry {
 			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor || Surface( curSurfNum ).Class == SurfaceClass_Roof ) {
 				for ( int jVertex = 1; jVertex <= zonePoly.SurfaceFace( iFace ).NSides; ++jVertex ) {
 					Vector curVertex = zonePoly.SurfaceFace( iFace ).FacePoints( jVertex );
-					Vector_2d curXY;
-					curXY.x = curVertex.x;
-					curXY.y = curVertex.y;
-					for ( auto curFloorCeiling : floorCeilingXY ) {
-						Vector_2d curFloorCeilingXY;
-						curFloorCeilingXY.x = curFloorCeiling.x;
-						curFloorCeilingXY.y = curFloorCeiling.x;
-						if ( isAlmostEqual2dPt( curXY, curFloorCeilingXY ) ) {
+					Vector2dCount curXYc;
+					curXYc.x = curVertex.x;
+					curXYc.y = curVertex.y;
+					curXYc.count = 1;
+					bool found = false;
+					for ( Vector2dCount& curFloorCeiling : floorCeilingXY ) { // can't use just "auto" because updating floorCeilingXY
+						if ( isAlmostEqual2dPt( curXYc, curFloorCeiling ) ) { // count ignored in comparison
 							++curFloorCeiling.count;
-						} else {
-							Vector2dCount curXYcount;
-							curXYcount.x = curXY.x;
-							curXYcount.y = curXY.y;
-							curXYcount.count = 1;
-							floorCeilingXY.emplace_back( curXYcount );
+							found = true;
 							break;
 						}
+					}
+					if ( !found ) {
+						floorCeilingXY.emplace_back( curXYc );
 					}
 				}
 			}
@@ -8986,11 +8977,15 @@ namespace SurfaceGeometry {
 		// now make sure every point has been counted and even number of times (usually twice)
 		// if they are then the ceiling and floor are (almost certainly) the same x and y coordinates.
 		bool areFlrAndClgSame = true;
-		for ( auto curFloorCeiling : floorCeilingXY ) {
-			if ( curFloorCeiling.count % 2 != 0 ) {
-				areFlrAndClgSame = false;
-				break;
+		if ( floorCeilingXY.size() > 0 ) {
+			for ( auto curFloorCeiling : floorCeilingXY ) {
+				if ( curFloorCeiling.count % 2 != 0 ) {
+					areFlrAndClgSame = false;
+					break;
+				}
 			}
+		} else {
+			areFlrAndClgSame = false;
 		}
 		return areFlrAndClgSame;
 	}
@@ -9211,6 +9206,21 @@ namespace SurfaceGeometry {
 		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
+
+	// test if two points on a plane are in the same position based on a small tolerance (based on Vector2dCount comparison)
+	bool
+		isAlmostEqual2dPt(
+			DataVectorTypes::Vector2dCount v1,
+			DataVectorTypes::Vector2dCount v2
+		)
+	{
+		// J. Glazer - March 2017
+
+		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
+	}
+
+
 
 	// returns the index of vertex in a list that is in the same position in space as the given vertex
 	int
