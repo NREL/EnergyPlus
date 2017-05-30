@@ -1152,7 +1152,7 @@ namespace PoweredInductionUnits {
 						if ( PltSizHeatNum > 0 ) {
 
 							if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
+								CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
 								CoilOutTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp;
 								CoilOutHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat;
 								DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
@@ -1216,7 +1216,7 @@ namespace PoweredInductionUnits {
 						if ( PltSizHeatNum > 0 ) {
 
 							if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
+								CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
 								CoilOutTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp;
 								CoilOutHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat;
 								DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
