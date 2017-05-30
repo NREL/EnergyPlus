@@ -8535,7 +8535,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Legacy Code
 		//       DATE WRITTEN   1992-1994
-		//       MODIFIED       Sep 2007
+		//       MODIFIED       Sep 2007, Mar 2017
 		//       RE-ENGINEERED  na
 
 		// METHODOLOGY EMPLOYED:
@@ -8755,7 +8755,7 @@ namespace SurfaceGeometry {
 		// if all edges had two counts then it is fully enclosed
 		if ( numEdgesNotUsedTwice == 0 ) {
 			return true;
-		} else if ( numEdgesNotUsedTwice < 3 ) { // less than three means that it is not a colinear point issue
+		} else if ( numEdgesNotUsedTwice % 3 != 0) { // less than three means that it is not a colinear point issue
 			return false;
 		} else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the "other side" of the edge
 				 // Go through all the points looking for the number that are colinear and see if that is consistent with the number of edges found that didn't have a count of two

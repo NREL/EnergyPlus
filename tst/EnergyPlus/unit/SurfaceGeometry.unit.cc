@@ -2408,4 +2408,72 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 
  }
 
+ TEST( SurfaceGeometryUnitTests, isEnclosedVolume_test )
+ {
+	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_test" );
+
+	 DataVectorTypes::Polyhedron zonePoly;
+
+	 zonePoly.NumSurfaceFaces = 6;
+	 zonePoly.SurfaceFace.allocate( 6 );
+
+	 zonePoly.SurfaceFace( 1 ).SurfNum = 1;
+	 zonePoly.SurfaceFace( 1 ).NSides = 4;
+	 zonePoly.SurfaceFace( 1 ).FacePoints.allocate( 4 );
+	 zonePoly.SurfaceFace( 1 ).FacePoints( 1 ) = Vector( 0., 0., 3. );
+	 zonePoly.SurfaceFace( 1 ).FacePoints( 2 ) = Vector( 0., 0., 0. );
+	 zonePoly.SurfaceFace( 1 ).FacePoints( 3 ) = Vector( 10., 0., 0. );
+	 zonePoly.SurfaceFace( 1 ).FacePoints( 4 ) = Vector( 10., 0., 3. );
+
+	 zonePoly.SurfaceFace( 2 ).SurfNum = 2;
+	 zonePoly.SurfaceFace( 2 ).NSides = 4;
+	 zonePoly.SurfaceFace( 2 ).FacePoints.allocate( 4 );
+	 zonePoly.SurfaceFace( 2 ).FacePoints( 1 ) = Vector( 0., 8., 3. );
+	 zonePoly.SurfaceFace( 2 ).FacePoints( 2 ) = Vector( 0., 8., 0. );
+	 zonePoly.SurfaceFace( 2 ).FacePoints( 3 ) = Vector( 0., 0., 0. );
+	 zonePoly.SurfaceFace( 2 ).FacePoints( 4 ) = Vector( 0., 0., 3. );
+
+	 zonePoly.SurfaceFace( 3 ).SurfNum = 3;
+	 zonePoly.SurfaceFace( 3 ).NSides = 4;
+	 zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
+	 zonePoly.SurfaceFace( 3 ).FacePoints( 1 ) = Vector( 10., 8., 3. );
+	 zonePoly.SurfaceFace( 3 ).FacePoints( 2 ) = Vector( 10., 8., 0. );
+	 zonePoly.SurfaceFace( 3 ).FacePoints( 3 ) = Vector( 0., 8., 0. );
+	 zonePoly.SurfaceFace( 3 ).FacePoints( 4 ) = Vector( 0., 8., 3. );
+
+	 zonePoly.SurfaceFace( 4 ).SurfNum = 4;
+	 zonePoly.SurfaceFace( 4 ).NSides = 4;
+	 zonePoly.SurfaceFace( 4 ).FacePoints.allocate( 4 );
+	 zonePoly.SurfaceFace( 4 ).FacePoints( 1 ) = Vector( 10., 0., 3. );
+	 zonePoly.SurfaceFace( 4 ).FacePoints( 2 ) = Vector( 10., 0., 0. );
+	 zonePoly.SurfaceFace( 4 ).FacePoints( 3 ) = Vector( 10., 8., 0. );
+	 zonePoly.SurfaceFace( 4 ).FacePoints( 4 ) = Vector( 10., 8., 3. );
+
+	 zonePoly.SurfaceFace( 5 ).SurfNum = 1;
+	 zonePoly.SurfaceFace( 5 ).NSides = 4;
+	 zonePoly.SurfaceFace( 5 ).FacePoints.allocate( 4 );
+	 zonePoly.SurfaceFace( 5 ).FacePoints( 1 ) = Vector( 0., 0., 0. );
+	 zonePoly.SurfaceFace( 5 ).FacePoints( 2 ) = Vector( 0., 8, 0. );
+	 zonePoly.SurfaceFace( 5 ).FacePoints( 3 ) = Vector( 10., 8, 0. );
+	 zonePoly.SurfaceFace( 5 ).FacePoints( 4 ) = Vector( 10., 0, 0. );
+
+	 zonePoly.SurfaceFace( 6 ).SurfNum = 2;
+	 zonePoly.SurfaceFace( 6 ).NSides = 4;
+	 zonePoly.SurfaceFace( 6 ).FacePoints.allocate( 4 );
+	 zonePoly.SurfaceFace( 6 ).FacePoints( 1 ) = Vector( 0., 8., 3. );
+	 zonePoly.SurfaceFace( 6 ).FacePoints( 2 ) = Vector( 0., 0., 3. );
+	 zonePoly.SurfaceFace( 6 ).FacePoints( 3 ) = Vector( 10., 0., 3. );
+	 zonePoly.SurfaceFace( 6 ).FacePoints( 4 ) = Vector( 10., 8., 3. );
+
+	 EXPECT_TRUE( isEnclosedVolume( zonePoly ) ) ;
+
+	 // leave gap
+	 zonePoly.SurfaceFace( 1 ).FacePoints( 3 ) = Vector( 9., 0., 0. );
+	 EXPECT_FALSE( isEnclosedVolume( zonePoly ) );
+
+
+
+ }
+
+
 
