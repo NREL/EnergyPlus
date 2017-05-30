@@ -582,49 +582,5 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
 	EXPECT_NEAR( 25.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
 
-	DataHeatBalance::ZoneIntGain.deallocate( );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.deallocate( );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.deallocate( );
-	DataZoneEquipment::ZoneEquipConfig.deallocate( );
-	DataLoopNode::Node.deallocate( );
-	DataHeatBalance::TempEffBulkAir.deallocate( );
-	DataHeatBalSurface::TempSurfInTmp.deallocate( );
-	DataHeatBalance::HConvIn.deallocate( );
-	DataHeatBalFanSys::ZoneAirHumRat.deallocate( );
-	DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate( );
-	DataHeatBalFanSys::MAT.deallocate( );
-	DataHeatBalFanSys::QHTRadSysSurf.deallocate( );
-	DataHeatBalFanSys::QHWBaseboardSurf.deallocate( );
-	DataHeatBalFanSys::QSteamBaseboardSurf.deallocate( );
-	DataHeatBalFanSys::QElecBaseboardSurf.deallocate( );
-	DataHeatBalance::QRadSWwinAbs.deallocate( );
-	DataHeatBalance::QRadThermInAbs.deallocate( );
-	DataHeatBalance::QRadSWOutIncident.deallocate( );
-	DataSurfaces::WinTransSolar.deallocate( );
-	DataHeatBalance::ZoneWinHeatGain.deallocate( );
-	DataHeatBalance::ZoneWinHeatGainRep.deallocate( );
-	DataHeatBalance::ZoneWinHeatGainRepEnergy.deallocate( );
-	DataSurfaces::WinHeatGain.deallocate( );
-	DataSurfaces::WinHeatTransfer.deallocate( );
-	DataSurfaces::WinGainConvGlazToZoneRep.deallocate( );
-	DataSurfaces::WinGainIRGlazToZoneRep.deallocate( );
-	DataSurfaces::WinGapConvHtFlowRep.deallocate( );
-	DataSurfaces::WinGapConvHtFlowRepEnergy.deallocate( );
-	DataHeatBalance::QS.deallocate( );
-	DataSurfaces::WinLossSWZoneToOutWinRep.deallocate( );
-	DataSurfaces::WinSysSolTransmittance.deallocate( );
-	DataSurfaces::WinSysSolAbsorptance.deallocate( );
-	DataSurfaces::WinSysSolReflectance.deallocate( );
-	DataSurfaces::InsideGlassCondensationFlag.deallocate( );
-	DataSurfaces::WinGainFrameDividerToZoneRep.deallocate( );
-	DataSurfaces::InsideFrameCondensationFlag.deallocate( );
-	DataSurfaces::InsideDividerCondensationFlag.deallocate( );
-	DataHeatBalSurface::QdotConvOutRep.deallocate( );
-	DataHeatBalSurface::QdotConvOutRepPerArea.deallocate( );
-	DataHeatBalSurface::QConvOutReport.deallocate( );
-	DataHeatBalSurface::QdotRadOutRep.deallocate( );
-	DataHeatBalSurface::QdotRadOutRepPerArea.deallocate( );
-	DataHeatBalSurface::QRadOutReport.deallocate( );
-
 }
 
