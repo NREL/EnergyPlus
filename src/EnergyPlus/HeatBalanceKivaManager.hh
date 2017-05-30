@@ -58,9 +58,20 @@
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
 
+const int KIVAZONE_UNCONTROLLED = 0;
+const int KIVAZONE_TEMPCONTROL = 1;
+const int KIVAZONE_COMFORTCONTROL = 2;
+const int KIVAZONE_STAGEDCONTROL = 3;
+
 class KivaWeatherData {
 public:
+	int intervalsPerHour;
+
 	Real64 annualAverageDrybulbTemp;
+	std::vector<Real64> dryBulb;
+	std::vector<Real64> windSpeed;
+	std::vector<Real64> skyEmissivity;
+
 };
 
 class FoundationKiva
@@ -94,13 +105,22 @@ public:
 	int floorSurface;
 	std::vector< int > wallSurfaces;
 	int zoneNum;
-	void initGround();
+	int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
+	int zoneControlNum;
+	void initGround(const KivaWeatherData& kivaWeather);
+	void setInitialBoundaryConditions(
+		const KivaWeatherData& kivaWeather,
+		const int date,
+		const int hour,
+		const int timestep
+	);
 	void setBoundaryConditions();
 	void reportKivaSurfaces();
 	void plotDomain();
 	Kiva::BoundaryConditions bcs;
 	Real64 weightedPerimeter;
 	int constructionNum;
+
 };
 
 class KivaManager

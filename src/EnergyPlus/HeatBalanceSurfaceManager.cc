@@ -3820,6 +3820,12 @@ namespace HeatBalanceSurfaceManager {
 							EMSConstructActuatorChecked( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = true;
 							EMSConstructActuatorIsOkay( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = false;
 
+						} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_Kiva ) { // don't allow
+							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with Foundation Outside Boundary Condition." );
+							ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
+							EMSConstructActuatorChecked( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = true;
+							EMSConstructActuatorIsOkay( Surface( SurfNum ).EMSConstructionOverrideValue, SurfNum ) = false;
+
 						}
 
 					} else {
@@ -5287,7 +5293,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			if ( SumSysMCp > 0.0 ) { // protect div by zero
 				RefAirTemp( SurfNum ) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
 			} else {
-				RefAirTemp( SurfNum ) = NodeTemp;
+				RefAirTemp( SurfNum ) = MAT( ZoneNum );
 			}
 			TempEffBulkAir( SurfNum ) = RefAirTemp( SurfNum ); // for reporting surf adjacent air temp
 		} else {

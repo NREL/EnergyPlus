@@ -106,18 +106,27 @@ TEST_F( EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest )
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).HeatRecActive = true;
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).CondenserType = ChillerElectricEIR::WaterCooled;
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).CWLoopNum = 1;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CDLoopNum = 2;
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).EvapVolFlowRate = 1.0;
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).CondVolFlowRate = 1.0;
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).RefCap = 10000;
 	ChillerElectricEIR::ElectricEIRChiller( 1 ).RefCOP = 3.0;
 
-	DataPlant::PlantLoop.allocate( 1 );
-	DataSizing::PlantSizData.allocate( 1 );
+	DataPlant::PlantLoop.allocate( 2 );
+	DataSizing::PlantSizData.allocate( 2 );
+	// chilled water loop
 	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
 	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
 	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
 	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
 	DataSizing::PlantSizData( 1 ).DeltaT = 5.0;
+	// condenser water loop
+	DataPlant::PlantLoop( 2 ).PlantSizNum = 2;
+	DataPlant::PlantLoop( 2 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 2 ).FluidName = "WATER";
+	DataSizing::PlantSizData( 2 ).DesVolFlowRate = 1.0;
+	DataSizing::PlantSizData( 2 ).DeltaT = 5.0;
+
 	DataPlant::PlantFirstSizesOkayToFinalize = true;
 
 	//now call sizing routine
