@@ -2410,7 +2410,7 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 
  TEST( SurfaceGeometryUnitTests, isEnclosedVolume_SimpleBox_test )
  {
-	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_test" );
+	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_SimpleBox_test" );
 
 	 DataVectorTypes::Polyhedron zonePoly;
 
@@ -2475,7 +2475,7 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 
  TEST( SurfaceGeometryUnitTests, isEnclosedVolume_BoxWithSplitSide_test )
  {
-	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_test" );
+	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_BoxWithSplitSide_test" );
 
 	 DataVectorTypes::Polyhedron zonePoly;
 
@@ -2549,5 +2549,365 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
  }
 
 
+TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test )
+{
+	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test" );
+	 using DataGlobals::NumOfZones;
+
+	 bool foundError;
+	 Array1D_bool enteredCeilingHeight;
+	 NumOfZones = 1;
+	 enteredCeilingHeight.dimension( NumOfZones, false );
+	 Zone.dimension( NumOfZones );
+	 Zone( 1 ).HasFloor = true;
+	 Zone( 1 ).SurfaceFirst = 1;
+	 Zone( 1 ).SurfaceLast = 6;
+
+	 Surface.dimension( 6 );
+
+	 Surface( 1 ).Sides = 4;
+	 Surface( 1 ).Vertex.dimension( 4 );
+	 Surface( 1 ).Class = SurfaceClass_Wall;
+	 Surface( 1 ).Tilt = 90.;
+	 Surface( 1 ).Vertex( 1 ) = Vector( 0., 0., 3. );
+	 Surface( 1 ).Vertex( 2 ) = Vector( 0., 0., 0. );
+	 Surface( 1 ).Vertex( 3 ) = Vector( 10., 0., 0. );
+	 Surface( 1 ).Vertex( 4 ) = Vector( 10., 0., 3. );
+
+	 Surface( 2 ).Sides = 4;
+	 Surface( 2 ).Vertex.dimension( 4 );
+	 Surface( 2 ).Class = SurfaceClass_Wall;
+	 Surface( 2 ).Tilt = 90.;
+	 Surface( 2 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	 Surface( 2 ).Vertex( 2 ) = Vector( 0., 8., 0. );
+	 Surface( 2 ).Vertex( 3 ) = Vector( 0., 0., 0. );
+	 Surface( 2 ).Vertex( 4 ) = Vector( 0., 0., 3. );
+
+	 Surface( 3 ).Sides = 4;
+	 Surface( 3 ).Vertex.dimension( 4 );
+	 Surface( 3 ).Class = SurfaceClass_Wall;
+	 Surface( 3 ).Tilt = 90.;
+	 Surface( 3 ).Vertex( 1 ) = Vector( 10., 8., 3. );
+	 Surface( 3 ).Vertex( 2 ) = Vector( 10., 8., 0. );
+	 Surface( 3 ).Vertex( 3 ) = Vector( 0., 8., 0. );
+	 Surface( 3 ).Vertex( 4 ) = Vector( 0., 8., 3. );
+
+	 Surface( 4 ).Sides = 4;
+	 Surface( 4 ).Vertex.dimension( 4 );
+	 Surface( 4 ).Class = SurfaceClass_Wall;
+	 Surface( 4 ).Tilt = 90.;
+	 Surface( 4 ).Vertex( 1 ) = Vector( 10., 0., 3. );
+	 Surface( 4 ).Vertex( 2 ) = Vector( 10., 0., 0. );
+	 Surface( 4 ).Vertex( 3 ) = Vector( 10., 8., 0. );
+	 Surface( 4 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	 Surface( 5 ).Sides = 4;
+	 Surface( 5 ).Vertex.dimension( 4 );
+	 Surface( 5 ).Class = SurfaceClass_Floor;
+	 Surface( 5 ).Tilt = 180.;
+	 Surface( 5 ).Vertex( 1 ) = Vector( 0., 0., 0. );
+	 Surface( 5 ).Vertex( 2 ) = Vector( 0., 8, 0. );
+	 Surface( 5 ).Vertex( 3 ) = Vector( 10., 8, 0. );
+	 Surface( 5 ).Vertex( 4 ) = Vector( 10., 0, 0. );
+
+	 Surface( 6 ).Sides = 4;
+	 Surface( 6 ).Vertex.dimension( 4 );
+	 Surface( 6 ).Class = SurfaceClass_Roof;
+	 Surface( 6 ).Tilt = 0.;
+	 Surface( 6 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	 Surface( 6 ).Vertex( 2 ) = Vector( 0., 0., 3. );
+	 Surface( 6 ).Vertex( 3 ) = Vector( 10., 0., 3. );
+	 Surface( 6 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	 foundError = false;
+	 CalculateZoneVolume( foundError, enteredCeilingHeight );
+	 EXPECT_EQ( 240., Zone(1).Volume );
+	 EXPECT_FALSE( foundError );
+
+
+ }
+
+TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test" );
+	using DataGlobals::NumOfZones;
+
+	bool foundError;
+	Array1D_bool enteredCeilingHeight;
+	NumOfZones = 1;
+	enteredCeilingHeight.dimension( NumOfZones, false );
+	Zone.dimension( NumOfZones );
+	Zone( 1 ).HasFloor = true;
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 5;
+
+	Surface.dimension( 5 );
+
+	Surface( 1 ).Sides = 4;
+	Surface( 1 ).Vertex.dimension( 4 );
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).Tilt = 90.;
+	Surface( 1 ).Vertex( 1 ) = Vector( 0., 0., 3. );
+	Surface( 1 ).Vertex( 2 ) = Vector( 0., 0., 0. );
+	Surface( 1 ).Vertex( 3 ) = Vector( 10., 0., 0. );
+	Surface( 1 ).Vertex( 4 ) = Vector( 10., 0., 3. );
+
+	Surface( 2 ).Sides = 4;
+	Surface( 2 ).Vertex.dimension( 4 );
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).Tilt = 90.;
+	Surface( 2 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	Surface( 2 ).Vertex( 2 ) = Vector( 0., 8., 0. );
+	Surface( 2 ).Vertex( 3 ) = Vector( 0., 0., 0. );
+	Surface( 2 ).Vertex( 4 ) = Vector( 0., 0., 3. );
+
+	Surface( 3 ).Sides = 4;
+	Surface( 3 ).Vertex.dimension( 4 );
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).Tilt = 90.;
+	Surface( 3 ).Vertex( 1 ) = Vector( 10., 8., 3. );
+	Surface( 3 ).Vertex( 2 ) = Vector( 10., 8., 0. );
+	Surface( 3 ).Vertex( 3 ) = Vector( 0., 8., 0. );
+	Surface( 3 ).Vertex( 4 ) = Vector( 0., 8., 3. );
+
+	Surface( 4 ).Sides = 4;
+	Surface( 4).Vertex.dimension( 4 );
+	Surface( 4 ).Class = SurfaceClass_Floor;
+	Surface( 4 ).Tilt = 180.;
+	Surface( 4 ).Vertex( 1 ) = Vector( 0., 0., 0. );
+	Surface( 4 ).Vertex( 2 ) = Vector( 0., 8, 0. );
+	Surface( 4 ).Vertex( 3 ) = Vector( 10., 8, 0. );
+	Surface( 4 ).Vertex( 4 ) = Vector( 10., 0, 0. );
+
+	Surface( 5 ).Sides = 4;
+	Surface( 5 ).Vertex.dimension( 4 );
+	Surface( 5 ).Class = SurfaceClass_Roof;
+	Surface( 5 ).Tilt = 0.;
+	Surface( 5 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	Surface( 5 ).Vertex( 2 ) = Vector( 0., 0., 3. );
+	Surface( 5 ).Vertex( 3 ) = Vector( 10., 0., 3. );
+	Surface( 5 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	foundError = false;
+
+	Zone( 1 ).FloorArea = 80.;
+	Zone( 1 ).CeilingHeight = 3.;
+
+	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	EXPECT_EQ( 240., Zone( 1 ).Volume );
+	EXPECT_FALSE( foundError );
+
+}
+
+
+TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test" );
+	using DataGlobals::NumOfZones;
+
+	bool foundError;
+	Array1D_bool enteredCeilingHeight;
+	NumOfZones = 1;
+	enteredCeilingHeight.dimension( NumOfZones, false );
+	Zone.dimension( NumOfZones );
+	Zone( 1 ).HasFloor = true;
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 5;
+
+	Surface.dimension( 5 );
+
+	Surface( 1 ).Sides = 4;
+	Surface( 1 ).Vertex.dimension( 4 );
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).Tilt = 90.;
+	Surface( 1 ).Vertex( 1 ) = Vector( 0., 0., 3. );
+	Surface( 1 ).Vertex( 2 ) = Vector( 0., 0., 0. );
+	Surface( 1 ).Vertex( 3 ) = Vector( 10., 0., 0. );
+	Surface( 1 ).Vertex( 4 ) = Vector( 10., 0., 3. );
+
+	Surface( 2 ).Sides = 4;
+	Surface( 2 ).Vertex.dimension( 4 );
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).Tilt = 90.;
+	Surface( 2 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	Surface( 2 ).Vertex( 2 ) = Vector( 0., 8., 0. );
+	Surface( 2 ).Vertex( 3 ) = Vector( 0., 0., 0. );
+	Surface( 2 ).Vertex( 4 ) = Vector( 0., 0., 3. );
+
+	Surface( 3 ).Sides = 4;
+	Surface( 3 ).Vertex.dimension( 4 );
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).Tilt = 90.;
+	Surface( 3 ).Vertex( 1 ) = Vector( 10., 8., 3. );
+	Surface( 3 ).Vertex( 2 ) = Vector( 10., 8., 0. );
+	Surface( 3 ).Vertex( 3 ) = Vector( 0., 8., 0. );
+	Surface( 3 ).Vertex( 4 ) = Vector( 0., 8., 3. );
+
+	Surface( 4 ).Sides = 4;
+	Surface( 4 ).Vertex.dimension( 4 );
+	Surface( 4 ).Class = SurfaceClass_Wall;
+	Surface( 4 ).Tilt = 90.;
+	Surface( 4 ).Vertex( 1 ) = Vector( 10., 0., 3. );
+	Surface( 4 ).Vertex( 2 ) = Vector( 10., 0., 0. );
+	Surface( 4 ).Vertex( 3 ) = Vector( 10., 8., 0. );
+	Surface( 4 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	Surface( 5 ).Sides = 4;
+	Surface( 5 ).Vertex.dimension( 4 );
+	Surface( 5 ).Class = SurfaceClass_Floor;
+	Surface( 5 ).Tilt = 180.;
+	Surface( 5 ).Vertex( 1 ) = Vector( 0., 0., 0. );
+	Surface( 5 ).Vertex( 2 ) = Vector( 0., 8, 0. );
+	Surface( 5 ).Vertex( 3 ) = Vector( 10., 8, 0. );
+	Surface( 5 ).Vertex( 4 ) = Vector( 10., 0, 0. );
+
+	foundError = false;
+
+	Zone( 1 ).FloorArea = 80.;
+	Zone( 1 ).CeilingHeight =  3.;
+
+	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	EXPECT_EQ( 240., Zone( 1 ).Volume );
+	EXPECT_FALSE( foundError );
+
+
+}
+
+TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test" );
+	using DataGlobals::NumOfZones;
+
+	bool foundError;
+	Array1D_bool enteredCeilingHeight;
+	NumOfZones = 1;
+	enteredCeilingHeight.dimension( NumOfZones, false );
+	Zone.dimension( NumOfZones );
+	Zone( 1 ).HasFloor = true;
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 5;
+
+	Surface.dimension( 5 );
+
+	Surface( 1 ).Sides = 4;
+	Surface( 1 ).Vertex.dimension( 4 );
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).Tilt = 90.;
+	Surface( 1 ).Vertex( 1 ) = Vector( 0., 0., 3. );
+	Surface( 1 ).Vertex( 2 ) = Vector( 0., 0., 0. );
+	Surface( 1 ).Vertex( 3 ) = Vector( 10., 0., 0. );
+	Surface( 1 ).Vertex( 4 ) = Vector( 10., 0., 3. );
+
+	Surface( 2 ).Sides = 4;
+	Surface( 2 ).Vertex.dimension( 4 );
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).Tilt = 90.;
+	Surface( 2 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	Surface( 2 ).Vertex( 2 ) = Vector( 0., 8., 0. );
+	Surface( 2 ).Vertex( 3 ) = Vector( 0., 0., 0. );
+	Surface( 2 ).Vertex( 4 ) = Vector( 0., 0., 3. );
+
+	Surface( 3 ).Sides = 4;
+	Surface( 3 ).Vertex.dimension( 4 );
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).Tilt = 90.;
+	Surface( 3 ).Vertex( 1 ) = Vector( 10., 8., 3. );
+	Surface( 3 ).Vertex( 2 ) = Vector( 10., 8., 0. );
+	Surface( 3 ).Vertex( 3 ) = Vector( 0., 8., 0. );
+	Surface( 3 ).Vertex( 4 ) = Vector( 0., 8., 3. );
+
+	Surface( 4 ).Sides = 4;
+	Surface( 4 ).Vertex.dimension( 4 );
+	Surface( 4 ).Class = SurfaceClass_Wall;
+	Surface( 4 ).Tilt = 90.;
+	Surface( 4 ).Vertex( 1 ) = Vector( 10., 0., 3. );
+	Surface( 4 ).Vertex( 2 ) = Vector( 10., 0., 0. );
+	Surface( 4 ).Vertex( 3 ) = Vector( 10., 8., 0. );
+	Surface( 4 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	Surface( 5 ).Sides = 4;
+	Surface( 5 ).Vertex.dimension( 4 );
+	Surface( 5 ).Class = SurfaceClass_Roof;
+	Surface( 5 ).Tilt = 0.;
+	Surface( 5 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	Surface( 5 ).Vertex( 2 ) = Vector( 0., 0., 3. );
+	Surface( 5 ).Vertex( 3 ) = Vector( 10., 0., 3. );
+	Surface( 5 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	foundError = false;
+
+	Zone( 1 ).CeilingArea = 80.;
+	Zone( 1 ).CeilingHeight = 3.;
+
+	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	EXPECT_EQ( 240., Zone( 1 ).Volume );
+	EXPECT_FALSE( foundError );
+}
+
+TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
+{
+	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test" );
+	using DataGlobals::NumOfZones;
+
+	bool foundError;
+	Array1D_bool enteredCeilingHeight;
+	NumOfZones = 1;
+	enteredCeilingHeight.dimension( NumOfZones, false );
+	Zone.dimension( NumOfZones );
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 4;
+
+	Surface.dimension( 4 );
+
+	Surface( 1 ).Sides = 4;
+	Surface( 1 ).Vertex.dimension( 4 );
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).Tilt = 90.;
+	Surface( 1 ).Azimuth = 180.; 
+	Surface( 1 ).Area = 30.;
+	Surface( 1 ).Vertex( 1 ) = Vector( 0., 0., 3. );
+	Surface( 1 ).Vertex( 2 ) = Vector( 0., 0., 0. );
+	Surface( 1 ).Vertex( 3 ) = Vector( 10., 0., 0. );
+	Surface( 1 ).Vertex( 4 ) = Vector( 10., 0., 3. );
+
+	Surface( 2 ).Sides = 4;
+	Surface( 2 ).Vertex.dimension( 4 );
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).Tilt = 90.;
+	Surface( 2 ).Azimuth = 270.;
+	Surface( 2 ).Area = 24.;
+	Surface( 2 ).Vertex( 1 ) = Vector( 0., 8., 3. );
+	Surface( 2 ).Vertex( 2 ) = Vector( 0., 8., 0. );
+	Surface( 2 ).Vertex( 3 ) = Vector( 0., 0., 0. );
+	Surface( 2 ).Vertex( 4 ) = Vector( 0., 0., 3. );
+
+	Surface( 3 ).Sides = 4;
+	Surface( 3 ).Vertex.dimension( 4 );
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).Tilt = 90.;
+	Surface( 3 ).Azimuth = 0.;
+	Surface( 3 ).Area = 30.;
+	Surface( 3 ).Vertex( 1 ) = Vector( 10., 8., 3. );
+	Surface( 3 ).Vertex( 2 ) = Vector( 10., 8., 0. );
+	Surface( 3 ).Vertex( 3 ) = Vector( 0., 8., 0. );
+	Surface( 3 ).Vertex( 4 ) = Vector( 0., 8., 3. );
+
+	Surface( 4 ).Sides = 4;
+	Surface( 4 ).Vertex.dimension( 4 );
+	Surface( 4 ).Class = SurfaceClass_Wall;
+	Surface( 4 ).Tilt = 90.;
+	Surface( 4 ).Azimuth = 90.;
+	Surface( 4 ).Area = 24.;
+	Surface( 4 ).Vertex( 1 ) = Vector( 10., 0., 3. );
+	Surface( 4 ).Vertex( 2 ) = Vector( 10., 0., 0. );
+	Surface( 4 ).Vertex( 3 ) = Vector( 10., 8., 0. );
+	Surface( 4 ).Vertex( 4 ) = Vector( 10., 8., 3. );
+
+	foundError = false;
+
+	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	EXPECT_EQ( 240., Zone( 1 ).Volume );
+	EXPECT_FALSE( foundError );
+}
 
 
